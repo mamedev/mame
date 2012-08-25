@@ -296,6 +296,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
+#include "machine/s3520cf.h"
 #include "video/m50458.h"
 #include "includes/snes.h"
 #include "rendlay.h"
@@ -306,10 +307,12 @@ class nss_state : public snes_state
 public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag),
-		m_m50458(*this,"m50458")
+		m_m50458(*this,"m50458"),
+		m_s3520cf(*this, "s3520cf")
 		{ }
 
 	required_device<m50458_device> m_m50458;
+	required_device<s3520cf_device> m_s3520cf;
 	UINT8 m_wram_wp_flag;
 	UINT8 *m_wram;
 	UINT8 m_nmi_enable;
@@ -540,7 +543,7 @@ WRITE8_MEMBER(nss_state::rtc_osd_w)
 	---- --x-  RTC Direction     (0=Low=Write,  1=High=Read)
 	---- ---x  RTC /CS           (0=Low/Select, 1=High/No)
 */
-	/* TODO */
+//	printf("%02x\n",data & 0xf);
 	ioport("RTC_OSD")->write(data, 0xff);
 }
 
@@ -550,6 +553,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(rtc_osd_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("RTC")
 
 	AM_RANGE(0x72, 0x72) AM_WRITE(rtc_osd_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(port_00_w)
@@ -608,9 +612,17 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 
 	PORT_START("RTC_OSD")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_clock_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_clock_line)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, write_bit)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_cs_line)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_dir_line)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_cs_line)
+
+	PORT_START("RTC")
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
 
 	PORT_START("SERIAL1_DATA1_L")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
@@ -771,6 +783,9 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_CPU_IO_MAP(bios_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nss_vblank_irq)
 
+	MCFG_M50458_ADD("m50458",4000000) /* TODO: clock */
+	MCFG_S3520CF_ADD("s3520cf") /* RTC */
+
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -782,8 +797,6 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
 
 	MCFG_EEPROM_ADD("eeprom", nss_eeprom_intf)
-
-	MCFG_M50458_ADD("m50458",4000000) /* TODO: clock */
 
 	MCFG_MACHINE_START( nss )
 MACHINE_CONFIG_END

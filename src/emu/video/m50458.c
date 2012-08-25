@@ -2,6 +2,8 @@
 
 Mitsubishi M50458 OSD chip
 
+preliminary device by Angelo Salese
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -19,6 +21,7 @@ const device_type M50458 = &device_creator<m50458_device>;
 static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
 	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
+	AM_RANGE(0x024c, 0x024d) AM_WRITE(vreg_126_w)
 	AM_RANGE(0x024e, 0x024f) AM_WRITE(vreg_127_w)
 ADDRESS_MAP_END
 
@@ -30,7 +33,14 @@ ROM_END
 
 WRITE16_MEMBER( m50458_device::vreg_120_w)
 {
+	// ...
 }
+
+WRITE16_MEMBER( m50458_device::vreg_126_w)
+{
+	// ...
+}
+
 
 WRITE16_MEMBER( m50458_device::vreg_127_w)
 {

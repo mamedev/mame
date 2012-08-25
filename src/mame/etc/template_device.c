@@ -14,7 +14,7 @@ Template for skeleton device
 //**************************************************************************
 
 // device type definition
-const device_type xxx = &device_creator<xxx_device>;
+const device_type XXX = &device_creator<xxx_device>;
 
 
 //**************************************************************************
@@ -26,7 +26,7 @@ const device_type xxx = &device_creator<xxx_device>;
 //-------------------------------------------------
 
 xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, xxx, "xxx", tag, owner, clock)
+	: device_t(mconfig, XXX, "xxx", tag, owner, clock)
 {
 
 }

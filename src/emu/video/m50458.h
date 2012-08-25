@@ -29,11 +29,6 @@ typedef enum
 	OSD_SET_DATA
 } m50458_state_t;
 
-typedef struct
-{
-	UINT8 r,g,b;
-} m50458_bg_t;
-
 // ======================> m50458_device
 
 class m50458_device :	public device_t,
@@ -48,6 +43,7 @@ public:
 	WRITE_LINE_MEMBER( set_cs_line );
 	WRITE_LINE_MEMBER( set_clock_line );
 	DECLARE_WRITE16_MEMBER(vreg_120_w);
+	DECLARE_WRITE16_MEMBER(vreg_126_w);
 	DECLARE_WRITE16_MEMBER(vreg_127_w);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -66,9 +62,9 @@ protected:
 	UINT16 m_current_cmd;
 	int m_cmd_stream_pos;
 	UINT16 m_osd_addr;
+	UINT8 m_bg_pen;
 
 	m50458_state_t m_osd_state;
-	m50458_bg_t m_m50458_bg;
 
 private:
 	inline UINT16 read_word(offs_t address);
