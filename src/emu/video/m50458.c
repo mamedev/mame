@@ -230,10 +230,15 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					UINT8 r,g,b;
 					UINT16 offset = ((tile & 0x7f)*36+yi*2);
 
+					/* TODO: blinking, bit 7 (RTC test in NSS) */
+
 					if(xi>=8)
 						pix = (pcg[offset+1] >> (7-(xi & 0x7))) & 1;
 					else
 						pix = (pcg[offset+0] >> (7-(xi & 0x7))) & 1;
+
+					if(yi == 17 && tile & 0x1000) /* underline? */
+						pix |= 1;
 
 					r = (tile & 0x100 && pix) ? 0xff : 0x00;
 					g = (tile & 0x200 && pix) ? 0xff : 0x00;
