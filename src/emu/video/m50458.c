@@ -18,6 +18,7 @@ const device_type M50458 = &device_creator<m50458_device>;
 
 static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
+	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
 	AM_RANGE(0x024e, 0x024f) AM_WRITE(vreg_127_w)
 ADDRESS_MAP_END
 
@@ -26,6 +27,10 @@ ROM_START( m50458 )
 	ROM_REGION( 0x1200, "m50458", 0 )
 	ROM_LOAD("m50458_char.bin",     0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) )
 ROM_END
+
+WRITE16_MEMBER( m50458_device::vreg_120_w)
+{
+}
 
 WRITE16_MEMBER( m50458_device::vreg_127_w)
 {
@@ -93,7 +98,7 @@ m50458_device::m50458_device(const machine_config &mconfig, const char *tag, dev
 	  device_memory_interface(mconfig, *this),
 	  m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(m50458_vram))
 {
-
+	m_shortname = "m50458";
 }
 
 
@@ -173,6 +178,7 @@ WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 						m_osd_state = OSD_SET_DATA;
 						break;
 					case OSD_SET_DATA:
+						//if(m_osd_addr >= 0x120)
 						//printf("%04x %04x\n",m_osd_addr,m_current_cmd);
 						write_word(m_osd_addr,m_current_cmd);
 						m_osd_addr++;
