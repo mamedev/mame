@@ -297,6 +297,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "machine/s3520cf.h"
+#include "machine/rp5h01.h"
 #include "video/m50458.h"
 #include "includes/snes.h"
 #include "rendlay.h"
@@ -308,14 +309,17 @@ public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag),
 		m_m50458(*this,"m50458"),
-		m_s3520cf(*this, "s3520cf")
+		m_s3520cf(*this, "s3520cf"),
+		m_rp5h01(*this,"rp5h01")
 		{ }
 
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
+	required_device<rp5h01_device> m_rp5h01;
 	UINT8 m_wram_wp_flag;
 	UINT8 *m_wram;
 	UINT8 m_nmi_enable;
+	UINT8 m_cart_sel;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
@@ -325,6 +329,9 @@ public:
 	DECLARE_READ8_MEMBER(ram_wp_r);
 	DECLARE_WRITE8_MEMBER(ram_wp_w);
 	DECLARE_WRITE8_MEMBER(rtc_osd_w);
+	DECLARE_WRITE8_MEMBER(port_01_w);
+	DECLARE_READ8_MEMBER(nss_prot_r);
+	DECLARE_WRITE8_MEMBER(nss_prot_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 };
 
@@ -384,9 +391,13 @@ bp 6bf9 EEPROM read
 bp 6f8d check the EEPROM2 results
 870d EEPROM2 result of checksum
 
-bp 6dce onward looks bogus, but it's probably the way it's intended to be
+New notes:
 
-M50458 charset is checked at 1382, a word checksum is provided at offsets 0xffe-0xfff of the given ROM
+0x3a7 is the protection check
+
+0x8000 work RAM is for cart 1
+0x8100 work RAM is for cart 2
+0x8200 work RAM is for cart 3
 
 */
 /*
@@ -470,16 +481,37 @@ WRITE8_MEMBER(nss_state::ram_wp_w)
 		m_wram[offset] = data;
 }
 
+
+READ8_MEMBER(nss_state::nss_prot_r)
+{
+	int data = 0xe7;
+
+	if (m_cart_sel == 0)
+	{
+		rp5h01_enable_w(m_rp5h01, 0, 0);
+		data |= ((~rp5h01_counter_r(m_rp5h01, 0)) << 4) & 0x10;	/* D4 */
+		data |= ((rp5h01_data_r(m_rp5h01, 0)) << 3) & 0x08;		/* D3 */
+		rp5h01_enable_w(m_rp5h01, 0, 1);
+	}
+	return data;
+}
+
+WRITE8_MEMBER(nss_state::nss_prot_w)
+{
+
+	if (m_cart_sel == 0)
+	{
+		rp5h01_enable_w(m_rp5h01, 0, 0);
+		rp5h01_test_w(m_rp5h01, 0, data & 0x10);		/* D4 */
+		rp5h01_clock_w(m_rp5h01, 0, data & 0x08);		/* D3 */
+		rp5h01_reset_w(m_rp5h01, 0, ~data & 0x01);	/* D0, check me */
+		rp5h01_enable_w(m_rp5h01, 0, 1);
+	}
+	//ioport("EEPROMOUT")->write(data, 0xff);
+}
+
 WRITE8_MEMBER(nss_state::eeprom_w)
 {
-/*
-	x--- ----   Unknown/set     (should be always 1) (EEPROM Reset (active low)?)
-	-xx- ---- Unknown/unused  (should be always 0)
-	---x ----   EEPROM Clock    (0=Low=Clock, 1=High=Idle) ;(Data In/Out must be stable
-	---- x---   EEPROM Data Out (0=Low=Zero, 1=High=One)   ;on raising CLK edge)
-	---- -xx- Unknown/unused  (should be always 0)       ;(and updated on falling edge)
-	---- ---x   EEPROM Select   (0=High=No, 1=Low=Select)
-*/
 	ioport("EEPROMOUT")->write(data, 0xff);
 }
 
@@ -490,6 +522,8 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("EEPROMIN")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_REGION("ibios_rom", 0x6000 )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(eeprom_w)
+	AM_RANGE(0xe000, 0xffff) AM_READ(nss_prot_r)
+	AM_RANGE(0xe001, 0xffff) AM_WRITE(nss_prot_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(nss_state::port_00_r)
@@ -506,7 +540,8 @@ READ8_MEMBER(nss_state::port_00_r)
 */
 	UINT8 res;
 
-	res = (machine().primary_screen->vblank() & 1) << 6;
+	res = 0 << 7;
+	res|= (machine().primary_screen->vblank() & 1) << 6;
 	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x80) >> 7) << 5);
 	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x80) >> 7) << 4);
 	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x08) >> 3) << 3);
@@ -547,6 +582,11 @@ WRITE8_MEMBER(nss_state::rtc_osd_w)
 	ioport("RTC_OSD")->write(data, 0xff);
 }
 
+WRITE8_MEMBER(nss_state::port_01_w)
+{
+	m_cart_sel = (data & 0xc) >> 2;
+}
+
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	/* TODO: I think that this actually masks to 0x7? */
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -557,6 +597,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 
 	AM_RANGE(0x72, 0x72) AM_WRITE(rtc_osd_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(port_00_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(port_01_w)
 	AM_RANGE(0x82, 0x82) AM_WRITE(rtc_osd_w)
 	AM_RANGE(0xea, 0xea) AM_WRITE(rtc_osd_w)
 ADDRESS_MAP_END
@@ -785,6 +826,7 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 
 	MCFG_M50458_ADD("m50458",4000000) /* TODO: clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
+	MCFG_RP5H01_ADD("rp5h01")
 
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
