@@ -49,7 +49,10 @@ class ip20_state : public driver_device
 {
 public:
 	ip20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_wd33c93(*this, "wd33c93"){ }
+
+	required_device<wd33c93_device> m_wd33c93;
 
 	HPC_t m_HPC;
 	RTC_t m_RTC;
@@ -131,7 +134,7 @@ READ32_MEMBER(ip20_state::hpc_r)
 	case 0x0120:
 		if (ACCESSING_BITS_8_15)
 		{
-			return ( wd33c93_r( &space, 0 ) << 8 );
+			return ( m_wd33c93->read( space, 0 ) << 8 );
 		}
 		else
 		{
@@ -140,7 +143,7 @@ READ32_MEMBER(ip20_state::hpc_r)
 	case 0x0124:
 		if (ACCESSING_BITS_8_15)
 		{
-			return ( wd33c93_r( &space, 1 ) << 8 );
+			return ( m_wd33c93->read( space, 1 ) << 8 );
 		}
 		else
 		{
@@ -288,7 +291,7 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		if (ACCESSING_BITS_8_15)
 		{
 			verboselog(machine(), 2, "HPC SCSI Controller Register Write: %08x\n", ( data >> 8 ) & 0x000000ff );
-			wd33c93_w( &space, 0, ( data >> 8 ) & 0x000000ff );
+			m_wd33c93->write( space, 0, ( data >> 8 ) & 0x000000ff );
 		}
 		else
 		{
@@ -299,7 +302,7 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		if (ACCESSING_BITS_8_15)
 		{
 			verboselog(machine(), 2, "HPC SCSI Controller Data Write: %08x\n", ( data >> 8 ) & 0x000000ff );
-			wd33c93_w( &space, 1, ( data >> 8 ) & 0x000000ff );
+			m_wd33c93->write( space, 1, ( data >> 8 ) & 0x000000ff );
 		}
 		else
 		{
@@ -562,8 +565,6 @@ static MACHINE_START( ip204415 )
 {
 	ip20_state *state = machine.driver_data<ip20_state>();
 
-	wd33c93_init(machine, &scsi_intf);
-
 	sgi_mc_init(machine);
 
 	state->m_HPC.nMiscStatus = 0;
@@ -615,6 +616,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
+	MCFG_WD33C93_ADD("wd33c93", scsi_intf);
 	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_6)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)

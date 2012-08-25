@@ -87,8 +87,6 @@ public:
 	DECLARE_READ32_MEMBER(cps3_40C0004_r);
 	DECLARE_READ32_MEMBER(cps3_eeprom_r);
 	DECLARE_WRITE32_MEMBER(cps3_eeprom_w);
-	DECLARE_READ32_MEMBER(cps3_cdrom_r);
-	DECLARE_WRITE32_MEMBER(cps3_cdrom_w);
 	DECLARE_WRITE32_MEMBER(cps3_ss_bank_base_w);
 	DECLARE_WRITE32_MEMBER(cps3_ss_pal_base_w);
 	DECLARE_WRITE32_MEMBER(cps3_palettedma_w);
