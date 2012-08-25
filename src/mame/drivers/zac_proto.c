@@ -4,7 +4,7 @@
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
-//#include "zac-proto.lh"
+#include "zac_proto.lh"
 
 class zac_proto_state : public driver_device
 {
@@ -73,9 +73,11 @@ WRITE8_MEMBER( zac_proto_state::out1_w )
 WRITE8_MEMBER( zac_proto_state::digit_w )
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	static const UINT8 decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
-	output_set_digit_value(offset++, patterns[data&15]);
-	output_set_digit_value(offset, patterns[data>>4]);
+	output_set_digit_value(offset, patterns[data&15] | decimals[offset]);
+	offset++;
+	output_set_digit_value(offset, patterns[data>>4] | decimals[offset]);
 }
 
 WRITE8_MEMBER( zac_proto_state::sound_w )
@@ -97,7 +99,7 @@ static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
 
 	/* Video */
-	//MCFG_DEFAULT_LAYOUT(layout_zac_proto)
+	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
 MACHINE_CONFIG_END
 
 /*--------------------------------
