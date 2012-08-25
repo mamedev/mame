@@ -162,9 +162,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_new_device, write)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_new_device, write)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_new_device, write)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(unknown)
@@ -230,9 +230,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_new_device, write)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_new_device, write)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_new_device, write)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(unknown)
@@ -551,6 +551,22 @@ static GFXDECODE_START( senjyo )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_START( senjyo, senjyo_state )
 
@@ -585,14 +601,17 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
+	MCFG_SOUND_ADD("sn1", SN76496_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
+	MCFG_SOUND_ADD("sn3", SN76496_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)

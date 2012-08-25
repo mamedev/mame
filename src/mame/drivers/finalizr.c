@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
-	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_new_device, write)	/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_byte_w)			/* custom sound chip */
@@ -235,6 +235,22 @@ static GFXDECODE_START( finalizr )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_START( finalizr )
 {
@@ -291,8 +307,9 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("snsnd", SN76489A_NEW, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)

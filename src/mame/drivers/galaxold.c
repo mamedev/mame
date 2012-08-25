@@ -886,9 +886,9 @@ static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
-	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
-	AM_RANGE(0x1e, 0x1e) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x1f, 0x1f) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("sn1", sn76496_new_device, write)
+	AM_RANGE(0x1e, 0x1e) AM_DEVWRITE("sn2", sn76496_new_device, write)
+	AM_RANGE(0x1f, 0x1f) AM_DEVWRITE("sn3", sn76496_new_device, write)
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
@@ -910,7 +910,7 @@ READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(hexpoola_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(hexpoola_data_port_r) AM_DEVWRITE("snsnd", sn76496_new_device, write)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
@@ -938,7 +938,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 static ADDRESS_MAP_START( bullsdrtg_io_map, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrtg_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrtg_data_port_r) AM_DEVWRITE("snsnd", sn76496_new_device, write)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
@@ -2139,6 +2139,24 @@ static GFXDECODE_START( _4in1 )
 	GFXDECODE_ENTRY( "gfx1", 0x4000, _4in1_spritelayout,    0, 8 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static const ay8910_interface bongo_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -2429,14 +2447,17 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn1", SN76496, PIXEL_CLOCK/2)
+	MCFG_SOUND_ADD("sn1", SN76496_NEW, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496, PIXEL_CLOCK/2)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76496, PIXEL_CLOCK/2)
+	MCFG_SOUND_ADD("sn3", SN76496_NEW, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ckongg, galaxian )
@@ -2484,8 +2505,9 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
+	MCFG_SOUND_ADD("snsnd", SN76496_NEW, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bullsdrtg, hexpoola )

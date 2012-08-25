@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76489_new_device, write)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -265,6 +265,24 @@ static I8255_INTERFACE( ppi8255_intf )
 	DEVCB_DRIVER_MEMBER(sg1000a_state,sg1000a_coin_counter_w)
 };
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 /*************************************
  *
  *  Machine drivers
@@ -287,8 +305,9 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("snsnd", SN76489_NEW, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 /*************************************

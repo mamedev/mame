@@ -146,6 +146,24 @@ static const tms9902_interface tms9902_uart2_ic5_params =
 #define SOUND_CLOCK 2000000
 #define DUART_CLOCK 2000000
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 	/* basic machine hardware */
@@ -164,8 +182,9 @@ static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn", SN76489, SOUND_CLOCK)
+	MCFG_SOUND_ADD("sn", SN76489_NEW, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 MACHINE_CONFIG_END
 
