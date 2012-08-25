@@ -62,9 +62,11 @@ class alesis_state : public driver_device
 public:
 	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_lcdc(*this, "hd44780"),
 		  m_cassette(*this, CASSETTE_TAG)
 		{ }
 
+	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;
 
 	virtual void palette_init();
@@ -76,6 +78,7 @@ public:
 	DECLARE_READ8_MEMBER( kb_r );
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
+	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
 
 private:
 	UINT8		m_kb_matrix;
