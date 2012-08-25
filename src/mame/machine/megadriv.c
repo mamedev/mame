@@ -1386,15 +1386,6 @@ static void megadriv_init_common(running_machine &machine)
 		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
 	}
 
-	if ((_32x_master_cpu != NULL) && (_32x_slave_cpu != NULL))
-	{
-		_32x_is_connected = 1;
-	}
-	else
-	{
-		_32x_is_connected = 0;
-	}
-
 
 
 	sega_cd_connected = 0;

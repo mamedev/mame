@@ -2,6 +2,8 @@
 
 #pragma once
 
+
+
 /*  The VDP occupies addresses C00000h to C0001Fh.
 
  C00000h    -   Data port (8=r/w, 16=r/w)

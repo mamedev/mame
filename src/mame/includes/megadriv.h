@@ -420,7 +420,6 @@ public:
 
 
 
-extern int _32x_is_connected;
 extern cpu_device *_32x_master_cpu;
 extern cpu_device *_32x_slave_cpu;
 
@@ -428,8 +427,7 @@ extern cpu_device *_32x_slave_cpu;
 
 
 
-extern int megadrive_vblank_flag;
-extern int genesis_scanline_counter;
+
 
 class segacd_state : public _32x_state	// use _32x_state as base to make easier the combo 32X + SCD
 {
@@ -468,15 +466,9 @@ extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
 extern int genesis_scanline_counter;
 extern UINT16* megadrive_vdp_palette_lookup;
-extern UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
-extern UINT16* megadrive_vdp_palette_lookup_shadow;
-extern UINT16* megadrive_vdp_palette_lookup_highlight;
-extern int segac2_bg_pal_lookup[4];
-extern int segac2_sp_pal_lookup[4];
-extern int genvdp_use_cram;
+
 extern int megadrive_region_export;
 extern int megadrive_region_pal;
-TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
 
 /* machine/megadriv.c */
 extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
