@@ -6,6 +6,9 @@ preliminary device by Angelo Salese
 
 TODO:
 - kludge on address?
+- SRAM hook-ups;
+- SRAM load/save;
+- system bits;
 
 ***************************************************************************/
 
@@ -36,6 +39,41 @@ s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, d
 
 }
 
+void s3520cf_device::timer_callback()
+{
+	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	int dpm_count;
+
+	m_rtc.sec++;
+
+	if((m_rtc.sec & 0x0f) >= 0x0a)				{ m_rtc.sec+=0x10; m_rtc.sec&=0xf0; }
+	if((m_rtc.sec & 0xf0) >= 0x60)				{ m_rtc.min++; m_rtc.sec = 0; }
+	if((m_rtc.min & 0x0f) >= 0x0a)				{ m_rtc.min+=0x10; m_rtc.min&=0xf0; }
+	if((m_rtc.min & 0xf0) >= 0x60)				{ m_rtc.hour++; m_rtc.min = 0; }
+	if((m_rtc.hour & 0x0f) >= 0x0a)				{ m_rtc.hour+=0x10; m_rtc.hour&=0xf0; }
+	if((m_rtc.hour & 0xff) >= 0x24)				{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
+	if(m_rtc.wday >= 7)							{ m_rtc.wday = 0; }
+	if((m_rtc.day & 0x0f) >= 0x0a)				{ m_rtc.day+=0x10; m_rtc.day&=0xf0; }
+
+	/* TODO: crude leap year support */
+	dpm_count = (m_rtc.month & 0xf) + (((m_rtc.month & 0x10) >> 4)*10)-1;
+
+	if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
+	{
+		if((m_rtc.day & 0xff) >= dpm[dpm_count]+1+1)
+			{ m_rtc.month++; m_rtc.day = 0x01; }
+	}
+	else if((m_rtc.day & 0xff) >= dpm[dpm_count]+1){ m_rtc.month++; m_rtc.day = 0x01; }
+	if((m_rtc.month & 0x0f) >= 0x0a)			{ m_rtc.month = 0x10; }
+	if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
+	if((m_rtc.year & 0x0f) >= 0x0a)				{ m_rtc.year+=0x10; m_rtc.year&=0xf0; }
+	if((m_rtc.year & 0xf0) >= 0xa0)				{ m_rtc.year = 0; } //1901-2000 possible timeframe
+}
+
+TIMER_CALLBACK( s3520cf_device::rtc_inc_callback )
+{
+	reinterpret_cast<s3520cf_device *>(ptr)->timer_callback();
+}
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -53,7 +91,19 @@ void s3520cf_device::device_validity_check(validity_checker &valid) const
 
 void s3520cf_device::device_start()
 {
+	/* let's call the timer callback every second for now */
+	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
 
+	system_time systime;
+	machine().base_datetime(systime);
+
+	m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
+	m_rtc.month = (((systime.local_time.month+1) / 10) << 4) | (((systime.local_time.month+1) % 10) & 0xf);
+	m_rtc.wday = systime.local_time.weekday;
+	m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
+	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
+	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
+	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
 }
 
 
@@ -63,6 +113,7 @@ void s3520cf_device::device_start()
 
 void s3520cf_device::device_reset()
 {
+	m_mode = 0;
 }
 
 //-------------------------------------------------
@@ -75,30 +126,52 @@ inline UINT8 s3520cf_device::rtc_read(UINT8 offset)
 
 	res = 0;
 
-	switch(offset)
+	if(m_mode != 0)
 	{
-//		case 0: // 1 sec
-//		case 1: // 10 sec
-//		case 2: // 1 min
-//		case 3: // 10 min
-//		case 6: // week
-//		case 7: // 1 day
-		case 4: // 1 hour
-			res = 1;
-			break;
-		case 5: // 10 hour
-			res = 2;
-			break;
+		if(offset == 0xf)
+			res = (m_sysr << 3) | m_mode;
+		else
+		{
+			res = 0;
+			printf("Warning: S-3520CF RTC reads SRAM %02x %02x\n",offset,m_mode);
+		}
 	}
-
-
+	else
+	{
+		switch(offset)
+		{
+			case 0x0: res = m_rtc.sec & 0xf; break;
+			case 0x1: res = m_rtc.sec >> 4; break;
+			case 0x2: res = m_rtc.min & 0xf; break;
+			case 0x3: res = m_rtc.min >> 4; break;
+			case 0x4: res = m_rtc.hour & 0xf; break;
+			case 0x5: res = m_rtc.hour >> 4; break;
+			case 0x6: res = m_rtc.wday & 0xf; break;
+			case 0x7: res = m_rtc.day & 0xf; break;
+			case 0x8: res = m_rtc.day >> 4; break;
+			case 0x9: res = m_rtc.month & 0xf; break;
+			case 0xa: res = m_rtc.month >> 4; break;
+			case 0xb: res = m_rtc.year & 0xf; break;
+			case 0xc: res = m_rtc.year >> 4; break;
+		}
+	}
 
 	return res;
 }
 
 inline void s3520cf_device::rtc_write(UINT8 offset,UINT8 data)
 {
-
+	if(offset == 0xf)
+	{
+		m_mode = data & 3;
+		m_sysr = (data & 8) >> 3;
+		printf("%02x\n",data);
+	}
+	else
+	{
+		if(m_mode != 0)
+			printf("Warning: S-3520CF RTC writes SRAM %02x %d\n",offset,m_mode);
+	}
 }
 
 
@@ -154,7 +227,7 @@ WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
 
 				if(m_cmd_stream_pos == 4)
 				{
-					m_rtc_addr = (m_current_cmd + 1) & 0xf; /* TODO: +1??? */
+					m_rtc_addr = (m_current_cmd) & 0xf;
 					m_rtc_state = RTC_SET_DATA;
 					m_cmd_stream_pos = 0;
 					m_current_cmd = 0;
@@ -167,7 +240,7 @@ WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
 					{
 						//printf("%02x %d\n",m_rtc_addr,m_cmd_stream_pos);
 					}
-					m_read_latch = (rtc_read(m_rtc_addr) >> (m_cmd_stream_pos)) & 1;
+					m_read_latch = (rtc_read((m_rtc_addr+1) & 0xf) >> (m_cmd_stream_pos)) & 1; /* TODO: +1??? */
 				}
 
 				m_current_cmd = (m_current_cmd >> 1) | ((m_latch<<3)&8);
@@ -176,8 +249,8 @@ WRITE_LINE_MEMBER( s3520cf_device::set_clock_line )
 				{
 					if(m_dir == 0) // WRITE
 					{
-						printf("%02x %02x\n",m_rtc_addr,m_current_cmd);
-						rtc_write(m_rtc_addr,m_current_cmd);
+						//printf("%02x %02x\n",m_rtc_addr,m_current_cmd);
+						rtc_write((m_rtc_addr - 1) & 0xf,m_current_cmd); /* TODO: -1??? */
 					}
 
 					m_rtc_addr = m_current_cmd;

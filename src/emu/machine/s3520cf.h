@@ -29,6 +29,11 @@ typedef enum
 	RTC_SET_DATA
 } s3520cf_state_t;
 
+typedef struct
+{
+	UINT8 sec, min, hour, day, wday, month, year;
+} rtc_regs_t;
+
 
 // ======================> s3520cf_device
 
@@ -44,6 +49,7 @@ public:
 	WRITE_LINE_MEMBER( set_cs_line );
 	WRITE_LINE_MEMBER( set_clock_line );
 	WRITE_LINE_MEMBER( write_bit );
+	void timer_callback();
 
 protected:
 	// device-level overrides
@@ -53,6 +59,8 @@ protected:
 	inline UINT8 rtc_read(UINT8 offset);
 	inline void rtc_write(UINT8 offset,UINT8 data);
 
+	static TIMER_CALLBACK( rtc_inc_callback );
+
 	int m_dir;
 	int m_latch;
 	int m_reset_line;
@@ -60,8 +68,10 @@ protected:
 	UINT8 m_current_cmd;
 	UINT8 m_cmd_stream_pos;
 	UINT8 m_rtc_addr;
+	UINT8 m_mode, m_sysr;
 
 	s3520cf_state_t m_rtc_state;
+	rtc_regs_t m_rtc;
 
 };
 
