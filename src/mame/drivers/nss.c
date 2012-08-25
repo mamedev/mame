@@ -295,6 +295,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/eeprom.h"
 #include "includes/snes.h"
 
 
@@ -302,10 +303,21 @@ class nss_state : public snes_state
 {
 public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag) { }
+		: snes_state(mconfig, type, tag)
+		{ }
+
+	UINT8 m_wram_wp_flag;
+	UINT8 *m_wram;
+	UINT8 m_nmi_enable;
 
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	DECLARE_READ8_MEMBER(port_00_r);
+	DECLARE_WRITE8_MEMBER(port_00_w);
+	DECLARE_READ8_MEMBER(ram_wp_r);
+	DECLARE_WRITE8_MEMBER(ram_wp_w);
+	DECLARE_WRITE8_MEMBER(rtc_osd_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
 };
 
 
@@ -369,17 +381,8 @@ map
 0x8000 - 0x8fff RAM
 0x9000 - 0x9fff RAM with write protection
 0xa000          EEPROM Read
-  7   EEPROM Data In (0=Low=Zero, 1=High=One)
-  6   EEPROM Ready   (0=Low=Busy, 1=High=Ready)
-  5-0 Unknown/unused
 0xc000 - 0xdfff instruction ROM
 0xe000          EEPROM Write
-  7   Unknown/set     (should be always 1)
-  6-5 Unknown/unused  (should be always 0)
-  4   EEPROM Clock    (0=Low=Clock, 1=High=Idle) ;(Data In/Out must be stable
-  3   EEPROM Data Out (0=Low=Zero, 1=High=One)   ;on raising CLK edge)
-  2-1 Unknown/unused  (should be always 0)       ;(and updated on falling edge)
-  0   EEPROM Select   (0=High=No, 1=Low=Select)
 0xe000 - 0xffff PROM Input & Output & Program Code (protection RP5H01, used also in earlier Nintendo systems)
 Data Write:
   7-5  Unknown/unused
@@ -398,23 +401,8 @@ Data Read and Opcode Fetch:
 i/o
 Input
 0x00 Joypad
-  7   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
-  6   Vblank or Vsync or so       (0=What, 1=What?)
-  5   Button "Joypad Button B?"   (0=Released, 1=Pressed)
-  4   Button "Joypad Button A"    (0=Released, 1=Pressed)
-  3   Button "Joypad Down"        (0=Released, 1=Pressed)
-  2   Button "Joypad Up"          (0=Released, 1=Pressed)
-  1   Button "Joypad Left"        (0=Released, 1=Pressed)
-  0   Button "Joypad Right"       (0=Released, 1=Pressed)
 0x01 Front-Panel Buttons and Game Over Flag
   7   From SNES Port 4016h.W.Bit2 (0=Game Over Flag, 1=Normal) (Inverted!)
-  6   Button "Restart"            (0=Released, 1=Pressed) ;-also resets SNES?
-  5   Button "Page Up"            (0=Released, 1=Pressed)
-  4   Button "Page Down"          (0=Released, 1=Pressed)
-  3   Button "Instructions"       (0=Released, 1=Pressed)
-  2   Button "Game 3"             (0=Released, 1=Pressed) ;\if present (single
-  1   Button "Game 2"             (0=Released, 1=Pressed) ; cartridge mode does
-  0   Button "Game 1"             (0=Released, 1=Pressed) ;/without them)
 0x02 Coin and Service Button Inputs
   7-3 Unknown/unused (maybe the (unused) Test button hides here)
   2   Service Button (1=Pressed: Add Credit; with INST button: Config)
@@ -423,11 +411,6 @@ Input
 0x03 RTC
 Output
 0x00/0x80 NMI Control and RAM protect
-  7-4 Unknown/unused      (should be always 0)
-  3     Maybe SNES CPU/PPU reset (usually same as Port 01h.W.Bit1)
-  2   RAM at 9000h-9FFFh  (0=Disable/Protect, 1=Enable/Unlock)
-  1   Looks like maybe somehow NMI Related ?    ;\or one of these is PC10-style
-  0   Looks like NMI Enable                     ;/hardware-watchdog reload?
 0x01/0x81 Unknown and Slot Select
   7     Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
   6   Unknown/unused        (should be always 0)
@@ -461,25 +444,156 @@ SNES part:
 
 */
 
+READ8_MEMBER(nss_state::ram_wp_r)
+{
+	return m_wram[offset];
+}
+
+WRITE8_MEMBER(nss_state::ram_wp_w)
+{
+	if(m_wram_wp_flag)
+		m_wram[offset] = data;
+}
+
+WRITE8_MEMBER(nss_state::eeprom_w)
+{
+/*
+	x--- ----   Unknown/set     (should be always 1) (EEPROM Reset (active low)?)
+	-xx- ---- Unknown/unused  (should be always 0)
+	---x ----   EEPROM Clock    (0=Low=Clock, 1=High=Idle) ;(Data In/Out must be stable
+	---- x---   EEPROM Data Out (0=Low=Zero, 1=High=One)   ;on raising CLK edge)
+	---- -xx- Unknown/unused  (should be always 0)       ;(and updated on falling edge)
+	---- ---x   EEPROM Select   (0=High=No, 1=Low=Select)
+*/
+	ioport("EEPROMOUT")->write(data, 0xff);
+}
+
 static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(ram_wp_r,ram_wp_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("EEPROMIN")
+	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_REGION("ibios_rom", 0x6000 )
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(eeprom_w)
 ADDRESS_MAP_END
 
+READ8_MEMBER(nss_state::port_00_r)
+{
+/*
+	x--- ----   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
+	-x-- ----   Vblank or Vsync or so       (0=What, 1=What?)
+	--x- ----   Button "Joypad Button B?"   (0=Released, 1=Pressed)
+	---x ----   Button "Joypad Button A"    (0=Released, 1=Pressed)
+	---- x---   Button "Joypad Down"        (0=Released, 1=Pressed)
+	---- -x--   Button "Joypad Up"          (0=Released, 1=Pressed)
+	---- --x-   Button "Joypad Left"        (0=Released, 1=Pressed)
+	---- ---x   Button "Joypad Right"       (0=Released, 1=Pressed)
+*/
+	UINT8 res;
 
+	res = (machine().primary_screen->vblank() & 1) << 6;
+	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x80) >> 7) << 5);
+	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x80) >> 7) << 4);
+	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x08) >> 3) << 3);
+	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x04) >> 2) << 2);
+	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x02) >> 1) << 1);
+	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x01) >> 0) << 0);
+
+	return res;
+}
+
+WRITE8_MEMBER(nss_state::port_00_w)
+{
+/*
+	xxxx ---- Unknown/unused      (should be always 0)
+ 	---- x--- Maybe SNES CPU/PPU reset (usually same as Port 01h.W.Bit1)
+	---- -x-- RAM at 9000h-9FFFh  (0=Disable/Protect, 1=Enable/Unlock)
+	---- --x- Looks like maybe somehow NMI Related ?    ;\or one of these is PC10-style
+	---- ---x Looks like NMI Enable                     ;/hardware-watchdog reload?
+*/
+	m_wram_wp_flag = (data & 4) >> 2;
+	m_nmi_enable = data & 1;
+
+}
+
+WRITE8_MEMBER(nss_state::rtc_osd_w)
+{
+/*
+	x--- ----  OSD Clock ?       (usually same as Bit6)  ;\Chip Select when Bit6=Bit7 ?
+	-x-- ----  OSD Clock ?       (usually same as Bit7)  ;/
+	--x- ----  OSD Data Out      (0=Low=Zero, 1=High=One)
+	---x ----  OSD Special       (?)  ... or just /CS ? (or software index DC3F/DD3F?)
+	---- x---  RTC /CLK          (0=Low=Clock,  1=High=Idle)              ;S-3520
+	---- -x--  RTC Data Out      (0=Low=Zero,   1=High=One)
+	---- --x-  RTC Direction     (0=Low=Write,  1=High=Read)
+	---- ---x  RTC /CS           (0=Low/Select, 1=High/No)
+*/
+	/* TODO */
+}
 
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
+	/* TODO: I think that this actually masks to 0x7? */
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(rtc_osd_w)
 
+	AM_RANGE(0x72, 0x72) AM_WRITE(rtc_osd_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(port_00_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(rtc_osd_w)
+	AM_RANGE(0xea, 0xea) AM_WRITE(rtc_osd_w)
 ADDRESS_MAP_END
+
+/* Mitsubishi M6M80011 */
+static const eeprom_interface nss_eeprom_intf =
+{
+	8,				/* address bits */
+	16,				/* data bits */
+	"10101000",		/*  read command */
+	"10100100",		/* write command */
+	0,				/* erase command */
+	"10100000",		/*  lock command */
+	"10100011"		/* unlock command*/
+	/* "10101001" TODO: status output? */
+};
+
 
 static MACHINE_START( nss )
 {
-//	nss_state *state = machine.driver_data<nss_state>();
+	nss_state *state = machine.driver_data<nss_state>();
 
 	MACHINE_START_CALL(snes);
+
+	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x1000);
 }
 
 static INPUT_PORTS_START( snes )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("FP")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Game Over Flag, TODO
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Instructions Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Game 3 Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Game 2 Button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Game 1 Button")
+
+	PORT_START("EEPROMIN")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // EEPROM Ready
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("EEPROMOUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+
 	PORT_START("SERIAL1_DATA1_L")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1)
@@ -652,13 +766,22 @@ static MACHINE_CONFIG_START( snes, nss_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
+static INTERRUPT_GEN ( nss_vblank_irq )
+{
+	nss_state *state = device->machine().driver_data<nss_state>();
+
+	if(state->m_nmi_enable)
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_DERIVED( nss, snes )
 
 	MCFG_CPU_ADD("bios", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
-//  MCFG_CPU_FLAGS(CPU_DISABLE)
+	MCFG_CPU_VBLANK_INT("screen", nss_vblank_irq)
+
+	MCFG_EEPROM_ADD("eeprom", nss_eeprom_intf)
 
 	MCFG_GFXDECODE( nss )
 	MCFG_PALETTE_LENGTH(2)
