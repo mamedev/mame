@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "machine/isa.h"
-#include "machine/scsibus.h"
 
 //*********************************************************************
 //   TYPE DEFINITIONS
