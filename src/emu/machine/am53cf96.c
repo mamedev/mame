@@ -162,6 +162,16 @@ am53cf96_device::am53cf96_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+void am53cf96_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const AM53CF96interface *intf = reinterpret_cast<const AM53CF96interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<AM53CF96interface *>(this) = *intf;
+	}
+}
+
 void am53cf96_device::device_start()
 {
 	memset(scsi_regs, 0, sizeof(scsi_regs));
@@ -184,12 +194,6 @@ void am53cf96_device::device_start()
 	save_item( NAME( last_id ) );
 
 	m_transfer_timer = timer_alloc( TIMER_TRANSFER );
-}
-
-void am53cf96_device::static_set_interface(device_t &device, const AM53CF96interface &interface)
-{
-	am53cf96_device &am53cf96 = downcast<am53cf96_device &>(device);
-	static_cast<AM53CF96interface &>(am53cf96) = interface;
 }
 
 // retrieve data from the SCSI controller

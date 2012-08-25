@@ -52,9 +52,9 @@ enum
 #define TEMP_INPUT_LEN	262144
 #define FIFO_SIZE		12
 
-#define MCFG_WD33C93_ADD( _tag, _interface ) \
+#define MCFG_WD33C93_ADD( _tag, _config ) \
 	MCFG_DEVICE_ADD( _tag, WD33C93, 0 ) \
-	wd33c93_device::static_set_interface(*device, _interface);
+	MCFG_DEVICE_CONFIG(_config)
 
 class wd33c93_device : public device_t,
 					   public WD33C93interface
@@ -62,9 +62,6 @@ class wd33c93_device : public device_t,
 public:
 	// construction/destruction
 	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// inline configuration helpers
-	static void static_set_interface(device_t &device, const WD33C93interface &interface);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -76,6 +73,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 

@@ -15,9 +15,9 @@ struct AM53CF96interface
 	void (*irq_callback)(running_machine &machine);	/* irq callback */
 };
 
-#define MCFG_AM53CF96_ADD( _tag, _interface ) \
+#define MCFG_AM53CF96_ADD( _tag, _config ) \
 	MCFG_DEVICE_ADD( _tag, AM53CF96, 0 ) \
-	am53cf96_device::static_set_interface(*device, _interface);
+	MCFG_DEVICE_CONFIG(_config)
 
 // 53CF96 register set
 enum
@@ -48,9 +48,6 @@ public:
 	// construction/destruction
 	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_interface(device_t &device, const AM53CF96interface &interface);
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -59,6 +56,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 

@@ -744,6 +744,16 @@ wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+void wd33c93_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const WD33C93interface *intf = reinterpret_cast<const WD33C93interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<WD33C93interface *>(this) = *intf;
+	}
+}
+
 void wd33c93_device::device_start()
 {
 	memset(&regs, 0, sizeof(regs));
@@ -770,12 +780,6 @@ void wd33c93_device::device_start()
 	save_item( NAME( busphase ) );
 	save_item( NAME( identify ) );
 	save_item( NAME( read_pending ) );
-}
-
-void wd33c93_device::static_set_interface(device_t &device, const WD33C93interface &interface)
-{
-	wd33c93_device &wd33c93 = downcast<wd33c93_device &>(device);
-	static_cast<WD33C93interface &>(wd33c93) = interface;
 }
 
 void wd33c93_device::get_dma_data( int bytes, UINT8 *pData )
