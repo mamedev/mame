@@ -298,18 +298,22 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "machine/eeprom.h"
 #include "video/m50458.h"
 #include "includes/snes.h"
+#include "rendlay.h"
 
 
 class nss_state : public snes_state
 {
 public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag)
+		: snes_state(mconfig, type, tag),
+		m_m50458(*this,"m50458")
 		{ }
 
+	required_device<m50458_device> m_m50458;
 	UINT8 m_wram_wp_flag;
 	UINT8 *m_wram;
 	UINT8 m_nmi_enable;
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
@@ -320,6 +324,13 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_osd_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 };
+
+UINT32 nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	m_m50458->screen_update(screen,bitmap,cliprect);
+	return 0;
+}
+
 
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, nss_state )
@@ -715,22 +726,6 @@ static INPUT_PORTS_START( snes )
 #endif
 INPUT_PORTS_END
 
-static const gfx_layout nss_char_layout_16x18 =
-{
-	16,18,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16, 16*16,17*16 },
-	16*18
-};
-
-
-/* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( nss )
-	GFXDECODE_ENTRY( "chargen",   0x00000, nss_char_layout_16x18,    0, 1 )
-GFXDECODE_END
 
 static MACHINE_CONFIG_START( snes, nss_state )
 
@@ -776,12 +771,20 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_CPU_IO_MAP(bios_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nss_vblank_irq)
 
+	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MCFG_SCREEN_ADD("osd", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
+	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
+
 	MCFG_EEPROM_ADD("eeprom", nss_eeprom_intf)
 
 	MCFG_M50458_ADD("m50458",4000000) /* TODO: clock */
 
-	MCFG_GFXDECODE( nss )
-	MCFG_PALETTE_LENGTH(2)
 	MCFG_MACHINE_START( nss )
 MACHINE_CONFIG_END
 
@@ -799,10 +802,6 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
 	ROM_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
 	ROM_LOAD("nss-ic14.02", 0x10000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
-	ROM_REGION( 0x1200, "chargen", ROMREGION_ERASEFF ) \
-	ROM_LOAD("m50458_char.bin",     0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) ) \
-	ROM_REGION( 0x1000, "m50458_gfx", ROMREGION_ERASEFF ) \
-	ROM_LOAD("m50458_char_mod.bin", 0x0000, 0x1000, BAD_DUMP CRC(8c4326ef) SHA1(21a63c5245ff7f3f70cb45e217b3045b19d0d799) ) \
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF) \
 	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 
