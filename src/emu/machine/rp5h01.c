@@ -2,6 +2,9 @@
 
     RP5H01
 
+	TODO:
+	- convert to modern and follow the datasheet better (all dumps
+	  presumably needs to be redone from scratch?)
 
     2009-06 Converted to be a device
 
@@ -86,6 +89,25 @@ WRITE8_DEVICE_HANDLER( rp5h01_reset_w )
 
 	/* update the pin */
 	rp5h01->old_reset = newstate;
+}
+
+/*-------------------------------------------------
+    rp5h01_cs_w
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( rp5h01_cs_w )
+{
+	rp5h01_state *rp5h01 = get_safe_token(device);
+
+	/* if it's not enabled, ignore */
+	if (!rp5h01->enabled)
+		return;
+
+	if (data == 1)
+	{
+		/* reset the counter */
+		rp5h01->counter = 0;
+	}
 }
 
 /*-------------------------------------------------

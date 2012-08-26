@@ -31,6 +31,7 @@ DECLARE_LEGACY_DEVICE(RP5H01, rp5h01);
 
 WRITE8_DEVICE_HANDLER( rp5h01_enable_w );	/* /CE */
 WRITE8_DEVICE_HANDLER( rp5h01_reset_w );	/* RESET */
+WRITE8_DEVICE_HANDLER( rp5h01_cs_w );	/* CS */
 WRITE8_DEVICE_HANDLER( rp5h01_clock_w );	/* DATA CLOCK (active low) */
 WRITE8_DEVICE_HANDLER( rp5h01_test_w );		/* TEST */
 READ8_DEVICE_HANDLER( rp5h01_counter_r );	/* COUNTER OUT */

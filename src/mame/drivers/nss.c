@@ -333,6 +333,8 @@ public:
 	DECLARE_READ8_MEMBER(nss_prot_r);
 	DECLARE_WRITE8_MEMBER(nss_prot_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
+
+	DECLARE_DRIVER_INIT(nss);
 };
 
 UINT32 nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -503,7 +505,7 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 		rp5h01_enable_w(m_rp5h01, 0, 0);
 		rp5h01_test_w(m_rp5h01, 0, data & 0x10);		/* D4 */
 		rp5h01_clock_w(m_rp5h01, 0, data & 0x08);		/* D3 */
-		rp5h01_reset_w(m_rp5h01, 0, ~data & 0x01);	/* D0, check me */
+		rp5h01_cs_w(m_rp5h01, 0, ~data & 0x01);
 		rp5h01_enable_w(m_rp5h01, 0, 1);
 	}
 	//ioport("EEPROMOUT")->write(data, 0xff);
@@ -1035,18 +1037,31 @@ ROM_START( nss_sten )
 	ROM_LOAD( "security.prm", 0x000000, 0x000010, NO_DUMP )
 ROM_END
 
+DRIVER_INIT_MEMBER(nss_state,nss)
+{
+	UINT8 *PROM = memregion("rp5h01")->base();
+	int i;
+	UINT8 tmp;
 
+	DRIVER_INIT_CALL(snes);
+
+	for(i=0;i<0x10;i++)
+	{
+		tmp = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7);
+		PROM[i] = tmp ^ 0xff;
+	}
+}
 
 GAME( 199?, nss,       0,     nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1992, nss_actr,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // sound sometimes dies, timing issues
-GAME( 1992, nss_adam,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1992, nss_aten,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_con3,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_lwep,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_ncaa,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_rob3,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // any sprite minus Robocop is missing
-GAME( 1992, nss_skin,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx issue caused by timing at start-up
-GAME( 1992, nss_ssoc,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_smw,   nss,   nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_fzer,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1991, nss_sten,  nss,   nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // sound sometimes dies, timing issues
+GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_con3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_lwep,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_ncaa,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // any sprite minus Robocop is missing
+GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx issue caused by timing at start-up
+GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_sten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
