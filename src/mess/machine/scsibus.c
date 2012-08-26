@@ -696,7 +696,7 @@ void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
 	LOG(3,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
 
 	if(line_change_cb!=NULL)
-		line_change_cb(&this, line,state);
+		line_change_cb(this, line,state);
 
 	switch (line)
 	{
