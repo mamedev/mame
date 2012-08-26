@@ -71,7 +71,7 @@ private:
 
 	abc1600bus_slot_device *m_slot;
 
-	required_device<device_t> m_sasibus;
+	required_device<scsibus_device> m_sasibus;
 
 	int m_cs;
 	int m_io;

@@ -478,9 +478,9 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 
 READ8_MEMBER( bulletf_state::scsi_r )
 {
-	UINT8 data = scsi_data_r(m_scsibus, 0);
+	UINT8 data = m_scsibus->scsi_data_r();
 
-	scsi_ack_w(m_scsibus, 0);
+	m_scsibus->scsi_ack_w(0);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -495,9 +495,9 @@ READ8_MEMBER( bulletf_state::scsi_r )
 
 WRITE8_MEMBER( bulletf_state::scsi_w )
 {
-	scsi_data_w(m_scsibus, 0, data);
+	m_scsibus->scsi_data_w(data);
 
-	scsi_ack_w(m_scsibus, 0);
+	m_scsibus->scsi_ack_w(0);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -927,11 +927,11 @@ READ8_MEMBER( bulletf_state::pio_pa_r )
 
 	UINT8 data = 0;
 
-	data |= !scsi_bsy_r(m_scsibus) << 3;
-	data |= !scsi_msg_r(m_scsibus) << 4;
-	data |= !scsi_cd_r(m_scsibus) << 5;
-	data |= !scsi_req_r(m_scsibus) << 6;
-	data |= !scsi_io_r(m_scsibus) << 7;
+	data |= !m_scsibus->scsi_bsy_r() << 3;
+	data |= !m_scsibus->scsi_msg_r() << 4;
+	data |= !m_scsibus->scsi_cd_r() << 5;
+	data |= !m_scsibus->scsi_req_r() << 6;
+	data |= !m_scsibus->scsi_io_r() << 7;
 
 	return data;
 }
@@ -953,9 +953,9 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 
     */
 
-	//scsi_atn_w(m_scsibus, !BIT(data, 0));
-	scsi_rst_w(m_scsibus, !BIT(data, 1));
-	scsi_sel_w(m_scsibus, !BIT(data, 2));
+	//m_scsibus->scsi_atn_w(!BIT(data, 0));
+	m_scsibus->scsi_rst_w(!BIT(data, 1));
+	m_scsibus->scsi_sel_w(!BIT(data, 2));
 }
 
 WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
@@ -1036,7 +1036,7 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 {
 	if (state)
 	{
-		scsi_ack_w(m_scsibus, 1);
+		m_scsibus->scsi_ack_w(1);
 
 		m_wack = 1;
 	}
@@ -1111,7 +1111,7 @@ void bullet_state::machine_start()
 void bulletf_state::machine_start()
 {
 	// initialize SASI bus
-	init_scsibus(m_scsibus, 512);
+	m_scsibus->init_scsibus(512);
 
 	// state saving
 	save_item(NAME(m_fdrdy));

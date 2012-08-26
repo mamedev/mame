@@ -274,7 +274,7 @@ WRITE_LINE_MEMBER( e01_device::scsi_bsy_w )
 {
 	if (!state)
 	{
-		scsi_sel_w(m_scsibus, 1);
+		m_scsibus->scsi_sel_w(1);
 	}
 }
 
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER( e01_device::scsi_req_w )
 {
 	if (state)
 	{
-		scsi_ack_w(m_scsibus, 1);
+		m_scsibus->scsi_ack_w(1);
 	}
 
 	m_hdc_irq = !state;
@@ -564,7 +564,7 @@ void e01_device::device_start()
 
 void e01_device::device_reset()
 {
-	init_scsibus(m_scsibus, 512);
+	m_scsibus->init_scsibus(512);
 
 	m_clk_timer->adjust(attotime::zero, 0, attotime::from_hz(200000));
 
@@ -697,9 +697,9 @@ WRITE8_MEMBER( e01_device::network_irq_enable_w )
 
 READ8_MEMBER( e01_device::hdc_data_r )
 {
-	UINT8 data = scsi_data_r(m_scsibus, 0);
+	UINT8 data = m_scsibus->scsi_data_r(space, 0);
 
-	scsi_ack_w(m_scsibus, 0);
+	m_scsibus->scsi_ack_w(0);
 
 	return data;
 }
@@ -711,9 +711,9 @@ READ8_MEMBER( e01_device::hdc_data_r )
 
 WRITE8_MEMBER( e01_device::hdc_data_w )
 {
-	scsi_data_w(m_scsibus, 0, data);
+	m_scsibus->scsi_data_w(space, 0, data);
 
-	scsi_ack_w(m_scsibus, 0);
+	m_scsibus->scsi_ack_w(0);
 }
 
 
@@ -741,11 +741,11 @@ READ8_MEMBER( e01_device::hdc_status_r )
 	UINT8 data = 0;
 
 	// SCSI bus
-	data |= !scsi_msg_r(m_scsibus);
-	data |= !scsi_bsy_r(m_scsibus) << 1;
-	data |= !scsi_req_r(m_scsibus) << 5;
-	data |= !scsi_io_r(m_scsibus) << 6;
-	data |= !scsi_cd_r(m_scsibus) << 7;
+	data |= !m_scsibus->scsi_msg_r();
+	data |= !m_scsibus->scsi_bsy_r() << 1;
+	data |= !m_scsibus->scsi_req_r() << 5;
+	data |= !m_scsibus->scsi_io_r() << 6;
+	data |= !m_scsibus->scsi_cd_r() << 7;
 
 	// TODO NIRQ
 
@@ -759,7 +759,7 @@ READ8_MEMBER( e01_device::hdc_status_r )
 
 WRITE8_MEMBER( e01_device::hdc_select_w )
 {
-	scsi_sel_w(m_scsibus, 0);
+	m_scsibus->scsi_sel_w(0);
 }
 
 

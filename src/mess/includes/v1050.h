@@ -94,7 +94,7 @@ public:
 	required_device<timer_device> m_timer_sio;
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
-	required_device<device_t> m_sasibus;
+	required_device<scsibus_device> m_sasibus;
 
 	virtual void machine_start();
 	virtual void machine_reset();

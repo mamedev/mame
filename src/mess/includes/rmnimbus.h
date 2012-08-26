@@ -336,7 +336,7 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
 
 #define FDC_SIDE()          ((state->m_nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
 #define FDC_MOTOR()         ((state->m_nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
-#define FDC_DRIVE()         (scsibus_driveno(state->m_nimbus_drives.reg400 & FDC_DRIVE_MASK))
+#define FDC_DRIVE()         (fdc_driveno(state->m_nimbus_drives.reg400 & FDC_DRIVE_MASK))
 #define HDC_DRQ_ENABLED()   ((state->m_nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
 #define FDC_DRQ_ENABLED(state)   ((state->m_nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
 

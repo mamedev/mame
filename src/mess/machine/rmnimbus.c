@@ -2280,6 +2280,22 @@ static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
         drq_callback(device->machine(),1);
 }
 
+static UINT8 fdc_driveno(UINT8 drivesel)
+{
+	switch (drivesel)
+	{
+		case 0x01: return 0;
+		case 0x02: return 1;
+		case 0x04: return 2;
+		case 0x08: return 3;
+		case 0x10: return 4;
+		case 0x20: return 5;
+		case 0x40: return 6;
+		case 0x80: return 7;
+		default: return 0;
+	}
+}
+
 /*
     0x410 read bits
 
@@ -2297,7 +2313,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 {
 	int result = 0;
 	device_t *fdc = machine().device(FDC_TAG);
-	device_t *hdc = machine().device(SCSIBUS_TAG);
+	scsibus_device *hdc = machine().device<scsibus_device>(SCSIBUS_TAG);
 
 	int pc=cpu_get_pc(&space.device());
 	rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
@@ -2328,7 +2344,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 			result=m_nimbus_drives.reg410_in ^ INV_BITS_410;
 			break;
 		case 0x18 :
-			result = scsi_data_r(hdc);
+			result = hdc->scsi_data_r();
 			hdc_post_rw(machine());
 		default:
 			break;
@@ -2365,7 +2381,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 {
 	device_t *fdc = machine().device(FDC_TAG);
-    device_t *hdc = machine().device(SCSIBUS_TAG);
+	scsibus_device *hdc = machine().device<scsibus_device>(SCSIBUS_TAG);
     int                 pc=cpu_get_pc(&space.device());
     UINT8               reg400_old = m_nimbus_drives.reg400;
 
@@ -2408,7 +2424,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
             break;
 
         case 0x18 :
-            scsi_data_w(hdc, data);
+            hdc->scsi_data_w(data);
             hdc_post_rw(machine());
             break;
 	}
@@ -2417,16 +2433,16 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 static void hdc_reset(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-    device_t *hdc = machine.device(SCSIBUS_TAG);
+	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
-    init_scsibus(hdc, 512);
+    hdc->init_scsibus(512);
 
     state->m_nimbus_drives.reg410_in=0;
-    state->m_nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_REQ) ? HDC_REQ_MASK : 0);
-    state->m_nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_CD)  ? HDC_CD_MASK  : 0);
-    state->m_nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_IO)  ? HDC_IO_MASK  : 0);
-    state->m_nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_BSY) ? HDC_BSY_MASK : 0);
-    state->m_nimbus_drives.reg410_in |= (get_scsi_line(hdc,SCSI_LINE_MSG) ? HDC_MSG_MASK : 0);
+    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_REQ) ? HDC_REQ_MASK : 0);
+    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_CD)  ? HDC_CD_MASK  : 0);
+    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_IO)  ? HDC_IO_MASK  : 0);
+    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_BSY) ? HDC_BSY_MASK : 0);
+    state->m_nimbus_drives.reg410_in |= (hdc->get_scsi_line(SCSI_LINE_MSG) ? HDC_MSG_MASK : 0);
 
     state->m_nimbus_drives.drq_ff=0;
 }
@@ -2434,7 +2450,7 @@ static void hdc_reset(running_machine &machine)
 static void hdc_ctrl_write(running_machine &machine, UINT8 data)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	device_t *hdc = machine.device(SCSIBUS_TAG);
+	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
     // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
     if(((data & HDC_IRQ_MASK) && (~state->m_nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
@@ -2443,17 +2459,17 @@ static void hdc_ctrl_write(running_machine &machine, UINT8 data)
 
     state->m_nimbus_drives.reg410_out=data;
 
-    set_scsi_line(hdc, SCSI_LINE_RESET, (data & HDC_RESET_MASK) ? 0 : 1);
-    set_scsi_line(hdc, SCSI_LINE_SEL, (data & HDC_SEL_MASK) ? 0 : 1);
+    hdc->set_scsi_line(SCSI_LINE_RESET, (data & HDC_RESET_MASK) ? 0 : 1);
+    hdc->set_scsi_line(SCSI_LINE_SEL, (data & HDC_SEL_MASK) ? 0 : 1);
 }
 
 static void hdc_post_rw(running_machine &machine)
 {
 	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-    device_t *hdc = machine.device(SCSIBUS_TAG);
+	scsibus_device *hdc = machine.device<scsibus_device>(SCSIBUS_TAG);
 
     if((state->m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
-        set_scsi_line(hdc,SCSI_LINE_ACK,0);
+        hdc->set_scsi_line(SCSI_LINE_ACK,0);
 
     state->m_nimbus_drives.drq_ff=0;
 }
@@ -2506,7 +2522,10 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state)
             }
         }
         else
-            set_scsi_line(device,SCSI_LINE_ACK,1);
+		{
+			scsibus_device *hdc = downcast<scsibus_device *>(device);
+			hdc->set_scsi_line(SCSI_LINE_ACK,1);
+		}
     }
 }
 

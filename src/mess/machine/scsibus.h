@@ -10,15 +10,32 @@
 #ifndef _SCSIBUS_H_
 #define _SCSIBUS_H_
 
-#include "emu.h"
 #include "machine/scsi.h"
+#include "machine/scsidev.h"
 
+
+/***************************************************************************
+    INTERFACE
+***************************************************************************/
+
+typedef struct _SCSIBus_interface SCSIBus_interface;
+struct _SCSIBus_interface
+{
+    const SCSIConfigTable *scsidevs;		/* SCSI devices */
+    void (*line_change_cb)(UINT8 line, UINT8 state);
+
+	devcb_write_line _out_bsy_func;
+	devcb_write_line _out_sel_func;
+	devcb_write_line _out_cd_func;
+	devcb_write_line _out_io_func;
+	devcb_write_line _out_msg_func;
+	devcb_write_line _out_req_func;
+	devcb_write_line _out_rst_func;
+};
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(SCSIBUS, scsibus);
 
 #define MCFG_SCSIBUS_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, SCSIBUS, 0) \
@@ -85,10 +102,10 @@ DECLARE_LEGACY_DEVICE(SCSIBUS, scsibus);
 #define XEBEC_PARAMS_SIZE			0x08
 #define XEBEC_ALT_TRACK_SIZE		0x03
 
-#define IS_COMMAND(cmd)         	(bus->command[0]==cmd)
-#define IS_READ_COMMAND()       	((bus->command[0]==0x08) || (bus->command[0]==0x28) || (bus->command[0]==0xa8))
-#define IS_WRITE_COMMAND()      	((bus->command[0]==0x0a) || (bus->command[0]==0x2a))
-#define SET_STATUS_SENSE(stat,sen)	{ bus->status=(stat); bus->sense=(sen); }
+#define IS_COMMAND(cmd)         	(command[0]==cmd)
+#define IS_READ_COMMAND()       	((command[0]==0x08) || (command[0]==0x28) || (command[0]==0xa8))
+#define IS_WRITE_COMMAND()      	((command[0]==0x0a) || (command[0]==0x2a))
+#define SET_STATUS_SENSE(stat,sen)	{ status=(stat); sense=(sen); }
 
 #define FORMAT_UNIT_TIMEOUT			5
 
@@ -150,70 +167,106 @@ typedef struct
 	UINT8		sectors_per_track;
 } adaptec_sense_t;
 
-/***************************************************************************
-    INTERFACE
-***************************************************************************/
-
-typedef struct _SCSIBus_interface SCSIBus_interface;
-struct _SCSIBus_interface
+class scsibus_device : public device_t,
+					   public SCSIBus_interface
 {
-    const SCSIConfigTable *scsidevs;		/* SCSI devices */
-    void (*line_change_cb)(device_t *device, UINT8 line, UINT8 state);
+public:
+	// construction/destruction
+	scsibus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	/* SCSI Bus read/write */
 
-	devcb_write_line out_bsy_func;
-	devcb_write_line out_sel_func;
-	devcb_write_line out_cd_func;
-	devcb_write_line out_io_func;
-	devcb_write_line out_msg_func;
-	devcb_write_line out_req_func;
-	devcb_write_line out_rst_func;
+	UINT8 scsi_data_r();
+	void scsi_data_w( UINT8 data );
+	DECLARE_READ8_MEMBER( scsi_data_r );
+	DECLARE_WRITE8_MEMBER( scsi_data_w );
+
+	/* Get/Set lines */
+
+	UINT8 get_scsi_line(UINT8 lineno);
+	void set_scsi_line(UINT8 line, UINT8 state);
+
+	DECLARE_READ_LINE_MEMBER( scsi_bsy_r );
+	DECLARE_READ_LINE_MEMBER( scsi_sel_r );
+	DECLARE_READ_LINE_MEMBER( scsi_cd_r );
+	DECLARE_READ_LINE_MEMBER( scsi_io_r );
+	DECLARE_READ_LINE_MEMBER( scsi_msg_r );
+	DECLARE_READ_LINE_MEMBER( scsi_req_r );
+	DECLARE_READ_LINE_MEMBER( scsi_ack_r );
+	DECLARE_READ_LINE_MEMBER( scsi_rst_r );
+
+	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_sel_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_cd_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_io_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_msg_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_ack_w );
+	DECLARE_WRITE_LINE_MEMBER( scsi_rst_w );
+
+	/* Initialisation at machine reset time */
+	void init_scsibus(int sectorbytes);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	int get_scsi_cmd_len(int cbyte);
+	UINT8 scsibus_driveno(UINT8  drivesel);
+	void scsi_change_phase(UINT8 newphase);
+	void set_scsi_line_now(UINT8 line, UINT8 state);
+	void set_scsi_line_ack(UINT8 state);
+	void scsi_in_line_changed(UINT8 line, UINT8 state);
+	void scsi_out_line_change(UINT8 line, UINT8 state);
+	void scsi_out_line_change_now(UINT8 line, UINT8 state);
+	void scsi_out_line_req(UINT8 state);
+	void scsibus_read_data();
+	void scsibus_write_data();
+	int datain_done();
+	int dataout_done();
+	void scsibus_exec_command();
+	void check_process_dataout();
+	void dump_command_bytes();
+	void dump_data_bytes(int count);
+	void dump_bytes(UINT8 *buff, int count);
+
+	scsidev_device          *devices[8];
+
+	devcb_resolved_write_line out_bsy_func;
+	devcb_resolved_write_line out_sel_func;
+	devcb_resolved_write_line out_cd_func;
+	devcb_resolved_write_line out_io_func;
+	devcb_resolved_write_line out_msg_func;
+	devcb_resolved_write_line out_req_func;
+	devcb_resolved_write_line out_rst_func;
+
+	UINT8       linestate;
+	UINT8       last_id;
+	UINT8       phase;
+
+	UINT8       command[CMD_BUF_SIZE];
+	UINT8       cmd_idx;
+	UINT8       is_linked;
+
+	UINT8       status;
+	UINT8       sense;
+
+	UINT8       buffer[ADAPTEC_BUF_SIZE];
+	UINT16      data_idx;
+	int         xfer_count;
+	int         bytes_left;
+	int         data_last;
+	int         sectorbytes;
+
+	emu_timer *req_timer;
+	emu_timer *ack_timer;
+	emu_timer *sel_timer;
+	emu_timer *dataout_timer;
 };
 
-/* SCSI Bus read/write */
-
-UINT8 scsi_data_r(device_t *device);
-void scsi_data_w(device_t *device, UINT8 data);
-
-READ8_DEVICE_HANDLER( scsi_data_r );
-WRITE8_DEVICE_HANDLER( scsi_data_w );
-
-/* Get/Set lines */
-
-UINT8 get_scsi_lines(device_t *device);
-UINT8 get_scsi_line(device_t *device, UINT8 lineno);
-void set_scsi_line(device_t *device, UINT8 line, UINT8 state);
-
-READ_LINE_DEVICE_HANDLER( scsi_bsy_r );
-READ_LINE_DEVICE_HANDLER( scsi_sel_r );
-READ_LINE_DEVICE_HANDLER( scsi_cd_r );
-READ_LINE_DEVICE_HANDLER( scsi_io_r );
-READ_LINE_DEVICE_HANDLER( scsi_msg_r );
-READ_LINE_DEVICE_HANDLER( scsi_req_r );
-READ_LINE_DEVICE_HANDLER( scsi_ack_r );
-READ_LINE_DEVICE_HANDLER( scsi_rst_r );
-
-WRITE_LINE_DEVICE_HANDLER( scsi_bsy_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_sel_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_cd_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_io_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_msg_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_req_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_ack_w );
-WRITE_LINE_DEVICE_HANDLER( scsi_rst_w );
-
-/* Get current bus phase */
-
-UINT8 get_scsi_phase(device_t *device);
-
-/* utility functions */
-
-/* get a drive's number from it's select line */
-UINT8 scsibus_driveno(UINT8  drivesel);
-
-/* get the number of bytes for a scsi command */
-int get_scsi_cmd_len(int cbyte);
-
-/* Initialisation at machine reset time */
-void init_scsibus(device_t *device, int sectorbytes);
+// device type definition
+extern const device_type SCSIBUS;
 
 #endif

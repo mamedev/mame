@@ -387,10 +387,10 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
 
 	UINT8 data = 0;
 
-	data |= !scsi_cd_r(m_sasibus) << 2;
-	data |= !scsi_bsy_r(m_sasibus) << 3;
-	data |= !scsi_io_r(m_sasibus) << 6;
-	data |= !scsi_msg_r(m_sasibus) << 7;
+	data |= !m_sasibus->scsi_cd_r() << 2;
+	data |= !m_sasibus->scsi_bsy_r() << 3;
+	data |= !m_sasibus->scsi_io_r() << 6;
+	data |= !m_sasibus->scsi_msg_r() << 7;
 
 	// drive type
 	data |= (m_variant == TYPE_9060) << 4;
@@ -415,18 +415,18 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
 
     */
 
-	scsi_sel_w(m_sasibus, !BIT(data, 0));
-	scsi_rst_w(m_sasibus, !BIT(data, 1));
+	m_sasibus->scsi_sel_w(!BIT(data, 0));
+	m_sasibus->scsi_rst_w(!BIT(data, 1));
 }
 
 READ_LINE_MEMBER( base_d9060_device::req_r )
 {
-	return !scsi_req_r(m_sasibus);
+	return !m_sasibus->scsi_req_r();
 }
 
 WRITE_LINE_MEMBER( base_d9060_device::ack_w )
 {
-	scsi_ack_w(m_sasibus, state);
+	m_sasibus->scsi_ack_w(state);
 }
 
 WRITE_LINE_MEMBER( base_d9060_device::enable_w )
@@ -436,14 +436,14 @@ WRITE_LINE_MEMBER( base_d9060_device::enable_w )
 
 static const via6522_interface via_intf =
 {
-	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_r),
+	DEVCB_DEVICE_MEMBER(SASIBUS_TAG, scsibus_device, scsi_data_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_r),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, req_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_w),
+	DEVCB_DEVICE_MEMBER(SASIBUS_TAG, scsibus_device, scsi_data_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -571,7 +571,7 @@ void base_d9060_device::device_start()
 
 void base_d9060_device::device_reset()
 {
-	init_scsibus(m_sasibus, 256);
+	m_sasibus->init_scsibus(256);
 
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);

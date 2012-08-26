@@ -104,7 +104,7 @@ public:
 		  m_scsibus(*this, SCSIBUS_TAG)
 	{ }
 
-	required_device<device_t> m_scsibus;
+	required_device<scsibus_device> m_scsibus;
 
 	virtual void machine_start();
 	virtual void machine_reset();
