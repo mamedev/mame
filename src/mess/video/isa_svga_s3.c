@@ -18,7 +18,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SVGA_S3 = &device_creator<isa8_svga_s3_device>;
+const device_type ISA16_SVGA_S3 = &device_creator<isa16_svga_s3_device>;
 
 
 //-------------------------------------------------
@@ -26,7 +26,7 @@ const device_type ISA8_SVGA_S3 = &device_creator<isa8_svga_s3_device>;
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_svga_s3_device::device_mconfig_additions() const
+machine_config_constructor isa16_svga_s3_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pcvideo_vga_isa );
 }
@@ -35,7 +35,7 @@ machine_config_constructor isa8_svga_s3_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_svga_s3_device::device_rom_region() const
+const rom_entry *isa16_svga_s3_device::device_rom_region() const
 {
 	return ROM_NAME( s3_764 );
 }
@@ -48,9 +48,9 @@ const rom_entry *isa8_svga_s3_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_s3_device::isa8_svga_s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_SVGA_S3, "SVGA S3 Graphics Card", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this)
+isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA16_SVGA_S3, "SVGA S3 Graphics Card", tag, owner, clock),
+		device_isa16_card_interface(mconfig, *this)
 {
 	m_shortname = "s3_764";
 }
@@ -60,7 +60,7 @@ isa8_svga_s3_device::isa8_svga_s3_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return space->machine().root_device().ioport("IN0")->read(); }
 
-void isa8_svga_s3_device::device_start()
+void isa16_svga_s3_device::device_start()
 {
 	set_isa_device();
 
@@ -78,7 +78,7 @@ void isa8_svga_s3_device::device_start()
 	m_isa->install_device(0x03b0, 0x03bf, 0, 0, FUNC(s3_port_03b0_r), FUNC(s3_port_03b0_w));
 	m_isa->install_device(0x03c0, 0x03cf, 0, 0, FUNC(s3_port_03c0_r), FUNC(s3_port_03c0_w));
 	m_isa->install_device(0x03d0, 0x03df, 0, 0, FUNC(s3_port_03d0_r), FUNC(s3_port_03d0_w));
-	m_isa->install_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_port_9ae8_r), FUNC(s3_port_9ae8_w));
+	m_isa->install16_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_port_9ae8_r), FUNC(s3_port_9ae8_w));
 
 	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(s3_mem_r), FUNC(s3_mem_w));
 }
@@ -87,7 +87,7 @@ void isa8_svga_s3_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_svga_s3_device::device_reset()
+void isa16_svga_s3_device::device_reset()
 {
 	pc_vga_reset(machine());
 }

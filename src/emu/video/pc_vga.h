@@ -64,8 +64,8 @@ READ8_HANDLER(s3_port_03c0_r);
 WRITE8_HANDLER(s3_port_03c0_w);
 READ8_HANDLER(s3_port_03d0_r);
 WRITE8_HANDLER(s3_port_03d0_w);
-READ8_HANDLER(s3_port_9ae8_r);
-WRITE8_HANDLER(s3_port_9ae8_w);
+READ16_HANDLER(s3_port_9ae8_r);
+WRITE16_HANDLER(s3_port_9ae8_w);
 READ8_HANDLER(s3_mem_r);
 WRITE8_HANDLER(s3_mem_w);
 

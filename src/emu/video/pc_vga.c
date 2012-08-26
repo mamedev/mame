@@ -193,6 +193,7 @@ static struct
 	UINT8 crt_reg_lock;
 	UINT8 reg_lock1;
 	UINT8 reg_lock2;
+	UINT8 enable_8514;
 }s3;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
@@ -2563,6 +2564,9 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 				/* TODO: reg lock mechanism */
 				s3.reg_lock2 = data;
 				break;
+			case 0x40:
+				s3.enable_8514 = data & 0x01;  // enable 8514/A registers (x2e8, x6e8, xae8, xee8)
+				break;
 			case 0x51:
 				vga.crtc.start_addr &= ~0xc0000;
 				vga.crtc.start_addr |= ((data & 0x3) << 18);
@@ -2686,14 +2690,128 @@ WRITE8_HANDLER(s3_port_03d0_w)
 }
 
 /* accelerated ports, TBD ... */
-READ8_HANDLER(s3_port_9ae8_r)
+/*
+  9AE8h W(R):  Graphics Processor Status Register (GP_STAT)
+bit   0-7  Queue State.
+             00h = 8 words available - queue is empty
+             01h = 7 words available
+             03h = 6 words available
+             07h = 5 words available
+             0Fh = 4 words available
+             1Fh = 3 words available
+             3Fh = 2 words available
+             7Fh = 1 word  available
+             FFh = 0 words available - queue is full
+        8  (911-928) DTA AVA. Read Data Available. If set data is ready to be
+            read from the PIX_TRANS register (E2E8h).
+        9  HDW BSY. Hardware Graphics Processor Busy
+           If set the Graphics Processor is busy.
+       10  (928 +) AE. All FIFO Slots Empty. If set all FIFO slots are empty.
+    11-15  (864/964) (R) Queue State bits 8-12. 1Fh if 8 words or less
+            available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
+            12 words and 0 for 13 words available.
+ */
+READ16_HANDLER(s3_port_9ae8_r)
 {
-	return 0;
+	logerror("S3: 9AE8 read\n");
+	if(s3.enable_8514 != 0)
+		return 0;
+	else
+		return 0xffff;
 }
 
-WRITE8_HANDLER(s3_port_9ae8_w)
+/*
+9AE8h W(W):  Drawing Command Register (CMD)
+bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
+            enabled. If clear operations execute normally but writes are
+            disabled.
+        1  PX MD. Pixel Mode. Defines the orientation of the display bitmap.
+             0 = Through plane mode (Single pixel transferred at a time)
+             1 = Across plane mode (Multiple pixels transferred at a time).
+        2  LAST PXOF. Last Pixel Off. If set the last pixel of a line command
+           (CMD_LINE, SSV or LINEAF) is not drawn. This is used for mixes such
+           as XOR where drawing the same pixel twice would give the wrong
+           color.
+        3  DIR TYP. Direction Type.
+             0: Bresenham line drawing (X-Y Axial)
+                  CMD_LINE draws a line using the Bresenham algorithm as
+                  specified in the DESTY_AXSTP (8AE8h), DESTX_DIASTP (8EE8h),
+                  ERR_TERM (92E8h) and MAJ_AXIS_PCNT (96E8h) registers
+                  INC_X, INC_Y and YMAJAXIS determines the direction.
+             1: Vector line draws (Radial).
+                  CMD_NOP allows drawing of Short Stroke Vectors (SSVs) by
+                  writing to the Short Stroke register (9EE8h).
+                  CMD_LINE draws a vector of length MAJ_AXIS_PCNT (96E8h)
+                  in the direction specified by LINEDIR (bits 5-7).
+                  DRWG-DIR determines the direction of the line.
+        4  DRAW YES. If clear the current position is moved, but no pixels
+           are modified. This bit should be set when attempting read or
+           write of bitmap data.
+      5-7  DRWG-DIR. Drawing Direction. When a line draw command (CMD_LINE)
+           with DIR TYP=1 (Radial) is issued, these bits define the direction
+           of the line counter clockwise relative to the positive X-axis.
+             0 = 000 degrees
+             1 = 045 degrees
+             2 = 090 degrees
+             3 = 135 degrees
+             4 = 180 degrees
+             5 = 225 degrees
+             6 = 270 degrees
+             7 = 315 degrees
+        5  INC_X. This bit together with INC_Y determines which quadrant
+           the slope of a line lies within. They also determine the
+           orientation of rectangle draw commands.
+           If set lines are drawn in the positive X direction (left to right).
+        6  YMAJAXIS. For Bresenham line drawing commands this bit determines
+           which axis is the independent or major axis. INC_X and INC_Y
+           determines which quadrant the slope falls within. This bit further
+           defines the slope to within an octant.
+           If set Y is the major (independent) axis.
+        7  INC_Y. This bit together with INC_X determines which quadrant
+           the slope of a line lies within. They also determine the
+           orientation of rectangle draw commands.
+           If set lines are drawn in the positive Y direction (down).
+        8  WAIT YES. If set the drawing engine waits for read/write of the
+           PIX_TRANS register (E2E8h) for each pixel during a draw operation.
+        9  (911-928) BUS SIZE. If set the PIX_TRANS register (E2E8h) is
+            processed internally as two bytes in the order specified by BYTE
+            SWAP. If clear all accesses to E2E8h are 8bit.
+     9-10  (864,964) BUS SIZE. Select System Bus Size. Controls the width of
+            the Pixel Data Transfer registers (E2E8h,E2EAh) and the memory
+            mapped I/O. 0: 8bit, 1: 16bit, 2: 32bit
+       12  BYTE SWAP. Affects both reads and writes of SHORT_STROKE (9EE8h)
+           and PIX_TRANS (E2E8h) when 16bit=1.
+           If set take low byte first, if clear take high byte first.
+    13-15  Draw Command:
+            0 = NOP. Used for Short Stroke Vectors.
+            1 = Draw Line. If bit 3 is set the line is drawn to the angle in
+                bits 5-7 and the length in the Major Axis Pixel Count register
+                (96E8h), if clear the line is drawn from the Bresenham
+                constants in the Axial Step Constant register(8AE8h), Diagonal
+                Step Constant register (8EE8h), Line Error Term register
+               (92E8h) and bits 5-7 of this register.
+            2 = Rectangle Fill. The Destination X (8EE8h) and Y (8AE8h)
+                registers holds the coordinates of the rectangle to fill and
+                the Major Axis Pixel Count register (96E8h) holds the
+                horizontal width (in pixels) fill and the Minor Axis Pixel
+                Count register (BEE8h index 0) holds the height of the
+                rectangle.
+            6 = BitBLT. Copies the source rectangle specified by the Current X
+                (86E8h) and Y (8AE8h) registers to the destination rectangle,
+                specified as for the Rectangle Fills.
+            7 = (80x +) Pattern Fill. The source rectangle is an 8x8 pattern
+                rectangle, which is copied repeatably to the destination
+                rectangle.
+ */
+WRITE16_HANDLER(s3_port_9ae8_w)
 {
-	// ...
+	/* really needs to be 16-bit... */
+	if(s3.enable_8514 != 0)
+	{
+		logerror("S3: 9AE8+%i write %04x\n",offset,data);
+	}
+	else
+		logerror("S3: Write to 8514/A port 9ae8 while disabled.\n");
 }
 
 READ8_HANDLER( s3_mem_r )

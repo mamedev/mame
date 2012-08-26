@@ -294,6 +294,7 @@ public:
 
 	void install16_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_device_func rhandler, const char* rhandler_name, write16_device_func whandler, const char *whandler_name);
 	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
+	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_space_func rhandler, const char* rhandler_name, write16_space_func whandler, const char *whandler_name);
 
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
 	DECLARE_WRITE_LINE_MEMBER( irq11_w );
