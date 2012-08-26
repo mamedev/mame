@@ -49,16 +49,16 @@
 		<bezel name="digit10" element="digit">
 			<bounds left="274" top="45" right="308" bottom="84" />
 		</bezel>
-		<bezel name="digit7" element="digit">
+		<bezel name="digit9" element="digit">
 			<bounds left="30" top="145" right="54" bottom="170" />
 		</bezel>
-		<bezel name="digit6" element="digit">
+		<bezel name="digit8" element="digit">
 			<bounds left="64" top="145" right="88" bottom="170" />
 		</bezel>
-		<bezel name="digit9" element="digit">
+		<bezel name="digit7" element="digit">
 			<bounds left="230" top="145" right="254" bottom="170" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit6" element="digit">
 			<bounds left="264" top="145" right="288" bottom="170" />
 		</bezel>
 		<bezel element="P0"><bounds left="230" right="288" top="110" bottom="135" /></bezel>

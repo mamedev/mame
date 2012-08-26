@@ -66,14 +66,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( flicker )
 	PORT_START("TEST")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Slam") PORT_CODE(KEYCODE_HOME)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1 coin credit") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2 credit") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3 credit") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4 credit") PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5 credit") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6 credit") PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Tilt") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Start") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_COIN1) // 1 credit
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_COIN2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_COIN3)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_COIN4)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_COIN5)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_COIN6) // 6 credits
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test")
 
 	PORT_START("B0")
@@ -111,7 +111,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( flicker_state::port02_r )
 {
-	offset = cpu_get_reg(m_maincpu, I4004_RAM) - 0x20; // we need the full address
+	offset = cpu_get_reg(m_maincpu, I4004_RAM) & 0x0f; // we need the full address
 
 	if (offset < 7)
 	{
@@ -132,10 +132,9 @@ WRITE8_MEMBER( flicker_state::port00_w )
 WRITE8_MEMBER( flicker_state::port01_w )
 {
 // The output lines operate the various lamps (44 of them)
-	offset = cpu_get_reg(m_maincpu, I4004_RAM) - 0x10; // we need the full address
+	offset = cpu_get_reg(m_maincpu, I4004_RAM) & 0x0f; // we need the full address
 
-	if (offset < 0x10)
-		i4004_set_test(m_maincpu, BIT(ioport("TEST")->read(), offset));
+	i4004_set_test(m_maincpu, BIT(ioport("TEST")->read(), offset));
 }
 
 WRITE8_MEMBER( flicker_state::port10_w )
@@ -152,7 +151,7 @@ WRITE8_MEMBER( flicker_state::port10_w )
     9 = knocker
     A = coin counter
     B = coin acceptor */
-	offset = cpu_get_reg(m_maincpu, I4004_RAM) - 0x10; // we need the full address
+	offset = cpu_get_reg(m_maincpu, I4004_RAM) & 0x0f; // we need the full address
 	if (data && data != offset)
 	{
 		switch (offset)
@@ -174,8 +173,8 @@ WRITE8_MEMBER( flicker_state::port10_w )
 				beep_set_frequency(m_beeper, 200);
 				break;
 			case 0x0a:
-				coin_counter_w(machine(), 0, 1);
-				coin_counter_w(machine(), 0, 0);
+				//coin_counter_w(machine(), 0, 1);
+				//coin_counter_w(machine(), 0, 0);
 				break;
 			default:
 				break;
