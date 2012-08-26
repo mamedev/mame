@@ -1785,15 +1785,14 @@ VIDEO_START( snes )
 	state_save_register_global_pointer(machine, state->m_snes_oam, SNES_OAM_SIZE/2);
 }
 
-SCREEN_UPDATE_RGB32( snes )
+UINT32 snes_state::snes_screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	snes_state *state = screen.machine().driver_data<snes_state>();
 	int y;
 
 	/*NTSC SNES draw range is 1-225. */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		state->snes_refresh_scanline(screen.machine(), bitmap, y + 1);
+		snes_refresh_scanline(screen.machine(), bitmap, y + 1);
 	}
 	return 0;
 }

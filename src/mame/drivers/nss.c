@@ -2,7 +2,7 @@
 
 	Nintendo Super System
 
-	driver by Angelo Salese, based off info from Nocash
+	driver by Angelo Salese, based off info from Noca$h
 
 	TODO:
 	- EEPROM
@@ -315,14 +315,18 @@ public:
 	DECLARE_WRITE8_MEMBER(port_01_w);
 	DECLARE_READ8_MEMBER(nss_prot_r);
 	DECLARE_WRITE8_MEMBER(nss_prot_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	DECLARE_DRIVER_INIT(nss);
+	bitmap_rgb32 *m_tmpbitmap;
+
 };
+
+
 
 UINT32 nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_m50458->screen_update(screen,bitmap,cliprect);
+
 	return 0;
 }
 
@@ -483,7 +487,6 @@ READ8_MEMBER(nss_state::nss_prot_r)
 
 WRITE8_MEMBER(nss_state::nss_prot_w)
 {
-
 	if (m_cart_sel == 0)
 	{
 		rp5h01_enable_w(m_rp5h01, 0, 0);
@@ -492,13 +495,9 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 		rp5h01_cs_w(m_rp5h01, 0, ~data & 0x01);
 		rp5h01_enable_w(m_rp5h01, 0, 1);
 	}
-	//ioport("EEPROMOUT")->write(data, 0xff);
-}
-
-WRITE8_MEMBER(nss_state::eeprom_w)
-{
 	ioport("EEPROMOUT")->write(data, 0xff);
 }
+
 
 static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -506,9 +505,8 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(ram_wp_r,ram_wp_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("EEPROMIN")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_REGION("ibios_rom", 0x6000 )
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(eeprom_w)
 	AM_RANGE(0xe000, 0xffff) AM_READ(nss_prot_r)
-	AM_RANGE(0xe001, 0xffff) AM_WRITE(nss_prot_w)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(nss_prot_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(nss_state::port_00_r)
@@ -573,18 +571,11 @@ WRITE8_MEMBER(nss_state::port_01_w)
 }
 
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
-	/* TODO: I think that this actually masks to 0x7? */
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")  AM_WRITE(port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(rtc_osd_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("RTC")
-
-	AM_RANGE(0x72, 0x72) AM_WRITE(rtc_osd_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(port_00_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(port_01_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(rtc_osd_w)
-	AM_RANGE(0xea, 0xea) AM_WRITE(rtc_osd_w)
 ADDRESS_MAP_END
 
 /* Mitsubishi M6M80011 */
@@ -608,6 +599,7 @@ static MACHINE_START( nss )
 	MACHINE_START_CALL(snes);
 
 	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	state->m_tmpbitmap = auto_bitmap_rgb32_alloc(machine,24*12,12*18);
 }
 
 static INPUT_PORTS_START( snes )
@@ -785,7 +777,7 @@ static MACHINE_CONFIG_START( snes, nss_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_STATIC( snes )
+	MCFG_SCREEN_UPDATE_DRIVER( snes_state, snes_screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -843,7 +835,8 @@ MACHINE_CONFIG_END
 	ROM_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
 	ROM_LOAD("nss-ic14.02", 0x10000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF) \
-	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF) \
+	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASEFF )
 
 
 

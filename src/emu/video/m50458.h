@@ -63,6 +63,7 @@ protected:
 	int m_cmd_stream_pos;
 	UINT16 m_osd_addr;
 	UINT8 m_bg_pen;
+	UINT8 m_phase;
 
 	m50458_state_t m_osd_state;
 

@@ -425,6 +425,8 @@ public:
 	UINT16                m_vtime;
 	UINT16                m_vmadd;
 
+	UINT32 snes_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	/* timers */
 	emu_timer             *m_scanline_timer;
 	emu_timer             *m_hblank_timer;

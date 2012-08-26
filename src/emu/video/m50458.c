@@ -33,12 +33,15 @@ ROM_END
 
 WRITE16_MEMBER( m50458_device::vreg_120_w)
 {
-	// ...
+	printf("%04x\n",data);
 }
 
 WRITE16_MEMBER( m50458_device::vreg_126_w)
 {
-	// ...
+	/* Raster Color Setting */
+	m_phase = data & 7;
+
+	//printf("%04x\n",data);
 }
 
 
@@ -212,6 +215,13 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	int x,y;
 	UINT8 *pcg = memregion("m50458")->base();
+	UINT8 bg_r,bg_g,bg_b;
+
+	/* TODO: there's probably a way to control the brightness in this */
+	bg_r = m_phase & 1 ? 0xff : 0;
+	bg_g = m_phase & 2 ? 0xff : 0;
+	bg_b = m_phase & 4 ? 0xff : 0;
+	bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
 
 	for(y=0;y<12;y++)
 	{
@@ -244,7 +254,8 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					g = (tile & 0x200 && pix) ? 0xff : 0x00;
 					b = (tile & 0x400 && pix) ? 0xff : 0x00;
 
-					bitmap.pix32(y*18+yi,x*12+(xi-4)) = r << 16 | g << 8 | b;
+					if(r || g || b)
+						bitmap.pix32(y*18+yi,x*12+(xi-4)) = r << 16 | g << 8 | b;
 				}
 			}
 		}
