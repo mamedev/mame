@@ -66,15 +66,20 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( flicker )
 	PORT_START("TEST")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Door Slam") PORT_CODE(KEYCODE_HOME)
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_COIN1) // 1 credit
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_COIN2)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_COIN3)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_COIN4)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_COIN5)
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_COIN6) // 6 credits
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_TILT)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test")
+
+	PORT_START("COIN")
+	// The coin slot would be connected to one of six lines via a wire jumper on a terminal strip
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_COIN1)
+	PORT_DIPNAME( 0x07e0, 0x0020, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_6C ) )
 
 	PORT_START("B0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Left Lane Target") PORT_CODE(KEYCODE_W)
@@ -134,7 +139,13 @@ WRITE8_MEMBER( flicker_state::port01_w )
 // The output lines operate the various lamps (44 of them)
 	offset = cpu_get_reg(m_maincpu, I4004_RAM) & 0x0f; // we need the full address
 
-	i4004_set_test(m_maincpu, BIT(ioport("TEST")->read(), offset));
+	UINT16 test_port = ioport("TEST")->read() & 0xf81e;
+	UINT16 coin_port = ioport("COIN")->read() & 0x07e0;
+
+	if (BIT(ioport("COIN")->read(), 0) )
+		test_port |= coin_port;
+
+	i4004_set_test(m_maincpu, BIT(test_port, offset));
 }
 
 WRITE8_MEMBER( flicker_state::port10_w )
