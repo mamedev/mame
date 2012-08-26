@@ -145,7 +145,7 @@ UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
         case 5:
         case 6:
         case 7:
-            return ncr5380_read_reg(m_ncr5380, offset);
+            return m_ncr5380->ncr5380_read_reg(offset);
 
     case 9:         // card's ID?
         return 7;
@@ -173,7 +173,7 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
         case 5:
         case 6:
         case 7:
-            ncr5380_write_reg(m_ncr5380, offset, data);
+            m_ncr5380->ncr5380_write_reg(offset, data);
             break;
 
         case 0xa:  // ROM and RAM banking (74LS273 at U3E)

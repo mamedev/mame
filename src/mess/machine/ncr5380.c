@@ -156,7 +156,7 @@ void ncr5380_device::device_stop()
 //-------------------------------------------------
 //  Public API
 //-------------------------------------------------
-READ8_DEVICE_HANDLER_TRAMPOLINE(ncr5380, ncr5380_read_reg)
+UINT8 ncr5380_device::ncr5380_read_reg(UINT32 offset)
 {
 	int reg = offset & 7;
 	UINT8 rv = 0;
@@ -240,7 +240,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ncr5380, ncr5380_read_reg)
 	return rv;
 }
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(ncr5380, ncr5380_write_reg)
+void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 {
 	int reg = offset & 7;
 
@@ -471,14 +471,4 @@ void ncr5380_device::ncr5380_write_data(int bytes, UINT8 *pData)
 	{
 		logerror("ncr5380: write to unknown device SCSI ID %d\n", m_last_id);
 	}
-}
-
-void ncr5380_read_data(device_t *dev, UINT8 bytes, UINT8 *pData)
-{
-	return downcast<ncr5380_device*>(dev)->ncr5380_read_data(bytes, pData);
-}
-
-void ncr5380_write_data(device_t *dev, UINT8 bytes, UINT8 *pData)
-{
-	downcast<ncr5380_device*>(dev)->ncr5380_write_data(bytes, pData);
 }

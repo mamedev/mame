@@ -974,7 +974,7 @@ Note:  Asserting the DACK signal applies only to write operations to
 READ16_MEMBER ( mac_state::macplus_scsi_r )
 {
 	int reg = (offset>>3) & 0xf;
-	device_t *ncr = space.machine().device("ncr5380");
+	ncr5380_device *ncr = space.machine().device<ncr5380_device>("ncr5380");
 
 //  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
@@ -983,23 +983,23 @@ READ16_MEMBER ( mac_state::macplus_scsi_r )
 		reg = R5380_CURDATA_DTACK;
 	}
 
-	return ncr5380_read_reg(ncr, reg)<<8;
+	return ncr->ncr5380_read_reg(reg)<<8;
 }
 
 READ32_MEMBER (mac_state::macii_scsi_drq_r)
 {
-	device_t *ncr = space.machine().device("ncr5380");
+	ncr5380_device *ncr = space.machine().device<ncr5380_device>("ncr5380");
 
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			return ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<24;
+			return ncr->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24;
 
 		case 0xffff0000:
-			return (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<24) | (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<16);
+			return (ncr->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24) | (ncr->ncr5380_read_reg(R5380_CURDATA_DTACK)<<16);
 
 		case 0xffffffff:
-			return (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<24) | (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<16) | (ncr5380_read_reg(ncr, R5380_CURDATA_DTACK)<<8) | ncr5380_read_reg(ncr, R5380_CURDATA_DTACK);
+			return (ncr->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24) | (ncr->ncr5380_read_reg(R5380_CURDATA_DTACK)<<16) | (ncr->ncr5380_read_reg(R5380_CURDATA_DTACK)<<8) | ncr->ncr5380_read_reg(R5380_CURDATA_DTACK);
 
 		default:
 			logerror("macii_scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
@@ -1010,24 +1010,24 @@ READ32_MEMBER (mac_state::macii_scsi_drq_r)
 
 WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 {
-	device_t *ncr = space.machine().device("ncr5380");
+	ncr5380_device *ncr = space.machine().device<ncr5380_device>("ncr5380");
 
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>24);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
 			break;
 
 		case 0xffff0000:
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>24);
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>16);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>16);
 			break;
 
 		case 0xffffffff:
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>24);
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>16);
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data>>8);
-			ncr5380_write_reg(ncr, R5380_OUTDATA_DTACK, data&0xff);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>16);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>8);
+			ncr->ncr5380_write_reg(R5380_OUTDATA_DTACK, data&0xff);
 			break;
 
 		default:
@@ -1039,7 +1039,7 @@ WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
-	device_t *ncr = space.machine().device("ncr5380");
+	ncr5380_device *ncr = space.machine().device<ncr5380_device>("ncr5380");
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
@@ -1048,13 +1048,13 @@ WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	ncr5380_write_reg(ncr, reg, data);
+	ncr->ncr5380_write_reg(reg, data);
 }
 
 WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
-	device_t *ncr = space.machine().device("ncr5380");
+	ncr5380_device *ncr = space.machine().device<ncr5380_device>("ncr5380");
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 
@@ -1063,7 +1063,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	ncr5380_write_reg(ncr, reg, data>>8);
+	ncr->ncr5380_write_reg(reg, data>>8);
 }
 
 void mac_scsi_irq(running_machine &machine, int state)

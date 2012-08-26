@@ -76,13 +76,4 @@ private:
 // device type definition
 extern const device_type NCR5380;
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-READ8_DEVICE_HANDLER(ncr5380_read_reg);
-WRITE8_DEVICE_HANDLER(ncr5380_write_reg);
-
-void ncr5380_read_data(device_t *dev, int bytes, UINT8 *pData);
-void ncr5380_write_data(device_t *dev, int bytes, UINT8 *pData);
-
 #endif
