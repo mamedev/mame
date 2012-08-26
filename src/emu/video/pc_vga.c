@@ -194,6 +194,19 @@ static struct
 	UINT8 reg_lock1;
 	UINT8 reg_lock2;
 	UINT8 enable_8514;
+	UINT16 current_cmd;
+	UINT16 dest_x;
+	UINT16 dest_y;
+	UINT16 curr_x;
+	UINT16 curr_y;
+	UINT16 line_axial_step;
+	UINT16 line_diagonal_step;
+	UINT16 rect_width;
+	UINT16 rect_height;
+	UINT32 fgcolour;
+	UINT32 bgcolour;
+	UINT32 pixel_xfer;
+	UINT8 multifunc_sel;
 }s3;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
@@ -2711,7 +2724,7 @@ bit   0-7  Queue State.
             available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
             12 words and 0 for 13 words available.
  */
-READ16_HANDLER(s3_port_9ae8_r)
+READ16_HANDLER(s3_gpstatus_r)
 {
 	logerror("S3: 9AE8 read\n");
 	if(s3.enable_8514 != 0)
@@ -2790,7 +2803,7 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 constants in the Axial Step Constant register(8AE8h), Diagonal
                 Step Constant register (8EE8h), Line Error Term register
                (92E8h) and bits 5-7 of this register.
-            2 = Rectangle Fill. The Destination X (8EE8h) and Y (8AE8h)
+            2 = Rectangle Fill. The Current X (86E8h) and Y (82E8h)
                 registers holds the coordinates of the rectangle to fill and
                 the Major Axis Pixel Count register (96E8h) holds the
                 horizontal width (in pixels) fill and the Minor Axis Pixel
@@ -2803,15 +2816,237 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 rectangle, which is copied repeatably to the destination
                 rectangle.
  */
-WRITE16_HANDLER(s3_port_9ae8_w)
+WRITE16_HANDLER(s3_cmd_w)
 {
 	/* really needs to be 16-bit... */
 	if(s3.enable_8514 != 0)
 	{
-		logerror("S3: 9AE8+%i write %04x\n",offset,data);
+		int x,y;
+		int dir_x;
+		UINT32 offset;
+		s3.current_cmd = data;
+		switch(data & 0xe000)
+		{
+		case 0x0000:  // NOP (for "Short Stroke Vectors")
+			logerror("S3: Command (%04x) - NOP\n",s3.current_cmd);
+			break;
+		case 0x2000:  // Line
+			logerror("S3: Command (%04x) - Line\n",s3.current_cmd);
+			break;
+		case 0x4000:  // Rectangle Fill
+			// TODO: handle wait-per-pixel drawing
+			offset = VGA_START_ADDRESS;
+			offset += (VGA_LINE_LENGTH * s3.curr_y);
+			offset += s3.curr_x;
+			if(s3.current_cmd & 0x0010) // INC_X (rectangle horizontal direction)
+				dir_x = 2;
+			else
+				dir_x = -2;
+			for(y=0;y<s3.rect_height;y++)
+			{
+				for(x=0;x<s3.rect_width;x+=dir_x)
+				{
+					vga.memory[(offset+x) % vga.svga_intf.vram_size] = s3.fgcolour & 0x000000ff;  // TODO: handle 16-bit or 32-bit transfers
+					vga.memory[(offset+x+1) % vga.svga_intf.vram_size] = (s3.fgcolour & 0x0000ff00) >> 8;
+				}
+				if(s3.current_cmd & 0x0040) // INC_Y (rectangle vertical direction)
+					offset += VGA_LINE_LENGTH;
+				else
+					offset -= VGA_LINE_LENGTH;
+			}
+			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+			break;
+		case 0xc000:  // BitBLT
+			logerror("S3: Command (%04x) - BitBLT\n",s3.current_cmd);
+			break;
+		case 0xe000:  // Pattern Fill
+			logerror("S3: Command (%04x) - Pattern Fill\n",s3.current_cmd);
+			break;
+		default:
+			logerror("S3: Unknown command: %04x\n",data);
+		}
 	}
 	else
 		logerror("S3: Write to 8514/A port 9ae8 while disabled.\n");
+}
+
+/*
+8AE8h W(R/W):  Destination Y Position & Axial Step Constant Register
+               (DESTY_AXSTP)
+bit  0-11  DESTINATION Y-POSITION. During BITBLT operations this is the Y
+           co-ordinate of the destination in pixels.
+     0-12  (911/924) LINE PARAMETER AXIAL STEP CONSTANT. During Line Drawing,
+            this is the Bresenham constant 2*dminor in two's complement
+            format. (dminor is the length of the line projected onto the minor
+            or dependent axis).
+     0-13  (80 x+) LINE PARAMETER AXIAL STEP CONSTANT. Se above
+
+ */
+READ16_HANDLER( s3_8ae8_r )
+{
+	return s3.line_axial_step;
+}
+
+WRITE16_HANDLER( s3_8ae8_w )
+{
+	s3.line_axial_step = data & 0x3fff;
+	s3.dest_y = data & 0x0fff;
+	logerror("S3: Line Axial Step / Destination Y write %04x\n",data);
+}
+
+/*
+8EE8h W(R/W):  Destination X Position & Diagonal Step Constant Register
+               (DESTX_DISTP)
+bit  0-11  DESTINATION X-POSITION. During BITBLT operations this is the X
+           co-ordinate of the destination in pixels.
+     0-12  (911/924) LINE PARAMETER DIAGONAL STEP CONSTANT. During Line
+            Drawing this is the Bresenham constant 2*dminor-2*dmajor in two's
+            complement format. (dminor is the length of the line projected
+            onto the minor or dependent axis, dmajor is the length of the line
+            projected onto the major or independent axis)
+     0-13  (80x +) LINE PARAMETER DIAGONAL STEP CONSTANT. Se above
+
+ */
+READ16_HANDLER( s3_8ee8_r )
+{
+	return s3.line_diagonal_step;
+}
+
+WRITE16_HANDLER( s3_8ee8_w )
+{
+	s3.line_diagonal_step = data & 0x3fff;
+	s3.dest_x = data & 0x0fff;
+	logerror("S3: Line Diagonal Step / Destination X write %04x\n",data);
+}
+
+/*
+96E8h W(R/W):  Major Axis Pixel Count/Rectangle Width Register (MAJ_AXIS_PCNT)
+bit  0-10  (911/924)  RECTANGLE WIDTH/LINE PARAMETER MAX. For BITBLT and
+            rectangle commands this is the width of the area. For Line Drawing
+            this is the Bresenham constant dmajor in two's complement format.
+            (dmajor is the length of the line projected onto the major or
+            independent axis). Must be positive.
+     0-11  (80x +) RECTANGLE WIDTH/LINE PARAMETER MAX. See above
+ */
+READ16_HANDLER( s3_width_r )
+{
+	return s3.rect_width;
+}
+
+WRITE16_HANDLER( s3_width_w )
+{
+	s3.rect_width = data & 0x0fff;
+	logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
+}
+
+READ16_HANDLER(s3_currentx_r)
+{
+	return s3.curr_x;
+}
+
+WRITE16_HANDLER(s3_currentx_w)
+{
+	s3.curr_x = data & 0x0fff;
+}
+
+READ16_HANDLER(s3_currenty_r)
+{
+	return s3.curr_y;
+}
+
+WRITE16_HANDLER(s3_currenty_w)
+{
+	s3.curr_y = data & 0x0fff;
+}
+
+READ16_HANDLER(s3_fgcolour_r)
+{
+	return s3.fgcolour;
+}
+
+WRITE16_HANDLER(s3_fgcolour_w)
+{
+	s3.fgcolour = data;
+	logerror("S3: Foreground Colour write %04x\n",data);
+}
+
+READ16_HANDLER(s3_bgcolour_r)
+{
+	return s3.bgcolour;
+}
+
+WRITE16_HANDLER(s3_bgcolour_w)
+{
+	s3.bgcolour = data;
+	logerror("S3: Background Colour write %04x\n",data);
+}
+
+READ16_HANDLER( s3_multifunc_r )
+{
+	switch(s3.multifunc_sel)
+	{
+	case 0:
+		return s3.rect_height;
+		// TODO: remaining functions
+	default:
+		logerror("S3: Unimplemented multifunction register %i selected\n",s3.multifunc_sel);
+		return 0xff;
+	}
+}
+
+WRITE16_HANDLER( s3_multifunc_w )
+{
+	switch(data & 0xf000)
+	{
+/*
+BEE8h index 00h W(R/W): Minor Axis Pixel Count Register (MIN_AXIS_PCNT).
+bit  0-10  (911/924) Rectangle Height. Height of BITBLT or rectangle command.
+            Actual height is one larger.
+     0-11  (80x +) Rectangle Height. See above
+*/
+	case 0x0000:
+		s3.rect_height = data & 0x0fff;
+		logerror("S3: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
+		break;
+/*
+BEE8h index 0Fh W(W):  Read Register Select Register (READ_SEL)    (801/5,928)
+bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
+            that is actually read when a read of BEE8h happens. Each read of
+            BEE8h increments this register by one.
+             0: Read will return contents of BEE8h index 0.
+             1: Read will return contents of BEE8h index 1.
+             2: Read will return contents of BEE8h index 2.
+             3: Read will return contents of BEE8h index 3.
+             4: Read will return contents of BEE8h index 4.
+             5: Read will return contents of BEE8h index 0Ah.
+             6: Read will return contents of BEE8h index 0Eh.
+             7: Read will return contents of 9AE8h (Bits 13-15 will be 0).
+      0-3  (864,964) READ-REG-SEL. See above plus:
+             8: Read will return contents of 42E8h (Bits 12-15 will be 0)
+             9: Read will return contents of 46E8h
+            10: Read will return contents of BEE8h index 0Dh
+ */
+	case 0xf000:
+		s3.multifunc_sel = data & 0x000f;
+	default:
+		logerror("S3: Unimplemented multifunction register %i write\n",data >> 12);
+	}
+}
+
+READ16_HANDLER(s3_pixel_xfer_r)
+{
+	if(offset == 1)
+		return (s3.pixel_xfer & 0xffff0000) >> 16;
+	else
+		return s3.pixel_xfer & 0x0000ffff;
+}
+
+WRITE16_HANDLER(s3_pixel_xfer_w)
+{
+	if(offset == 1)
+		s3.pixel_xfer = (s3.pixel_xfer & 0x0000ffff) | (data << 16);
+	else
+		s3.pixel_xfer = (s3.pixel_xfer & 0xffff0000) | data;
 }
 
 READ8_HANDLER( s3_mem_r )
