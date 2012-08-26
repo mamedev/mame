@@ -1,6 +1,17 @@
-/*
+/*************************************************************************************
+
     Zaccaria Generation 1
-*/
+
+
+ToDo:
+- Inputs
+- Outputs
+- Display
+- Sound
+- Artwork
+- Int generator
+
+**************************************************************************************/
 
 
 #include "emu.h"
@@ -11,13 +22,19 @@ class zac_1_state : public driver_device
 public:
 	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_p_ram(*this, "ram")
 	{ }
 
+	DECLARE_READ8_MEMBER(ctrl_r);
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_READ8_MEMBER(serial_r);
+	DECLARE_WRITE8_MEMBER(serial_w);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_p_ram;
 
 	// driver_device overrides
 	virtual void machine_reset();
@@ -27,11 +44,41 @@ public:
 
 
 static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8, zac_1_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x13ff) AM_ROM
+	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x1c00, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(zac_1_io, AS_IO, 8, zac_1_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(serial_r,serial_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_1 )
 INPUT_PORTS_END
+
+READ8_MEMBER( zac_1_state::ctrl_r )
+{
+// reads inputs
+	return 0xff;
+}
+
+WRITE8_MEMBER( zac_1_state::ctrl_w )
+{
+}
+
+READ8_MEMBER( zac_1_state::serial_r )
+{
+// from printer
+	return 0;
+}
+
+WRITE8_MEMBER( zac_1_state::serial_w )
+{
+// to printer
+}
 
 void zac_1_state::machine_reset()
 {
@@ -45,6 +92,7 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_1_map)
+	MCFG_CPU_IO_MAP(zac_1_io)
 MACHINE_CONFIG_END
 
 
