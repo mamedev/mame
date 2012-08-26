@@ -401,7 +401,6 @@ New notes:
 
 */
 /*
-Nocash info: http://nocash.emubase.de/fullsnes.htm
 map
 0x0000 - 0x7fff BIOS
 0x8000 - 0x8fff RAM
