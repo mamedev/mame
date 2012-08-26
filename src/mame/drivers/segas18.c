@@ -298,8 +298,8 @@ WRITE16_MEMBER( segas18_state::io_chip_w )
 			segaic16_sprites_set_flip(machine(), 0, data & 0x20);
 // These are correct according to cgfm's docs, but mwalker and ddcrew both
 // enable the lockout and never turn it off
-            coin_lockout_w(machine(), 1, data & 0x08);
-            coin_lockout_w(machine(), 0, data & 0x04);
+//            coin_lockout_w(machine(), 1, data & 0x08);
+//            coin_lockout_w(machine(), 0, data & 0x04);
 			coin_counter_w(machine(), 1, data & 0x02);
 			coin_counter_w(machine(), 0, data & 0x01);
 			break;
