@@ -1,31 +1,14 @@
 /***************************************************************************
 
-  nss.c
+	Nintendo Super System
 
-  Driver file to handle emulation of the Nintendo Super System.
+	driver by Angelo Salese, based off info from Nocash
 
-  R. Belmont
-  Anthony Kruize
-  Based on the original MESS driver by Lee Hammerton (aka Savoury Snax)
-
-  Driver is preliminary right now.
-
-  The memory map included below is setup in a way to make it easier to handle
-  Mode 20 and Mode 21 ROMs.
-
-  Todo (in no particular order):
-    - Fix additional sound bugs
-    - Emulate extra chips - superfx, dsp2, sa-1 etc.
-    - Add horizontal mosaic, hi-res. interlaced etc to video emulation.
-    - Fix support for Mode 7. (In Progress)
-    - Handle interleaved roms (maybe even multi-part roms, but how?)
-    - Add support for running at 3.58Mhz at the appropriate time.
-    - I'm sure there's lots more ...
-
-    Nintendo Super System
-
-  There is a second processor and Menu system for selecting the games
-  controlling timer etc.? which still needs emulating there are dipswitches too
+	TODO:
+	- EEPROM
+	- Various M50458 bits
+	- Still dies at a cart check, why?
+	- OSD should actually super-impose with the SNES video somehow;
 
 ***************************************************************************
 
@@ -403,6 +386,7 @@ New notes:
 
 */
 /*
+noca$h info @ nocash.emubase.de/fullsnes.htm
 map
 0x0000 - 0x7fff BIOS
 0x8000 - 0x8fff RAM
@@ -784,7 +768,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( snes, nss_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
+	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)	/* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
 	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
@@ -1041,26 +1025,23 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 {
 	UINT8 *PROM = memregion("rp5h01")->base();
 	int i;
-	UINT8 tmp;
 
 	DRIVER_INIT_CALL(snes);
 
 	for(i=0;i<0x10;i++)
-	{
-		tmp = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7);
-		PROM[i] = tmp ^ 0xff;
-	}
+		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
+
 }
 
 GAME( 199?, nss,       0,     nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // sound sometimes dies, timing issues
+GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1992, nss_con3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1992, nss_lwep,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1992, nss_ncaa,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // any sprite minus Robocop is missing
-GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx issue caused by timing at start-up
+GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // can't start
 GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
