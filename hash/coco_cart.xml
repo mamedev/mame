@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-Compiled by K1W1
+Compiled by K1W1 and Cowering (from GoodCoCo)
 -->
 
 <!--
@@ -10,6 +10,7 @@ Compiled by K1W1
   * Due to OS & hardware differences the following programs will only run on the CoCo 3: -
 
     - A Mazing World of Malcom Mortar
+    - Alphabet Zoo
     - Castle of Tharoggad
     - GFL Championship Football II
     - RAD Warrior
@@ -26,7 +27,6 @@ Compiled by K1W1
 
 	- 7 Card Stud		26-3074	(1984)
 	- 8-Ball
-	- Alphabet Zoo		26-3170	(1984)
 	- Crosswords		26-3082	(1981)
 	- Math Tutor		26-3148	(1988)
 	- Robot Battle		26-3070	(1981)
@@ -41,6 +41,7 @@ Compiled by K1W1
 
   * These ROM's Appear to have been dumped from RAM and have been marked as "Bad Dumps"
 
+	- Alphabet Zoo
 	- FORTH
 	- Demon Attack
 	- Doodle Bug
@@ -50,6 +51,20 @@ Compiled by K1W1
 	- Cumana DOS v2.0
 -->
 <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
+
+	<software name="alphazoo">
+		<description>Alphabet Zoo</description>
+		<year>1984</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Spinnaker" />
+		<info name="serial" value="26-3170" />
+		<info name="usage" value="CoCo 3 Only" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="alphabet zoo (1984)(26-3170)(spinnaker).rom" size="32768" crc="a8a83f53" sha1="b6c8048549c60909c6a9e8e808df342d6491eae2" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="amazing">
 		<description>A Mazing World of Malcom Mortar</description>
@@ -1366,7 +1381,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-<!-- Cartridges releasesed for Dragon Data systems -->
+<!-- Cartridges released for Dragon Data systems -->
 
 	<software name="dospls49">
 		<description>DOSPlus v4.9B</description>
