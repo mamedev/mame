@@ -3118,7 +3118,7 @@ READ16_HANDLER(s3_pixel_xfer_r)
 
 WRITE16_HANDLER(s3_pixel_xfer_w)
 {
-	int x,data_size;
+	int x,data_size = 0;
 	UINT32 off,xfer = 0;
 
 	if(offset == 1)
