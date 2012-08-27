@@ -319,7 +319,8 @@ GFXDECODE_END
 static HD44780_INTERFACE( pc2000_display )
 {
 	2,					// number of lines
-	20					// chars for line
+	20,					// chars for line
+	NULL				// pixel update callback
 };
 
 static MACHINE_CONFIG_START( pc2000, pc2000_state )

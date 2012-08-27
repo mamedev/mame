@@ -37,6 +37,7 @@ void hd44780_device::device_config_complete()
 	else
 	{
 		height = width = 0;
+		pixel_update_func = NULL;
 	}
 }
 
@@ -141,7 +142,14 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 	m_busy_flag = 1;
 
 	m_busy_timer->adjust( attotime::from_usec( usec ) );
+}
 
+inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
+{
+	if (pixel_update_func != NULL)
+		pixel_update_func(*this, bitmap, line, pos, y, x, state);
+	else
+		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
 //**************************************************************************
@@ -177,21 +185,21 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 						if (m_ddram[char_pos] <= 0x10)
 						{
 							//draw CGRAM characters
-							bitmap.pix16(l*9 + y, i*6 + x) = BIT(m_cgram[(m_ddram[char_pos]&0x07)*8+y], 4-x);
+							pixel_update(bitmap, l, i, y, x, BIT(m_cgram[(m_ddram[char_pos]&0x07)*8+y], 4-x));
 						}
 						else
 						{
 							//draw CGROM characters
 							if (region()->bytes() <= 0x800)
 							{
-								bitmap.pix16(l*9 + y, i*6 + x) = BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x);
+								pixel_update(bitmap, l, i, y, x, BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x));
 							}
 							else
 							{
 								if(m_ddram[char_pos] < 0xe0)
-									bitmap.pix16(l*9 + y, i*6 + x) = BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x);
+									pixel_update(bitmap, l, i, y, x, BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x));
 								else
-									bitmap.pix16(l*9 + y, i*6 + x) = BIT(region()->u8(0x700+((m_ddram[char_pos]-0xe0)*11)+y), 4-x);
+									pixel_update(bitmap, l, i, y, x, BIT(region()->u8(0x700+((m_ddram[char_pos]-0xe0)*11)+y), 4-x));
 							}
 						}
 
@@ -201,12 +209,12 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					//draw the cursor
 					if (m_cursor_on)
 						for (int x=0; x<5; x++)
-							bitmap.pix16(l*9 + 7, i * 6 + x) = 1;
+							pixel_update(bitmap, l, i, 7, x, 1);
 
 					if (!m_blink && m_blink_on)
 						for (int y=0; y<7; y++)
 							for (int x=0; x<5; x++)
-								bitmap.pix16(l*9 + y, i * 6 + x) = 1;
+								pixel_update(bitmap, l, i, y, x, 1);
 				}
 			}
 

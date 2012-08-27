@@ -235,13 +235,15 @@ void alesis_state::machine_reset()
 static HD44780_INTERFACE( hr16_display )
 {
 	2,					// number of lines
-	16					// chars for line
+	16,					// chars for line
+	NULL				// pixel update callback
 };
 
 static HD44780_INTERFACE( sr16_display )
 {
 	2,					// number of lines
-	8					// chars for line
+	8,					// chars for line
+	NULL				// pixel update callback
 };
 
 static const cassette_interface hr16_cassette_interface =

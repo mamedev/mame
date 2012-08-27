@@ -191,7 +191,8 @@ public:
 static HD44780_INTERFACE( chess_display )
 {
     2,                  // number of lines
-    16                  // chars for line
+    16,					// chars for line
+	NULL				// pixel update callback
 };
 
 static UINT8 convert_imputmask(UINT8 input)

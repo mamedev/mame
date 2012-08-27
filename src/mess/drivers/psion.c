@@ -463,7 +463,8 @@ GFXDECODE_END
 static HD44780_INTERFACE( psion_2line_display )
 {
 	2,					// number of lines
-	16					// chars for line
+	16,					// chars for line
+	NULL				// pixel update callback
 };
 
 /* basic configuration for 2 lines display */
@@ -506,7 +507,8 @@ MACHINE_CONFIG_END
 static HD44780_INTERFACE( psion_4line_display )
 {
 	4,					// number of lines
-	20					// chars for line
+	20,					// chars for line
+	NULL				// pixel update callback
 };
 
 /* basic configuration for 4 lines display */

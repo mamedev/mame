@@ -21,12 +21,16 @@
 #define HD44780_INTERFACE(name) \
 	const hd44780_interface (name) =
 
+typedef void (*hd44780_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state);
+#define HD44780_PIXEL_UPDATE(name) void name(device_t &device, bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
+
 // ======================> hd44780_interface
 
 struct hd44780_interface
 {
 	UINT8 height;			// number of lines
 	UINT8 width;			// chars for line
+	hd44780_pixel_update_func pixel_update_func;	// pixel update callback
 };
 
 // ======================> hd44780_device
@@ -59,6 +63,7 @@ protected:
 	// internal helper
 	void set_busy_flag(UINT16 usec);
 	void update_ac(void);
+	void pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state);
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;
 	static const device_timer_id BLINKING_TIMER = 1;

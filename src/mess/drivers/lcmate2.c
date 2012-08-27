@@ -205,7 +205,8 @@ void lcmate2_state::machine_start()
 static HD44780_INTERFACE( lcmate2_display )
 {
 	2,					// number of lines
-	20					// chars for line
+	20,					// chars for line
+	NULL				// pixel update callback
 };
 
 static const gfx_layout lcmate2_charlayout =
