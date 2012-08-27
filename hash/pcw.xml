@@ -62,6 +62,58 @@
 <!-- SYSTEM disks -->
 
 	<software name="system">
+		<description>System Disks (UK)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1A - LocoScript 1.1" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [a] loco script [maxit][samdisk][original].dsk" size="195635" crc="da5c169d" sha1="9592b6b3be8f0887d76d6f8adbea14bed2dd1f73" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1B - C/PM Plus 1.1" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [b] cpm plus [maxit][samdisk][original].dsk" size="195635" crc="6fdf8e6e" sha1="32c08a256da984c44f8d32d31f62119f48890509" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systemf" cloneof="system">
+		<description>System Disks (Fra)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1A - LocoScript 1.21" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [1a] loco script [maxit][samdisk][original].dsk" size="195635" crc="7bcab8b0" sha1="d955816ca31ed4f1e60f27fe63f1390719bc09cc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1B - C/PM Plus 1.4" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [1b] cpm plus [maxit][samdisk][original].dsk" size="195635" crc="21771889" sha1="f2f9dc937e975aee7eac9989308d4470800deda8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2A - Utilitaires de Programmation" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [2a] utilitaires de programmation cpm plus [maxit][samdisk][original].dsk" size="195635" crc="7e85a947" sha1="f5234711ceb70a027c54746ba0a98fdd57d5971e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2B - Dr. Logo &amp; Help" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [2b] dr. logo &amp; help. cpm plus [maxit][samdisk][original].dsk" size="195635" crc="3e0eb995" sha1="b4d23e06168a7d2ca5e201ef704b45e3a12be615" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systems" cloneof="system">
 		<description>System Disks (Spa)</description>
 		<year>19??</year>
 		<publisher>Amstrad</publisher>
@@ -95,7 +147,7 @@
 	</software>
 
 <!-- were there more disks? were they different from the above? -->
-	<software name="system1" cloneof="system">
+	<software name="systems1" cloneof="system">
 		<description>System Disks (Spa, Newer, Only disks 1 &amp; 2)</description>
 		<year>19??</year>
 		<publisher>Amstrad</publisher>

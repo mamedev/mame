@@ -1638,18 +1638,18 @@
 		</part>
 	</software>
 
-	<software name="inchip">
-		<description>In The Chip (NTSC)</description>
+	<software name="inchips">
+		<description>In The Chips (NTSC)</description>
 		<year>1983</year>
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI CH C" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
-				<rom name="in the chip (creative)(1983)(vi ch c)(ju).60" size="0x2000" crc="7c15099a" sha1="97d841debfc1c7be067eca103b0a8173b53ff775" offset="0x0000" />
+				<rom name="in the chips (creative)(1983)(vi ch c)(ju).60" size="0x2000" crc="7c15099a" sha1="97d841debfc1c7be067eca103b0a8173b53ff775" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
-				<rom name="in the chip (creative)(1983)(vi ch c)(ju).a0" size="0x2000" crc="f43976c1" sha1="3bce8177b5447dadebd3f4ae192e27fbc4bbe609" offset="0x0000" />
+				<rom name="in the chips (creative)(1983)(vi ch c)(ju).a0" size="0x2000" crc="f43976c1" sha1="3bce8177b5447dadebd3f4ae192e27fbc4bbe609" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3488,6 +3488,21 @@
 		</part>
 	</software>
 
+	<software name="mikro">
+		<description>VIC 20 Mikro Assembler</description>
+		<year>1982</year>
+		<publisher>Supersoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="blk3" size="0x1000">
+				<rom name="vic-20 mikro assembler (supersoft)(1982).60" size="0x1000" crc="0f591693" sha1="d1e4a26a92628b4738ee6b4d419ff2665346e833" offset="0x0000" />
+			</dataarea>
+			<dataarea name="blk5" size="0x1000">
+				<rom name="vic-20 mikro assembler (supersoft)(1982).a0" size="0x1000" crc="92f37949" sha1="5b2be0be78227664e09172f3ecbaf9c6d3ad0dab" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="colrtest">
 		<description>VIC Color Test (Ger)</description>
 		<year>198?</year>
@@ -3754,6 +3769,43 @@
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="videomania (creative)(1982)(vi vm c)(e).a0" size="0x1000" crc="e32563a9" sha1="e8b7be53ef5b8d2660483721c984a5a584aae0a0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wacky">
+		<description>Wacky Waiters</description>
+		<year>1982</year>
+		<publisher>Imagine</publisher>
+		<info name="usage" value="Enter 'SYS 48896' to run" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="blk5" size="0x2000">
+				<rom name="wacky waiters (imagine)(1982)(jue)(sys 48896).a0" size="0x2000" crc="4c4a2e94" sha1="6583b47f07750a36a269e2457a7302abb2ff49bf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waterloo">
+		<description>Waterloo BASIC</description>
+		<year>1983</year>
+		<publisher>Waterloo Computing Systems</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="blk5" size="0x1000">
+				<rom name="waterloo basic (waterloo systems)(1983)(jue).a0" size="0x1000" crc="3d3151b1" sha1="0253461ad69742eec4936070b585382bcb6aa648" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witchway">
+		<description>Witch Way (NTSC)</description>
+		<year>1983</year>
+		<publisher>Commercial Data Systems</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="vic1001_cart">
+			<dataarea name="blk5" size="0x2000">
+				<rom name="witch way (cds)(1983)(ju).a0" size="0x2000" crc="76818e65" sha1="e89658b05af3f0802405e36159a7406f4488c46d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
