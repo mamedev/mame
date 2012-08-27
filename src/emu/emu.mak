@@ -203,6 +203,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ldpr8210.o	\
 	$(EMUMACHINE)/ldv1000.o		\
 	$(EMUMACHINE)/ldvp931.o		\
+	$(EMUMACHINE)/m6m80011ap.o	\
 	$(EMUMACHINE)/matsucd.o		\
 	$(EMUMACHINE)/mb14241.o		\
 	$(EMUMACHINE)/mb3773.o		\

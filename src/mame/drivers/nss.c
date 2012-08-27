@@ -280,7 +280,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/m6m80011ap.h"
 #include "machine/s3520cf.h"
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
@@ -606,20 +606,6 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // Pad watchdog
 ADDRESS_MAP_END
 
-/* Mitsubishi M6M80011 */
-static const eeprom_interface nss_eeprom_intf =
-{
-	8,				/* address bits */
-	16,				/* data bits */
-	"*10101000",		/*  read command */
-	"*10100100",		/* write command */
-	0,				/* erase command */
-	"*10100000",		/*  lock command */
-	"*10100011"		/* unlock command*/
-	/* "10101001" TODO: status output? */
-};
-
-
 static MACHINE_START( nss )
 {
 	nss_state *state = machine.driver_data<nss_state>();
@@ -649,14 +635,14 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Game 1 Button")
 
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // EEPROM Ready
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, ready_line )
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, set_clock_line)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, write_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, set_cs_line)
 
 	PORT_START("RTC_OSD")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_clock_line)
@@ -844,6 +830,7 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_M50458_ADD("m50458",4000000) /* TODO: clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 	MCFG_RP5H01_ADD("rp5h01")
+	MCFG_M6M80011AP_ADD("m6m80011ap")
 
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -856,8 +843,6 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
-
-	MCFG_EEPROM_ADD("eeprom", nss_eeprom_intf)
 
 	MCFG_MACHINE_START( nss )
 MACHINE_CONFIG_END
