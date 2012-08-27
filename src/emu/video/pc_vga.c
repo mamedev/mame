@@ -191,7 +191,8 @@ enum
 	S3_IDLE = 0,
 	S3_DRAWING_RECT,
 	S3_DRAWING_LINE,
-	S3_DRAWING_BITBLT
+	S3_DRAWING_BITBLT,
+	S3_DRAWING_PATTERN
 };
 
 static struct
@@ -2841,9 +2842,11 @@ WRITE16_HANDLER(s3_cmd_w)
 {
 	if(s3.enable_8514 != 0)
 	{
-		int x,y;
+		int x,y,count;
 		int dir_x;
-		UINT32 offset;
+		UINT32 offset,src;
+		UINT8* buffer;  // for bitblt operations
+
 		s3.current_cmd = data;
 		switch(data & 0xe000)
 		{
@@ -2873,16 +2876,59 @@ WRITE16_HANDLER(s3_cmd_w)
 			{
 				for(x=0;x<=s3.rect_width;x+=dir_x)
 				{
-					vga.memory[(offset+x) % vga.svga_intf.vram_size] = s3.fgcolour & 0x000000ff;  // TODO: handle 16-bit or 32-bit transfers
+					vga.memory[(offset+x) % vga.svga_intf.vram_size] = s3.fgcolour & 0x000000ff;
 					vga.memory[(offset+x+1) % vga.svga_intf.vram_size] = (s3.fgcolour & 0x0000ff00) >> 8;
 				}
 				offset += VGA_LINE_LENGTH;
 			}
-			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+			s3.gpbusy = false;
+			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			break;
 		case 0xc000:  // BitBLT
+			offset = VGA_START_ADDRESS;
+			offset += (VGA_LINE_LENGTH * s3.dest_y);
+			offset += s3.dest_x;
+			src = VGA_START_ADDRESS;
+			src += (VGA_LINE_LENGTH * s3.curr_y);
+			src += s3.curr_x;
+			buffer = (UINT8*)malloc((s3.rect_height+1)*(s3.rect_width+1));
+			count = 0;
+			// copy to temporary buffer
+			for(y=0;y<=s3.rect_height;y++)
+			{
+				for(x=0;x<=s3.rect_width;x++)
+				{
+					if(data & 0x0020)
+						buffer[count++] = vga.memory[(src+x) % vga.svga_intf.vram_size];
+					else
+						buffer[count++] = vga.memory[(src-x) % vga.svga_intf.vram_size];
+				}
+				if(data & 0x0080)
+					src += VGA_LINE_LENGTH;
+				else
+					src -= VGA_LINE_LENGTH;
+			}
+			// write from buffer to screen
+			count = 0;
+			for(y=0;y<=s3.rect_height;y++)
+			{
+				for(x=0;x<=s3.rect_width;x++)
+				{
+					if(data & 0x0020)
+						vga.memory[(offset+x) % vga.svga_intf.vram_size] = buffer[count++];
+					else
+						vga.memory[(offset-x) % vga.svga_intf.vram_size] = buffer[count++];
+				}
+				if(data & 0x0080)
+					offset += VGA_LINE_LENGTH;
+				else
+					offset -= VGA_LINE_LENGTH;
+			}
+			free(buffer);
 			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - BitBLT\n",s3.current_cmd);
+			logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
+					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		case 0xe000:  // Pattern Fill
 			s3.gpbusy = false;
@@ -2974,6 +3020,7 @@ READ16_HANDLER(s3_currentx_r)
 WRITE16_HANDLER(s3_currentx_w)
 {
 	s3.curr_x = data & 0x0fff;
+	logerror("S3: Current X set to %04x\n",data);
 }
 
 READ16_HANDLER(s3_currenty_r)
@@ -2984,6 +3031,7 @@ READ16_HANDLER(s3_currenty_r)
 WRITE16_HANDLER(s3_currenty_w)
 {
 	s3.curr_y = data & 0x0fff;
+	logerror("S3: Current Y set to %04x\n",data);
 }
 
 READ16_HANDLER(s3_fgcolour_r)
