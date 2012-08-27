@@ -33,8 +33,50 @@
 		</part>
 	</software>
 
-	<software name="tfdos21">
-		<description>TF-DOS Ver2.1</description>
+<!--
+
+2011/10/25-2011/12/08 Rel.1.1  for MZ-2500 Extended Keys and 2DD,
+                               Change Drive Assignment for 2DD,
+                               Change the Utility Command Name:
+                                   - SYSINIT -> SETUP
+                                   - DISKCOPY -> COPYDISK
+                                   - SYSGEN -> COPYSYS
+                               Bug fixes, etc.
+ -->
+	<software name="cpm22a" cloneof="cpm22">
+		<description>CP/M 2.2 (Release 1.1)</description>
+		<year>2011?</year>
+		<publisher>Toshio Fukui</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="348848">
+				<rom name="mz64cpmb.d88" size="348848" crc="0e65fc85" sha1="10194f69a9e399d4822026026c1a6d0c8de1ab9a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Source Disk (w/ TF-DOS)" />
+			<dataarea name="flop" size="348848">
+				<rom name="mz64cpms.d88" size="348848" crc="5d76a801" sha1="a05cd4b99030685d7878e44f9bd1a82d8161de1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tfdos21c">
+		<description>TF-DOS Ver2.1C (TF)</description>
+		<year>200?</year>
+		<publisher>Toshio Fukui</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Master Disk" />
+			<dataarea name="flop" size="348848">
+				<rom name="tfds21cmr.d88" size="348848" crc="dca59c9f" sha1="313465c15b9046104c70202a46e3e7454c8d095e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tfdos21" cloneof="tfdos21c">
+		<description>TF-DOS Ver2.1 (TF)</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -51,12 +93,17 @@
 		</part>
 	</software>
 
-<!-- what disk 1 should be this with? -->
-	<software name="tfdos20" supported="no">
-		<description>TF-DOS Ver2.0B (on TS-2000)</description>
+	<software name="tfdos20b" cloneof="tfdos21c">
+		<description>TF-DOS Ver2.0B (TS)</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="tfd2ts2e.d88" size="348848" crc="a8bb3380" sha1="f0d2e58f97f4bd8abf8c3b066d2ed4ce751985e3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="348848">
 				<rom name="tfd2ts2r.d88" size="348848" crc="5bbbe5dc" sha1="e0162ed833bc8dcd691bcf6d2b18e9d7a7a11714" offset="0" />
 			</dataarea>
@@ -96,7 +143,7 @@
 		</part>
 	</software>
 
-	<software name="dosprog">
+	<software name="dosprog1">
 		<description>TF-DOS Programs 1</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
@@ -107,7 +154,18 @@
 		</part>
 	</software>
 
-<!-- How to run these? They probably require BASIC... -->
+	<software name="dosprog2">
+		<description>TF-DOS Programs 2</description>
+		<year>200?</year>
+		<publisher>Toshio Fukui</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cdosprg2.d88" size="348848" crc="4f0a38c6" sha1="fafaee86a65883b7270ff247802220777468c9fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This requires BASIC... -->
 	<software name="basprog">
 		<description>Sharp BASIC Programs 1</description>
 		<year>200?</year>

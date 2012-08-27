@@ -623,7 +623,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chopliftp" cloneof="choplift">
-		<description>Choplifter (Jpn, Proto)</description>
+		<description>Choplifter (Jpn, Prototype)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1903,7 +1903,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="safarihu">
+	<software name="safarihu" supported="no">
 		<description>Safari Hunting (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -1916,7 +1916,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="safarihut" cloneof="safarihu">
+	<software name="safarihut" cloneof="safarihu" supported="no">
 		<description>Safari Hunting (Tw)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
@@ -2591,6 +2591,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>BASIC Level III (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Needs SC-3000 to work" />
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="basic3.bin" size="32768" crc="a46e3c73" sha1="b1a8585a9afff962e8fd0e79b3305199da4e4562" offset="000000" />
@@ -2602,6 +2603,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>BASIC Level III (Export)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Needs SC-3000 to work" />
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="basic3e.bin" size="32768" crc="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" offset="000000" />
@@ -2613,6 +2615,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>BASIC Level 2 (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Needs SC-3000 to work" />
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="basic2.bin" size="32768" crc="f691f9c7" sha1="1fa9f4ec347681d7909415b6d06179e44b0fcd5e" offset="000000" />

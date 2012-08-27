@@ -481,6 +481,7 @@
 		</part>
 	</software>
 
+<!-- Glitches on NTSC -->
 	<software name="pugshunt">
 		<description>The Addams Family - Pugsley's Scavenger Hunt (Euro)</description>
 		<year>1993</year>
@@ -25368,7 +25369,7 @@
 		</part>
 	</software>
 
-	<software name="oekashi">
+	<software name="oekashi" supported="no">
 		<description>Oeka Kids - Anpanman to Oekaki Shiyou!! (Jpn)</description>
 		<year>1990</year>
 		<publisher>Bandai</publisher>
@@ -25918,7 +25919,7 @@
 	</software>
 
 	<software name="pachidai">
-		<description>Pachinko Daisakusen (Jpn)</description>
+		<description>Pachinko Daisakusen 1 (Jpn)</description>
 		<year>1991</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-81"/>
@@ -25936,7 +25937,7 @@
 		</part>
 	</software>
 
-	<software name="pachid2">
+	<software name="pachida2">
 		<description>Pachinko Daisakusen 2 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
@@ -25997,7 +25998,7 @@
 	</software>
 
 	<software name="pachikn4">
-		<description>Pachio-Kun 4 (Jpn)</description>
+		<description>Pachio-kun 4 (Jpn)</description>
 		<year>1991</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-84"/>
@@ -26221,7 +26222,7 @@
 	</software>
 
 	<software name="parasolp" cloneof="parasol">
-		<description>Parasol Stars - Rainbow Islands II - The Story of Bubble Bobble III (Euro, Prototype)</description>
+		<description>Parasol Stars - The Story of Bubble Bobble III (Euro, Prototype)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="nes_cart">
@@ -26462,6 +26463,7 @@
 		</part>
 	</software>
 
+<!-- Glitched in NTSC -->
 	<software name="pinbot" supported="partial">
 		<description>Pin-Bot (Euro)</description>
 		<year>1990</year>
@@ -27527,7 +27529,7 @@
 		</part>
 	</software>
 
-	<software name="qix">
+	<software name="qix" supported="partial">
 		<description>Qix (USA)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -28091,7 +28093,7 @@
 		</part>
 	</software>
 
-	<software name="rbislandj" cloneof="rbisland">
+	<software name="rbislantj" cloneof="rbislant">
 		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Jpn)</description>
 		<year>1988</year>
 		<publisher>Taito / Disco</publisher>
@@ -28110,7 +28112,7 @@
 		</part>
 	</software>
 
-	<software name="rbislandu" cloneof="rbisland">
+	<software name="rbislant">
 		<description>Rainbow Islands - The Story of Bubble Bobble 2 (USA)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -28253,7 +28255,7 @@
 		</part>
 	</software>
 
-	<software name="rampartj" cloneof="rampart">
+	<software name="rampartj">
 		<description>Rampart (Jpn)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -28798,6 +28800,7 @@
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="robocop3">
 		<description>RoboCop 3 (Euro)</description>
 		<year>1994</year>
@@ -40630,7 +40633,7 @@ We should eventually add it to MESS as a separate driver with a NES CPU and a GB
 		</part>
 	</software>
 
-	<software name="pboxbas">
+	<software name="pboxbas" supported="no">
 		<description>Playbox Basic V0.0 (Jpn, Proto)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
@@ -41034,7 +41037,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="asmiklnd">
-		<description>Asmik-Kun Land (Jpn)</description>
+		<description>Asmik-kun Land (Jpn)</description>
 		<year>1991</year>
 		<publisher>Asmik</publisher>
 		<info name="serial" value="ASM-YI"/>
@@ -44464,7 +44467,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="moaikun">
-		<description>Moai-Kun (Jpn)</description>
+		<description>Moai-kun (Jpn)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KDS-M9"/>
@@ -44823,7 +44826,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="ninjashs">
-		<description>Ninja-Kun - Ashura no Shou (Jpn)</description>
+		<description>Ninja-kun - Ashura no Shou (Jpn)</description>
 		<year>1988</year>
 		<publisher>UPL</publisher>
 		<info name="serial" value="UPL-NJ"/>
@@ -44880,7 +44883,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="oekahira">
+	<software name="oekahira" supported="no">
 		<description>Oeka Kids - Anpanman no Hiragana Daisuki (Jpn)</description>
 		<year>1991</year>
 		<publisher>Bandai</publisher>
@@ -44970,7 +44973,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="pachikn5">
-		<description>Pachio-Kun 5 (Jpn)</description>
+		<description>Pachio-kun 5 - Pachio-kun Jr. (Jpn)</description>
 		<year>1993</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-PE"/>
@@ -45006,9 +45009,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="parasol">
-		<description>Parasol Stars - Rainbow Islands II - The Story of Bubble Bobble III (Euro)</description>
+		<description>Parasol Stars - The Story of Bubble Bobble III (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
+		<info name="alt_title" value="Parasol Stars - Rainbow Islands II - The Story of Bubble Bobble III (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -45038,6 +45042,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Glitched in NTSC -->
 	<software name="pirates" >
 		<description>Pirates! (Euro)</description>
 		<year>1991</year>
@@ -45053,6 +45058,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Glitched in NTSC -->
 	<software name="piratesg" cloneof="pirates">
 		<description>Pirates! (Ger)</description>
 		<year>1991</year>
@@ -45411,12 +45417,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="rodlandj" cloneof="rodland">
-		<description>Yousei Monogatari Rod Land (Jpn)</description>
+		<description>Rod Land (Jpn)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-39"/>
 		<info name="release" value="19921211"/>
-		<info name="alt_title" value="妖精物語 ロッド・ランド"/>
+		<info name="alt_title" value="妖精物語 ロッド・ランド ~ Yousei Monogatari Rod Land (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -47271,7 +47277,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="othelloa">
 		<description>Othello (Aus)</description>
 		<year>19??</year>
-		<publisher>HES;</publisher>
+		<publisher>HES</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="chr" size="8192">
@@ -50635,6 +50641,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- related to pokesj by Mars! -->
 	<software name="pokeszs">
 		<description>Kou Dai Yao Guai - Zuan Shi Ban (Chi)</description>
 		<year>19??</year>
@@ -50815,7 +50822,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="rongyu" cloneof="akagawa">
 		<description>Rong Yu Xun Zhang (Chi)</description>
-		<year>19??</year>
+		<year>2005?</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1108?"/>
 		<info name="alt_title" value="荣誉勋章"/>
@@ -52718,7 +52725,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="pukejing">
-		<description>PuKe JingLing (Chi)</description>
+		<description>Pu Ke Jing Ling (Chi)</description>
 		<!-- TOSEC title Mari, Ayami, Luka no AV Poker - Pu Nu Jing Ling, check if doubling the second rom we get  d6a102ed!! -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55695,7 +55702,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="pokesj">
-		<description>KouDai JingLing - Pocket Monster - ShuiJing (Asia)</description>
+		<description>Kou Dai Jing Ling - Pocket Monster - ShuiJing (Asia)</description>
 		<year>19??</year>
 		<publisher>Mars</publisher>
 		<part name="cart" interface="nes_cart">
@@ -55906,8 +55913,8 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="pandaprn">
-		<description>The Panda Prince</description>
-		<year>19??</year>
+		<description>The Panda Prince (Asia, English Title)</description>
+		<year>1996</year>
 		<publisher>Shin-Shin</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-PANDAPRINCE" />
@@ -55921,8 +55928,8 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="pandaprna" cloneof="pandaprn">
-		<description>The Panda Prince (Alt)</description>
-		<year>19??</year>
+		<description>The Panda Prince (Asia)</description>
+		<year>1996</year>
 		<publisher>Shin-Shin</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-PANDAPRINCE" />
@@ -55982,11 +55989,10 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="pocahon">
-		<description>Pocahontas (Asia)</description>
+	<software name="pocohon">
+		<description>Pocohontos (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="Pocohontos (on the cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-HOSENKAN" />
 			<dataarea name="chr" size="262144">
@@ -55998,7 +56004,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="pocahond" cloneof="pocahon">
+	<software name="pocahond" cloneof="pocahon2">
 		<description>Pocahontas (Asia, Debug?)</description>
 		<year>19??</year>
 		<publisher>Super Games</publisher>
@@ -56013,7 +56019,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="pocahonp" cloneof="pocahon">
+	<software name="pocahonp" cloneof="pocahon2">
 		<description>Pocahontas (Asia, Prototype?)</description>
 		<year>19??</year>
 		<publisher>Super Games</publisher>
@@ -56029,9 +56035,9 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 	<software name="pocahon2">
-		<description>Pocahontas 2 (Asia)</description>
+		<description>Pocahontas Part 2 (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Super Games</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-8237" />
 			<dataarea name="chr" size="524288">
@@ -56121,7 +56127,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="saiyaren">
+	<software name="saiyaren" supported="no">
 		<description>Sai Ya Ren Mei Jue Ji Hua (Chi)</description>
 		<year>199?</year>
 		<publisher>CoolBoy</publisher>
@@ -57832,7 +57838,7 @@ All musics were removed in this game.
 	<software name="pokegolda" cloneof="pokegold">
 		<description>Pokemon Gold (Asia, Alt)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Mars</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-PS2" />
 			<dataarea name="prg" size="1048576">
@@ -57859,12 +57865,13 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="puzzleb" cloneof="puzzle">
+	<software name="puzzlea" cloneof="puzzle">
 		<description>Puzzle (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="puzzle (unl) [a1].chr" size="32768" crc="73ee9175" sha1="cde4ce484be0c7a34787e934eda3e2f30ff691b7" offset="00000" status="baddump" />
 			</dataarea>
@@ -57874,7 +57881,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="puzzlea" cloneof="puzzle">
+	<software name="puzzleb" cloneof="puzzle" supported="no">
 		<description>Puzzle (Asia, Bad?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57889,8 +57896,8 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="pyramida" cloneof="pyramid">
-		<description>Pyramid (Asia)</description>
+	<software name="pyramidh" cloneof="pyramid">
+		<description>Pyramid (Asia, Pirate?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -57906,10 +57913,10 @@ All musics were removed in this game.
 	</software>
 
 <!-- is this overdumped? -->
-	<software name="pyramidb" cloneof="pyramid">
-		<description>Pyramid (Asia, Alt)</description>
+	<software name="pyramida" cloneof="pyramid">
+		<description>Pyramid (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;Sachen&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="chr" size="16384">
@@ -57923,7 +57930,7 @@ All musics were removed in this game.
 	</software>
 
 <!-- which game is this?!? pirating MGC-001?!? -->
-	<software name="qiwanga" cloneof="qiwang">
+	<software name="qiwanga" cloneof="qiwang" supported="partial">
 		<description>Qi Wang - Chinese Chess (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>TXC Corp.</publisher>
@@ -63672,7 +63679,7 @@ resulting in tons of glitches? -->
 	</software>
 
 <!-- FIXME: which board should use this game?? -->
-	<software name="pizzamar" cloneof="pizzapop">
+	<software name="pizzamar" cloneof="pizzapop" supported="no">
 		<description>Pizza Pop Mario (Pizza Pop pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63688,7 +63695,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="poketetr" cloneof="tetris">
-		<description>Poke Tetris (Tetris pirate, dumped from multicart with damaged CHR)</description>
+		<description>Pikachu - Poke Tetris (Tetris pirate, dumped from multicart with damaged CHR)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -63826,11 +63833,12 @@ resulting in tons of glitches? -->
 
 <!-- is the following also hacked?!? -->
 	<software name="ppersiah" cloneof="ppersia">
-		<description>Prince of Persia (Pirate)</description>
-		<year>19??</year>
+		<description>Prince of Rosia (Pirate)</description>
+		<year>1992</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="prince of persia (u) [h1].prg" size="131072" crc="f3eb8cb3" sha1="87943f1a764caddf63704d5081b18893df6b8897" offset="00000" status="baddump" />
 			</dataarea>
@@ -63888,7 +63896,7 @@ resulting in tons of glitches? -->
 
 	<software name="robocop4" cloneof="robocop3">
 		<description>Robocop 4 (Robocop 3 pirate)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -63903,7 +63911,7 @@ resulting in tons of glitches? -->
 
 	<software name="robocop4a" cloneof="robocop3">
 		<description>Robocop 4 (Robocop 3 pirate, Alt)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -63918,7 +63926,7 @@ resulting in tons of glitches? -->
 
 	<software name="robocop4b" cloneof="robocop3">
 		<description>Robocop 4 (Robocop 3 pirate, Alt 2)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />

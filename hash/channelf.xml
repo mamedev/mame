@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="channelf" description="Fairchild Channel F cartridges">
+
 	<software name="democrt1">
 		<description>Democart 1</description>
 		<year>1977</year>
@@ -25,18 +26,6 @@
 		</part>
 	</software>
 
-	<software name="ordtvlng">
-		<description>Ordtävling</description>
-		<year>1978</year>
-		<publisher>Fairchild</publisher>
-		<info name="series" value="Luxor 18" />
-		<part name="cart" interface="channelf_cart">
-			<dataarea name="rom" size="3072">
-				<rom name="ordtvlng.bin" size="3072" crc="3a386e79" sha1="62509545b8eef641c432705ff82cd8264c3e1d82" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tctactoe">
 		<description>Tic-Tac-Toe / Shooting Gallery / Doodle / Quadra-Doodle</description>
 		<year>1976</year>
@@ -49,11 +38,11 @@
 		</part>
 	</software>
 
-	<software name="muehle">
-		<description>Muehle / Tontauben-Schiessen / Kreatives Malspiel / Videoscope</description>
+	<software name="muehle" cloneof="tctactoe">
+		<description>Muehle / Tontauben-Schiessen / Kreatives Malspiel / Videoscope (Ger)</description>
 		<year>1978</year>
 		<publisher>SABA</publisher>
-		<info name="series" value="Videocart 1g" />
+		<info name="series" value="Videocart 1" />
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="muehle.bin" size="2048" crc="7124dc59" sha1="15d5e6d152d93a2099b97a2bd5dcf7134dd1a770" offset="0" />
@@ -173,7 +162,7 @@
 		<description>Maze / Jailbreak / Blind-man's-bluff / Trailblazer (Alt)</description>
 		<year>1977</year>
 		<publisher>Fairchild</publisher>
-		<info name="series" value="Videocart 10a" />
+		<info name="series" value="Videocart 10" />
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="mazealt.bin" size="2048" crc="0a948b61" sha1="b53ba16c6d91e2f62e020d18445217b91907a83b" offset="0" />
@@ -254,18 +243,6 @@
 		</part>
 	</software>
 
-	<software name="ratmal">
-		<description>Rat' Mal</description>
-		<year>197?</year>
-		<publisher>SABA</publisher>
-		<info name="series" value="Videocart 16g" />
-		<part name="cart" interface="channelf_cart">
-			<dataarea name="rom" size="3072">
-				<rom name="ratmal.bin" size="3072" crc="87752425" sha1="35f3fb741b643c4b8e8fdbff4ed0ea24402c4528" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pinball">
 		<description>Pinball Challenge</description>
 		<year>1978</year>
@@ -282,7 +259,7 @@
 		<description>Pinball Challenge (Alt)</description>
 		<year>1978</year>
 		<publisher>Fairchild</publisher>
-		<info name="series" value="Videocart 17a" />
+		<info name="series" value="Videocart 17" />
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="pinballa.bin" size="2048" crc="7cadf0fd" sha1="cc69feb8243e6fce3e6317bf9ea82d70a85eae1c" offset="0" />
@@ -302,9 +279,33 @@
 		</part>
 	</software>
 
+	<software name="ordtvlng" cloneof="hangman">
+		<description>Ordtävling (Swe)</description>
+		<year>1978</year>
+		<publisher>Luxor</publisher>
+		<info name="series" value="Luxor 18" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="3072">
+				<rom name="ordtvlng.bin" size="3072" crc="3a386e79" sha1="62509545b8eef641c432705ff82cd8264c3e1d82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratmal" cloneof="hangman">
+		<description>Rat' Mal (Ger)</description>
+		<year>197?</year>
+		<publisher>SABA</publisher>
+		<info name="series" value="SABA 16" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="3072">
+				<rom name="ratmal.bin" size="3072" crc="87752425" sha1="35f3fb741b643c4b8e8fdbff4ed0ea24402c4528" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="checkers">
 		<description>Checkers</description>
-		<year>197?</year>
+		<year>1978</year>
 		<publisher>Zircon</publisher>
 		<info name="series" value="Videocart 19" />
 		<part name="cart" interface="channelf_cart">
@@ -316,7 +317,7 @@
 
 	<software name="whizball">
 		<description>Video Whizball</description>
-		<year>197?</year>
+		<year>1978</year>
 		<publisher>Fairchild</publisher>
 		<info name="series" value="Videocart 20" />
 		<part name="cart" interface="channelf_cart">
@@ -327,10 +328,10 @@
 	</software>
 
 	<software name="schach">
-		<description>Schach</description>
+		<description>Schach (Ger)</description>
 		<year>197?</year>
 		<publisher>SABA</publisher>
-		<info name="series" value="Videocart 20g" />
+		<info name="series" value="SABA 20" />
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="6144">
 				<rom name="schach.bin" size="6144" crc="04fb6dce" sha1="cbbaa8522fee16a0cc13ed3140d41e22919da24b" offset="0" />
@@ -352,7 +353,7 @@
 
 	<software name="slotmchn">
 		<description>Slot Machine</description>
-		<year>197?</year>
+		<year>1980</year>
 		<publisher>Zircon</publisher>
 		<info name="series" value="Videocart 22" />
 		<part name="cart" interface="channelf_cart">
@@ -364,7 +365,7 @@
 
 	<software name="galactic">
 		<description>Galactic Space Wars / Lunar Lander</description>
-		<year>197?</year>
+		<year>1980</year>
 		<publisher>Zircon</publisher>
 		<info name="series" value="Videocart 23" />
 		<part name="cart" interface="channelf_cart">
@@ -376,7 +377,7 @@
 
 	<software name="pfootbll">
 		<description>Pro Football</description>
-		<year>197?</year>
+		<year>1981</year>
 		<publisher>Zircon</publisher>
 		<info name="series" value="Videocart 24" />
 		<part name="cart" interface="channelf_cart">
@@ -388,7 +389,7 @@
 
 	<software name="casinop">
 		<description>Casino Poker</description>
-		<year>197?</year>
+		<year>1980</year>
 		<publisher>Zircon</publisher>
 		<info name="series" value="Videocart 25" />
 		<part name="cart" interface="channelf_cart">
@@ -400,7 +401,7 @@
 
 	<software name="alieninv">
 		<description>Alien Invasion</description>
-		<year>197?</year>
+		<year>1981</year>
 		<publisher>Zircon</publisher>
 		<info name="series" value="Videocart 26" />
 		<part name="cart" interface="channelf_cart">

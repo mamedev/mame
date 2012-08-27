@@ -7,7 +7,7 @@
 	<software name="harvestc" supported="no">
 		<description>Harvest (Color?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>マイクロネット (Micronet)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
 				<rom name="harvest_color.mzt" size="47808" crc="7e50de6f" sha1="646450d817f3b27ced3a5f34d62d76e1d29bff57" offset="0" />
@@ -18,7 +18,7 @@
 	<software name="harvestg" supported="no">
 		<description>Harvest (Green?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>マイクロネット (Micronet)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
 				<rom name="harvest_green.mzt" size="47808" crc="fe0b6a0b" sha1="5ba88252496cc12a1f9807b36a664aa32d7dc1a4" offset="0" />
@@ -26,10 +26,12 @@
 		</part>
 	</software>
 
+<!-- This was was obtained by removing the MTW header from the available jelda.mtw. 
+     was any info lost? i.e. was the wav inside the mtw the complete content of the MZ tape? -->
 	<software name="jelda" supported="no">
 		<description>Jelda</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3676194">
 				<rom name="jelda.wav" size="3676194" crc="5812e3f2" sha1="d751932064f53a764b756846393526dd511f5cff" offset="0" />
@@ -37,13 +39,26 @@
 		</part>
 	</software>
 
+<!-- This was was obtained by removing the MTW header from the available jelda.mtw. 
+     was any info lost? i.e. was the wav inside the mtw the complete content of the MZ tape? -->
 	<software name="jelda2" supported="no">
 		<description>Jelda 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6435154">
 				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sstream" supported="no">
+		<description>Star Stream</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="26752">
+				<rom name="star stream.mzt" size="21248" crc="28e2db60" sha1="f309b5803e8e5241301f2e738d00d0975bbfc00f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
