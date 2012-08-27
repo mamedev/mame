@@ -887,7 +887,7 @@ void scsibus_device::device_start()
 	for (int devno = 0; devno < scsidevs->devs_present; devno++)
 	{
 		LOG(1,"SCSIBUS:init devno=%d \n",devno);
-		scsidev_device *scsidev = machine().device<scsidev_device>( scsidevs->devices[devno].tag );
+		scsidev_device *scsidev = owner()->subdevice<scsidev_device>( scsidevs->devices[devno].tag );
 		devices[scsidev->GetDeviceID()] = scsidev;
 	}
 }
