@@ -762,7 +762,7 @@ void wd33c93_device::device_start()
 	// try to open the devices
 	for (int i = 0; i < scsidevs->devs_present; i++)
 	{
-		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
 		devices[device->GetDeviceID()] = device;
 	}
 

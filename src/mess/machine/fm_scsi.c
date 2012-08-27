@@ -76,7 +76,7 @@ void fmscsi_device::device_start()
     // initialise SCSI devices, if any present
     for(int x=0;x<scsidevs->devs_present;x++)
     {
-		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[x].tag );
+		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[x].tag );
 		m_SCSIdevices[device->GetDeviceID()] = device;
     }
 

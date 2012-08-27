@@ -21,13 +21,13 @@ static const SCSIConfigTable x68k_scsiext_devtable =
 {
 	7,                                      /* 7 SCSI devices */
 	{
-		{ ":exp:cz6bs1:extharddisk0" },
-		{ ":exp:cz6bs1:extharddisk1" },
-		{ ":exp:cz6bs1:extharddisk2" },
-		{ ":exp:cz6bs1:extharddisk3" },
-		{ ":exp:cz6bs1:extharddisk4" },
-		{ ":exp:cz6bs1:extharddisk5" },
-		{ ":exp:cz6bs1:extharddisk6" },
+		{ "extharddisk0" },
+		{ "extharddisk1" },
+		{ "extharddisk2" },
+		{ "extharddisk3" },
+		{ "extharddisk4" },
+		{ "extharddisk5" },
+		{ "extharddisk6" },
 	}
 };
 

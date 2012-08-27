@@ -158,7 +158,7 @@ void ncr539x_device::device_start()
 	// try to open the devices
 	for (int i = 0; i < scsidevs->devs_present; i++)
 	{
-		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
 		m_scsi_devices[device->GetDeviceID()] = device;
 	}
 
@@ -193,7 +193,7 @@ void ncr539x_device::device_reset()
 	// try to open the devices
 	for (int i = 0; i < scsidevs->devs_present; i++)
 	{
-		scsidev_device *device = machine().device<scsidev_device>( scsidevs->devices[i].tag );
+		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
 		m_scsi_devices[device->GetDeviceID()] = device;
 	}
 }
