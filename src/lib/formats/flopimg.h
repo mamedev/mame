@@ -481,17 +481,25 @@ protected:
 
 	//! PC-type sectors with MFM encoding, sector size can go from 128 bytes to 16K.
 	void extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+	//! PC-type sectors with FM encoding
+	void extract_sectors_from_bitstream_fm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
 
     //!   PC-type sectors with MFM encoding
 	void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
+	//!   PC-type sectors with FM encoding
+	void get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
 
 
 	//!  Regenerate the data for a full track.
 	//!  PC-type sectors with MFM encoding and fixed-size.
 	void get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
+
+	//!  Regenerate the data for a full track.
+	//!  PC-type sectors with FM encoding and fixed-size.
+	void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
 
 	//! Look up a bit in a level-type stream.
 	bool bit_r(const UINT32 *buffer, int offset);

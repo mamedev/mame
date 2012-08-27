@@ -2303,3 +2303,150 @@ void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, floppy_im
 	}
 }
 
+
+void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size)
+{
+	memset(sectors, 0, 256*sizeof(desc_xs));
+
+	// Don't bother if it's just too small
+	if(track_size < 100)
+		return;
+
+	// Start by detecting all id and data blocks
+
+	// If 100 is not enough, that track is too funky to be worth
+	// bothering anyway
+
+	int idblk[100], dblk[100];
+	int idblk_count = 0, dblk_count = 0;
+
+	// Precharge the shift register to detect over-the-index stuff
+	UINT16 shift_reg = 0;
+	for(int i=0; i<16; i++)
+		if(sbit_r(bitstream, track_size-16+i))
+			shift_reg |= 0x8000 >> i;
+
+	// Scan the bitstream for sync marks and follow them to check for
+	// blocks
+	for(int i=0; i<track_size; i++) {
+		shift_reg = (shift_reg << 1) | sbit_r(bitstream, i);
+		if(shift_reg == 0xf77a) {
+			//index mark
+			UINT16 header;
+			int pos = i+1;
+			do {
+				header = 0;
+				for(int j=0; j<16; j++)
+					if(sbit_rp(bitstream, pos, track_size))
+						header |= 0x8000 >> j;
+				// Accept strings of sync marks as long and they're not wrapping
+
+				// Wrapping ones have already been take into account
+				// thanks to the precharging
+
+				// fe
+				if(header == 0xf57e) { // address mark
+					if(idblk_count < 100)
+						idblk[idblk_count++] = pos;
+					i = pos-1;
+				}
+				// fb
+				if(header == 0xf56f ) { // data mark
+					if(dblk_count < 100)
+						dblk[dblk_count++] = pos;
+					i = pos-1;
+				}
+			} while(header != 0xf77a);
+		}
+	}
+
+	// Then extract the sectors
+	int sectdata_pos = 0;
+	for(int i=0; i<idblk_count; i++) {
+		int pos = idblk[i];
+		UINT8 track = sbyte_mfm_r(bitstream, pos, track_size);
+		UINT8 head = sbyte_mfm_r(bitstream, pos, track_size);
+		UINT8 sector = sbyte_mfm_r(bitstream, pos, track_size);
+		UINT8 size = sbyte_mfm_r(bitstream, pos, track_size);
+		if(size >= 8)
+			continue;
+		int ssize = 128 << size;
+
+		// If we don't have enough space for a sector's data, skip it
+		if(ssize + sectdata_pos > sectdata_size)
+			continue;
+
+		// Start of IDAM and DAM are supposed to be exactly 384 cells
+		// apart.  Of course the hardware is tolerant.  Accept +/- 128
+		// cells of shift.
+
+		int d_index;
+		for(d_index = 0; d_index < dblk_count; d_index++) {
+			int delta = dblk[d_index] - idblk[i];
+			if(delta >= 384-128 && delta <= 384+128)
+				break;
+		}
+		if(d_index == dblk_count)
+			continue;
+
+		pos = dblk[d_index];
+
+		sectors[sector].track = track;
+		sectors[sector].head = head;
+		sectors[sector].size = ssize;
+		sectors[sector].data = sectdata + sectdata_pos;
+		for(int j=0; j<ssize; j++)
+			sectdata[sectdata_pos++] = sbyte_mfm_r(bitstream, pos, track_size);
+	}
+}
+
+void floppy_image_format_t::get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count)
+{
+	image->get_actual_geometry(track_count, head_count);
+
+	if(!track_count) {
+		sector_count = 0;
+		return;
+	}
+
+	UINT8 bitstream[500000/8];
+	UINT8 sectdata[50000];
+	desc_xs sectors[256];
+	int track_size;
+
+	// Extract an arbitrary track to get an idea of the number of
+	// sectors
+
+	// 20 was rarely used for protections, not near the start like
+	// 0-10, not near the end like 70+, no special effects on sync
+	// like 33
+
+	generate_bitstream_from_track(track_count > 20 ? 20 : 0, 0, cell_size, bitstream, track_size, image);
+	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+
+	for(sector_count = 44; sector_count > 0 && !sectors[sector_count].data; sector_count--);
+}
+
+
+void floppy_image_format_t::get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata)
+{
+	UINT8 bitstream[500000/8];
+	UINT8 sectbuf[50000];
+	desc_xs sectors[256];
+	int track_size;
+
+	generate_bitstream_from_track(track, head, cell_size, bitstream, track_size, image);
+	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectbuf, sizeof(sectbuf));
+	for(int sector=1; sector <= sector_count; sector++) {
+		UINT8 *sd = sectdata + (sector-1)*sector_size;
+		if(sectors[sector].data && sectors[sector].track == track && sectors[sector].head == head) {
+			int asize = sectors[sector].size;
+			if(asize > sector_size)
+				asize = sector_size;
+			memcpy(sd, sectors[sector].data, asize);
+			if(asize < sector_size)
+				memset(sd+asize, 0, sector_size-asize);
+		} else
+			memset(sd, 0, sector_size);
+	}
+}
