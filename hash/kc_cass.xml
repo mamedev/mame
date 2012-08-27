@@ -1120,7 +1120,7 @@
 
 	<software name="snake">
 		<description>Snake</description>
-		<year>192?</year>
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="2-3"/>
 		<part name="cass" interface="kc_cass">
