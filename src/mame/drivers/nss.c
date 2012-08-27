@@ -5,12 +5,14 @@
 	driver by Angelo Salese, based off info from Noca$h
 
 	TODO:
-	- EEPROM defaults / fix EEPROM hook-up, all games but F-Zero doesn't
-	  boot at current stage
 	- Fix sound CPU halt / reset lines, particularly needed by this to work
 	  correctly;
 	- Various M50458 bits
 	- OSD should actually super-impose with the SNES video somehow;
+
+	Notes:
+	- Multi-Cart BIOS works only with F-Zero, Super Tennis and Super Mario
+	  World;
 
 ***************************************************************************
 
@@ -470,6 +472,9 @@ READ8_MEMBER(nss_state::nss_prot_r)
 		data |= ((rp5h01_data_r(m_rp5h01, 0)) << 3) & 0x08;		/* D3 */
 		rp5h01_enable_w(m_rp5h01, 0, 1);
 	}
+	else
+		rp5h01_enable_w(m_rp5h01, 0, 1);
+
 	return data;
 }
 
@@ -483,6 +488,9 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 		rp5h01_cs_w(m_rp5h01, 0, ~data & 0x01);
 		rp5h01_enable_w(m_rp5h01, 0, 1);
 	}
+	else
+		rp5h01_enable_w(m_rp5h01, 0, 1);
+
 	ioport("EEPROMOUT")->write(data, 0xff);
 }
 
@@ -858,9 +866,11 @@ MACHINE_CONFIG_END
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION(0x10000,           "addons", ROMREGION_ERASE00)		/* add-on chip ROMs (DSP1 will be needed if we dump the NSS version of Super Mario Kart)*/\
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) \
-	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
-	ROM_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
-	ROM_LOAD("nss-ic14.02", 0x10000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
+	ROM_REGION(0x8000,         "bios",  0)		/* Bios CPU */ \
+	ROM_SYSTEM_BIOS( 0, "single", "Nintendo Super System (Single Cart BIOS)" ) \
+	ROMX_LOAD("nss-ic14.02", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(1) )	/* bios */ \
+	ROM_SYSTEM_BIOS( 1, "multi", "Nintendo Super System (Multi Cart BIOS)" ) \
+	ROMX_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )	/* bios */ \
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF) \
 	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 
@@ -1050,6 +1060,7 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 
 	for(i=0;i<0x10;i++)
 		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
+
 
 }
 

@@ -797,9 +797,9 @@ WRITE8_HANDLER( snes_w_io )
 		case JOY3H:
 		case JOY4L:
 		case JOY4H:
-#ifdef MAME_DEBUG
+//#ifdef MAME_DEBUG
 			logerror( "Write to read-only register: %X value: %X", offset, data );
-#endif /* MAME_DEBUG */
+//#endif /* MAME_DEBUG */
 			return;
 	}
 
