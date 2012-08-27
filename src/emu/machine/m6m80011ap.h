@@ -24,9 +24,21 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+typedef enum
+{
+	EEPROM_GET_CMD = 0,
+	EEPROM_READ,
+	EEPROM_WRITE,
+	EEPROM_WRITE_ENABLE,
+	EEPROM_WRITE_DISABLE,
+	EEPROM_STATUS_OUTPUT
+} eeprom_cmd_t;
+
+
 // ======================> m6m80011ap_device
 
-class m6m80011ap_device :	public device_t
+class m6m80011ap_device :	public device_t,
+    						public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -44,6 +56,22 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
+
+	virtual void nvram_default();
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
+
+private:
+	UINT8 m_latch;
+	UINT8 m_reset_line;
+	UINT8 m_cmd_stream_pos;
+	UINT32 m_current_cmd;
+	UINT8 m_read_latch;
+	UINT8 m_current_addr;
+	UINT8 m_eeprom_we;
+
+	eeprom_cmd_t m_eeprom_state;
+	UINT16 m_eeprom_data[0x80];
 
 };
 
