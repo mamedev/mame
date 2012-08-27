@@ -108,6 +108,7 @@ hash/msx2_cart.xml svneol=native#text/xml
 hash/mz2000_cass.xml svneol=native#text/xml
 hash/mz2000_flop.xml svneol=native#text/xml
 hash/mz2500.xml svneol=native#text/xml
+hash/mz700_cass.xml svneol=native#text/xml
 hash/n64.xml svneol=native#text/xml
 hash/neogeo.xml svneol=native#text/xml
 hash/nes.hsi svneol=native#text/plain

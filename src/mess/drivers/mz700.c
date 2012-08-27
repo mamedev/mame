@@ -324,7 +324,7 @@ static const cassette_interface mz700_cassette_interface =
 	mz700_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"mz_cass",
 	NULL
 };
 
@@ -363,6 +363,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_TTL74145_ADD("ls145", default_ttl74145)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, mz700_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

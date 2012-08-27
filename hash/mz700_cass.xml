@@ -1,0 +1,2858 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+Pretty much all info taken from http://www.sharpmz.org/index.html
+
+Currently, this list lists all dumps known and found. A lot of these are simple
+homemade hacks, mods and bad dumps which should probably be weeded out from the originals.
+
+Undumped:
+Pascal Compiler (BBG Software)
+Editor-Assembler 1Z-018C
+Editor-Assembler 5Z-011C
+Symbolic Debugger 1Z-018D
+Symbolic Debugger 5Z-011D
+Easidata (English Version)
+-->
+
+<softwarelist name="mz700_cass" description="Sharp MZ-700 cassette images">
+
+	<software name="1z013b">
+		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A</description>
+		<year>1983</year>
+		<publisher>Sharp Corporation</publisher>
+		<info name="usage" value="Load Side A first, then your Side B program"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Side A: Interpreter 1Z-013B V1.0A"/>
+			<dataarea name="cass" size="27680">
+				<rom name="1z-013b.mzf" size="27680" crc="2d1a7697" sha1="254ab9d3b7edc921d3f02136c2c6855e79e3b4fd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Side B: MZ-700 Demo"/>
+			<dataarea name="cass" size="7714">
+				<rom name="mz-700 demo.mzf" size="7714" crc="65cf25ec" sha1="9c055cb9a3d519b1661e16337ef5b1eb872a4b4f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mz_cass">
+			<feature name="part_id" value="Side B: Music"/>
+			<dataarea name="cass" size="2432">
+				<rom name="music.mzf" size="2432" crc="2230824a" sha1="8a48b6db013db0e08a97b87855e413cd5378369c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="mz_cass">
+			<feature name="part_id" value="Side B: MZ-1P01 Demo (Color Plotter)"/>
+			<dataarea name="cass" size="10885">
+				<rom name="mz-1p01.mzf" size="10885" crc="bad0cb47" sha1="d94116ac7f992f303147eefbbacc22ed58a25eab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a straight recording of the tape. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation? -->
+	<software name="1z013bswe" cloneof="1z013b">
+		<description>BASIC Interpreter 1Z-013B V1.0A (Swe)</description>
+		<year>1983</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="74092456">
+				<rom name="s-basic swe.wav" size="74092456" crc="ed0ab4c8" sha1="a402c9c646a85869c30fa2be7d90b93c482f5689" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a straight recording of the tape. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation? -->
+	<software name="10gamesa" cloneof="10games">
+		<description>10 Games for MZ-700 (Alt)</description>
+		<year>1983?</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side A"/>
+			<dataarea name="cass" size="101777452">
+				<rom name="10 plays for mz-700 1a.wav" size="101777452" crc="84ba7cf4" sha1="7357e9202037517874987ea30dc336fb9dc68370" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side B"/>
+			<dataarea name="cass" size="101417004">
+				<rom name="10 plays for mz-700 1b.wav" size="101417004" crc="987ad1ac" sha1="25e8438ba36413552afbeb707990e75b18a0434f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side A"/>
+			<dataarea name="cass" size="109170732">
+				<rom name="10 plays for mz-700 2a.wav" size="109170732" crc="984d4d67" sha1="8fd7964ae7dbc269179c7d85fb0539733735d265" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side B"/>
+			<dataarea name="cass" size="109117484">
+				<rom name="10 plays for mz-700 2b.wav" size="109117484" crc="f42c9fd7" sha1="9dc4bb6dc9d209817bd06e3254e5b7deb05a9af5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a straight recording of the tape. The tape seems to have been destroyed by time and as such a possible bad dump. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation?
+     Side A of the dumped tape had been taped over, hence the nodump. -->
+	<software name="1z013b_a" cloneof="1z013b">
+		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A (Alt)</description>
+		<year>1983</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="BASIC V1.0A"/>
+			<dataarea name="cass" size="60000000">
+				<rom name="basic v1.0a.wav" size="60000000" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Applications V1.0A"/>
+			<dataarea name="cass" size="59977632">
+				<rom name="applications v1.0a.wav" size="59977632" crc="19d9b5c3" sha1="6a7b0888251918511c67ce84907f3fef43b0f4b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic700">
+		<description>Basic 700/4</description>
+		<year>19??</year>
+		<publisher>R. &amp; L. Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27685">
+				<rom name="basic 700-vers.4.mzf" size="27685" crc="9fc513ad" sha1="45b6657fe25fdcd95ab28ad0a1a70e6c4e0d37d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of 1z013b. -->
+	<software name="gdp9ba" cloneof="1z013b">
+		<description>BASIC GDP9-BA</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="29606">
+				<rom name="gdp9-ba.mzf" size="29606" crc="434aba4e" sha1="b1c6bf95d11f44a859ed32b75561916dc8d3b051" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of 1z013b. -->
+	<software name="sutapeba" cloneof="1z013b">
+		<description>BASIC SUTAPEBA</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="29060">
+				<rom name="sutapeba.mzf" size="29060" crc="c7cf80d1" sha1="03a1f12ff2d0d57698db1b6b4b3e1cc45ce1b9ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of 1z013b. -->
+	<software name="kbasic5" cloneof="1z013b">
+		<description>Interpreteur K-BASIC 5 (Fra)</description>
+		<year>1984</year>
+		<publisher>Bernard Kokanosky</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="30296">
+				<rom name="k-basic v.5.mzf" size="30296" crc="95c0d65a" sha1="e55fc43638bd6249df1b557ea037804c28314303" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kuma">
+		<description>Kuma Interpreter</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11905">
+				<rom name="kuma interpr..mzf" size="11905" crc="0e1fb28f" sha1="4ab5c35b63a704dc3ea176a7a7861cee64b23296" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is apparently a mashup of several BASIC variants and hacks. -->
+	<software name="tbasic" cloneof="1z013b">
+		<description>T-BASIC+BM+PK(+) (Ned)</description>
+		<year>19??</year>
+		<publisher>MZ-GG</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="cass" size="28063">
+				<rom name="t-basic+bm+pk(+).mzf" size="28063" crc="b1f4ddb9" sha1="0bad5abbc5772eeb9b3abbd43f59ab993488b6c5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Documentation"/>
+			<dataarea name="cass" size="6155">
+				<rom name="t-basic (uitleg).mzf" size="6155" crc="e19e76b6" sha1="f3e65322933c7c0657e5bdbd26a0930e177ff28a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgbasic">
+		<description>PCG BASIC Interpreter (Ger)</description>
+		<year>19??</year>
+		<publisher>Ursoft</publisher>
+		<info name="usage" value="PCG-700 supported"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="28849">
+				<rom name="pcg basic.mzf" size="28849" crc="4f190928" sha1="1ee2def8105cecd633d6f68210ece4046f6aec5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of 1z013b. -->
+	<software name="cent2" cloneof="1z013b">
+		<description>BASIC-Interpreter for Parallel Printer (Ger)</description>
+		<year>1983</year>
+		<publisher>Multisoft</publisher>
+		<info name="usage" value="Load documentation from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="cass" size="27681">
+				<rom name="s-basic-cent-2.mzf" size="27681" crc="1bd8c019" sha1="567294fffd602639c99694311a268c1a9c20794f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Documentation"/>
+			<dataarea name="cass" size="3379">
+				<rom name="centro-anleitung.mzf" size="3379" crc="0235012c" sha1="fa0ff0b7439a14041fa763d93d990e6985dc7809" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is just the documentation for the program. The actual program is on disk while the docs are on tape. -->
+	<software name="cent2dsk">
+		<description>Centronics Interface Utility (Ger)</description>
+		<year>1984</year>
+		<publisher>Multisoft</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4454">
+				<rom name="centro-anl.disk.mzf" size="4454" crc="c810256f" sha1="fe6560ee585801d024da9196ce1ebd52ac76922d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbasicc">
+		<description>S-BASIC Compiler</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27542">
+				<rom name="s-basic-compiler-original.mzf" size="27542" crc="6c94ad9f" sha1="a451093eda8fa6e03dc1b82186d95e7394a92626" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of sbasicc. -->
+	<software name="sbasiccdutch1" cloneof="sbasicc">
+		<description>S-BASIC Compiler (Ned)</description>
+		<year>1987</year>
+		<publisher>Marius H. Velimaat</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27520">
+				<rom name="s-basic-comp-cnt.mzf" size="27520" crc="3d63ad48" sha1="95961dda9e8c2ff8272de8cf09747d02ec772750" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of sbasicc. -->
+	<software name="sbasiccdutch2" cloneof="sbasicc">
+		<description>S-BASIC Compiler (Ned, Printer Version)</description>
+		<year>1987</year>
+		<publisher>Marius H. Velimaat</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27520">
+				<rom name="s-basic-compiler.mzf" size="27520" crc="2e2e16b9" sha1="bcc0cacef084ede4a5339d0b8fe2f89b443822b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbc">
+		<description>XBC F V1.02</description>
+		<year>1987</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="31488">
+				<rom name="xbc f 1_02.mzf" size="31488" crc="26acda5e" sha1="fc099cf7713bff86e590cebc2bdfde694065d05e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of xbc. -->
+	<software name="xbcmod" cloneof="xbc">
+		<description>XBC F V1.02 (Modified)</description>
+		<year>1988</year>
+		<publisher>MiKrSoft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="31408">
+				<rom name="xbc.mzf" size="31408" crc="6a322758" sha1="74be58aa476b99dc1bcf6d5c306e5320f1c65269" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mz700tut">
+		<description>BASIC Sharp MZ-700 Tutorial</description>
+		<year>1984</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="26249">
+				<rom name="bas700tutorial.mzf" size="26249" crc="487231f6" sha1="112c125d1b536cafb3cb61fe94d6659106ab7cbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6502i">
+		<description>6502 Interpreter</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5545">
+				<rom name="6502 betriebssys.mzf" size="5545" crc="cf305643" sha1="31e21334aa01e3bbcb3d9f260baccdc52d4dbe75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicod2">
+		<description>S-BASIC/Vertaler BASICODE-2 (Ned)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="28447">
+				<rom name="s-basicode 2.mzf" size="28447" crc="1372eee2" sha1="2d2450804764412e6c70eaa8a01fc1f35ee4b492" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Might originally be for the MZ-80. Works with MZ-700. Should possibly be moved to MZ-80 list. -->
+	<software name="sp4015">
+		<description>Interpreter PASCAL SP-4015</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16512">
+				<rom name="pascal sp-4015.mzf" size="16512" crc="7530565b" sha1="796faa1ce799b6e488166f43bf55356eabe8cdd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of sp4015. Might originally be for the MZ-80. Works with MZ-700. Should possibly be moved to MZ-80 list. -->
+	<software name="sp4015c" cloneof="sp4015">
+		<description>Interpreter PASCAL SP-4015:C</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16512">
+				<rom name="pascal sp-4015_c.mzf" size="16512" crc="9a530859" sha1="ff0b36b62efa8d7dc86969da8c235996cbff6fad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Qick disk version hacked to boot from tape. Might originally be for the MZ-80. Works with MZ-700. Should possibly be moved to MZ-80 list. -->
+	<software name="sp4015qd" cloneof="sp4015">
+		<description>Interpreter PASCAL SP-4015 (Quick disk hack)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16513">
+				<rom name="qd-pascal_c.mzf" size="16513" crc="d236ba38" sha1="fa0c5cfc70826a5d1f6c69b8fdba4ec56e05f84d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hspascal">
+		<description>Hisoft PASCAL 4T</description>
+		<year>1984</year>
+		<publisher>Hisoft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="21397">
+				<rom name="hp4tmz7.mzf" size="21397" crc="f743d246" sha1="987181b475c184d0d77bd53118e5ff6c23ac08a6" offset="0" />
+			</dataarea>
+		</part>
+<!-- This came in the same zip. What is it? -->
+		<part name="cass2" interface="mz_cass">
+			<dataarea name="cass" size="175">
+				<rom name="hp4tmz7l.mzf" size="175" crc="dc7bfadf" sha1="562db950562e820cc710aec215f4b8d740c2b5fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="realfort">
+		<description>RealFortran</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16001">
+				<rom name="realfort.mzf" size="16001" crc="3a683729" sha1="85e02bacc79929459535a6cff94d8e92f8bbf18c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sosz80">
+		<description>SOSZ80 Fortran V1.0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12417">
+				<rom name="fortransosz80.mzf" size="12417" crc="1f274461" sha1="0a47cf8884c27ae79c898fdce14d72dafc2f7fbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mz7forth">
+		<description>MZ-700 Forth</description>
+		<year>1983</year>
+		<publisher>Sharpsoft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="13953">
+				<rom name="mz700 forth1.mzf" size="13953" crc="118f2300" sha1="a8635945d0c264b2a9791adbba05392a2f5af602" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knightsf">
+		<description>Knight's MZ-700 Forth</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5313">
+				<rom name="kniforth.mzf" size="5313" crc="9b5e6cb9" sha1="e74921d01173dc201fb6a167e6a223da511421c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knightsfmod" cloneof="knightsf">
+		<description>Knight's MZ-700 Forth (Modified)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5329">
+				<rom name="mz-700 forth.mzf" size="5329" crc="bf45d5ed" sha1="dd459ce6133102af4fd15379518e08d1e5007180" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logov30">
+		<description>Bienvenue sous LOGO V3.0 (Fra)</description>
+		<year>1987?</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15488">
+				<rom name="logo_v30.mzf" size="15488" crc="1c49805f" sha1="fab0632fe498fb36250ef086cd2672266f585458" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z80dis">
+		<description>Z80 Disassembleur V1.1 (Fra)</description>
+		<year>1989</year>
+		<publisher>Jean François Campan</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5248">
+				<rom name="z80_desassembleur.mzf" size="5248" crc="0c71f2be" sha1="2874d2d516c24090d146b56c087f9e69b1c98295" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="urasz80">
+		<description>URAS-Z80 V1.1 (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8577">
+				<rom name="uras-700.mzf" size="8577" crc="9277ac3a" sha1="1534b509d8574142fd4eaf26026b2f199412b626" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlsp8002">
+		<description>ML SP-8002</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3713">
+				<rom name="ml-sp 8002 bbg.mzf" size="3713" crc="4b6d1616" sha1="611485dd5dd08d6dd7f78cd0c43569259863bea9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specdbug">
+		<description>Spectrum Debugger V1.1R (Cz)</description>
+		<year>1991</year>
+		<publisher>Proton Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11077">
+				<rom name="s-master.mzf" size="11077" crc="b759422c" sha1="5e8652e31470d0875252838975743538437f547c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smonitor">
+		<description>Sub-Monitor 700</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4224">
+				<rom name="sub-monitor-700.mzf" size="4224" crc="b482d378" sha1="d347284ccd4880e59dd3224798142217ec45f956" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Broken? -->
+	<software name="sutam1f">
+		<description>SUTAM1F</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4480">
+				<rom name="sutam1f.mzf" size="4480" crc="f9b44b41" sha1="7bdad0d3d4c6345679c0385058ea23786dab99f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Broken? -->
+	<software name="sutamc9">
+		<description>SUTAMC9</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1616">
+				<rom name="sutamc9.mzf" size="1616" crc="4c76c19d" sha1="55559e8d5e39c9fbbee6bcceb17a9a30694f3cca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Broken? The only difference between this and sutamc9 is in the header name. -->
+	<software name="sutapemo" cloneof="sutamc9">
+		<description>SUTAPEMO</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1616">
+				<rom name="sutapemo.mzf" size="1616" crc="5ef2fa2c" sha1="d16ec89129427f570fcc94661cc6496b6a2d2673" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Broken? -->
+	<software name="monitor">
+		<description>Monitor (BASIC)</description>
+		<year>1984</year>
+		<publisher>R. Scharnagl?</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4224">
+				<rom name="monitor.mzf" size="4224" crc="cc78903a" sha1="73289ef8b73cd3151c89e6379b434e2bd0e5c654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Broken? -->
+	<software name="monitor2">
+		<description>Monitor (Machine code)</description>
+		<year>1984</year>
+		<publisher>R. Scharnagl?</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4240">
+				<rom name="monitor3.mzf" size="4240" crc="3c80140f" sha1="2a8b036b6f8cbdeb897a12bc69ff890d1acebde1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Broken? -->
+	<software name="monitor6">
+		<description>Monitor 6</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5482">
+				<rom name="monitor6.mzf" size="5482" crc="800455e4" sha1="492ee04b9560667727997527115deae2b3674488" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zen">
+		<description>Zen</description>
+		<year>1983</year>
+		<publisher>Multisoft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5120">
+				<rom name="zen.mzf" size="5120" crc="c4c61b6d" sha1="759f6ab2032cadf2312ac1595028dfd1afa4603e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dgraph">
+		<description>3-D Graphikpaket (Ger)</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="13038">
+				<rom name="3-d graphikpaket.mzf" size="13038" crc="432f9972" sha1="956056be3dac70ef4a4d5953aebd7a92cf29e26b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plot">
+		<description>MZ700 Plot (Ger)</description>
+		<year>1985</year>
+		<publisher>RK-Datentechnik</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11226">
+				<rom name="mz-700 plot.mzf" size="11226" crc="fa78d9e8" sha1="bced0f6903cc0a6d6fd2b9ffcf581c5b95574b9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgaid">
+		<description>PCGAID-700 V1.0 (Jpn)</description>
+		<year>19??</year>
+		<publisher>HAL Laboratory</publisher>
+        <info name="usage" value="PCG-700 required"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4162">
+				<rom name="pcgaid.mzf" size="4162" crc="c34ef347" sha1="4319578cdf1aa0d21400c33627701774c0297de6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcgaide" cloneof="pcgaid">
+		<description>PCGAID-700 V1.0 (Euro)</description>
+		<year>19??</year>
+		<publisher>HAL Laboratory</publisher>
+        <info name="usage" value="PCG-700 required"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4162">
+				<rom name="pcgaid_europe.mzf" size="4162" crc="40bf7069" sha1="4c528571f93f63e5b94421d4eac5880f2d5fffc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy">
+		<description>Multicopy-BV (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2560">
+				<rom name="copy-cf.mzf" size="2560" crc="4f9d7b59" sha1="b996ea036260ec7e80578ca4467f2f0188433d84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmaster">
+		<description>C-Master (Ger)</description>
+		<year>19??</year>
+		<publisher>Ursoft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="19885">
+				<rom name="c-master.mzf" size="19885" crc="56c13ae3" sha1="0e138a80939121d40ccf66049eb3ce6c3a5af8c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbp701">
+		<description>DBP701+ Datenbanksystem (Ger)</description>
+		<year>1982</year>
+		<publisher>Kersten &amp; Partner</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6663">
+				<rom name="dbp-701+.mzf" size="6663" crc="cdbc1f16" sha1="49d42828ba3b90beafbe164dbc1e226bb225b234" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spadata">
+		<description>SPA Data (Ger)</description>
+		<year>1983</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7B55"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11005">
+				<rom name="spa data.mzf" size="11005" crc="1a4ae23d" sha1="104d53300934005471079ce2fabe2e5827d7b859" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbfiler">
+		<description>Database Filer</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7B50"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="14838">
+				<rom name="database filer.mzf" size="14838" crc="d679484e" sha1="60a0d6c4180fc183966f716d0c838e256fe4e5f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easidata">
+		<description>Easidata V1.3 (Ger)</description>
+		<year>1983</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7B53"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6073">
+				<rom name="sh7ced1.3g.mzf" size="6073" crc="2dfd5a67" sha1="e7f7acde3eac31699a910c2a34213e208c85793b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dateiuni">
+		<description>Datei Universal (Ger)</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4313">
+				<rom name="datei universal.mzf" size="4313" crc="2fb5138d" sha1="fe962faed7fa11ed8d65dd2e51c22e65701ab1ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kalender">
+		<description>Kalender</description>
+		<year>1984</year>
+		<publisher>Michael Gartner</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="">
+				<rom name="kalender.mzf" size="10208" crc="6fb5a68a" sha1="dbdd53674934d2fe83aa98c895e5a8e989ab1bf3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apollowp">
+		<description>Apollo Word Processor V2.7</description>
+		<year>1982</year>
+		<publisher>Apollo Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="">
+				<rom name="apollo.mzf" size="5499" crc="46b8ae1c" sha1="916c3ccd0f1c441b0f8c268e774eea511a953dd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moleatck">
+		<description>Mole Attack</description>
+		<year>1982</year>
+		<publisher>HAL Laboratory</publisher>
+        <info name="usage" value="PCG-700 required"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4146">
+				<rom name="moleatta.mzf" size="4146" crc="11c14b64" sha1="fbb3482690505748cd8193f6ec77794d9d8be942" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Has boot modes for several siffernt MZ models including 80K, 1200, 700 etc. -->
+	<software name="tomahawk">
+		<description>Tomahawk (Ger)</description>
+		<year>19??</year>
+		<publisher>Hiroshi Masuko</publisher>
+		<info name="usage" value="PCG-700 optional"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20353">
+				<rom name="tomahawk.mzf" size="20353" crc="2304a6b4" sha1="334981fe23cc1977f86354871ebb72b20dfa66a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lissajou">
+		<description>Lissajou-Figur (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from PCG-BASIC"/>
+		<info name="usage" value="PCG-700 required"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1697">
+				<rom name="demo-lissajou.mzf" size="1697" crc="1102f5d5" sha1="f16e4e8281bf8c64e6d5944bf986f6b032877fa5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sinberg">
+		<description>Sin-Berg (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from PCG-BASIC"/>
+		<info name="usage" value="PCG-700 required"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1154">
+				<rom name="demo sin-berg.mzf" size="1154" crc="e975b2d7" sha1="adad4be627e9d3cdab1203ff2cf9386266c0fdae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of apollowp. -->
+	<software name="apollowp28" cloneof="apollowp">
+		<description>Apollo Word Processor V2.8 (Ned)</description>
+		<year>1985</year>
+		<publisher>MZ-GG</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="33413">
+				<rom name="apollo2_8-200785.mzf" size="33413" crc="d37b7953" sha1="ea4d4ac1a81f391e57d9c98a96fcf2e34e773a3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dcarrac">
+		<description>3D Car Race</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6785">
+				<rom name="3-d car race.mzf" size="6785" crc="f7647581" sha1="3603461843bf7f13902fc35b6d0f708a93b98b7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raumuhle">
+		<description>Raummühle (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3217">
+				<rom name="3dmuehle.mzf" size="3217" crc="9da17c5b" sha1="a8f91e63f80f1b93e995d8ba476e83b28343a351" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dwayout">
+		<description>3-D Way Out</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10565">
+				<rom name="3d-way out.mzf" size="10565" crc="33ea8534" sha1="b4a6a366b9e0a96f7ff3d0577749441e29835f58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceracer">
+		<description>Ace Racer</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G088"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8951">
+				<rom name="ace racer.mzf" size="8951" crc="ffbda92c" sha1="e9de546a81aaaf6a2dc9006d54552fa4ab1b323a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advchess">
+		<description>Advanced Chess</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G073"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12418">
+				<rom name="advancedchess.mzf" size="12418" crc="f7f205a2" sha1="a0c31412abc14cc8381588a335594553e7949fce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airbus">
+		<description>Airbus A 310</description>
+		<year>1985</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="43744">
+				<rom name="airbus a 310.mzf" size="43744" crc="14e293be" sha1="905d9de7b83d46378d319d23ed1d6abf2f75756b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliens">
+		<description>Aliens (Ned)</description>
+		<year>19??</year>
+		<publisher>G.J. Krijnen</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2739">
+				<rom name="aliens.mzf" size="2739" crc="2c09eec8" sha1="dc067073242cb3f6bb2dba142963820f6c6d936d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antares">
+		<description>Antares (Ger)</description>
+		<year>1986</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20352">
+				<rom name="antares.mzf" size="20352" crc="c1993ef5" sha1="73492978e9a096526031bd3d59b890dbc181b1c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amity">
+		<description>Amityville (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="19328">
+				<rom name="amityville.mzf" size="19328" crc="f928e0fc" sha1="398640708aabad3ae9402d2207aaade35f615a2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anthill">
+		<description>Anthill Raiders</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G082"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10504">
+				<rom name="anthill raider.mzf" size="10504" crc="ea797005" sha1="93bc7f06e32636d301e719ac467cc89d77cc8d4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nombres">
+		<description>Apprentissage des Nombres (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5248">
+				<rom name="apprentissage_nombres.mzf" size="5248" crc="e7b01f7c" sha1="2f7f669f10260b1a919fd05ee0d33fc96db5d023" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astbelt">
+		<description>Asteroid Belt</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G055"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8473">
+				<rom name="asteroid belt.mzf" size="8473" crc="78f2deec" sha1="8678842f82ab3ddd2caee7b8ad54132ecc8cc222" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrobla">
+		<description>Astro-Blaster</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G056"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7808">
+				<rom name="astro-blaster.mzf" size="7808" crc="2745b08a" sha1="c10a6748043b909706aa2cc0915b4fae2abc786d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atkatank">
+		<description>Attack-A-Tank</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8018">
+				<rom name="attack-a-tank.mzf" size="8018" crc="136cbd7b" sha1="9daaf83eda41837167d9652113e38d6f0d780379" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamm">
+		<description>Backgammon</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G052"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="28801">
+				<rom name="backgammon.mzf" size="28801" crc="1af3a970" sha1="5ecf8b6b7e54e6e081d00d390bcd63fa39c2f9a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basezero">
+		<description>Base Zero</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20448">
+				<rom name="basezero.mzf" size="20448" crc="99267a84" sha1="d197e3521cba91957300f9b40e640e015b1f1b3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bio700">
+		<description>Biorhythmus (Ger)</description>
+		<year>1983</year>
+		<publisher>Ursoft</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5417">
+				<rom name="bio-700.mzf" size="5417" crc="f80a86ad" sha1="f24fc2392a8c2d0714609a4ddca6787dfb1f21c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blastoff">
+		<description>Blast Off</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="19078">
+				<rom name="blastoff.mzf" size="19078" crc="79eb92a5" sha1="e3ca0f39eb2871811c14d693f8f69b6df3de6445" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bloktek">
+		<description>Bloktekeningen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="664">
+				<rom name="bloktekeningen.mzf" size="664" crc="7cac9e40" sha1="cded29d07d538dbd713bed02cbadfa169f290574" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombman">
+		<description>Bomber Man</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8336">
+				<rom name="f1200.mzf" size="8336" crc="47ce8ceb" sha1="26aaa0e0c5d4056f0a1a37a40005661645ab06bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bouldash">
+		<description>Boulder Dash (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="22656">
+				<rom name="boulder_dash.mzf" size="22656" crc="573adbe0" sha1="1937bcfbf001ae2cccc33a75c62eea3e7dfc6f4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breuken1">
+		<description>Breuken 1 (Ned)</description>
+		<year>1984?</year>
+		<publisher>Roger Deneweth?</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="21946">
+				<rom name="breuken 1.mzf" size="21946" crc="28fc471d" sha1="a062939fce7caf8463a8b8af77fd41a441880604" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calendri">
+		<description>Calendrier (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1664">
+				<rom name="calendrier.mzf" size="1664" crc="182b1b9a" sha1="18bbc9c6f38006bb3dee730bc43e654c3c90b241" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannball">
+		<description>Cannon Ball</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5248">
+				<rom name="cannon ball.mzf" size="5248" crc="cdcd5637" sha1="2706ce8894d69423244d8d92218d41fd1fd90523" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catacomb">
+		<description>Catacombes (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20096">
+				<rom name="catacombes.mzf" size="20096" crc="9790770c" sha1="628724cc7d20ddeffce6d016d9ed4fc993fe38de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cataplus">
+		<description>Catacombes+ (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="45440">
+				<rom name="catacombes_+.mzf" size="45440" crc="71605b7f" sha1="936582548efdb78062906e4111a9f02730eb0c76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Counter Reverse seems to simply be Hudson's Reverse with a different header. Is this dump wrong or was it like that on the tape. -->
+	<software name="ccacr">
+		<description>Caterpillar Crawl and Counter Reverse</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07COUN"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3792">
+				<rom name="caterpillar.mzf" size="3792" crc="77302ba9" sha1="8a1617fdee0eafe0f373d8b64245b36c8c43367f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<dataarea name="cass" size="7408">
+				<rom name="reverse.mzf" size="7408" crc="6a09cc09" sha1="2eeb7dcff6c4fbfe8b2a5f5be544a617fc7cd77e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clubgolf">
+		<description>Club Golf</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G062"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16648">
+				<rom name="club golf.mzf" size="16648" crc="edd2b5b1" sha1="0c08d31972268d54877cff89afec1ff03c16c0be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codeword">
+		<description>Codewoord (Ned)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2934">
+				<rom name="codewoord.mzf" size="2934" crc="3a233848" sha1="c7b52536f756d3adb4e64d9ad439bb216db81c20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="complain">
+		<description>Commando Plain</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11014">
+				<rom name="commando plain.mzf" size="11014" crc="a95485bb" sha1="1ec9c8218ac15fb54fb8b70ef4e8a458eaeba18a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="competit">
+		<description>Competitie (Ned)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4133">
+				<rom name="competitie.mzf" size="4133" crc="695343f6" sha1="5bfcbf28fa3bb43404490fce04f5c3abafd04c66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compslot">
+		<description>Comput-A-Slot</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G072"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8996">
+				<rom name="comput-a-slot.mzf" size="8996" crc="840810ea" sha1="94d50fbb71ec9cc4652588acbcf30ee3c2850bbd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comptek">
+		<description>Computertekenen (Ned)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2325">
+				<rom name="computertekenen.mzf" size="2325" crc="a46a4773" sha1="5bd07e412ea476464ca0a5f6f408c698c87aadc3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="connect4">
+		<description>Connect Four</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G105"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7986">
+				<rom name="connect four.mzf" size="7986" crc="87d8256a" sha1="f21a36efaf417d3df0acfdff81a1131978eb4af4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conveyor">
+		<description>Conveyor</description>
+		<year>1983</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G102"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6775">
+				<rom name="conveyor.mzf" size="6775" crc="cd128bcf" sha1="665ba6d48506b7089b373e2837b5cb25a05e6784" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cribbage">
+		<description>Cribbage</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07CRIB"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="23011">
+				<rom name="cribbage.mzf" size="23011" crc="bb14182d" sha1="fd52418ccd80bcfd58dfb57c08e746f44d5acf76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="croaker">
+		<description>Croaker</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G092"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16036">
+				<rom name="croaker.mzf" size="16036" crc="530cb577" sha1="2e7c67a1cbad480cba8175c9d89963dddfdb414c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyfax">
+		<description>Cyfax</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11914">
+				<rom name="cyfax.mzf" size="11914" crc="b6f3b13f" sha1="25821e2076526d3cf5edc79a1d45f691242ca6e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demasaso">
+		<description>Demasaso (Fra)</description>
+		<year>1985</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16000">
+				<rom name="demasaso.mzf" size="16000" crc="f52e8b7d" sha1="58f5851a9e467069d812395c91a31e808088814f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="descente">
+		<description>Descente aux Enfers (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8832">
+				<rom name="descente_aux_enfers.mzf" size="8832" crc="57f1b9d7" sha1="c4197feb7cd8542da05577d76733eba869ae0c51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destruct">
+		<description>Destructeurs (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="32384">
+				<rom name="destructeurs.mzf" size="32384" crc="e09ac0f0" sha1="a9cf3baf1aacd2d5d2d27637fdc4304c303af8a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dominat">
+		<description>Domination</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G096"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11560">
+				<rom name="domination.mzf" size="11560" crc="083afb5b" sha1="7f9f6c1f3bae5674a79a3d7e9c3409d4012b9b93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dgorilla">
+		<description>Donkey Gorilla</description>
+		<year>19??</year>
+		<publisher>Tecno Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="34579">
+				<rom name="donkey gorilla.mzf" size="34579" crc="b51608c2" sha1="8ba846204f21a8dec594de2a3ddb982ae16c249f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explatom">
+		<description>Exploding Atoms</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07EXPL"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4786">
+				<rom name="exploding atoms.mzf" size="4786" crc="179d150b" sha1="0d88d2aa6b99b9bd383aa8ce81ea657d706af327" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantgrov">
+		<description>Fantastic Grove</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="24134">
+				<rom name="fantastic grove.mzf" size="24134" crc="e71e6fe8" sha1="994907ef0b5178cd7bb396a61864143717645bc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightcom">
+		<description>Fighter Command</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G059"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="">
+				<rom name="fighter command.mzf" size="15219" crc="91b4540f" sha1="bf3b9c484459e0d4736ab01daa01bc118210fa16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fire">
+		<description>Fire!!!</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G093"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8989">
+				<rom name="fire!!!.mzf" size="8989" crc="f436dbdf" sha1="13105caad93da5e6edb5a73080f8b1178923c521" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishfred">
+		<description>Fisherman Fred</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8526">
+				<rom name="fisherman fred.mzf" size="8526" crc="c24fb14f" sha1="f0cd799ecaae485bda506a3cfeafaae0900fbe0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flugsim">
+		<description>Flugsimulator (Ger)</description>
+		<year>1984</year>
+		<publisher>HOBRA Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11904">
+				<rom name="flugsimulator.mzf" size="11904" crc="be7207ff" sha1="20e845bfa10489c2e163d4c916cca7382fef353d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fulspeed">
+		<description>Full Speed</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15950">
+				<rom name="full speed.mzf" size="15950" crc="ed38789c" sha1="f613825ed468528b743338f760ce7ceebf09d638" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gcajj">
+		<description>Gate Crasher and Jungle Jinks</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07GATE"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5656">
+				<rom name="gate-crasher.mzf" size="5656" crc="db3998de" sha1="1fbd8fe5a5f8f4800519bf48292cd0d34f93be5d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<dataarea name="cass" size="5307">
+				<rom name="jungle-jinks.mzf" size="5307" crc="41763067" sha1="d3d0a6aeb5d6b73a2d1225fa95ffff11700a69e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geboorte">
+		<description>Geboortedatum (Ned)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="763">
+				<rom name="geboortedatum.mzf" size="763" crc="7a7a957b" sha1="24ec6678e6cb8576ed1f5b68a8ea3ebf3e25f926" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="globwar3">
+		<description>Global War III</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="28011">
+				<rom name="global war 3.mzf" size="28011" crc="3f7b491c" sha1="0f9f4b1b28e7d9548fc56fd9292502c219180b9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="globule">
+		<description>Globule (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4224">
+				<rom name="globule.mzf" size="4224" crc="23b3dbbd" sha1="62f3c2f79ae67891c4905b7354492d6a54386bd1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobbler">
+		<description>Gobbler</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G049"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10347">
+				<rom name="gobbler.mzf" size="10347" crc="6d63bca8" sha1="4ba5cbfddd2c05a8b4a377000ad3e77a5b1526a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greedyg">
+		<description>Greedy Gremlins</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07GREE"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20745">
+				<rom name="greedy gremlins.mzf" size="20745" crc="08e2c994" sha1="735520576db0d672477ecbeed537de9c91229029" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grid">
+		<description>Grid</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15776">
+				<rom name="grid.mzf" size="15776" crc="0233c676" sha1="882302288d2115ea29591b14be3268576239e21f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guerre">
+		<description>Guerre Spatiale (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8320">
+				<rom name="guerre_spatiale.mzf" size="8320" crc="2e40a2f1" sha1="1a4528b62c37398fd00362456bafee3b28a1390f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdcorgel">
+		<description>HDC Orgel</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1921">
+				<rom name="hdc_orgel.mzf" size="1921" crc="ec2146af" sha1="1d0f337604d97197bb068c9c0f400232a3d6b6a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hunchy">
+		<description>Hunchy</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G052"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16282">
+				<rom name="hunchy.mzf" size="16282" crc="40567a46" sha1="a4937311ebf234589fd050f91bdc9efed3afa9ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impomiss">
+		<description>Impossible Mission (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="25728">
+				<rom name="impossible_mission.mzf" size="25728" crc="df0187ce" sha1="5a36aef949b5629730d68e983ef8946d55470184" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isola">
+		<description>Isola (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4736">
+				<rom name="isola.mzf" size="4736" crc="b1c581e4" sha1="d0632f520f20f5ec64d68109ccc1a02f41bd531d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuxint">
+		<description>Jeux Intergalactiques (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11392">
+				<rom name="jeux_intergalactiques.mzf" size="11392" crc="ad0d9838" sha1="2bbb536162ea1f1c34d379741ade621fae48163b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumprun">
+		<description>Jumping-Runner (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10624">
+				<rom name="jumping_runner.mzf" size="10624" crc="25581b92" sha1="3b64599774c915bc719dcb5d9def1cce0f706bf6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamertje">
+		<description>Kamertje Verhuren (Ned)</description>
+		<year>1987</year>
+		<publisher>NOS</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10525">
+				<rom name="kamertje.mzf" size="10525" crc="83a15d59" sha1="ff08b5c9a83ae1f61de6e96b30e411b8292cb6cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kasboek">
+		<description>Kasboek (Ned)</description>
+		<year>1984</year>
+		<publisher>NOS</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12041">
+				<rom name="kasboek.mzf" size="12041" crc="3f9d7399" sha1="0ad40ba436a8de31224456b3c8267a93f3ba2e98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kentucky">
+		<description>Kentucky Derby</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<info name="serial" value="MZ-7G091"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8184">
+				<rom name="kentucky derby.mzf" size="8184" crc="9d4d89ee" sha1="6f54cb5a29864edc3352eeb01bc6985c8347cacd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- What is Part 2 and what does it do? -->
+	<software name="ksmines">
+		<description>King Solomon's Mines</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<info name="serial" value="MZ-8G047"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Original Loader"/>
+			<dataarea name="cass" size="193">
+				<rom name="k.s.m. pt. 1.mzf" size="193" crc="63c2c635" sha1="501052ef0b01c2169cb438e3cd9afc98ca31dd6f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="cass" size="29461">
+				<rom name="k.s.m. pt. 2.mzf" size="29461" crc="8ef4de01" sha1="1f00ae547e26c100457e4406a24b7eb23940bc34" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mz_cass">
+			<feature name="part_id" value="Program (BASIC)"/>
+			<dataarea name="cass" size="29461">
+				<rom name="k.s.m. pt. 3.mzf" size="29461" crc="cc2308cf" sha1="c5c9a7164e599b7fcec34eef723bf6c22750cc8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcastle">
+		<description>Knight's Castle</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="21113">
+				<rom name="knight's castle.mzf" size="21113" crc="ac3ce797" sha1="7133718daf0498a5f314f3d06f5f77c29db0d561" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcufo">
+		<description>UFO (Knight's Computers)</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07UFO"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="17936">
+				<rom name="knights ufo.mzf" size="17936" crc="909f5517" sha1="f0f65998d4e12aa89de3985f7b50a8f82b29e1b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssufo">
+		<description>UFO (Solo Software)</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G057"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8050">
+				<rom name="ufo.mzf" size="8050" crc="6d821a57" sha1="4a688d114f15d7910693b1fc714c926454c5d26b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trucker">
+		<description>Trucker</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16543">
+				<rom name="trucker.mzf" size="16543" crc="a0b4bcd3" sha1="a73ba6a2a86af00cd8a153ee13883b521da9cbc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladybug">
+		<description>Lady Bug</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="18256">
+				<rom name="lady-bug.mzf" size="18256" crc="4bb2a291" sha1="1b3ecb8924af8b380424368aba6affaf2b957333" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diaboliq">
+		<description>Le Cadre Diabolique</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3456">
+				<rom name="cadre_diabolique.mzf" size="3456" crc="05f663ae" sha1="e32da60a7f288cd33237cbf0ddc4670930ee1de8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemans">
+		<description>Le Mans</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="17166">
+				<rom name="le mans.mzf" size="17166" crc="bfef7e0b" sha1="1ad73d1e80b3c073f4429d60db47317dc8edf684" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lightpat">
+		<description>Lightning Patrol</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G085"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10164">
+				<rom name="lightning patrol.mzf" size="10164" crc="552c516b" sha1="ca00efede327de7508e1282b68910ffb2662ebc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lijnspel">
+		<description>Lijnenspel</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="441">
+				<rom name="lijnenspel.mzf" size="441" crc="790a3465" sha1="a68aa49e15b9ca651769fa817a3a6e356d1313f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macpac">
+		<description>Mac Pac</description>
+		<year>1983</year>
+		<publisher>Ursoft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8649">
+				<rom name="mac pac.mzf" size="8649" crc="b845be69" sha1="91d8f91ddc9b0cc7b7a6eacd4a1f3bdf85cd47f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madmaze">
+		<description>Mad Maze</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20046">
+				<rom name="mad maze.mzf" size="20046" crc="18261cd3" sha1="f661a85bea8fc287111b760bf78192255b9f5577" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manza">
+		<description>Manza (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11904">
+				<rom name="manza.mzf" size="11904" crc="079081be" sha1="bc4aaf0eb54f5f07b058b6690cbecee6c9afa2ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstrmind">
+		<description>Mastermind</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10182">
+				<rom name="mastermind.mzf" size="10182" crc="093892af" sha1="ce19e4e4f14233d37267ae47998491104d7e3c6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matpendu">
+		<description>Matpendu (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5760">
+				<rom name="math_pendu.mzf" size="5760" crc="9bb0f637" sha1="686c441087af017f3d7cad1579506578ae47ebd1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazeesc">
+		<description>Maze Escape</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G051"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4738">
+				<rom name="maze escape.mzf" size="4738" crc="45ab6536" sha1="c216e1470398f1040f6113d44c0be5ec1a4ad8c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="messing">
+		<description>Messing (Ned)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3112">
+				<rom name="messing.mzf" size="3112" crc="ff4508ba" sha1="b08a1d9b8cc2dbf3097cfd796d8731d552508ace" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missiona">
+		<description>Mission A</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2688">
+				<rom name="mission_a.mzf" size="2688" crc="a7593358" sha1="a80fa24a663a932261419b8bd0571ffb5b2f7c54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misalpha">
+		<description>Mission Alpha (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="25472">
+				<rom name="mission_alpha.mzf" size="25472" crc="1bde34ee" sha1="2a3b9674bc196efcdb41db8286ed590c661c016f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misdelta">
+		<description>Mission Delta (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="14720">
+				<rom name="mission_delta.mzf" size="14720" crc="47c0345b" sha1="5feae82aa28ae55348c1122aa15c0a29d39c1583" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="morpion">
+		<description>Morpion (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2688">
+				<rom name="morpion.mzf" size="2688" crc="3da53fae" sha1="f0653e2653593aa8e5a687ca717b77d4d0669358" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="morpius">
+		<description>Morpius (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2176">
+				<rom name="morpius.mzf" size="2176" crc="ce0e4c85" sha1="d0c065f7ebb17bc0ed327292798870955d8d7095" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moty">
+		<description>Moty</description>
+		<year>1985</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="47695">
+				<rom name="moty.mzf" size="47695" crc="73567390" sha1="d5c350a672e91a73bf97ddaadaa994109dab32d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Cassette contains both an MZ-700 and an MZ-800 version. Proper tagging pending. -->
+	<software name="mucmac">
+		<description>Muc Mac</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16585">
+				<rom name="mucmac700.mzf" size="16585" crc="5a49451e" sha1="b4d3f23019df154e1a7bf5db32388dabf5f43c66" offset="0" />
+			</dataarea>
+		</part>
+<!--
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20896">
+				<rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d" offset="0" />
+			</dataarea>
+		</part>
+-->
+	</software>
+
+	<software name="musiques">
+		<description>Musique Suisse</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3979">
+				<rom name="musique_suisse.mzf" size="3979" crc="c2d839fd" sha1="2262373e3bbcfd70e1610aa4b2c2e0b9fcf3605b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="momm">
+		<description>Mystery of Munroe Manor</description>
+		<year>19??</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-8G048"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="31713">
+				<rom name="munroe manor.mzf" size="31713" crc="5482373e" sha1="6fdb88a8d9bb7d55acdd505526b12c862b9754e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klavier">
+		<description>MZ-700 Klavier (Ger)</description>
+		<year>19??</year>
+		<publisher>MZ-Verlag</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12060">
+				<rom name="mz-700_klavier.mzf" size="12060" crc="407f598a" sha1="9df150d4fa64829371a16b554c017162c11ed8c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nakamoto">
+		<description>Nakamoto</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="28977">
+				<rom name="nakamoto.mzf" size="28977" crc="33becdc4" sha1="598cc23e49f01586965cd21f1cfe2525097445dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibbler">
+		<description>Nibbler</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<info name="usage" value="Load Part 1 first, then load Part 2"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="34944">
+				<rom name="nibbler_part1.mzf" size="34944" crc="aee17b3a" sha1="eda65cf9278e83437d2687aa95ef5e004dc07cc2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="13358">
+				<rom name="nibbler_part2.mzf" size="13358" crc="052745b4" sha1="61b8b5b847593b686eebc0a0e4bd5f27a15a16c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nighpark">
+		<description>Nightmare Park</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G060"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="20656">
+				<rom name="nightmare park.mzf" size="20656" crc="be8c07e0" sha1="0b3362bf72c67222753c3f8e278a50ec651ac480" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="20668">
+				<rom name="nightmare park2.mzf" size="20668" crc="ebc21e74" sha1="c6c0347b167126b0bcdf72671d9d1d4aed4a0bfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was originally found with an .mzt extension, but does not seem to actually be an MZT file -->
+	<software name="nighparkb" cloneof="nighpark">
+		<description>Nightmare Park (Bad Dump?)</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G060"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20803">
+				<rom name="nightm_prk.mzf" size="20803" crc="bf063aaf" sha1="a52ed6f7d8490990c91a34f11be76422c730f0fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="niteflit">
+		<description>Nite Flite</description>
+		<year>1984</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G071"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="25228">
+				<rom name="nite flite.mzf" size="25228" crc="f0991a0d" sha1="7776f387ea2f8a4f350a95bbae043507cde29336" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="octopuss">
+		<description>Octopussy (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5760">
+				<rom name="octopussy.mzf" size="5760" crc="742d5401" sha1="e78bb963a25920ef93ceb70bdfb94923d424ae7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macpacg" cloneof="macpac">
+		<description>Mac Pac (Ger)</description>
+		<year>1983</year>
+		<publisher>DEVIL-Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8837">
+				<rom name="pac-man.mzf" size="8837" crc="a50e8b50" sha1="7f80110b2287a3a8db338e994f0c2c7f2cb73212" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panique">
+		<description>Panique (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+        <info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6784">
+				<rom name="panique.mzf" size="6784" crc="20651b41" sha1="40cc592f430552f6aa7bdc9cc7434a9013756cf7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parashot">
+		<description>Para Shoot</description>
+		<year>1983</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G087"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7112">
+				<rom name="para shoot.mzf" size="7112" crc="cf5e1e1d" sha1="808569f6ffd4014f88403f40bc8c5ce8e5a16cd8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patalpha">
+		<description>Patrol Alpha</description>
+		<year>1983</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15830">
+				<rom name="patrol alpha.mzf" size="15830" crc="cdc5462e" sha1="f024fcc7baee47f73cae19acd031541e4cfebc8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pendu">
+		<description>Le Pendu (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8576">
+				<rom name="pendu.mzf" size="8576" crc="abe4b706" sha1="dbc5f8079daa5f6b535f95497581d32d153a3a97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poker">
+		<description>Poker</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07POKE"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6600">
+				<rom name="700 poker.mzf" size="6600" crc="a9d02df8" sha1="6a939f6907adfdc22dfd8b0f2e89d3b3d716abcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printfig">
+		<description>Printerfiguren</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="427">
+				<rom name="printerfiguren1.mzf" size="427" crc="3dbeeb8b" sha1="371114f826077bbfc68e7f4238325d8becc9738c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puiss4">
+		<description>Puissance 4 (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7808">
+				<rom name="puissance_4.mzf" size="7808" crc="2975c9a2" sha1="83630db3f4454687a85026c96f4ac7a55ea3fb9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzle">
+		<description>Puzzle (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15232">
+				<rom name="puzzle.mzf" size="15232" crc="d9ceece4" sha1="994380bc5f24ef05044cfa4e33ebd1bd2f54a953" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qixi">
+		<description>Qixi</description>
+		<year>1984</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="21198">
+				<rom name="quixi.mzf" size="21198" crc="0d423204" sha1="666432a33e21b0945c2f4337f0fd89b92722d320" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rebond">
+		<description>Rebond (Fra)</description>
+		<year>1987</year>
+		<publisher>Jean François Campan</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27776">
+				<rom name="rebond.mzf" size="27776" crc="c3a4b8d8" sha1="8200d5e2253e8ec469480965a16a5d505063c4fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rescplan">
+		<description>Rescue Plane</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20605">
+				<rom name="rescue plane.mzf" size="20605" crc="ae0137cd" sha1="c8279f282a41d225c44fa14ef862d376d75cbca6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reverse">
+		<description>Reverse</description>
+		<year>1982</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="MZ-7G044"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7408">
+				<rom name="reverse.mzf" size="7408" crc="3cc6464d" sha1="ed23c7d394afbc809f890377ead11a33d9453c68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rr1906">
+		<description>Rolls-Royce 1906 Silverghost (Ger?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="9512">
+				<rom name="rollsroyce1906.mzf" size="9512" crc="6fe27560" sha1="5a075c9a9e6dfe295d4e242d4c835fb3e5fc769a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safecrak">
+		<description>Safecracker</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8929">
+				<rom name="safe-cracker.mzf" size="8929" crc="cf27eb34" sha1="09364fafd6246d2af8cdcc5313e7bc205a1f6a25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schac700">
+		<description>Schach 700 (Ger)</description>
+		<year>1984</year>
+		<publisher>Hobra Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20480">
+				<rom name="schach700.mzf" size="20480" crc="197eba5f" sha1="0bc16ee277149f564443fb12afd562f3f29edb16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shogun">
+		<description>Shogun</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16338">
+				<rom name="shogun.mzf" size="16338" crc="93108528" sha1="d0247f3e738dfa58d7f3d06f59fb052238236584" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skychaos">
+		<description>Sky Chaos</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="24921">
+				<rom name="sky chaos.mzf" size="24921" crc="b7412dcb" sha1="39e5b7e20913eb25f178d06467b338f609c939e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soudard">
+		<description>Soudard (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5504">
+				<rom name="soudard.mzf" size="5504" crc="9900dacd" sha1="11fdc09260accacb0d0228d5d0c0866f255855b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacific">
+		<description>South Pacific</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="17024">
+				<rom name="south_pacific.mzf" size="17024" crc="13e5f4d7" sha1="cfb2b29a5ae5f6664fa87592acb1a8b1d2cfa625" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srasf">
+		<description>Suicide Run and Space Fighter</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07SUIC"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Suicide Run"/>
+			<dataarea name="cass" size="3109">
+				<rom name="suicide run.mzf" size="3109" crc="9d6e0f22" sha1="ba44bd9999904e3e890a11cd797be104769cfb30" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Space Fighter"/>
+			<dataarea name="cass" size="5164">
+				<rom name="space fighter.mzf" size="5164" crc="de494a0c" sha1="37250c450f25f5046e3ea5b28bb865650ffd15d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprbndt">
+		<description>Super Bandit</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="23814">
+				<rom name="super-bandit.mzf" size="23814" crc="ef9eb1a4" sha1="c31ff65ac8fd61c2c87e174e95f5232f089d0dcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guerilla">
+		<description>Space Guerilla</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20046">
+				<rom name="space guerilla.mzf" size="20046" crc="a963cdca" sha1="bed1c9918e73e25208e5784f991a7ac9e93af7d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squash">
+		<description>Squash (Ger)</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5098">
+				<rom name="squash 700.mzf" size="5098" crc="01e0a8d4" sha1="345eebea5c497fec30d0ac03830274755090dabf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfght">
+		<description>Star Fighter</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6784">
+				<rom name="star_fighter.mzf" size="6784" crc="db54bfe9" sha1="4ebfb1522dab32c190c60a9db0f5989f0a72f6db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>Star Trek</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G100"/>
+        <info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15099">
+				<rom name="startrek.mzf" size="15099" crc="0214ccce" sha1="560e1bf2322ce647e00c39b4989349ae05241dd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strppokr">
+		<description>Strip Poker</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16768">
+				<rom name="strip_poker.mzf" size="16768" crc="3c0a9ebc" sha1="489ce40abc6ab6b64cd8a809ea466ef57e48c14b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subshoot">
+		<description>Submarine Shooter</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="MZ-7G045"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="19322">
+				<rom name="submarine shooter.mzf" size="19322" crc="c263bfd6" sha1="c56fda3aba5d2c2a76772f8e6a9e2ca759133b10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biorythm">
+		<description>Super Biorhythm</description>
+		<year>1983</year>
+		<publisher>Solo Software</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11283">
+				<rom name="super biorhythm.mzf" size="11283" crc="3f984659" sha1="71a1ba7768144cf5f0824d2176a8e78e91623980" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprheli">
+		<description>Super Helicopter</description>
+		<year>19??</year>
+		<publisher>Nag Soft</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16834">
+				<rom name="super helicopter.mzf" size="16834" crc="97528bce" sha1="81cbc0e16fbff868531eb0a2efee492b8f7da1ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supinvdr">
+		<description>Superior Space Invader</description>
+		<year>1983</year>
+		<publisher>P. Dormand</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="21888">
+				<rom name="space_invaders.mzf" size="21888" crc="38438e14" sha1="ab758a95305c022ef796f866b52bc98da1d12b02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superspy">
+		<description>Super Spy (Ned)</description>
+		<year>19??</year>
+		<publisher>Erik van Hattum</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="22854">
+				<rom name="super spy_obj.mzf" size="22854" crc="eb884baf" sha1="99b78750697a8222f3a48d7be0aa74b7df4c1be4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprtypn">
+		<description>Lichtkrantspel (Ned)</description>
+		<year>19??</year>
+		<publisher>Henk Barten</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="35327">
+				<rom name="supertypen.mzf" size="35327" crc="30418d21" sha1="dc6edec978278d297682ee30b8b3acb80780a2be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprvrac">
+		<description>Super Vrac (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6272">
+				<rom name="super_vrac.mzf" size="6272" crc="a33a5dd8" sha1="fa310529b825290c9dbdea647d6a9315aa9892e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysxpert">
+		<description>Systeme Expert (Fra)</description>
+		<year>1989</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11136">
+				<rom name="systeme_expert.mzf" size="11136" crc="34e6ea88" sha1="bfa7aef85c3f8ee8a347b4b210fedf8a1dc80c1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Possibly a Quickdisk image -->
+	<software name="telefon">
+		<description>Telefontarieven (Ned)</description>
+		<year>1987?</year>
+		<publisher>NOS</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="22349">
+				<rom name="telefontarieven.mzf" size="22349" crc="511086d7" sha1="38a6f069830f825af07463e0b1434e20e6940c28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3crdbrag">
+		<description>Three Card Brag</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G090"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12807">
+				<rom name="three card brag.mzf" size="12807" crc="d06d5a7d" sha1="b30d57e76352226f009c31230d4ce85b1b69ac98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapeworm">
+		<description>Tape Worm</description>
+		<year>1983</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20044">
+				<rom name="tapeworm.mzf" size="20044" crc="1fe0ac7a" sha1="002ea9ebf4b489724a50e19a0d8a1e725cadf3e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tracker">
+		<description>Tracker</description>
+		<year>1982</year>
+		<publisher>Solo Software</publisher>
+		<info name="serial" value="MZ-7G089"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4939">
+				<rom name="tracker.mzf" size="4939" crc="7965da44" sha1="ed0599f59620c2fbfa1ffa742370ee586c0c5522" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typen">
+		<description>Typevaardigheid (Ned)</description>
+		<year>19??</year>
+		<publisher>Henk Barten</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="26944">
+				<rom name="typen.mzf" size="26944" crc="18649219" sha1="a55df4f632cab4560b8bb487395e47900aa9e5e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="urania2">
+		<description>Urania II (Fra)</description>
+		<year>1984</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="18048">
+				<rom name="urania_ii.mzf" size="18048" crc="f13a4a5b" sha1="ebebbd2242b92639d3ffc1d5ee847a494b7eb9d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vviper">
+		<description>Vicious Viper</description>
+		<year>19??</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07VICI"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3423">
+				<rom name="vicious viper.mzf" size="3423" crc="801a08f3" sha1="8c24591be0e092148ce1feba49a51125e9345e0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vol676">
+		<description>Vol 676 (Fra)</description>
+		<year>1986</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="27520">
+				<rom name="vol_676.mzf" size="27520" crc="c8e07921" sha1="0feeecdde67ef12db0a4e8e6d489837c534c9a22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vragend">
+		<description>Vragend Maken (Ned)</description>
+		<year>1984?</year>
+		<publisher>NOS</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="23522">
+				<rom name="vragendmaken.mzf" size="23522" crc="9621e4ed" sha1="d138f25e4f1ec562be1c83d4cde1551e9021b814" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizcastl">
+		<description>Wizards Castle</description>
+		<year>1983</year>
+		<publisher>Knight's Computers</publisher>
+		<info name="serial" value="MZ-07WIZA"/>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="21062">
+				<rom name="wizard castle.mzf" size="21062" crc="08661823" sha1="eb19181a08b781752f50e5ce19ae15daa67ff6b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wndrhous">
+		<description>Wonder House (Jpn)</description>
+		<year>1983</year>
+		<publisher>Task Forts Kochi</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="28307">
+				<rom name="wonderhouse.mzf" size="28307" crc="c99d1276" sha1="491b988334b0aa58b5c03eaca1954a0bf8773975" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wooky">
+		<description>Wooky</description>
+		<year>19??</year>
+		<publisher>BBG Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Wooky"/>
+			<dataarea name="cass" size="7529">
+				<rom name="wookya.mzf" size="7529" crc="a18ba08d" sha1="9056c1b2200f86a3a08c1e18df977243883b539e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Wooky II"/>
+			<dataarea name="cass" size="47744">
+				<rom name="wookyb.mzf" size="47744" crc="55e002c8" sha1="2c0c8cff60ac4c8c89f613523cb3ab22eac8a13a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xanagram">
+		<description>Xanagrams</description>
+		<year>1983</year>
+		<publisher>Dean Software</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="39106">
+				<rom name="xanagrams.mzf" size="39106" crc="3bb485ed" sha1="53b6ac78e3084f13e55c5736027d6a994aa2d43c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yams">
+		<description>Y.A.M.S. (Fra)</description>
+		<year>19??</year>
+		<publisher>Jean François Campan</publisher>
+		<info name="usage" value="Load from BASIC"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15232">
+				<rom name="yams.mzf" size="15232" crc="0a7dec34" sha1="aa56420b65f65e0a5ec6a5453c0516c4842420f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10games">
+		<description>10 Games for MZ-700</description>
+		<year>1983?</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side A: Battle Game"/>
+			<dataarea name="cass" size="10933">
+				<rom name="battle game.mzf" size="10933" crc="b73a396c" sha1="6830eee6cdaa5b797efb7d4e94761a87d832d642" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side A: Super Puck Man"/>
+			<dataarea name="cass" size="9930">
+				<rom name="super puck-man.mzf" size="9930" crc="4e2907f1" sha1="2dd87d1b880e08cd2ef1a928ab040e93dfd1937e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side A: Circus Star"/>
+			<dataarea name="cass" size="10817">
+				<rom name="circus star.mzf" size="10817" crc="e8a70639" sha1="58c2a0f95e232dbab93cddb564e07fc0a53319eb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side B: Moving Searcher"/>
+			<dataarea name="cass" size="8480">
+				<rom name="moving searcher.mzf" size="8480" crc="ec11c6b0" sha1="8b3a4992ab51c3210d94b7526db42c5a2d9228f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="mz_cass">
+			<feature name="part_id" value="Tape 1 Side B: Painful Man"/>
+			<dataarea name="cass" size="12178">
+				<rom name="painful man.mzf" size="12178" crc="53a5af9d" sha1="3e8d0e6f6f57f70dd6896547eb2a86d903e5c05b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side A: Man-Hunt"/>
+			<dataarea name="cass" size="2708">
+				<rom name="man-hunt.mzf" size="2708" crc="a3a73667" sha1="29e075032b975bd1ed6b8c804a8176591e3d155c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side A: Land Escape"/>
+			<dataarea name="cass" size="14267">
+				<rom name="land escape.mzf" size="14267" crc="2a1158b3" sha1="a3f1fd87f4254292947ee34315b7ca9e3f18d0cf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side A: Round Shoot"/>
+			<dataarea name="cass" size="16142">
+				<rom name="round shoot.mzf" size="16142" crc="fe9c19e1" sha1="2e93ac6a2d8d301725598146df52ac79a9ea7f38" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side B: Send-1"/>
+			<dataarea name="cass" size="11799">
+				<rom name="send-1.mzf" size="11799" crc="ad162095" sha1="65785fe158e2164316661cf418057d08a927922b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass10" interface="mz_cass">
+			<feature name="part_id" value="Tape 2 Side B: Snake &amp; Snake"/>
+			<dataarea name="cass" size="28958">
+				<rom name="snake snake exp1.mzf" size="28958" crc="b0ceb64f" sha1="ae993cef663d8b2275404cfb8d8d029dbb917ce2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is the disk version hacked to be bootable from tape. -->
+	<software name="mz2z009e">
+		<description>Disk BASIC Interpreter MZ-2Z009E V1.0A</description>
+		<year>19??</year>
+		<publisher>Bernd Krueger-Knauber?</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="34431">
+				<rom name="mz-2z009.mzf" size="34431" crc="a7f673e0" sha1="22eccc3bf55d804ebc17a1c002dfc65846ac4966" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is the quick disk version hacked to be bootable from tape. -->
+	<software name="mz5z008">
+		<description>BASIC Interpreter MZ-5Z008 V1.0A</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="34431">
+				<rom name="basic mz-5z008_2.mzf" size="34431" crc="490e72f3" sha1="791572a2ec8be4a931c68629708834a7c811408a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- WARNING! The following ones should be in disk formats, but they seem to be only available as tapes (MZF is a tape format!) -->
+<!-- we include these here as placeholders until proper dumps are found -->
+
+<!-- Pretty much all info taken from http://www.sharpmz.org/index.html
+
+Undumped:
+Centronics Interface Utility Disk Version
+SPA DATA (SOLO SOFTWARE)
+DATABASE FILER (SOLO SOFTWARE)
+-->
+
+	<software name="mz2z009ed" cloneof="mz2z009e">
+		<description>Disk BASIC Interpreter MZ-2Z009E V1.0A (Disk?)</description>
+		<year>1984</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="36992">
+				<rom name="2z009e.mzf" size="36992" crc="edc7035b" sha1="c4096524f26eb7ec361861fb62f32780fc2ec45e" offset="0" />
+			</dataarea>
+		</part>
+<!-- These came bundled in the same zip file. How were they stored on the disk? -->
+		<part name="cass2" interface="mz_cass">
+			<dataarea name="cass" size="9010">
+				<rom name="fdcopy.mzf" size="9010" crc="28babdfa" sha1="e1256279fceec16c1a7e17941898c450e8e96569" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="mz_cass">
+			<dataarea name="cass" size="26750">
+				<rom name="trans.mzf" size="26750" crc="a4c1c515" sha1="b4384e2034411b832a223c80a31cd40303296815" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="mz_cass">
+			<dataarea name="cass" size="431">
+				<rom name="auto run.mzf" size="431" crc="dc6d0ef0" sha1="92805c5ffc06a25f4f49f388d488980f2362accf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kp80c354">
+		<description>K&amp;P 80-column Disk Basic V3.54 (Ger)</description>
+		<year>19??</year>
+		<publisher>Kersten &amp; Partner</publisher>
+		<info name="usage" value="K&amp;P 80-column card supported"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="33409">
+				<rom name="kup80z354.mzf" size="33409" crc="810133bc" sha1="f97516935970ca5baf664eeb6c046b5a7bf1befe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kp80c355">
+		<description>K&amp;P 80-column Disk Basic V3.55 (Ger)</description>
+		<year>19??</year>
+		<publisher>Kersten &amp; Partner</publisher>
+		<info name="usage" value="K&amp;P 80-column card supported"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="33409">
+				<rom name="kup80z355.mzf" size="33409" crc="11991c57" sha1="82f0386d492fd892193cbb9308b6107ead0f7bcb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kpbasic">
+		<description>K&amp;P BASIC V1.04</description>
+		<year>1984</year>
+		<publisher>Kersten &amp; Partner</publisher>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="34944">
+				<rom name="kp dbasic.800b.mzf" size="34944" crc="bece51e4" sha1="78248460a2fd5960420453d72a7258cffdfc0285" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- WARNING! The following ones come from QDisks (a Sharp tape-like medium), but they seem to be only available as tapes (MZF is a tape format!) -->
+<!-- we include these here as placeholders until proper dumps are found -->
+
+<!--
+These are Quick Disks. Pretty much all info taken from http://www.sharpmz.org/index.html
+
+Undumped:
+BASIC 5Z-008 V1.0B
+-->
+
+
+	<software name="mz5z008qd" cloneof="mz5z008">
+		<description>BASIC Interpreter MZ-5Z008 V1.0A (Quick Disk?)</description>
+		<year>1984</year>
+		<publisher>Sharp Corporation</publisher>
+		<part name="flop" interface="floppy_qd">
+			<feature name="part_id" value="Side A: BASIC - Auto Run"/>
+			<dataarea name="flop" size="382">
+				<rom name="auto run.mzf" size="382" crc="11711e10" sha1="a96ec8fc7f42f769f481c75c241aca910bb79254" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_qd">
+			<feature name="part_id" value="Side A: BASIC - BASIC Interpreter MZ-5Z008 V1.0A"/>
+			<dataarea name="flop" size="34431">
+				<rom name="basic mz-5z008.mzf" size="34431" crc="9af19fa9" sha1="51c7e0ce506019397043ac4f9b07abb522e21eef" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_qd">
+			<feature name="part_id" value="Side B: Utilities - QD File Delete Utility V1.1A"/>
+			<dataarea name="flop" size="8575">
+				<rom name="delete.mzf" size="8575" crc="46a38036" sha1="151493c0d3dd316c8ae25c7c662339093f6b5cbe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_qd">
+			<feature name="part_id" value="Side B: Utilities - QD Format/Copy Utility V1.1A"/>
+			<dataarea name="flop" size="7967">
+				<rom name="qdcopy.mzf" size="7967" crc="2413efcf" sha1="938d7639503ef9614fd3259f27f1f306f1c68ac1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_qd">
+			<feature name="part_id" value="Side B: Utilities - File Convert Utility V1.2A"/>
+			<dataarea name="flop" size="25795">
+				<rom name="trans.mzf" size="25795" crc="1f9a6eef" sha1="b2fb093b2d14464d3262e15bf203b6c23cc1efb8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Modified version of mz5z008. -->
+	<software name="unigg" cloneof="mz5z008">
+		<description>Uni GG BASIC</description>
+		<year>19??</year>
+		<publisher>MZ-GG</publisher>
+		<part name="flop" interface="floppy_qd">
+			<dataarea name="flop" size="35469">
+				<rom name="uni700basic.mzf" size="35469" crc="59d85063" sha1="11a9bbd79d4ae0d103b8b28f08b814f8a5852d49" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
