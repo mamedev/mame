@@ -43,6 +43,8 @@ public:
 	WRITE_LINE_MEMBER( set_cs_line );
 	WRITE_LINE_MEMBER( set_clock_line );
 	DECLARE_WRITE16_MEMBER(vreg_120_w);
+	DECLARE_WRITE16_MEMBER(vreg_122_w);
+	DECLARE_WRITE16_MEMBER(vreg_123_w);
 	DECLARE_WRITE16_MEMBER(vreg_126_w);
 	DECLARE_WRITE16_MEMBER(vreg_127_w);
 
@@ -64,6 +66,8 @@ protected:
 	UINT16 m_osd_addr;
 	UINT8 m_bg_pen;
 	UINT8 m_phase;
+	UINT8 m_scrf,m_scrr;
+	UINT8 m_space;
 
 	m50458_state_t m_osd_state;
 

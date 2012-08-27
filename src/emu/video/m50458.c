@@ -21,6 +21,9 @@ const device_type M50458 = &device_creator<m50458_device>;
 static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
 	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
+//	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
+	AM_RANGE(0x0244, 0x0245) AM_WRITE(vreg_122_w)
+	AM_RANGE(0x0246, 0x0247) AM_WRITE(vreg_123_w)
 	AM_RANGE(0x024c, 0x024d) AM_WRITE(vreg_126_w)
 	AM_RANGE(0x024e, 0x024f) AM_WRITE(vreg_127_w)
 ADDRESS_MAP_END
@@ -34,6 +37,24 @@ ROM_END
 WRITE16_MEMBER( m50458_device::vreg_120_w)
 {
 //	printf("%04x\n",data);
+}
+
+WRITE16_MEMBER( m50458_device::vreg_122_w)
+{
+//	printf("%04x\n",data);
+}
+
+WRITE16_MEMBER( m50458_device::vreg_123_w)
+{
+	/* fractional part of vertical scrolling */
+	m_scrf = data & 0x1f;
+
+	m_space = (data & 0x60) >> 5;
+
+	/* char part of vertical scrolling */
+	m_scrr = (data & 0x0f00) >> 8;
+
+	printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
 }
 
 WRITE16_MEMBER( m50458_device::vreg_126_w)
@@ -168,10 +189,6 @@ WRITE_LINE_MEMBER( m50458_device::set_cs_line )
 	}
 }
 
-/*
-0x7e: "JUST A MOMENT"
-0x81: "NON SLOT"
-*/
 
 WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 {
@@ -194,7 +211,7 @@ WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 						break;
 					case OSD_SET_DATA:
 						//if(m_osd_addr >= 0x120)
-						//printf("%04x %04x\n",m_osd_addr,m_current_cmd);
+						printf("%04x %04x\n",m_osd_addr,m_current_cmd);
 						write_word(m_osd_addr,m_current_cmd);
 						m_osd_addr++;
 						/* Presumably wraps at 0x127? */
@@ -225,14 +242,27 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	bg_b = m_phase & 4 ? 0xdf : 0;
 	bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
 
+
 	for(y=0;y<12;y++)
 	{
 		for(x=0;x<24;x++)
 		{
 			int xi,yi;
 			UINT16 tile;
+			int y_base = y;
 
-			tile = read_word(x+y*24);
+			/* TODO: needs improvements */
+			if(y != 0 && m_scrr)
+				y_base+=(m_scrr - 1);
+
+			if(y != 0 && y_base == 0)
+				y_base ++;
+
+			if(y_base >= 12)
+				y_base -= 11;
+
+
+			tile = read_word(x+y_base*24);
 
 			for(yi=0;yi<18;yi++)
 			{
