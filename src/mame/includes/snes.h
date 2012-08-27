@@ -430,6 +430,8 @@ public:
 	/* HW flags */
 	UINT8                 m_is_nss;
 	UINT8				  m_input_disabled;
+	UINT8				  m_game_over_flag;
+	UINT8                 m_joy_flag;
 //	UINT8                 m_is_sfcbox;
 
 	/* timers */

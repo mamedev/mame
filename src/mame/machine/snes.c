@@ -561,20 +561,44 @@ READ8_HANDLER( snes_r_io )
 		case RDMPYH:		/* Product/Remainder of mult/div result (high) */
 			return snes_ram[offset];
 		case JOY1L:			/* Joypad 1 status register (low) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy1l;
 		case JOY1H:			/* Joypad 1 status register (high) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy1h;
 		case JOY2L:			/* Joypad 2 status register (low) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy2l;
 		case JOY2H:			/* Joypad 2 status register (high) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy2h;
 		case JOY3L:			/* Joypad 3 status register (low) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy3l;
 		case JOY3H:			/* Joypad 3 status register (high) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy3h;
 		case JOY4L:			/* Joypad 4 status register (low) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy4l;
 		case JOY4H:			/* Joypad 4 status register (high) */
+			if(state->m_is_nss && state->m_input_disabled)
+				return 0;
+
 			return state->m_joy4h;
 
 		case 0x4100:		/* NSS Dip-Switches */
@@ -584,7 +608,7 @@ READ8_HANDLER( snes_r_io )
 
 				return snes_open_bus_r(space, 0);
 			}
-//      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
+//      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr (DSW actually reads in word units ...)
 
 		default:
 //          mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(&space->device()));
@@ -592,7 +616,7 @@ READ8_HANDLER( snes_r_io )
                         break;
 	}
 
-	//printf("unsupported read: offset == %08x\n", offset);
+//	printf("unsupported read: offset == %08x\n", offset);
 
 	/* Unsupported reads returns open bus */
 //  printf("%02x %02x\n",offset,snes_open_bus_r(space, 0));
@@ -695,7 +719,10 @@ WRITE8_HANDLER( snes_w_io )
 				state->m_read_idx[0] = 0;
 				state->m_read_idx[1] = 0;
 			}
-
+			if(state->m_is_nss)
+			{
+				state->m_game_over_flag = (data & 4) >> 2;
+			}
 			break;
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
 			if((data & 0x30) == 0x00)
@@ -1527,21 +1554,29 @@ static void nss_io_read( running_machine &machine )
 	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
 	if (snes_ram[NMITIMEN] & 1)
 	{
-		state->m_joy1l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[0] & 0x00ff) >> 0;
-		state->m_joy1h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[0] & 0xff00) >> 8;
-		state->m_joy2l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[1] & 0x00ff) >> 0;
-		state->m_joy2h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[1] & 0xff00) >> 8;
-		state->m_joy3l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[0] & 0x00ff) >> 0;
-		state->m_joy3h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[0] & 0xff00) >> 8;
-		state->m_joy4l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[1] & 0x00ff) >> 0;
-		state->m_joy4h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[1] & 0xff00) >> 8;
+		state->m_joy1l = (state->m_data1[0] & 0x00ff) >> 0;
+		state->m_joy1h = (state->m_data1[0] & 0xff00) >> 8;
+		state->m_joy2l = (state->m_data1[1] & 0x00ff) >> 0;
+		state->m_joy2h = (state->m_data1[1] & 0xff00) >> 8;
+		state->m_joy3l = (state->m_data2[0] & 0x00ff) >> 0;
+		state->m_joy3h = (state->m_data2[0] & 0xff00) >> 8;
+		state->m_joy4l = (state->m_data2[1] & 0x00ff) >> 0;
+		state->m_joy4h = (state->m_data2[1] & 0xff00) >> 8;
 
 		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->m_read_idx[0] = 16;
 		state->m_read_idx[1] = 16;
 	}
 
+	if(state->m_is_nss)
+		state->m_joy_flag = 0;
 }
+
+/*
+		if(state->m_is_nss)
+			state->m_joy_flag = 0;
+
+*/
 
 static UINT8 nss_oldjoy1_read( running_machine &machine )
 {

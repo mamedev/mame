@@ -7,6 +7,7 @@
 	TODO:
 	- Fix sound CPU halt / reset lines, particularly needed by this to work
 	  correctly;
+	- Fix continue behaviour, might be the same issue as the one above.
 	- Various M50458 bits
 	- OSD should actually super-impose with the SNES video somehow;
 
@@ -322,10 +323,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port_02_w);
 	DECLARE_WRITE8_MEMBER(port_03_w);
 	DECLARE_WRITE8_MEMBER(port_04_w);
+	DECLARE_WRITE8_MEMBER(port_07_w);
 
 	DECLARE_DRIVER_INIT(nss);
-	bitmap_rgb32 *m_tmpbitmap;
 
+	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 };
 
 
@@ -333,7 +335,6 @@ public:
 UINT32 nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_m50458->screen_update(screen,bitmap,cliprect);
-
 	return 0;
 }
 
@@ -518,14 +519,14 @@ READ8_MEMBER(nss_state::port_00_r)
 */
 	UINT8 res;
 
-	res = 0 << 7;
+	res = (m_joy_flag) << 7;
 	res|= (machine().primary_screen->vblank() & 1) << 6;
 	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x80) >> 7) << 5);
 	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x80) >> 7) << 4);
-	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x08) >> 3) << 3);
-	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x04) >> 2) << 2);
-	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x02) >> 1) << 1);
-	res|= (((ioport("SERIAL1_DATA1_L")->read() & 0x01) >> 0) << 0);
+	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x04) >> 2) << 3);
+	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x08) >> 3) << 2);
+	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x02) >> 1) << 1);
+	res|= (((ioport("SERIAL1_DATA1_H")->read() & 0x01) >> 0) << 0);
 
 	return res;
 }
@@ -604,6 +605,11 @@ WRITE8_MEMBER(nss_state::port_04_w)
 	coin_counter_w(machine(), 1, (data >> 1) & 1);
 }
 
+WRITE8_MEMBER(nss_state::port_07_w)
+{
+	m_joy_flag = 1;
+}
+
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
@@ -611,7 +617,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(port_02_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("RTC") AM_WRITE(port_03_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(port_04_w)
-	AM_RANGE(0x07, 0x07) AM_WRITENOP // Pad watchdog
+	AM_RANGE(0x07, 0x07) AM_WRITE(port_07_w)
 ADDRESS_MAP_END
 
 static MACHINE_START( nss )
@@ -622,7 +628,12 @@ static MACHINE_START( nss )
 
 	state->m_is_nss = 1;
 	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x1000);
-	state->m_tmpbitmap = auto_bitmap_rgb32_alloc(machine,24*12,12*18);
+}
+
+
+CUSTOM_INPUT_MEMBER(nss_state::game_over_flag_r)
+{
+	return m_game_over_flag;
 }
 
 static INPUT_PORTS_START( snes )
@@ -633,7 +644,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("FP")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Game Over Flag, TODO
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")
@@ -826,6 +837,9 @@ static MACHINE_RESET( nss )
 	/* start with both CPUs disabled */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+
+	state->m_game_over_flag = 1;
+	state->m_joy_flag = 1;
 }
 
 static MACHINE_CONFIG_DERIVED( nss, snes )
