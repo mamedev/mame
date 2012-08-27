@@ -6174,11 +6174,11 @@ GAME( 1981, hangly3,  puckman,  pacman,   pacman,   driver_device, 0,        ROT
 GAME( 1981, popeyeman,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Popeye-Man", GAME_SUPPORTS_SAVE )
 GAME( 1980, crockman, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Rene Pierre)", "Crock-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, driver_device, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1981, crush,    0,        pacman,   maketrax, pacman_state,  maketrax, ROT90,  "Kural Electric", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE ) // Kural is also known as Craul Denshi. Crush Roller may have been developed by Alpha Denshi.
-GAME( 1981, crush4,   crush,    crush4,   crush4,   driver_device, 0,        ROT90,  "Kural Electric", "Crush Roller (set 2)", GAME_SUPPORTS_SAVE ) // Kural TWT
-GAME( 1981, maketrax, crush,    pacman,   maketrax, pacman_state,  maketrax, ROT270, "Kural Electric (Williams license)", "Make Trax (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, maketrxb, crush,    pacman,   maketrax, pacman_state,  maketrax, ROT270, "Kural Electric (Williams license)", "Make Trax (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, korosuke, crush,    pacman,   korosuke, pacman_state,  korosuke, ROT90,  "Kural Electric", "Korosuke Roller (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crush,    0,        pacman,   maketrax, pacman_state,  maketrax, ROT90,  "Kural Samno Electric, Ltd.", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE ) // Kural is also known as Craul Denshi. Crush Roller may have been developed by Alpha Denshi.
+GAME( 1981, crush4,   crush,    crush4,   crush4,   driver_device, 0,        ROT90,  "Kural TWT", "Crush Roller (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, maketrax, crush,    pacman,   maketrax, pacman_state,  maketrax, ROT270, "Kural (Williams license)", "Make Trax (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, maketrxb, crush,    pacman,   maketrax, pacman_state,  maketrax, ROT270, "Kural (Williams license)", "Make Trax (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, korosuke, crush,    pacman,   korosuke, pacman_state,  korosuke, ROT90,  "Kural Electric, Ltd.", "Korosuke Roller (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    pacman,   mbrush,   pacman_state,  maketrax, ROT90,  "bootleg?", "Crush Roller (bootleg? set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush2,   crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg?", "Crush Roller (bootleg? set 3)", GAME_SUPPORTS_SAVE )
