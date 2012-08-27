@@ -186,6 +186,14 @@ static struct
 	bool ext_reg_ena;
 }et4k;
 
+enum
+{
+	S3_IDLE = 0,
+	S3_DRAWING_RECT,
+	S3_DRAWING_LINE,
+	S3_DRAWING_BITBLT
+};
+
 static struct
 {
 	UINT8 memory_config;
@@ -206,7 +214,12 @@ static struct
 	UINT32 fgcolour;
 	UINT32 bgcolour;
 	UINT32 pixel_xfer;
+	UINT16 wait_rect_x;
+	UINT16 wait_rect_y;
+	UINT8 bus_size;
 	UINT8 multifunc_sel;
+	bool gpbusy;
+	int state;
 }s3;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
@@ -2579,6 +2592,8 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 				break;
 			case 0x40:
 				s3.enable_8514 = data & 0x01;  // enable 8514/A registers (x2e8, x6e8, xae8, xee8)
+				if(data & 0x01)
+					s3.state = S3_IDLE;
 				break;
 			case 0x51:
 				vga.crtc.start_addr &= ~0xc0000;
@@ -2726,9 +2741,15 @@ bit   0-7  Queue State.
  */
 READ16_HANDLER(s3_gpstatus_r)
 {
+	UINT16 ret = 0x0000;
+
 	logerror("S3: 9AE8 read\n");
 	if(s3.enable_8514 != 0)
-		return 0;
+	{
+		if(s3.gpbusy == true)
+			ret |= 0x0200;
+		return ret;
+	}
 	else
 		return 0xffff;
 }
@@ -2818,7 +2839,6 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
  */
 WRITE16_HANDLER(s3_cmd_w)
 {
-	/* really needs to be 16-bit... */
 	if(s3.enable_8514 != 0)
 	{
 		int x,y;
@@ -2828,41 +2848,48 @@ WRITE16_HANDLER(s3_cmd_w)
 		switch(data & 0xe000)
 		{
 		case 0x0000:  // NOP (for "Short Stroke Vectors")
+			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - NOP\n",s3.current_cmd);
 			break;
 		case 0x2000:  // Line
+			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - Line\n",s3.current_cmd);
 			break;
 		case 0x4000:  // Rectangle Fill
-			// TODO: handle wait-per-pixel drawing
+			if(data & 0x0100)  // WAIT (for read/write of PIXEL TRANSFER (E2E8))
+			{
+				s3.state = S3_DRAWING_RECT;
+				s3.gpbusy = true;
+				s3.wait_rect_x = s3.curr_x;
+				s3.wait_rect_y = s3.curr_y;
+				s3.bus_size = (data & 0x0600) >> 9;
+				break;
+			}
 			offset = VGA_START_ADDRESS;
 			offset += (VGA_LINE_LENGTH * s3.curr_y);
 			offset += s3.curr_x;
-			if(s3.current_cmd & 0x0010) // INC_X (rectangle horizontal direction)
-				dir_x = 2;
-			else
-				dir_x = -2;
-			for(y=0;y<s3.rect_height;y++)
+			dir_x = 2;
+			for(y=0;y<=s3.rect_height;y++)
 			{
-				for(x=0;x<s3.rect_width;x+=dir_x)
+				for(x=0;x<=s3.rect_width;x+=dir_x)
 				{
 					vga.memory[(offset+x) % vga.svga_intf.vram_size] = s3.fgcolour & 0x000000ff;  // TODO: handle 16-bit or 32-bit transfers
 					vga.memory[(offset+x+1) % vga.svga_intf.vram_size] = (s3.fgcolour & 0x0000ff00) >> 8;
 				}
-				if(s3.current_cmd & 0x0040) // INC_Y (rectangle vertical direction)
-					offset += VGA_LINE_LENGTH;
-				else
-					offset -= VGA_LINE_LENGTH;
+				offset += VGA_LINE_LENGTH;
 			}
 			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			break;
 		case 0xc000:  // BitBLT
+			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - BitBLT\n",s3.current_cmd);
 			break;
 		case 0xe000:  // Pattern Fill
+			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - Pattern Fill\n",s3.current_cmd);
 			break;
 		default:
+			s3.gpbusy = false;
 			logerror("S3: Unknown command: %04x\n",data);
 		}
 	}
@@ -3043,10 +3070,53 @@ READ16_HANDLER(s3_pixel_xfer_r)
 
 WRITE16_HANDLER(s3_pixel_xfer_w)
 {
+	int x,data_size;
+	UINT32 off,xfer = 0;
+
 	if(offset == 1)
 		s3.pixel_xfer = (s3.pixel_xfer & 0x0000ffff) | (data << 16);
 	else
 		s3.pixel_xfer = (s3.pixel_xfer & 0xffff0000) | data;
+
+	if(s3.state == S3_DRAWING_RECT)
+	{
+		// the data in the pixel transfer register masks the rectangle output(?)
+		if(s3.bus_size == 0)  // 8-bit
+			data_size = 8;
+		if(s3.bus_size == 1)  // 16-bit
+			data_size = 16;
+		if(s3.bus_size == 2)  // 32-bit
+			data_size = 32;
+		off = VGA_START_ADDRESS;
+		off += (VGA_LINE_LENGTH * s3.wait_rect_y);
+		off += s3.wait_rect_x;
+		for(x=0;x<data_size;x++)
+		{
+			if(s3.current_cmd & 0x1000)
+			{
+				xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
+					 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+			}
+			else
+				xfer = s3.pixel_xfer;
+			if((xfer & ((1<<(data_size-1))>>x)) != 0)
+				vga.memory[off] = s3.fgcolour & 0x00ff;
+			off++;
+			s3.wait_rect_x++;
+			if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
+			{
+				s3.wait_rect_x = s3.curr_x;
+				s3.wait_rect_y++;
+				if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+				{
+					s3.state = S3_IDLE;
+					s3.gpbusy = false;
+				}
+			}
+		}
+	}
+
+	logerror("S3: Pixel Transfer = %08x\n",s3.pixel_xfer);
 }
 
 READ8_HANDLER( s3_mem_r )
