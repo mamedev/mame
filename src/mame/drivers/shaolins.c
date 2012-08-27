@@ -30,8 +30,8 @@ static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE_LEGACY("sn1", sn76496_w)	/* trigger chip to read from latch. The program always */
-	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE_LEGACY("sn2", sn76496_w)	/* writes the same number as the latch, so we don't */
+	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE("sn1", sn76489a_new_device, write)	/* trigger chip to read from latch. The program always */
+	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE("sn2", sn76489a_new_device, write)	/* writes the same number as the latch, so we don't */
 															/* bother emulating them. */
 	AM_RANGE(0x0500, 0x0500) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0600, 0x0600) AM_READ_PORT("DSW2")
@@ -186,6 +186,21 @@ static GFXDECODE_START( shaolins )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_START( shaolins, shaolins_state )
 
@@ -211,21 +226,25 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
+	MCFG_SOUND_ADD("sn1", SN76489A_NEW, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
+	MCFG_SOUND_ADD("sn2", SN76489A_NEW, MASTER_CLOCK/6)        /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 #if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
 static MACHINE_CONFIG_DERIVED( shaolinb, shaolins )
 
-	MCFG_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
+	MCFG_SOUND_REPLACE("sn1", SN76489_NEW, MASTER_CLOCK/12) /* only type verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
+	MCFG_SOUND_REPLACE("sn2", SN76489_NEW, MASTER_CLOCK/6)  /* only type verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 #endif
 

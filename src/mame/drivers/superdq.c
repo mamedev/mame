@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( superdq_io, AS_IO, 8, superdq_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE("snsnd", sn76496_new_device, write)
 	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
 	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */
 ADDRESS_MAP_END
@@ -310,6 +310,21 @@ static GFXDECODE_START( superdq )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 /*************************************
  *
@@ -348,8 +363,9 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
+	MCFG_SOUND_ADD("snsnd", SN76496_NEW, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

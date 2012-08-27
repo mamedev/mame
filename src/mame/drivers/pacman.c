@@ -1311,8 +1311,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("namco", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("namco", sn76496_new_device, write)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76496_new_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8, pacman_state )
@@ -1350,7 +1350,7 @@ static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8, pacman_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_writeport, AS_IO, 8, pacman_state )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE_LEGACY("namco", sn76496_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("namco", sn76496_new_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8, pacman_state )
@@ -3273,6 +3273,15 @@ static const namco_interface namco_config =
 };
 
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 /*************************************
  *
@@ -3412,9 +3421,11 @@ static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("namco", SN76496, 1789750)
+	MCFG_SOUND_REPLACE("namco", SN76496_NEW, 1789750)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_ADD("sn2", SN76496, 1789750)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, 1789750)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -3451,7 +3462,8 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 	MCFG_VIDEO_START(s2650games)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)	/* 1H */
+	MCFG_SOUND_REPLACE("namco", SN76496_NEW, MASTER_CLOCK/6)	/* 1H */
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
