@@ -5194,7 +5194,7 @@
 <software name="mathtr1" supported="no">
 	<description>Mathtrak K1 (USA)[DVC]</description>
 	<year>1994</year>
-	<publisher> InterROM </publisher>
+	<publisher>InterROM</publisher>
 	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
@@ -5206,7 +5206,7 @@
 <software name="mathtr2" supported="no">
 	<description>Mathtrak K2 (USA)[DVC]</description>
 	<year>1994</year>
-	<publisher> InterROM </publisher>
+	<publisher>InterROM</publisher>
 	<sharedfeat name="compatibility" value="DVC" />
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
@@ -5534,7 +5534,7 @@
 <software name="operaimg">
 	<description>Opera Imaginaire (Euro)</description>
 	<year>1995</year>
-	<publisher> Pascavision </publisher>
+	<publisher>Pascavision</publisher>
 	<part name="cdrom" interface="cdi_cdrom">
 		<diskarea name="cdrom">
 			<disk name="opera imaginaire (1995)(pascavision)(eu)[!]" sha1="5526f7be339ded40867fa9748f91255b7a2f4fd0"/>

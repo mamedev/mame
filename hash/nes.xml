@@ -414,7 +414,7 @@
 	<software name="actionny">
 		<description>Action In New York (Euro)</description>
 		<year>1991</year>
-		<publisher> Infogrames </publisher>
+		<publisher>Infogrames</publisher>
 		<info name="serial" value="NES-FV-UKV"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
