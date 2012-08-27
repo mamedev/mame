@@ -9,7 +9,6 @@ ToDo:
 - Display
 - Sound
 - Artwork
-- Int generator
 
 **************************************************************************************/
 
@@ -30,14 +29,19 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
+	DECLARE_WRITE8_MEMBER(reset_int_w);
+	UINT8 m_t_c;
+	UINT8 m_out_offs;
+	required_device<cpu_device> m_maincpu;
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
 
 	// driver_device overrides
 	virtual void machine_reset();
+private:
+	UINT8 m_input_line;
 public:
 	DECLARE_DRIVER_INIT(zac_1);
 };
@@ -46,6 +50,7 @@ public:
 static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8, zac_1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(reset_int_w)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -57,16 +62,44 @@ static ADDRESS_MAP_START(zac_1_io, AS_IO, 8, zac_1_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_1 )
+	PORT_START("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test") PORT_CODE(KEYCODE_0)
+
+	PORT_START("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Slam")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Printer")
+
+	PORT_START("ROW1")
+	PORT_BIT( 0xBF, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 INPUT_PORTS_END
 
 READ8_MEMBER( zac_1_state::ctrl_r )
 {
 // reads inputs
-	return 0xff;
+	if (m_input_line == 0xfe)
+		return ioport("ROW0")->read();
+	else
+	if (m_input_line == 0xfd)
+		return ioport("ROW1")->read();
+	else
+		return 0xff; // playboard contactors
 }
 
 WRITE8_MEMBER( zac_1_state::ctrl_w )
 {
+	m_input_line = data;
+}
+
+WRITE8_MEMBER( zac_1_state::reset_int_w )
+{
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 READ8_MEMBER( zac_1_state::serial_r )
@@ -82,6 +115,29 @@ WRITE8_MEMBER( zac_1_state::serial_w )
 
 void zac_1_state::machine_reset()
 {
+	m_t_c = 0;
+}
+
+static TIMER_DEVICE_CALLBACK( zac_1_inttimer )
+{
+	zac_1_state *state = timer.machine().driver_data<zac_1_state>();
+	if (state->m_t_c > 0x40)
+	{
+		UINT8 vector = (state->ioport("TEST")->read() ) ? 0x10 : 0x18;
+		device_set_input_line_and_vector(state->m_maincpu, INPUT_LINE_IRQ0, ASSERT_LINE, vector);
+	}
+	else
+		state->m_t_c++;
+}
+
+static TIMER_DEVICE_CALLBACK( zac_1_outtimer )
+{
+	zac_1_state *state = timer.machine().driver_data<zac_1_state>();
+	state->m_out_offs++;
+// displays, solenoids, lamps
+// not sure yet but seems scores = 1800-182D; solenoids = 1840-187F;
+// lamps = 1880-18BF; credits &balls=18C0-18FF.
+// 182E-183F is a storage area for inputs.
 }
 
 DRIVER_INIT_MEMBER(zac_1_state,zac_1)
@@ -93,6 +149,8 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_1_map)
 	MCFG_CPU_IO_MAP(zac_1_io)
+	MCFG_TIMER_ADD_PERIODIC("zac_1_inttimer", zac_1_inttimer, attotime::from_hz(200))
+	MCFG_TIMER_ADD_PERIODIC("zac_1_outtimer", zac_1_outtimer, attotime::from_hz(187500))
 MACHINE_CONFIG_END
 
 
