@@ -579,14 +579,12 @@ READ8_HANDLER( snes_r_io )
 
 		case 0x4100:		/* NSS Dip-Switches */
 			{
-				ioport_port *port = state->ioport("DSW");
-				if (port != NULL)
+				if (state->m_is_nss)
 					return space->machine().root_device().ioport("DSW")->read();
-				else
-					return snes_open_bus_r(space, 0);
+
+				return snes_open_bus_r(space, 0);
 			}
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
-//      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
 		default:
 //          mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(&space->device()));
@@ -697,6 +695,7 @@ WRITE8_HANDLER( snes_w_io )
 				state->m_read_idx[0] = 0;
 				state->m_read_idx[1] = 0;
 			}
+
 			break;
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
 			if((data & 0x30) == 0x00)
@@ -1528,14 +1527,14 @@ static void nss_io_read( running_machine &machine )
 	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
 	if (snes_ram[NMITIMEN] & 1)
 	{
-		state->m_joy1l = (state->m_data1[0] & 0x00ff) >> 0;
-		state->m_joy1h = (state->m_data1[0] & 0xff00) >> 8;
-		state->m_joy2l = (state->m_data1[1] & 0x00ff) >> 0;
-		state->m_joy2h = (state->m_data1[1] & 0xff00) >> 8;
-		state->m_joy3l = (state->m_data2[0] & 0x00ff) >> 0;
-		state->m_joy3h = (state->m_data2[0] & 0xff00) >> 8;
-		state->m_joy4l = (state->m_data2[1] & 0x00ff) >> 0;
-		state->m_joy4h = (state->m_data2[1] & 0xff00) >> 8;
+		state->m_joy1l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[0] & 0x00ff) >> 0;
+		state->m_joy1h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[0] & 0xff00) >> 8;
+		state->m_joy2l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[1] & 0x00ff) >> 0;
+		state->m_joy2h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data1[1] & 0xff00) >> 8;
+		state->m_joy3l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[0] & 0x00ff) >> 0;
+		state->m_joy3h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[0] & 0xff00) >> 8;
+		state->m_joy4l = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[1] & 0x00ff) >> 0;
+		state->m_joy4h = (state->m_is_nss && state->m_input_disabled) ? 0 : (state->m_data2[1] & 0xff00) >> 8;
 
 		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->m_read_idx[0] = 16;
@@ -1816,6 +1815,8 @@ MACHINE_START( snes )
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_scope[i].fire_lock);
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_scope[i].offscreen);
 	}
+
+	state->m_is_nss = 0;
 }
 
 MACHINE_RESET( snes )

@@ -405,7 +405,9 @@ class snes_state : public driver_device
 {
 public:
 	snes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		{ }
+
 
 	/* misc */
 	UINT16                m_htmult;		/* in 512 wide, we run HTOTAL double and halve it on latching */
@@ -425,7 +427,10 @@ public:
 	UINT16                m_vtime;
 	UINT16                m_vmadd;
 
-	UINT32 snes_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	/* HW flags */
+	UINT8                 m_is_nss;
+	UINT8				  m_input_disabled;
+//	UINT8                 m_is_sfcbox;
 
 	/* timers */
 	emu_timer             *m_scanline_timer;
@@ -524,6 +529,8 @@ public:
 	void snes_update_offsets( void );
 	inline void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens );
 	void snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline );
+
+	UINT32 snes_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( snes_oam_read );
 	DECLARE_WRITE8_MEMBER( snes_oam_write );

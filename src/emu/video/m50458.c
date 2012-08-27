@@ -33,7 +33,7 @@ ROM_END
 
 WRITE16_MEMBER( m50458_device::vreg_120_w)
 {
-	printf("%04x\n",data);
+//	printf("%04x\n",data);
 }
 
 WRITE16_MEMBER( m50458_device::vreg_126_w)
@@ -52,7 +52,9 @@ WRITE16_MEMBER( m50458_device::vreg_127_w)
 		int i;
 
 		for(i=0;i<0x120;i++)
+		{
 			write_word(i,0);
+		}
 	}
 }
 
@@ -218,9 +220,9 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	UINT8 bg_r,bg_g,bg_b;
 
 	/* TODO: there's probably a way to control the brightness in this */
-	bg_r = m_phase & 1 ? 0xff : 0;
-	bg_g = m_phase & 2 ? 0xff : 0;
-	bg_b = m_phase & 4 ? 0xff : 0;
+	bg_r = m_phase & 1 ? 0xdf : 0;
+	bg_g = m_phase & 2 ? 0xdf : 0;
+	bg_b = m_phase & 4 ? 0xdf : 0;
 	bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
 
 	for(y=0;y<12;y++)

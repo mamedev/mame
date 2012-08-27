@@ -5,9 +5,11 @@
 	driver by Angelo Salese, based off info from Noca$h
 
 	TODO:
-	- EEPROM
+	- EEPROM defaults / fix EEPROM hook-up, all games but F-Zero doesn't
+	  boot at current stage
+	- Fix sound CPU halt / reset lines, particularly needed by this to work
+	  correctly;
 	- Various M50458 bits
-	- Still dies at a cart check, why?
 	- OSD should actually super-impose with the SNES video somehow;
 
 ***************************************************************************
@@ -307,14 +309,17 @@ public:
 
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	DECLARE_READ8_MEMBER(port_00_r);
-	DECLARE_WRITE8_MEMBER(port_00_w);
 	DECLARE_READ8_MEMBER(ram_wp_r);
 	DECLARE_WRITE8_MEMBER(ram_wp_w);
-	DECLARE_WRITE8_MEMBER(rtc_osd_w);
-	DECLARE_WRITE8_MEMBER(port_01_w);
 	DECLARE_READ8_MEMBER(nss_prot_r);
 	DECLARE_WRITE8_MEMBER(nss_prot_w);
+
+	DECLARE_READ8_MEMBER(port_00_r);
+	DECLARE_WRITE8_MEMBER(port_00_w);
+	DECLARE_WRITE8_MEMBER(port_01_w);
+	DECLARE_WRITE8_MEMBER(port_02_w);
+	DECLARE_WRITE8_MEMBER(port_03_w);
+	DECLARE_WRITE8_MEMBER(port_04_w);
 
 	DECLARE_DRIVER_INIT(nss);
 	bitmap_rgb32 *m_tmpbitmap;
@@ -427,26 +432,9 @@ Input
 Output
 0x00/0x80 NMI Control and RAM protect
 0x01/0x81 Unknown and Slot Select
-  7     Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
-  6   Unknown/unused        (should be always 0)
-  5   SNES Sound Mute       (0=Normal, 1=Mute) (for optional mute in demo mode)
-  4   Unknown  ;from INST-ROM flag! (Lo/HiROM, 2-player, zapper, volume or so?)
-  3-2 Slot Select        (0..2 for Slot 1..3) (mapping to both SNES and Z80)
-  1     Maybe SNES CPU pause?  (cleared on deposit coin to continue) (1=Run)
-  0     Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
 0x02/0x82 RTC and OSD
 0x03/0x83 Unknown and LED control
-  7     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
-  6     Layer OSD Enable?
-  5-4 Unknown/unused (should be always 0)
-  3   LED Instructions (0=Off, 1=On)  ;-glows in demo (prompt for INST button)
-  2   LED Game 3       (0=Off, 1=On)  ;\
-  1   LED Game 2       (0=Off, 1=On)  ; blinked when enough credits inserted
-  0   LED Game 1       (0=Off, 1=On)  ;/
 0x84 Coin Counter Outputs
-  7-2 Unknown/unused (should be always 0)
-  1   Coin Counter 2 (0=No change, 1=Increment external counter)
-  0   Coin Counter 1 (0=No change, 1=Increment external counter)
 0x05 Unknown
 0x07 SNES Watchdog / Acknowledge SNES Joypad Read Flag
 
@@ -505,8 +493,7 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(ram_wp_r,ram_wp_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("EEPROMIN")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_REGION("ibios_rom", 0x6000 )
-	AM_RANGE(0xe000, 0xffff) AM_READ(nss_prot_r)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(nss_prot_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nss_prot_r,nss_prot_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(nss_state::port_00_r)
@@ -549,7 +536,30 @@ WRITE8_MEMBER(nss_state::port_00_w)
 
 }
 
-WRITE8_MEMBER(nss_state::rtc_osd_w)
+WRITE8_MEMBER(nss_state::port_01_w)
+{
+/*
+	x--- ---- Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
+	-x-- ---- Unknown/unused        (should be always 0)
+	--x- ---- SNES Sound Mute       (0=Normal, 1=Mute) (for optional mute in demo mode)
+	---x ---- Unknown  ;from INST-ROM flag! (Lo/HiROM, 2-player, zapper, volume or so?)
+	---- xx-- Slot Select        (0..2 for Slot 1..3) (mapping to both SNES and Z80)
+	---- --x- Maybe SNES CPU pause?  (cleared on deposit coin to continue) (1=Run)
+	---- ---x Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
+*/
+	m_input_disabled = ((data & 0x80) >> 7) ^ 1;
+
+	m_cart_sel = (data & 0xc) >> 2;
+
+	device_set_input_line(m_maincpu, INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_soundcpu, INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+
+//	printf("%02x\n",data);
+}
+
+WRITE8_MEMBER(nss_state::port_02_w)
 {
 /*
 	x--- ----  OSD Clock ?       (usually same as Bit6)  ;\Chip Select when Bit6=Bit7 ?
@@ -565,17 +575,35 @@ WRITE8_MEMBER(nss_state::rtc_osd_w)
 	ioport("RTC_OSD")->write(data, 0xff);
 }
 
-WRITE8_MEMBER(nss_state::port_01_w)
+WRITE8_MEMBER(nss_state::port_03_w)
 {
-	m_cart_sel = (data & 0xc) >> 2;
+/*
+	x--- ----     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
+	-x-- ----     Layer OSD Enable?
+	--xx ---- Unknown/unused (should be always 0)
+	---- x---   LED Instructions (0=Off, 1=On)  ;-glows in demo (prompt for INST button)
+	---- -x--   LED Game 3       (0=Off, 1=On)  ;\
+	---- --x-   LED Game 2       (0=Off, 1=On)  ; blinked when enough credits inserted
+	---- ---x   LED Game 1       (0=Off, 1=On)  ;/
+
+*/
+//	popmessage("%02x",data);
+}
+
+WRITE8_MEMBER(nss_state::port_04_w)
+{
+	coin_counter_w(machine(), 0, (data >> 0) & 1);
+	coin_counter_w(machine(), 1, (data >> 1) & 1);
 }
 
 static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")  AM_WRITE(port_01_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(rtc_osd_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("RTC")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(port_02_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("RTC") AM_WRITE(port_03_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(port_04_w)
+	AM_RANGE(0x07, 0x07) AM_WRITENOP // Pad watchdog
 ADDRESS_MAP_END
 
 /* Mitsubishi M6M80011 */
@@ -583,11 +611,11 @@ static const eeprom_interface nss_eeprom_intf =
 {
 	8,				/* address bits */
 	16,				/* data bits */
-	"10101000",		/*  read command */
-	"10100100",		/* write command */
+	"*10101000",		/*  read command */
+	"*10100100",		/* write command */
 	0,				/* erase command */
-	"10100000",		/*  lock command */
-	"10100011"		/* unlock command*/
+	"*10100000",		/*  lock command */
+	"*10100011"		/* unlock command*/
 	/* "10101001" TODO: status output? */
 };
 
@@ -598,6 +626,7 @@ static MACHINE_START( nss )
 
 	MACHINE_START_CALL(snes);
 
+	state->m_is_nss = 1;
 	state->m_wram = auto_alloc_array_clear(machine, UINT8, 0x1000);
 	state->m_tmpbitmap = auto_bitmap_rgb32_alloc(machine,24*12,12*18);
 }
@@ -794,6 +823,17 @@ static INTERRUPT_GEN ( nss_vblank_irq )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static MACHINE_RESET( nss )
+{
+	nss_state *state = machine.driver_data<nss_state>();
+
+	MACHINE_RESET_CALL( snes );
+
+	/* start with both CPUs disabled */
+	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_DERIVED( nss, snes )
 
 	MCFG_CPU_ADD("bios", Z80, 4000000)
@@ -807,6 +847,8 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MCFG_MACHINE_RESET( nss )
 
 	MCFG_SCREEN_ADD("osd", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -835,8 +877,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
 	ROM_LOAD("nss-ic14.02", 0x10000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
 	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF) \
-	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF) \
-	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 
 
 
