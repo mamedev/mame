@@ -1,4 +1,5 @@
 #include "video/poly.h"
+#include "machine/53c810.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -16,11 +17,13 @@ public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_lsi53c810(*this,"lsi53c810"),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_soundram(*this, "soundram"){ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<lsi53c810_device> m_lsi53c810;
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;

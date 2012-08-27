@@ -27,6 +27,7 @@
 #include "machine/idectrl.h"
 #include "machine/mpc105.h"
 #include "machine/intelfsh.h"
+#include "machine/53c810.h"
 
 /* Devices */
 #include "machine/scsicd.h"
@@ -93,6 +94,48 @@ static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
 	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
+static const SCSIConfigTable dev_table =
+{
+	2, /* 2 SCSI devices */
+	{
+		{ "harddisk1" },
+		{ "cdrom" }
+	}
+};
+
+#define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
+								((x >> 8) & 0xff00) | \
+								((x << 8) & 0xff0000) | \
+								((x << 24) & 0xff000000))
+
+static UINT32 scsi53c810_fetch(running_machine &machine, UINT32 dsp)
+{
+	UINT32 result;
+	result = machine.device("ppc1")->memory().space(AS_PROGRAM)->read_dword(dsp & 0x7FFFFFFF);
+	return BYTE_REVERSE32(result);
+}
+
+
+static void scsi53c810_irq_callback(running_machine &machine, int value)
+{
+	bebox_set_irq_bit(machine, 21, value);
+}
+
+
+static void scsi53c810_dma_callback(running_machine &machine, UINT32 src, UINT32 dst, int length, int byteswap)
+{
+}
+
+
+static const struct LSI53C810interface scsi53c810_intf =
+{
+	&dev_table,		/* SCSI device table */
+	&scsi53c810_irq_callback,
+	&scsi53c810_dma_callback,
+	&scsi53c810_fetch,
+};
+
+
 static const floppy_interface bebox_floppy_interface =
 {
 	DEVCB_NULL,
@@ -154,6 +197,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
+	MCFG_LSI53C810_ADD( "lsi51c810", scsi53c810_intf)
 	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_3)
 

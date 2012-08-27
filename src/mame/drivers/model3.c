@@ -1001,28 +1001,28 @@ READ64_MEMBER(model3_state::scsi_r)
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (ACCESSING_BITS_56_63) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+0) << 56;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+0) << 56;
 	}
 	if (ACCESSING_BITS_48_55) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+1) << 48;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+1) << 48;
 	}
 	if (ACCESSING_BITS_40_47) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+2) << 40;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+2) << 40;
 	}
 	if (ACCESSING_BITS_32_39) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+3) << 32;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+3) << 32;
 	}
 	if (ACCESSING_BITS_24_31) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+4) << 24;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+4) << 24;
 	}
 	if (ACCESSING_BITS_16_23) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+5) << 16;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+5) << 16;
 	}
 	if (ACCESSING_BITS_8_15) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+6) << 8;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+6) << 8;
 	}
 	if (ACCESSING_BITS_0_7) {
-		r |= (UINT64)lsi53c810_reg_r(&space, reg+7) << 0;
+		r |= (UINT64)m_lsi53c810->lsi53c810_reg_r(reg+7) << 0;
 	}
 
 	return r;
@@ -1032,28 +1032,28 @@ WRITE64_MEMBER(model3_state::scsi_w)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
-		lsi53c810_reg_w(&space, reg+0, data >> 56);
+		m_lsi53c810->lsi53c810_reg_w(reg+0, data >> 56);
 	}
 	if (ACCESSING_BITS_48_55) {
-		lsi53c810_reg_w(&space, reg+1, data >> 48);
+		m_lsi53c810->lsi53c810_reg_w(reg+1, data >> 48);
 	}
 	if (ACCESSING_BITS_40_47) {
-		lsi53c810_reg_w(&space, reg+2, data >> 40);
+		m_lsi53c810->lsi53c810_reg_w(reg+2, data >> 40);
 	}
 	if (ACCESSING_BITS_32_39) {
-		lsi53c810_reg_w(&space, reg+3, data >> 32);
+		m_lsi53c810->lsi53c810_reg_w(reg+3, data >> 32);
 	}
 	if (ACCESSING_BITS_24_31) {
-		lsi53c810_reg_w(&space, reg+4, data >> 24);
+		m_lsi53c810->lsi53c810_reg_w(reg+4, data >> 24);
 	}
 	if (ACCESSING_BITS_16_23) {
-		lsi53c810_reg_w(&space, reg+5, data >> 16);
+		m_lsi53c810->lsi53c810_reg_w(reg+5, data >> 16);
 	}
 	if (ACCESSING_BITS_8_15) {
-		lsi53c810_reg_w(&space, reg+6, data >> 8);
+		m_lsi53c810->lsi53c810_reg_w(reg+6, data >> 8);
 	}
 	if (ACCESSING_BITS_0_7) {
-		lsi53c810_reg_w(&space, reg+7, data >> 0);
+		m_lsi53c810->lsi53c810_reg_w(reg+7, data >> 0);
 	}
 }
 
@@ -1241,7 +1241,6 @@ static TIMER_CALLBACK(model3_sound_timer_tick)
 
 static MACHINE_START(model3_10)
 {
-	lsi53c810_init(machine, &scsi_intf);
 	configure_fast_ram(machine);
 
 	model3_state *state = machine.driver_data<model3_state>();
@@ -1249,7 +1248,6 @@ static MACHINE_START(model3_10)
 }
 static MACHINE_START(model3_15)
 {
-	lsi53c810_init(machine, &scsi_intf);
 	configure_fast_ram(machine);
 
 	model3_state *state = machine.driver_data<model3_state>();
@@ -5341,6 +5339,8 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SOUND_CONFIG(scsp2_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_LSI53C810_ADD( "lsi51c810", scsi_intf)	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_15, model3_state )
@@ -5380,6 +5380,8 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SOUND_CONFIG(scsp2_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+
+	MCFG_LSI53C810_ADD( "lsi51c810", scsi_intf)	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_20, model3_state )

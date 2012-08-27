@@ -11,6 +11,7 @@
 
 #include "machine/ins8250.h"
 #include "machine/8237dma.h"
+#include "machine/53c810.h"
 
 typedef struct
 {
@@ -25,8 +26,10 @@ class bebox_state : public driver_device
 {
 public:
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+			m_lsi53c810(*this, "lsi53c810"){ }
 
+	required_device<lsi53c810_device> m_lsi53c810;
 	UINT32 m_cpu_imask[2];
 	UINT32 m_interrupts;
 	UINT32 m_crossproc_interrupts;
@@ -76,6 +79,7 @@ WRITE8_HANDLER( bebox_80000480_w );
 WRITE8_HANDLER( bebox_flash_w );
 
 void bebox_ide_interrupt(device_t *device, int state);
+void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int val);
 
 UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
 void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);
