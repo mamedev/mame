@@ -58,13 +58,13 @@ it as ASCII text.
 static TIMER_DEVICE_CALLBACK( scregg_interrupt )
 {
 	btime_state *state = timer.machine().driver_data<btime_state>();
-	device_set_input_line(state->m_maincpu, 0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, (param & 8) ? HOLD_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( scregg_irqack_w )
+static WRITE8_HANDLER( dommy_coincounter_w )
 {
-	btime_state *state = space->machine().driver_data<btime_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	coin_counter_w(space->machine(), 0, data & 0x40);
+	coin_counter_w(space->machine(), 1, data & 0x80);
 }
 
 
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(scregg_irqack_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(dommy_coincounter_w)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
 /*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(scregg_irqack_w)
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") // AM_WRITENOP // irqack/watchdog? + coincounter?
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
 	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
