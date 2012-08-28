@@ -54711,7 +54711,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="aladdin3" cloneof="magicarp">
-		<description>Aladdin 3 (Asia)</description>
+		<description>Aladdin III (Asia)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -62743,7 +62743,7 @@ Other
 
 	<software name="backtof4" cloneof="bmaster">
 		<description>Back to the Future 4 (Blaster Master pirate)</description>
-		<year>19??</year>
+		<year>1996</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
@@ -62881,7 +62881,7 @@ Other
 		</part>
 	</software>
 
-	<software name="braveboy">
+	<software name="braveboy" cloneof="jchan">
 		<description>Brave Boy - Kung Fu Pikachu (Jackie Chan pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62913,7 +62913,7 @@ Other
 
 	<software name="chipndl3" cloneof="hbarrel" supported="no">
 		<description>Chip &amp; Dale 3 (Heavy Barrel pirate)</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -63222,7 +63222,7 @@ resulting in tons of glitches? -->
 
 	<software name="goldnax4" cloneof="astyanax">
 		<description>Golden Axe IV (The Lord of King pirate)</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -63694,7 +63694,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="poketetr" cloneof="tetris">
+	<software name="poketetr" cloneof="tetrist">
 		<description>Pikachu - Poke Tetris (Tetris pirate, dumped from multicart with damaged CHR)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64000,7 +64000,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="sbros10" cloneof="jchan">
+	<software name="smb10" cloneof="jchan">
 		<description>Super Bros 10 Kung Fu Mari (Jackie Chan pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64360,7 +64360,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="smb16" cloneof="kaikeya2">
-		<description>Super Mario Bros. 16 (Kaiketsu Yanchamaru 2 - Karakuri Land pirate)</description>
+		<description>Super Bros. 16 (Kaiketsu Yanchamaru 2 - Karakuri Land pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64653,7 +64653,7 @@ resulting in tons of glitches? -->
 
 	<software name="ssimpson" cloneof="smb">
 		<description>Super Simpsons. (Super Mario Bros. pirate)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
@@ -64803,8 +64803,8 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="ustrike" cloneof="cobramis">
-		<description>Urban Strike (Cobra Mission pirate, Ripped from multicart)</description>
+	<software name="ustrike" cloneof="cobracom">
+		<description>Urban Strike (Cobra Command pirate, Ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="serial" value="Ripped from NG-011 4-in-1 cart"/>
