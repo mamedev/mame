@@ -1,5 +1,7 @@
 /*  Konami Cobra System
 
+	Driver by Ville Linde
+
 
     Games on this hardware
     ----------------------
@@ -158,26 +160,54 @@
 
         0x0011c:        Same as above?
 
+		0x00454:		(mask 0xff) 0x80000000							Tex related
+
         0x00458:        Set to 0x02100000 (0xff) by texselect()
 
-        0x02904:        -------- ------xx xx------ --------             Tex mag filter?
-                        -------- -------- --xxxx-- --------             Tex min filter?
+						------xx -------- -------- --------				Texture select (0-3)
+						-------- ---x---- -------- --------				?
 
-        0x02908:        -------- ----xxx- -------- --------             Tex wrap S (0 = repeat, 1 = mirror, 2 = clamp)
-                        -------- -------x xx------ --------             Tex wrap T
+		0x02900:		-------- -------- -------- --------				Texture[0] ?
 
-        0x02910:        xxxx---- -------- -------- --------             Texture width shift (size = 1 << X)
-                        ----xxxx -------- -------- --------             Texture height shift (size = 1 << X)
+        0x02904:        -------- ------xx xx------ --------             Texture[0] mag filter?
+                        -------- -------- --xxxx-- --------             Texture[0] min filter?
+
+        0x02908:        -------- ----xxx- -------- --------             Texture[0] wrap S (0 = repeat, 1 = mirror, 2 = clamp)
+                        -------- -------x xx------ --------             Texture[0] wrap T
+
+        0x02910:        xxxx---- -------- -------- --------             Texture[0] width shift (size = 1 << X)
+                        ----xxxx -------- -------- --------             Texture[0] height shift (size = 1 << X)
                         -------- ----x--- -------- --------             ?
                         -------- -------- -x------ --------             ?
-                        -------- -------- -------- xxx-----             Texture format (texel size, 2 = 4-bit, 3 = 8-bit, 4 = 16-bit)
-                        -------- -------- -------- ---xxx--             Texture format param
+                        -------- -------- -------- xxx-----             Texture[0] format (texel size, 2 = 4-bit, 3 = 8-bit, 4 = 16-bit)
+                        -------- -------- -------- ---xxx--             Texture[0] format param
 
-        0x02914:        --xxxxxx xxxxxxxx xx------ --------             ? (texture param, set to 0x1243)
+        0x02914:        xxxxxxxx xxxxxxxx xxxx---- --------             Texture[0] address
+
+		0x02980:		Texture[1] ?
+		0x02984:		Texture[1] min/mag filter
+		0x02988:		Texture[1] wrap
+		0x02990:		Texture[1] width/height/format
+		0x02994:		Texture[1] address
+
+		0x02a00:		Texture[2] ?
+		0x02a04:		Texture[2] min/mag filter
+		0x02a08:		Texture[2] wrap
+		0x02a10:		Texture[2] width/height/format
+		0x02a14:		Texture[2] address
+
+		0x02a80:		Texture[3] ?
+		0x02a84:		Texture[3] min/mag filter
+		0x02a88:		Texture[3] wrap
+		0x02a90:		Texture[3] width/height/format
+		0x02a94:		Texture[3] address
 
         0x40018:        Set to 0x0001040a (0xc0) by mode_stipple()      (bits 24..27 = stipple pattern?)
         0x400d0:        Set to 0x80000000 (0x80) by mode_stipple()
-        0x400f4:        Set to 0x40000000 (0x80) by texselect()
+
+        0x400f4:        xxx----- -------- -------- --------				Texture select (0-3)
+
+						xxx----- -------- -------- --------				?
 
         0x40114:        -------- ----x--- -------- --------             Scissor enable
 
@@ -198,9 +228,14 @@
         0x40198:        x------- -------- -------- --------             Alpha test enable?
                         -------- xxx----- -------- --------             Alpha test function (0 = never, 1 = less, 2 = lequal, 3 = greater,
                                                                                              4 = gequal, 5 = equal, 6 = notequal, 7 = always)
+						-------- -------- xxxxxxxx xxxxxxxx				Alpha test reference value?
 
         0x4019c:        x------- -------- -------- --------             Fog enable
                         ----x--- -------- -------- --------             0 = table fog, 1 = linear fog
+
+		0x401a8:		(mask 0xff): 0x2CAB34FD							?
+		0x401ac:		(mask 0xf0): 0x48C70000							?
+		0x401b8:		(mask 0x20): 0x00400000							?
 
         0x401bc:                                                        Texture env mode
                         xxx----- -------- -------- --------             ?
@@ -216,10 +251,15 @@
                                     0xa92b0100 = (equal, 16)
 
                         -------- -------- xxxxxxxx xxxx----             Stencil reference value?
+						----xxxx xxxxxxxx -------- --------				Stencil fill value?
                         xxx----- -------- -------- --------             Stencil function?
 
 
         0x80020:        -------- ----xxx- -------- --------             Depth test function (7 = always?)
+
+		0x80040:		(mask 0x0f) 0x00002CAB (same value as 0x401a8)
+		0x80044:		(mask 0x0f) 0x000034FD (same value as 0x401a8)
+		0x80048:		(mask 0x0f) 0x000048C7 (same value as 0x401ac)
 
         0x80050:        (mask 0x7c) 0x04445500 = (As, 1-As)             Blend register
                                     0x04111100 = (1, 1)
@@ -284,23 +324,32 @@
 #include "video/polynew.h"
 #include "sound/rf5c400.h"
 
-#define GFXFIFO_IN_VERBOSE		0
-#define GFXFIFO_OUT_VERBOSE		0
-#define M2SFIFO_VERBOSE			1
-#define S2MFIFO_VERBOSE			1
+#define GFXFIFO_IN_VERBOSE			0
+#define GFXFIFO_OUT_VERBOSE			0
+#define M2SFIFO_VERBOSE				0
+#define S2MFIFO_VERBOSE				0
+
+#define LOG_DEBUG_STATES			0
+#define LOG_JVS						0
+#define LOG_GFX_RAM_WRITES			0
+#define LOG_DRAW_COMMANDS			0
 
 
 /* Cobra Renderer class */
 
 struct cobra_polydata
 {
+	UINT32 alpha_test;
+	UINT32 zmode;
+	UINT32 tex_format;
+	UINT32 tex_address;
 };
 
-class cobra_renderer : public poly_manager<float, cobra_polydata, 6, 10000>
+class cobra_renderer : public poly_manager<float, cobra_polydata, 8, 10000>
 {
 public:
 	cobra_renderer(running_machine &machine)
-		: poly_manager<float, cobra_polydata, 6, 10000>(machine)
+		: poly_manager<float, cobra_polydata, 8, 10000>(machine)
 	{
 		m_texture_ram = auto_alloc_array(machine, UINT32, 0x100000);
 
@@ -338,6 +387,8 @@ public:
 	void gfx_fifo_exec(running_machine &machine);
 	UINT32 gfx_read_gram(UINT32 address);
 	void gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data);
+	UINT64 gfx_read_reg(running_machine &machine);
+	void gfx_write_reg(running_machine &machine, UINT64 data);
 
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 
@@ -352,11 +403,28 @@ private:
 
 	UINT32 *m_gfx_gram;
 	UINT32 *m_gfx_regmask;
+	
+	UINT32 m_gfx_register_select;
+	UINT64 *m_gfx_register;
+
+	UINT32 m_texram_ptr;
 
 	enum
 	{
 		RE_STATUS_IDLE				= 0,
 		RE_STATUS_COMMAND			= 1,
+	};
+
+	enum
+	{
+		POLY_Z		= 0,
+		POLY_R		= 1,
+		POLY_G		= 2,
+		POLY_B		= 3,
+		POLY_A		= 4,
+		POLY_U		= 5,
+		POLY_V		= 6,
+		POLY_W		= 7,
 	};
 };
 
@@ -433,7 +501,9 @@ cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *o
 
 bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
 {
+#if LOG_JVS
 	printf("jvs switch read: num players %d, bytes %d\n", count_players, bytes_per_switch);
+#endif
 
 	if (count_players > 2 || bytes_per_switch > 2)
 		return false;
@@ -455,7 +525,9 @@ bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switc
 
 bool cobra_jvs::coin_counters(UINT8 *&buf, UINT8 count)
 {
+#if LOG_JVS
 	printf("jvs coin counter read: count %d\n", count);
+#endif
 
 	if (count > 2)
 		return false;
@@ -625,8 +697,6 @@ public:
 	int m_gfx_re_status;
 	UINT32 m_gfx_unk_status;
 
-	int m_gfx_register_select;
-	UINT64 *m_gfx_register;
 	UINT64 m_gfx_fifo_mem[256];
 	int m_gfx_fifo_cache_addr;
 	int m_gfx_fifo_loopback;
@@ -642,54 +712,163 @@ public:
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
-    UINT32 *fb = &m_framebuffer->pix32(scanline);
+    UINT32 *fb = &m_backbuffer->pix32(scanline);
+	float *zb = (float*)&m_zbuffer->pix32(scanline);
 
-    UINT32 color = 0xff000000; // TODO
+	float z = extent.param[POLY_Z].start;
+	float dz = extent.param[POLY_Z].dpdx;
+
+	float gr = extent.param[POLY_R].start;
+	float dgr = extent.param[POLY_R].dpdx;
+	float gg = extent.param[POLY_G].start;
+	float dgg = extent.param[POLY_G].dpdx;
+	float gb = extent.param[POLY_B].start;
+	float dgb = extent.param[POLY_B].dpdx;
+	float ga = extent.param[POLY_A].start;
+	float dga = extent.param[POLY_A].dpdx;
+
+	UINT32 zmode = extradata.zmode;
 
     for (int x = extent.startx; x < extent.stopx; x++)
     {
-        fb[x] = color;
+		if (z <= zb[x] || zmode == 7)
+		{
+			UINT32 r = (int)(gr);
+			UINT32 g = (int)(gg);
+			UINT32 b = (int)(gb);
+
+			if (r > 255) r = 255;
+			if (g > 255) g = 255;
+			if (b > 255) b = 255;
+
+			r <<= 16;
+			g <<= 8;
+
+			fb[x] = 0xff000000 | r | g | b;
+			zb[x] = z;
+		}
+
+		z += dz;
+		gr += dgr;
+		gg += dgg;
+		gb += dgb;
+		ga += dga;
     }
 }
 
 void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
-	float u = extent.param[0].start;
-	float v = extent.param[1].start;
-	float du = extent.param[0].dpdx;
-	float dv = extent.param[1].dpdx;
-	UINT32 *fb = &m_framebuffer->pix32(scanline);
+	float u = extent.param[POLY_U].start;
+	float v = extent.param[POLY_V].start;
+	float du = extent.param[POLY_U].dpdx;
+	float dv = extent.param[POLY_V].dpdx;
 
-	int texture_width = 1 << ((m_gfx_gram[0x2910/4] >> 28) & 0xf);
-	int texture_height = 1 << ((m_gfx_gram[0x2910/4] >> 24) & 0xf);
+	float w = extent.param[POLY_W].start;
+	float dw = extent.param[POLY_W].dpdx;
+
+	float z = extent.param[POLY_Z].start;
+	float dz = extent.param[POLY_Z].dpdx;
+
+	float gr = extent.param[POLY_R].start;
+	float dgr = extent.param[POLY_R].dpdx;
+	float gg = extent.param[POLY_G].start;
+	float dgg = extent.param[POLY_G].dpdx;
+	float gb = extent.param[POLY_B].start;
+	float dgb = extent.param[POLY_B].dpdx;
+	float ga = extent.param[POLY_A].start;
+	float dga = extent.param[POLY_A].dpdx;
+
+	UINT32 *fb = &m_backbuffer->pix32(scanline);
+	float *zb = (float*)&m_zbuffer->pix32(scanline);
+
+	UINT32 texture_width  = 1 << ((extradata.tex_format >> 28) & 0xf);
+	UINT32 texture_height = 1 << ((extradata.tex_format >> 24) & 0xf);
+	UINT32 tex_address = extradata.tex_address;
+
+	UINT32 alpha_test = extradata.alpha_test;
+	UINT32 zmode = extradata.zmode;
+	UINT32 tex_format = (extradata.tex_format >> 2) & 0x7;
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
 		UINT32 texel;
 
-		iu = (int)(u * texture_width);
-		iv = (int)(v * texture_height);
-
-		texel = m_texture_ram[((iv * texture_width) + iu) / 2];
-
-		if (iu & 1)
+		if (z <= zb[x] || zmode == 7)
 		{
-			texel &= 0xffff;
-		}
-		else
-		{
-			texel >>= 16;
-		}
+			float oow;
 
-		UINT32 r = (texel & 0x7c00) << 9;
-		UINT32 g = (texel & 0x03e0) << 6;
-		UINT32 b = (texel & 0x001f) << 3;
+			if (w == 0)
+				oow = 1.0f;
+			else
+				oow = 1.0f / w;
 
-		fb[x] = 0xff000000 | r | g | b;
+			iu = (int)((u * oow) * texture_width) & 0x7ff;
+			iv = (int)((v * oow) * texture_height) & 0x7ff;
+
+			texel = m_texture_ram[tex_address + (((iv * texture_width) + iu) / 2)];
+
+			if (iu & 1)
+			{
+				texel &= 0xffff;
+			}
+			else
+			{
+				texel >>= 16;
+			}
+
+			UINT32 texr, texg, texb, texa;
+
+			if (tex_format == 6)
+			{
+				texr = (texel & 0xf000) >> 8;
+				texg = (texel & 0x0f00) >> 4;
+				texb = (texel & 0x00f0) >> 0;
+				texa = (texel & 0x000f);
+			}
+			else
+			{
+				texr = (texel & 0xf800) >> 8;
+				texg = (texel & 0x07c0) >> 3;
+				texb = (texel & 0x003e) << 2;
+				texa = (texel & 0x0001) ? 0xff : 0;
+			}
+
+			UINT32 goua = (int)(ga);
+
+			int a = (texa * goua) >> 8;
+
+			if (a != 0 || !alpha_test)
+			{
+				UINT32 gour = (int)(gr);
+				UINT32 goug = (int)(gg);
+				UINT32 goub = (int)(gb);
+	
+				int r = (texr * gour) >> 8;
+				int g = (texg * goug) >> 8;
+				int b = (texb * goub) >> 8;
+
+				if (r > 255) r = 255;
+				if (g > 255) g = 255;
+				if (b > 255) b = 255;
+
+				r <<= 16;
+				g <<= 8;
+
+				fb[x] = 0xff000000 | r | g | b;
+				zb[x] = z;
+			}
+		}
 
 		u += du;
 		v += dv;
+		w += dw;
+		z += dz;
+
+		gr += dgr;
+		gg += dgg;
+		gb += dgb;
+		ga += dga;
 	}
 }
 
@@ -701,7 +880,7 @@ void cobra_renderer::draw_point(const rectangle &visarea, vertex_t &v, UINT32 co
 	if (x >= visarea.min_x && x <= visarea.max_x &&
 		y >= visarea.min_y && y <= visarea.max_y)
 	{
-		UINT32 *fb = &m_framebuffer->pix32(y);
+		UINT32 *fb = &m_backbuffer->pix32(y);
 		fb[x] = color;
 	}
 }
@@ -729,7 +908,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
 
-			UINT32 *fb = &m_framebuffer->pix32(y);
+			UINT32 *fb = &m_backbuffer->pix32(y);
 			fb[x] = color;
 
 			x++;
@@ -742,7 +921,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
 
-			UINT32 *fb = &m_framebuffer->pix32(y);
+			UINT32 *fb = &m_backbuffer->pix32(y);
 			fb[x] = color;
 
 			y++;
@@ -1172,9 +1351,9 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		//
 		// 7 6 5 4 3 2 1 0
 		//----------------
-		//             x     S2M FIFO unknown flag
+		//             x     S2M FIFO interrupt active
 		//           x       Graphics board/FIFO busy flag
-		//         x         M2S FIFO unknown flag
+		//         x         M2S FIFO interrupt active
 
 		int value = 0x01;
 
@@ -1299,6 +1478,8 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		if ((m_m2s_int_enable & 0x80) == 0)
 		{
+			m_main_int_active &= ~MAIN_INT_M2S;
+
 			// clear the interrupt
 			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 		}
@@ -1321,10 +1502,12 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 	if (m_main_debug_state_wc >= 2)
 	{
+#if LOG_DEBUG_STATES
 		if (m_main_debug_state != 0)
 		{
 			printf("MAIN: debug state %02X\n", m_main_debug_state);
 		}
+#endif
 
 		m_main_debug_state = 0;
 		m_main_debug_state_wc = 0;
@@ -1549,10 +1732,12 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 
 	if (m_sub_debug_state_wc >= 2)
 	{
+#if LOG_DEBUG_STATES
 		if (m_sub_debug_state != 0)
 		{
 			printf("SUB: debug state %02X\n", m_sub_debug_state);
 		}
+#endif
 
 		m_sub_debug_state = 0;
 		m_sub_debug_state_wc = 0;
@@ -1689,19 +1874,22 @@ WRITE32_MEMBER(cobra_state::sub_psac2_w)
 
 static UINT32 sub_unknown_dma_r(device_t *device, int width)
 {
-	printf("DMA read from unknown: size %d\n", width);
+	//printf("DMA read from unknown: size %d\n", width);
 	return 0;
 }
 
 static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
 {
-	printf("DMA write to unknown: size %d, data %08X\n", width, data);
+	//printf("DMA write to unknown: size %d, data %08X\n", width, data);
 }
 
 static void sub_jvs_w(device_t *device, UINT8 data)
 {
 	cobra_jvs_host *jvs = downcast<cobra_jvs_host *>(device->machine().device("cobra_jvs_host"));
+
+#if LOG_JVS
 	printf("sub_jvs_w: %02X\n", data);
+#endif
 
 	const UINT8 *rec_data;
 	UINT32 rec_size;
@@ -1710,14 +1898,14 @@ static void sub_jvs_w(device_t *device, UINT8 data)
 
 	if (rec_size > 0)
 	{
-		/*
+#if LOG_JVS
 		printf("jvs reply ");
 		for (int i=0; i < rec_size; i++)
 		{
 			printf("%02X ", rec_data[i]);
 		}
 		printf("\n");
-		*/
+#endif
 
 		for (int i=0; i < rec_size; i++)
 		{
@@ -1737,13 +1925,14 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x78210000, 0x78217fff) AM_MIRROR(0x80000000) AM_RAM_WRITE(sub_psac_palette_w) AM_SHARE("paletteram")						// PSAC palette RAM
 	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)			// PSAC tile RAM
 	AM_RANGE(0x78240000, 0x7827ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_char_r, k001604_char_w)			// PSAC character RAM
+	AM_RANGE(0x78280000, 0x7828000f) AM_MIRROR(0x80000000) AM_NOP											// ???
 	AM_RANGE(0x78300000, 0x7830000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_psac2_r, sub_psac2_w)			// PSAC
 	AM_RANGE(0x7e000000, 0x7e000003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk7e_r, sub_debug_w)
 	AM_RANGE(0x7e040000, 0x7e041fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7e180000, 0x7e180003) AM_MIRROR(0x80000000) AM_READWRITE(sub_unk1_r, sub_unk1_w)				// TMS57002?
 	AM_RANGE(0x7e200000, 0x7e200003) AM_MIRROR(0x80000000) AM_READWRITE(sub_config_r, sub_config_w)
-//  AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
-//  AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_RAM                                           // LANC
+	AM_RANGE(0x7e280000, 0x7e28ffff) AM_MIRROR(0x80000000) AM_NOP                                           // LANC
+	AM_RANGE(0x7e300000, 0x7e30ffff) AM_MIRROR(0x80000000) AM_NOP                                           // LANC
 	AM_RANGE(0x7e380000, 0x7e380003) AM_MIRROR(0x80000000) AM_READWRITE(sub_mainbd_r, sub_mainbd_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)						/* Boot ROM */
 ADDRESS_MAP_END
@@ -1781,16 +1970,27 @@ ADDRESS_MAP_END
 
 void cobra_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 {
-	copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+	if (m_gfx_register[0] & 0x4)
+	{
+		copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+	}
+	else
+	{
+		copybitmap_trans(*bitmap, *m_backbuffer, 0, 0, 0, 0, cliprect, 0);
+	}
 }
 
 void cobra_renderer::gfx_init(running_machine &machine)
 {
-	cobra_state *cobra = machine.driver_data<cobra_state>();
+	const rectangle& visarea = machine.primary_screen->visible_area();
 
 	m_gfx_gram = auto_alloc_array(machine, UINT32, 0x40000);
 
-	cobra->m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
+	m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
+	m_gfx_register_select = 0;
+
+	float zvalue = 10000000.0f;
+	m_zbuffer->fill(*(int*)&zvalue, visarea);
 }
 
 void cobra_renderer::gfx_exit(running_machine &machine)
@@ -1806,7 +2006,7 @@ void cobra_renderer::gfx_exit(running_machine &machine)
         fputc((UINT8)(m_texture_ram[i] >> 0), file);
     }
     fclose(file);
-    */
+	*/
 }
 
 void cobra_renderer::gfx_reset(running_machine &machine)
@@ -1859,6 +2059,21 @@ void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 			}
 			break;
 		}
+
+		case 0xc:		// 0xCxxxx
+		{
+			switch (address & 0xffff)
+			{
+				case 0x3020:
+				case 0x0020:
+				{
+					m_texram_ptr = (data & mask) * 4;
+					break;
+				}
+			}
+
+			break;
+		}
 	}
 
 	if (address & 3)
@@ -1871,6 +2086,31 @@ void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 	m_gfx_gram[address/4] |= data & mask;
 }
 
+UINT64 cobra_renderer::gfx_read_reg(running_machine &machine)
+{
+	return m_gfx_register[m_gfx_register_select];
+}
+
+void cobra_renderer::gfx_write_reg(running_machine &machine, UINT64 data)
+{
+	switch (m_gfx_register_select)
+	{
+		case 0x0000:
+		{
+			const rectangle& visarea = machine.primary_screen->visible_area();
+
+			copybitmap_trans(*m_framebuffer, *m_backbuffer, 0, 0, 0, 0, visarea, 0);
+			m_backbuffer->fill(0xff000000, visarea);
+
+			float zvalue = 10000000.0f;
+			m_zbuffer->fill(*(int*)&zvalue, visarea);
+			break;
+		}
+	}
+
+	m_gfx_register[m_gfx_register_select] = data;
+}
+
 void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 {
 	cobra_state *cobra = machine.driver_data<cobra_state>();
@@ -1879,7 +2119,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 		return;
 
 	const rectangle& visarea = machine.primary_screen->visible_area();
-	vertex_t vert[8];
+	vertex_t vert[32];
 
 	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
 	cobra_fifo *fifo_out = cobra->m_gfxfifo_out;
@@ -1941,17 +2181,17 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				if (w2 == 0x10500010)
 				{
 					// GFX register select
-					cobra->m_gfx_register_select = w[3];
+					m_gfx_register_select = w[3];
 
-					printf("GFX: register select %04X\n", cobra->m_gfx_register_select);
+					printf("GFX: register select %08X\n", m_gfx_register_select);
 				}
 				else if (w2 == 0x10500018)
 				{
 					// register write to the register selected above?
 					// 64-bit registers, top 32-bits in word 2, low 32-bit in word 3
-					printf("GFX: register write %04X: %08X %08X\n", cobra->m_gfx_register_select, w[2], w[3]);
+					printf("GFX: register write %08X: %08X %08X\n", m_gfx_register_select, w[2], w[3]);
 
-					cobra->m_gfx_register[cobra->m_gfx_register_select] = ((UINT64)(w[2]) << 32) | w[3];
+					gfx_write_reg(machine, ((UINT64)(w[2]) << 32) | w[3]);
 				}
 				else if (w2 == 0x10521000)
 				{
@@ -1984,7 +2224,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
 
-				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
 
 				fifo_in->pop(NULL, &in3);
 				fifo_in->pop(NULL, &in4);
@@ -2008,7 +2248,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 			case 0xf1:
 			case 0xf4:
 			{
-				printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -2056,42 +2296,118 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				}
 
 
+				
+				float vp_width		= u2f(m_gfx_gram[0x00090/4]);
+				float vp_height		= u2f(m_gfx_gram[0x000a4/4]);
+				float vp_center_x	= u2f(m_gfx_gram[0x0009c/4]);
+				float vp_center_y	= u2f(m_gfx_gram[0x000ac/4]);
+
+				if (vp_width == 0.0f)
+				{
+					vp_width = 256.0f;
+					vp_center_x = 256.0f;
+				}
+
+#if LOG_DRAW_COMMANDS
+				printf("--- Draw command %08X %08X ---\n", w1, w2);
+#endif
+				
+
 				// extract vertex data
 				for (int i=0; i < units; i++)
 				{
-					UINT64 in;
+					float x, y, z, w;
+					float r, g, b, a;
+					w = 1.0f;
+
+					UINT64 in[4];
 					if (w2 & 0x40000000)		// line flags
 					{
-						fifo_in->pop(NULL, &in);
+						fifo_in->pop(NULL, &in[0]);
 					}
 
 					if (w2 & 0x20000000)		// unknown float (0.0f ... 1.0f)
 					{
-						fifo_in->pop(NULL, &in);
+						fifo_in->pop(NULL, &in[1]);
 					}
 
-					fifo_in->pop(NULL, &vert[i].x);				// X coord
-					fifo_in->pop(NULL, &vert[i].y);				// Y coord
-					fifo_in->pop(NULL, &in);					// coord?
-					fifo_in->pop(NULL, &in);					// Z coord
+					fifo_in->pop(NULL, &x);						// X coord
+					fifo_in->pop(NULL, &y);						// Y coord
+					fifo_in->pop(NULL, &in[2]);					// coord?
+					fifo_in->pop(NULL, &z);						// Z coord
 
 					if (w2 & 0x00200000)		// texture coords
 					{
-						fifo_in->pop(NULL, &in);				// W coord (1 / Z)
-						fifo_in->pop(NULL, &vert[i].p[0]);		// U coord
-						fifo_in->pop(NULL, &vert[i].p[1]);		// V coord
+						fifo_in->pop(NULL, &w);					// W coord (1 / Z)
+						fifo_in->pop(NULL, &vert[i].p[POLY_U]);	// U/Z coord
+						fifo_in->pop(NULL, &vert[i].p[POLY_V]);	// V/Z coord
 					}
 
-					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
-					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
-					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
-					fifo_in->pop(NULL, &in);					// ? (float 0.0f ... 1.0f)
+					fifo_in->pop(NULL, &a);						// Gouraud Color Alpha
+					fifo_in->pop(NULL, &r);						// Gouraud Color R
+					fifo_in->pop(NULL, &g);						// Gouraud Color G
+					fifo_in->pop(NULL, &b);						// Gouraud Color B
 
 					if (w2 & 0x00000001)		// unknown float (0.0f ... 1.0f)
 					{
-						fifo_in->pop(NULL, &in);
+						fifo_in->pop(NULL, &in[3]);
 					}
+
+					vert[i].x = ((x / z) * vp_width) + vp_center_x;
+					vert[i].y = ((y / z) * vp_height) + vp_center_y;
+					vert[i].p[POLY_Z] = z;
+					vert[i].p[POLY_W] = w;
+					vert[i].p[POLY_R] = r * 255.0f;
+					vert[i].p[POLY_G] = g * 255.0f;
+					vert[i].p[POLY_B] = b * 255.0f;
+					vert[i].p[POLY_A] = a * 255.0f;
+
+
+#if LOG_DRAW_COMMANDS
+					if (w2 & 0x40000000)
+					{
+						printf("    ?: %08X\n", (UINT32)in[0]);
+					}
+					if (w2 & 0x20000000)
+					{
+						printf("    ?: %08X\n", (UINT32)in[1]);
+					}
+
+					printf("    x: %f\n", x);
+					printf("    y: %f\n", y);
+					printf("    ?: %08X\n", (UINT32)in[2]);
+					printf("    z: %f\n", z);
+
+					if (w2 & 0x00200000)
+					{
+						printf("    w: %f\n", w);
+						printf("    u: %f\n", vert[i].p[POLY_U]);
+						printf("    v: %f\n", vert[i].p[POLY_V]);
+					}
+
+					printf("    a: %f\n", a);
+					printf("    r: %f\n", r);
+					printf("    g: %f\n", g);
+					printf("    b: %f\n", b);
+
+					if (w2 & 0x00000001)
+					{
+						printf("    ?: %08X\n", (UINT32)in[3]);
+					}
+
+					printf("\n");
+#endif
 				}
+
+
+				cobra_polydata &extra = object_data_alloc();
+
+				int texture = (m_gfx_gram[0x400f4/4] >> 29);
+
+				extra.alpha_test = m_gfx_gram[0x40198/4] & 0x80000000;
+				extra.zmode = (m_gfx_gram[0x80020/4] >> 17) & 0x7;
+				extra.tex_format = m_gfx_gram[(0x2910 + (texture << 7)) / 4];
+				extra.tex_address = (m_gfx_gram[(0x2914 + (texture << 7)) / 4] >> 12) & 0xfffff;
 
 
 				// render
@@ -2104,7 +2420,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
+								render_triangle(visarea, rd, 8, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						else
@@ -2112,10 +2428,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_color_scan), this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 6, vert[i-2], vert[i-1], vert[i]);
-								//draw_point(visarea, vert[i-2], 0xffff0000);
-								//draw_point(visarea, vert[i-1], 0xffff0000);
-								//draw_point(visarea, vert[i], 0xffff0000);
+								render_triangle(visarea, rd, 5, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						break;
@@ -2175,6 +2488,9 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 				int x = (m_gfx_gram[0x118/4] >> 16) & 0xffff;
 				int y = m_gfx_gram[0x118/4] & 0xffff;
+
+				x &= 0x3ff;
+				y &= 0x3ff;
 
 				for (i=0; i < num; i+=4)
 				{
@@ -2312,10 +2628,12 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 				gfx_write_gram(reg, mask, w2);
 
+#if LOG_GFX_RAM_WRITES
 				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
 				{
 					printf("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
 				}
+#endif
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -2412,7 +2730,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 				cobra->m_gfx_unk_status |= 0x400;
 
-				if (cobra->m_gfx_re_word_count == 0)
+				if (cobra->m_gfx_re_word_count == 0 && num_left > 0)
 					printf("gfxfifo_exec: tex_ints %d words left\n", num - cobra->m_gfx_re_word_count);
 
 				for (int i=0; i < num_left; i++)
@@ -2421,9 +2739,8 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					fifo_in->pop(NULL, &param);
 					cobra->m_gfx_re_word_count++;
 
-					UINT32 addr = m_gfx_gram[0xc3020/4];
-					m_texture_ram[addr] = (UINT32)(param);
-					m_gfx_gram[0xc3020/4]++;
+					m_texture_ram[m_texram_ptr] = (UINT32)(param);
+					m_texram_ptr++;
 				}
 
 
@@ -2610,8 +2927,10 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 		// reads back the register selected by gfx register select
 
-		m_gfxfifo_out->push(&space.device(), (UINT32)((m_gfx_register[m_gfx_register_select] >> 32)));
-		m_gfxfifo_out->push(&space.device(), (UINT32)(m_gfx_register[m_gfx_register_select]));
+		UINT64 regdata = m_renderer->gfx_read_reg(space.machine());
+
+		m_gfxfifo_out->push(&space.device(), (UINT32)(regdata >> 32));
+		m_gfxfifo_out->push(&space.device(), (UINT32)(regdata));
 	}
 	else if (data == U64(0x00a0000110520800))
 	{
@@ -2682,10 +3001,12 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 
 	if (m_gfx_debug_state_wc >= 2)
 	{
+#if LOG_DEBUG_STATES
 		if (m_gfx_debug_state != 0)
 		{
 			printf("GFX: debug state %02X\n", m_gfx_debug_state);
 		}
+#endif
 
 		m_gfx_debug_state = 0;
 		m_gfx_debug_state_wc = 0;
@@ -2797,6 +3118,7 @@ static void ide_interrupt(device_t *device, int state)
 
 static INTERRUPT_GEN( cobra_vblank )
 {
+	/*
 	cobra_state *cobra = device->machine().driver_data<cobra_state>();
 
 	if (cobra->m_vblank_enable & 0x80)
@@ -2804,6 +3126,7 @@ static INTERRUPT_GEN( cobra_vblank )
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 		cobra->m_gfx_unk_flag = 0x80;
 	}
+	*/
 }
 
 
@@ -2853,8 +3176,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_SIZE(512, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
 	MCFG_PALETTE_LENGTH(65536)
 	MCFG_SCREEN_UPDATE_STATIC(cobra)
 
@@ -2973,6 +3296,7 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	{
 		UINT8 *rom = (UINT8*)machine().root_device().memregion("m48t58")->base();
 		rom[0x00] = 0x47;		// G
+		rom[0x01] = 0x4e;		// N		// N = 2-player, Q = 1-player?
 		rom[0x02] = 0x36;		// 6
 		rom[0x03] = 0x34;		// 4
 		rom[0x04] = 0x35;		// 5
@@ -2993,7 +3317,12 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	}
 
 	// hd patches
-	// 0x18932c = 0x38600000            skips check_one_scene()
+	// (gfx)
+	// 0x18932c = 0x38600000					skips check_one_scene()
+
+	// (main)
+	// 0x5025ac = 0x60000000 [0x4082055c]		skip IRQ fail...
+	// 0x503ec4 = 0x60000000 [0x4186fff8]
 
 	m_has_psac = false;
 }
@@ -3006,7 +3335,7 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 	{
 		UINT32 *rom = (UINT32*)machine().root_device().memregion("user2")->base();
 
-		//rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
+		rom[0x62094 / 4] = 0x60000000;			// skip hardcheck()...
 		rom[0x62ddc / 4] = 0x60000000;			// skip lanc_hardcheck()
 
 
@@ -3073,6 +3402,19 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 		rom[0x0e] = (UINT8)(sum >> 8);
 		rom[0x0f] = (UINT8)(sum);
 	}
+
+	// hd patches
+	// (gfx)
+	// 0x144354 = 0x38600000 [0x4bfffb91]		skips check_one_scene()
+
+	// (sub)
+	// 0x2a5394 = 0x4800001c [0x4182001c]		sound chip check?
+	// 0x2a53f4 = 0x4800001c [0x4082001c]		?
+	// 0x2a546c = 0x60000000 [0x48001a0d]		?
+	// 0x2a5510 = 0x48000014 [0x419e0014]		?
+
+	// (main)
+	// 0x14aa48 = 0x60000000 [0x4182fff4]		?
 
 	m_has_psac = true;
 }
