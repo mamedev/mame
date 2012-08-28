@@ -15,6 +15,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "zac_1.lh"
 
 class zac_1_state : public driver_device
 {
@@ -151,6 +152,9 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 	MCFG_CPU_IO_MAP(zac_1_io)
 	MCFG_TIMER_ADD_PERIODIC("zac_1_inttimer", zac_1_inttimer, attotime::from_hz(200))
 	MCFG_TIMER_ADD_PERIODIC("zac_1_outtimer", zac_1_outtimer, attotime::from_hz(187500))
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_zac_1)
 MACHINE_CONFIG_END
 
 

@@ -4416,6 +4416,7 @@ src/mame/layout/videopkr.lay svneol=native#text/plain
 src/mame/layout/wecleman.lay svneol=native#text/plain
 src/mame/layout/wildone.lay svneol=native#text/plain
 src/mame/layout/wldarrow.lay svneol=native#text/plain
+src/mame/layout/zac_1.lay svneol=native#text/plain
 src/mame/layout/zac_proto.lay svneol=native#text/plain
 src/mame/machine/3do.c svneol=native#text/plain
 src/mame/machine/acitya.c svneol=native#text/plain
