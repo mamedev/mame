@@ -219,6 +219,7 @@ static struct
 	INT16 wait_rect_y;
 	UINT8 bus_size;
 	UINT8 multifunc_sel;
+	UINT8 write_count;
 	bool gpbusy;
 	int state;
 }s3;
@@ -2594,7 +2595,11 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 			case 0x40:
 				s3.enable_8514 = data & 0x01;  // enable 8514/A registers (x2e8, x6e8, xae8, xee8)
 				if(data & 0x01)
+				{
 					s3.state = S3_IDLE;
+					s3.gpbusy = false;
+					s3.write_count = 0;
+				}
 				break;
 			case 0x51:
 				vga.crtc.start_addr &= ~0xc0000;
@@ -2864,7 +2869,7 @@ WRITE16_HANDLER(s3_cmd_w)
 			if(data & 0x0100)  // WAIT (for read/write of PIXEL TRANSFER (E2E8))
 			{
 				s3.state = S3_DRAWING_RECT;
-				s3.gpbusy = true;
+				//s3.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
 				s3.wait_rect_x = s3.curr_x;
 				s3.wait_rect_y = s3.curr_y;
 				s3.bus_size = (data & 0x0600) >> 9;
@@ -3125,6 +3130,51 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 	}
 }
 
+static void s3_wait_draw()
+{
+	int x,data_size = 0;
+	UINT32 off,xfer = 0;
+
+	// the data in the pixel transfer register masks the rectangle output(?)
+	if(s3.bus_size == 0)  // 8-bit
+		data_size = 8;
+	if(s3.bus_size == 1)  // 16-bit
+		data_size = 16;
+	if(s3.bus_size == 2)  // 32-bit
+		data_size = 32;
+	off = VGA_START_ADDRESS;
+	off += (VGA_LINE_LENGTH * s3.wait_rect_y);
+	off += s3.wait_rect_x;
+	for(x=0;x<data_size;x++)
+	{
+		if(s3.wait_rect_x >= 0 || s3.wait_rect_y >= 0)
+		{
+			if(s3.current_cmd & 0x1000)
+			{
+				xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
+					 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+			}
+			else
+				xfer = s3.pixel_xfer;
+			if((xfer & ((1<<(data_size-1))>>x)) != 0)
+				vga.memory[off] = s3.fgcolour & 0x00ff;
+		}
+		off++;
+		s3.wait_rect_x++;
+		if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
+		{
+			s3.wait_rect_x = s3.curr_x;
+			s3.wait_rect_y++;
+			if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+			{
+				s3.state = S3_IDLE;
+				s3.gpbusy = false;
+			}
+		}
+	}
+	logerror("S3: Wait Draw data = %08x\n",s3.pixel_xfer);
+}
+
 READ16_HANDLER(s3_pixel_xfer_r)
 {
 	if(offset == 1)
@@ -3135,9 +3185,6 @@ READ16_HANDLER(s3_pixel_xfer_r)
 
 WRITE16_HANDLER(s3_pixel_xfer_w)
 {
-	int x,data_size = 0;
-	UINT32 off,xfer = 0;
-
 	if(offset == 1)
 		s3.pixel_xfer = (s3.pixel_xfer & 0x0000ffff) | (data << 16);
 	else
@@ -3145,43 +3192,7 @@ WRITE16_HANDLER(s3_pixel_xfer_w)
 
 	if(s3.state == S3_DRAWING_RECT)
 	{
-		// the data in the pixel transfer register masks the rectangle output(?)
-		if(s3.bus_size == 0)  // 8-bit
-			data_size = 8;
-		if(s3.bus_size == 1)  // 16-bit
-			data_size = 16;
-		if(s3.bus_size == 2)  // 32-bit
-			data_size = 32;
-		off = VGA_START_ADDRESS;
-		off += (VGA_LINE_LENGTH * s3.wait_rect_y);
-		off += s3.wait_rect_x;
-		for(x=0;x<data_size;x++)
-		{
-			if(s3.wait_rect_x >= 0 || s3.wait_rect_y >= 0)
-			{
-				if(s3.current_cmd & 0x1000)
-				{
-					xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
-						 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
-				}
-				else
-					xfer = s3.pixel_xfer;
-				if((xfer & ((1<<(data_size-1))>>x)) != 0)
-					vga.memory[off] = s3.fgcolour & 0x00ff;
-			}
-			off++;
-			s3.wait_rect_x++;
-			if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
-			{
-				s3.wait_rect_x = s3.curr_x;
-				s3.wait_rect_y++;
-				if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
-				{
-					s3.state = S3_IDLE;
-					s3.gpbusy = false;
-				}
-			}
-		}
+		s3_wait_draw();
 	}
 
 	logerror("S3: Pixel Transfer = %08x\n",s3.pixel_xfer);
@@ -3214,6 +3225,51 @@ READ8_HANDLER( s3_mem_r )
 
 WRITE8_HANDLER( s3_mem_w )
 {
+	if(s3.state != S3_IDLE)
+	{
+		// pass through to the pixel transfer register (DirectX 5 wants this)
+		if(s3.bus_size == 0)
+		{
+			s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+			s3_wait_draw();
+		}
+		if(s3.bus_size == 1)
+		{
+			switch(offset & 0x0001)
+			{
+			case 0:
+			default:
+				s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+				break;
+			case 1:
+				s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+				s3_wait_draw();
+				break;
+			}
+		}
+		if(s3.bus_size == 2)
+		{
+			switch(offset & 0x0003)
+			{
+			case 0:
+			default:
+				s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+				break;
+			case 1:
+				s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+				break;
+			case 2:
+				s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
+				break;
+			case 3:
+				s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
+				s3_wait_draw();
+				break;
+			}
+		}
+		return;
+	}
+
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
 		//printf("%08x %02x (%02x %02x) %02X\n",offset,data,vga.sequencer.map_mask,svga.bank_w,(vga.sequencer.data[4] & 0x08));
