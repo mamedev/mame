@@ -3041,7 +3041,7 @@ WRITE16_HANDLER(s3_cmd_w)
 			if(data & 0x0020)
 				dir_x = 1;
 			else
-				dir_x -= 1;
+				dir_x = -1;
 			for(y=0;y<=s3.rect_height;y++)
 			{
 				for(x=0;x<=s3.rect_width;x+=dir_x)
