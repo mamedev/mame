@@ -204,10 +204,10 @@ static struct
 	UINT8 reg_lock2;
 	UINT8 enable_8514;
 	UINT16 current_cmd;
-	UINT16 dest_x;
-	UINT16 dest_y;
-	UINT16 curr_x;
-	UINT16 curr_y;
+	INT16 dest_x;
+	INT16 dest_y;
+	INT16 curr_x;
+	INT16 curr_y;
 	UINT16 line_axial_step;
 	UINT16 line_diagonal_step;
 	UINT16 rect_width;
@@ -215,8 +215,8 @@ static struct
 	UINT32 fgcolour;
 	UINT32 bgcolour;
 	UINT32 pixel_xfer;
-	UINT16 wait_rect_x;
-	UINT16 wait_rect_y;
+	INT16 wait_rect_x;
+	INT16 wait_rect_y;
 	UINT8 bus_size;
 	UINT8 multifunc_sel;
 	bool gpbusy;
@@ -2851,10 +2851,12 @@ WRITE16_HANDLER(s3_cmd_w)
 		switch(data & 0xe000)
 		{
 		case 0x0000:  // NOP (for "Short Stroke Vectors")
+			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - NOP\n",s3.current_cmd);
 			break;
 		case 0x2000:  // Line
+			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - Line\n",s3.current_cmd);
 			break;
@@ -2866,12 +2868,17 @@ WRITE16_HANDLER(s3_cmd_w)
 				s3.wait_rect_x = s3.curr_x;
 				s3.wait_rect_y = s3.curr_y;
 				s3.bus_size = (data & 0x0600) >> 9;
+				logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+						s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 				break;
 			}
 			offset = VGA_START_ADDRESS;
 			offset += (VGA_LINE_LENGTH * s3.curr_y);
 			offset += s3.curr_x;
-			dir_x = 2;
+			if(data & 0x0020)
+				dir_x = 2;
+			else
+				dir_x -= 2;
 			for(y=0;y<=s3.rect_height;y++)
 			{
 				for(x=0;x<=s3.rect_width;x+=dir_x)
@@ -2879,8 +2886,12 @@ WRITE16_HANDLER(s3_cmd_w)
 					vga.memory[(offset+x) % vga.svga_intf.vram_size] = s3.fgcolour & 0x000000ff;
 					vga.memory[(offset+x+1) % vga.svga_intf.vram_size] = (s3.fgcolour & 0x0000ff00) >> 8;
 				}
-				offset += VGA_LINE_LENGTH;
+				if(data & 0x0080)
+					offset += VGA_LINE_LENGTH;
+				else
+					offset -= VGA_LINE_LENGTH;
 			}
+			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
 					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
@@ -2891,7 +2902,10 @@ WRITE16_HANDLER(s3_cmd_w)
 			offset += s3.dest_x;
 			src = VGA_START_ADDRESS;
 			src += (VGA_LINE_LENGTH * s3.curr_y);
-			src += s3.curr_x;
+			if(s3.curr_x & 0x0800)
+				src -= s3.curr_x & 0x7ff;
+			else
+				src += s3.curr_x;
 			buffer = (UINT8*)malloc((s3.rect_height+1)*(s3.rect_width+1));
 			count = 0;
 			// copy to temporary buffer
@@ -2926,15 +2940,18 @@ WRITE16_HANDLER(s3_cmd_w)
 					offset -= VGA_LINE_LENGTH;
 			}
 			free(buffer);
+			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
 					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		case 0xe000:  // Pattern Fill
+			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - Pattern Fill\n",s3.current_cmd);
 			break;
 		default:
+			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Unknown command: %04x\n",data);
 		}
@@ -2963,7 +2980,7 @@ READ16_HANDLER( s3_8ae8_r )
 WRITE16_HANDLER( s3_8ae8_w )
 {
 	s3.line_axial_step = data & 0x3fff;
-	s3.dest_y = data & 0x0fff;
+	s3.dest_y = data;
 	logerror("S3: Line Axial Step / Destination Y write %04x\n",data);
 }
 
@@ -2988,7 +3005,7 @@ READ16_HANDLER( s3_8ee8_r )
 WRITE16_HANDLER( s3_8ee8_w )
 {
 	s3.line_diagonal_step = data & 0x3fff;
-	s3.dest_x = data & 0x0fff;
+	s3.dest_x = data;
 	logerror("S3: Line Diagonal Step / Destination X write %04x\n",data);
 }
 
@@ -3019,8 +3036,8 @@ READ16_HANDLER(s3_currentx_r)
 
 WRITE16_HANDLER(s3_currentx_w)
 {
-	s3.curr_x = data & 0x0fff;
-	logerror("S3: Current X set to %04x\n",data);
+	s3.curr_x = data;
+	logerror("S3: Current X set to %04x (%i)\n",data,s3.curr_x);
 }
 
 READ16_HANDLER(s3_currenty_r)
@@ -3030,8 +3047,8 @@ READ16_HANDLER(s3_currenty_r)
 
 WRITE16_HANDLER(s3_currenty_w)
 {
-	s3.curr_y = data & 0x0fff;
-	logerror("S3: Current Y set to %04x\n",data);
+	s3.curr_y = data;
+	logerror("S3: Current Y set to %04x (%i)\n",data,s3.curr_y);
 }
 
 READ16_HANDLER(s3_fgcolour_r)
@@ -3104,7 +3121,7 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 	case 0xf000:
 		s3.multifunc_sel = data & 0x000f;
 	default:
-		logerror("S3: Unimplemented multifunction register %i write\n",data >> 12);
+		logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
 	}
 }
 
@@ -3140,15 +3157,18 @@ WRITE16_HANDLER(s3_pixel_xfer_w)
 		off += s3.wait_rect_x;
 		for(x=0;x<data_size;x++)
 		{
-			if(s3.current_cmd & 0x1000)
+			if(s3.wait_rect_x >= 0 || s3.wait_rect_y >= 0)
 			{
-				xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
-					 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+				if(s3.current_cmd & 0x1000)
+				{
+					xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
+						 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+				}
+				else
+					xfer = s3.pixel_xfer;
+				if((xfer & ((1<<(data_size-1))>>x)) != 0)
+					vga.memory[off] = s3.fgcolour & 0x00ff;
 			}
-			else
-				xfer = s3.pixel_xfer;
-			if((xfer & ((1<<(data_size-1))>>x)) != 0)
-				vga.memory[off] = s3.fgcolour & 0x00ff;
 			off++;
 			s3.wait_rect_x++;
 			if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
