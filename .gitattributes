@@ -5505,6 +5505,7 @@ src/mess/drivers/advision.c svneol=native#text/plain
 src/mess/drivers/aim65.c svneol=native#text/plain
 src/mess/drivers/aim65_40.c svneol=native#text/plain
 src/mess/drivers/alesis.c svneol=native#text/plain
+src/mess/drivers/alphasma.c svneol=native#text/plain
 src/mess/drivers/alphatro.c svneol=native#text/plain
 src/mess/drivers/altair.c svneol=native#text/plain
 src/mess/drivers/ami1200.c svneol=native#text/plain

@@ -1928,6 +1928,7 @@ $(MESSOBJ)/test.a:				\
 	$(MESS_DRIVERS)/zexall.o	\
 
 $(MESSOBJ)/skeleton.a:			\
+	$(MESS_DRIVERS)/alphasma.o	\
 	$(MESS_DRIVERS)/alphatro.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\
