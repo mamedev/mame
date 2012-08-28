@@ -2735,7 +2735,7 @@ WRITE8_HANDLER(s3_port_03d0_w)
 static void s3_write_fg(UINT32 offset)
 {
 	UINT8 dst = vga.memory[offset];
-	UINT8 src;
+	UINT8 src = 0;
 
 	// determine source
 	switch(s3.fgmix & 0x0060)
@@ -2811,7 +2811,7 @@ static void s3_write_fg(UINT32 offset)
 static void s3_write_bg(UINT32 offset)
 {
 	UINT8 dst = vga.memory[offset];
-	UINT8 src;
+	UINT8 src = 0;
 	// determine source
 	switch(s3.bgmix & 0x0060)
 	{
