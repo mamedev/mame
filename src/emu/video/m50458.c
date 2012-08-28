@@ -1,8 +1,14 @@
 /***************************************************************************
 
-Mitsubishi M50458 OSD chip
+	Mitsubishi M50458 OSD chip
 
-preliminary device by Angelo Salese
+	preliminary device by Angelo Salese
+
+	TODO:
+	- vertical scrolling needs references (might work differently and/or in
+	  "worse" ways, the one currently implemented guesses that the screen is
+	   masked at the top and the end when in scrolling mode).
+	- Understand what the "vertical start position" really does (vblank?)
 
 ***************************************************************************/
 
@@ -54,7 +60,7 @@ WRITE16_MEMBER( m50458_device::vreg_123_w)
 	/* char part of vertical scrolling */
 	m_scrr = (data & 0x0f00) >> 8;
 
-	printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
+//	printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
 }
 
 WRITE16_MEMBER( m50458_device::vreg_126_w)
@@ -211,7 +217,7 @@ WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 						break;
 					case OSD_SET_DATA:
 						//if(m_osd_addr >= 0x120)
-						printf("%04x %04x\n",m_osd_addr,m_current_cmd);
+						//printf("%04x %04x\n",m_osd_addr,m_current_cmd);
 						write_word(m_osd_addr,m_current_cmd);
 						m_osd_addr++;
 						/* Presumably wraps at 0x127? */
@@ -242,7 +248,6 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	bg_b = m_phase & 4 ? 0xdf : 0;
 	bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
 
-
 	for(y=0;y<12;y++)
 	{
 		for(x=0;x<24;x++)
@@ -251,16 +256,9 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			UINT16 tile;
 			int y_base = y;
 
-			/* TODO: needs improvements */
-			if(y != 0 && m_scrr)
-				y_base+=(m_scrr - 1);
-
-			if(y != 0 && y_base == 0)
-				y_base ++;
-
-			if(y_base >= 12)
-				y_base -= 11;
-
+			if(y != 0 && m_scrr > 1) { y_base+=(m_scrr - 1); }
+			if(y_base > 11) 		 { y_base -= 11; }
+			if(m_scrr && y == 11)    { y_base = 0; } /* Guess: repeat line 0 if scrolling is active */
 
 			tile = read_word(x+y_base*24);
 
@@ -271,6 +269,7 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					UINT8 pix;
 					UINT8 r,g,b;
 					UINT16 offset = ((tile & 0x7f)*36+yi*2);
+					int res_y;
 
 					/* TODO: blinking, bit 7 (RTC test in NSS) */
 
@@ -286,8 +285,17 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					g = (tile & 0x200 && pix) ? 0xff : 0x00;
 					b = (tile & 0x400 && pix) ? 0xff : 0x00;
 
+					res_y = y*18+yi;
+
+					if(y != 0 && y != 11)
+					{
+						res_y -= m_scrf;
+						if(res_y < 18) /* wrap-around */
+							res_y += 216;
+					}
+
 					if(r || g || b)
-						bitmap.pix32(y*18+yi,x*12+(xi-4)) = r << 16 | g << 8 | b;
+						bitmap.pix32(res_y,x*12+(xi-4)) = r << 16 | g << 8 | b;
 				}
 			}
 		}
