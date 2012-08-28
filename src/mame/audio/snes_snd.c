@@ -1051,6 +1051,19 @@ static STREAM_UPDATE( snes_sh_update )
 	}
 }
 
+/*-------------------------------------------------
+    spc700_set_volume - sets SPC700 volume level
+    for both speakers, used for fade in/out effects
+-------------------------------------------------*/
+
+void spc700_set_volume(device_t *device,int volume)
+{
+	snes_sound_state *spc700 = get_safe_token(device);
+
+	spc700->channel->set_output_gain(0,volume / 100.0);
+	spc700->channel->set_output_gain(1,volume / 100.0);
+}
+
 
 /***************************
          I/O for DSP

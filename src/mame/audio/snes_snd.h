@@ -32,5 +32,6 @@ READ8_DEVICE_HANDLER( spc_port_out );
 WRITE8_DEVICE_HANDLER( spc_port_in );
 
 UINT8 *spc_get_ram(device_t *device);
+void spc700_set_volume(device_t *device,int volume);
 
 #endif /* __SNES_SPC_H__ */

@@ -5,6 +5,7 @@
 	driver by Angelo Salese, based off info from Noca$h
 
 	TODO:
+	- EEPROM doesn't save?
 	- Fix sound CPU halt / reset lines, particularly needed by this to work
 	  correctly;
 	- Fix continue behaviour, might be the same issue as the one above.
@@ -557,6 +558,7 @@ WRITE8_MEMBER(nss_state::port_01_w)
 	---- ---x Maybe SNES CPU/PPU reset?   (0=Reset, 1=Run)
 */
 	m_input_disabled = ((data & 0x80) >> 7) ^ 1;
+	spc700_set_volume(machine().device("spc700"),data & 0x20 ? 0.0 : 100.0);
 
 	m_cart_sel = (data & 0xc) >> 2;
 
