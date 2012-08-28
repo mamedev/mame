@@ -314,11 +314,6 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 #define NO_DRIVE_SELECTED   0xFF
 
 /* SASI harddisk interface */
-#define HARDDISK0_TAG           "harddisk0"
-#define HARDDISK1_TAG           "harddisk1"
-#define HARDDISK2_TAG           "harddisk2"
-#define HARDDISK3_TAG           "harddisk3"
-
 #define SCSIBUS_TAG             "scsibus"
 
 void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);

@@ -139,14 +139,6 @@ ADDRESS_MAP_END
 //  SCSIBus_interface sasi_intf
 //-------------------------------------------------
 
-static const SCSIConfigTable sasi_dev_table =
-{
-	1, /* 1 SCSI device */
-	{
-		{ "harddisk0" }
-	}
-};
-
 WRITE_LINE_MEMBER( base_d9060_device::req_w )
 {
 	m_via->write_ca1(!state);
@@ -154,8 +146,7 @@ WRITE_LINE_MEMBER( base_d9060_device::req_w )
 
 static const SCSIBus_interface sasi_intf =
 {
-    &sasi_dev_table,
-    NULL,
+	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -469,7 +460,7 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_4MHz/4, via_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 MACHINE_CONFIG_END
 
 

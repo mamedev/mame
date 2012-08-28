@@ -21,7 +21,6 @@
 typedef struct _SCSIBus_interface SCSIBus_interface;
 struct _SCSIBus_interface
 {
-    const SCSIConfigTable *scsidevs;		/* SCSI devices */
     void (*line_change_cb)(device_t *, UINT8 line, UINT8 state);
 
 	devcb_write_line _out_bsy_func;

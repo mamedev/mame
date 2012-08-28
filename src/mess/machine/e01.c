@@ -262,14 +262,6 @@ static const wd17xx_interface fdc_intf =
 //  SCSIBus_interface scsi_intf
 //-------------------------------------------------
 
-static const SCSIConfigTable scsi_dev_table =
-{
-	1, /* 1 SCSI device */
-	{
-		{ "harddisk0" }
-	}
-};
-
 WRITE_LINE_MEMBER( e01_device::scsi_bsy_w )
 {
 	if (!state)
@@ -291,8 +283,7 @@ WRITE_LINE_MEMBER( e01_device::scsi_req_w )
 
 static const SCSIBus_interface scsi_intf =
 {
-    &scsi_dev_table,
-    NULL,
+	NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, scsi_bsy_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -357,7 +348,7 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

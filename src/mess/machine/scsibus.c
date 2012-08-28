@@ -883,11 +883,9 @@ void scsibus_device::device_start()
 	sel_timer=timer_alloc(2);
 	dataout_timer=timer_alloc(3);
 
-	// try to open the devices
-	for (int devno = 0; devno < scsidevs->devs_present; devno++)
+	for( device_t *device = first_subdevice(); device != NULL; device = device->next() )
 	{
-		LOG(1,"SCSIBUS:init devno=%d \n",devno);
-		scsidev_device *scsidev = owner()->subdevice<scsidev_device>( scsidevs->devices[devno].tag );
+		scsidev_device *scsidev = downcast<scsidev_device *>(device);
 		devices[scsidev->GetDeviceID()] = scsidev;
 	}
 }

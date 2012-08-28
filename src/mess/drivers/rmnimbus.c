@@ -78,22 +78,9 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static const SCSIConfigTable nimbus_scsi_dev_table =
-{
-	4, /* 4 SCSI devices */
-	{
-		{ HARDDISK0_TAG },
-		{ HARDDISK1_TAG },
-		{ HARDDISK2_TAG },
-		{ HARDDISK3_TAG },
-	}
-};
-
-
 static const SCSIBus_interface scsibus_config =
 {
-    &nimbus_scsi_dev_table,
-    &nimbus_scsi_linechange
+	&nimbus_scsi_linechange
 };
 
 static const centronics_interface nimbus_centronics_config =
@@ -334,11 +321,11 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
-	MCFG_SCSIDEV_ADD(HARDDISK0_TAG, SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD(HARDDISK1_TAG, SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD(HARDDISK2_TAG, SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD(HARDDISK3_TAG, SCSIHD, SCSI_ID_3)
-    MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", SCSIHD, SCSI_ID_3)
 
     MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1536K")

@@ -8,6 +8,7 @@
 *********************************************************************/
 
 #include "lux4105.h"
+#include "machine/scsihd.h"
 
 
 
@@ -29,14 +30,6 @@ const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
 //-------------------------------------------------
 //  SCSIBus_interface sasi_intf
 //-------------------------------------------------
-
-static const SCSIConfigTable sasi_dev_table =
-{
-	1, /* 1 SCSI device */
-	{
-		{ "harddisk0" }
-	}
-};
 
 WRITE_LINE_MEMBER( luxor_4105_device::sasi_bsy_w )
 {
@@ -70,8 +63,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::sasi_req_w )
 
 static const SCSIBus_interface sasi_intf =
 {
-    &sasi_dev_table,
-    NULL,
+	NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_4105_device, sasi_bsy_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -87,7 +79,8 @@ static const SCSIBus_interface sasi_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( luxor_4105 )
-    MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
+	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 MACHINE_CONFIG_END
 
 

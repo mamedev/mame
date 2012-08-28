@@ -1024,14 +1024,6 @@ static const wd17xx_interface bulletf_fdc_intf =
 //  SCSIBus_interface scsi_intf
 //-------------------------------------------------
 
-static const SCSIConfigTable scsi_dev_table =
-{
-	1, /* 1 SCSI device */
-	{
-		{ "harddisk0" }
-	}
-};
-
 WRITE_LINE_MEMBER( bulletf_state::req_w )
 {
 	if (state)
@@ -1047,8 +1039,7 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 
 static const SCSIBus_interface scsi_intf =
 {
-    &scsi_dev_table,
-    NULL,
+	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1214,8 +1205,9 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
-    MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
+
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
