@@ -162,6 +162,7 @@ enum
 #define OPTION_MULTIKEYBOARD		"multikeyboard"
 #define OPTION_MULTIMOUSE			"multimouse"
 #define OPTION_STEADYKEY			"steadykey"
+#define OPTION_UI_ACTIVE			"ui_active"
 #define OPTION_OFFSCREEN_RELOAD		"offscreen_reload"
 #define OPTION_JOYSTICK_MAP			"joystick_map"
 #define OPTION_JOYSTICK_DEADZONE	"joystick_deadzone"
@@ -328,6 +329,7 @@ public:
 	float joystick_deadzone() const { return float_value(OPTION_JOYSTICK_DEADZONE); }
 	float joystick_saturation() const { return float_value(OPTION_JOYSTICK_SATURATION); }
 	bool steadykey() const { return bool_value(OPTION_STEADYKEY); }
+	bool ui_active() const { return bool_value(OPTION_UI_ACTIVE); }
 	bool offscreen_reload() const { return bool_value(OPTION_OFFSCREEN_RELOAD); }
 	bool natural_keyboard() const { return bool_value(OPTION_NATURAL_KEYBOARD); }
 	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }

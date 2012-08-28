@@ -164,7 +164,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_new_driver_pending(NULL),
 	  m_soft_reset_timer(NULL),
 	  m_rand_seed(0x9d14abd7),
-      m_ui_active(false),
+      m_ui_active(_config.options().ui_active()),
 	  m_basename(_config.gamedrv().name),
 	  m_sample_rate(_config.options().sample_rate()),
 	  m_logfile(NULL),
