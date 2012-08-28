@@ -159,14 +159,10 @@ enum
 
 
 
-
-
-
-static UINT8 *decrypted;
+static UINT8 *decrypted; // TODO: put me in btime class
 
 WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 {
-
 	/* for most games, this serves as the NMI enable for the audio CPU; however,
        lnc and disco use bit 0 of the first AY-8910's port A instead; many other
        games also write there in addition to this address */
@@ -179,7 +175,6 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 
 WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 {
-
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
 	{
@@ -210,7 +205,6 @@ static void btime_decrypt( address_space *space )
 	UINT8 *src, *src1;
 	int addr, addr1;
 
-
 	/* the encryption is a simple bit rotation: 76543210 -> 65342710, but */
 	/* with a catch: it is only applied if the previous instruction did a */
 	/* memory write. Also, only opcodes at addresses with this bit pattern: */
@@ -237,7 +231,6 @@ static void btime_decrypt( address_space *space )
 
 WRITE8_MEMBER(btime_state::lnc_w)
 {
-
 	if      (offset <= 0x3bff)                       ;
 	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(space, offset - 0x3c00, data); return; }
 	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(space, offset - 0x7c00, data); return; }
@@ -257,7 +250,6 @@ WRITE8_MEMBER(btime_state::lnc_w)
 
 WRITE8_MEMBER(btime_state::mmonkey_w)
 {
-
 	if      (offset <= 0x3bff)                       ;
 	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(space, offset - 0x3c00, data); return; }
 	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(space, offset - 0x7c00, data); return; }
@@ -276,7 +268,6 @@ WRITE8_MEMBER(btime_state::mmonkey_w)
 
 WRITE8_MEMBER(btime_state::btime_w)
 {
-
 	if      (offset <= 0x07ff)                     ;
 	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(space, offset - 0x0c00, data);
 	else if (offset >= 0x1000 && offset <= 0x17ff) ;
@@ -294,7 +285,6 @@ WRITE8_MEMBER(btime_state::btime_w)
 
 WRITE8_MEMBER(btime_state::tisland_w)
 {
-
 	if      (offset <= 0x07ff)                     ;
 	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(space, offset - 0x0c00, data);
 	else if (offset >= 0x1000 && offset <= 0x17ff) ;
@@ -314,7 +304,6 @@ WRITE8_MEMBER(btime_state::tisland_w)
 
 WRITE8_MEMBER(btime_state::zoar_w)
 {
-
 	if      (offset <= 0x07ff)					   ;
 	else if (offset >= 0x8000 && offset <= 0x87ff) ;
 	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(space, offset - 0x8800, data);
@@ -333,7 +322,6 @@ WRITE8_MEMBER(btime_state::zoar_w)
 
 WRITE8_MEMBER(btime_state::disco_w)
 {
-
 	if      (offset <= 0x04ff)                     ;
 	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(space, offset - 0x2000, data);
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
@@ -517,14 +505,12 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_hi)
 {
-
 	if (newval)
 		device_set_input_line(m_maincpu, 0, HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_lo)
 {
-
 	if (!newval)
 		device_set_input_line(m_maincpu, 0, HOLD_LINE);
 }

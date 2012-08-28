@@ -7,7 +7,8 @@ Very similar to Burger Time hardware (and uses its video driver)
 driver by Nicola Salmoria
 
 To Do:
-Sprite Priorities in Dommy
+- Sprite Priorities in dommy
+- Where is IRQ ack in dommy?
 
 
 Rock Duck
@@ -54,26 +55,38 @@ it as ASCII text.
 #include "sound/ay8910.h"
 #include "includes/btime.h"
 
+class scregg_state : public btime_state
+{
+public:
+	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: btime_state(mconfig, type, tag) { }
+
+	DECLARE_WRITE8_MEMBER(dommy_coincounter_w);
+
+	DECLARE_DRIVER_INIT(rockduck);
+};
+
+
 
 static TIMER_DEVICE_CALLBACK( scregg_interrupt )
 {
-	btime_state *state = timer.machine().driver_data<btime_state>();
+	scregg_state *state = timer.machine().driver_data<scregg_state>();
 	device_set_input_line(state->m_maincpu, 0, (param & 8) ? HOLD_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( dommy_coincounter_w )
+WRITE8_MEMBER(scregg_state::dommy_coincounter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x40);
-	coin_counter_w(space->machine(), 1, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x40);
+	coin_counter_w(machine(), 1, data & 0x80);
 }
 
 
-static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, btime_state )
+static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, scregg_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(dommy_coincounter_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(dommy_coincounter_w)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
 /*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
@@ -84,7 +97,7 @@ static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, btime_state )
+static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, scregg_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
@@ -215,7 +228,7 @@ GFXDECODE_END
 
 static MACHINE_START( scregg )
 {
-	btime_state *state = machine.driver_data<btime_state>();
+	scregg_state *state = machine.driver_data<scregg_state>();
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = NULL;
@@ -228,7 +241,7 @@ static MACHINE_START( scregg )
 
 static MACHINE_RESET( scregg )
 {
-	btime_state *state = machine.driver_data<btime_state>();
+	scregg_state *state = machine.driver_data<scregg_state>();
 
 	state->m_btime_palette = 0;
 	state->m_bnj_scroll1 = 0;
@@ -239,7 +252,7 @@ static MACHINE_RESET( scregg )
 	state->m_btime_tilemap[3] = 0;
 }
 
-static MACHINE_CONFIG_START( dommy, btime_state )
+static MACHINE_CONFIG_START( dommy, scregg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -271,7 +284,7 @@ static MACHINE_CONFIG_START( dommy, btime_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( scregg, btime_state )
+static MACHINE_CONFIG_START( scregg, scregg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -392,7 +405,7 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(btime_state,rockduck)
+DRIVER_INIT_MEMBER(scregg_state,rockduck)
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;
@@ -406,7 +419,7 @@ DRIVER_INIT_MEMBER(btime_state,rockduck)
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg, driver_device, 0, ROT270, "Technos Japan", "Dommy", GAME_SUPPORTS_SAVE )
-GAME( 1983, scregg,   0,        scregg, scregg, driver_device, 0, ROT270, "Technos Japan", "Scrambled Egg", GAME_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg, driver_device, 0, ROT270, "Technos Japan / Universal USA", "Eggs", GAME_SUPPORTS_SAVE )
-GAME( 1983, rockduck, 0,        scregg, rockduck, btime_state, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, dommy,    0,        dommy,  scregg,   driver_device, 0,        ROT270, "Technos Japan", "Dommy", GAME_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg,   driver_device, 0,        ROT270, "Technos Japan", "Scrambled Egg", GAME_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg,   driver_device, 0,        ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", GAME_SUPPORTS_SAVE )
+GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state,  rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

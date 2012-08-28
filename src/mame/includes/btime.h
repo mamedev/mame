@@ -1,9 +1,14 @@
+/***************************************************************************
+
+    Burger Time hardware
+
+***************************************************************************/
 
 class btime_state : public driver_device
 {
 public:
 	btime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -12,7 +17,8 @@ public:
 		m_lnc_charbank(*this, "lnc_charbank"),
 		m_deco_charram(*this, "deco_charram"),
 		m_spriteram(*this, "spriteram"),
-		m_audio_rambase(*this, "audio_rambase"){ }
+		m_audio_rambase(*this, "audio_rambase")
+	{ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -48,6 +54,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(lnc_w);
 	DECLARE_WRITE8_MEMBER(mmonkey_w);
@@ -80,6 +87,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
 	DECLARE_WRITE8_MEMBER(ay_audio_nmi_enable_w);
+
 	DECLARE_DRIVER_INIT(btime);
 	DECLARE_DRIVER_INIT(tisland);
 	DECLARE_DRIVER_INIT(cookrace);
@@ -90,7 +98,6 @@ public:
 	DECLARE_DRIVER_INIT(protennb);
 	DECLARE_DRIVER_INIT(disco);
 	DECLARE_DRIVER_INIT(lnc);
-	DECLARE_DRIVER_INIT(rockduck);
 };
 
 
@@ -113,5 +120,4 @@ SCREEN_UPDATE_IND16( lnc );
 SCREEN_UPDATE_IND16( zoar );
 SCREEN_UPDATE_IND16( disco );
 SCREEN_UPDATE_IND16( eggs );
-
 
