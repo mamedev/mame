@@ -597,6 +597,7 @@ $(MESSOBJ)/act.a:				\
 $(MESSOBJ)/alesis.a:			\
 	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_AUDIO)/alesis.o		\
+	$(MESS_VIDEO)/alesis.o		\
 
 $(MESSOBJ)/amiga.a:				\
 	$(MESS_MACHINE)/amigacrt.o	\
@@ -2095,6 +2096,7 @@ $(MESS_VIDEO)/abc1600.o:	$(MESS_LAYOUT)/abc1600.lh
 $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
+$(MESS_DRIVERS)/alesis.o:	$(MESS_LAYOUT)/sr16.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
 $(MESS_VIDEO)/apollo.o:		$(MESS_LAYOUT)/apollo.lh
 $(MESS_VIDEO)/apollo.o:		$(MESS_LAYOUT)/apollo_15i.lh

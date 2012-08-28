@@ -72,6 +72,7 @@ public:
 	virtual void palette_init();
 	virtual void machine_reset();
 
+	void update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, UINT8 x, int state);
 	DECLARE_DRIVER_INIT(hr16);
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
@@ -82,6 +83,7 @@ public:
 
 private:
 	UINT8		m_kb_matrix;
+	UINT8		m_lcd_digits[5];
 };
 
 // device type definition
