@@ -214,9 +214,15 @@ static struct
 	UINT16 rect_height;
 	UINT32 fgcolour;
 	UINT32 bgcolour;
+	UINT16 fgmix;
+	UINT16 bgmix;
 	UINT32 pixel_xfer;
 	INT16 wait_rect_x;
 	INT16 wait_rect_y;
+	INT16 scissors_left;
+	INT16 scissors_right;
+	INT16 scissors_top;
+	INT16 scissors_bottom;
 	UINT8 bus_size;
 	UINT8 multifunc_sel;
 	UINT8 write_count;
@@ -2724,6 +2730,158 @@ WRITE8_HANDLER(s3_port_03d0_w)
 }
 
 /* accelerated ports, TBD ... */
+
+
+static void s3_write_fg(UINT32 offset)
+{
+	UINT8 dst = vga.memory[offset];
+	UINT8 src;
+
+	// determine source
+	switch(s3.fgmix & 0x0060)
+	{
+	case 0x0000:
+		src = s3.bgcolour;
+		break;
+	case 0x0020:
+		src = s3.fgcolour;
+		break;
+	case 0x0040:
+		src = s3.pixel_xfer;
+		break;
+	case 0x0060:
+		// TODO: Bitmap data;
+		break;
+	}
+
+	// write the data
+	switch(s3.fgmix & 0x000f)
+	{
+	case 0x0000:
+		vga.memory[offset] = !dst;
+		break;
+	case 0x0001:
+		// TODO: false
+		break;
+	case 0x0002:
+		// TODO: true
+		break;
+	case 0x0003:
+		// change nothing, pixel is unchanged
+		break;
+	case 0x0004:
+		vga.memory[offset] = !src;
+		break;
+	case 0x0005:
+		vga.memory[offset] = src ^ dst;
+		break;
+	case 0x0006:
+		vga.memory[offset] = !(src ^ dst);
+		break;
+	case 0x0007:
+		vga.memory[offset] = src;
+		break;
+	case 0x0008:
+		vga.memory[offset] = !(src & dst);
+		break;
+	case 0x0009:
+		vga.memory[offset] = (!src) | dst;
+		break;
+	case 0x000a:
+		vga.memory[offset] = src | (!dst);
+		break;
+	case 0x000b:
+		vga.memory[offset] = src | dst;
+		break;
+	case 0x000c:
+		vga.memory[offset] = src & dst;
+		break;
+	case 0x000d:
+		vga.memory[offset] = src & (!dst);
+		break;
+	case 0x000e:
+		vga.memory[offset] = (!src) & dst;
+		break;
+	case 0x000f:
+		vga.memory[offset] = !(src | dst);
+		break;
+	}
+}
+
+static void s3_write_bg(UINT32 offset)
+{
+	UINT8 dst = vga.memory[offset];
+	UINT8 src;
+	// determine source
+	switch(s3.bgmix & 0x0060)
+	{
+	case 0x0000:
+		src = s3.bgcolour;
+		break;
+	case 0x0020:
+		src = s3.fgcolour;
+		break;
+	case 0x0040:
+		src = s3.pixel_xfer;
+		break;
+	case 0x0060:
+		// TODO: Bitmap data;
+		break;
+	}
+
+	// write the data
+	switch(s3.bgmix & 0x000f)
+	{
+	case 0x0000:
+		vga.memory[offset] = !dst;
+		break;
+	case 0x0001:
+		// TODO: false
+		break;
+	case 0x0002:
+		// TODO: true
+		break;
+	case 0x0003:
+		// change nothing, pixel is unchanged
+		break;
+	case 0x0004:
+		vga.memory[offset] = !src;
+		break;
+	case 0x0005:
+		vga.memory[offset] = src ^ dst;
+		break;
+	case 0x0006:
+		vga.memory[offset] = !(src ^ dst);
+		break;
+	case 0x0007:
+		vga.memory[offset] = src;
+		break;
+	case 0x0008:
+		vga.memory[offset] = !(src & dst);
+		break;
+	case 0x0009:
+		vga.memory[offset] = (!src) | dst;
+		break;
+	case 0x000a:
+		vga.memory[offset] = src | (!dst);
+		break;
+	case 0x000b:
+		vga.memory[offset] = src | dst;
+		break;
+	case 0x000c:
+		vga.memory[offset] = src & dst;
+		break;
+	case 0x000d:
+		vga.memory[offset] = src & (!dst);
+		break;
+	case 0x000e:
+		vga.memory[offset] = (!src) & dst;
+		break;
+	case 0x000f:
+		vga.memory[offset] = !(src | dst);
+		break;
+	}
+}
 /*
   9AE8h W(R):  Graphics Processor Status Register (GP_STAT)
 bit   0-7  Queue State.
@@ -2881,15 +3039,14 @@ WRITE16_HANDLER(s3_cmd_w)
 			offset += (VGA_LINE_LENGTH * s3.curr_y);
 			offset += s3.curr_x;
 			if(data & 0x0020)
-				dir_x = 2;
+				dir_x = 1;
 			else
-				dir_x -= 2;
+				dir_x -= 1;
 			for(y=0;y<=s3.rect_height;y++)
 			{
 				for(x=0;x<=s3.rect_width;x+=dir_x)
 				{
-					vga.memory[(offset+x) % vga.svga_intf.vram_size] = s3.fgcolour & 0x000000ff;
-					vga.memory[(offset+x+1) % vga.svga_intf.vram_size] = (s3.fgcolour & 0x0000ff00) >> 8;
+					s3_write_fg((offset+x) % vga.svga_intf.vram_size);
 				}
 				if(data & 0x0080)
 					offset += VGA_LINE_LENGTH;
@@ -3084,6 +3241,14 @@ READ16_HANDLER( s3_multifunc_r )
 	{
 	case 0:
 		return s3.rect_height;
+	case 1:
+		return s3.scissors_top;
+	case 2:
+		return s3.scissors_left;
+	case 3:
+		return s3.scissors_bottom;
+	case 4:
+		return s3.scissors_right;
 		// TODO: remaining functions
 	default:
 		logerror("S3: Unimplemented multifunction register %i selected\n",s3.multifunc_sel);
@@ -3104,6 +3269,43 @@ bit  0-10  (911/924) Rectangle Height. Height of BITBLT or rectangle command.
 	case 0x0000:
 		s3.rect_height = data & 0x0fff;
 		logerror("S3: Minor Axis Pixel Count / Rectangle Height write %04x\n",data);
+		break;
+/*
+BEE8h index 01h W(R/W):  Top Scissors Register (SCISSORS_T).
+bit  0-10  (911/924) Clipping Top Limit. Defines the upper bound of the
+            Clipping Rectangle (Lowest Y coordinate).
+     0-11  (80x +) Clipping Top Limit. See above
+
+BEE8h index 02h W(R/W):  Left Scissors Registers (SCISSORS_L).
+bit  0-10  (911,924) Clipping Left Limit. Defines the left bound of the
+            Clipping Rectangle (Lowest X coordinate).
+     0-11  (80x +) Clipping Left Limit. See above.
+
+BEE8h index 03h W(R/W):  Bottom Scissors Register (SCISSORS_B).
+bit  0-10  (911,924) Clipping Bottom Limit. Defines the bottom bound of the
+            Clipping Rectangle (Highest Y coordinate).
+     0-11  (80x +) Clipping Bottom Limit. See above.
+
+BEE8h index 04h W(R/W):  Right Scissors Register (SCISSORS_R).
+bit  0-10  (911,924) Clipping Right Limit. Defines the right bound of the
+            Clipping Rectangle (Highest X coordinate).
+     0-11  (80x +) Clipping Bottom Limit. See above.
+ */
+	case 0x1000:
+		s3.scissors_top = data & 0x0fff;
+		logerror("S3: Scissors Top write %04x\n",data);
+		break;
+	case 0x2000:
+		s3.scissors_left = data & 0x0fff;
+		logerror("S3: Scissors Left write %04x\n",data);
+		break;
+	case 0x3000:
+		s3.scissors_bottom = data & 0x0fff;
+		logerror("S3: Scissors Bottom write %04x\n",data);
+		break;
+	case 0x4000:
+		s3.scissors_right = data & 0x0fff;
+		logerror("S3: Scissors Right write %04x\n",data);
 		break;
 /*
 BEE8h index 0Fh W(W):  Read Register Select Register (READ_SEL)    (801/5,928)
@@ -3147,17 +3349,23 @@ static void s3_wait_draw()
 	off += s3.wait_rect_x;
 	for(x=0;x<data_size;x++)
 	{
-		if(s3.wait_rect_x >= 0 || s3.wait_rect_y >= 0)
+		if(s3.wait_rect_x >= 0 && s3.wait_rect_y >= 0)
 		{
-			if(s3.current_cmd & 0x1000)
+			// check clipping rectangle
+			if(s3.wait_rect_x >= s3.scissors_left && s3.wait_rect_x <= s3.scissors_right && s3.wait_rect_y >= s3.scissors_top && s3.wait_rect_y <= s3.scissors_bottom)
 			{
-				xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
-					 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+				if(s3.current_cmd & 0x1000)
+				{
+					xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
+						 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+				}
+				else
+					xfer = s3.pixel_xfer;
+				if((xfer & ((1<<(data_size-1))>>x)) != 0)
+					s3_write_fg(off % vga.svga_intf.vram_size);
+				else
+					s3_write_bg(off % vga.svga_intf.vram_size);
 			}
-			else
-				xfer = s3.pixel_xfer;
-			if((xfer & ((1<<(data_size-1))>>x)) != 0)
-				vga.memory[off] = s3.fgcolour & 0x00ff;
 		}
 		off++;
 		s3.wait_rect_x++;
@@ -3172,7 +3380,53 @@ static void s3_wait_draw()
 			}
 		}
 	}
-	logerror("S3: Wait Draw data = %08x\n",s3.pixel_xfer);
+}
+
+/*
+B6E8h W(R/W):  Background Mix Register (BKGD_MIX)
+bit   0-3  Background MIX (BACKMIX).
+            00  not DST
+            01  0 (false)
+            02  1 (true)
+            03  2 DST
+            04  not SRC
+            05  SRC xor DST
+            06  not (SRC xor DST)
+            07  SRC
+            08  not (SRC and DST)
+            09  (not SRC) or DST
+            0A  SRC or (not DST)
+            0B  SRC or DST
+            0C  SRC and DST
+            0D  SRC and (not DST)
+            0E  (not SRC) and DST
+            0F  not (SRC or DST)
+           DST is always the destination bitmap, bit SRC has four
+           possible sources selected by the BSS bits.
+      5-6  Background Source Select (BSS)
+             0  BSS is Background Color
+             1  BSS is Foreground Color
+             2  BSS is Pixel Data from the PIX_TRANS register (E2E8h)
+             3  BSS is Bitmap Data (Source data from display buffer).
+ */
+READ16_HANDLER(s3_backmix_r)
+{
+	return s3.bgmix;
+}
+
+WRITE16_HANDLER(s3_backmix_w)
+{
+	s3.bgmix = data;
+}
+
+READ16_HANDLER(s3_foremix_r)
+{
+	return s3.fgmix;
+}
+
+WRITE16_HANDLER(s3_foremix_w)
+{
+	s3.fgmix = data;
 }
 
 READ16_HANDLER(s3_pixel_xfer_r)

@@ -86,6 +86,8 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install16_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_gpstatus_r), FUNC(s3_cmd_w));
 	m_isa->install16_device(0xa2e8, 0xa2eb, 0, 0, FUNC(s3_bgcolour_r), FUNC(s3_bgcolour_w));
 	m_isa->install16_device(0xa6e8, 0xa6eb, 0, 0, FUNC(s3_fgcolour_r), FUNC(s3_fgcolour_w));
+	m_isa->install16_device(0xb6e8, 0xb6eb, 0, 0, FUNC(s3_backmix_r), FUNC(s3_backmix_w));
+	m_isa->install16_device(0xbae8, 0xbaeb, 0, 0, FUNC(s3_foremix_r), FUNC(s3_foremix_w));
 	m_isa->install16_device(0xbee8, 0xbeeb, 0, 0, FUNC(s3_multifunc_r), FUNC(s3_multifunc_w));
 	m_isa->install16_device(0xe2e8, 0xe2eb, 0, 0, FUNC(s3_pixel_xfer_r), FUNC(s3_pixel_xfer_w));
 
