@@ -1,6 +1,6 @@
-<!-- flicker.lay -->
+<!-- zac_proto.lay -->
 
-<!-- 2012-08-22: Initial version.  [Robbbert] -->
+<!-- 2012-08-25: Initial version.  [Robbbert] -->
 
 <mamelayout version="2">
 
@@ -16,7 +16,7 @@
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="P0"><text string="Ball"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P0"><text string="Balls"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="P3"><text string="Score"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
