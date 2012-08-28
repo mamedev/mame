@@ -29,7 +29,7 @@ const device_type M50458 = &device_creator<m50458_device>;
 static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
 	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
-//	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
+	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
 	AM_RANGE(0x0244, 0x0245) AM_WRITE(vreg_122_w)
 	AM_RANGE(0x0246, 0x0247) AM_WRITE(vreg_123_w)
 	AM_RANGE(0x024c, 0x024d) AM_WRITE(vreg_126_w)
@@ -47,9 +47,30 @@ WRITE16_MEMBER( m50458_device::vreg_120_w)
 //	printf("%04x\n",data);
 }
 
+WRITE16_MEMBER( m50458_device::vreg_121_w)
+{
+	/* Horizontal char size for line 0 */
+	m_hsz1 = (data & 0xc0) >> 6;
+
+	/* Horizontal char size for line 1 - 10 */
+	m_hsz2 = (data & 0x300) >> 8;
+
+	/* Horizontal char size for line 11 */
+	m_hsz3 = (data & 0xc00) >> 10;
+}
+
+
 WRITE16_MEMBER( m50458_device::vreg_122_w)
 {
-//	printf("%04x\n",data);
+	/* Vertical char size for line 0 */
+	m_vsz1 = (data & 0xc0) >> 6;
+
+	/* Vertical char size for line 1 - 10 */
+	m_vsz2 = (data & 0x300) >> 8;
+
+	/* Vertical char size for line 11 */
+	m_vsz3 = (data & 0xc00) >> 10;
+
 }
 
 WRITE16_MEMBER( m50458_device::vreg_123_w)
@@ -314,7 +335,8 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					UINT8 pix;
 					UINT8 color = (tile & 0x700) >> 8;
 					UINT16 offset = ((tile & 0x7f)*36+yi*2);
-					int res_y;
+					int res_y,res_x;
+					UINT8 xh,yh;
 
 					/* TODO: blinking, bit 7 (RTC test in NSS) */
 
@@ -332,6 +354,7 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 						pix |= 1;
 
 					res_y = y*18+yi;
+					res_x = x*12+(xi-4);
 
 					if(y != 0 && y != 11)
 					{
@@ -352,13 +375,50 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 						}
 						else //if(pix & 1)
 						{
-							/* TODO: shadow parameter */
+							/* TODO: is there a parameter for the border parameter? */
 							r = 0x00;
 							g = 0x00;
 							b = 0x00;
 						}
 
-						bitmap.pix32(res_y,x*12+(xi-4)) = r << 16 | g << 8 | b;
+						/* TODO: clean this up (also needs better testing) */
+						if(y_base == 0)
+						{
+							res_x *= (m_hsz1 + 1);
+							res_y *= (m_vsz1 + 1);
+
+							if(res_y > 215 || res_x > 288)
+								continue;
+
+							for(yh=0;yh<m_vsz1+1;yh++)
+								for(xh=0;xh<m_hsz1+1;xh++)
+									bitmap.pix32(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
+						}
+						else if(y_base == 11)
+						{
+							res_x *= (m_hsz3 + 1);
+							res_y += ((m_vsz2 * (y-1)) * 18) + 9 * m_vsz2;
+							res_y *= (m_vsz3 + 1);
+
+							if(res_y > 215 || res_x > 288)
+								continue;
+
+							for(yh=0;yh<m_vsz3+1;yh++)
+								for(xh=0;xh<m_hsz3+1;xh++)
+									bitmap.pix32(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
+						}
+						else
+						{
+							res_x *= (m_hsz2 + 1);
+							res_y *= (m_vsz2 + 1);
+
+							if(res_y > 215 || res_x > 288)
+								continue;
+
+							for(yh=0;yh<m_vsz2+1;yh++)
+								for(xh=0;xh<m_hsz2+1;xh++)
+									bitmap.pix32(res_y+yh,res_x+xh) = r << 16 | g << 8 | b;
+						}
 					}
 				}
 			}
