@@ -32,6 +32,8 @@ static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
 	AM_RANGE(0x0244, 0x0245) AM_WRITE(vreg_122_w)
 	AM_RANGE(0x0246, 0x0247) AM_WRITE(vreg_123_w)
+	AM_RANGE(0x0248, 0x0249) AM_WRITE(vreg_124_w)
+	AM_RANGE(0x024a, 0x024b) AM_WRITE(vreg_125_w)
 	AM_RANGE(0x024c, 0x024d) AM_WRITE(vreg_126_w)
 	AM_RANGE(0x024e, 0x024f) AM_WRITE(vreg_127_w)
 ADDRESS_MAP_END
@@ -84,6 +86,17 @@ WRITE16_MEMBER( m50458_device::vreg_123_w)
 	m_scrr = (data & 0x0f00) >> 8;
 
 //	printf("%02x %02x %02x\n",m_scrr,m_scrf,m_space);
+}
+
+WRITE16_MEMBER( m50458_device::vreg_124_w)
+{
+
+}
+
+WRITE16_MEMBER( m50458_device::vreg_125_w)
+{
+	/* blinking cycle */
+	m_blink = data & 4 ? 0x20 : 0x40;
 }
 
 WRITE16_MEMBER( m50458_device::vreg_126_w)
@@ -175,6 +188,20 @@ void m50458_device::device_validity_check(validity_checker &valid) const
 }
 
 
+void m50458_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const m50458_interface *intf = reinterpret_cast<const m50458_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<m50458_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		// ...
+	}
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -222,6 +249,14 @@ void m50458_device::device_start()
 			m_shadow_gfx[dst] |= (tmp >> 8);
 		}
 	}
+
+	// find screen
+	m_screen = machine().device<screen_device>(m_screen_tag);
+
+	if (m_screen == NULL)
+	{
+		m_screen = owner()->subdevice<screen_device>(m_screen_tag);
+	}
 }
 
 
@@ -236,6 +271,8 @@ void m50458_device::device_reset()
 	/* clear VRAM at boot */
 	for(i=0;i<0x120;i++)
 		write_word(i,0x007f);
+
+	m_blink = 0x40;
 }
 
 
@@ -338,8 +375,6 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					int res_y,res_x;
 					UINT8 xh,yh;
 
-					/* TODO: blinking, bit 7 (RTC test in NSS) */
-
 					if(xi>=8)
 						pix = ((pcg[offset+1] >> (7-(xi & 0x7))) & 1) << 1;
 					else
@@ -349,6 +384,10 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 						pix |= ((m_shadow_gfx[offset+1] >> (7-(xi & 0x7))) & 1);
 					else
 						pix |= ((m_shadow_gfx[offset+0] >> (7-(xi & 0x7))) & 1);
+
+					/* blinking, VERY preliminary */
+					if(tile & 0x800 && m_screen->frame_number() & m_blink)
+						pix = 0;
 
 					if(yi == 17 && tile & 0x1000) /* underline? */
 						pix |= 1;

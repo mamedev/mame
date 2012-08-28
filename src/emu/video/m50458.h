@@ -15,8 +15,13 @@ Mitsubishi M50458 OSD chip
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_M50458_ADD(_tag,_freq) \
+#define MCFG_M50458_ADD(_tag,_config,_freq) \
 	MCFG_DEVICE_ADD(_tag, M50458,_freq) \
+	MCFG_DEVICE_CONFIG(_config) \
+
+
+#define M50458_INTERFACE(name) \
+	const m50458_interface (name) =
 
 
 //**************************************************************************
@@ -29,10 +34,18 @@ typedef enum
 	OSD_SET_DATA
 } m50458_state_t;
 
+// ======================> upd7220_interface
+
+struct m50458_interface
+{
+	const char *m_screen_tag;
+};
+
 // ======================> m50458_device
 
 class m50458_device :	public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public m50458_interface
 {
 public:
 	// construction/destruction
@@ -46,6 +59,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vreg_121_w);
 	DECLARE_WRITE16_MEMBER(vreg_122_w);
 	DECLARE_WRITE16_MEMBER(vreg_123_w);
+	DECLARE_WRITE16_MEMBER(vreg_124_w);
+	DECLARE_WRITE16_MEMBER(vreg_125_w);
 	DECLARE_WRITE16_MEMBER(vreg_126_w);
 	DECLARE_WRITE16_MEMBER(vreg_127_w);
 
@@ -58,6 +73,9 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_config_complete();
+
+	screen_device *m_screen;
 
 	int m_latch;
 	int	m_reset_line;
@@ -73,6 +91,7 @@ protected:
 	UINT8 m_space;
 	UINT8 m_hsz1,m_hsz2,m_hsz3;
 	UINT8 m_vsz1,m_vsz2,m_vsz3;
+	UINT8 m_blink;
 
 	m50458_state_t m_osd_state;
 
