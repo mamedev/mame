@@ -488,27 +488,25 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 static void cde_init(running_machine &machine)
 {
 	konamim2_state *state = machine.driver_data<konamim2_state>();
-	cdrom_file *cd = cdrom_open(get_disk_handle(machine, "cdrom"));
-	const cdrom_toc *toc = cdrom_get_toc(cd);
+	cdrom_file *cdfile = cdrom_open(get_disk_handle(machine, ":cdrom"));
 
-	if (cd)
+	const cdrom_toc *toc = cdrom_get_toc(cdfile);
+
+	if (cdfile)
 	{
 		memcpy(&state->m_cde_toc, toc, sizeof(cdrom_toc));
-	}
 
-	/*
-    printf("%d tracks\n", toc->numtrks);
-    for (i=0; i < toc->numtrks; i++)
-    {
-        const cdrom_track_info *track = &toc->tracks[i];
-        printf("Track %d: type %d, subtype %d, datasize %d, subsize %d, frames %d, extraframes %d, physframeofs %d\n",
-            i, track->trktype, track->subtype, track->datasize, track->subsize,track->frames, track->extraframes, track->physframeofs);
-    }
-    */
+		/*
+		printf("%d tracks\n", toc->numtrks);
+		for (int i=0; i < toc->numtrks; i++)
+		{
+			const cdrom_track_info *track = &toc->tracks[i];
+			printf("Track %d: type %d, subtype %d, datasize %d, subsize %d, frames %d, extraframes %d, physframeofs %d\n",
+					i, track->trktype, track->subtype, track->datasize, track->subsize,track->frames, track->extraframes, track->physframeofs);
+		}
+		*/
 
-	if (cd)
-	{
-		cdrom_close(cd);
+		cdrom_close(cdfile);
 	}
 
 	state->m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
@@ -1170,12 +1168,12 @@ static INTERRUPT_GEN(m2)
 static MACHINE_CONFIG_START( m2, konamim2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC602, 33000000)	/* actually PPC602, 66MHz */
+	MCFG_CPU_ADD("maincpu", PPC602, 66000000)	/* actually PPC602, 66MHz */
 	MCFG_CPU_CONFIG(ppc602_config)
 	MCFG_CPU_PROGRAM_MAP(m2_main)
 	MCFG_CPU_VBLANK_INT("screen", m2)
 
-	MCFG_CPU_ADD("sub", PPC602, 33000000)	/* actually PPC602, 66MHz */
+	MCFG_CPU_ADD("sub", PPC602, 66000000)	/* actually PPC602, 66MHz */
 	MCFG_CPU_CONFIG(ppc602_config)
 	MCFG_CPU_PROGRAM_MAP(m2_main)
 
