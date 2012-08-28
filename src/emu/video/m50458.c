@@ -9,6 +9,8 @@
 	  "worse" ways, the one currently implemented guesses that the screen is
 	   masked at the top and the end when in scrolling mode).
 	- Understand what the "vertical start position" really does (vblank?)
+	- Check if the ROM source is actually 2bpp once that a redump is made
+	  (the shadow ROM copy doesn't convince me 100%);
 
 ***************************************************************************/
 
@@ -79,9 +81,7 @@ WRITE16_MEMBER( m50458_device::vreg_127_w)
 		int i;
 
 		for(i=0;i<0x120;i++)
-		{
-			write_word(i,0);
-		}
+			write_word(i,0x007f);
 	}
 }
 
@@ -160,7 +160,47 @@ void m50458_device::device_validity_check(validity_checker &valid) const
 
 void m50458_device::device_start()
 {
+	UINT16 tmp;
+	UINT8 *pcg = memregion("m50458")->base();
+	int tile;
+	int yi;
+	UINT16 src,dst;
 
+	/* Create an array for shadow gfx */
+	/* this will spread the source ROM into four directions (up-left, up-right, down-left, down-right) thus creating a working shadow copy */
+	m_shadow_gfx = auto_alloc_array_clear(machine(), UINT8, 0x1200);
+
+	for(tile=0;tile<0x80;tile++)
+	{
+		for(yi=1;yi<17;yi++)
+		{
+			src = (tile & 0x7f)*36+yi*2; /* source offset */
+
+			dst = (tile & 0x7f)*36+(yi-1)*2; /* destination offset */
+
+			tmp = (((pcg[src]<<8)|(pcg[src+1]&0xff)) & 0xfffe) >> 1;
+
+			m_shadow_gfx[dst+1] |= tmp & 0xff;
+			m_shadow_gfx[dst] |= (tmp >> 8);
+
+			tmp = (((pcg[src]<<8)|(pcg[src+1]&0xff)) & 0x7fff) << 1;
+
+			m_shadow_gfx[dst+1] |= tmp & 0xff;
+			m_shadow_gfx[dst] |= (tmp >> 8);
+
+			dst = (tile & 0x7f)*36+(yi+1)*2; /* destination offset */
+
+			tmp = (((pcg[src]<<8)|(pcg[src+1]&0xff)) & 0xfffe) >> 1;
+
+			m_shadow_gfx[dst+1] |= tmp & 0xff;
+			m_shadow_gfx[dst] |= (tmp >> 8);
+
+			tmp = (((pcg[src]<<8)|(pcg[src+1]&0xff)) & 0x7fff) << 1;
+
+			m_shadow_gfx[dst+1] |= tmp & 0xff;
+			m_shadow_gfx[dst] |= (tmp >> 8);
+		}
+	}
 }
 
 
@@ -170,6 +210,11 @@ void m50458_device::device_start()
 
 void m50458_device::device_reset()
 {
+	int i;
+
+	/* clear VRAM at boot */
+	for(i=0;i<0x120;i++)
+		write_word(i,0x007f);
 }
 
 
@@ -267,23 +312,24 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				for(xi=4;xi<16;xi++) /* TODO: remove 4 / 16 / -4 offset once that the ROM is fixed */
 				{
 					UINT8 pix;
-					UINT8 r,g,b;
+					UINT8 color = (tile & 0x700) >> 8;
 					UINT16 offset = ((tile & 0x7f)*36+yi*2);
 					int res_y;
 
 					/* TODO: blinking, bit 7 (RTC test in NSS) */
 
 					if(xi>=8)
-						pix = (pcg[offset+1] >> (7-(xi & 0x7))) & 1;
+						pix = ((pcg[offset+1] >> (7-(xi & 0x7))) & 1) << 1;
 					else
-						pix = (pcg[offset+0] >> (7-(xi & 0x7))) & 1;
+						pix = ((pcg[offset+0] >> (7-(xi & 0x7))) & 1) << 1;
+
+					if(xi>=8)
+						pix |= ((m_shadow_gfx[offset+1] >> (7-(xi & 0x7))) & 1);
+					else
+						pix |= ((m_shadow_gfx[offset+0] >> (7-(xi & 0x7))) & 1);
 
 					if(yi == 17 && tile & 0x1000) /* underline? */
 						pix |= 1;
-
-					r = (tile & 0x100 && pix) ? 0xff : 0x00;
-					g = (tile & 0x200 && pix) ? 0xff : 0x00;
-					b = (tile & 0x400 && pix) ? 0xff : 0x00;
 
 					res_y = y*18+yi;
 
@@ -294,8 +340,26 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 							res_y += 216;
 					}
 
-					if(r || g || b)
+					if(pix != 0)
+					{
+						UINT8 r,g,b;
+
+						if(pix & 2)
+						{
+							r = (color & 0x1) ? 0xff : 0x00;
+							g = (color & 0x2) ? 0xff : 0x00;
+							b = (color & 0x4) ? 0xff : 0x00;
+						}
+						else //if(pix & 1)
+						{
+							/* TODO: shadow parameter */
+							r = 0x00;
+							g = 0x00;
+							b = 0x00;
+						}
+
 						bitmap.pix32(res_y,x*12+(xi-4)) = r << 16 | g << 8 | b;
+					}
 				}
 			}
 		}
