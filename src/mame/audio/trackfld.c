@@ -13,7 +13,6 @@ typedef struct _trackfld_audio_state trackfld_audio_state;
 struct _trackfld_audio_state
 {
 	/* sound-related */
-	int      m_SN76496_latch;
 	int      m_last_addr;
 	int      m_last_irq;
 
@@ -46,7 +45,6 @@ static DEVICE_START( trackfld_audio )
 	state->m_vlm = device->machine().device("vlm");
 
 	/* sound */
-	device->save_item(NAME(state->m_SN76496_latch));
 	device->save_item(NAME(state->m_last_addr));
 	device->save_item(NAME(state->m_last_irq));
 }
@@ -55,7 +53,6 @@ static DEVICE_RESET( trackfld_audio )
 {
 	trackfld_audio_state *state = get_safe_token(device);
 
-	state->m_SN76496_latch = 0;
 	state->m_last_addr = 0;
 	state->m_last_irq = 0;
 }
@@ -158,20 +155,7 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
 }
 
 
-WRITE8_HANDLER( konami_SN76496_latch_w )
-{
-	device_t *audio = space->machine().device("trackfld_audio");
-	trackfld_audio_state *state = get_safe_token(audio);
-	state->m_SN76496_latch = data;
-}
 
-
-WRITE8_DEVICE_HANDLER( konami_SN76496_w )
-{
-	device_t *audio = device->machine().device("trackfld_audio");
-	trackfld_audio_state *state = get_safe_token(audio);
-	sn76496_w(device, offset, state->m_SN76496_latch);
-}
 
 /*****************************************************************************
     DEVICE DEFINITION

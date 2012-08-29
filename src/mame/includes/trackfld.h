@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 
+#include "sound/sn76496.h"
 
 class trackfld_state : public driver_device
 {
@@ -15,7 +16,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scroll2(*this, "scroll2"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_sn(*this, "snsnd")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram2;
@@ -24,6 +27,7 @@ public:
 	required_shared_ptr<UINT8> m_scroll2;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	optional_device<sn76496_new_device> m_sn;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -51,6 +55,10 @@ public:
 	DECLARE_DRIVER_INIT(atlantol);
 	DECLARE_DRIVER_INIT(wizzquiz);
 	DECLARE_DRIVER_INIT(mastkin);
+
+	UINT8 m_SN76496_latch;
+	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 };
 
 

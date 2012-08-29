@@ -1,3 +1,6 @@
+
+#include "sound/sn76496.h"
+
 class hyperspt_state : public driver_device
 {
 public:
@@ -6,13 +9,16 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_sn(*this, "snsnd")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scroll;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	optional_device<sn76496_new_device> m_sn;
 	UINT8 *  m_scroll2;
 	UINT8 *  m_spriteram2;
 
@@ -27,6 +33,10 @@ public:
 	DECLARE_WRITE8_MEMBER(hyperspt_colorram_w);
 	DECLARE_WRITE8_MEMBER(hyperspt_flipscreen_w);
 	DECLARE_DRIVER_INIT(hyperspt);
+
+	UINT8 m_SN76496_latch;
+	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 };
 
 /*----------- defined in video/hyperspt.c -----------*/
