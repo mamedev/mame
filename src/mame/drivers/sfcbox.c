@@ -119,7 +119,7 @@ How does the Super Famicom Box operates
 #include "cpu/g65816/g65816.h"
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
-#include "video/mb90092.h"
+#include "video/mb90082.h"
 #include "includes/snes.h"
 #include "audio/snes_snd.h"
 #include "rendlay.h"
@@ -130,12 +130,12 @@ public:
 	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag),
 		m_bios(*this, "bios"),
-		m_mb90092(*this,"mb90092"),
+		m_mb90082(*this,"mb90082"),
 		m_s3520cf(*this, "s3520cf")
 		{ }
 
 	required_device<cpu_device> m_bios;
-	required_device<mb90092_device> m_mb90092;
+	required_device<mb90082_device> m_mb90082;
 	required_device<s3520cf_device> m_s3520cf;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -151,7 +151,7 @@ public:
 
 UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	m_mb90092->screen_update(screen,bitmap,cliprect);
+	m_mb90082->screen_update(screen,bitmap,cliprect);
 	return 0;
 }
 
@@ -280,7 +280,7 @@ WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
 }
 
 static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
-	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90092",mb90092_device,write)
+	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90082",mb90082_device,write)
 	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY") AM_WRITE(port_80_w) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	AM_RANGE(0x81, 0x81) AM_READWRITE(port_81_r,port_81_w) // SNES Transfer and Misc Input / Misc Output
@@ -318,7 +318,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Play Mode 1 Button")
 
 	PORT_START("OSD_CS")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mb90092", mb90092_device, set_cs_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mb90082", mb90082_device, set_cs_line)
 
 	PORT_START("SERIAL1_DATA1_L")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
 	MCFG_CPU_IO_MAP(sfcbox_io)
 
-	MCFG_MB90092_ADD("mb90092",XTAL_12MHz / 2) /* TODO: correct clock */
+	MCFG_MB90082_ADD("mb90082",XTAL_12MHz / 2) /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 
 	MCFG_MACHINE_START( sfcbox )

@@ -903,7 +903,7 @@ data |= 0x02; // kludge for 20pacgal
 	case Z180_CNTR:
 		data = cpustate->IO_CNTR & Z180_CNTR_RMASK;
 		data &= ~0x10; // Super Famicom Box sets the TE bit then wants it to be toggled after 8 bits transmitted
-		logerror("Z180 '%s' CNTR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]);
+		LOG(("Z180 '%s' CNTR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
 		break;
 
 	case Z180_TRDR:

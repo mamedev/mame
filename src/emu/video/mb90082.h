@@ -6,8 +6,8 @@ Template for skeleton device
 
 #pragma once
 
-#ifndef __MB90092DEV_H__
-#define __MB90092DEV_H__
+#ifndef __MB90082DEV_H__
+#define __MB90082DEV_H__
 
 
 
@@ -15,8 +15,8 @@ Template for skeleton device
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MB90092_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, MB90092, _freq) \
+#define MCFG_MB90082_ADD(_tag,_freq) \
+	MCFG_DEVICE_ADD(_tag, MB90082, _freq) \
 
 
 //**************************************************************************
@@ -30,14 +30,14 @@ enum
 };
 
 
-// ======================> mb90092_device
+// ======================> mb90082_device
 
-class mb90092_device :	public device_t,
+class mb90082_device :	public device_t,
 						public device_memory_interface
 {
 public:
 	// construction/destruction
-	mb90092_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -56,8 +56,12 @@ protected:
 private:
 	UINT8 m_cmd_ff;
 	UINT8 m_cmd,m_cmd_param;
-	UINT16 m_osd_addr;
 	UINT8 m_reset_line;
+
+	UINT16 m_osd_addr;
+	UINT8 m_fil;
+	UINT8 m_uc;
+	UINT8 m_attr;
 
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);
@@ -67,7 +71,7 @@ private:
 
 
 // device type definition
-extern const device_type MB90092;
+extern const device_type MB90082;
 
 
 
