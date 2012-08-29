@@ -2,7 +2,7 @@
 
 	Mitsubishi M50458 OSD chip
 
-	preliminary device by Angelo Salese
+	device by Angelo Salese
 
 	TODO:
 	- vertical scrolling needs references (might work differently and/or in

@@ -117,22 +117,31 @@ How does the Super Famicom Box operates
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
 #include "cpu/z180/z180.h"
+#include "video/mb90092.h"
 #include "includes/snes.h"
 #include "audio/snes_snd.h"
+#include "rendlay.h"
 
 class sfcbox_state : public snes_state
 {
 public:
 	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag),
-		m_bios(*this, "bios")
+		m_bios(*this, "bios"),
+		m_mb90092(*this,"mb90092")
 		{ }
 
 	required_device <cpu_device> m_bios;
+	required_device <mb90092_device> m_mb90092;
 
-	DECLARE_WRITE8_MEMBER(tx_w);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	m_mb90092->screen_update(screen,bitmap,cliprect);
+	return 0;
+}
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
@@ -171,13 +180,9 @@ static ADDRESS_MAP_START( sfcbox_map, AS_PROGRAM, 8, sfcbox_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( sfcbox_state::tx_w )
-{
-	printf("%02x\n",data);
-}
 
 static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(tx_w)
+	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90092",mb90092_device,write)
 	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
 //	AM_RANGE(0x80, 0x80) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 //	AM_RANGE(0x81, 0x81) // SNES Transfer and Misc Input / Misc Output
@@ -343,6 +348,19 @@ static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
 	MCFG_CPU_IO_MAP(sfcbox_io)
 
+	MCFG_MB90092_ADD("mb90092",XTAL_12MHz / 2) /* TODO: pixel clock */
+
+	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MCFG_SCREEN_ADD("osd", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+//	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
+	MCFG_SCREEN_SIZE(24*16+22, 12*16+22)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*16-1, 0*8, 12*16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(sfcbox_state,screen_update)
 MACHINE_CONFIG_END
 
 /***************************************************************************
