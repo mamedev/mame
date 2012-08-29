@@ -20,6 +20,7 @@
 
 #include "a2scsi.h"
 #include "includes/apple2.h"
+#include "machine/scsibus.h"
 
 
 /***************************************************************************
@@ -33,24 +34,19 @@
 const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
 
 #define SCSI_ROM_REGION  "scsi_rom"
-#define SCSI_5380_TAG    "ncr5380"
+#define SCSI_5380_TAG    "scsi:ncr5380"
 
-static const SCSIConfigTable dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	0,                                      /* 2 SCSI devices */
-	{
-//   { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
-//   { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
-	}
 };
 
 static const struct NCR5380interface a2scsi_5380_intf =
 {
-	&dev_table,	// SCSI device table
 	NULL        // IRQ handler (unconnected according to schematic)
 };
 
 MACHINE_CONFIG_FRAGMENT( scsi )
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
 	MCFG_NCR5380_ADD(SCSI_5380_TAG, (XTAL_28_63636MHz/4), a2scsi_5380_intf)
 MACHINE_CONFIG_END
 

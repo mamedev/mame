@@ -6,12 +6,10 @@
 #ifndef _NCR5380_H_
 #define _NCR5380_H_
 
-#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 struct NCR5380interface
 {
-	const SCSIConfigTable *scsidevs;		/* SCSI devices */
 	void (*irq_callback)(running_machine &machine, int state);	/* irq callback */
 };
 

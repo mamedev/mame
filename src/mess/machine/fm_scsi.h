@@ -8,7 +8,6 @@
 #ifndef FM_SCSI_H_
 #define FM_SCSI_H_
 
-#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 // SCSI input lines (from target)
@@ -37,7 +36,6 @@
 
 struct FMSCSIinterface
 {
-	const SCSIConfigTable *scsidevs;		/* SCSI devices */
 	devcb_write_line irq_callback;	/* irq callback */
 	devcb_write_line drq_callback;	/* drq callback */
 };

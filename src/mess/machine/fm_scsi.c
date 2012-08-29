@@ -43,7 +43,6 @@ void fmscsi_device::device_config_complete()
     // otherwise, initialize it to defaults
     else
     {
-		scsidevs = NULL;
 		memset(&irq_callback,0,sizeof(irq_callback));
 		memset(&drq_callback,0,sizeof(drq_callback));
     }
@@ -73,12 +72,15 @@ void fmscsi_device::device_start()
 
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
 
-    // initialise SCSI devices, if any present
-    for(int x=0;x<scsidevs->devs_present;x++)
-    {
-		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[x].tag );
-		m_SCSIdevices[device->GetDeviceID()] = device;
-    }
+	// try to open the devices
+	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
+	{
+		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		if( scsidev != NULL )
+		{
+			m_SCSIdevices[scsidev->GetDeviceID()] = scsidev;
+		}
+	}
 
     // allocate read timer
     m_transfer_timer = timer_alloc(TIMER_TRANSFER);

@@ -1204,16 +1204,12 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (Lost World needs this, very similar to wbeachvl in playmark.c) */
 };
 
-static const SCSIConfigTable scsi_dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	0, /* no SCSI device */
-	{
-	}
 };
 
-static const struct LSI53C810interface scsi_intf =
+static const struct LSI53C810interface lsi53c810_intf =
 {
-	&scsi_dev_table,  /* SCSI device table */
 	&scsi_irq_callback,
 	&real3d_dma_callback,
 	&scsi_fetch,
@@ -5340,7 +5336,8 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_LSI53C810_ADD( "lsi51c810", scsi_intf)	
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_15, model3_state )
@@ -5381,7 +5378,8 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_LSI53C810_ADD( "lsi51c810", scsi_intf)	
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_20, model3_state )

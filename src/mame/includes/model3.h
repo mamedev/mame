@@ -1,4 +1,5 @@
 #include "video/poly.h"
+#include "machine/scsibus.h"
 #include "machine/53c810.h"
 
 typedef float MATRIX[4][4];
@@ -17,7 +18,7 @@ public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_lsi53c810(*this,"lsi53c810"),
+		m_lsi53c810(*this, "scsi:lsi53c810"),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_soundram(*this, "soundram"){ }

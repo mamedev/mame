@@ -388,8 +388,9 @@ Notes:
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "includes/cps3.h"
-#include "machine/wd33c93.h"
+#include "machine/scsibus.h"
 #include "machine/scsicd.h"
+#include "machine/wd33c93.h"
 
 #define MASTER_CLOCK	42954500
 
@@ -2167,7 +2168,7 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0x05100000, 0x05100003) AM_WRITE(cps3_irq12_ack_w )
 	AM_RANGE(0x05110000, 0x05110003) AM_WRITE(cps3_irq10_ack_w )
 
-	AM_RANGE(0x05140000, 0x05140003) AM_DEVREADWRITE8("wd33c93", wd33c93_device, read, write, 0x00ff00ff )
+	AM_RANGE(0x05140000, 0x05140003) AM_DEVREADWRITE8("scsi:wd33c93", wd33c93_device, read, write, 0x00ff00ff )
 
 	AM_RANGE(0x06000000, 0x067fffff) AM_READWRITE(cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
 	AM_RANGE(0x06800000, 0x06ffffff) AM_READWRITE(cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
@@ -2261,17 +2262,12 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 //static sh2_cpu_core sh2cp_conf_slave  = { 1, NULL };
 
 
-static const SCSIConfigTable dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	1, /* 1 SCSI device */
-	{
-		{ ":cdrom" }
-	}
 };
 
-static const struct WD33C93interface scsi_intf =
+static const struct WD33C93interface wd33c93_intf =
 {
-	&dev_table,		/* SCSI device table */
 	NULL			/* command completion IRQ */
 };
 
@@ -2509,8 +2505,9 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 	MCFG_CPU_CONFIG(sh2_conf_cps3)
 
-	MCFG_WD33C93_ADD("wd33c93", scsi_intf);
-	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_1)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_1)
+	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2615,7 +2612,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROMX_LOAD( "redearth-simm5.1", 0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23), flags ) \
 
 #define REDEARTH_961121_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-5", 0, BAD_DUMP SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-5", 0, BAD_DUMP SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) ) \
 
 #define REDEARTH_961023_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "redearth(__961023)-simm1.0", 0x00000, 0x200000, CRC(65bac346) SHA1(6f4ba0c2cae91a37fc97bea5fc8a50aaf6ca6513), flags ) \
@@ -2642,7 +2639,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROMX_LOAD( "redearth-simm5.1",  0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23), flags ) \
 
 #define REDEARTH_961023_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-3", 0, SHA1(a6ff67093db6bc80ee5fc46e4300e0177b213a52) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-3", 0, SHA1(a6ff67093db6bc80ee5fc46e4300e0177b213a52) ) \
 
 #define SFIII_970204_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "sfiii-simm1.0", 0x00000, 0x200000, CRC(cfc9e45a) SHA1(5d9061f76680642e730373e3ac29b24926dc5c0c), flags ) \
@@ -2669,7 +2666,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROMX_LOAD( "sfiii-simm5.1", 0x00000, 0x200000, CRC(c6f1c066) SHA1(00de492dd1ef7aef05027a8c501c296b6602e917), flags ) \
 
 #define SFIII_970204_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) ) \
 
 #define SFIII2_970930_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "sfiii2-simm1.0", 0x00000, 0x200000, CRC(2d666f0b) SHA1(68de034b3a3aeaf4b26122a84ad48b0b763e4122), flags ) \
@@ -2706,7 +2703,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROMX_LOAD( "sfiii2-simm5.7", 0x00000, 0x200000, CRC(93ffa199) SHA1(33ec2379f30c6fdf47ba72c1d0cad8bdd02f17df), flags ) \
 
 #define SFIII2_970930_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-3ga000", 0, BAD_DUMP SHA1(4e162885b0b3265a56e0265037bcf247e820f027) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-3ga000", 0, BAD_DUMP SHA1(4e162885b0b3265a56e0265037bcf247e820f027) ) \
 
 #define JOJO_990128_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "jojo(__990128)-simm1.0", 0x00000, 0x200000, CRC(9516948b) SHA1(4d7e6c1eb7d1bebff2a5069bcd186070a9105474), flags ) \
@@ -2737,7 +2734,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROMX_LOAD( "jojo-simm5.1", 0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32), flags ) \
 
 #define JOJO_990128_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) ) \
 
 #define JOJO_990108_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "jojo(__990108)-simm1.0", 0x00000, 0x200000, CRC(cfbc38d6) SHA1(c33e3a51fe8ab54e0912a1d6e662fe1ade73cee7), flags ) \
@@ -2768,7 +2765,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROMX_LOAD( "jojo-simm5.1", 0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32), flags ) \
 
 #define JOJO_990108_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-2", 0, BAD_DUMP SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-2", 0, BAD_DUMP SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) ) \
 
 #define JOJO_981202_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "jojo(__981202)-simm1.0", 0x00000, 0x200000, CRC(e06ba886) SHA1(4defd5e8e1e6d0c439fed8a6454e89a59e24ea4c), flags ) \
@@ -2799,7 +2796,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROMX_LOAD( "jojo-simm5.1",  0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32), flags ) \
 
 #define JOJO_981202_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk000", 0, BAD_DUMP SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-jjk000", 0, BAD_DUMP SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) ) \
 
 #define SFIII3_990608_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "sfiii3(__990608)-simm1.0", 0x00000, 0x200000, CRC(11dfd3cd) SHA1(dba1f77c46e80317e3279298411154dfb6db2309), flags ) \
@@ -2844,7 +2841,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm6.7", 0 ) ROMX_LOAD( "sfiii3-simm6.7", 0x00000, 0x200000, CRC(cc5f4187) SHA1(248ddace21ed4736a56e92f77cc6ad219d7fef0b), flags ) \
 
 #define SFIII3_990608_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) ) \
 
 #define SFIII3_990512_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "sfiii3(__990512)-simm1.0", 0x00000, 0x200000, CRC(66e66235) SHA1(0a98038721d176458d4f85dbd76c5edb93a65322), flags ) \
@@ -2889,7 +2886,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm6.7", 0 ) ROMX_LOAD( "sfiii3-simm6.7",  0x00000, 0x200000, CRC(cc5f4187) SHA1(248ddace21ed4736a56e92f77cc6ad219d7fef0b), flags ) \
 
 #define SFIII3_990512_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) ) \
 
 #define JOJOBA_990927_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "jojoba(__990927)-simm1.0", 0x00000, 0x200000, CRC(adcd8377) SHA1(f1aacbe061e3bcade5cca34435c3f86aec5f1499), flags ) \
@@ -2926,7 +2923,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROMX_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404), flags ) \
 
 #define JOJOBA_990927_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) ) \
 
 #define JOJOBA_990913_FLASH( flags ) \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROMX_LOAD( "jojoba(__990913)-simm1.0", 0x00000, 0x200000, CRC(76976231) SHA1(90adde7e5983ec6a4e02789d5cefe9e85c9c52d5), flags ) \
@@ -2963,7 +2960,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROMX_LOAD( "jojoba-simm5.7",  0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404), flags ) \
 
 #define JOJOBA_990913_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-0", 0, BAD_DUMP SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) ) \
+	DISK_REGION( "scsi:cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-0", 0, BAD_DUMP SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) ) \
 
 
 /* CD sets - use CD BIOS roms */

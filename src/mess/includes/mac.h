@@ -16,13 +16,14 @@
 #include "machine/cuda.h"
 #include "machine/nubus.h"
 #include "machine/ncr539x.h"
+#include "machine/ncr5380.h"
 #include "machine/mackbd.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
 
 #define MAC_SCREEN_NAME "screen"
-#define MAC_539X_1_TAG "539x_1"
-#define MAC_539X_2_TAG "539x_2"
+#define MAC_539X_1_TAG "scsi:539x_1"
+#define MAC_539X_2_TAG "scsi:539x_2"
 
 // model helpers
 #define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
@@ -202,6 +203,7 @@ public:
         m_screen(*this, MAC_SCREEN_NAME),
         m_539x_1(*this, MAC_539X_1_TAG),
         m_539x_2(*this, MAC_539X_2_TAG),
+		m_ncr5380(*this, "scsi:ncr5380"),
         m_mackbd(*this, MACKBD_TAG),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16")
@@ -218,6 +220,7 @@ public:
     optional_device<screen_device> m_screen;
     optional_device<ncr539x_device> m_539x_1;
     optional_device<ncr539x_device> m_539x_2;
+    optional_device<ncr5380_device> m_ncr5380;
     optional_device<mackbd_device> m_mackbd;
 
 	virtual void machine_start();

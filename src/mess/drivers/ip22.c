@@ -50,13 +50,12 @@
 #include "includes/ps2.h"
 #include "machine/pcshare.h"
 #include "video/newport.h"
-#include "machine/wd33c93.h"
-#include "imagedev/harddriv.h"
-#include "imagedev/chd_cd.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
+#include "machine/scsibus.h"
 #include "machine/scsicd.h"
 #include "machine/scsihd.h"
+#include "machine/wd33c93.h"
 
 typedef struct
 {
@@ -96,7 +95,7 @@ class ip22_state : public driver_device
 public:
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_wd33c93(*this, "wd33c93"),
+		m_wd33c93(*this, "scsi:wd33c93"),
 		m_unkpbus0(*this, "unkpbus0"),
 		m_mainram(*this, "mainram") { }
 
@@ -1497,18 +1496,12 @@ static void scsi_irq(running_machine &machine, int state)
 	}
 }
 
-static const SCSIConfigTable dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	2, /* 2 SCSI devices */
-	{
-		{ "harddisk1" },
-		{ "cdrom" }
-	}
 };
 
-static const struct WD33C93interface scsi_intf =
+static const struct WD33C93interface wd33c93_intf =
 {
-	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
 };
 
@@ -1692,9 +1685,10 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_WD33C93_ADD("wd33c93", scsi_intf);
-	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
+	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )

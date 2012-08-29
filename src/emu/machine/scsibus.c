@@ -8,7 +8,6 @@
 */
 
 #include "emu.h"
-#include "machine/scsi.h"
 #include "machine/scsidev.h"
 #include "machine/scsibus.h"
 #include "debugger.h"
@@ -885,8 +884,11 @@ void scsibus_device::device_start()
 
 	for( device_t *device = first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *scsidev = downcast<scsidev_device *>(device);
-		devices[scsidev->GetDeviceID()] = scsidev;
+		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		if( scsidev != NULL )
+		{
+			devices[scsidev->GetDeviceID()] = scsidev;
+		}
 	}
 }
 

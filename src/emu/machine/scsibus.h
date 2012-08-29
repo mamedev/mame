@@ -10,7 +10,6 @@
 #ifndef _SCSIBUS_H_
 #define _SCSIBUS_H_
 
-#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 

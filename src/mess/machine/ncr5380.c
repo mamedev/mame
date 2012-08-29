@@ -81,7 +81,6 @@ void ncr5380_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		scsidevs = NULL;
 		irq_callback = NULL;
 	}
 }
@@ -123,10 +122,13 @@ void ncr5380_device::device_start()
 	save_item(NAME(m_next_req_flag));
 
 	// try to open the devices
-	for (int i = 0; i < scsidevs->devs_present; i++)
+	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
-		m_scsi_devices[device->GetDeviceID()] = device;
+		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		if( scsidev != NULL )
+		{
+			m_scsi_devices[scsidev->GetDeviceID()] = scsidev;
+		}
 	}
 }
 

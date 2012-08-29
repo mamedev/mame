@@ -7,7 +7,6 @@
 #ifndef MB89352_H_
 #define MB89352_H_
 
-#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 // SCSI lines readable via PSNS register (reg 5)
@@ -55,7 +54,6 @@
 
 struct mb89352_interface
 {
-	const SCSIConfigTable *scsidevs;		/* SCSI devices */
 	devcb_write_line irq_callback;	/* irq callback */
 	devcb_write_line drq_callback;	/* drq callback */
 };

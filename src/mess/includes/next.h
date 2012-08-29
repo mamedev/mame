@@ -114,7 +114,6 @@ public:
 	void mo_irq(bool state);
 	void mo_drq(bool state);
 
-	//  static const SCSIConfigTable scsi_devices;
 	static const floppy_format_type floppy_formats[];
 	static const cdrom_interface cdrom_intf;
 	static const harddisk_interface harddisk_intf;

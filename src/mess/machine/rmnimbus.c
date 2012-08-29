@@ -62,7 +62,6 @@ even if you have to use unusual geometry to do so !
 #include "machine/i8251.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
-#include "machine/scsi.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 

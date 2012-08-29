@@ -760,10 +760,13 @@ void wd33c93_device::device_start()
 	memset(devices, 0, sizeof(devices));
 
 	// try to open the devices
-	for (int i = 0; i < scsidevs->devs_present; i++)
+	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
-		devices[device->GetDeviceID()] = device;
+		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		if( scsidev != NULL )
+		{
+			devices[scsidev->GetDeviceID()] = scsidev;
+		}
 	}
 
 	/* allocate a timer for commands */

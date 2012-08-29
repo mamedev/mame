@@ -244,7 +244,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/s3c2410.o		\
 	$(EMUMACHINE)/s3c2440.o		\
 	$(EMUMACHINE)/s3520cf.o		\
-	$(EMUMACHINE)/scsi.o		\
+	$(EMUMACHINE)/scsibus.o	\
 	$(EMUMACHINE)/scsicd.o		\
 	$(EMUMACHINE)/scsidev.o		\
 	$(EMUMACHINE)/scsihd.o		\

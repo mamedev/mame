@@ -27,14 +27,13 @@
 #include "machine/idectrl.h"
 #include "machine/mpc105.h"
 #include "machine/intelfsh.h"
+#include "machine/scsibus.h"
 #include "machine/53c810.h"
 
 /* Devices */
 #include "machine/scsicd.h"
 #include "machine/scsihd.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/chd_cd.h"
-#include "imagedev/harddriv.h"
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
@@ -94,15 +93,6 @@ static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
 	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
-static const SCSIConfigTable dev_table =
-{
-	2, /* 2 SCSI devices */
-	{
-		{ "harddisk1" },
-		{ "cdrom" }
-	}
-};
-
 #define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \
 								((x << 8) & 0xff0000) | \
@@ -127,9 +117,12 @@ static void scsi53c810_dma_callback(running_machine &machine, UINT32 src, UINT32
 }
 
 
-static const struct LSI53C810interface scsi53c810_intf =
+static const SCSIBus_interface scsibus_intf =
 {
-	&dev_table,		/* SCSI device table */
+};
+
+static const struct LSI53C810interface lsi53c810_intf =
+{
 	&scsi53c810_irq_callback,
 	&scsi53c810_dma_callback,
 	&scsi53c810_fetch,
@@ -197,9 +190,10 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MCFG_LSI53C810_ADD( "lsi51c810", scsi53c810_intf)
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_3)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
+	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 
 	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL, false )	/* FIXME */
 

@@ -27,7 +27,7 @@ class bebox_state : public driver_device
 public:
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_lsi53c810(*this, "lsi53c810"){ }
+			m_lsi53c810(*this, "scsi:lsi53c810"){ }
 
 	required_device<lsi53c810_device> m_lsi53c810;
 	UINT32 m_cpu_imask[2];

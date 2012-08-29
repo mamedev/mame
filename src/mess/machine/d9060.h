@@ -26,7 +26,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/harddriv.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"

@@ -17,8 +17,6 @@
 #include "machine/upd71071.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "imagedev/harddriv.h"
-#include "machine/scsi.h"
 #include "machine/fm_scsi.h"
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity

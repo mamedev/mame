@@ -115,6 +115,7 @@
  */
 
 #include "includes/fmtowns.h"
+#include "machine/scsibus.h"
 #include "machine/scsihd.h"
 
 // CD controller IRQ types
@@ -2171,7 +2172,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
   // SCSI controller
-  AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
+  AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi:fm",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
   // CMOS
   AM_RANGE(0x3000,0x4fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
@@ -2485,7 +2486,7 @@ void towns_state::machine_reset()
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device("cdda");
 	m_speaker = machine().device(SPEAKER_TAG);
-	m_scsi = machine().device<fmscsi_device>("scsi");
+	m_scsi = machine().device<fmscsi_device>("scsi:fm");
 	m_ram = machine().device<ram_device>(RAM_TAG);
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
@@ -2625,21 +2626,12 @@ static const rf5c68_interface rf5c68_intf =
 	towns_pcm_irq
 };
 
-static const SCSIConfigTable towns_scsi_devtable =
+static const SCSIBus_interface scsibus_intf =
 {
-	5, /* 5 SCSI devices */
-	{
-		{ "harddisk0" },
-		{ "harddisk1" },
-		{ "harddisk2" },
-		{ "harddisk3" },
-		{ "harddisk4" },
-	}
 };
 
 static const FMSCSIinterface towns_scsi_config =
 {
-	&towns_scsi_devtable,
 	DEVCB_LINE(towns_scsi_irq),
 	DEVCB_LINE(towns_scsi_drq)
 };
@@ -2721,12 +2713,13 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_FMSCSI_ADD("scsi",towns_scsi_config)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_FMSCSI_ADD("scsi:fm",towns_scsi_config)
 
 	MCFG_UPD71071_ADD("dma_1",towns_dma_config)
 	MCFG_UPD71071_ADD("dma_2",towns_dma_config)

@@ -128,11 +128,9 @@
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
 #include "machine/mb89352.h"
-#include "machine/scsi.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "formats/dim_dsk.h"
-#include "imagedev/harddriv.h"
 #include "machine/x68k_hdc.h"
 #include "includes/x68k.h"
 #include "machine/ram.h"
@@ -140,6 +138,7 @@
 #include "machine/x68kexp.h"
 #include "machine/x68k_neptunex.h"
 #include "machine/x68k_scsiext.h"
+#include "machine/scsibus.h"
 #include "machine/scsihd.h"
 #include "x68000.lh"
 
@@ -2018,7 +2017,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE_LEGACY(x68k_fdc_r, x68k_fdc_w)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE_LEGACY(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE_LEGACY(x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE_LEGACY(x68k_ioc_r, x68k_ioc_w)
@@ -2056,7 +2055,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16_LEGACY(x68k_fdc_r, x68k_fdc_w,0xffffffff)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("scsi:mb89352",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16_LEGACY(x68k_scc_r, x68k_scc_w,0xffffffff)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16_LEGACY(x68k_ppi_r, x68k_ppi_w,0xffffffff)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16_LEGACY(x68k_ioc_r, x68k_ioc_w,0xffffffff)
@@ -2529,23 +2528,12 @@ static const floppy_interface x68k_floppy_interface =
 	NULL
 };
 
-static const SCSIConfigTable x68k_scsi_devtable =
+static const SCSIBus_interface scsibus_intf =
 {
-	7, /* 7 SCSI devices */
-	{
-		{ "harddisk0" },
-		{ "harddisk1" },
-		{ "harddisk2" },
-		{ "harddisk3" },
-		{ "harddisk4" },
-		{ "harddisk5" },
-		{ "harddisk6" },
-	}
 };
 
 static const mb89352_interface x68k_scsi_intf =
 {
-	&x68k_scsi_devtable,
 	DEVCB_LINE(x68k_scsi_irq),
 	DEVCB_LINE(x68k_scsi_drq)
 };
@@ -2833,14 +2821,15 @@ static MACHINE_CONFIG_START( x68ksupr, x68k_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
-	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("harddisk5", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("harddisk6", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
+	MCFG_MB89352A_ADD("scsi:mb89352",x68k_scsi_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( x68kxvi, x68k_state )
@@ -2853,14 +2842,15 @@ static MACHINE_CONFIG_START( x68kxvi, x68k_state )
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
-	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("harddisk5", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("harddisk6", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
+	MCFG_MB89352A_ADD("scsi:mb89352",x68k_scsi_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( x68030, x68k_state )
@@ -2874,14 +2864,15 @@ static MACHINE_CONFIG_START( x68030, x68k_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram32")
 
-	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
-	MCFG_SCSIDEV_ADD("harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_SCSIDEV_ADD("harddisk5", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("harddisk6", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
+	MCFG_MB89352A_ADD("scsi:mb89352",x68k_scsi_intf)
 MACHINE_CONFIG_END
 
 ROM_START( x68000 )

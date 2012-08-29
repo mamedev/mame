@@ -8,7 +8,6 @@
 #include "cpu/m68000/m68000.h"
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/harddriv.h"
 #include "machine/ram.h"
 #include "machine/8530scc.h"
 #include "machine/abc99.h"

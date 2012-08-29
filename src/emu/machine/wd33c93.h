@@ -6,12 +6,10 @@
 #ifndef _WD33C93_H_
 #define _WD33C93_H_
 
-#include "machine/scsi.h"
 #include "scsidev.h"
 
 struct WD33C93interface
 {
-	const SCSIConfigTable *scsidevs;		/* SCSI devices */
 	void (*irq_callback)(running_machine &machine, int state); /* irq callback */
 };
 

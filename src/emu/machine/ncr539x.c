@@ -122,7 +122,6 @@ void ncr539x_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		scsidevs = NULL;
 		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
 		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
 	}
@@ -156,10 +155,13 @@ void ncr539x_device::device_start()
 	m_out_drq_func.resolve(m_out_drq_cb, *this);
 
 	// try to open the devices
-	for (int i = 0; i < scsidevs->devs_present; i++)
+	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
 	{
-		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
-		m_scsi_devices[device->GetDeviceID()] = device;
+		scsidev_device *scsidev = dynamic_cast<scsidev_device *>(device);
+		if( scsidev != NULL )
+		{
+			m_scsi_devices[scsidev->GetDeviceID()] = scsidev;
+		}
 	}
 
 	m_operation_timer = timer_alloc(0, NULL);
@@ -189,13 +191,6 @@ void ncr539x_device::device_reset()
 
 	m_out_irq_func(CLEAR_LINE);
 	m_out_drq_func(CLEAR_LINE);
-
-	// try to open the devices
-	for (int i = 0; i < scsidevs->devs_present; i++)
-	{
-		scsidev_device *device = owner()->subdevice<scsidev_device>( scsidevs->devices[i].tag );
-		m_scsi_devices[device->GetDeviceID()] = device;
-	}
 }
 
 void ncr539x_device::dma_read_data(int bytes, UINT8 *pData)

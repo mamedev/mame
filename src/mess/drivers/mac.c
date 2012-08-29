@@ -45,11 +45,10 @@
 #include "machine/ncr5380.h"
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
-#include "imagedev/harddriv.h"
 #include "formats/ap_dsk35.h"
 #include "machine/ram.h"
+#include "machine/scsibus.h"
 #include "machine/scsihd.h"
-#include "imagedev/chd_cd.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
 #include "sound/cdda.h"
@@ -814,24 +813,17 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const SCSIConfigTable dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	2, /* 2 SCSI devices */
-	{
-		{ "harddisk1" },
-		{ "harddisk2" }
-	}
 };
 
 static const struct NCR5380interface macplus_5380intf =
 {
-	&dev_table,	// SCSI device table
 	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
 };
 
 static const struct NCR539Xinterface mac_539x_intf =
 {
-	&dev_table,	// SCSI device table
 	DEVCB_DRIVER_LINE_MEMBER(mac_state, irq_539x_1_w),
 	DEVCB_DRIVER_LINE_MEMBER(mac_state, drq_539x_1_w)
 };
@@ -939,10 +931,10 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
@@ -998,16 +990,16 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1044,7 +1036,10 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
 
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1053,9 +1048,6 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1096,7 +1088,10 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
 
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1104,9 +1099,6 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1294,7 +1286,10 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1303,9 +1298,6 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1345,7 +1337,10 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1354,9 +1349,6 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1416,7 +1408,10 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1425,9 +1420,6 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1587,7 +1579,10 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_NCR5380_ADD("ncr5380", C7M, macplus_5380intf)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
+	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1596,9 +1591,6 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1647,10 +1639,10 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
 
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR539X_ADD(MAC_539X_1_TAG, C7M, mac_539x_intf)
-
-	MCFG_SCSIDEV_ADD("harddisk1", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("harddisk2", SCSIHD, SCSI_ID_5)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

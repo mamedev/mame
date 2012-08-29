@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/harddriv.h"
 #include "machine/ctronics.h"
 #include "machine/ram.h"
 #include "machine/scsibus.h"

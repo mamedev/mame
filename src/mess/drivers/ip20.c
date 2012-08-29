@@ -22,10 +22,9 @@
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
 #include "machine/eeprom.h"
-#include "machine/wd33c93.h"
+#include "machine/scsibus.h"
 #include "machine/scsicd.h"
-#include "imagedev/harddriv.h"
-#include "imagedev/chd_cd.h"
+#include "machine/wd33c93.h"
 
 typedef struct
 {
@@ -50,7 +49,7 @@ class ip20_state : public driver_device
 public:
 	ip20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_wd33c93(*this, "wd33c93"){ }
+		m_wd33c93(*this, "scsi:wd33c93"){ }
 
 	required_device<wd33c93_device> m_wd33c93;
 
@@ -484,17 +483,12 @@ static void scsi_irq(running_machine &machine, int state)
 {
 }
 
-static const SCSIConfigTable dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	1, /* 1 SCSI device */
-	{
-		{ "cdrom" }
-	}
 };
 
-static const struct WD33C93interface scsi_intf =
+static const struct WD33C93interface wd33c93_intf =
 {
-	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
 };
 
@@ -616,8 +610,9 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
-	MCFG_WD33C93_ADD("wd33c93", scsi_intf);
-	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_6)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)
+	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_CONFIG_END

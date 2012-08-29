@@ -6,12 +6,10 @@
 #ifndef _AM53CF96_H_
 #define _AM53CF96_H_
 
-#include "scsi.h"
 #include "scsidev.h"
 
 struct AM53CF96interface
 {
-	const SCSIConfigTable *scsidevs;	/* SCSI devices */
 	void (*irq_callback)(running_machine &machine);	/* irq callback */
 };
 

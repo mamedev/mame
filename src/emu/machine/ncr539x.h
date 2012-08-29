@@ -6,14 +6,12 @@
 #ifndef _NCR539x_H_
 #define _NCR539x_H_
 
-#include "machine/scsi.h"
 #include "machine/scsidev.h"
 
 struct NCR539Xinterface
 {
-	const SCSIConfigTable *scsidevs;		/* SCSI devices */
-    devcb_write_line m_out_irq_cb;          /* IRQ line */
-    devcb_write_line m_out_drq_cb;          /* DRQ line */
+	devcb_write_line m_out_irq_cb;          /* IRQ line */
+	devcb_write_line m_out_drq_cb;          /* DRQ line */
 };
 
 //// 539x registers
@@ -23,8 +21,8 @@ struct NCR539Xinterface
 
 // device stuff
 #define MCFG_NCR539X_ADD(_tag, _clock, _intrf) \
-    MCFG_DEVICE_ADD(_tag, NCR539X, _clock) \
-    MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_ADD(_tag, NCR539X, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 class ncr539x_device : public device_t,
 					   public NCR539Xinterface

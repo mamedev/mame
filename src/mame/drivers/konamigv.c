@@ -125,8 +125,9 @@ Notes:
 #include "includes/psx.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
-#include "machine/am53cf96.h"
+#include "machine/scsibus.h"
 #include "machine/scsicd.h"
+#include "machine/am53cf96.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
 
@@ -134,7 +135,10 @@ class konamigv_state : public psx_state
 {
 public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+		: psx_state(mconfig, type, tag),
+		m_am53cf96(*this, "scsi:am53cf96"){ }
+
+	required_device<am53cf96_device> m_am53cf96;
 
 	UINT32 m_flash_address;
 
@@ -190,7 +194,7 @@ READ32_MEMBER(konamigv_state::mb89371_r)
 
 static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
 	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
@@ -209,8 +213,6 @@ ADDRESS_MAP_END
 
 static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size )
 {
-	am53cf96_device *am53cf96 = state->machine().device<am53cf96_device>("am53cf96");
-
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -229,12 +231,12 @@ static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size
 		if( n_this < 2048 / 4 )
 		{
 			/* non-READ commands */
-			am53cf96->dma_read_data( n_this * 4, sector_buffer );
+			state->m_am53cf96->dma_read_data( n_this * 4, sector_buffer );
 		}
 		else
 		{
 			/* assume normal 2048 byte data for now */
-			am53cf96->dma_read_data( 2048, sector_buffer );
+			state->m_am53cf96->dma_read_data( 2048, sector_buffer );
 			n_this = 2048 / 4;
 		}
 		n_size -= n_this;
@@ -256,8 +258,6 @@ static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size
 
 static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_size )
 {
-	am53cf96_device *am53cf96 = state->machine().device<am53cf96_device>("am53cf96");
-
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -287,7 +287,7 @@ static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_siz
 			n_this--;
 		}
 
-		am53cf96->dma_write_data( n_this * 4, sector_buffer );
+		state->m_am53cf96->dma_write_data( n_this * 4, sector_buffer );
 	}
 }
 
@@ -296,17 +296,12 @@ static void scsi_irq(running_machine &machine)
 	psx_irq_set(machine, 0x400);
 }
 
-static const SCSIConfigTable dev_table =
+static const SCSIBus_interface scsibus_intf =
 {
-	1, /* 1 SCSI device */
-	{
-		{ ":cdrom", }
-	}
 };
 
-static const struct AM53CF96interface scsi_intf =
+static const struct AM53CF96interface am53cf96_intf =
 {
-	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
 };
 
@@ -331,7 +326,7 @@ static MACHINE_RESET( konamigv )
 {
 	/* also hook up CDDA audio to the CD-ROM drive */
 	void *cdrom;
-	scsidev_device *scsidev = machine.device<scsidev_device>("cdrom");
+	scsidev_device *scsidev = machine.device<scsidev_device>("scsi:cdrom");
 	scsidev->GetDevice( &cdrom );
 	cdda_set_cdrom(machine.device("cdda"), cdrom);
 }
@@ -357,9 +352,9 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_AM53CF96_ADD("am53cf96", scsi_intf);
-
-	MCFG_SCSIDEV_ADD("cdrom", SCSICD, SCSI_ID_4)
+	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
+	MCFG_AM53CF96_ADD("scsi:am53cf96", am53cf96_intf)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL_53_693175MHz )
@@ -779,7 +774,7 @@ ROM_START( susume )
 
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "gv027j1", 0, BAD_DUMP SHA1(e7e6749ac65de7771eb8fed7d5eefaec3f902255) )
 ROM_END
 
@@ -789,7 +784,7 @@ ROM_START( hyperath )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "hyperath", 0, BAD_DUMP SHA1(694ef6200c61d3052316100cd9251b495eab88a1) )
 ROM_END
 
@@ -799,7 +794,7 @@ ROM_START( pbball96 )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "pbball96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "pbball96", 0, BAD_DUMP SHA1(ebd0ea18ff9ce300ea1e30d66a739a96acfb0621) )
 ROM_END
 
@@ -809,7 +804,7 @@ ROM_START( weddingr )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "weddingr", 0, BAD_DUMP SHA1(4e7122b191747ab7220fe4ce1b4483d62ab579af) )
 ROM_END
 
@@ -819,7 +814,7 @@ ROM_START( simpbowl )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "simpbowl", 0, BAD_DUMP SHA1(72b32a863e6891ad3bfc1fdfe9cb90a2bd334d71) )
 ROM_END
 
@@ -829,7 +824,7 @@ ROM_START( btchamp )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "btchamp", 0, BAD_DUMP SHA1(c9c858e9034826e1a12c3c003dd068a49a3577e1) )
 ROM_END
 
@@ -839,7 +834,7 @@ ROM_START( kdeadeye )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "kdeadeye", 0, BAD_DUMP SHA1(3c737c51717925be724dcb93d30769649029b8ce) )
 ROM_END
 
@@ -849,7 +844,7 @@ ROM_START( nagano98 )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "nagano98", 0, BAD_DUMP SHA1(1be7bd4531f249ff2233dd40a206c8d60054a8c6) )
 ROM_END
 
@@ -859,7 +854,7 @@ ROM_START( naganoj )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "720ja.25c",  0x000000, 0x000080, CRC(34c473ba) SHA1(768225b04a293bdbc114a092d14dee28d52044e9) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "720jaa01", 0, SHA1(437160996551ef4dfca43899d1d14beca62eb4c9) )
 ROM_END
 
@@ -869,7 +864,7 @@ ROM_START( tokimosh )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "tokimosh.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "755jaa01", 0, BAD_DUMP SHA1(4af080f9650e34d1ddb91bb763469d5fb3c754bd) )
 ROM_END
 
@@ -879,7 +874,7 @@ ROM_START( tokimosp )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "tokimosp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "756jab01", 0, BAD_DUMP SHA1(7bd974d908ae5a7bfa8d30db185ab01ac38dff28) )
 ROM_END
 
