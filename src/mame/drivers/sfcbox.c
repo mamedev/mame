@@ -12,7 +12,7 @@ for which the system holds two at once.
 
 The "To Do" list:
 -----------------
--Consider moving the 3 cartridges of the slot 2 in a sowtware list since they are interchangable
+-Consider moving the 3 cartridges of the slot 2 in a sotwware list since they are interchangable
 -Hook the z180 clone, the DSP 1A/1B and the Super FX
 -Add the missing GROM4-1
 -Add the possibly alternate revision of the attract ROM, with Kirby holding a coin
@@ -116,10 +116,25 @@ How does the Super Famicom Box operates
 #include "emu.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
+#include "cpu/z180/z180.h"
 #include "includes/snes.h"
 #include "audio/snes_snd.h"
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, snes_state )
+class sfcbox_state : public snes_state
+{
+public:
+	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: snes_state(mconfig, type, tag),
+		m_bios(*this, "bios")
+		{ }
+
+	required_device <cpu_device> m_bios;
+
+	DECLARE_WRITE8_MEMBER(tx_w);
+};
+
+
+static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
@@ -140,13 +155,43 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 	spc_ram_w(device, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, snes_state )
+static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE_LEGACY("spc700", spc_ram_100_w)
 	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD_LEGACY("spc700", spc_ram_100_r)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD_LEGACY("spc700", spc_ipl_r)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sfcbox_map, AS_PROGRAM, 8, sfcbox_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("krom", 0)
+	AM_RANGE(0x20000, 0x27fff) AM_RAM
+	AM_RANGE(0x40000, 0x47fff) AM_ROM AM_REGION("grom", 0)
+	AM_RANGE(0x60000, 0x67fff) AM_NOP // grom slot 1
+ADDRESS_MAP_END
+
+
+WRITE8_MEMBER( sfcbox_state::tx_w )
+{
+	printf("%02x\n",data);
+}
+
+static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(tx_w)
+	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
+//	AM_RANGE(0x80, 0x80) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
+//	AM_RANGE(0x81, 0x81) // SNES Transfer and Misc Input / Misc Output
+//	AM_RANGE(0x82, 0x82) // Unknown/unused
+//	AM_RANGE(0x83, 0x83) // Joypad Input/Status / Joypad Output/Control
+//	AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+// 	AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//	AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//	AM_RANGE(0xa0, 0xa0) //  Real Time Clock
+//	AM_RANGE(0xc0, 0xc0) // SNES Mapping Register 0
+//  AM_RANGE(0xc1, 0xc1) // SNES Mapping Register 1
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( snes )
 	PORT_START("SERIAL1_DATA1_L")
@@ -263,7 +308,7 @@ static INPUT_PORTS_START( snes )
 #endif
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( snes, snes_state )
+static MACHINE_CONFIG_START( snes, sfcbox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
@@ -291,9 +336,12 @@ static MACHINE_CONFIG_START( snes, snes_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 
-	// ...
+	MCFG_CPU_ADD("bios", Z180, XTAL_12MHz / 2)	/* HD64180RF6X */
+	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
+	MCFG_CPU_IO_MAP(sfcbox_io)
 
 MACHINE_CONFIG_END
 
@@ -303,81 +351,61 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+#define SFCBOX_BIOS \
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100, "user5", 0 )	\
+	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
+	ROM_REGION( 0x10000, "krom", 0 ) \
+	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \
+
+
 ROM_START( sfcbox )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	SFCBOX_BIOS
 
-//  ROM_REGION( 0x80000, "atrom", 0 )
-//  ROM_REGION( 0x10000, "user3", 0 )
-
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-
-	ROM_REGION( 0x10000, "krom", 0 )
-	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) )
-
-//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
-//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "grom", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( pss61 )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	SFCBOX_BIOS
 
 	ROM_REGION( 0x100000, "atrom", 0 )
 	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
 
-	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom1-1.ic1", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
 
 	ROM_REGION( 0x380000, "user3", 0 )
-  ROM_LOAD( "shvc-mk-0.rom6", 0x000000, 0x080000, CRC(c8002453) SHA1(cbb853bf911255c1d8eb27cd34fc7855a0dda218) )
-  ROM_LOAD( "shvc-4m-1.rom3", 0x080000, 0x200000, CRC(91b28d56) SHA1(b83dd73d3d6049450bb8092d73c3af879804f58c) )
+	ROM_LOAD( "shvc-mk-0.rom6", 0x000000, 0x080000, CRC(c8002453) SHA1(cbb853bf911255c1d8eb27cd34fc7855a0dda218) )
+	ROM_LOAD( "shvc-4m-1.rom3", 0x080000, 0x200000, CRC(91b28d56) SHA1(b83dd73d3d6049450bb8092d73c3af879804f58c) )
 	ROM_LOAD( "shvc-fo-1.ic20", 0x280000, 0x100000, CRC(ad668a41) SHA1(39ff7354a7fa02295c899b7a7ec3556998ac2636) ) /* Super FX hook needed for Star Fox */
-
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-
-//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
-//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pss62 )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	SFCBOX_BIOS
 
-	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom2-1.ic1", 0x0000, 0x8000, CRC(bcfc5642) SHA1(a96e52685bd3dcdf09d1b7acd6e1c1ab7726a640) )
 
 	ROM_REGION( 0x180000, "user3", 0 )
 	ROM_LOAD( "shvc-gc-0.rom1", 0x000000, 0x100000, CRC(b4fd7aff) SHA1(eb553b77418dedba25fc4d5dddcb04f424b0f6a9) )
 	ROM_LOAD( "shvc-2a-1.rom3", 0x100000, 0x080000, CRC(6b23e2e4) SHA1(684123a12ca1e31115bd6221d96f82461066877f) )
-
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-
-//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
-//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pss63 )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	SFCBOX_BIOS
 
-	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom3-1.ic1", 0x0000, 0x8000, CRC(ebec4c1c) SHA1(d638ef1486b4c0b3d4d5b666929ca7947e16efad) )
 
 	ROM_REGION( 0x500000, "user3", 0 )
 	ROM_LOAD( "shvc-t2-1.rom3", 0x000000, 0x100000, CRC(4ae93c10) SHA1(5fa25d027940907b769578d7bf85a9d5ba94911a) )
 	ROM_LOAD( "shvc-8x-1.rom1", 0x100000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
-
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-
-//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
-//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pss64 )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	SFCBOX_BIOS
 
-	ROM_REGION( 0x10000, "grom", 0 )
+	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x500000, "user3", 0 )
@@ -386,12 +414,6 @@ ROM_START( pss64 )
 //  Possibly reverse order :
 //  ROM_LOAD( "shvc-8x-1.rom1", 0x000000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
 //  ROM_LOAD( "shvc-m4-0.rom3", 0x400000, 0x100000, CRC(fb259f4f) SHA1(8faeb56f80e82dd042bdc84d19c526a979c6de8f) )
-
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
-
-//  ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )       /* add-on chip ROMs (DSP, SFX, etc) */
-//  ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 
