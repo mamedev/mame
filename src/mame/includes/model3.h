@@ -24,7 +24,7 @@ public:
 		m_soundram(*this, "soundram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<lsi53c810_device> m_lsi53c810;
+	optional_device<lsi53c810_device> m_lsi53c810;
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;
