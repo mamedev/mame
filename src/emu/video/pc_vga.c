@@ -3005,10 +3005,10 @@ WRITE16_HANDLER(s3_cmd_w)
 {
 	if(s3.enable_8514 != 0)
 	{
-		int x,y,count;
+		int x,y;
 		int dir_x;
+//		int pattern_x,pattern_y;
 		UINT32 offset,src;
-		UINT8* buffer;  // for bitblt operations
 
 		s3.current_cmd = data;
 		switch(data & 0xe000)
@@ -3064,53 +3064,64 @@ WRITE16_HANDLER(s3_cmd_w)
 			offset += s3.dest_x;
 			src = VGA_START_ADDRESS;
 			src += (VGA_LINE_LENGTH * s3.curr_y);
-			if(s3.curr_x & 0x0800)
-				src -= s3.curr_x & 0x7ff;
-			else
-				src += s3.curr_x;
-			buffer = (UINT8*)malloc((s3.rect_height+1)*(s3.rect_width+1));
-			count = 0;
-			// copy to temporary buffer
+			src += s3.curr_x;
 			for(y=0;y<=s3.rect_height;y++)
 			{
 				for(x=0;x<=s3.rect_width;x++)
 				{
 					if(data & 0x0020)
-						buffer[count++] = vga.memory[(src+x) % vga.svga_intf.vram_size];
+						vga.memory[(offset+x) % vga.svga_intf.vram_size] = vga.memory[(src+x) % vga.svga_intf.vram_size];
 					else
-						buffer[count++] = vga.memory[(src-x) % vga.svga_intf.vram_size];
+						vga.memory[(offset-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
 				}
 				if(data & 0x0080)
+				{
 					src += VGA_LINE_LENGTH;
-				else
-					src -= VGA_LINE_LENGTH;
-			}
-			// write from buffer to screen
-			count = 0;
-			for(y=0;y<=s3.rect_height;y++)
-			{
-				for(x=0;x<=s3.rect_width;x++)
-				{
-					if(data & 0x0020)
-						vga.memory[(offset+x) % vga.svga_intf.vram_size] = buffer[count++];
-					else
-						vga.memory[(offset-x) % vga.svga_intf.vram_size] = buffer[count++];
-				}
-				if(data & 0x0080)
 					offset += VGA_LINE_LENGTH;
+				}
 				else
+				{
+					src -= VGA_LINE_LENGTH;
 					offset -= VGA_LINE_LENGTH;
+				}
 			}
-			free(buffer);
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
 					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		case 0xe000:  // Pattern Fill
+//			offset = VGA_START_ADDRESS;
+//			offset += (VGA_LINE_LENGTH * s3.dest_y);
+//			offset += s3.dest_x;
+//			src = VGA_START_ADDRESS;
+//			src += (VGA_LINE_LENGTH * s3.curr_y);
+//			src += s3.curr_x;
+//			pattern_x = pattern_y = 0;
+//			for(y=0;y<=s3.rect_height;y++)
+//			{
+//				for(x=0;x<=s3.rect_width;x++)
+//				{
+//					if(data & 0x0020)
+//						vga.memory[(offset+x) % vga.svga_intf.vram_size] = vga.memory[(src+pattern_x) % vga.svga_intf.vram_size];
+//					else
+//						vga.memory[(offset-x) % vga.svga_intf.vram_size] = vga.memory[(src-pattern_x) % vga.svga_intf.vram_size];
+//					pattern_x++;
+//					pattern_x %= 8;
+//				}
+//				pattern_y++;
+//				src += VGA_LINE_LENGTH;
+//				if(pattern_y % 8 == 0)
+//					src -= (VGA_LINE_LENGTH * 8);  // move src pointer back to top of pattern
+//				if(data & 0x0080)
+//					offset += VGA_LINE_LENGTH;
+//				else
+//					offset -= VGA_LINE_LENGTH;
+//			}
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - Pattern Fill\n",s3.current_cmd);
+			logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
+					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		default:
 			s3.state = S3_IDLE;
@@ -3337,7 +3348,7 @@ static void s3_wait_draw()
 	int x,data_size = 0;
 	UINT32 off,xfer = 0;
 
-	// the data in the pixel transfer register masks the rectangle output(?)
+	// the data in the pixel transfer register or written to VRAM masks the rectangle output
 	if(s3.bus_size == 0)  // 8-bit
 		data_size = 8;
 	if(s3.bus_size == 1)  // 16-bit
@@ -3354,7 +3365,7 @@ static void s3_wait_draw()
 			// check clipping rectangle
 			if(s3.wait_rect_x >= s3.scissors_left && s3.wait_rect_x <= s3.scissors_right && s3.wait_rect_y >= s3.scissors_top && s3.wait_rect_y <= s3.scissors_bottom)
 			{
-				if(s3.current_cmd & 0x1000)
+				if((s3.current_cmd & 0x1000) && (data_size != 8))
 				{
 					xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
 						 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
@@ -3378,6 +3389,7 @@ static void s3_wait_draw()
 				s3.state = S3_IDLE;
 				s3.gpbusy = false;
 			}
+			return;
 		}
 	}
 }
