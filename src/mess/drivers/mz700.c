@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( mz800_io, AS_IO, 8, mz_state )
 	AM_RANGE(0xeb, 0xeb) AM_WRITE(mz800_ramaddr_w )
 	AM_RANGE(0xf0, 0xf0) AM_READ_PORT("atari_joy1") AM_WRITE(mz800_palette_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_PORT("atari_joy2")
-	AM_RANGE(0xf2, 0xf2) AM_DEVWRITE_LEGACY("sn76489n", sn76496_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVWRITE("sn76489n", sn76489_new_device, write)
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 ADDRESS_MAP_END
 
@@ -315,6 +315,24 @@ static GFXDECODE_START( mz800 )
 	GFXDECODE_ENTRY("monitor", 0x1000, mz700_layout, 0, 256)	// for mz800 viewer only
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -384,7 +402,8 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(mz800)
 
-	MCFG_SOUND_ADD("sn76489n", SN76489, XTAL_17_73447MHz/5)
+	MCFG_SOUND_ADD("sn76489n", SN76489_NEW, XTAL_17_73447MHz/5)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */

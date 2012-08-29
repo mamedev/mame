@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY(SN76489AN_TAG, sn76496_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_new_device, write)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("Y0") // 64KBF bank select
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("Y1")
 	AM_RANGE(0x32, 0x32) AM_READ_PORT("Y2")
@@ -449,6 +449,17 @@ static TMS9928A_INTERFACE(m5_tms9928a_interface)
 	0x4000,
 	DEVCB_LINE(sordm5_video_interrupt_callback)
 };
+
+
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 //-------------------------------------------------
 //  I8255_INTERFACE( ppi_intf )
@@ -662,8 +673,9 @@ static MACHINE_CONFIG_START( m5, m5_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A_NEW, XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)
