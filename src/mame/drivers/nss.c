@@ -856,15 +856,16 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_CPU_IO_MAP(bios_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nss_vblank_irq)
 
-	MCFG_M50458_ADD("m50458",m50458_intf,4000000) /* TODO: clock */
+	MCFG_M50458_ADD("m50458",m50458_intf,4000000) /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 	MCFG_RP5H01_ADD("rp5h01")
 	MCFG_M6M80011AP_ADD("m6m80011ap")
 
-	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
-
+	MCFG_MACHINE_START( nss )
 	MCFG_MACHINE_RESET( nss )
+
+	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("osd", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -872,8 +873,6 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
-
-	MCFG_MACHINE_START( nss )
 MACHINE_CONFIG_END
 
 /***************************************************************************

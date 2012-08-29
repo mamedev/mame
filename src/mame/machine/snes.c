@@ -1852,6 +1852,7 @@ MACHINE_START( snes )
 	}
 
 	state->m_is_nss = 0;
+	state->m_is_sfcbox = 0;
 }
 
 MACHINE_RESET( snes )

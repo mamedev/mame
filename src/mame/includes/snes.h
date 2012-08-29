@@ -427,12 +427,12 @@ public:
 	UINT16                m_vtime;
 	UINT16                m_vmadd;
 
-	/* HW flags */
+	/* non-SNES HW-specific flags / variables */
 	UINT8                 m_is_nss;
 	UINT8				  m_input_disabled;
 	UINT8				  m_game_over_flag;
 	UINT8                 m_joy_flag;
-//	UINT8                 m_is_sfcbox;
+	UINT8                 m_is_sfcbox;
 
 	/* timers */
 	emu_timer             *m_scanline_timer;

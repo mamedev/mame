@@ -41,6 +41,7 @@ public:
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
+	WRITE_LINE_MEMBER( set_cs_line );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
@@ -56,6 +57,7 @@ private:
 	UINT8 m_cmd_ff;
 	UINT8 m_cmd,m_cmd_param;
 	UINT16 m_osd_addr;
+	UINT8 m_reset_line;
 
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);

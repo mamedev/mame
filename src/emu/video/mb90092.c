@@ -128,6 +128,17 @@ void mb90092_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
+WRITE_LINE_MEMBER( mb90092_device::set_cs_line )
+{
+	m_reset_line = state;
+
+	if(m_reset_line != CLEAR_LINE)
+	{
+		// ...
+	}
+}
+
+
 WRITE8_MEMBER( mb90092_device::write )
 {
 	UINT16 dat;
@@ -143,11 +154,11 @@ WRITE8_MEMBER( mb90092_device::write )
 			dat = ((m_cmd_param & 7)<<7) | (data & 0x7f);
 			switch(m_cmd)
 			{
-				case 0x80: // preset VRAM address
+				case 0x80: // Preset VRAM address
 					m_osd_addr = dat;
 					//printf("%04x %d %d\n",m_osd_addr,(m_osd_addr & 0x1f),(m_osd_addr & 0x1e0) >> 5);
 					break;
-				case 0x90: // write Character
+				case 0x90: // Write Character
 					int x,y;
 					x = (m_osd_addr & 0x1f);
 					y = (m_osd_addr & 0x1e0) >> 5;

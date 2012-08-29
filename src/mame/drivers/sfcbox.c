@@ -135,6 +135,8 @@ public:
 	required_device <mb90092_device> m_mb90092;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE8_MEMBER( port_81_w );
 };
 
 UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -179,13 +181,19 @@ static ADDRESS_MAP_START( sfcbox_map, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0x60000, 0x67fff) AM_NOP // grom slot 1
 ADDRESS_MAP_END
 
+WRITE8_MEMBER( sfcbox_state::port_81_w )
+{
+	device_set_input_line(m_maincpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
+	ioport("OSD_CS")->write(data, 0xff);
+}
 
 static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
 	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90092",mb90092_device,write)
 	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
 //	AM_RANGE(0x80, 0x80) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
-//	AM_RANGE(0x81, 0x81) // SNES Transfer and Misc Input / Misc Output
+	AM_RANGE(0x81, 0x81) AM_WRITE(port_81_w) // SNES Transfer and Misc Input / Misc Output
 //	AM_RANGE(0x82, 0x82) // Unknown/unused
 //	AM_RANGE(0x83, 0x83) // Joypad Input/Status / Joypad Output/Control
 //	AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
@@ -199,6 +207,9 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( snes )
+	PORT_START("OSD_CS")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mb90092", mb90092_device, set_cs_line)
+
 	PORT_START("SERIAL1_DATA1_L")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1)
@@ -342,15 +353,38 @@ static MACHINE_CONFIG_START( snes, sfcbox_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_START( sfcbox )
+{
+	sfcbox_state *state = machine.driver_data<sfcbox_state>();
+
+	MACHINE_START_CALL(snes);
+
+	state->m_is_sfcbox = 1;
+}
+
+static MACHINE_RESET( sfcbox )
+{
+	sfcbox_state *state = machine.driver_data<sfcbox_state>();
+
+	MACHINE_RESET_CALL( snes );
+
+	/* start with both CPUs disabled */
+	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_DERIVED( sfcbox, snes )
 
 	MCFG_CPU_ADD("bios", Z180, XTAL_12MHz / 2)	/* HD64180RF6X */
 	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
 	MCFG_CPU_IO_MAP(sfcbox_io)
 
-	MCFG_MB90092_ADD("mb90092",XTAL_12MHz / 2) /* TODO: pixel clock */
+	MCFG_MB90092_ADD("mb90092",XTAL_12MHz / 2) /* TODO: correct clock */
 
-	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs for now */
+	MCFG_MACHINE_START( sfcbox )
+	MCFG_MACHINE_RESET( sfcbox )
+
+	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("osd", RASTER)
@@ -375,6 +409,8 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "spc700.rom", 0x00, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION( 0x10000, "krom", 0 ) \
 	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \
+	ROM_REGION( 0x100000, "user3", 0 ) \
+	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) ) \
 
 
 ROM_START( sfcbox )
@@ -386,13 +422,10 @@ ROM_END
 ROM_START( pss61 )
 	SFCBOX_BIOS
 
-	ROM_REGION( 0x100000, "atrom", 0 )
-	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
-
 	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom1-1.ic1", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
 
-	ROM_REGION( 0x380000, "user3", 0 )
+	ROM_REGION( 0x380000, "game", 0 )
 	ROM_LOAD( "shvc-mk-0.rom6", 0x000000, 0x080000, CRC(c8002453) SHA1(cbb853bf911255c1d8eb27cd34fc7855a0dda218) )
 	ROM_LOAD( "shvc-4m-1.rom3", 0x080000, 0x200000, CRC(91b28d56) SHA1(b83dd73d3d6049450bb8092d73c3af879804f58c) )
 	ROM_LOAD( "shvc-fo-1.ic20", 0x280000, 0x100000, CRC(ad668a41) SHA1(39ff7354a7fa02295c899b7a7ec3556998ac2636) ) /* Super FX hook needed for Star Fox */
@@ -404,7 +437,7 @@ ROM_START( pss62 )
 	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom2-1.ic1", 0x0000, 0x8000, CRC(bcfc5642) SHA1(a96e52685bd3dcdf09d1b7acd6e1c1ab7726a640) )
 
-	ROM_REGION( 0x180000, "user3", 0 )
+	ROM_REGION( 0x180000, "game", 0 )
 	ROM_LOAD( "shvc-gc-0.rom1", 0x000000, 0x100000, CRC(b4fd7aff) SHA1(eb553b77418dedba25fc4d5dddcb04f424b0f6a9) )
 	ROM_LOAD( "shvc-2a-1.rom3", 0x100000, 0x080000, CRC(6b23e2e4) SHA1(684123a12ca1e31115bd6221d96f82461066877f) )
 ROM_END
@@ -415,7 +448,7 @@ ROM_START( pss63 )
 	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom3-1.ic1", 0x0000, 0x8000, CRC(ebec4c1c) SHA1(d638ef1486b4c0b3d4d5b666929ca7947e16efad) )
 
-	ROM_REGION( 0x500000, "user3", 0 )
+	ROM_REGION( 0x500000, "game", 0 )
 	ROM_LOAD( "shvc-t2-1.rom3", 0x000000, 0x100000, CRC(4ae93c10) SHA1(5fa25d027940907b769578d7bf85a9d5ba94911a) )
 	ROM_LOAD( "shvc-8x-1.rom1", 0x100000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
 ROM_END
@@ -426,7 +459,7 @@ ROM_START( pss64 )
 	ROM_REGION( 0x8000, "grom", 0 )
 	ROM_LOAD( "grom4-1.ic1", 0x0000, 0x8000, NO_DUMP )
 
-	ROM_REGION( 0x500000, "user3", 0 )
+	ROM_REGION( 0x500000, "game", 0 )
 	ROM_LOAD( "shvc-m4-0.rom3", 0x000000, 0x100000, CRC(fb259f4f) SHA1(8faeb56f80e82dd042bdc84d19c526a979c6de8f) )
 	ROM_LOAD( "shvc-8x-1.rom1", 0x100000, 0x400000, CRC(3adef543) SHA1(df02860e691fbee453e345dd343c08b6da08d4ea) )
 //  Possibly reverse order :
