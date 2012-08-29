@@ -322,6 +322,7 @@
 #include "machine/jvsdev.h"
 #include "video/konicdev.h"
 #include "video/polynew.h"
+#include "video/rgbgen.h"
 #include "sound/rf5c400.h"
 
 #define GFXFIFO_IN_VERBOSE			0
@@ -333,6 +334,8 @@
 #define LOG_JVS						0
 #define LOG_GFX_RAM_WRITES			0
 #define LOG_DRAW_COMMANDS			0
+
+#define ENABLE_BILINEAR				1
 
 
 /* Cobra Renderer class */
@@ -756,6 +759,41 @@ void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, c
     }
 }
 
+INLINE rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format)
+{
+	UINT32 texel = texture[((v * width) + u) / 2];
+
+	if (u & 1)
+	{
+		texel &= 0xffff;
+	}
+	else
+	{
+		texel >>= 16;
+	}
+
+	rgb_t color;
+
+	if (format == 6)
+	{
+		int r = (texel & 0xf000) >> 8;
+		int g = (texel & 0x0f00) >> 4;
+		int b = (texel & 0x00f0) >> 0;
+		int a = (texel & 0x000f) | ((texel & 0x000f) << 4);
+		color = MAKE_ARGB(a, r, g, b);
+	}
+	else
+	{
+		int r = (texel & 0xf800) >> 8;
+		int g = (texel & 0x07c0) >> 3;
+		int b = (texel & 0x003e) << 2;
+		int a = (texel & 0x0001) ? 0xff : 0;
+		color = MAKE_ARGB(a, r, g, b);
+	}
+
+	return color;
+}
+
 void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
 	float u = extent.param[POLY_U].start;
@@ -792,7 +830,6 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		int iu, iv;
-		UINT32 texel;
 
 		if (z <= zb[x] || zmode == 7)
 		{
@@ -803,40 +840,33 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 			else
 				oow = 1.0f / w;
 
+#if !ENABLE_BILINEAR
+
 			iu = (int)((u * oow) * texture_width) & 0x7ff;
 			iv = (int)((v * oow) * texture_height) & 0x7ff;
 
-			texel = m_texture_ram[tex_address + (((iv * texture_width) + iu) / 2)];
+			rgb_t texel = texture_fetch(&m_texture_ram[tex_address], iu, iv, texture_width, tex_format);
 
-			if (iu & 1)
-			{
-				texel &= 0xffff;
-			}
-			else
-			{
-				texel >>= 16;
-			}
+#else
 
-			UINT32 texr, texg, texb, texa;
+			float tex_u = (u * oow) * texture_width;
+			float tex_v = (v * oow) * texture_height;
+			iu = (int)(tex_u) & 0x7ff;
+			iv = (int)(tex_v) & 0x7ff;
 
-			if (tex_format == 6)
-			{
-				texr = (texel & 0xf000) >> 8;
-				texg = (texel & 0x0f00) >> 4;
-				texb = (texel & 0x00f0) >> 0;
-				texa = (texel & 0x000f);
-			}
-			else
-			{
-				texr = (texel & 0xf800) >> 8;
-				texg = (texel & 0x07c0) >> 3;
-				texb = (texel & 0x003e) << 2;
-				texa = (texel & 0x0001) ? 0xff : 0;
-			}
+			float lerp_u = tex_u - (float)(iu);
+			float lerp_v = tex_v - (float)(iv);
 
-			UINT32 goua = (int)(ga);
+			rgb_t texel00 = texture_fetch(&m_texture_ram[tex_address], iu, iv, texture_width, tex_format);
+			rgb_t texel01 = texture_fetch(&m_texture_ram[tex_address], iu+1, iv, texture_width, tex_format);
+			rgb_t texel10 = texture_fetch(&m_texture_ram[tex_address], iu, iv+1, texture_width, tex_format);
+			rgb_t texel11 = texture_fetch(&m_texture_ram[tex_address], iu+1, iv+1, texture_width, tex_format);
 
-			int a = (texa * goua) >> 8;
+			rgb_t texel = rgba_bilinear_filter(texel00, texel01, texel10, texel11, (int)(lerp_u * 255), (int)(lerp_v * 255));
+
+#endif
+
+			int a = RGB_ALPHA(texel);
 
 			if (a != 0 || !alpha_test)
 			{
@@ -844,9 +874,20 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 				UINT32 goug = (int)(gg);
 				UINT32 goub = (int)(gb);
 	
-				int r = (texr * gour) >> 8;
-				int g = (texg * goug) >> 8;
-				int b = (texb * goub) >> 8;
+				int r = (RGB_RED(texel) * gour) >> 8;
+				int g = (RGB_GREEN(texel) * goug) >> 8;
+				int b = (RGB_BLUE(texel) * goub) >> 8;
+
+				if (a != 0xff)
+				{
+					int fb_r = (fb[x] >> 16) & 0xff;
+					int fb_g = (fb[x] >> 8) & 0xff;
+					int fb_b = fb[x] & 0xff;
+
+					r = ((r * a) >> 8) + ((fb_r * (0xff-a)) >> 8);
+					g = ((g * a) >> 8) + ((fb_g * (0xff-a)) >> 8);
+					b = ((b * a) >> 8) + ((fb_b * (0xff-a)) >> 8);
+				}
 
 				if (r > 255) r = 255;
 				if (g > 255) g = 255;
@@ -3118,7 +3159,6 @@ static void ide_interrupt(device_t *device, int state)
 
 static INTERRUPT_GEN( cobra_vblank )
 {
-	/*
 	cobra_state *cobra = device->machine().driver_data<cobra_state>();
 
 	if (cobra->m_vblank_enable & 0x80)
@@ -3126,9 +3166,7 @@ static INTERRUPT_GEN( cobra_vblank )
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 		cobra->m_gfx_unk_flag = 0x80;
 	}
-	*/
 }
-
 
 static MACHINE_RESET( cobra )
 {
@@ -3304,6 +3342,13 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 		rom[0x06] = 0x00;
 		rom[0x07] = 0x00;
 
+		rom[0x08] = 0x00;
+		rom[0x09] = 0x00;
+		rom[0x0a] = 0x4a;		// J
+		rom[0x0b] = 0x41;		// A
+		rom[0x0c] = 0x41;		// A
+		rom[0x0d] = 0x00;
+
 		// calculate checksum
 		UINT16 sum = 0;
 		for (int i=0; i < 14; i+=2)
@@ -3320,9 +3365,13 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	// (gfx)
 	// 0x18932c = 0x38600000					skips check_one_scene()
 
+	// (sub)
+	// 0x2d3568 = 0x60000000 [0x4082001c]		skip IRQ fail
+
 	// (main)
 	// 0x5025ac = 0x60000000 [0x4082055c]		skip IRQ fail...
 	// 0x503ec4 = 0x60000000 [0x4186fff8]
+	// 0x503f00 = 0x60000000 [0x4186fff8]
 
 	m_has_psac = false;
 }
