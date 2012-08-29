@@ -34818,7 +34818,7 @@
 		<!-- Alt Title: Alex Ferguson's Player Manager 2002 (box?) -->
 		<description>Total Soccer Manager (Euro)</description>
 		<year>2001</year>
-		<publisher>Ubi </publisher>
+		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">

@@ -365,7 +365,7 @@
 	<software name="adv6">
 		<description>Adventure 6 - Strange Odyssey</description>
 		<year>19??</year>
-		<publisher>>Adventure Soft</publisher>
+		<publisher>Adventure Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10659">
 				<rom name="adv6-strangeodyssey(adventuresoft).uef" size="10659" crc="83e314c9" sha1="7646078e5d0e8522f22f2173e43f0a4c46d2ff89" offset="0" />
@@ -6719,7 +6719,7 @@
 	<software name="lastninj">
 		<description>The Last Ninja</description>
 		<year>1988</year>
-		<publisher>>Superior Software</publisher>
+		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="40937">
 				<rom name="lastninja(1988)(superior).uef" size="40937" crc="87a6dbdf" sha1="5790e682f1f5dabc50daa45547a8103c1e56ace2" offset="0" />

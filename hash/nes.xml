@@ -30278,7 +30278,7 @@
 	</software>
 
 	<software name="satsujin">
-		<description>Satsujin Club (Jpn)</description>
+		<description>Murder Club - Satsujin Club (Jpn)</description>
 		<year>1989</year>
 		<publisher>Seta</publisher>
 		<info name="serial" value="KKS-RZ (05)"/>
@@ -33719,6 +33719,7 @@
 		</part>
 	</software>
 
+<!-- This is marked as partially supported due to lack of powerpad emulation! -->
 	<software name="smbdhwca" cloneof="smbdhwc" supported="partial">
 		<description>Super Mario Bros. / Duck Hunt / World Class Track Meet (USA)</description>
 		<year>1990</year>
@@ -33738,6 +33739,7 @@
 		</part>
 	</software>
 
+<!-- This is marked as partially supported due to lack of powerpad emulation! -->
 	<software name="smbdhwc" supported="partial">
 		<description>Super Mario Bros. / Duck Hunt / World Class Track Meet (USA, Rev. A)</description>
 		<year>1990</year>
@@ -40751,7 +40753,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="1943jp">
+	<software name="1943jp" cloneof="1943">
 		<description>1943 - The Battle of Midway (Jpn, Prototype)</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
@@ -45805,7 +45807,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="solsticeup" cloneof="solstice">
-		<description>Solstice - The Quest For The Staff of Demnos (USA, Prototype)</description>
+		<description>Solstice - The Quest for the Staff of Demnos (USA, Prototype)</description>
 		<year>1990</year>
 		<publisher>CSG Imagesoft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -47547,9 +47549,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- is this bad?!? -->
 	<software name="sidewindb" cloneof="sidewind">
-		<description>Sidewinder (Joy Van)</description>
+		<description>Sidewinder - Xiang Wei She (Tw, Alt)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Joy Van?</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<dataarea name="chr" size="16384">
@@ -49831,7 +49833,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sangzlz">
-		<description>San Guo Zhong Lie Zhuan (Chi)</description>
+		<description>San Guo Zhong Lie Zhuan ~ The Story of Three Kingdoms (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1016"/>
@@ -49864,7 +49866,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="smjsj" supported="partial">
+	<software name="smjsj" cloneof="zelda" supported="no">
 		<description>Shen Mi Jin San Jiao (Chi)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -49878,10 +49880,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="smjsja" cloneof="smjsj" supported="partial">
+<!-- SRAM not saved in this! -->
+	<software name="smjsja" cloneof="zelda" supported="partial">
 		<description>Shen Mi Jin San Jiao (Chi, Fixed?)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -49894,6 +49900,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -50274,7 +50283,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanguoxb">
+	<software name="sanguoxb" supported="no">
 		<!-- Notes: AKA Fighting for Supremacy -->
 		<description>San Guo Zhi - Xiong Ba Tian Xia (Chi)</description>
 		<year>19??</year>
@@ -51527,7 +51536,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="skzl">
-		<description>Shi Kong Zhi Lun (Chi)</description>
+		<description>Shi Kong Zhi Lun - Chrono Trigger (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ038"/>
@@ -53505,7 +53514,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- REVIEW -->
 
-	<software name="shentkn" cloneof="akagawa">
+	<software name="shconan" cloneof="akagawa">
 		<description>Shentan Conan (Chi)</description>
 		<year>19??</year>
 		<publisher>XingXing</publisher>
@@ -56145,8 +56154,8 @@ We don't include these hacks because they were not burned into real carts nor so
 <!-- nointro -->
 	<software name="seadream">
 		<description>Sea of Dreamland (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Mega Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<dataarea name="chr" size="32768">
@@ -56259,8 +56268,8 @@ We don't include these hacks because they were not burned into real carts nor so
 	<software name="shuangxp">
 		<description>Shuang Xiang Pao (Asia)</description>
 		<!-- TOSEC title Sheng Hen Pao - Twin Loud Cannon check -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Bit Corp.</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -56429,7 +56438,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="smfd">
+	<software name="smfd" supported="no">
 		<description>Super Mario Funky Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -57127,7 +57136,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="smzd4">
+	<software name="shumab4">
 		<description>Shu Ma Bao Long 4 - Shui Jing Ban (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -58018,8 +58027,8 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="shuiguli" cloneof="jackpot">
-		<description>Shui Guo Li (Chi)</description>
+	<software name="shuiguli2" cloneof="jackpot">
+		<description>Shui Guo Li (Chi, Pirate?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -58035,7 +58044,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="shuiguli1" cloneof="jackpot">
-		<description>Shui Guo Li (Chi, Alt)</description>
+		<description>Shui Guo Li (Chi, Pirate? Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -58050,9 +58059,9 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="shuiguli2" cloneof="jackpot">
-		<description>Shui Guo Li (Tw, Alt 2)</description>
-		<year>19??</year>
+	<software name="shuiguli" cloneof="jackpot">
+		<description>Shui Guo Li (Tw)</description>
+		<year>1988</year>
 		<publisher>Bit Corp.</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
@@ -58066,7 +58075,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="silucq">
+	<software name="silucq" supported="no">
 		<description>Si Lu Chuan Qi (Chi)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -62663,7 +62672,7 @@ Other
 
 <!-- Misc CaH4e3's dumps -->
 
-	<software name="1944">
+	<software name="1944" cloneof="1943">
 		<description>1944 (1943 pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62679,7 +62688,7 @@ Other
 	</software>
 
 <!-- This seems to have infinite lives! -->
-	<software name="1945">
+	<software name="1945" cloneof="skyshark">
 		<description>1945 (Sky Shark pirate, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64015,8 +64024,8 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="sfight">
-		<description>Super Fighter (Contra 2 pirate)</description>
+	<software name="sfight" cloneof="probot2">
+		<description>Super Fighter (Super Contra pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64046,7 +64055,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="smb2fdsb" cloneof="smb2fds" supported="no">
+	<software name="smb2fdsb" cloneof="smb2fds" supported="partial">
 		<description>Super Mario Bros. 2 (FDS pirate, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64098,7 +64107,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="smb2k" cloneof="smb2fds" supported="no">
+	<software name="smb2k" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (Kaiser)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64238,7 +64247,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="smario14">
+	<software name="smario14" cloneof="kaikeya3">
 		<description>Super Mario 14 (Kaiketsu Yanchamaru 3 - Taiketsu! Zouringen pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64254,7 +64263,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="smb6" cloneof="ttoonadv">
-		<description>Super Mario Bros. 6 (Tiny Toon Adventures pirate)</description>
+		<description>Super Bros. 6 (Tiny Toon Adventures pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64299,7 +64308,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="smb11a" cloneof="advisln3">
-		<description>Super Mario Bros. 11 (Takahashi Meijin no Boukenjima III pirate, Hacked?)</description>
+		<description>Super Bros. 11 (Takahashi Meijin no Boukenjima III pirate, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64314,7 +64323,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="smb11" cloneof="advisln3">
-		<description>Super Mario Bros. 11 (Takahashi Meijin no Boukenjima III pirate)</description>
+		<description>Super Bros. 11 (Takahashi Meijin no Boukenjima III pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64834,7 +64843,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="wingoal5">
+	<software name="wingoal5" cloneof="jlwingol">
 		<description>Winning Goal 5 (J.League Winning Goal pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -66378,8 +66387,8 @@ be better to redump them properly. -->
 
 	<software name="samsho3">
 		<description>Samurai Shodown III (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Rex Soft</publisher>
 		<info name="alt_title" value="侍魂III"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -66560,7 +66569,7 @@ be better to redump them properly. -->
 	<software name="sf5t60a" cloneof="sf5t60">
 		<description>Street Fighter V Turbo 60 (Asia, Alt)</description>
 		<year>1996</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cony</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="262144">
@@ -66575,7 +66584,7 @@ be better to redump them properly. -->
 	<software name="sf5t60">
 		<description>Street Fighter V Turbo 60 (Asia)</description>
 		<year>1995</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Cony</publisher>
 		<info name="alt_title" value="60人街霸"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -66590,8 +66599,8 @@ be better to redump them properly. -->
 
 	<software name="sfxt">
 		<description>Street Fighter X Turbo 40 (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Cony</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
@@ -66603,9 +66612,10 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!--  Displays a "Copyright  Hummer Team" message at start -->
 	<software name="sfz2_97" supported="partial">
 		<description>Street Fighter Zero 2 '97 (Asia)</description>
-		<year>19??</year>
+		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-PANDAPRINCE" />

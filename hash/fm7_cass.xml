@@ -17,6 +17,7 @@ Titles, serial #s, publishers and release dates taken from:
 	At the F-Basic Ready prompt, type run"" and press Return.
 	If a Bad File Mode error occurs, then you must type loadm"",r and press Return.  Once the loader has loaded,
 	type exec and press Return, and the application will run, or continue to load.
+    Some games which are written in machine language actually need loadm"",,r to load!
 
 	If you are using a disk version of F-Basic, then put CAS0: in the quotes.  Note that this is case-sensitive.
 -->
@@ -342,7 +343,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>ソフトプロ (Soft Pro)</publisher>
 		<info name="alt_title" value="チョップリフター"/>
-		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
+		<info name="usage" value="Type LOADM&quot;&quot;,,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2073552">
 				<rom name="chop.t77" size="2073552" crc="cf49f0a8" sha1="899e5d4a8e1d8e7dc1d5014979f9928066c9b856" offset="0" />
