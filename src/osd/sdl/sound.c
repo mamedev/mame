@@ -307,7 +307,7 @@ void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_thi
 					fprintf(sound_log, "Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
 
 				buffer_underflows++;
-				stream_in += samples_this_frame;
+				stream_in += bytes_this_frame;
 			}
 
 			// if we're going to overlap the play position, just skip this chunk
