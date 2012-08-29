@@ -41,7 +41,18 @@ enum
 	S3C2410_CORE_PIN_OM1
 };
 
-DECLARE_LEGACY_DEVICE(S3C2410, s3c2410);
+DEVICE_GET_INFO( s3c2410 );
+
+class s3c2410_device : public legacy_device_base
+{
+public:
+	s3c2410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
+
+extern const device_type S3C2410;
+
 
 READ32_DEVICE_HANDLER( s3c2410_lcd_r );
 
@@ -119,11 +130,6 @@ struct _s3c2410_interface
 /*******************************************************************************
     PROTOTYPES
 *******************************************************************************/
-
-DEVICE_GET_INFO( s3c2410 );
-
-VIDEO_START( s3c2410 );
-SCREEN_UPDATE_RGB32( s3c2410 );
 
 void s3c2410_uart_fifo_w( device_t *device, int uart, UINT8 data);
 void s3c2410_touch_screen( device_t *device, int state);

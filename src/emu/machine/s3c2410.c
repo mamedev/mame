@@ -31,16 +31,9 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 #include "machine/s3c24xx.c"
 #undef DEVICE_S3C2410
 
-VIDEO_START( s3c2410 )
+UINT32 s3c2410_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *device = machine.device( S3C2410_TAG);
-	s3c24xx_video_start( device, machine);
-}
-
-SCREEN_UPDATE_RGB32( s3c2410 )
-{
-	device_t *device = screen.machine().device( S3C2410_TAG);
-	return s3c24xx_video_update( device, screen, bitmap, cliprect);
+	return s3c24xx_video_update( this, screen, bitmap, cliprect);
 }
 
 DEVICE_START( s3c2410 )
@@ -72,6 +65,8 @@ DEVICE_START( s3c2410 )
 	space->install_legacy_readwrite_handler( *device, 0x59000000, 0x59000017, FUNC(s3c24xx_spi_0_r), FUNC(s3c24xx_spi_0_w));
 	space->install_legacy_readwrite_handler( *device, 0x59000020, 0x59000037, FUNC(s3c24xx_spi_1_r), FUNC(s3c24xx_spi_1_w));
 	space->install_legacy_readwrite_handler( *device, 0x5a000000, 0x5a000043, FUNC(s3c24xx_sdi_r), FUNC(s3c24xx_sdi_w));
+	
+	s3c24xx_video_start( device, device->machine());
 }
 
 DEVICE_GET_INFO( s3c2410 )
@@ -113,4 +108,9 @@ void s3c2410_request_eint( device_t *device, UINT32 number)
 	s3c24xx_request_eint( device, number);
 }
 
-DEFINE_LEGACY_DEVICE(S3C2410, s3c2410);
+s3c2410_device::s3c2410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: legacy_device_base(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(s3c2410))
+{
+}
+
+const device_type S3C2410 = &legacy_device_creator<s3c2410_device>;

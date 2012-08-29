@@ -31,16 +31,9 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 #include "machine/s3c24xx.c"
 #undef DEVICE_S3C2440
 
-VIDEO_START( s3c2440 )
+UINT32 s3c2440_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *device = machine.device( S3C2440_TAG);
-	s3c24xx_video_start( device, machine);
-}
-
-SCREEN_UPDATE_RGB32( s3c2440 )
-{
-	device_t *device = screen.machine().device( S3C2440_TAG);
-	return s3c24xx_video_update( device, screen, bitmap, cliprect);
+	return s3c24xx_video_update( this, screen, bitmap, cliprect);
 }
 
 DEVICE_START( s3c2440 )
@@ -74,6 +67,8 @@ DEVICE_START( s3c2440 )
 	space->install_legacy_readwrite_handler( *device, 0x5a000000, 0x5a000043, FUNC(s3c24xx_sdi_r), FUNC(s3c24xx_sdi_w));
 	space->install_legacy_readwrite_handler( *device, 0x5b000000, 0x5b00001f, FUNC(s3c24xx_ac97_r), FUNC(s3c24xx_ac97_w));
 	DEVICE_START_CALL(s3c24xx);
+	
+	s3c24xx_video_start( device, device->machine());
 }
 
 DEVICE_GET_INFO( s3c2440 )
@@ -114,4 +109,9 @@ WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w )
 	s3c24xx_pin_frnb_w( device, state);
 }
 
-DEFINE_LEGACY_DEVICE(S3C2440, s3c2440);
+s3c2440_device::s3c2440_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: legacy_device_base(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(s3c2440))
+{
+}
+
+const device_type S3C2440 = &legacy_device_creator<s3c2440_device>;

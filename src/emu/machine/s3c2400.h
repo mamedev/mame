@@ -33,7 +33,17 @@ enum
 	S3C2400_GPIO_PORT_G
 };
 
-DECLARE_LEGACY_DEVICE(S3C2400, s3c2400);
+DEVICE_GET_INFO( s3c2400 );
+
+class s3c2400_device : public legacy_device_base
+{
+public:
+	s3c2400_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
+
+extern const device_type S3C2400;
 
 /*******************************************************************************
     TYPE DEFINITIONS
@@ -99,11 +109,6 @@ struct _s3c2400_interface
 /*******************************************************************************
     PROTOTYPES
 *******************************************************************************/
-
-DEVICE_GET_INFO( s3c2400 );
-
-VIDEO_START( s3c2400 );
-SCREEN_UPDATE_RGB32( s3c2400 );
 
 void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data);
 
