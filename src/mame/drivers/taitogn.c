@@ -422,7 +422,6 @@ static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine &machine, UINT8 reg)
 
 WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 {
-
 	if(offset < 2) {
 		ide_controller32_pcmcia_w(machine().device(":card"), offset, data, mem_mask);
 		return;
@@ -438,7 +437,6 @@ WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 
 READ32_MEMBER(taitogn_state::rf5c296_io_r)
 {
-
 	if(offset < 2)
 		return ide_controller32_pcmcia_r(machine().device(":card"), offset, mem_mask);
 
@@ -460,7 +458,6 @@ READ32_MEMBER(taitogn_state::rf5c296_io_r)
 
 READ32_MEMBER(taitogn_state::rf5c296_mem_r)
 {
-
 	if(offset < 0x80)
 		return (m_cis[offset*2+1] << 16) | m_cis[offset*2];
 
@@ -475,9 +472,8 @@ READ32_MEMBER(taitogn_state::rf5c296_mem_r)
 
 WRITE32_MEMBER(taitogn_state::rf5c296_mem_w)
 {
-
 	if(offset >= 0x140 && offset <= 0x144) {
-		dynamic_buffer key;
+		dynamic_buffer key(get_disk_handle(machine(), ":drive_0")->hunk_bytes());
 
 		int pos = (offset - 0x140)*2;
 		UINT8 v, k;
@@ -524,61 +520,51 @@ static void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, U
 
 READ32_MEMBER(taitogn_state::flash_subbios_r)
 {
-
 	return gen_flash_r(m_biosflash, offset, mem_mask);
 }
 
 WRITE32_MEMBER(taitogn_state::flash_subbios_w)
 {
-
 	gen_flash_w(m_biosflash, offset, data, mem_mask);
 }
 
 READ32_MEMBER(taitogn_state::flash_mn102_r)
 {
-
 	return gen_flash_r(m_pgmflash, offset, mem_mask);
 }
 
 WRITE32_MEMBER(taitogn_state::flash_mn102_w)
 {
-
 	gen_flash_w(m_pgmflash, offset, data, mem_mask);
 }
 
 READ32_MEMBER(taitogn_state::flash_s1_r)
 {
-
 	return gen_flash_r(m_sndflash[0], offset, mem_mask);
 }
 
 WRITE32_MEMBER(taitogn_state::flash_s1_w)
 {
-
 	gen_flash_w(m_sndflash[0], offset, data, mem_mask);
 }
 
 READ32_MEMBER(taitogn_state::flash_s2_r)
 {
-
 	return gen_flash_r(m_sndflash[1], offset, mem_mask);
 }
 
 WRITE32_MEMBER(taitogn_state::flash_s2_w)
 {
-
 	gen_flash_w(m_sndflash[1], offset, data, mem_mask);
 }
 
 READ32_MEMBER(taitogn_state::flash_s3_r)
 {
-
 	return gen_flash_r(m_sndflash[2], offset, mem_mask);
 }
 
 WRITE32_MEMBER(taitogn_state::flash_s3_w)
 {
-
 	gen_flash_w(m_sndflash[2], offset, data, mem_mask);
 }
 
@@ -605,14 +591,12 @@ static void install_handlers(running_machine &machine, int mode)
 
 READ32_MEMBER(taitogn_state::control_r)
 {
-
 	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, machine().describe_context());
 	return m_control;
 }
 
 WRITE32_MEMBER(taitogn_state::control_w)
 {
-
 	// 20 = watchdog
 	// 04 = select bank
 
@@ -645,19 +629,16 @@ WRITE32_MEMBER(taitogn_state::control_w)
 
 WRITE32_MEMBER(taitogn_state::control2_w)
 {
-
 	COMBINE_DATA(&m_control2);
 }
 
 READ32_MEMBER(taitogn_state::control3_r)
 {
-
 	return m_control3;
 }
 
 WRITE32_MEMBER(taitogn_state::control3_w)
 {
-
 	COMBINE_DATA(&m_control3);
 }
 
@@ -681,7 +662,6 @@ WRITE32_MEMBER(taitogn_state::gn_1fb70000_w)
 
 READ32_MEMBER(taitogn_state::hack1_r)
 {
-
 	m_v = m_v ^ 8;
 	// Probably something to do with sound
 	return m_v;
@@ -696,7 +676,6 @@ static const UINT8 tt16[ 8 ] = { 0xc0, 0x04, 0xf9, 0xe1, 0x60, 0x70, 0xf2, 0x02 
 
 READ32_MEMBER(taitogn_state::znsecsel_r)
 {
-
 	return m_n_znsecsel;
 }
 
@@ -771,7 +750,6 @@ static void sio_dip_handler( running_machine &machine, int n_data )
 
 WRITE32_MEMBER(taitogn_state::znsecsel_w)
 {
-
 	COMBINE_DATA( &m_n_znsecsel );
 
 	if( ( m_n_znsecsel & 0x80 ) == 0 )
@@ -843,7 +821,6 @@ READ32_MEMBER(taitogn_state::boardconfig_r)
 
 WRITE32_MEMBER(taitogn_state::coin_w)
 {
-
 	/* 0x01=counter
        0x02=coin lock 1
        0x08=??
@@ -855,14 +832,12 @@ WRITE32_MEMBER(taitogn_state::coin_w)
 
 READ32_MEMBER(taitogn_state::coin_r)
 {
-
 	return m_coin_info;
 }
 
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
 READ32_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 {
-
 	m_mux_data = m_coin_info;
 	m_mux_data &= 0xcc;
 
@@ -882,7 +857,6 @@ READ32_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 
 DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 {
-
 	m_biosflash = machine().device<intel_te28f160_device>("biosflash");
 	m_pgmflash = machine().device<intel_e28f400_device>("pgmflash");
 	m_sndflash[0] = machine().device<intel_te28f160_device>("sndflash0");
