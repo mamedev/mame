@@ -424,8 +424,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE_LEGACY("sn1", sn76496_w )
-	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE_LEGACY("sn2", sn76496_w )
+	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE("sn1", segapsg_new_device, write )
+	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE("sn2", segapsg_new_device, write )
 	AM_RANGE(0x7e, 0x7e) AM_DEVREAD( "vdp1", sega315_5124_device, vcount_read )
 	AM_RANGE(0xba, 0xba) AM_DEVREADWRITE( "vdp1", sega315_5124_device, vram_read, vram_write )
 	AM_RANGE(0xbb, 0xbb) AM_DEVREADWRITE( "vdp1", sega315_5124_device, register_read, register_write )
@@ -1099,6 +1099,16 @@ static SCREEN_UPDATE_RGB32( systeme )
 }
 
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
@@ -1122,11 +1132,13 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("sn1", SEGAPSG_NEW, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("sn2", SEGAPSG_NEW, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 
