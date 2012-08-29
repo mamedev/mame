@@ -33,8 +33,6 @@
         * The above listed joystick maneuver to enable Pac-Man will still play a tone, but
           the effect (if any) is unknown.
 
-        * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz
-
     Note: The "correct" size of the roms are 27C020 for the program rom and 27C256 for the
           graphics rom.  However genuine boards have been found with larger roms containing
           the same data with the extra rom space blanked out.
@@ -45,6 +43,41 @@
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
+
++-------------------------------------------------------+
+|                        +-------------+                |
+|                        |     U13     |                |
+|                        |ms pac/galaga|                |
+|                        +-------------+                |
+|                         +-----------+                 |
+|        +---+            |           |                 |
+|        |VOL|            |   ZiLOG   |                 |
+|        +---+            |Z8S18020VSC|                 |
+|                         | Z180 MPU  |                 |
+|J                        |           |                 |
+|A                        +-----------+                 |
+|M              +-----------+      +-----------+        |
+|M              |           |  OSC |           |        |
+|A              |CY37256P160|      |CY37256P160|        |
+|               |-83AC      |      |-83AC      |        |
+|               |           |   :: |           |   +---+|
+|               |           |   :: |           |   | C ||
+|               +-----------+   J1 +-----------+   | 1 ||
+|                 93LC46A                          | 9 ||
+|         +-------------+              +-------+   | 9 ||
+|         |     U14     |   +-------+  |CY7C199|   +---+|
+|         |ms pac/galaga|   |CY7C199|  +-------+        |
+|  D4     +-------------+   +-------+                   |
++-------------------------------------------------------+
+
+     CPU: Z8S18020VSC ZiLOG Z180 (20MHz part)
+Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macrocells, 83MHz speed)
+  MEMORY: CY7C199-15VC 32K x 8 Static RAM x 3 (or equivalent ISSI IS61C256AH-15J)
+     OSC: 73.728MHz
+  EEPROM: 93LC46A 128 x 8-bit 1K microwire compatible Serial EEPROM
+     VOL: Volume adjust
+      D4: Diode - Status light
+      J1: 5 2-pin jumper array
 
 ***************************************************************************/
 
