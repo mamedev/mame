@@ -86,6 +86,17 @@
 		</part>
 	</software>
 
+	<software name="spitfirep" cloneof="spitfire">
+		<description>Spitfire (Prototype)</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="spitfire (proto).bin" size="2048" crc="0a728afc" sha1="66e2d158095721c0c9b4d50de4a6d9925ec62c73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacewar">
 		<description>Space War</description>
 		<year>1977</year>
@@ -203,6 +214,17 @@
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="robotwar.bin" size="2048" crc="38241e4f" sha1="87f3f9afcc232d767cf6a5040c88b31283f76199" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotwarp" cloneof="robotwar">
+		<description>Robot War (Prototype)</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="robot war (proto).bin" size="2048" crc="7f62a23c" sha1="7e5966c1c393dc1b02ac34d57733a357bbcd4d5c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -375,6 +397,17 @@
 		</part>
 	</software>
 
+	<software name="galacticp" cloneof="galactic">
+		<description>Galactic Space Wars (Prototype)</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="glactic space war (proto).bin" size="2048" crc="a61258a8" sha1="7077e42b2e8a101da05bb2188d7b65858ca8ec1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pfootbll">
 		<description>Pro Football</description>
 		<year>1981</year>
@@ -383,6 +416,17 @@
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="pfootbll.bin" size="4096" crc="a1ae99be" sha1="9be97cace9b99f15a373bd95f3996034d633fff5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football" cloneof="pfootbll">
+		<description>Football (Prototype)</description>
+		<year>1981</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="football (proto).bin" size="4096" crc="7e5dafea" sha1="db17bbc4f3f64bc5cb698de66b0f4838be430afa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,6 +443,17 @@
 		</part>
 	</software>
 
+	<software name="drawpkr" cloneof="casinop">
+		<description>Draw Poker (Prototype)</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="draw poker (proto).bin" size="4096" crc="619fcc00" sha1="f1bd458f1efc4e9afe06db190a2a7ddb660418bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alieninv">
 		<description>Alien Invasion</description>
 		<year>1981</year>
@@ -410,4 +465,16 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="clrorgan">
+		<description>Color Organ (Prototype)</description>
+		<year>19??</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="color organ (proto).bin" size="2048" crc="3fa2d4eb" sha1="1ccc13a2f4aeb4538379d77d08ac7bf425bc4780" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
