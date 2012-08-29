@@ -14,6 +14,7 @@
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
+ Robert "Bob" C. Quinn was definitely lead engineer on the VT125 and may have been lead engineer on the VK100 as well
 
  The prototype name for the VK100 was 'SMAKY' (Smart Keyboard)
 
@@ -166,7 +167,7 @@ public:
 	UINT8 m_vgDVM;
 	UINT8 m_vgDIR;
 	UINT8 m_vgWOPS;
-	UINT8 m_VG_MODE; // latched on EXEC
+	UINT8 m_VG_MODE; // 2 bits, latched on EXEC
 	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
 	UINT8 m_ACTS;
 	UINT16 m_RXDivisor;
@@ -278,18 +279,18 @@ static TIMER_CALLBACK( execute_vg )
 			state->m_vgGO = 0; // done
 			break;
 	}
-	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+    /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
      * see figure 5-24 on page 5-39
      * It tells the direction and enable for counting on the X and Y counters
      * and also handles the non-math related parts of the bresenham line algorithm
      * control bits:
-     *            /CE1 ----- ? ENA ERROR L?
-     *            /CE2 ----- ? D COUNT 0?
+     *            /CE1 ----- DCOUNT 0 H [verified via tracing]
+     *            /CE2 ----- ENA ERROR L [verified via tracing]
      * addr bits: 76543210
      *            ||||\\\\-- DIR (vgDIR register low 4 bits)
-     *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
-     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
-     *            |\-------- feedback bit from d5 gated by V CLK
+     *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
+     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
+     *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
      *            \--------- GND; the second half of the prom is blank (0x00)
      * data bits: 76543210
      *            |||||||\-- ENA X (enables change on X counter)
@@ -297,9 +298,10 @@ static TIMER_CALLBACK( execute_vg )
      *            |||||\---- Y DIRECTION (high is count down, low is count up)
      *            ||||\----- X DIRECTION (high is count down, low is count up)
      *            |||\------ PIXEL WRT
-     *            ||\------- feedback bit to a6
+     *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
      *            |\-------- UNUSED, always 0
      *            \--------- UNUSED, always 0
+     * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
      */
 	//UINT8 direction_rom = state->m_dir[];
 	// HACK: we need the proper direction rom dump for this!
@@ -571,7 +573,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
  * write command -> 0x05 (normal, normal, /RTS is 1, normal, normal, recieve ON, /DTR is 0, transmit off)
  * read SYSTAT B (and xor with 0xe), expect d7 to be SET or jump to error
  * after this it does something and waits for an rxrdy interrupt
-
+ 
  shows the results of:
  * ACTS (/CTS)  ?      ?      ?      ?      ?      ?      ?
  * d7           d6     d5     d4     d3     d2     d1     d0
@@ -606,39 +608,80 @@ static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
 ADDRESS_MAP_END
 
+/*
+ * 8085 IO address map (x = ignored; * = selects address within this range; ? = not sure; ** = subparts check this bit)
+ * (a15 to a8 are latched the same value as a7-a0 on the 8080 and 8085)
+ * [this map is derived from extensive tracing as well as some guesswork, noted for the crtc, systat_b and the uart]
+   a7  a6  a5  a4  a3  a2  a1  a0
+   ?x  0   ?x  ?x  ?x  ?x  ?x  0     W     CRTC address
+   ?x  0   ?x  ?x  ?x  ?x  ?x  1     RW    CRTC register r/w
+   x   1   *   *   *   **  **  **        read area (rightmost 74ls138):
+   x   1   0   0   0   *   *   *     R     SYSTAT_A (a0-a3 chooses the bit of the dipswitches read via d3)
+   x   1   0   0   1   ?x  ?x  ?x    R     SYSTAT_B
+   x   1   0   1   0   ?x  ?x  0     R     i8251 UART data
+   x   1   0   1   0   ?x  ?x  1     R     i8251 UART status
+   x   1   0   1   1   x   x   x     R     unused
+   x   1   1   0   0   x   x   x     R     unused
+   x   1   1   0   1   x   x   x     R     unused
+   x   1   1   1   0   x   x   x     R     unused
+   x   1   1   1   1   x   x   x     R     unused
+   x   1   0   x   x   *   *   *         write area (right 74ls138):
+   x   1   0   x   x   0   0   0     W     X (low 8 bits)
+   x   1   0   x   x   0   0   1     W     X (high 4 bits)
+   x   1   0   x   x   0   1   0     W     Y (low 8 bits)
+   x   1   0   x   x   0   1   1     W     Y (high 4 bits)
+   x   1   0   x   x   1   0   0     W     ERR
+   x   1   0   x   x   1   0   1     W     SOPS
+   x   1   0   x   x   1   1   0     W     PAT
+   x   1   0   x   x   1   1   1     W     PMUL
+   x   1   1   *   *   *   **  **        write area (middle 74ls138):
+   x   1   1   0   0   0   **  **          write to register file 2x 74ls670:
+   x   1   1   0   0   0   0   0     W       DU
+   x   1   1   0   0   0   0   1     W       DVM
+   x   1   1   0   0   0   1   0     W       DIR
+   x   1   1   0   0   0   1   1     W       WOPS
+   x   1   1   0   0   1   *   *     W     set VG_MODE to * * XOR 3 and Execute (if GO is not active)
+   x   1   1   0   1   0   x   x     W     KYBDW
+   x   1   1   0   1   1   x   x     W     BAUD
+   x   1   1   1   0   0   ?x  0     W     i8251 UART data
+   x   1   1   1   0   0   ?x  1     W     i8251 UART control
+   x   1   1   1   0   1   x   x     W     unused
+   x   1   1   1   1   0   x   x     W     unused? (may be wired-or to KYBDW)
+   x   1   1   1   1   1   x   x     W     unused
+*/
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	//ADDRESS_MAP_GLOBAL_MASK(0x7f) // guess
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	//ADDRESS_MAP_GLOBAL_MASK(0x7f) // guess, probably correct
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xBE) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xBE) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
-	AM_RANGE (0x40, 0x41) AM_WRITE(vgLD_X)  //LD X LO + HI 12 bits
-	AM_RANGE (0x42, 0x43) AM_WRITE(vgLD_Y)  //LD Y LO + HI 12 bits
-	AM_RANGE (0x44, 0x44) AM_WRITE(vgERR)    //LD ERR ('error' in bresenham algorithm)
-	AM_RANGE (0x45, 0x45) AM_WRITE(vgSOPS)   //LD SOPS (screen options (plus uart dest))
-	AM_RANGE (0x46, 0x46) AM_WRITE(vgPAT)    //LD PAT (pattern register)
-	AM_RANGE (0x47, 0x47) AM_WRITE(vgPMUL)   //LD PMUL (pattern multiplier)
-	AM_RANGE (0x60, 0x60) AM_WRITE(vgDU)     //LD DU (major)
-	AM_RANGE (0x61, 0x61) AM_WRITE(vgDVM)    //LD DVM (minor)
-	AM_RANGE (0x62, 0x62) AM_WRITE(vgDIR)    //LD DIR (direction)
-	AM_RANGE (0x63, 0x63) AM_WRITE(vgWOPS)   //LD WOPS (write options)
-	AM_RANGE (0x64, 0x67) AM_WRITE(vgEX)    //EX MOV, DOT, VEC, ER
-	AM_RANGE (0x68, 0x68) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
-	AM_RANGE (0x6C, 0x6C) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
-	AM_RANGE (0x70, 0x70) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
-	AM_RANGE (0x71, 0x71) AM_DEVWRITE("i8251", i8251_device, control_w) //LD COM (i8251 control reg)
-	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
-	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
-	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
-	AM_RANGE (0x40, 0x47) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
-	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff)
-	AM_RANGE (0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
-	AM_RANGE (0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
-	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
-	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
-	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED
-	//AM_RANGE (0x70, 0x70) AM_READ(unknown_70)
-	//AM_RANGE (0x78, 0x7f) AM_READ(unknown_78)
+	AM_RANGE (0x40, 0x41) AM_MIRROR(0x98) AM_WRITE(vgLD_X)  //LD X LO + HI 12 bits
+	AM_RANGE (0x42, 0x43) AM_MIRROR(0x98) AM_WRITE(vgLD_Y)  //LD Y LO + HI 12 bits
+	AM_RANGE (0x44, 0x44) AM_MIRROR(0x98) AM_WRITE(vgERR)    //LD ERR ('error' in bresenham algorithm)
+	AM_RANGE (0x45, 0x45) AM_MIRROR(0x98) AM_WRITE(vgSOPS)   //LD SOPS (screen options (plus uart dest))
+	AM_RANGE (0x46, 0x46) AM_MIRROR(0x98) AM_WRITE(vgPAT)    //LD PAT (pattern register)
+	AM_RANGE (0x47, 0x47) AM_MIRROR(0x98) AM_WRITE(vgPMUL)   //LD PMUL (pattern multiplier)
+	AM_RANGE (0x60, 0x60) AM_MIRROR(0x80) AM_WRITE(vgDU)     //LD DU (major)
+	AM_RANGE (0x61, 0x61) AM_MIRROR(0x80) AM_WRITE(vgDVM)    //LD DVM (minor)
+	AM_RANGE (0x62, 0x62) AM_MIRROR(0x80) AM_WRITE(vgDIR)    //LD DIR (direction)
+	AM_RANGE (0x63, 0x63) AM_MIRROR(0x80) AM_WRITE(vgWOPS)   //LD WOPS (write options)
+	AM_RANGE (0x64, 0x67) AM_MIRROR(0x80) AM_WRITE(vgEX)    //EX MOV, DOT, VEC, ER
+	AM_RANGE (0x68, 0x68) AM_MIRROR(0x83) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
+	AM_RANGE (0x6C, 0x6C) AM_MIRROR(0x83) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
+	AM_RANGE (0x70, 0x70) AM_MIRROR(0x82) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
+	AM_RANGE (0x71, 0x71) AM_MIRROR(0x82) AM_DEVWRITE("i8251", i8251_device, control_w) //LD COM (i8251 control reg)
+	//AM_RANGE (0x74, 0x74) AM_MIRROR(0x83) AM_WRITE(unknown_74)
+	//AM_RANGE (0x78, 0x78) AM_MIRROR(0x83) AM_WRITE(kbdw)   //KBDW ?(mirror?)
+	//AM_RANGE (0x7C, 0x7C) AM_MIRROR(0x83) AM_WRITE(unknown_7C)
+	AM_RANGE (0x40, 0x47) AM_MIRROR(0x80) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
+	AM_RANGE (0x48, 0x48) AM_MIRROR(0x87/*0x80*/) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff)
+	AM_RANGE (0x50, 0x50) AM_MIRROR(0x86) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
+	AM_RANGE (0x51, 0x51) AM_MIRROR(0x86) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
+	//AM_RANGE (0x58, 0x58) AM_MIRROR(0x87) AM_READ(unknown_58)
+	//AM_RANGE (0x60, 0x60) AM_MIRROR(0x87) AM_READ(unknown_60)
+	//AM_RANGE (0x68, 0x68) AM_MIRROR(0x87) AM_READ(unknown_68) // NOT USED
+	//AM_RANGE (0x70, 0x70) AM_MIRROR(0x87) AM_READ(unknown_70)
+	//AM_RANGE (0x78, 0x7f) AM_MIRROR(0x87) AM_READ(unknown_78)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -983,12 +1026,17 @@ ROM_START( vk100 )
      * 2 select bits to choose one of the 4 bits, sourced from the X reg LSBs (a4, a5)
      * 3 pattern function bits from WOPS (F0 "N" is a6, F1 and F2 are a7 and a8
      * and one bit from the lsb of the pattern register shifter (a9)
-i.e. addr bits 9876543210
-     *         ||||||\\\\- input from ram A
-     *         ||||\\----- bit select (from x reg lsb)
-     *         |||\------- negate N \___ low 3 bits of WOPS
-     *         |\\-------- function /
-     *         \---------- pattern bit P
+     * control bits:
+     *            /CE1 ----- GND [verified via tracing]
+     *            /CE2 ----- GND [verified via tracing]
+     * addr bits 9876543210
+     *           ||||||\\\\- input from ram (A)
+     *           ||||\\----- bit select (from x reg lsb)
+     *           |||\------- negate (N) \___ low 3 bits of WOPS
+     *           |\\-------- function   /
+     *           \---------- pattern bit (P)
+     * data bits: 3210
+     *            \\\\-- output to ram (M), but gated by an io line from vector rom
      *    functions are:
      *    Overlay: M=A|(P^N)
      *    Replace: M=P^N
@@ -998,9 +1046,17 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF )
-	// this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
-	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
-	// The VT125 prom @ E60 is literally identical to this, the same exact part: 23-060B1
+    /* this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
+     * it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
+     * control bits:
+     *            /CE1 ----- GND [verified via tracing]
+     *            /CE2 ----- GND [verified via tracing]
+     * addr bits: 76543210
+     *            \\\\\\\\- X9 thru X2
+     * data bits: 76543210
+     *            \\\\\\\\- X'9 thru X'2
+     * The VT125 prom @ E60 is literally identical to this, the same exact part: 23-060B1
+     */
 	ROM_LOAD( "wb---0_060b1.mmi6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "dir", ROMREGION_ERASEFF )
@@ -1009,13 +1065,13 @@ i.e. addr bits 9876543210
      * It tells the direction and enable for counting on the X and Y counters
      * and also handles the non-math related parts of the bresenham line algorithm
      * control bits:
-     *            /CE1 ----- ? ENA ERROR L?
-     *            /CE2 ----- ? D COUNT 0?
+     *            /CE1 ----- DCOUNT 0 H [verified via tracing]
+     *            /CE2 ----- ENA ERROR L [verified via tracing]
      * addr bits: 76543210
      *            ||||\\\\-- DIR (vgDIR register low 4 bits)
-     *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
-     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
-     *            |\-------- feedback bit from d5 gated by V CLK
+     *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
+     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
+     *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
      *            \--------- GND; the second half of the prom is blank (0x00)
      * data bits: 76543210
      *            |||||||\-- ENA X (enables change on X counter)
@@ -1023,7 +1079,7 @@ i.e. addr bits 9876543210
      *            |||||\---- Y DIRECTION (high is count down, low is count up)
      *            ||||\----- X DIRECTION (high is count down, low is count up)
      *            |||\------ PIXEL WRT
-     *            ||\------- feedback bit to a6
+     *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
      *            |\-------- UNUSED, always 0
      *            \--------- UNUSED, always 0
      * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
@@ -1033,18 +1089,18 @@ i.e. addr bits 9876543210
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
 	/* this is the "RAS/ERASE ROM" involved with driving the RAS lines and erasing VRAM dram (256*4, 82s129)
      * control bits:
-     *            /CE1 ----- /WRITE aka WRITE L (pin 6 of vector rom after being latched by its ls273) [verified from tracing and vt125 schematic]
-     *            /CE2 ----- /ENA WRITE aka ENA WRITE L [verified from tracing and vt125 schematic]
+     *            /CE1 ----- /WRITE aka WRITE L (pin 6 of vector rom after being latched by its ls273) [verified via tracing and vt125 schematic]
+     *            /CE2 ----- /ENA WRITE aka ENA WRITE L [verified via tracing and vt125 schematic]
      *                       (INHIBIT WRITE L (pin 5 of ls74 to extreme left edge of translate prom) XOR STROBE D COUNT (pin 5 of ls74 near the 20ma port) (pin 3 of the ls86 above the crtc)
      * addr bits: 76543210
-     *            |||||||\-- X'2 [verified from tracing]
-     *            ||||||\--- X'3 [verified from tracing]
-     *            |||||\---- register file bit 3/upper file MSB (DIR prom pin 4, ls191 2nd from left edge left of the hd46505 pin 9, upper ls670n pin 6, ls283 at the left edge left of the hd46505 pin 15) [verified from tracing]
-     *            ||||\----- (Y8 NOR !(X10 NAND X9)) (pins 4,5,6 of ls32 left of 8085, and pins 1,2 of the ls04 in the lower left corner, pins 10,9,8 of the ls00 at the left edge drawn from the ls74 between the 8251 and 8202) [verified from tracing]
-     *            |||\------ (X10 NOR Y10) (pins 10,9,8 of ;s32 left of 8085) [verified from tracing]
-     *            ||\------- X11 (D out of ls191 left of ls191 left of hd46505) [verified from tracing]
-     *            |\-------- Y11 (D out of ls191 left of hd46505) [verified from tracing]
-     *            \--------- ERASE L/d5 on the vector rom [verified from tracing]
+     *            |||||||\-- X'2 [verified via tracing]
+     *            ||||||\--- X'3 [verified via tracing]
+     *            |||||\---- register file bit 3/upper file MSB (DIR prom pin 4, ls191 2nd from left edge left of the hd46505 pin 9, upper ls670n pin 6, ls283 at the left edge left of the hd46505 pin 15) [verified via tracing]
+     *            ||||\----- (Y8 NOR !(X10 NAND X9)) (pins 4,5,6 of ls32 left of 8085, and pins 1,2 of the ls04 in the lower left corner, pins 10,9,8 of the ls00 at the left edge drawn from the ls74 between the 8251 and 8202) [verified via tracing]
+     *            |||\------ (X10 NOR Y10) (pins 10,9,8 of ls32 left of 8085) [verified via tracing]
+     *            ||\------- X11 (D out of ls191 left of ls191 left of hd46505) [verified via tracing]
+     *            |\-------- Y11 (D out of ls191 left of hd46505) [verified via tracing]
+     *            \--------- ERASE L/d5 on the vector rom [verified via tracing]
      * data bits: 3210
      *            |||\-- ? wr_1?
      *            ||\--- ? wr_2?
@@ -1075,14 +1131,14 @@ i.e. addr bits 9876543210
      * the vector rom bits are complex and are unfortunately poorly documented
      * in the tech manual. see figure 5-23.
      * control bits:
-     *            /CE1 ----- /GO aka GO L
-     *            /CE2 ----- GND
+     *            /CE1 ----- /GO aka GO L [verified via tracing]
+     *            /CE2 ----- GND [verified via tracing]
      * addr bits: 76543210
      *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-     *            |||\------ A0\__Address lsb bits of the execute write, i.e. VG_MODE; these are INVERTED FIRST.
-     *            ||\------- A1/
-     *            |\-------- CARRY_IN (when set, only one /LD ERROR pulse occurs instead of two)
-     *            \--------- ??? (/LD ERROR only goes active (low) when this is unset)
+     *            |||\------ (MODE 0 NAND GO) \_This effectively means when GO is low, these bits are both 1, when GO is high, these bits are the inverse of the MODE bits; this is DIFFERENT from the vt125, and was probably removed as unnecessary given that /GO is an enable for the vector rom anyway [verified via tracing]
+     *            ||\------- (MODE 1 NAND GO) /
+     *            |\-------- ? C OUT (when set, only one /LD ERROR pulse occurs instead of two)
+     *            \--------- ? FINISH (/LD ERROR only goes active (low) when this is unset)
      *
      * data bits: 76543210
      *            |||||||\-- /WRITE aka WRITE L (fig 5-20, page 5-32, writes the post-pattern-converted value back to vram at X,Y)
@@ -1090,7 +1146,7 @@ i.e. addr bits 9876543210
      *            |||||\---- VECTOR CLK aka V CLK [verified via tracing]
      *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
      *            |||\------ D LOAD [by process of elimination and limited tracing]
-     *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
+     *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified via tracing]
      *            |\-------- C0 aka C IN (high during DVM read, low otherwise, a carry in to the adder so DVM is converted from 1s to 2s complement)
      *            \--------- SHIFT ENA [verified via tracing]
      * The data bits all have pull-ups to +5v if the /CE1 pin is not low
@@ -1114,7 +1170,7 @@ i.e. addr bits 9876543210
      *            /CE1 -- GND(Unused)
      * addr bits: 43210
      *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-     *            \------ comes from the gated ERASE L/d5 from the vector rom, only low during VG_MODE == ER (ERase Screen) [verified from tracing]
+     *            \------ comes from the gated ERASE L/d5 from the vector rom, only low during VG_MODE == ER (ERase Screen) [verified via tracing]
      *                      when high: the sync rom matches figure 5-20 (page 5-32) and 5-23 (page 5-38)
      *                      when low: RA/RB is fixed on WOPS in the register file
      *                                LD SHFR does NOT output pulses (effectively blanking the screen)
