@@ -1231,6 +1231,14 @@ void genesis_vdp_lv4irqline_callback_segas18(running_machine &machine, bool stat
  *
  *************************************/
 
+static const sega315_5124_interface sms_vdp_ntsc_intf =
+{
+	false,
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
 static MACHINE_CONFIG_START( system18, segas18_state )
 
 	// basic machine hardware
@@ -1248,6 +1256,7 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
 	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_segas18);
 	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_segas18);
 	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_segas18);

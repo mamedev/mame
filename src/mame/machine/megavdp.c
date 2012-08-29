@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "megavdp.h"
 #include "mega32x.h"
+#include "video/315_5124.h"
 
 /* still have dependencies on the following external gunk */
 
@@ -57,7 +58,7 @@ void genesis_vdp_lv4irqline_callback_default(running_machine &machine, bool stat
 const device_type SEGA_GEN_VDP = &device_creator<sega_genesis_vdp_device>;
 
 sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_GEN_VDP, "sega_genesis_vdp_device", tag, owner, clock)
+	: sega315_5124_device( mconfig, SEGA315_5246, "Sega Genesis VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true )
 {
 	m_genesis_vdp_sndirqline_callback = genesis_vdp_sndirqline_callback_default;
 	m_genesis_vdp_lv6irqline_callback = genesis_vdp_lv6irqline_callback_default;

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "video/315_5124.h"
 
 
 /*  The VDP occupies addresses C00000h to C0001Fh.
@@ -153,7 +154,7 @@ extern void megadriv_reset_vdp(running_machine &machine);
 extern int genvdp_use_cram;
 
 
-class sega_genesis_vdp_device : public device_t
+class sega_genesis_vdp_device : public sega315_5124_device
 {
 public:
 	sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

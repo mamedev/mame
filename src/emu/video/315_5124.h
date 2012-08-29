@@ -42,6 +42,12 @@ PALETTE_INIT( sega315_5124 );
 PALETTE_INIT( sega315_5378 );
 
 
+#define SEGA315_5378_CRAM_SIZE    0x40	/* 32 colors x 2 bytes per color = 64 bytes */
+#define SEGA315_5124_CRAM_SIZE    0x20	/* 32 colors x 1 bytes per color = 32 bytes */
+
+#define VRAM_SIZE             0x4000
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/

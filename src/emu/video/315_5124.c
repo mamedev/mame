@@ -66,11 +66,6 @@ PAL frame timing
 #define DRAW_TIME_GG		86		/* 1 + 2 + 14 +8 + 96/2 */
 #define DRAW_TIME_SMS		0
 
-#define SEGA315_5378_CRAM_SIZE    0x40	/* 32 colors x 2 bytes per color = 64 bytes */
-#define SEGA315_5124_CRAM_SIZE    0x20	/* 32 colors x 1 bytes per color = 32 bytes */
-
-#define VRAM_SIZE             0x4000
-
 #define PRIORITY_BIT          0x1000
 #define BACKDROP_COLOR        ((m_vdp_mode == 4 ? 0x10 : 0x00) + (m_reg[0x07] & 0x0f))
 
