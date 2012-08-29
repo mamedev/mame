@@ -8,7 +8,6 @@ driver by Nicola Salmoria
 
 To Do:
 - Sprite Priorities in dommy
-- Where is IRQ ack in dommy?
 
 
 Rock Duck
@@ -61,7 +60,8 @@ public:
 	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: btime_state(mconfig, type, tag) { }
 
-	DECLARE_WRITE8_MEMBER(dommy_coincounter_w);
+	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
+	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
 	DECLARE_DRIVER_INIT(rockduck);
 };
@@ -70,14 +70,20 @@ public:
 
 static TIMER_DEVICE_CALLBACK( scregg_interrupt )
 {
+	// assume that the irq generator is similar to burgertime hw
 	scregg_state *state = timer.machine().driver_data<scregg_state>();
-	device_set_input_line(state->m_maincpu, 0, (param & 8) ? HOLD_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(scregg_state::dommy_coincounter_w)
+WRITE8_MEMBER(scregg_state::scregg_irqack_w)
 {
-	coin_counter_w(machine(), 0, data & 0x40);
-	coin_counter_w(machine(), 1, data & 0x80);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+}
+
+READ8_MEMBER(scregg_state::scregg_irqack_r)
+{
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	return 0;
 }
 
 
@@ -86,12 +92,11 @@ static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, scregg_state )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(dommy_coincounter_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(scregg_irqack_w)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
-/*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("P2")
-	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w) AM_READ(scregg_irqack_r)
 	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -104,10 +109,10 @@ static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, scregg_state )
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") // AM_WRITENOP // irqack/watchdog? + coincounter?
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE(scregg_irqack_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
-	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w) AM_READ(scregg_irqack_r)
 	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM    /* reset/interrupt vectors */
