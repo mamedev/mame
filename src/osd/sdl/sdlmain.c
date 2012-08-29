@@ -199,7 +199,7 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_KEYMAP,                      "0",    OPTION_BOOLEAN,    "enable keymap" },
 	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", OPTION_STRING, "keymap filename" },
 #ifdef SDLMAME_MACOSX
-	{ SDLOPTION_UIMODEKEY,					 "DELETE", OPTION_STRING,   "Key to toggle keyboard mode" },
+	{ SDLOPTION_UIMODEKEY,					 "DEL", OPTION_STRING,   "Key to toggle keyboard mode" },
 #else
 	{ SDLOPTION_UIMODEKEY,			         "SCRLOCK", OPTION_STRING,  "Key to toggle keyboard mode" },
 #endif	// SDLMAME_MACOSX
