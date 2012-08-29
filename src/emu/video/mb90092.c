@@ -155,12 +155,14 @@ WRITE8_MEMBER( mb90092_device::write )
 			switch(m_cmd)
 			{
 				case 0x80: // Preset VRAM address
-					m_osd_addr = dat;
-					//printf("%04x %d %d\n",m_osd_addr,(m_osd_addr & 0x1f),(m_osd_addr & 0x1e0) >> 5);
+					m_osd_addr = dat & 0x1ff;
+					//m_vsl = (dat & 0x200) >> 9);
+					break;
+				case 0x88: //
 					break;
 				case 0x90: // Write Character
 					int x,y;
-					x = (m_osd_addr & 0x1f);
+					x = (m_osd_addr & 0x01f);
 					y = (m_osd_addr & 0x1e0) >> 5;
 					//printf("%d %d\n",x,y);
 					write_word(x+y*24,dat);

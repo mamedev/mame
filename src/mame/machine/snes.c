@@ -1572,11 +1572,7 @@ static void nss_io_read( running_machine &machine )
 		state->m_joy_flag = 0;
 }
 
-/*
-		if(state->m_is_nss)
-			state->m_joy_flag = 0;
 
-*/
 
 static UINT8 nss_oldjoy1_read( running_machine &machine )
 {
