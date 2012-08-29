@@ -13,7 +13,8 @@ for which the system holds two at once.
 The "To Do" list:
 -----------------
 -Main CPU banks cartridges via ports $c0/$c1
--Consider moving the 3 cartridges of the slot 2 in a sotwware list since they are interchangable
+-Consider moving the 3 cartridges of the slot 2 in a software list since they are interchangable
+ (that's bs, since that pss61 should always be there anyway ... -AS)
 -Hook the z180 clone, the DSP 1A/1B and the Super FX
 -Add the missing GROM4-1
 -Add the possibly alternate revision of the attract ROM, with Kirby holding a coin
@@ -541,7 +542,7 @@ ROM_START( pss61 )
 	ROM_REGION( 0x8000, "grom2", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x380000, "game", 0 )
-	ROM_LOAD( "shvc-mk-0.rom6", 0x000000, 0x080000, CRC(c8002453) SHA1(cbb853bf911255c1d8eb27cd34fc7855a0dda218) )
+	ROM_LOAD( "shvc-mk-0.rom12", 0x000000, 0x080000, CRC(c8002453) SHA1(cbb853bf911255c1d8eb27cd34fc7855a0dda218) )
 	ROM_LOAD( "shvc-4m-1.rom3", 0x080000, 0x200000, CRC(91b28d56) SHA1(b83dd73d3d6049450bb8092d73c3af879804f58c) )
 	ROM_LOAD( "shvc-fo-1.ic20", 0x280000, 0x100000, CRC(ad668a41) SHA1(39ff7354a7fa02295c899b7a7ec3556998ac2636) ) /* TODO: Super FX hook needed for Star Fox */
 ROM_END
