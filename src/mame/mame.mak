@@ -2247,6 +2247,8 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
 $(DRIVERS)/zac_1.o:	$(LAYOUT)/zac_1.lh
 
+$(DRIVERS)/zac_2.o:	$(LAYOUT)/zac_2.lh
+
 $(DRIVERS)/zac_proto.o:	$(LAYOUT)/zac_proto.lh
 
 $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
