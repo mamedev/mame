@@ -48,17 +48,14 @@
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
 /* enumeration specifying which model of Voodoo we are emulating */
 enum
 {
-	VOODOO_1,
-	VOODOO_2,
-	VOODOO_BANSHEE,
-	VOODOO_3,
-	MAX_VOODOO_TYPES
+	TYPE_VOODOO_1,
+	TYPE_VOODOO_2,
+	TYPE_VOODOO_BANSHEE,
+	TYPE_VOODOO_3
 };
-
 
 #define STD_VOODOO_1_CLOCK			50000000
 #define STD_VOODOO_2_CLOCK			90000000
@@ -77,7 +74,6 @@ typedef void (*voodoo_stall_func)(device_t *device, int state);
 typedef struct _voodoo_config voodoo_config;
 struct _voodoo_config
 {
-	int					type;
 	UINT8				fbmem;
 	UINT8				tmumem0;
 	UINT8				tmumem1;
@@ -93,40 +89,21 @@ struct _voodoo_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_3DFX_VOODOO_ADD(_tag, _type, _clock, _fbmem, _screen) \
-	MCFG_DEVICE_ADD(_tag, VOODOO_GRAPHICS, _clock) \
-	MCFG_DEVICE_CONFIG_DATA32(voodoo_config, type, _type) \
-	MCFG_DEVICE_CONFIG_DATA32(voodoo_config, fbmem, _fbmem) \
-	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, screen, _screen)
+#define MCFG_3DFX_VOODOO_1_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, VOODOO_1, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_3DFX_VOODOO_1_ADD(_tag, _clock, _fbmem, _screen) \
-	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_1, _clock, _fbmem, _screen)
+#define MCFG_3DFX_VOODOO_2_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, VOODOO_2, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_3DFX_VOODOO_2_ADD(_tag, _clock, _fbmem, _screen) \
-	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_2, _clock, _fbmem, _screen)
+#define MCFG_3DFX_VOODOO_BANSHEE_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, VOODOO_BANSHEE, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_3DFX_VOODOO_BANSHEE_ADD(_tag, _clock, _fbmem, _screen) \
-	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_BANSHEE, _clock, _fbmem, _screen)
-
-#define MCFG_3DFX_VOODOO_3_ADD(_tag, _clock, _fbmem, _screen) \
-	MCFG_3DFX_VOODOO_ADD(_tag, VOODOO_3, _clock, _fbmem, _screen)
-
-#define MCFG_3DFX_VOODOO_TMU_MEMORY(_tmu, _tmumem) \
-	MCFG_DEVICE_CONFIG_DATA32(voodoo_config, tmumem##_tmu, _tmumem)
-
-#define MCFG_3DFX_VOODOO_VBLANK(_vblank) \
-	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, vblank, _vblank)
-
-#define MCFG_3DFX_VOODOO_STALL(_stall) \
-	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, stall, _stall)
-
-#define MCFG_3DFX_VOODOO_CPU(_cputag) \
-	MCFG_DEVICE_CONFIG_DATAPTR(voodoo_config, cputag, _cputag)
-
-#define MCFG_3DFX_VOODOO_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-
+#define MCFG_3DFX_VOODOO_3_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, VOODOO_3, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -151,6 +128,8 @@ READ32_DEVICE_HANDLER( banshee_rom_r );
 
 /* ----- device interface ----- */
 
-DECLARE_LEGACY_DEVICE(VOODOO_GRAPHICS, voodoo);
-
+DECLARE_LEGACY_DEVICE(VOODOO_1, voodoo_1);
+DECLARE_LEGACY_DEVICE(VOODOO_2, voodoo_2);
+DECLARE_LEGACY_DEVICE(VOODOO_BANSHEE, voodoo_banshee);
+DECLARE_LEGACY_DEVICE(VOODOO_3, voodoo_3);
 #endif

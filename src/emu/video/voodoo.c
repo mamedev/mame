@@ -314,7 +314,7 @@ static const raster_info predef_raster_table[] =
 INLINE voodoo_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == VOODOO_GRAPHICS);
+	assert((device->type() == VOODOO_1) || (device->type() == VOODOO_2) || (device->type() == VOODOO_BANSHEE) ||  (device->type() == VOODOO_3));
 
 	return (voodoo_state *)downcast<legacy_device_base *>(device)->token();
 }
@@ -339,7 +339,7 @@ int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &clipr
 	v->fbi.video_changed = FALSE;
 
 	/* if we are blank, just fill with black */
-	if (v->type <= VOODOO_2 && FBIINIT1_SOFTWARE_BLANK(v->reg[fbiInit1].u))
+	if (v->type <= TYPE_VOODOO_2 && FBIINIT1_SOFTWARE_BLANK(v->reg[fbiInit1].u))
 	{
 		bitmap.fill(0, cliprect);
 		return changed;
@@ -351,7 +351,7 @@ int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &clipr
 		UINT8 rtable[32], gtable[64], btable[32];
 
 		/* Voodoo/Voodoo-2 have an internal 33-entry CLUT */
-		if (v->type <= VOODOO_2)
+		if (v->type <= TYPE_VOODOO_2)
 		{
 			/* kludge: some of the Midway games write 0 to the last entry when they obviously mean FF */
 			if ((v->fbi.clut[32] & 0xffffff) == 0 && (v->fbi.clut[31] & 0xffffff) != 0)
@@ -512,7 +512,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 
 	/* init the pens */
 	f->clut_dirty = TRUE;
-	if (v->type <= VOODOO_2)
+	if (v->type <= TYPE_VOODOO_2)
 	{
 		for (pen = 0; pen < 32; pen++)
 			v->fbi.clut[pen] = MAKE_ARGB(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
@@ -533,7 +533,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	f->fifo.size = f->fifo.in = f->fifo.out = 0;
 
 	/* set the fog delta mask */
-	f->fogdelta_mask = (v->type < VOODOO_2) ? 0xff : 0xfc;
+	f->fogdelta_mask = (v->type < TYPE_VOODOO_2) ? 0xff : 0xfc;
 }
 
 
@@ -589,7 +589,7 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 	t->mask = tmem - 1;
 	t->reg = reg;
 	t->regdirty = TRUE;
-	t->bilinear_mask = (v->type >= VOODOO_2) ? 0xff : 0xf0;
+	t->bilinear_mask = (v->type >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
 	t->ncc[0].dirty = t->ncc[1].dirty = TRUE;
@@ -603,7 +603,7 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 	t->texel[3] = v->tmushare.int8;
 	t->texel[4] = v->tmushare.ai44;
 	t->texel[5] = t->palette;
-	t->texel[6] = (v->type >= VOODOO_2) ? t->palettea : NULL;
+	t->texel[6] = (v->type >= TYPE_VOODOO_2) ? t->palettea : NULL;
 	t->texel[7] = NULL;
 	t->texel[8] = v->tmushare.rgb332;
 	t->texel[9] = t->ncc[0].texel;
@@ -617,11 +617,11 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 
 	/* attach the palette to NCC table 0 */
 	t->ncc[0].palette = t->palette;
-	if (v->type >= VOODOO_2)
+	if (v->type >= TYPE_VOODOO_2)
 		t->ncc[0].palettea = t->palettea;
 
 	/* set up texture address calculations */
-	if (v->type <= VOODOO_2)
+	if (v->type <= TYPE_VOODOO_2)
 	{
 		t->texaddr_mask = 0x0fffff;
 		t->texaddr_shift = 3;
@@ -647,7 +647,7 @@ static void voodoo_postload(voodoo_state *v)
 	}
 
 	/* recompute video memory to get the FBI FIFO base recomputed */
-	if (v->type <= VOODOO_2)
+	if (v->type <= TYPE_VOODOO_2)
 		recompute_video_memory(v);
 }
 
@@ -799,7 +799,7 @@ static void init_save_state(device_t *device)
 	}
 
 	/* register states: banshee */
-	if (v->type >= VOODOO_BANSHEE)
+	if (v->type >= TYPE_VOODOO_BANSHEE)
 	{
 		device->save_item(NAME(v->banshee.io));
 		device->save_item(NAME(v->banshee.agp));
@@ -883,9 +883,9 @@ static void swap_buffers(voodoo_state *v)
 	v->reg[fbiSwapHistory].u = (v->reg[fbiSwapHistory].u << 4) | count;
 
 	/* rotate the buffers */
-	if (v->type <= VOODOO_2)
+	if (v->type <= TYPE_VOODOO_2)
 	{
-		if (v->type < VOODOO_2 || !v->fbi.vblank_dont_swap)
+		if (v->type < TYPE_VOODOO_2 || !v->fbi.vblank_dont_swap)
 		{
 			if (v->fbi.rgboffs[2] == ~0)
 			{
@@ -1000,7 +1000,7 @@ static TIMER_CALLBACK( vblank_off_callback )
 	v->fbi.vblank = FALSE;
 
 	// TODO: Vblank IRQ enable is VOODOO3 only?
-	if (v->type >= VOODOO_3)
+	if (v->type >= TYPE_VOODOO_3)
 	{
 		if (v->reg[intrCtrl].u & 0x8)		// call IRQ handler if VSYNC interrupt (falling) is enabled
 		{
@@ -1056,7 +1056,7 @@ static TIMER_CALLBACK( vblank_callback )
 	v->fbi.vblank = TRUE;
 
 	// TODO: Vblank IRQ enable is VOODOO3 only?
-	if (v->type >= VOODOO_3)
+	if (v->type >= TYPE_VOODOO_3)
 	{
 		if (v->reg[intrCtrl].u & 0x4)		// call IRQ handler if VSYNC interrupt (rising) is enabled
 		{
@@ -1118,14 +1118,14 @@ static void recompute_video_memory(voodoo_state *v)
 
 	/* memory config is determined differently between V1 and V2 */
 	memory_config = FBIINIT2_ENABLE_TRIPLE_BUF(v->reg[fbiInit2].u);
-	if (v->type == VOODOO_2 && memory_config == 0)
+	if (v->type == TYPE_VOODOO_2 && memory_config == 0)
 		memory_config = FBIINIT5_BUFFER_ALLOCATION(v->reg[fbiInit5].u);
 
 	/* tiles are 64x16/32; x_tiles specifies how many half-tiles */
-	v->fbi.tile_width = (v->type == VOODOO_1) ? 64 : 32;
-	v->fbi.tile_height = (v->type == VOODOO_1) ? 16 : 32;
+	v->fbi.tile_width = (v->type == TYPE_VOODOO_1) ? 64 : 32;
+	v->fbi.tile_height = (v->type == TYPE_VOODOO_1) ? 16 : 32;
 	v->fbi.x_tiles = FBIINIT1_X_VIDEO_TILES(v->reg[fbiInit1].u);
-	if (v->type == VOODOO_2)
+	if (v->type == TYPE_VOODOO_2)
 	{
 		v->fbi.x_tiles = (v->fbi.x_tiles << 1) |
 						(FBIINIT1_X_VIDEO_TILES_BIT5(v->reg[fbiInit1].u) << 5) |
@@ -1722,7 +1722,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 			if (LOG_CMDFIFO) logerror("  PACKET TYPE 1: count=%d inc=%d reg=%04X\n", count, inc, target);
 
-			if (v->type >= VOODOO_BANSHEE && (target & 0x800))
+			if (v->type >= TYPE_VOODOO_BANSHEE && (target & 0x800))
 			{
 				//  Banshee/Voodoo3 2D register writes
 
@@ -1900,7 +1900,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 			if (LOG_CMDFIFO) logerror("  PACKET TYPE 4: mask=%X reg=%04X pad=%d\n", (command >> 15) & 0x3fff, target, command >> 29);
 
-			if (v->type >= VOODOO_BANSHEE && (target & 0x800))
+			if (v->type >= TYPE_VOODOO_BANSHEE && (target & 0x800))
 			{
 				//  Banshee/Voodoo3 2D register writes
 
@@ -2447,21 +2447,21 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		/* mask off invalid bits for different cards */
 		case fbzColorPath:
 			poly_wait(v->poly, v->regnames[regnum]);
-			if (v->type < VOODOO_2)
+			if (v->type < TYPE_VOODOO_2)
 				data &= 0x0fffffff;
 			if (chips & 1) v->reg[fbzColorPath].u = data;
 			break;
 
 		case fbzMode:
 			poly_wait(v->poly, v->regnames[regnum]);
-			if (v->type < VOODOO_2)
+			if (v->type < TYPE_VOODOO_2)
 				data &= 0x001fffff;
 			if (chips & 1) v->reg[fbzMode].u = data;
 			break;
 
 		case fogMode:
 			poly_wait(v->poly, v->regnames[regnum]);
-			if (v->type < VOODOO_2)
+			if (v->type < TYPE_VOODOO_2)
 				data &= 0x0000003f;
 			if (chips & 1) v->reg[fogMode].u = data;
 			break;
@@ -2519,7 +2519,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		/* gamma table access -- Voodoo/Voodoo2 only */
 		case clutData:
-			if (v->type <= VOODOO_2 && (chips & 1))
+			if (v->type <= TYPE_VOODOO_2 && (chips & 1))
 			{
 				poly_wait(v->poly, v->regnames[regnum]);
 				if (!FBIINIT1_VIDEO_TIMING_RESET(v->reg[fbiInit1].u))
@@ -2538,7 +2538,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		/* external DAC access -- Voodoo/Voodoo2 only */
 		case dacData:
-			if (v->type <= VOODOO_2 && (chips & 1))
+			if (v->type <= TYPE_VOODOO_2 && (chips & 1))
 			{
 				poly_wait(v->poly, v->regnames[regnum]);
 				if (!(data & 0x800))
@@ -2553,7 +2553,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		case vSync:
 		case backPorch:
 		case videoDimensions:
-			if (v->type <= VOODOO_2 && (chips & 1))
+			if (v->type <= TYPE_VOODOO_2 && (chips & 1))
 			{
 				poly_wait(v->poly, v->regnames[regnum]);
 				v->reg[regnum].u = data;
@@ -2565,7 +2565,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
 
-					if (v->type == VOODOO_2)
+					if (v->type == TYPE_VOODOO_2)
 					{
 						htotal = ((v->reg[hSync].u >> 16) & 0x7ff) + 1 + (v->reg[hSync].u & 0x1ff) + 1;
 						vtotal = ((v->reg[vSync].u >> 16) & 0x1fff) + (v->reg[vSync].u & 0x1fff);
@@ -2645,7 +2645,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		/* fbiInit0 can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
 		case fbiInit0:
 			poly_wait(v->poly, v->regnames[regnum]);
-			if (v->type <= VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
+			if (v->type <= TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
 			{
 				v->reg[fbiInit0].u = data;
 				if (FBIINIT0_GRAPHICS_RESET(data))
@@ -2659,7 +2659,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		/* fbiInit5-7 are Voodoo 2-only; ignore them on anything else */
 		case fbiInit5:
 		case fbiInit6:
-			if (v->type < VOODOO_2)
+			if (v->type < TYPE_VOODOO_2)
 				break;
 			/* else fall through... */
 
@@ -2669,7 +2669,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		case fbiInit2:
 		case fbiInit4:
 			poly_wait(v->poly, v->regnames[regnum]);
-			if (v->type <= VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
+			if (v->type <= TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
 			{
 				v->reg[regnum].u = data;
 				recompute_video_memory(v);
@@ -2679,7 +2679,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		case fbiInit3:
 			poly_wait(v->poly, v->regnames[regnum]);
-			if (v->type <= VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
+			if (v->type <= TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
 			{
 				v->reg[regnum].u = data;
 				v->alt_regmap = FBIINIT3_TRI_REGISTER_REMAP(data);
@@ -2690,20 +2690,20 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		case fbiInit7:
 /*      case swapPending: -- Banshee */
-			if (v->type == VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(v->pci.init_enable))
 			{
 				poly_wait(v->poly, v->regnames[regnum]);
 				v->reg[regnum].u = data;
 				v->fbi.cmdfifo[0].enable = FBIINIT7_CMDFIFO_ENABLE(data);
 				v->fbi.cmdfifo[0].count_holes = !FBIINIT7_DISABLE_CMDFIFO_HOLES(data);
 			}
-			else if (v->type >= VOODOO_BANSHEE)
+			else if (v->type >= TYPE_VOODOO_BANSHEE)
 				v->fbi.swaps_pending++;
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
 		case cmdFifoBaseAddr:
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 			{
 				poly_wait(v->poly, v->regnames[regnum]);
 				v->reg[regnum].u = data;
@@ -2713,28 +2713,28 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			break;
 
 		case cmdFifoBump:
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 				fatalerror("cmdFifoBump");
 			break;
 
 		case cmdFifoRdPtr:
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].rdptr = data;
 			break;
 
 		case cmdFifoAMin:
 /*      case colBufferAddr: -- Banshee */
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].amin = data;
-			else if (v->type >= VOODOO_BANSHEE && (chips & 1))
+			else if (v->type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 				v->fbi.rgboffs[1] = data & v->fbi.mask & ~0x0f;
 			break;
 
 		case cmdFifoAMax:
 /*      case colBufferStride: -- Banshee */
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].amax = data;
-			else if (v->type >= VOODOO_BANSHEE && (chips & 1))
+			else if (v->type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 			{
 				if (data & 0x8000)
 					v->fbi.rowpixels = (data & 0x7f) << 6;
@@ -2745,17 +2745,17 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		case cmdFifoDepth:
 /*      case auxBufferAddr: -- Banshee */
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].depth = data;
-			else if (v->type >= VOODOO_BANSHEE && (chips & 1))
+			else if (v->type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 				v->fbi.auxoffs = data & v->fbi.mask & ~0x0f;
 			break;
 
 		case cmdFifoHoles:
 /*      case auxBufferStride: -- Banshee */
-			if (v->type == VOODOO_2 && (chips & 1))
+			if (v->type == TYPE_VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].holes = data;
-			else if (v->type >= VOODOO_BANSHEE && (chips & 1))
+			else if (v->type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 			{
 				int rowpixels;
 
@@ -3121,7 +3121,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 		mask &= ~(0xf0 + LFB_DEPTH_PRESENT_MSW);
 
 	/* select the target buffer */
-	destbuf = (v->type >= VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_WRITE_BUFFER_SELECT(v->reg[lfbMode].u);
+	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_WRITE_BUFFER_SELECT(v->reg[lfbMode].u);
 	switch (destbuf)
 	{
 		case 0:			/* front buffer */
@@ -3317,7 +3317,7 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 		UINT8 *dest;
 
 		/* extract info */
-		if (v->type <= VOODOO_2)
+		if (v->type <= TYPE_VOODOO_2)
 		{
 			lod = (offset >> 15) & 0x0f;
 			tt = (offset >> 7) & 0xff;
@@ -3362,7 +3362,7 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 		UINT16 *dest;
 
 		/* extract info */
-		if (v->type <= VOODOO_2)
+		if (v->type <= TYPE_VOODOO_2)
 		{
 			lod = (offset >> 15) & 0x0f;
 			tt = (offset >> 7) & 0xff;
@@ -3554,7 +3554,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		UINT8 access;
 
 		/* some special stuff for Voodoo 2 */
-		if (v->type >= VOODOO_2)
+		if (v->type >= TYPE_VOODOO_2)
 		{
 			/* we might be in CMDFIFO mode */
 			if (FBIINIT7_CMDFIFO_ENABLE(v->reg[fbiInit7].u))
@@ -3762,7 +3762,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 				result |= 1 << 9;
 
 			/* Banshee is different starting here */
-			if (v->type < VOODOO_BANSHEE)
+			if (v->type < TYPE_VOODOO_BANSHEE)
 			{
 				/* bits 11:10 specifies which buffer is visible */
 				result |= v->fbi.frontbuf << 10;
@@ -3906,7 +3906,7 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	y = (offset >> 9) & 0x3ff;
 
 	/* select the target buffer */
-	destbuf = (v->type >= VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_READ_BUFFER_SELECT(v->reg[lfbMode].u);
+	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_READ_BUFFER_SELECT(v->reg[lfbMode].u);
 	switch (destbuf)
 	{
 		case 0:			/* front buffer */
@@ -4807,28 +4807,23 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
     device start callback
 -------------------------------------------------*/
 
-static DEVICE_START( voodoo )
+static void common_start_voodoo(device_t *device, UINT8 type)
 {
-	const voodoo_config *config = (const voodoo_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	const voodoo_config *config = (const voodoo_config *)device->static_config();
 	voodoo_state *v = get_safe_token(device);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
 	UINT32 tmumem0;
 	int val;
 
-	/* validate some basic stuff */
-	assert(device->static_config() == NULL);
-	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
-
 	/* validate configuration */
 	assert(config->screen != NULL);
 	assert(config->cputag != NULL);
-	assert(config->type >= VOODOO_1 && config->type < MAX_VOODOO_TYPES);
 	assert(config->fbmem > 0);
-	assert(config->type >= VOODOO_BANSHEE || config->tmumem0 > 0);
 
 	/* store a pointer back to the device */
 	v->device = device;
+	v->type = type;
 
 	/* copy config data */
 	v->freq = device->clock();
@@ -4869,30 +4864,30 @@ static DEVICE_START( voodoo )
 	}
 
 	/* configure type-specific values */
-	switch (config->type)
+	switch (v->type)
 	{
-		case VOODOO_1:
+		case TYPE_VOODOO_1:
 			v->regaccess = voodoo_register_access;
 			v->regnames = voodoo_reg_name;
 			v->alt_regmap = 0;
 			v->fbi.lfb_stride = 10;
 			break;
 
-		case VOODOO_2:
+		case TYPE_VOODOO_2:
 			v->regaccess = voodoo2_register_access;
 			v->regnames = voodoo_reg_name;
 			v->alt_regmap = 0;
 			v->fbi.lfb_stride = 10;
 			break;
 
-		case VOODOO_BANSHEE:
+		case TYPE_VOODOO_BANSHEE:
 			v->regaccess = banshee_register_access;
 			v->regnames = banshee_reg_name;
 			v->alt_regmap = 1;
 			v->fbi.lfb_stride = 11;
 			break;
 
-		case VOODOO_3:
+		case TYPE_VOODOO_3:
 			v->regaccess = banshee_register_access;
 			v->regnames = banshee_reg_name;
 			v->alt_regmap = 1;
@@ -4918,7 +4913,6 @@ static DEVICE_START( voodoo )
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
 	v->cpu = device->machine().device(config->cputag);
 	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
-	v->type = config->type;
 	v->chipmask = 0x01;
 	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;
 	v->trigger = 51324 + v->index;
@@ -4936,7 +4930,7 @@ static DEVICE_START( voodoo )
 
 	/* allocate memory */
 	tmumem0 = config->tmumem0;
-	if (config->type <= VOODOO_2)
+	if (v->type <= TYPE_VOODOO_2)
 	{
 		/* separate FB/TMU memory */
 		fbmem = auto_alloc_array(device->machine(), UINT8, config->fbmem << 20);
@@ -4959,7 +4953,7 @@ static DEVICE_START( voodoo )
 	/* set up the TMUs */
 	init_tmu(v, &v->tmu[0], &v->reg[0x100], tmumem[0], tmumem0 << 20);
 	v->chipmask |= 0x02;
-	if (config->tmumem1 != 0 || v->type == VOODOO_3)
+	if (config->tmumem1 != 0 || v->type == TYPE_VOODOO_3)
 	{
 		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], config->tmumem1 << 20);
 		v->chipmask |= 0x04;
@@ -4991,6 +4985,24 @@ static DEVICE_START( voodoo )
 	init_save_state(device);
 }
 
+static DEVICE_START( voodoo_1 )
+{
+	common_start_voodoo(device, TYPE_VOODOO_1);
+}
+static DEVICE_START( voodoo_2 )
+{
+	common_start_voodoo(device, TYPE_VOODOO_2);
+}
+
+static DEVICE_START( voodoo_banshee )
+{
+	common_start_voodoo(device, TYPE_VOODOO_BANSHEE);
+}
+
+static DEVICE_START( voodoo_3 )
+{
+	common_start_voodoo(device, TYPE_VOODOO_3);
+}
 
 /*-------------------------------------------------
     device exit callback
@@ -5021,36 +5033,58 @@ static DEVICE_RESET( voodoo )
     device definition
 -------------------------------------------------*/
 
-INLINE const char *get_voodoo_name(const device_t *device)
-{
-	const voodoo_config *config = (device != NULL) ? (const voodoo_config *)downcast<const legacy_device_base *>(device)->inline_config() : NULL;
-	switch (config->type)
-	{
-		default:
-		case VOODOO_1:					return "3dfx Voodoo Graphics";
-		case VOODOO_2:					return "3dfx Voodoo 2";
-		case VOODOO_BANSHEE:			return "3dfx Voodoo Banshee";
-		case VOODOO_3:					return "3dfx Voodoo 3";
-	}
-}
-
 DEVICE_GET_INFO(voodoo)
 {
  switch (state)
  {
   case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(voodoo_state); break;
 
-  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(voodoo_config); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo); break;
-
   case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(voodoo); break;
 
   case DEVINFO_FCT_STOP: info->stop = DEVICE_STOP_NAME(voodoo); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, get_voodoo_name(device)); break;
  }
 }
+
+
+DEVICE_GET_INFO(voodoo_1)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo Graphics"); break;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_1); break;
+  default: DEVICE_GET_INFO_CALL(voodoo); break;
+ }
+}
+
+DEVICE_GET_INFO(voodoo_2)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo 2"); break;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_2); break;
+  default: DEVICE_GET_INFO_CALL(voodoo); break;
+ }
+}
+DEVICE_GET_INFO(voodoo_banshee)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo Banshee"); break;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_banshee); break;
+  default: DEVICE_GET_INFO_CALL(voodoo); break;
+ }
+}
+
+DEVICE_GET_INFO(voodoo_3)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo 3"); break;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_3); break;
+  default: DEVICE_GET_INFO_CALL(voodoo); break;
+ }
+}
+
 
 /***************************************************************************
     COMMAND HANDLERS
@@ -5081,7 +5115,7 @@ static INT32 fastfill(voodoo_state *v)
 	if (FBZMODE_RGB_BUFFER_MASK(v->reg[fbzMode].u))
 	{
 		/* determine the draw buffer */
-		int destbuf = (v->type >= VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
+		int destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
 		switch (destbuf)
 		{
 			case 0:		/* front buffer */
@@ -5219,7 +5253,7 @@ static INT32 triangle(voodoo_state *v)
 //  poly_wait(v->poly, "triangle");
 
 	/* determine the draw buffer */
-	destbuf = (v->type >= VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
+	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(v->reg[fbzMode].u);
 	switch (destbuf)
 	{
 		case 0:		/* front buffer */
@@ -5679,8 +5713,10 @@ static void dump_rasterizer_stats(voodoo_state *v)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(VOODOO_GRAPHICS, voodoo);
-
+DEFINE_LEGACY_DEVICE(VOODOO_1, voodoo_1);
+DEFINE_LEGACY_DEVICE(VOODOO_2, voodoo_2);
+DEFINE_LEGACY_DEVICE(VOODOO_BANSHEE, voodoo_banshee);
+DEFINE_LEGACY_DEVICE(VOODOO_3, voodoo_3);
 
 /***************************************************************************
     GENERIC RASTERIZERS

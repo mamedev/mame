@@ -685,6 +685,12 @@ static MACHINE_RESET( midqslvr )
 	machine.root_device().membank("video_bank2")->set_base(machine.root_device().memregion("video_bios")->base() + 0x4000);
 }
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000)	// actually Celeron 333
@@ -706,7 +712,7 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE( 0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(31, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

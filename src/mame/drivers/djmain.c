@@ -1448,6 +1448,13 @@ static const k056832_interface djmain_k056832_intf =
 	djmain_tile_callback, "none"
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_START( djmain, djmain_state )
 
 	/* basic machine hardware */
@@ -1460,7 +1467,7 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_MACHINE_START(djmain)
 	MCFG_MACHINE_RESET(djmain)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

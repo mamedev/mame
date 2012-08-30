@@ -770,7 +770,7 @@ static READ32_HANDLER( pci_3dfx_r )
 	switch (offset)
 	{
 		case 0x00:		/* ID register: 0x0002 = SST-2, 0x121a = 3dfx */
-			if (voodoo_type == VOODOO_2)
+			if (voodoo_type == TYPE_VOODOO_2)
 				result = 0x0002121a;
 			else
 				result = 0x0003121a;
@@ -805,7 +805,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 	switch (offset)
 	{
 		case 0x04:		/* address register */
-			if (voodoo_type == VOODOO_2)
+			if (voodoo_type == TYPE_VOODOO_2)
 				state->m_pci_3dfx_regs[offset] &= 0xff000000;
 			else
 				state->m_pci_3dfx_regs[offset] &= 0xfe000000;
@@ -813,7 +813,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			break;
 
 		case 0x05:		/* address register */
-			if (voodoo_type >= VOODOO_BANSHEE)
+			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xfe000000;
 				remap_dynamic_addresses(space->machine());
@@ -821,7 +821,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			break;
 
 		case 0x06:		/* I/O register */
-			if (voodoo_type >= VOODOO_BANSHEE)
+			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xffffff00;
 				remap_dynamic_addresses(space->machine());
@@ -829,7 +829,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			break;
 
 		case 0x0c:		/* romBaseAddr register */
-			if (voodoo_type >= VOODOO_BANSHEE)
+			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xffff0000;
 				remap_dynamic_addresses(space->machine());
@@ -1657,13 +1657,13 @@ static void remap_dynamic_addresses(running_machine &machine)
 		base = state->m_pci_3dfx_regs[0x04] & 0xfffffff0;
 		if (base >= state->m_rambase.bytes() && base < 0x20000000)
 		{
-			if (voodoo_type == VOODOO_2)
+			if (voodoo_type == TYPE_VOODOO_2)
 				add_dynamic_device_address(state, state->m_voodoo, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
 			else
 				add_dynamic_device_address(state, state->m_voodoo, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
 		}
 
-		if (voodoo_type >= VOODOO_BANSHEE)
+		if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 		{
 			base = state->m_pci_3dfx_regs[0x05] & 0xfffffff0;
             if (base >= state->m_rambase.bytes() && base < 0x20000000)
@@ -2222,6 +2222,29 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	"maincpu", 
+	AS_PROGRAM
+};
+
+static const smc91c9x_config ethernet_intf = 
+{
+	ethernet_interrupt
+};
+
+static const voodoo_config voodoo_intf =
+{
+	2, //				fbmem;
+	4,//				tmumem0;
+	4,//				tmumem1;
+	"screen",//		screen;
+	"maincpu",//			cputag;
+	vblank_assert,//	vblank;
+	NULL,//				stall;
+};
+
 static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	/* basic machine hardware */
@@ -2233,16 +2256,11 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_MACHINE_RESET(vegas)
 	MCFG_M48T37_ADD("timekeeper")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
-	MCFG_IDE_BUS_MASTER_SPACE("ide", "maincpu", PROGRAM)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
-	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
 
-	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, 2, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 4)
-	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, voodoo_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2274,6 +2292,16 @@ static MACHINE_CONFIG_DERIVED( vegas32m, vegascore )
 MACHINE_CONFIG_END
 
 
+static const voodoo_config vegasban_voodoo_intf =
+{
+	16, //				fbmem;
+	0,//				tmumem0;
+	0,//				tmumem1;
+	"screen",//		screen;
+	"maincpu",//			cputag;
+	vblank_assert,//	vblank;
+	NULL,//				stall;
+};
 static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 
@@ -2281,9 +2309,7 @@ static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, 16, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, vegasban_voodoo_intf)	
 MACHINE_CONFIG_END
 
 
@@ -2293,9 +2319,7 @@ static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m )
 	MCFG_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, vegasban_voodoo_intf)
 MACHINE_CONFIG_END
 
 
@@ -2307,9 +2331,7 @@ static MACHINE_CONFIG_DERIVED( denver, vegascore )
 	MCFG_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MCFG_DEVICE_REMOVE("voodoo")
-	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, vegasban_voodoo_intf)
 MACHINE_CONFIG_END
 
 

@@ -122,6 +122,12 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(kc_d004_floppy_interface)
 MACHINE_CONFIG_END
 
+static const ide_config ide_intf = 
+{
+	NULL, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
 	MCFG_FRAGMENT_ADD(kc_d004)
@@ -129,7 +135,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_IO_MAP(kc_d004_gide_io)
 
-	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, NULL, ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_intf, ide_image_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 

@@ -31,13 +31,13 @@ struct _smc91c9x_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_SMC91C94_ADD(_tag, _callback) \
+#define MCFG_SMC91C94_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, SMC91C94, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(smc91c9x_config, interrupt, _callback)
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_SMC91C96_ADD(_tag, _callback) \
+#define MCFG_SMC91C96_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, SMC91C96, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(smc91c9x_config, interrupt, _callback)
+	MCFG_DEVICE_CONFIG(_config)
 
 
 

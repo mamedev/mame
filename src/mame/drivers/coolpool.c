@@ -898,7 +898,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)

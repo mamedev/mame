@@ -186,7 +186,7 @@ static DEVICE_START( latch8 )
 	int i;
 
 	/* validate arguments */
-	latch8->intf = (latch8_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	latch8->intf = (latch8_config *)&downcast<latch8_device *>(device)->m_inline_config;
 
 	latch8->value = 0x0;
 
@@ -238,7 +238,6 @@ DEVICE_GET_INFO( latch8 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(latch8_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(latch8_config);							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(latch8);break;
@@ -254,5 +253,10 @@ DEVICE_GET_INFO( latch8 )
 	}
 }
 
+latch8_device::latch8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+       : legacy_device_base(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(latch8))
+{
+	memset((void*)&m_inline_config,0,sizeof(m_inline_config));
+}
 
-DEFINE_LEGACY_DEVICE(LATCH8, latch8);
+const device_type LATCH8 = &legacy_device_creator<latch8_device>;

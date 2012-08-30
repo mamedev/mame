@@ -17,8 +17,6 @@
 
 #include "devlegcy.h"
 
-DECLARE_LEGACY_DEVICE(LATCH8, latch8);
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -45,6 +43,35 @@ struct _latch8_config
 	latch8_devread			devread[8];
 };
 
+
+DEVICE_GET_INFO( latch8 );
+
+class latch8_device : public legacy_device_base
+{
+public:
+       latch8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	   
+	   latch8_config m_inline_config;
+	   
+	   void set_maskout(UINT32 maskout) { m_inline_config.maskout = maskout; } 
+	   void set_xorvalue(UINT32 xorvalue) { m_inline_config.xorvalue = xorvalue; } 
+	   void set_nosync(UINT32 nosync) { m_inline_config.nosync = nosync; } 
+	   
+	   void set_discrete_node(const char *dev_tag, int bit, UINT32 node) { m_inline_config.node_device[bit] = dev_tag;  m_inline_config.node_map[bit] = node;  } 
+	   void set_devread(int bit, const char *tag, read8_device_func handler, int from_bit) 
+	   {
+			m_inline_config.devread[bit].from_bit = from_bit; 
+			m_inline_config.devread[bit].tag = tag; 
+			m_inline_config.devread[bit].devread_handler = handler;			
+	   }
+	   void set_read(int bit, read8_space_func handler, int from_bit) 
+	   {
+			m_inline_config.devread[bit].from_bit = from_bit; 
+			m_inline_config.devread[bit].read_handler = handler;			
+	   }		
+};
+
+extern const device_type LATCH8;
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
@@ -55,31 +82,27 @@ struct _latch8_config
 
 /* Bit mask specifying bits to be masked *out* */
 #define MCFG_LATCH8_MASKOUT(_maskout) \
-	MCFG_DEVICE_CONFIG_DATA32(latch8_config, maskout, _maskout)
+	static_cast<latch8_device *>(device)->set_maskout(_maskout);	
 
 /* Bit mask specifying bits to be inverted */
 #define MCFG_LATCH8_INVERT(_xor) \
-	MCFG_DEVICE_CONFIG_DATA32(latch8_config, xorvalue, _xor)
+	static_cast<latch8_device *>(device)->set_xorvalue(_xor);
 
 /* Bit mask specifying bits not needing cpu synchronization. */
 #define MCFG_LATCH8_NOSYNC(_nosync) \
-	MCFG_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync)
+	static_cast<latch8_device *>(device)->set_nosync(_nosync);
 
 /* Write bit to discrete node */
 #define MCFG_LATCH8_DISCRETE_NODE(_device, _bit, _node) \
-	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY(latch8_config, node_device, _bit, _device) \
-	MCFG_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
+	static_cast<latch8_device *>(device)->set_discrete_node(_device, _bit, _node);
 
 /* Upon read, replace bits by reading from another device handler */
 #define MCFG_LATCH8_DEVREAD(_bit, _tag, _handler, _from_bit) \
-	MCFG_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
-	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, tag, _tag) \
-	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, devread_handler, _handler) \
+	static_cast<latch8_device *>(device)->set_devread(_bit, _tag, _handler, _from_bit);
 
 /* Upon read, replace bits by reading from another machine handler */
 #define MCFG_LATCH8_READ(_bit, _handler, _from_bit) \
-	MCFG_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
-	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, read_handler, _handler) \
+	static_cast<latch8_device *>(device)->set_read(_bit, _handler, _from_bit);
 
 /* Accessor macros */
 

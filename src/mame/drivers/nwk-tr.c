@@ -677,6 +677,17 @@ static MACHINE_RESET( nwktr )
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+static const voodoo_config voodoo_intf =
+{
+	2, //				fbmem;
+	2,//				tmumem0;
+	2,//				tmumem1;
+	"screen",//			screen;
+	"dsp",//			cputag;
+	voodoo_vblank_0,//	vblank;
+	NULL,//				stall;
+};
+
 static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	/* basic machine hardware */
@@ -695,11 +706,7 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_MACHINE_START(nwktr)
 	MCFG_MACHINE_RESET(nwktr)
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")
-	MCFG_3DFX_VOODOO_CPU("dsp")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 2)
-	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 2)
-	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
 
 	MCFG_K033906_ADD("k033906_1", nwktr_k033906_interface)
 

@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_VIDEO_START(tickee)
 
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_VIDEO_START(tickee)
 
@@ -844,7 +844,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)

@@ -226,6 +226,30 @@ static const cassette_interface aim65_2_cassette_interface =
 	NULL
 };
 
+const dl1416_interface aim65_ds1_intf = 
+{
+	aim65_update_ds1
+};
+
+const dl1416_interface aim65_ds2_intf = 
+{
+	aim65_update_ds2
+};
+
+const dl1416_interface aim65_ds3_intf = 
+{
+	aim65_update_ds3
+};
+
+const dl1416_interface aim65_ds4_intf = 
+{
+	aim65_update_ds4
+};
+
+const dl1416_interface aim65_ds5_intf = 
+{
+	aim65_update_ds5
+};
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -241,11 +265,11 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MCFG_DL1416T_ADD("ds1", aim65_update_ds1)
-	MCFG_DL1416T_ADD("ds2", aim65_update_ds2)
-	MCFG_DL1416T_ADD("ds3", aim65_update_ds3)
-	MCFG_DL1416T_ADD("ds4", aim65_update_ds4)
-	MCFG_DL1416T_ADD("ds5", aim65_update_ds5)
+	MCFG_DL1416T_ADD("ds1", aim65_ds1_intf)
+	MCFG_DL1416T_ADD("ds2", aim65_ds2_intf)
+	MCFG_DL1416T_ADD("ds3", aim65_ds3_intf)
+	MCFG_DL1416T_ADD("ds4", aim65_ds4_intf)
+	MCFG_DL1416T_ADD("ds5", aim65_ds5_intf)
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

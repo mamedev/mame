@@ -1151,6 +1151,13 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	0
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
@@ -1174,7 +1181,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	MCFG_TIMER_ADD("sound_timer", sound_timer_callback)
 

@@ -31,8 +31,15 @@ const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_IDE_TAG     "cffa2_ide"
 
+static const ide_config ide_intf = 
+{
+	NULL, 
+	NULL, 
+	0
+};
+
 MACHINE_CONFIG_FRAGMENT( cffa2 )
-    MCFG_IDE_CONTROLLER_ADD(CFFA2_IDE_TAG, NULL, ide_image_devices, "hdd", "hdd", false)
+    MCFG_IDE_CONTROLLER_ADD(CFFA2_IDE_TAG, ide_intf, ide_image_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 ROM_START( cffa2 )

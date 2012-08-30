@@ -203,7 +203,7 @@ INLINE ide_state *get_safe_token(device_t *device)
 
 INLINE void signal_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)downcast<const legacy_device_base *>(ide->device)->inline_config();
+	const ide_config *config = (const ide_config *)ide->device->static_config();
 
 	LOG(("IDE interrupt assert\n"));
 
@@ -217,7 +217,7 @@ INLINE void signal_interrupt(ide_state *ide)
 
 INLINE void clear_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)downcast<const legacy_device_base *>(ide->device)->inline_config();
+	const ide_config *config = (const ide_config *)ide->device->static_config();
 
 	LOG(("IDE interrupt clear\n"));
 
@@ -1839,14 +1839,13 @@ static DEVICE_START( ide_controller )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config() == NULL);
-	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
+	assert(device->static_config() != NULL);
 
 	/* store a pointer back to the device */
 	ide->device = device;
 
 	/* set MAME harddisk handle */
-	config = (const ide_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	config = (const ide_config *)device->static_config();
 
 	ide->drive[0].slot = device->owner()->subdevice<ide_slot_device>("drive_0");
 	ide->drive[1].slot = device->owner()->subdevice<ide_slot_device>("drive_1");
@@ -1954,7 +1953,6 @@ DEVICE_GET_INFO( ide_controller )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ide_state);			break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(ide_config);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ide_controller); break;

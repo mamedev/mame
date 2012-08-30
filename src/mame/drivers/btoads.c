@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( btoads, btoads_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)

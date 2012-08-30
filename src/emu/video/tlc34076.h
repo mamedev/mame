@@ -23,6 +23,8 @@ struct _tlc34076_config
 	int res_sel;
 };
 
+extern const tlc34076_config tlc34076_6_bit_intf;
+
 DECLARE_LEGACY_DEVICE(TLC34076, tlc34076);
 
 
@@ -30,9 +32,9 @@ DECLARE_LEGACY_DEVICE(TLC34076, tlc34076);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_TLC34076_ADD(_tag, _res_sel) \
+#define MCFG_TLC34076_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, TLC34076, 0) \
-	MCFG_DEVICE_CONFIG_DATA32(tlc34076_config, res_sel, _res_sel)
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

@@ -849,7 +849,7 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_VIDEO_START(artmagic)
 

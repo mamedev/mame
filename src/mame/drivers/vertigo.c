@@ -98,7 +98,10 @@ static INPUT_PORTS_START( vertigo )
 INPUT_PORTS_END
 
 
-
+static const ttl74148_config vertigo_ttl74148_intf = 
+{
+	vertigo_update_irq
+};
 /*************************************
  *
  *  Machine driver
@@ -116,7 +119,7 @@ static MACHINE_CONFIG_START( vertigo, vertigo_state )
 
 	MCFG_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
 
-	MCFG_74148_ADD( "74148", vertigo_update_irq )
+	MCFG_74148_ADD( "74148", vertigo_ttl74148_intf )
 
 	/* motor controller */
 	/*

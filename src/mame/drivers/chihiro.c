@@ -1822,6 +1822,13 @@ static SLOT_INTERFACE_START(ide_baseboard)
 	SLOT_INTERFACE("bb", IDE_BASEBOARD)
 SLOT_INTERFACE_END
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	"maincpu", 
+	AS_PROGRAM
+};
+
 static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 
 	/* basic machine hardware */
@@ -1843,8 +1850,7 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
 	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt , ide_baseboard, NULL, "bb", true)
-	MCFG_IDE_BUS_MASTER_SPACE( "ide", "maincpu", PROGRAM )
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf , ide_baseboard, NULL, "bb", true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

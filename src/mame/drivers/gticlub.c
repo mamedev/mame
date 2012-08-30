@@ -882,6 +882,28 @@ static MACHINE_RESET( hangplt )
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+static const voodoo_config voodoo_l_intf =
+{
+	2, //				fbmem;
+	2,//				tmumem0;
+	2,//				tmumem1;
+	"lscreen",//		screen;
+	"dsp",//			cputag;
+	voodoo_vblank_0,//	vblank;
+	NULL,//				stall;
+};
+
+static const voodoo_config voodoo_r_intf =
+{
+	2, //				fbmem;
+	2,//				tmumem0;
+	2,//				tmumem1;
+	"rscreen",//		screen;
+	"dsp2",//			cputag;
+	voodoo_vblank_1,//	vblank;
+	NULL,//				stall;
+};
+
 static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	/* basic machine hardware */
@@ -909,17 +931,8 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
 	MCFG_K056230_ADD("k056230", gticlub_k056230_intf)
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
-	MCFG_3DFX_VOODOO_CPU("dsp")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 2)
-	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 2)
-	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
-
-	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "rscreen")
-	MCFG_3DFX_VOODOO_CPU("dsp2")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 2)
-	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 2)
-	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, voodoo_r_intf)
 
 	MCFG_K033906_ADD("k033906_1", hangplt_k033906_intf_0)
 	MCFG_K033906_ADD("k033906_2", hangplt_k033906_intf_1)

@@ -334,9 +334,16 @@ static const rtc65271_interface ide_rtc_cfg =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, nouspikel_ide_interface_device, clock_interrupt_callback)
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt_callback, 
+	NULL, 
+	0
+};
+
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback, ide_image_devices, "hdd", NULL, false)  // see idectrl.c
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, ide_image_devices, "hdd", NULL, false)  // see idectrl.c
 //  MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
 MACHINE_CONFIG_END
 

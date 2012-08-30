@@ -116,7 +116,7 @@ public:
 	required_device<i8237_device> m_dma8237_2;
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
-	required_device<voodoo_device> m_voodoo;
+	required_device<voodoo_1_device> m_voodoo;
 
 	required_shared_ptr<UINT32> m_unk_ram;
 
@@ -1140,6 +1140,24 @@ SCREEN_UPDATE_RGB32( funkball )
 	return 0;
 }
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
+
+static const voodoo_config voodoo_intf =
+{
+	2, //				fbmem;
+	4,//				tmumem0;
+	0,//				tmumem1;
+	"screen",//			screen;
+	"maincpu",//		cputag;
+	NULL,//				vblank;
+	NULL,//				stall;
+};
+
 static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
@@ -1160,12 +1178,10 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
-	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, 2, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, voodoo_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

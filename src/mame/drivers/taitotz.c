@@ -2470,6 +2470,12 @@ static const tlcs900_interface taitotz_tlcs900_interface =
 	DEVCB_DRIVER_MEMBER(taitotz_state, tlcs900_port_write),
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	/* IBM EMPPC603eBG-100 */
@@ -2490,7 +2496,7 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	MCFG_MACHINE_START( taitotz )
 	MCFG_MACHINE_RESET( taitotz )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

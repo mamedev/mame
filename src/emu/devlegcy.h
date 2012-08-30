@@ -48,8 +48,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define DEVINFO_IMAGE_CREATE_OPTMAX   32
-
 // state constants passed to the device_get_config_func
 enum
 {
@@ -57,7 +55,6 @@ enum
 	DEVINFO_INT_FIRST = 0x00000,
 
 		DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,	// R/O: bytes to allocate for the token
-		DEVINFO_INT_INLINE_CONFIG_BYTES,				// R/O: bytes to allocate for the inline configuration
 
 		DEVINFO_INT_ENDIANNESS,							// R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE
 		DEVINFO_INT_DATABUS_WIDTH,						// R/O: data bus size for each address space (8,16,32,64)
@@ -194,56 +191,6 @@ device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, 
 #define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(device_t *device)
 #define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(device)
 
-
-//**************************************************************************
-//  DEVICE_CONFIGURATION_MACROS
-//**************************************************************************
-
-#define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
-
-// inline device configurations that require 32 bits of storage in the token
-#define MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
-	legacy_device_base::static_set_inline32(*device, _offset, _size, (UINT32)(_val));
-
-#define MCFG_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
-	MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
-
-#define MCFG_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val) \
-	MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
-
-#define MCFG_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
-	MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
-
-
-// inline device configurations that require 64 bits of storage in the token
-#define MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
-	legacy_device_base::static_set_inline64(*device, _offset, _size, (UINT64)(_val));
-
-#define MCFG_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
-	MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
-
-#define MCFG_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val) \
-	MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
-
-#define MCFG_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
-	MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
-
-
-// inline device configurations that require a pointer-sized amount of storage in the token
-#ifdef PTR64
-#define MCFG_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(_struct, _size, _offset)
-#define MCFG_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MCFG_DEVICE_CONFIG_DATA64(_struct, _field, _val)
-#define MCFG_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MCFG_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val)
-#define MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MCFG_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
-#else
-#define MCFG_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(_struct, _size, _offset)
-#define MCFG_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MCFG_DEVICE_CONFIG_DATA32(_struct, _field, _val)
-#define MCFG_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MCFG_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val)
-#define MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MCFG_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
-#endif
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -299,14 +246,6 @@ protected:
 	virtual ~legacy_device_base();
 
 public:
-	// access to legacy inline configuartion
-	void *inline_config() const { return m_inline_config; }
-
-	// inline configuration helpers
-	static void static_set_inline32(device_t &device, UINT32 offset, UINT32 size, UINT32 value);
-	static void static_set_inline64(device_t &device, UINT32 offset, UINT32 size, UINT64 value);
-	static void static_set_inline_float(device_t &device, UINT32 offset, UINT32 size, float value);
-
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 
@@ -327,7 +266,6 @@ protected:
 
 	// configuration state
 	device_get_config_func		m_get_config_func;
-	void *						m_inline_config;
 
 	// internal state
 	void *						m_token;

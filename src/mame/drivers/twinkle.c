@@ -901,6 +901,13 @@ static const rtc65271_interface twinkle_rtc =
 	DEVCB_NULL
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
@@ -921,7 +928,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
 	MCFG_AM53CF96_ADD("scsi:am53cf96", am53cf96_intf)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 
 	/* video hardware */

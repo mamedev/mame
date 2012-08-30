@@ -1655,6 +1655,21 @@ static INTERRUPT_GEN( sub_vblank_irq )
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
+const namco_06xx_config bosco_namco_06xx_0_intf = 
+{
+	"maincpu", "51xx",   NULL,   "50xx_1", "54xx"
+};
+
+const namco_06xx_config bosco_namco_06xx_1_intf = 
+{
+	"sub",     "50xx_2", "52xx", NULL,     NULL
+};
+
+const namco_54xx_config namco_54xx_intf = 
+{
+	"discrete", NODE_01
+};
+
 static MACHINE_CONFIG_START( bosco, bosco_state )
 
 	/* basic machine hardware */
@@ -1673,10 +1688,10 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	MCFG_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2)	/* 1.536 MHz */
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/6/2, namco_52xx_intf)		/* 1.536 MHz */
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, namco_54xx_intf)		/* 1.536 MHz */
 
-	MCFG_NAMCO_06XX_ADD("06xx_0", MASTER_CLOCK/6/64, "maincpu", "51xx",   NULL,   "50xx_1", "54xx")
-	MCFG_NAMCO_06XX_ADD("06xx_1", MASTER_CLOCK/6/64, "sub",     "50xx_2", "52xx", NULL,     NULL)
+	MCFG_NAMCO_06XX_ADD("06xx_0", MASTER_CLOCK/6/64, bosco_namco_06xx_0_intf)
+	MCFG_NAMCO_06XX_ADD("06xx_1", MASTER_CLOCK/6/64, bosco_namco_06xx_1_intf)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1710,6 +1725,11 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 MACHINE_CONFIG_END
 
 
+const namco_06xx_config galaga_namco_06xx_intf = 
+{
+	"maincpu", "51xx", NULL, NULL, "54xx"
+};
+
 static MACHINE_CONFIG_START( galaga, galaga_state )
 
 	/* basic machine hardware */
@@ -1725,9 +1745,9 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, namco_54xx_intf)		/* 1.536 MHz */
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64,  galaga_namco_06xx_intf)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1760,6 +1780,11 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
+const namco_06xx_config galagab_namco_06xx_intf = 
+{
+	"maincpu", "51xx", NULL, NULL, NULL
+};
+
 static MACHINE_CONFIG_DERIVED( galagab, galaga )
 
 	/* basic machine hardware */
@@ -1768,7 +1793,7 @@ static MACHINE_CONFIG_DERIVED( galagab, galaga )
 	MCFG_DEVICE_REMOVE("06xx")
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, galagab_namco_06xx_intf)
 
 	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_mem4)
@@ -1777,6 +1802,10 @@ static MACHINE_CONFIG_DERIVED( galagab, galaga )
 	MCFG_DEVICE_REMOVE("discrete")
 MACHINE_CONFIG_END
 
+const namco_06xx_config xevious_namco_06xx_intf = 
+{
+	"maincpu", "51xx", NULL, "50xx", "54xx"
+};
 
 static MACHINE_CONFIG_START( xevious, xevious_state )
 
@@ -1794,9 +1823,9 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 
 	MCFG_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/6/2)	/* 1.536 MHz */
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2, namco_54xx_intf)		/* 1.536 MHz */
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, "50xx", "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, xevious_namco_06xx_intf)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
@@ -1828,6 +1857,11 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
+const namco_06xx_config battles_namco_06xx_intf = 
+{
+	"maincpu", "51xx", NULL, NULL, NULL
+};
+
 static MACHINE_CONFIG_DERIVED( battles, xevious )
 
 	/* basic machine hardware */
@@ -1837,7 +1871,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_DEVICE_REMOVE("06xx")
 
 	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, battles_namco_06xx_intf)
 
 	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(battles_mem4)
@@ -1857,6 +1891,10 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
+const namco_06xx_config digdug_namco_06xx_intf = 
+{
+	"maincpu", "51xx", "53xx", NULL, NULL
+};
 
 static MACHINE_CONFIG_START( digdug, digdug_state )
 
@@ -1875,7 +1913,7 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2, namco_51xx_intf)		/* 1.536 MHz */
 	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/6/2, namco_53xx_intf)		/* 1.536 MHz */
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", "53xx", NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, digdug_namco_06xx_intf)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

@@ -3185,6 +3185,13 @@ static MACHINE_RESET( cobra )
 	cobra->m_renderer->gfx_reset(machine);
 }
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	/* basic machine hardware */
@@ -3207,7 +3214,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_VIDEO_START(cobra)

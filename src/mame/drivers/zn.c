@@ -1523,10 +1523,17 @@ static MACHINE_RESET( coh1000w )
 	devtag_reset(machine, "ide");
 }
 
+static const ide_config ide_intf = 
+{
+	atpsx_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_MACHINE_RESET( coh1000w )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", atpsx_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( atpsx_dma_write ), (zn_state *) owner ) )
 MACHINE_CONFIG_END
@@ -2197,6 +2204,13 @@ static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 	MCFG_MACHINE_RESET( coh1000a )
 MACHINE_CONFIG_END
 
+static const ide_config jdredd_ide_intf = 
+{
+	jdredd_ide_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
 	MCFG_DEVICE_MODIFY( "gpu" )
@@ -2204,7 +2218,7 @@ static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
 	MCFG_MACHINE_RESET( coh1000a )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_intf, ide_devices, "hdd", NULL, true)
 MACHINE_CONFIG_END
 
 /*

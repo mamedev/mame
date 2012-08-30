@@ -2523,6 +2523,24 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	"maincpu", 
+	AS_PROGRAM
+};
+
+static const voodoo_config voodoo_intf =
+{
+	2, //				fbmem;
+	4,//				tmumem0;
+	0,//				tmumem1;
+	"screen",//			screen;
+	"maincpu",//			cputag;
+	vblank_assert,//	vblank;
+	voodoo_stall,//				stall;
+};
+
 static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	/* basic machine hardware */
@@ -2534,14 +2552,9 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 	MCFG_MACHINE_RESET(seattle)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
-	MCFG_IDE_BUS_MASTER_SPACE("ide", "maincpu", PROGRAM)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
-	MCFG_3DFX_VOODOO_STALL(voodoo_stall)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2571,9 +2584,13 @@ static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
+static const smc91c9x_config ethernet_intf = 
+{
+	ethernet_interrupt
+};
 
 static MACHINE_CONFIG_DERIVED( seattle150_widget, seattle150 )
-	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
 MACHINE_CONFIG_END
 
 
@@ -2587,9 +2604,19 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle200_widget, seattle200 )
-	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
 MACHINE_CONFIG_END
 
+static const voodoo_config voodoo_2_intf =
+{
+	2, //				fbmem;
+	4,//				tmumem0;
+	4,//				tmumem1;
+	"screen",//			screen;
+	"maincpu",//			cputag;
+	vblank_assert,//	vblank;
+	voodoo_stall,//				stall;
+};
 
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_FRAGMENT_ADD(cage_seattle)
@@ -2598,10 +2625,10 @@ static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
-	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
 
-	MCFG_3DFX_VOODOO_MODIFY("voodoo")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 4)
+	MCFG_DEVICE_REMOVE("voodoo")
+	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_2_intf)
 MACHINE_CONFIG_END
 
 

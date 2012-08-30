@@ -898,7 +898,27 @@ static const adsp21xx_config adsp_config =
 	0,//timer_enable_callback   /* callback for timer fired */
 };
 
+static const voodoo_config voodoo_1_intf =
+{
+	2, //				fbmem;
+	4,//				tmumem0;
+	0,//				tmumem1;
+	"screen",//			screen;
+	"mips",//			cputag;
+	NULL,//				vblank;
+	NULL,//				stall;
+};
 
+static const voodoo_config voodoo_2_intf =
+{
+	2, //				fbmem;
+	4,//				tmumem0;
+	0,//				tmumem1;
+	"screen",//			screen;
+	"mips",//			cputag;
+	NULL,//vblank_assert				vblank;
+	NULL,//	voodoo_stall			stall;
+};
 /*************************************
  *
  *  Machine driver
@@ -933,15 +953,9 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 #endif
 	MCFG_PCI_BUS_LEGACY_DEVICE(9, "zr36120", zr36120_pci_r, zr36120_pci_w)
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, 2, "screen")
-	MCFG_3DFX_VOODOO_CPU("mips")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo_0", STD_VOODOO_1_CLOCK, voodoo_1_intf)
 
-	MCFG_3DFX_VOODOO_1_ADD("voodoo_1", STD_VOODOO_1_CLOCK, 2, "screen")
-	MCFG_3DFX_VOODOO_CPU("mips")
-	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
-//  MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
-//  MCFG_3DFX_VOODOO_STALL(voodoo_stall)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo_1", STD_VOODOO_1_CLOCK, voodoo_2_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

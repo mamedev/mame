@@ -49,7 +49,7 @@ INLINE const sst39vfx_config *get_config(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == SST39VF020 || device->type() == SST39VF400A);
 
-	return (const sst39vfx_config *) downcast<const legacy_device_base *>(device)->inline_config();
+	return (const sst39vfx_config *)device->static_config();
 }
 
 
@@ -189,7 +189,6 @@ DEVICE_GET_INFO( sst39vf020 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sst39vfx_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(sst39vfx_config);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf020);	break;

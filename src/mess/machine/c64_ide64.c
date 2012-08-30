@@ -46,12 +46,18 @@ const device_type C64_IDE64 = &device_creator<c64_ide64_cartridge_device>;
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_ide64 )
 //-------------------------------------------------
+static const ide_config ide_intf = 
+{
+	NULL, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
 	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
 	MCFG_DS1302_ADD(DS1302_TAG, XTAL_32_768kHz)
 
-	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, NULL, ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_intf, ide_image_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 

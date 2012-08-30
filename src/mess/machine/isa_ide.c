@@ -40,9 +40,15 @@ static void ide_interrupt(device_t *device, int state)
 	}
 }
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_FRAGMENT( ide )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_image_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )

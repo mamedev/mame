@@ -345,6 +345,11 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 MACHINE_CONFIG_END
 
+const sst39vfx_config cybyko_sst39vfx_intf = 
+{
+	16, ENDIANNESS_BIG
+};
+
 static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2246, 11059200)
@@ -353,7 +358,7 @@ static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	// machine
 	MCFG_MACHINE_START(cybikov2)
 	MCFG_MACHINE_RESET(cybikov2)
-	MCFG_SST39VF020_ADD("flash2", 16, ENDIANNESS_BIG)
+	MCFG_SST39VF020_ADD("flash2", cybyko_sst39vfx_intf)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -370,7 +375,7 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	MCFG_MACHINE_START(cybikoxt)
 	MCFG_MACHINE_RESET(cybikoxt)
 	MCFG_DEVICE_REMOVE("flash1")
-	MCFG_SST39VF400A_ADD("flash2", 16, ENDIANNESS_BIG)
+	MCFG_SST39VF400A_ADD("flash2", cybyko_sst39vfx_intf)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

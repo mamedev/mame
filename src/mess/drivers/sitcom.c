@@ -82,16 +82,25 @@ MACHINE_RESET_MEMBER( sitcom_state )
 	dl1416_cu_w(m_ds1, 1);
 }
 
-void sitcom_update_ds0(device_t *device, UINT8 offset, int data)
+void sitcom_update_ds0(device_t *device, int digit, int data)
 {
-	output_set_digit_value(offset, data);
+	output_set_digit_value(digit, data);
 }
 
-void sitcom_update_ds1(device_t *device, UINT8 offset, int data)
+void sitcom_update_ds1(device_t *device, int digit, int data)
 {
-	output_set_digit_value(4 + offset, data);
+	output_set_digit_value(4 + digit, data);
 }
 
+const dl1416_interface sitcom_ds0_intf = 
+{
+	sitcom_update_ds0
+};
+
+const dl1416_interface sitcom_ds1_intf = 
+{
+	sitcom_update_ds1
+};
 
 // SID line used as serial input from a pc
 READ_LINE_MEMBER( sitcom_state::sid_line )
@@ -120,8 +129,8 @@ static MACHINE_CONFIG_START( sitcom, sitcom_state )
 	MCFG_CPU_CONFIG(sitcom_cpu_config)
 
 	/* video hardware */
-	MCFG_DL1416B_ADD("ds0", sitcom_update_ds0)
-	MCFG_DL1416B_ADD("ds1", sitcom_update_ds1)
+	MCFG_DL1416B_ADD("ds0", sitcom_ds0_intf)
+	MCFG_DL1416B_ADD("ds1", sitcom_ds1_intf)
 	MCFG_DEFAULT_LAYOUT(layout_sitcom)
 MACHINE_CONFIG_END
 

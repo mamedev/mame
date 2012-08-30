@@ -51,9 +51,9 @@ struct _ttl74148_config
 };
 
 
-#define MCFG_74148_ADD(_tag, _output_cb) \
+#define MCFG_74148_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, TTL74148, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ttl74148_config, output_cb, _output_cb)
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /* must call ttl74148_update() after setting the inputs */

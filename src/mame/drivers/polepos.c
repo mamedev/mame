@@ -863,6 +863,15 @@ static const namco_interface namco_config =
 	1				/* stereo */
 };
 
+const namco_06xx_config polepos_namco_06xx_intf = 
+{
+	"maincpu", "51xx", "53xx", "52xx", "54xx"
+};
+
+const namco_54xx_config polepos_namco_54xx_intf = 
+{
+	"discrete", NODE_01
+};
 
 /*********************************************************************
  * Machine driver
@@ -884,9 +893,9 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_intf)		/* 1.536 MHz */
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2, namco_52xx_intf)		/* 1.536 MHz */
 	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/8/2, namco_53xx_intf)		/* 1.536 MHz */
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2, polepos_namco_54xx_intf)	/* 1.536 MHz */
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, "maincpu", "51xx", "53xx", "52xx", "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, polepos_namco_06xx_intf)
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
@@ -945,6 +954,10 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 	}
 };
 
+const namco_06xx_config topracern_namco_06xx_intf = 
+{
+	"maincpu", "51xx", NULL, NULL, NULL
+};
 
 static MACHINE_CONFIG_START( topracern, polepos_state )
 
@@ -961,7 +974,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	/* todo, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_bl_intf)		/* 1.536 MHz */
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, "maincpu", "51xx", NULL, NULL, NULL)
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, topracern_namco_06xx_intf)
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 

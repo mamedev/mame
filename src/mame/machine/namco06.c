@@ -220,7 +220,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 
 static DEVICE_START( namco_06xx )
 {
-	const namco_06xx_config *config = (const namco_06xx_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	const namco_06xx_config *config = (const namco_06xx_config *)device->static_config();
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
@@ -298,8 +298,6 @@ DEVICE_GET_INFO(namco_06xx)
  {
 
   case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namco_06xx_state); break;
-
-  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(namco_06xx_config); break;
 
   case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(namco_06xx); break;
 

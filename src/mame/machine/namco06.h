@@ -15,13 +15,9 @@ struct _namco_06xx_config
 };
 
 
-#define MCFG_NAMCO_06XX_ADD(_tag, _clock, _nmicpu, _chip0, _chip1, _chip2, _chip3) \
+#define MCFG_NAMCO_06XX_ADD(_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_06XX, _clock) \
-	MCFG_DEVICE_CONFIG_DATAPTR(namco_06xx_config, nmicpu, _nmicpu) \
-	MCFG_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip0, _chip0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip1, _chip1) \
-	MCFG_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip2, _chip2) \
-	MCFG_DEVICE_CONFIG_DATAPTR(namco_06xx_config, chip3, _chip3)
+	MCFG_DEVICE_CONFIG(_config)
 
 
 READ8_DEVICE_HANDLER( namco_06xx_data_r );

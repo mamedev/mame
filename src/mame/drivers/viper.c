@@ -1929,7 +1929,7 @@ static INTERRUPT_GEN(viper_vblank)
 	//mpc8240_interrupt(device->machine, MPC8240_IRQ3);
 }
 
-static void voodoo_vblank(const device_t *device, int param)
+static void voodoo_vblank(device_t *device, int state)
 {
 	mpc8240_interrupt(device->machine(), MPC8240_IRQ4);
 }
@@ -1967,6 +1967,24 @@ static MACHINE_RESET(viper)
 	ide_features[67*2+1] = 0x00;
 }
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
+
+static const voodoo_config voodoo_intf =
+{
+	8, //				fbmem;
+	0,//				tmumem0;
+	0,//				tmumem1;
+	"screen",//			screen;
+	"maincpu",//		cputag;
+	voodoo_vblank,//	vblank;
+	NULL,//				stall;
+};
+
 static MACHINE_CONFIG_START( viper, viper_state )
 
 	/* basic machine hardware */
@@ -1982,10 +2000,8 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
-	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 8, "screen")
-	MCFG_3DFX_VOODOO_CPU("maincpu")
-	MCFG_3DFX_VOODOO_VBLANK(voodoo_vblank)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
+	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, voodoo_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

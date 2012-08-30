@@ -35,6 +35,11 @@ struct _tlc34076_state
 	rgb_t pens[0x100];
 };
 
+const tlc34076_config tlc34076_6_bit_intf = 
+{
+	TLC34076_6_BIT
+};
+
 
 /*************************************
  *
@@ -262,7 +267,7 @@ WRITE8_DEVICE_HANDLER( tlc34076_w )
 
 static DEVICE_START( tlc34076 )
 {
-	tlc34076_config *config = (tlc34076_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	tlc34076_config *config = (tlc34076_config *)device->static_config();
 	tlc34076_state *state = get_safe_token(device);
 
 	state->dacbits = config->res_sel ? 8 : 6;
@@ -281,8 +286,6 @@ DEVICE_GET_INFO(tlc34076)
  switch (state)
  {
   case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tlc34076_state); break;
-
-  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(tlc34076_config); break;
 
   case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tlc34076); break;
 

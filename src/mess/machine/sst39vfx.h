@@ -31,20 +31,18 @@ struct _sst39vfx_config
 
 DECLARE_LEGACY_DEVICE(SST39VF020, sst39vf020);
 
-#define MCFG_SST39VF020_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
+#define MCFG_SST39VF020_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, SST39VF020, 0) \
-	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_datawidth, _cpu_datawidth) \
-	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_SST39VF020_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 DECLARE_LEGACY_DEVICE(SST39VF400A, sst39vf400a);
 
-#define MCFG_SST39VF400A_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
+#define MCFG_SST39VF400A_ADD(_tag,_config) \
 	MCFG_DEVICE_ADD(_tag, SST39VF400A, 0) \
-	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_datawidth, _cpu_datawidth) \
-	MCFG_DEVICE_CONFIG_DATA32(sst39vfx_config, cpu_endianess, _cpu_endianess)
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_SST39VF400A_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)

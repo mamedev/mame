@@ -662,6 +662,12 @@ static const mips3_config r4600_config =
 	16384				/* data cache size */
 };
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_START( kinst, kinst_state )
 
@@ -674,7 +680,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_MACHINE_START(kinst)
 	MCFG_MACHINE_RESET(kinst)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

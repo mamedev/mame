@@ -136,7 +136,7 @@ int ttl74153_output_r(device_t *device, int section)
 
 static DEVICE_START( ttl74153 )
 {
-	ttl74153_config *config = (ttl74153_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	ttl74153_config *config = (ttl74153_config *)device->static_config();
 	ttl74153_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 
@@ -182,8 +182,6 @@ DEVICE_GET_INFO(ttl74153)
  {
 
   case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(ttl74153_state); break;
-
-  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(ttl74153_config); break;
 
   case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(ttl74153); break;
 

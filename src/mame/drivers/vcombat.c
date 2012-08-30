@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 #endif
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	/* Disabled for now as it can't handle multiple screens */
 //  MCFG_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET(shadfgtr)
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
 

@@ -1344,7 +1344,6 @@ DEVICE_GET_INFO( omti8621 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(omti8621_state);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(omti8621_config);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(omti8621); break;

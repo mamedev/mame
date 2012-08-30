@@ -536,6 +536,12 @@ static MACHINE_RESET( savquest )
 	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x20000);
 }
 
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000)	// actually Pentium II 450
@@ -557,7 +563,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

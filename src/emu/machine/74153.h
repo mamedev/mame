@@ -46,9 +46,9 @@ struct _ttl74153_config
 };
 
 
-#define MCFG_74153_ADD(_tag, _output_cb) \
+#define MCFG_74153_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, TTL74153, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ttl74153_config, output_cb, _output_cb)
+	MCFG_DEVICE_CONFIG(_config)
 
 
 

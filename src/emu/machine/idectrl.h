@@ -146,16 +146,11 @@ SLOT_INTERFACE_EXTERN(ide_image_devices);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_IDE_CONTROLLER_ADD(_tag, _callback, _slotintf, _master, _slave, _fixed) \
+#define MCFG_IDE_CONTROLLER_ADD(_tag, _config, _slotintf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_IDE_SLOT_ADD("drive_0", _slotintf, _master, NULL, _fixed) \
 	MCFG_IDE_SLOT_ADD("drive_1", _slotintf, _slave, NULL, _fixed) \
-
-#define MCFG_IDE_BUS_MASTER_SPACE(_tag, _cpu, _space) \
-	MCFG_DEVICE_MODIFY(_tag) \
-	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
-	MCFG_DEVICE_CONFIG_DATA32(ide_config, bmspace, AS_##_space)
 
 #define MCFG_IDE_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_SLOT, 0) \

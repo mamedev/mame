@@ -509,13 +509,11 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 
 static DEVICE_START( smc91c9x )
 {
-	const smc91c9x_config *config = (const smc91c9x_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	const smc91c9x_config *config = (const smc91c9x_config *)device->static_config();
 	smc91c9x_state *smc = get_safe_token(device);
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->static_config() == NULL);
-	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* store a pointer back to the device */
 	smc->device = device;
@@ -596,7 +594,6 @@ static DEVICE_GET_INFO( smc91c9x )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(smc91c9x_state);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(smc91c9x_config);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(smc91c9x); break;

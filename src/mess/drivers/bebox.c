@@ -153,6 +153,13 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE("cirrus", CIRRUS)
 SLOT_INTERFACE_END
 
+static const ide_config ide_intf = 
+{
+	bebox_ide_interrupt, 
+	NULL, 
+	0
+};
+
 static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)	/* 66 MHz */
@@ -195,7 +202,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL, false )	/* FIXME */
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, ide_image_devices, "hdd", NULL, false )	/* FIXME */
 
 	/* pci */
 	MCFG_PCI_BUS_ADD("pcibus", 0)

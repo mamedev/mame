@@ -1732,6 +1732,12 @@ static const jaguar_cpu_config dsp_config =
 	jaguar_dsp_cpu_int
 };
 
+static const ide_config ide_intf = 
+{
+	jaguar_external_int, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_START( cojagr3k, cojag_state )
 
@@ -1751,7 +1757,7 @@ static MACHINE_CONFIG_START( cojagr3k, cojag_state )
 	MCFG_MACHINE_RESET(cojag)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", jaguar_external_int, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	MCFG_TIMER_ADD("serial_timer", jaguar_serial_callback)
 

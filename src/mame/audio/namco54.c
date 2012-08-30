@@ -164,7 +164,7 @@ ROM_END
 
 static DEVICE_START( namco_54xx )
 {
-	namco_54xx_config *config = (namco_54xx_config *)downcast<const legacy_device_base *>(device)->inline_config();
+	namco_54xx_config *config = (namco_54xx_config *)device->static_config();
 	namco_54xx_state *state = get_safe_token(device);
 	astring tempstring;
 
@@ -190,8 +190,6 @@ DEVICE_GET_INFO(namco_54xx)
  {
 
   case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namco_54xx_state); break;
-
-  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(namco_54xx_config); break;
 
   case DEVINFO_PTR_ROM_REGION: info->romregion = ROM_NAME(namco_54xx); break;
 

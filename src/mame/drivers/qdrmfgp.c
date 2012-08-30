@@ -667,6 +667,12 @@ static MACHINE_RESET( qdrmfgp )
  *  Machine driver
  *
  *************************************/
+static const ide_config ide_intf = 
+{
+	ide_interrupt, 
+	NULL, 
+	0
+};
 
 static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 
@@ -679,7 +685,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_MACHINE_RESET(qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -704,6 +710,12 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static const ide_config qdrmfgp2_ide_intf = 
+{
+	gp2_ide_interrupt, 
+	NULL, 
+	0
+};
 static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 
 	/* basic machine hardware */
@@ -715,7 +727,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_MACHINE_RESET(qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt, ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", qdrmfgp2_ide_intf, ide_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
