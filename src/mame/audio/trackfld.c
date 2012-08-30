@@ -161,13 +161,18 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
     DEVICE DEFINITION
 *****************************************************************************/
 
+DEVICE_GET_INFO(trackfld_audio)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(trackfld_audio_state); break;
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(trackfld_audio); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##trackfld_audio##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"Track And Field Audio"
-#define DEVTEMPLATE_FAMILY				"Track And Field Audio IC"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(trackfld_audio); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Track And Field Audio"); break;
+ }
+}
 
 DEFINE_LEGACY_SOUND_DEVICE(TRACKFLD_AUDIO, trackfld_audio);

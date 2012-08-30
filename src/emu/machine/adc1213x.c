@@ -358,24 +358,37 @@ static DEVICE_RESET( adc12138 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(adc12138)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(adc12138_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##adc12138##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"A/D Converter 12138"
-#define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1213x"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(adc12138); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc12130##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"A/D Converter 12130"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(adc12138); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##adc12132##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"A/D Converter 12132"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converter 12138"); break;
+ }
+}
 
+DEVICE_GET_INFO(adc12130)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converter 12130"); break;
+  default: DEVICE_GET_INFO_CALL(adc12138); break;
+ }
+}
+
+DEVICE_GET_INFO(adc12132)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converter 12132"); break;
+  default: DEVICE_GET_INFO_CALL(adc12138); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(ADC12130, adc12130);
 DEFINE_LEGACY_DEVICE(ADC12132, adc12132);

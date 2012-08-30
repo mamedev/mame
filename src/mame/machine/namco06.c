@@ -292,14 +292,23 @@ static DEVICE_RESET( namco_06xx )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(namco_06xx)
+{
+ switch (state)
+ {
 
-#define DEVTEMPLATE_ID(p,s)		p##namco_06xx##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME		"Namco 06xx"
-#define DEVTEMPLATE_FAMILY		"Namco I/O"
-#define DEVTEMPLATE_SHORTNAME   "namco06xx"
-#include "devtempl.h"
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namco_06xx_state); break;
 
+  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(namco_06xx_config); break;
+
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(namco_06xx); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(namco_06xx); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Namco 06xx"); break;
+
+  case DEVINFO_STR_SHORTNAME: strcpy(info->s, "namco06xx"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(NAMCO_06XX, namco_06xx);

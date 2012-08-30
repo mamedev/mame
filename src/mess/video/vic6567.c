@@ -2804,12 +2804,18 @@ static DEVICE_RESET( vic2 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(vic2)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vic2_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##vic2##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"6567 / 6569 VIC II"
-#define DEVTEMPLATE_FAMILY				"6567 / 6569 VIC II"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vic2); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vic2); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "6567 / 6569 VIC II"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(VIC2, vic2);

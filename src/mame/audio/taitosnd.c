@@ -313,13 +313,18 @@ static DEVICE_RESET( tc0140syt )
 	}
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(tc0140syt)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tc0140syt_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##tc0140syt##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"Taito TC0140SYT"
-#define DEVTEMPLATE_FAMILY		"Taito Audio Custom IC"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tc0140syt); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tc0140syt); break;
+
+ case DEVINFO_STR_NAME: strcpy(info->s, "Taito TC0140SYT"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(TC0140SYT, tc0140syt);

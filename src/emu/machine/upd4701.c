@@ -305,13 +305,18 @@ static DEVICE_RESET( upd4701 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(upd4701)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(upd4701_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##upd4701##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"NEC uPD4701 Encoder"
-#define DEVTEMPLATE_FAMILY		"NEC uPD4701 Encoder"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(upd4701); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(upd4701); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "NEC uPD4701 Encoder"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(UPD4701, upd4701);

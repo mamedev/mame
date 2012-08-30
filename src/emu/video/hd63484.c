@@ -1577,13 +1577,18 @@ static DEVICE_RESET( hd63484 )
 	hd63484->fifo_counter = 0;
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(hd63484)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(hd63484_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##hd63484##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"HD63484"
-#define DEVTEMPLATE_FAMILY		"HD63484 Video Controller"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(hd63484); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(hd63484); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "HD63484"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(HD63484, hd63484);

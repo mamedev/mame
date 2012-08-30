@@ -2010,29 +2010,52 @@ void tms5220_set_frequency(device_t *device, int frequency)
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(tms5220)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tms5220_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##tms5220##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"TMS5220"
-#define DEVTEMPLATE_FAMILY				"TI Speech"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5220); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5220c##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"TMS5220C"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tms5220); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tmc0285##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"TMC0285"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5220"); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5200##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"TMS5200"
-#include "devtempl.h"
+DEVICE_GET_INFO(tms5220c)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5220c); break;
 
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5220C"); break;
+  default: DEVICE_GET_INFO_CALL(tms5220); break;
+ }
+}
+
+DEVICE_GET_INFO(tmc0285)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tmc0285); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMC0285"); break;
+  default: DEVICE_GET_INFO_CALL(tms5220); break;
+ }
+}
+
+DEVICE_GET_INFO(tms5200)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5200); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5200"); break;
+  default: DEVICE_GET_INFO_CALL(tms5220); break;
+ }
+}
 
 DEFINE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
 DEFINE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);

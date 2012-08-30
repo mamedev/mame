@@ -382,14 +382,18 @@ void micropolis_reset(device_t *device)
     DEVICE GETINFO
 ***************************************************************************/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(micropolis)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(micropolis_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##micropolis##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"MICROPOLIS"
-#define DEVTEMPLATE_FAMILY				"MICROPOLIS"
-#define DEVTEMPLATE_VERSION				"0.1"
-#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(micropolis); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(micropolis); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "MICROPOLIS"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(MICROPOLIS, micropolis);

@@ -2104,130 +2104,229 @@ void wd17xx_reset(device_t *device)
     DEVICE GETINFO
 ***************************************************************************/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(wd1770)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(wd1770_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##wd1770##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"WD1770"
-#define DEVTEMPLATE_FAMILY				"WD17xx"
-#define DEVTEMPLATE_VERSION				"1.0"
-#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(wd1770); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1771##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1771"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(wd1770); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1781##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1781"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD1770"); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1791##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1791"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1771)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1771"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1792##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1792"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1781)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1781"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1793##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1793"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1791)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1791"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1794##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1794"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1792)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1792"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1795##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1795"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1793)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1793"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1797##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1797"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1794)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1794"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1761##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1761"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1795)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1795"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1762##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1762"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1797)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1797"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1763##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1763"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1761)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1761"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1764##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1764"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1762)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1762"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1765##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1765"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1763)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1763"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##fd1767##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"FD1767"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1764)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1764"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2791##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD2791"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1765)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1765"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2793##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD2793"
-#include "devtempl.h"
+DEVICE_GET_INFO(fd1767)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "FD1767"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2795##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD2795"
-#include "devtempl.h"
+DEVICE_GET_INFO(wd2791)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD2791"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd2797##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD2797"
-#include "devtempl.h"
+DEVICE_GET_INFO(wd2793)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD2793"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1772##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"WD1772"
-#include "devtempl.h"
+DEVICE_GET_INFO(wd2795)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD2795"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##wd1773##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"WD1773"
-#include "devtempl.h"
+DEVICE_GET_INFO(wd2797)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD2797"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8866##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"MB8866"
-#include "devtempl.h"
+DEVICE_GET_INFO(wd1772)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(wd1772); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8876##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"MB8876"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD1772"); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##mb8877##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"MB8877"
-#include "devtempl.h"
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
+
+DEVICE_GET_INFO(wd1773)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "WD1773"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
+
+DEVICE_GET_INFO(mb8866)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "MB8866"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
+
+DEVICE_GET_INFO(mb8876)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "MB8876"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
+
+DEVICE_GET_INFO(mb8877)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "MB8877"); break;
+  default: DEVICE_GET_INFO_CALL(wd1770); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(FD1771, fd1771);
 DEFINE_LEGACY_DEVICE(FD1781, fd1781);

@@ -266,13 +266,18 @@ static DEVICE_RESET( mb87078 )
 	mb87078_reset_comp_w(device, 1);
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(mb87078)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mb87078_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##mb87078##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"Fujitsu MB87078"
-#define DEVTEMPLATE_FAMILY		"Fujitsu Volume Controller MB87078"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(mb87078); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(mb87078); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Fujitsu MB87078"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(MB87078, mb87078);

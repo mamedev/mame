@@ -264,19 +264,29 @@ READ_LINE_DEVICE_HANDLER( tms6100_data_r )
     TMS 6100 device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(tms6100)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tms6100_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##tms6100##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"TMS6100"
-#define DEVTEMPLATE_FAMILY				"TI Speech"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms6100); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##m58819##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"M58819"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tms6100); break;
 
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS6100"); break;
+ }
+}
+
+DEVICE_GET_INFO(m58819)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(m58819); break;
+  case DEVINFO_STR_NAME: strcpy(info->s, "M58819"); break;
+  default: DEVICE_GET_INFO_CALL(tms6100); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(TMS6100, tms6100);
 DEFINE_LEGACY_DEVICE(M58819, m58819);

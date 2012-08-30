@@ -276,13 +276,20 @@ static DEVICE_START( tlc34076 )
 	state_save_register_global(device->machine(), state->dacbits);
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(tlc34076)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tlc34076_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##tlc34076##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME		"TLC34076"
-#define DEVTEMPLATE_FAMILY		"RAMDAC"
-#include "devtempl.h"
+  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(tlc34076_config); break;
 
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tlc34076); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tlc34076); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "TLC34076"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(TLC34076, tlc34076);

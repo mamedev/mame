@@ -261,14 +261,16 @@ MACHINE_CONFIG_END
     DEVICE DEFINITION
 *****************************************************************************/
 
+DEVICE_GET_INFO(timeplt_audio)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(timeplt_audio_state); break;
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(timeplt_audio); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##timeplt_audio##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START
-#define DEVTEMPLATE_NAME				"Time Pilot Audio"
-#define DEVTEMPLATE_FAMILY				"Time Pilot Audio IC"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "Time Pilot Audio"); break;
+ }
+}
 
 DEFINE_LEGACY_SOUND_DEVICE(TIMEPLT_AUDIO, timeplt_audio);
-

@@ -325,13 +325,18 @@ static DEVICE_RESET( kaneko_pandora )
 	pandora->clear_bitmap = 1;
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(kaneko_pandora)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(kaneko_pandora_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##kaneko_pandora##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"Kaneko Pandora - PX79C480FP-3"
-#define DEVTEMPLATE_FAMILY		"Kaneko Video Chips"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(kaneko_pandora); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(kaneko_pandora); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Kaneko Pandora - PX79C480FP-3"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);

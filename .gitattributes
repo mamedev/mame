@@ -871,7 +871,6 @@ src/emu/device.c svneol=native#text/plain
 src/emu/device.h svneol=native#text/plain
 src/emu/devlegcy.c svneol=native#text/plain
 src/emu/devlegcy.h svneol=native#text/plain
-src/emu/devtempl.h svneol=native#text/plain
 src/emu/didisasm.c svneol=native#text/plain
 src/emu/didisasm.h svneol=native#text/plain
 src/emu/diexec.c svneol=native#text/plain

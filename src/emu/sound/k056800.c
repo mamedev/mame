@@ -165,13 +165,18 @@ static DEVICE_RESET( k056800 )
 }
 
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(k056800)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(k056800_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##k056800##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"Konami 056800 MIRAC"
-#define DEVTEMPLATE_FAMILY		"Konami custom"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(k056800); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(k056800); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Konami 056800 MIRAC"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(K056800, k056800);

@@ -601,13 +601,17 @@ static DEVICE_RESET( vr0video )
 	vr0->LastPalUpdate = 0xffffffff;
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(vr0video)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vr0video_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##vr0video##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"VRender0"
-#define DEVTEMPLATE_FAMILY		"???"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vr0video); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vr0video); break;
 
+  case DEVINFO_STR_NAME: strcpy(info->s, "VRender0"); break;
+ }
+}
 DEFINE_LEGACY_DEVICE(VIDEO_VRENDER0, vr0video);

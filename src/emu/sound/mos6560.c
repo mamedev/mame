@@ -944,13 +944,18 @@ static DEVICE_RESET( mos6560 )
  Device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(mos6560)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mos6560_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##mos6560##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"MOS 6560 / 6561 VIC"
-#define DEVTEMPLATE_FAMILY				"MOS Video Interface Chip"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(mos6560); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(mos6560); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "MOS 6560 / 6561 VIC"); break;
+ }
+}
 
 DEFINE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);

@@ -226,13 +226,18 @@ static DEVICE_RESET( rp5h01 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(rp5h01)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(rp5h01_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##rp5h01##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"RP5H01"
-#define DEVTEMPLATE_FAMILY		"RP5H01"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(rp5h01); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(rp5h01); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "RP5H01"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(RP5H01, rp5h01);

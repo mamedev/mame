@@ -509,29 +509,46 @@ static DEVICE_RESET( adc0831 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(adc0831)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(adc0831_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##adc0831##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"A/D Converters 0831"
-#define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 083x"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(adc0831); break;
 
-#define DEVTEMPLATE_DERIVED_ID( p, s )	p##adc0832##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"A/D Converters 0832"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(adc0831); break;
 
-#define DEVTEMPLATE_DERIVED_ID( p, s )	p##adc0834##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"A/D Converters 0834"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0831"); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID( p, s )	p##adc0838##s
-#define DEVTEMPLATE_DERIVED_FEATURES	0
-#define DEVTEMPLATE_DERIVED_NAME		"A/D Converters 0838"
-#include "devtempl.h"
+DEVICE_GET_INFO(adc0832)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0832"); break;
+  default: DEVICE_GET_INFO_CALL(adc0831); break;
+ }
+}
 
+DEVICE_GET_INFO(adc0834)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0834"); break;
+  default: DEVICE_GET_INFO_CALL(adc0831); break;
+ }
+}
+
+DEVICE_GET_INFO(adc0838)
+{
+ switch (state)
+ {
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0838"); break;
+  default: DEVICE_GET_INFO_CALL(adc0831); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(ADC0831, adc0831);
 DEFINE_LEGACY_DEVICE(ADC0832, adc0832);

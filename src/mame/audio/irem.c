@@ -489,15 +489,16 @@ MACHINE_CONFIG_END
 /*****************************************************************************
     DEVICE DEFINITION
 *****************************************************************************/
+DEVICE_GET_INFO(irem_audio)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(irem_audio_state); break;
 
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(irem_audio); break;
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)				p##irem_audio##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START
-#define DEVTEMPLATE_NAME				"Irem Audio"
-#define DEVTEMPLATE_FAMILY				"Irem Audio IC"
-#include "devtempl.h"
-
+  case DEVINFO_STR_NAME: strcpy(info->s, "Irem Audio"); break;
+ }
+}
 
 DEFINE_LEGACY_SOUND_DEVICE(IREM_AUDIO, irem_audio);

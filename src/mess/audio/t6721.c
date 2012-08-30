@@ -289,12 +289,18 @@ static DEVICE_RESET( t6721 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(t6721)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(t6721_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##t6721##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"Toshiba 6721A"
-#define DEVTEMPLATE_FAMILY				"Toshiba 6721A"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(t6721); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(t6721); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Toshiba 6721A"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(T6721, t6721);

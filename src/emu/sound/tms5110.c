@@ -1497,58 +1497,94 @@ WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
     TMS 5110 device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-#define DEVTEMPLATE_ID(p,s)				p##tms5110##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"TMS5110"
-#define DEVTEMPLATE_FAMILY				"TI Speech"
-#include "devtempl.h"
+DEVICE_GET_INFO(tms5110)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tms5110_state); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5100##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"TMS5100"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5110); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tms5110a##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"TMS5110A"
-#include "devtempl.h"
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tms5110); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##cd2801##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"CD2801"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5110"); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##tmc0281##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"TMC0281"
-#include "devtempl.h"
+DEVICE_GET_INFO(tms5100)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5100); break;
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##cd2802##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"CD2802"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5100"); break;
+  default: DEVICE_GET_INFO_CALL(tms5110); break;
+ }
+}
 
-#define DEVTEMPLATE_DERIVED_ID(p,s)		p##m58817##s
-#define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
-#define DEVTEMPLATE_DERIVED_NAME		"M58817"
-#include "devtempl.h"
+DEVICE_GET_INFO(tms5110a)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5110a); break;
 
-/*-------------------------------------------------
-    TMS PROM interface definition
--------------------------------------------------*/
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5110A"); break;
+  default: DEVICE_GET_INFO_CALL(tms5110); break;
+ }
+}
 
-#undef DEVTEMPLATE_ID
-#undef DEVTEMPLATE_NAME
-#undef DEVTEMPLATE_FEATURES
+DEVICE_GET_INFO(cd2801)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(cd2801); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##tmsprom##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START
-#define DEVTEMPLATE_NAME				"TMSPROM"
-#define DEVTEMPLATE_FAMILY				"TI Speech"
-#include "devtempl.h"
+  case DEVINFO_STR_NAME: strcpy(info->s, "CD2801"); break;
+  default: DEVICE_GET_INFO_CALL(tms5110); break;
+ }
+}
 
+DEVICE_GET_INFO(tmc0281)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tmc0281); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMC0281"); break;
+  default: DEVICE_GET_INFO_CALL(tms5110); break;
+ }
+}
+
+DEVICE_GET_INFO(cd2802)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(cd2802); break;
+  case DEVINFO_STR_NAME: strcpy(info->s, "CD2802"); break;
+  default: DEVICE_GET_INFO_CALL(tms5110); break;
+ }
+}
+
+DEVICE_GET_INFO(m58817)
+{
+ switch (state)
+ {
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(m58817); break;
+  case DEVINFO_STR_NAME: strcpy(info->s, "M58817"); break;
+  default: DEVICE_GET_INFO_CALL(tms5110); break;
+ }
+}
+
+DEVICE_GET_INFO(tmsprom)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tmsprom_state); break;
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tmsprom); break;
+  case DEVINFO_STR_NAME: strcpy(info->s, "TMSPROM"); break;
+ }
+}
 
 DEFINE_LEGACY_SOUND_DEVICE(TMS5110, tms5110);
 DEFINE_LEGACY_SOUND_DEVICE(TMS5100, tms5100);

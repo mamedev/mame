@@ -176,13 +176,21 @@ static DEVICE_RESET( ttl74153 )
     state->last_output[1] = -1;
 }
 
+DEVICE_GET_INFO(ttl74153)
+{
+ switch (state)
+ {
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(ttl74153_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##ttl74153##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME		"74153"
-#define DEVTEMPLATE_FAMILY		"TTL"
-#include "devtempl.h"
+  case DEVINFO_INT_INLINE_CONFIG_BYTES: info->i = sizeof(ttl74153_config); break;
+
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(ttl74153); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(ttl74153); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "74153"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(TTL74153, ttl74153);

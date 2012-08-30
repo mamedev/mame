@@ -239,13 +239,19 @@ static DEVICE_RESET( buggychl_mcu )
     DEVICE DEFINITION
 *****************************************************************************/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(buggychl_mcu)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(buggychl_mcu_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##buggychl_mcu##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"BuggyChl MCU"
-#define DEVTEMPLATE_FAMILY				"BuggyChl MCU IC"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(buggychl_mcu); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(buggychl_mcu); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "BuggyChl MCU"); break;
+
+ }
+}
 
 DEFINE_LEGACY_DEVICE(BUGGYCHL_MCU, buggychl_mcu);

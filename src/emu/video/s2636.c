@@ -365,13 +365,16 @@ static DEVICE_START( s2636 )
 	device->save_item(NAME(*s2636->collision_bitmap));
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(s2636)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(s2636_state); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##s2636##s
-#define DEVTEMPLATE_FEATURES		DT_HAS_START
-#define DEVTEMPLATE_NAME		"Signetics 2636"
-#define DEVTEMPLATE_FAMILY		"Signetics Video Chips"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(s2636); break;
 
+  case DEVINFO_STR_NAME: strcpy(info->s, "Signetics 2636"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(S2636, s2636);

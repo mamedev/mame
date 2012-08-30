@@ -917,13 +917,20 @@ WRITE32_DEVICE_HANDLER( amiga_akiko32_w )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(akiko)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(akiko_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##akiko##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"Akiko"
-#define DEVTEMPLATE_FAMILY		"Amiga"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(akiko); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(akiko); break;
+
+  case DEVINFO_FCT_STOP: info->stop = DEVICE_STOP_NAME(akiko); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "Akiko"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(AKIKO, akiko);

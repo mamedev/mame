@@ -165,13 +165,18 @@ static DEVICE_RESET( adc1038 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(adc1038)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(adc1038_state); break;
+ 
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(adc1038); break;
 
-#define DEVTEMPLATE_ID( p, s )	p##adc1038##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"A/D Converters 1038"
-#define DEVTEMPLATE_FAMILY		"National Semiconductor A/D Converters 1038"
-#include "devtempl.h"
-
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(adc1038); break;
+  
+  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 1038"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(ADC1038, adc1038);

@@ -525,13 +525,18 @@ static DEVICE_RESET( upd4990a )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(upd4990a)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(upd4990a_state); break;
 
-#define DEVTEMPLATE_ID(p,s)		p##upd4990a##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"NEC uPD4990A"
-#define DEVTEMPLATE_FAMILY		"NEC uPD4990A Calendar & Clock"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(upd4990a); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(upd4990a); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "NEC uPD4990A"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(UPD4990A, upd4990a);

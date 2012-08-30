@@ -380,13 +380,19 @@ static DEVICE_RESET( saa5050 )
 	saa5050->frame_count = 0;
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-#define DEVTEMPLATE_ID( p, s )	p##saa5050##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"SAA5050"
-#define DEVTEMPLATE_FAMILY		"SAA5050 Teletext Character Generator"
-#include "devtempl.h"
+DEVICE_GET_INFO(saa5050)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(saa5050_state); break;
 
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(saa5050); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(saa5050); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "SAA5050"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(SAA5050, saa5050);

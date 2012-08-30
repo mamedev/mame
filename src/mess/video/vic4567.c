@@ -2154,12 +2154,18 @@ static DEVICE_RESET( vic3 )
     device definition
 -------------------------------------------------*/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(vic3)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vic3_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##vic3##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"4567 VIC III"
-#define DEVTEMPLATE_FAMILY				"4567 VIC III"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vic3); break;
+
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vic3); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "4567 VIC III"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(VIC3, vic3);

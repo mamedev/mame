@@ -157,13 +157,18 @@ static DEVICE_RESET( nmk112 )
     DEVICE DEFINITION
 *****************************************************************************/
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+DEVICE_GET_INFO(nmk112)
+{
+ switch (state)
+ {
+  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(nmk112_state); break;
 
-#define DEVTEMPLATE_ID(p,s)				p##nmk112##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"NMK 112"
-#define DEVTEMPLATE_FAMILY				"NMK 112 Bankswitch IC"
-#include "devtempl.h"
+  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(nmk112); break;
 
+  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(nmk112); break;
+
+  case DEVINFO_STR_NAME: strcpy(info->s, "NMK 112"); break;
+ }
+}
 
 DEFINE_LEGACY_DEVICE(NMK112, nmk112);
