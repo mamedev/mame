@@ -1933,7 +1933,6 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_FD1797_ADD(SAB1797_02P_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_interface)
 	MCFG_ABC99_ADD(abc99_intf)
-	MCFG_S1410_ADD()
 
 	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL, NULL)
 	MCFG_ABC1600BUS_SLOT_ADD("bus0x", bus0x_intf, abc1600bus_cards, NULL, NULL)

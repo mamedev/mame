@@ -25,7 +25,7 @@ CP3020          20MB        623     2       33              41118
 ST225NP         20MB        615     4       17              41720
 CP3040          40MB        1026    2       40              82080
 
-Via Xibec S1410 SASI to MFM bridge board - format with WINFORM.EXE
+Via Xebec S1410 SASI to MFM bridge board - format with WINFORM.EXE
 NP05-10S         8MB        160     6       17              16320
 NP04-20T        16MB        320     6       17              32640
 NP03-20         15MB        306     6       17              31212

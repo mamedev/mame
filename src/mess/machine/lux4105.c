@@ -81,6 +81,7 @@ static const SCSIBus_interface sasi_intf =
 static MACHINE_CONFIG_FRAGMENT( luxor_4105 )
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_S1410_ADD("s1410")
 MACHINE_CONFIG_END
 
 
