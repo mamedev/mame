@@ -303,7 +303,6 @@ DRVLIBS += \
 	$(MESSOBJ)/hp.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/intelgnt.a \
-	$(MESSOBJ)/interact.a \
 	$(MESSOBJ)/interton.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/kaypro.a \
@@ -1177,11 +1176,7 @@ $(MESSOBJ)/hec2hrp.a:			\
 	$(MESS_VIDEO)/hec2video.o	\
 	$(MESS_MACHINE)/hecdisk2.o  \
 	$(MESS_MACHINE)/hec2hrp.o   \
-
-$(MESSOBJ)/interact.a:			\
 	$(MESS_DRIVERS)/interact.o	\
-	$(MESS_VIDEO)/hec2video.o	\
-	$(MESS_MACHINE)/hec2hrp.o   \
 
 $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/basic52.o	\
@@ -1556,7 +1551,6 @@ $(MESSOBJ)/sega.a:				\
 	$(MESS_MACHINE)/dccons.o	\
 	$(MESS_MACHINE)/sms.o	\
 	$(MESS_DRIVERS)/sms.o	\
-	$(MESS_DRIVERS)/sg1000.o	\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
