@@ -107,7 +107,6 @@ DEVICE_GET_INFO( pf10 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pf10_state);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_CONFIG_NAME(pf10);	break;

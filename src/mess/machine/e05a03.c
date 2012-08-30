@@ -116,7 +116,6 @@ DEVICE_GET_INFO( e05a03 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(e05a03_state);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(e05a03);		break;

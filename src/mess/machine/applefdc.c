@@ -745,7 +745,6 @@ static DEVICE_GET_INFO(applefdc_base)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(applefdc_token);			break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							/* Nothing */								break;
