@@ -6040,9 +6040,9 @@ sbishik			// GX675 (c) 1998 (Korea)
 
 // Konami dual 68000 games
 overdriv		// GX789 (c) 1990
-gradius3		// GX945 (c) 1989 (Japan)
+gradius3		// GX945 (c) 1989 (World)
+gradius3j		// GX945 (c) 1989 (Japan)
 gradius3a		// GX945 (c) 1989 (Asia)
-gradius3e		// GX945 (c) 1989 (World?)
 
 // Konami 68020 games
 plygonet		// GX305 (c) 1993
