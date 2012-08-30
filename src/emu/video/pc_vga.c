@@ -2758,37 +2758,37 @@ static void s3_write_fg(UINT32 offset)
 	switch(s3.fgmix & 0x000f)
 	{
 	case 0x0000:
-		vga.memory[offset] = !dst;
+		vga.memory[offset] = ~dst;
 		break;
 	case 0x0001:
-		// TODO: false
+		vga.memory[offset] = 0x00;  // is this correct?
 		break;
 	case 0x0002:
-		// TODO: true
+		vga.memory[offset] = 0xff;  // is this correct?
 		break;
 	case 0x0003:
 		// change nothing, pixel is unchanged
 		break;
 	case 0x0004:
-		vga.memory[offset] = !src;
+		vga.memory[offset] = ~src;
 		break;
 	case 0x0005:
 		vga.memory[offset] = src ^ dst;
 		break;
 	case 0x0006:
-		vga.memory[offset] = !(src ^ dst);
+		vga.memory[offset] = ~(src ^ dst);
 		break;
 	case 0x0007:
 		vga.memory[offset] = src;
 		break;
 	case 0x0008:
-		vga.memory[offset] = !(src & dst);
+		vga.memory[offset] = ~(src & dst);
 		break;
 	case 0x0009:
-		vga.memory[offset] = (!src) | dst;
+		vga.memory[offset] = (~src) | dst;
 		break;
 	case 0x000a:
-		vga.memory[offset] = src | (!dst);
+		vga.memory[offset] = src | (~dst);
 		break;
 	case 0x000b:
 		vga.memory[offset] = src | dst;
@@ -2797,13 +2797,13 @@ static void s3_write_fg(UINT32 offset)
 		vga.memory[offset] = src & dst;
 		break;
 	case 0x000d:
-		vga.memory[offset] = src & (!dst);
+		vga.memory[offset] = src & (~dst);
 		break;
 	case 0x000e:
-		vga.memory[offset] = (!src) & dst;
+		vga.memory[offset] = (~src) & dst;
 		break;
 	case 0x000f:
-		vga.memory[offset] = !(src | dst);
+		vga.memory[offset] = ~(src | dst);
 		break;
 	}
 }
@@ -2833,37 +2833,37 @@ static void s3_write_bg(UINT32 offset)
 	switch(s3.bgmix & 0x000f)
 	{
 	case 0x0000:
-		vga.memory[offset] = !dst;
+		vga.memory[offset] = ~dst;
 		break;
 	case 0x0001:
-		// TODO: false
+		vga.memory[offset] = 0x00;  // is this correct?
 		break;
 	case 0x0002:
-		// TODO: true
+		vga.memory[offset] = 0xff;  // is this correct?
 		break;
 	case 0x0003:
 		// change nothing, pixel is unchanged
 		break;
 	case 0x0004:
-		vga.memory[offset] = !src;
+		vga.memory[offset] = ~src;
 		break;
 	case 0x0005:
 		vga.memory[offset] = src ^ dst;
 		break;
 	case 0x0006:
-		vga.memory[offset] = !(src ^ dst);
+		vga.memory[offset] = ~(src ^ dst);
 		break;
 	case 0x0007:
 		vga.memory[offset] = src;
 		break;
 	case 0x0008:
-		vga.memory[offset] = !(src & dst);
+		vga.memory[offset] = ~(src & dst);
 		break;
 	case 0x0009:
-		vga.memory[offset] = (!src) | dst;
+		vga.memory[offset] = (~src) | dst;
 		break;
 	case 0x000a:
-		vga.memory[offset] = src | (!dst);
+		vga.memory[offset] = src | (~dst);
 		break;
 	case 0x000b:
 		vga.memory[offset] = src | dst;
@@ -2872,13 +2872,13 @@ static void s3_write_bg(UINT32 offset)
 		vga.memory[offset] = src & dst;
 		break;
 	case 0x000d:
-		vga.memory[offset] = src & (!dst);
+		vga.memory[offset] = src & (~dst);
 		break;
 	case 0x000e:
-		vga.memory[offset] = (!src) & dst;
+		vga.memory[offset] = (~src) & dst;
 		break;
 	case 0x000f:
-		vga.memory[offset] = !(src | dst);
+		vga.memory[offset] = ~(src | dst);
 		break;
 	}
 }
@@ -3006,8 +3006,7 @@ WRITE16_HANDLER(s3_cmd_w)
 	if(s3.enable_8514 != 0)
 	{
 		int x,y;
-		int dir_x;
-//		int pattern_x,pattern_y;
+		int pattern_x,pattern_y;
 		UINT32 offset,src;
 
 		s3.current_cmd = data;
@@ -3038,15 +3037,14 @@ WRITE16_HANDLER(s3_cmd_w)
 			offset = VGA_START_ADDRESS;
 			offset += (VGA_LINE_LENGTH * s3.curr_y);
 			offset += s3.curr_x;
-			if(data & 0x0020)
-				dir_x = 1;
-			else
-				dir_x = -1;
 			for(y=0;y<=s3.rect_height;y++)
 			{
-				for(x=0;x<=s3.rect_width;x+=dir_x)
+				for(x=0;x<=s3.rect_width;x++)
 				{
-					s3_write_fg((offset+x) % vga.svga_intf.vram_size);
+					if(data & 0x0020)
+						s3_write_fg((offset+x) % vga.svga_intf.vram_size);
+					else
+						s3_write_fg((offset-x) % vga.svga_intf.vram_size);
 				}
 				if(data & 0x0080)
 					offset += VGA_LINE_LENGTH;
@@ -3091,33 +3089,75 @@ WRITE16_HANDLER(s3_cmd_w)
 					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		case 0xe000:  // Pattern Fill
-//			offset = VGA_START_ADDRESS;
-//			offset += (VGA_LINE_LENGTH * s3.dest_y);
-//			offset += s3.dest_x;
-//			src = VGA_START_ADDRESS;
-//			src += (VGA_LINE_LENGTH * s3.curr_y);
-//			src += s3.curr_x;
-//			pattern_x = pattern_y = 0;
-//			for(y=0;y<=s3.rect_height;y++)
-//			{
-//				for(x=0;x<=s3.rect_width;x++)
-//				{
-//					if(data & 0x0020)
-//						vga.memory[(offset+x) % vga.svga_intf.vram_size] = vga.memory[(src+pattern_x) % vga.svga_intf.vram_size];
-//					else
-//						vga.memory[(offset-x) % vga.svga_intf.vram_size] = vga.memory[(src-pattern_x) % vga.svga_intf.vram_size];
-//					pattern_x++;
-//					pattern_x %= 8;
-//				}
-//				pattern_y++;
-//				src += VGA_LINE_LENGTH;
-//				if(pattern_y % 8 == 0)
-//					src -= (VGA_LINE_LENGTH * 8);  // move src pointer back to top of pattern
-//				if(data & 0x0080)
-//					offset += VGA_LINE_LENGTH;
-//				else
-//					offset -= VGA_LINE_LENGTH;
-//			}
+			offset = VGA_START_ADDRESS;
+			offset += (VGA_LINE_LENGTH * s3.dest_y);
+			offset += s3.dest_x;
+			src = VGA_START_ADDRESS;
+			src += (VGA_LINE_LENGTH * s3.curr_y);
+			src += s3.curr_x;
+			if(data & 0x0020)
+				pattern_x = 0;
+			else
+				pattern_x = 7;
+			if(data & 0x0080)
+				pattern_y = 0;
+			else
+				pattern_y = 7;
+
+			for(y=0;y<=s3.rect_height;y++)
+			{
+				for(x=0;x<=s3.rect_width;x++)
+				{
+					if(data & 0x0020)
+					{
+						if(vga.memory[(src+pattern_x) % vga.svga_intf.vram_size] == 0x00)
+							s3_write_fg(offset+x);
+						else
+							s3_write_bg(offset+x);
+						pattern_x++;
+						if(pattern_x >= 8)
+							pattern_x = 0;
+					}
+					else
+					{
+						if(vga.memory[(src-pattern_x) % vga.svga_intf.vram_size] == 0x00)
+							s3_write_fg(offset-x);
+						else
+							s3_write_bg(offset-x);
+						pattern_x--;
+						if(pattern_x < 0)
+							pattern_x = 7;
+					}
+				}
+
+				// for now, presume that INC_X and INC_Y affect both src and dest, at is would for a bitblt.
+				if(data & 0x0020)
+					pattern_x = 0;
+				else
+					pattern_x = 7;
+				if(data & 0x0080)
+				{
+					pattern_y++;
+					src += VGA_LINE_LENGTH;
+					if(pattern_y >= 8)
+					{
+						pattern_y = 0;
+						src -= (VGA_LINE_LENGTH * 8);  // move src pointer back to top of pattern
+					}
+					offset += VGA_LINE_LENGTH;
+				}
+				else
+				{
+					pattern_y--;
+					src -= VGA_LINE_LENGTH;
+					if(pattern_y < 0)
+					{
+						pattern_y = 7;
+						src += (VGA_LINE_LENGTH * 8);  // move src pointer back to bottom of pattern
+					}
+					offset -= VGA_LINE_LENGTH;
+				}
+			}
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
 			logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
@@ -3378,18 +3418,61 @@ static void s3_wait_draw()
 					s3_write_bg(off % vga.svga_intf.vram_size);
 			}
 		}
-		off++;
-		s3.wait_rect_x++;
-		if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
+		if(s3.current_cmd & 0x0020)
 		{
-			s3.wait_rect_x = s3.curr_x;
-			s3.wait_rect_y++;
-			if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+			off++;
+			s3.wait_rect_x++;
+			if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
 			{
-				s3.state = S3_IDLE;
-				s3.gpbusy = false;
+				s3.wait_rect_x = s3.curr_x;
+				if(s3.current_cmd & 0x0080)
+				{
+					s3.wait_rect_y++;
+					if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+					{
+						s3.state = S3_IDLE;
+						s3.gpbusy = false;
+					}
+				}
+				else
+				{
+					s3.wait_rect_y--;
+					if(s3.wait_rect_y < s3.curr_y - s3.rect_height)
+					{
+						s3.state = S3_IDLE;
+						s3.gpbusy = false;
+					}
+				}
+				return;
 			}
-			return;
+		}
+		else
+		{
+			off--;
+			s3.wait_rect_x--;
+			if(s3.wait_rect_x < s3.curr_x - s3.rect_width)
+			{
+				s3.wait_rect_x = s3.curr_x;
+				if(s3.current_cmd & 0x0080)
+				{
+					s3.wait_rect_y++;
+					if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+					{
+						s3.state = S3_IDLE;
+						s3.gpbusy = false;
+					}
+				}
+				else
+				{
+					s3.wait_rect_y--;
+					if(s3.wait_rect_y < s3.curr_y - s3.rect_height)
+					{
+						s3.state = S3_IDLE;
+						s3.gpbusy = false;
+					}
+				}
+				return;
+			}
 		}
 	}
 }
@@ -3429,6 +3512,7 @@ READ16_HANDLER(s3_backmix_r)
 WRITE16_HANDLER(s3_backmix_w)
 {
 	s3.bgmix = data;
+	logerror("S3: BG Mix write %04x\n",data);
 }
 
 READ16_HANDLER(s3_foremix_r)
@@ -3439,6 +3523,7 @@ READ16_HANDLER(s3_foremix_r)
 WRITE16_HANDLER(s3_foremix_w)
 {
 	s3.fgmix = data;
+	logerror("S3: FG Mix write %04x\n",data);
 }
 
 READ16_HANDLER(s3_pixel_xfer_r)
