@@ -196,19 +196,6 @@ void legacy_device_base::static_set_inline_float(device_t &device, UINT32 offset
 
 
 //-------------------------------------------------
-//  device_validity_check - perform validity
-//  checks on a device configuration
-//-------------------------------------------------
-
-void legacy_device_base::device_validity_check(validity_checker &valid) const
-{
-	device_validity_check_func validity_func = reinterpret_cast<device_validity_check_func>(get_legacy_fct(DEVINFO_FCT_VALIDITY_CHECK));
-	if (validity_func != NULL)
-		(*validity_func)(&mconfig().gamedrv(), this, mconfig().options());
-}
-
-
-//-------------------------------------------------
 //  device_start - called to start up a device
 //-------------------------------------------------
 

@@ -114,9 +114,6 @@ enum
 		DEVINFO_FCT_START = DEVINFO_FCT_FIRST,			// R/O: device_start_func
 		DEVINFO_FCT_STOP,								// R/O: device_stop_func
 		DEVINFO_FCT_RESET,								// R/O: device_reset_func
-		DEVINFO_FCT_EXECUTE,							// R/O: device_execute_func
-		DEVINFO_FCT_NVRAM,								// R/O: device_nvram_func
-		DEVINFO_FCT_VALIDITY_CHECK,						// R/O: device_validity_check_func
 
 	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				// R/W: device-specific values start here
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				// R/W: device-specific values start here
@@ -185,10 +182,6 @@ device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, 
 #define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_t *device, UINT32 state, deviceinfo *info)
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
 
-#define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
-#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_t *device, emu_options &options)
-#define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
-
 #define DEVICE_START_NAME(name)		device_start_##name
 #define DEVICE_START(name)			void DEVICE_START_NAME(name)(device_t *device)
 #define DEVICE_START_CALL(name)		DEVICE_START_NAME(name)(device)
@@ -200,10 +193,6 @@ device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, 
 #define DEVICE_RESET_NAME(name)		device_reset_##name
 #define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(device_t *device)
 #define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(device)
-
-#define DEVICE_EXECUTE_NAME(name)	device_execute_##name
-#define DEVICE_EXECUTE(name)		INT32 DEVICE_EXECUTE_NAME(name)(device_t *device, INT32 clocks)
-#define DEVICE_EXECUTE_CALL(name)	DEVICE_EXECUTE_NAME(name)(device, clocks)
 
 
 //**************************************************************************
@@ -269,13 +258,10 @@ resource_pool &machine_get_pool(running_machine &machine);
 
 // device interface function types
 typedef void (*device_get_config_func)(const device_t *device, UINT32 state, deviceinfo *info);
-typedef int (*device_validity_check_func)(const game_driver *driver, const device_t *device, emu_options &options);
 
 typedef void (*device_start_func)(device_t *device);
 typedef void (*device_stop_func)(device_t *device);
-typedef INT32 (*device_execute_func)(device_t *device, INT32 clocks);
 typedef void (*device_reset_func)(device_t *device);
-typedef void (*device_nvram_func)(device_t *device, emu_file *file, int read_or_write);
 
 // the actual deviceinfo union
 union deviceinfo
@@ -288,8 +274,6 @@ union deviceinfo
 	device_start_func		start;						// DEVINFO_FCT_START
 	device_stop_func		stop;						// DEVINFO_FCT_STOP
 	device_reset_func		reset;						// DEVINFO_FCT_RESET
-	device_execute_func 	execute;					// DEVINFO_FCT_EXECUTE
-	device_nvram_func		nvram;						// DEVINFO_FCT_NVRAM
 	const rom_entry *		romregion;					// DEVINFO_PTR_ROM_REGION
 	machine_config_constructor machine_config;			// DEVINFO_PTR_MACHINE_CONFIG
 	ioport_constructor ipt;								// DEVINFO_PTR_INPUT_PORTS
@@ -331,7 +315,6 @@ protected:
 	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_ptr(DEVINFO_PTR_ROM_REGION)); }
 	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
 	virtual ioport_constructor device_input_ports() const { return reinterpret_cast<ioport_constructor>(get_legacy_ptr(DEVINFO_PTR_INPUT_PORTS)); }
-	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_stop();
