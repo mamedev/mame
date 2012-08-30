@@ -15,7 +15,6 @@
 #include "machine/e0516.h"
 #include "machine/lux4105.h"
 #include "machine/nmc9306.h"
-#include "machine/s1410.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"

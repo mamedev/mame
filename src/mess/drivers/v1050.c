@@ -107,6 +107,7 @@ Notes:
 
 #include "includes/v1050.h"
 #include "machine/scsihd.h"
+#include "machine/s1410.h"
 
 void v1050_state::set_interrupt(UINT8 mask, int state)
 {

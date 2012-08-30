@@ -9,6 +9,7 @@
 
 #include "lux4105.h"
 #include "machine/scsihd.h"
+#include "machine/s1410.h"
 
 
 
