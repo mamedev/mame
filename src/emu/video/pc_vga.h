@@ -74,6 +74,8 @@ READ16_HANDLER(s3_currentx_r);
 WRITE16_HANDLER(s3_currentx_w);
 READ16_HANDLER(s3_currenty_r);
 WRITE16_HANDLER(s3_currenty_w);
+READ16_HANDLER(s3_line_error_r);
+WRITE16_HANDLER(s3_line_error_w);
 READ16_HANDLER(s3_width_r);
 WRITE16_HANDLER(s3_width_w);
 READ16_HANDLER(s3_multifunc_r);

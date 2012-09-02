@@ -203,13 +203,19 @@ static struct
 	UINT8 reg_lock1;
 	UINT8 reg_lock2;
 	UINT8 enable_8514;
+	UINT8 cr53;
 	UINT16 current_cmd;
 	INT16 dest_x;
 	INT16 dest_y;
 	INT16 curr_x;
 	INT16 curr_y;
+	INT16 prev_x;
+	INT16 prev_y;
+	UINT16 src_x;
+	UINT16 src_y;
 	UINT16 line_axial_step;
 	UINT16 line_diagonal_step;
+	UINT16 line_errorterm;
 	UINT16 rect_width;
 	UINT16 rect_height;
 	UINT32 fgcolour;
@@ -217,15 +223,19 @@ static struct
 	UINT16 fgmix;
 	UINT16 bgmix;
 	UINT32 pixel_xfer;
-	INT16 wait_rect_x;
-	INT16 wait_rect_y;
 	INT16 scissors_left;
 	INT16 scissors_right;
 	INT16 scissors_top;
 	INT16 scissors_bottom;
+	UINT16 pixel_control;
 	UINT8 bus_size;
 	UINT8 multifunc_sel;
 	UINT8 write_count;
+
+	// data for memory-mapped I/O
+	UINT16 mmio_9ae8;
+	UINT16 mmio_bee8;
+
 	bool gpbusy;
 	int state;
 }s3;
@@ -2611,6 +2621,9 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 				vga.crtc.start_addr &= ~0xc0000;
 				vga.crtc.start_addr |= ((data & 0x3) << 18);
 				break;
+			case 0x53:
+				s3.cr53 = data;
+				break;
 			case 0x67:
 				s3.ext_misc_ctrl_2 = data;
 				s3_define_video_mode();
@@ -2624,7 +2637,7 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 					fatalerror("TODO: s3 bank selects above 1M");
 				break;
 			default:
-				//printf("%02x %02x\n",index,data);
+				logerror("S3: 3D4 index %02x write %02x\n",index,data);
 				break;
 		}
 	}
@@ -2737,6 +2750,10 @@ static void s3_write_fg(UINT32 offset)
 	UINT8 dst = vga.memory[offset];
 	UINT8 src = 0;
 
+	// check clipping rectangle
+	if(s3.curr_x < s3.scissors_left || s3.curr_x > s3.scissors_right || s3.curr_y < s3.scissors_top || s3.curr_y > s3.scissors_bottom)
+		return;  // do nothing
+
 	// determine source
 	switch(s3.fgmix & 0x0060)
 	{
@@ -2750,7 +2767,8 @@ static void s3_write_fg(UINT32 offset)
 		src = s3.pixel_xfer;
 		break;
 	case 0x0060:
-		// TODO: Bitmap data;
+		// video memory - presume the memory is sourced from the current X/Y co-ords
+		src = vga.memory[(VGA_START_ADDRESS + (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
 		break;
 	}
 
@@ -2761,10 +2779,10 @@ static void s3_write_fg(UINT32 offset)
 		vga.memory[offset] = ~dst;
 		break;
 	case 0x0001:
-		vga.memory[offset] = 0x00;  // is this correct?
+		vga.memory[offset] = 0x00;
 		break;
 	case 0x0002:
-		vga.memory[offset] = 0xff;  // is this correct?
+		vga.memory[offset] = 0xff;
 		break;
 	case 0x0003:
 		// change nothing, pixel is unchanged
@@ -2812,6 +2830,11 @@ static void s3_write_bg(UINT32 offset)
 {
 	UINT8 dst = vga.memory[offset];
 	UINT8 src = 0;
+
+	// check clipping rectangle
+	if(s3.curr_x < s3.scissors_left || s3.curr_x > s3.scissors_right || s3.curr_y < s3.scissors_top || s3.curr_y > s3.scissors_bottom)
+		return;  // do nothing
+
 	// determine source
 	switch(s3.bgmix & 0x0060)
 	{
@@ -2825,7 +2848,8 @@ static void s3_write_bg(UINT32 offset)
 		src = s3.pixel_xfer;
 		break;
 	case 0x0060:
-		// TODO: Bitmap data;
+		// video memory - presume the memory is sourced from the current X/Y co-ords
+		src = vga.memory[(VGA_START_ADDRESS + (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
 		break;
 	}
 
@@ -2836,10 +2860,10 @@ static void s3_write_bg(UINT32 offset)
 		vga.memory[offset] = ~dst;
 		break;
 	case 0x0001:
-		vga.memory[offset] = 0x00;  // is this correct?
+		vga.memory[offset] = 0x00;
 		break;
 	case 0x0002:
-		vga.memory[offset] = 0xff;  // is this correct?
+		vga.memory[offset] = 0xff;
 		break;
 	case 0x0003:
 		// change nothing, pixel is unchanged
@@ -2882,6 +2906,82 @@ static void s3_write_bg(UINT32 offset)
 		break;
 	}
 }
+
+void s3_write(UINT32 offset, UINT32 src)
+{
+	int data_size = 8;
+	UINT32 xfer = 0;
+
+	switch(s3.pixel_control & 0x00c0)
+	{
+	case 0x0000:  // Foreground Mix only
+		// check clipping rectangle
+		if(s3.curr_x < s3.scissors_left || s3.curr_x > s3.scissors_right || s3.curr_y < s3.scissors_top || s3.curr_y > s3.scissors_bottom)
+			return;  // do nothing
+		s3_write_fg(offset);
+		break;
+	case 0x0040:  // fixed pattern (?)
+		// TODO
+		break;
+	case 0x0080:  // use pixel transfer register
+		if(s3.bus_size == 0)  // 8-bit
+			data_size = 8;
+		if(s3.bus_size == 1)  // 16-bit
+			data_size = 16;
+		if(s3.bus_size == 2)  // 32-bit
+			data_size = 32;
+		if((s3.current_cmd & 0x1000) && (data_size != 8))
+		{
+			xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
+				 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+		}
+		else
+			xfer = s3.pixel_xfer;
+		if(s3.current_cmd & 0x0002)
+		{
+			if((xfer & ((1<<(data_size-1))>>s3.src_x)) != 0)
+				s3_write_fg(offset);
+			else
+				s3_write_bg(offset);
+		}
+		else
+		{
+			s3_write_fg(offset);
+		}
+		s3.src_x++;
+		if(s3.src_x >= data_size)
+			s3.src_x = 0;
+		break;
+	case 0x00c0:  // use source plane
+		if(vga.memory[(src) % vga.svga_intf.vram_size] != 0x00)
+			s3_write_fg(offset);
+		else
+			s3_write_bg(offset);
+		break;
+	}
+}
+
+/*
+92E8h W(R/W):  Line Error Term Read/Write Register (ERR_TERM).
+bit  0-12  (911/924) LINE PARAMETER/ERROR TERM. For Line Drawing this is the
+            Bresenham Initial Error Term 2*dminor-dmajor (one less if the
+            starting X is less than the ending X) in two's complement format.
+            (dminor is the length of the line projected onto the minor or
+            dependent axis, dmajor is the length of the line projected onto
+            the major or independent axis).
+     0-13  (80x +) LINE PARAMETER/ERROR TERM. See above.
+ */
+READ16_HANDLER(s3_line_error_r)
+{
+	return s3.line_errorterm;
+}
+
+WRITE16_HANDLER(s3_line_error_w)
+{
+	s3.line_errorterm = data & 0x3fff;
+	logerror("S3: Line Parameter/Error Term write %04x\n",data);
+}
+
 /*
   9AE8h W(R):  Graphics Processor Status Register (GP_STAT)
 bit   0-7  Queue State.
@@ -3010,6 +3110,8 @@ WRITE16_HANDLER(s3_cmd_w)
 		UINT32 offset,src;
 
 		s3.current_cmd = data;
+		s3.src_x = 0;
+		s3.src_y = 0;
 		switch(data & 0xe000)
 		{
 		case 0x0000:  // NOP (for "Short Stroke Vectors")
@@ -3027,8 +3129,6 @@ WRITE16_HANDLER(s3_cmd_w)
 			{
 				s3.state = S3_DRAWING_RECT;
 				//s3.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
-				s3.wait_rect_x = s3.curr_x;
-				s3.wait_rect_y = s3.curr_y;
 				s3.bus_size = (data & 0x0600) >> 9;
 				logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
 						s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
@@ -3041,10 +3141,36 @@ WRITE16_HANDLER(s3_cmd_w)
 			{
 				for(x=0;x<=s3.rect_width;x++)
 				{
-					if(data & 0x0020)
-						s3_write_fg((offset+x) % vga.svga_intf.vram_size);
+					if(data & 0x0020)  // source pattern is always based on current X/Y?
+						s3_write((offset+x) % vga.svga_intf.vram_size,(offset+x) % vga.svga_intf.vram_size);
 					else
-						s3_write_fg((offset-x) % vga.svga_intf.vram_size);
+						s3_write((offset-x) % vga.svga_intf.vram_size,(offset-x) % vga.svga_intf.vram_size);
+					if(s3.current_cmd & 0x0020)
+					{
+						s3.curr_x++;
+						if(s3.curr_x > s3.prev_x + s3.rect_width)
+						{
+							s3.curr_x = s3.prev_x;
+							s3.src_x = 0;
+							if(s3.current_cmd & 0x0080)
+								s3.curr_y++;
+							else
+								s3.curr_y--;
+						}
+					}
+					else
+					{
+						s3.curr_x--;
+						if(s3.curr_x < s3.prev_x - s3.rect_width)
+						{
+							s3.curr_x = s3.prev_x;
+							s3.src_x = 0;
+							if(s3.current_cmd & 0x0080)
+								s3.curr_y++;
+							else
+								s3.curr_y--;
+						}
+					}
 				}
 				if(data & 0x0080)
 					offset += VGA_LINE_LENGTH;
@@ -3071,6 +3197,32 @@ WRITE16_HANDLER(s3_cmd_w)
 						vga.memory[(offset+x) % vga.svga_intf.vram_size] = vga.memory[(src+x) % vga.svga_intf.vram_size];
 					else
 						vga.memory[(offset-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
+					if(s3.current_cmd & 0x0020)
+					{
+						s3.curr_x++;
+						if(s3.curr_x > s3.prev_x + s3.rect_width)
+						{
+							s3.curr_x = s3.prev_x;
+							s3.src_x = 0;
+							if(s3.current_cmd & 0x0080)
+								s3.curr_y++;
+							else
+								s3.curr_y--;
+						}
+					}
+					else
+					{
+						s3.curr_x--;
+						if(s3.curr_x < s3.prev_x - s3.rect_width)
+						{
+							s3.curr_x = s3.prev_x;
+							s3.src_x = 0;
+							if(s3.current_cmd & 0x0080)
+								s3.curr_y++;
+							else
+								s3.curr_y--;
+						}
+					}
 				}
 				if(data & 0x0080)
 				{
@@ -3110,20 +3262,14 @@ WRITE16_HANDLER(s3_cmd_w)
 				{
 					if(data & 0x0020)
 					{
-						if(vga.memory[(src+pattern_x) % vga.svga_intf.vram_size] == 0x00)
-							s3_write_fg(offset+x);
-						else
-							s3_write_bg(offset+x);
+						s3_write(offset+x,src+pattern_x);
 						pattern_x++;
 						if(pattern_x >= 8)
 							pattern_x = 0;
 					}
 					else
 					{
-						if(vga.memory[(src-pattern_x) % vga.svga_intf.vram_size] == 0x00)
-							s3_write_fg(offset-x);
-						else
-							s3_write_bg(offset-x);
+						s3_write(offset-x,src-pattern_x);
 						pattern_x--;
 						if(pattern_x < 0)
 							pattern_x = 7;
@@ -3250,6 +3396,7 @@ READ16_HANDLER(s3_currentx_r)
 WRITE16_HANDLER(s3_currentx_w)
 {
 	s3.curr_x = data;
+	s3.prev_x = data;
 	logerror("S3: Current X set to %04x (%i)\n",data,s3.curr_x);
 }
 
@@ -3261,6 +3408,7 @@ READ16_HANDLER(s3_currenty_r)
 WRITE16_HANDLER(s3_currenty_w)
 {
 	s3.curr_y = data;
+	s3.prev_y = data;
 	logerror("S3: Current Y set to %04x (%i)\n",data,s3.curr_y);
 }
 
@@ -3359,6 +3507,20 @@ bit  0-10  (911,924) Clipping Right Limit. Defines the right bound of the
 		logerror("S3: Scissors Right write %04x\n",data);
 		break;
 /*
+BEE8h index 0Ah W(R/W):  Pixel Control Register (PIX_CNTL).
+BIT     2  (911-928) Pack Data. If set image read data is a monochrome bitmap,
+            if clear it is a bitmap of the current pixel depth
+      6-7  DT-EX-DRC. Select Mix Select.
+             0  Foreground Mix is always used.
+             1  use fixed pattern to decide which mix setting to use on a pixel
+             2  CPU Data (Pixel Transfer register) determines the Mix register used.
+             3  Video memory determines the Mix register used.
+ */
+	case 0xa000:
+		s3.pixel_control = data;
+		logerror("S3: Pixel control write %04x\n",data);
+		break;
+/*
 BEE8h index 0Fh W(W):  Read Register Select Register (READ_SEL)    (801/5,928)
 bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
             that is actually read when a read of BEE8h happens. Each read of
@@ -3385,8 +3547,8 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 
 static void s3_wait_draw()
 {
-	int x,data_size = 0;
-	UINT32 off,xfer = 0;
+	int x, data_size = 8;
+	UINT32 off;
 
 	// the data in the pixel transfer register or written to VRAM masks the rectangle output
 	if(s3.bus_size == 0)  // 8-bit
@@ -3396,82 +3558,137 @@ static void s3_wait_draw()
 	if(s3.bus_size == 2)  // 32-bit
 		data_size = 32;
 	off = VGA_START_ADDRESS;
-	off += (VGA_LINE_LENGTH * s3.wait_rect_y);
-	off += s3.wait_rect_x;
-	for(x=0;x<data_size;x++)
+	off += (VGA_LINE_LENGTH * s3.curr_y);
+	off += s3.curr_x;
+	if(s3.current_cmd & 0x02) // "across plane mode"
 	{
-		if(s3.wait_rect_x >= 0 && s3.wait_rect_y >= 0)
+		for(x=0;x<data_size;x++)
 		{
-			// check clipping rectangle
-			if(s3.wait_rect_x >= s3.scissors_left && s3.wait_rect_x <= s3.scissors_right && s3.wait_rect_y >= s3.scissors_top && s3.wait_rect_y <= s3.scissors_bottom)
+			s3_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
+			if(s3.current_cmd & 0x0020)
 			{
-				if((s3.current_cmd & 0x1000) && (data_size != 8))
+				off++;
+				s3.curr_x++;
+				if(s3.curr_x > s3.prev_x + s3.rect_width)
 				{
-					xfer = ((s3.pixel_xfer & 0x000000ff) << 8) | ((s3.pixel_xfer & 0x0000ff00) >> 8)
-						 | ((s3.pixel_xfer & 0x00ff0000) << 8) | ((s3.pixel_xfer & 0xff000000) >> 8);
+					s3.curr_x = s3.prev_x;
+					s3.src_x = 0;
+					if(s3.current_cmd & 0x0080)
+					{
+						s3.curr_y++;
+						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
+					}
+					else
+					{
+						s3.curr_y--;
+						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
+					}
+					return;
 				}
-				else
-					xfer = s3.pixel_xfer;
-				if((xfer & ((1<<(data_size-1))>>x)) != 0)
-					s3_write_fg(off % vga.svga_intf.vram_size);
-				else
-					s3_write_bg(off % vga.svga_intf.vram_size);
+			}
+			else
+			{
+				off--;
+				s3.curr_x--;
+				if(s3.curr_x < s3.prev_x - s3.rect_width)
+				{
+					s3.curr_x = s3.prev_x;
+					s3.src_x = 0;
+					if(s3.current_cmd & 0x0080)
+					{
+						s3.curr_y++;
+						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
+					}
+					else
+					{
+						s3.curr_y--;
+						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
+					}
+					return;
+				}
 			}
 		}
-		if(s3.current_cmd & 0x0020)
+	}
+	else
+	{
+		// "through plane" mode (single pixel)
+		for(x=0;x<data_size;x+=8)
 		{
-			off++;
-			s3.wait_rect_x++;
-			if(s3.wait_rect_x > s3.curr_x + s3.rect_width)
+			s3_write(off % vga.svga_intf.vram_size,off % vga.svga_intf.vram_size);
+
+			if(s3.current_cmd & 0x0020)
 			{
-				s3.wait_rect_x = s3.curr_x;
-				if(s3.current_cmd & 0x0080)
+				off++;
+				s3.curr_x++;
+				if(s3.curr_x > s3.prev_x + s3.rect_width)
 				{
-					s3.wait_rect_y++;
-					if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+					s3.curr_x = s3.prev_x;
+					s3.src_x = 0;
+					if(s3.current_cmd & 0x0080)
 					{
-						s3.state = S3_IDLE;
-						s3.gpbusy = false;
+						s3.curr_y++;
+						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
 					}
-				}
-				else
-				{
-					s3.wait_rect_y--;
-					if(s3.wait_rect_y < s3.curr_y - s3.rect_height)
+					else
 					{
-						s3.state = S3_IDLE;
-						s3.gpbusy = false;
+						s3.curr_y--;
+						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
 					}
+					return;
 				}
-				return;
 			}
-		}
-		else
-		{
-			off--;
-			s3.wait_rect_x--;
-			if(s3.wait_rect_x < s3.curr_x - s3.rect_width)
+			else
 			{
-				s3.wait_rect_x = s3.curr_x;
-				if(s3.current_cmd & 0x0080)
+				off--;
+				s3.curr_x--;
+				if(s3.curr_x < s3.prev_x - s3.rect_width)
 				{
-					s3.wait_rect_y++;
-					if(s3.wait_rect_y > s3.curr_y + s3.rect_height)
+					s3.curr_x = s3.prev_x;
+					s3.src_x = 0;
+					if(s3.current_cmd & 0x0080)
 					{
-						s3.state = S3_IDLE;
-						s3.gpbusy = false;
+						s3.curr_y++;
+						if(s3.curr_y > s3.prev_y + s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
 					}
-				}
-				else
-				{
-					s3.wait_rect_y--;
-					if(s3.wait_rect_y < s3.curr_y - s3.rect_height)
+					else
 					{
-						s3.state = S3_IDLE;
-						s3.gpbusy = false;
+						s3.curr_y--;
+						if(s3.curr_y < s3.prev_y - s3.rect_height)
+						{
+							s3.state = S3_IDLE;
+							s3.gpbusy = false;
+						}
 					}
+					return;
 				}
-				return;
 			}
 		}
 	}
@@ -3576,47 +3793,191 @@ READ8_HANDLER( s3_mem_r )
 
 WRITE8_HANDLER( s3_mem_w )
 {
-	if(s3.state != S3_IDLE)
+	// bit 4 of CR53 enables memory-mapped I/O
+	// 0xA0000-0xA7ffff maps to port 0xE2E8 (pixel transfer)
+	if(s3.cr53 & 0x10)
 	{
-		// pass through to the pixel transfer register (DirectX 5 wants this)
-		if(s3.bus_size == 0)
+		if(offset < 0x8000)
 		{
-			s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
-			s3_wait_draw();
-		}
-		if(s3.bus_size == 1)
-		{
-			switch(offset & 0x0001)
+			// pass through to the pixel transfer register (DirectX 5 wants this)
+			if(s3.bus_size == 0)
 			{
-			case 0:
-			default:
 				s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
-				break;
-			case 1:
-				s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
 				s3_wait_draw();
-				break;
 			}
-		}
-		if(s3.bus_size == 2)
-		{
-			switch(offset & 0x0003)
+			if(s3.bus_size == 1)
 			{
-			case 0:
-			default:
-				s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
-				break;
-			case 1:
-				s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
-				break;
-			case 2:
-				s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
-				break;
-			case 3:
-				s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
-				s3_wait_draw();
-				break;
+				switch(offset & 0x0001)
+				{
+				case 0:
+				default:
+					s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+					break;
+				case 1:
+					s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+					s3_wait_draw();
+					break;
+				}
 			}
+			if(s3.bus_size == 2)
+			{
+				switch(offset & 0x0003)
+				{
+				case 0:
+				default:
+					s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+					break;
+				case 1:
+					s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+					break;
+				case 2:
+					s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
+					break;
+				case 3:
+					s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
+					s3_wait_draw();
+					break;
+				}
+			}
+			return;
+		}
+		switch(offset)
+		{
+		case 0x8100:
+		case 0x82e8:
+			s3.curr_y = (s3.curr_y & 0xff00) | data;
+			s3.prev_y = (s3.prev_y & 0xff00) | data;
+			break;
+		case 0x8101:
+		case 0x82e9:
+			s3.curr_y = (s3.curr_y & 0x00ff) | (data << 8);
+			s3.prev_y = (s3.prev_y & 0x00ff) | (data << 8);
+			break;
+		case 0x8102:
+		case 0x86e8:
+			s3.curr_x = (s3.curr_x & 0xff00) | data;
+			s3.prev_x = (s3.prev_x & 0xff00) | data;
+			break;
+		case 0x8103:
+		case 0x86e9:
+			s3.curr_x = (s3.curr_x & 0x00ff) | (data << 8);
+			s3.prev_x = (s3.prev_x & 0x00ff) | (data << 8);
+			break;
+		case 0x8108:
+		case 0x8ae8:
+			s3.line_axial_step = (s3.line_axial_step & 0xff00) | data;
+			s3.dest_y = (s3.dest_y & 0xff00) | data;
+			break;
+		case 0x8109:
+		case 0x8ae9:
+			s3.line_axial_step = (s3.line_axial_step & 0x00ff) | ((data & 0x3f) << 8);
+			s3.dest_y = (s3.dest_y & 0x00ff) | (data << 8);
+			break;
+		case 0x810a:
+		case 0x8ee8:
+			s3.line_diagonal_step = (s3.line_diagonal_step & 0xff00) | data;
+			s3.dest_x = (s3.dest_x & 0xff00) | data;
+			break;
+		case 0x810b:
+		case 0x8ee9:
+			s3.line_diagonal_step = (s3.line_diagonal_step & 0x00ff) | ((data & 0x3f) << 8);
+			s3.dest_x = (s3.dest_x & 0x00ff) | (data << 8);
+			break;
+		case 0x8118:
+		case 0x9ae8:
+			s3.mmio_9ae8 = (s3.mmio_9ae8 & 0xff00) | data;
+			break;
+		case 0x8119:
+		case 0x9ae9:
+			s3.mmio_9ae8 = (s3.mmio_9ae8 & 0x00ff) | (data << 8);
+			s3_cmd_w(space,0,s3.mmio_9ae8,0xffff);
+			break;
+		case 0x8120:
+		case 0xa2e8:
+			s3.bgcolour = (s3.bgcolour & 0xff00) | data;
+			break;
+		case 0x8121:
+		case 0xa2e9:
+			s3.bgcolour = (s3.bgcolour & 0x00ff) | (data << 8);
+			break;
+		case 0x8124:
+		case 0xa6e8:
+			s3.fgcolour = (s3.fgcolour & 0xff00) | data;
+			break;
+		case 0x8125:
+		case 0xa6e9:
+			s3.fgcolour = (s3.fgcolour & 0x00ff) | (data << 8);
+			break;
+		case 0xb6e8:
+		case 0x8134:
+			s3.bgmix = (s3.bgmix & 0xff00) | data;
+			break;
+		case 0x8135:
+		case 0xb6e9:
+			s3.bgmix = (s3.bgmix & 0x00ff) | (data << 8);
+			break;
+		case 0x8136:
+		case 0xbae8:
+			s3.fgmix = (s3.fgmix & 0xff00) | data;
+			break;
+		case 0xbae9:
+		case 0x8137:
+			s3.fgmix = (s3.fgmix & 0x00ff) | (data << 8);
+			break;
+		case 0x8138:
+			s3.scissors_top = (s3.scissors_top & 0xff00) | data;
+			break;
+		case 0x8139:
+			s3.scissors_top = (s3.scissors_top & 0x00ff) | (data << 8);
+			break;
+		case 0x813a:
+			s3.scissors_left = (s3.scissors_left & 0xff00) | data;
+			break;
+		case 0x813b:
+			s3.scissors_left = (s3.scissors_left & 0x00ff) | (data << 8);
+			break;
+		case 0x813c:
+			s3.scissors_bottom = (s3.scissors_bottom & 0xff00) | data;
+			break;
+		case 0x813d:
+			s3.scissors_bottom = (s3.scissors_bottom & 0x00ff) | (data << 8);
+			break;
+		case 0x813e:
+			s3.scissors_right = (s3.scissors_right & 0xff00) | data;
+			break;
+		case 0x813f:
+			s3.scissors_right = (s3.scissors_right & 0x00ff) | (data << 8);
+			break;
+		case 0x8140:
+			s3.pixel_control = (s3.pixel_control & 0xff00) | data;
+			break;
+		case 0x8141:
+			s3.pixel_control = (s3.pixel_control & 0x00ff) | (data << 8);
+			break;
+		case 0x8146:
+			s3.multifunc_sel = (s3.multifunc_sel & 0xff00) | data;
+			break;
+		case 0x8148:
+			s3.rect_height = (s3.rect_height & 0xff00) | data;
+			break;
+		case 0x8149:
+			s3.rect_height = (s3.rect_height & 0x00ff) | (data << 8);
+			break;
+		case 0x814a:
+			s3.rect_width = (s3.rect_width & 0xff00) | data;
+			break;
+		case 0x814b:
+			s3.rect_width = (s3.rect_width & 0x00ff) | (data << 8);
+			break;
+		case 0xbee8:
+			s3.mmio_bee8 = (s3.mmio_bee8 & 0xff00) | data;
+			break;
+		case 0xbee9:
+			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
+			s3_multifunc_w(space,0,s3.mmio_bee8,0xffff);
+			break;
+		default:
+			logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);
 		}
 		return;
 	}
