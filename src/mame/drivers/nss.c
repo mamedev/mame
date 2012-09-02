@@ -560,8 +560,9 @@ WRITE8_MEMBER(nss_state::port_01_w)
 	device_set_input_line(m_soundcpu, INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	device_set_input_line(m_maincpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-
-//	printf("%02x\n",data);
+	/* also reset the device */
+	if((data & 1) == 0)
+		spc700_reset(machine().device("spc700"));
 }
 
 WRITE8_MEMBER(nss_state::port_02_w)

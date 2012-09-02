@@ -1335,7 +1335,7 @@ static DEVICE_START( snes_sound )
 	device->save_pointer(NAME(spc700->ram), SNES_SPCRAM_SIZE);
 }
 
-static DEVICE_RESET( snes_sound )
+void spc700_reset(device_t *device)
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 	int ii;
@@ -1351,6 +1351,12 @@ static DEVICE_RESET( snes_sound )
 	}
 
 	dsp_reset(device);
+}
+
+
+static DEVICE_RESET( snes_sound )
+{
+	spc700_reset(device);
 }
 
 /*-------------------------------------------------
