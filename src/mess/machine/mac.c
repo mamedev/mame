@@ -1952,7 +1952,7 @@ void mac_state::machine_reset()
 
 WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
 {
-    if (state == ASSERT_LINE)
+    if ((state == ASSERT_LINE) && (m_model < MODEL_MAC_POWERMAC_6100))
     {
         set_memory_overlay(0);
         set_memory_overlay(1);
