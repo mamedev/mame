@@ -1184,7 +1184,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 			if ((data & 0x80) != (spc700->ram[0xf1] & 0x80))
 			{
 				if (data & 0x80)
-					memcpy(spc700->ipl_region, device->machine().root_device().memregion("user5")->base(), 64);
+					memcpy(spc700->ipl_region, device->machine().root_device().memregion("sound_ipl")->base(), 64);
 				else
 					memcpy(spc700->ipl_region, &spc700->ram[0xffc0], 64);
 			}
@@ -1332,7 +1332,7 @@ static DEVICE_START( snes_sound )
 	spc700->ram[0xf1] = 0x80;
 
 	/* put IPL image at the top of RAM */
-	memcpy(spc700->ipl_region, machine.root_device().memregion("user5")->base(), 64);
+	memcpy(spc700->ipl_region, machine.root_device().memregion("sound_ipl")->base(), 64);
 
 	/* Initialize the timers */
 	spc700->timer[0] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);

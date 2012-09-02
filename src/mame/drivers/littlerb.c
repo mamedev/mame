@@ -88,7 +88,7 @@ public:
 		  m_dacl(*this, "dacl"),
 	      m_dacr(*this, "dacr"),
 		m_region4(*this, "region4")
-	{ 
+	{
 		m_1ff80804 = -1;
 	}
 
@@ -111,7 +111,7 @@ public:
 	UINT32 m_lasttype2pc;
 	UINT8 m_sound_index_l,m_sound_index_r;
 	UINT16 m_sound_pointer_l,m_sound_pointer_r;
-	
+
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind16 m_temp_bitmap_sprites_back; // not currently used
 
@@ -155,17 +155,17 @@ public:
 	{
 		littlerb_printf("littlerb_1ff80804_w %04x\n", data);
 
-		if ((!(m_spritelist[2] & 0x1000)) && (!(m_spritelist[1] & 0x1000))) 
+		if ((!(m_spritelist[2] & 0x1000)) && (!(m_spritelist[1] & 0x1000)))
 		{
 
 		}
-		else 
+		else
 		{
 			if (!(m_spritelist[2] & 0x1000))
 				m_temp_bitmap_sprites_back.fill(0, m_temp_bitmap_sprites_back.cliprect());
 
 		}
-		
+
 		littlerb_draw_sprites(space.machine());
 
 
@@ -664,7 +664,7 @@ static void littlerb_draw_sprites(running_machine &machine)
 		else if (spriteregion[offs+0] == 0x0040)
 		{
 			littlerb_alt_printf("Control Word %04x %04x %04x %04x %04x %04x ---- ---- ---- ----\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
-			
+
 			// some scroll stuff is here (title -> high score transition)
 			// maybe also copy area operations?
 
@@ -680,7 +680,7 @@ static void littlerb_draw_sprites(running_machine &machine)
 		else if (read_dword == 0x00e40020)
 		{
 			littlerb_alt_printf("Control Word %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5], spriteregion[offs+6], spriteregion[offs+7], spriteregion[offs+8], spriteregion[offs+9]);
-		
+
 			if (spriteregion[offs+4]==0x6000)
 				layer = 1;
 			else
@@ -692,12 +692,12 @@ static void littlerb_draw_sprites(running_machine &machine)
 		else if (read_dword == 0x00e40000)
 		{
 			littlerb_alt_printf("Control Word %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5], spriteregion[offs+6], spriteregion[offs+7], spriteregion[offs+8], spriteregion[offs+9]);
-	
+
 			if (spriteregion[offs+4]==0x6000)
 				layer = 1;
 			else
 				layer = 0;
-			
+
 			offs += 10;
 		}
 		else if (read_dword == 0x00000000)
@@ -723,7 +723,7 @@ static void littlerb_draw_sprites(running_machine &machine)
 			if (layer==0) draw_sprite(machine, state->m_temp_bitmap_sprites, state->m_temp_bitmap_sprites.cliprect(),xsize,ysize,fullcode,x,y);
 			else draw_sprite(machine, state->m_temp_bitmap_sprites_back, state->m_temp_bitmap_sprites_back.cliprect(),xsize,ysize,fullcode,x,y);
 
-				
+
 			offs += 6;
 		}
 	}

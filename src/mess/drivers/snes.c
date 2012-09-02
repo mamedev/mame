@@ -812,7 +812,7 @@ MACHINE_CONFIG_END
 ROM_START( snes )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -825,7 +825,7 @@ ROM_END
 ROM_START( snesdsp )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -843,7 +843,7 @@ ROM_END
 ROM_START( snesst10 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x11000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -857,7 +857,7 @@ ROM_END
 ROM_START( snesst11 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x11000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -871,7 +871,7 @@ ROM_END
 ROM_START( snessfx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -884,7 +884,7 @@ ROM_END
 ROM_START( snespal )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -897,7 +897,7 @@ ROM_END
 ROM_START( snespdsp )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -915,7 +915,7 @@ ROM_END
 ROM_START( snespsfx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -928,7 +928,7 @@ ROM_END
 ROM_START( snesst )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
@@ -945,7 +945,7 @@ ROM_END
 ROM_START( snesbsx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_REGION( 0x100, "sound_ipl", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
 
 	ROM_REGION( 0x10000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
