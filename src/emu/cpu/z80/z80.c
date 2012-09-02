@@ -366,7 +366,6 @@ static const UINT8 cc_ex[0x100] = {
 
 static void take_interrupt(z80_state *z80);
 static void take_interrupt_nsc800(z80_state *z80);
-static CPU_BURN( z80 );
 
 typedef void (*funcptr)(z80_state *z80);
 
@@ -477,19 +476,6 @@ PROTOTYPES(Z80ed,ed);
 PROTOTYPES(Z80fd,fd);
 PROTOTYPES(Z80xycb,xycb);
 
-/****************************************************************************/
-/* Burn an odd amount of cycles, that is instructions taking something      */
-/* different from 4 T-states per opcode (and r increment)                   */
-/****************************************************************************/
-INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
-{
-	if( cycles > 0 )
-	{
-		z80->r += (cycles / cyclesum) * opcodes;
-		z80->icount -= (cycles / cyclesum) * cyclesum;
-	}
-}
-
 /***************************************************************
  * define an opcode function
  ***************************************************************/
@@ -594,8 +580,6 @@ INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 #define ENTER_HALT(Z) do {										\
 	(Z)->PC--;													\
 	(Z)->halt = 1;												\
-	if( (Z)->irq_state == CLEAR_LINE )							\
-		CPU_BURN_NAME(z80)( (Z)->device, (Z)->icount);			\
 } while (0)
 
 /***************************************************************
@@ -3684,22 +3668,6 @@ static CPU_EXECUTE( z80 )
 		z80->r++;
 		EXEC_INLINE(z80,op,ROP(z80));
 	} while (z80->icount > 0);
-}
-
-/****************************************************************************
- * Burn 'cycles' T-states. Adjust z80->r register for the lost time
- ****************************************************************************/
-static CPU_BURN( z80 )
-{
-	z80_state *z80 = get_safe_token(device);
-
-	if( cycles > 0 )
-	{
-		/* NOP takes 4 cycles per instruction */
-		int n = (cycles + 3) / 4;
-		z80->r += n;
-		z80->icount -= 4 * n;
-	}
 }
 
 /****************************************************************************
