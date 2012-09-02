@@ -245,6 +245,15 @@ static ADDRESS_MAP_START( snesb_map, AS_PROGRAM, 8, snesb_state )
 	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
 ADDRESS_MAP_END
 
+static READ8_DEVICE_HANDLER( spc_ram_100_r )
+{
+	return spc_ram_r(device, offset + 0x100);
+}
+
+static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
+{
+	spc_ram_w(device, offset + 0x100, data);
+}
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, snesb_state )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
