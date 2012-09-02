@@ -881,7 +881,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 #define NSS_BIOS \
-	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */ \
+	ROM_REGION(0x100,           "sound_ipl", 0)		/* IPL ROM */ \
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION(0x10000,           "addons", ROMREGION_ERASE00)		/* add-on chip ROMs (DSP1 will be needed if we dump the NSS version of Super Mario Kart)*/\
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) \
