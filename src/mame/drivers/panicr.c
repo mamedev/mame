@@ -3,9 +3,8 @@ Panic Road
 ----------
 
 TODO:
-- there are 3 more bitplanes of tile graphics, but colors are correct as they are...
-  what are they, priority info? Should they be mapped at 8000-bfff in memory?
-- problems with bg tilemaps reading (USER3 region)
+- problems with bg collision
+- high priority tiles
 
 --
 
@@ -69,21 +68,30 @@ class panicr_state : public driver_device
 {
 public:
 	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_scrollram(*this, "scrollram")
+		m_textram(*this, "textram"),
+		m_spritebank(*this, "spritebank")
 	{ }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<UINT8> m_textram;
+	required_shared_ptr<UINT8> m_spritebank;
+
 	tilemap_t *m_bgtilemap;
+	tilemap_t *m_infotilemap;
 	tilemap_t *m_txttilemap;
+	int m_scrollx;
+
+	DECLARE_READ8_MEMBER(panicr_collision_r);
+	DECLARE_WRITE8_MEMBER(panicr_scrollx_lo_w);
+	DECLARE_WRITE8_MEMBER(panicr_scrollx_hi_w);
+	DECLARE_WRITE8_MEMBER(panicr_output_w);
 	DECLARE_READ8_MEMBER(t5182shared_r);
 	DECLARE_WRITE8_MEMBER(t5182shared_w);
+
 	DECLARE_DRIVER_INIT(panicr);
 };
 
@@ -92,6 +100,12 @@ public:
 #define SOUND_CLOCK		XTAL_14_31818MHz
 #define TC15_CLOCK		XTAL_12MHz
 
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
 
 static PALETTE_INIT( panicr )
 {
@@ -149,6 +163,7 @@ static PALETTE_INIT( panicr )
 	}
 }
 
+
 static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr;
@@ -163,12 +178,25 @@ static TILE_GET_INFO( get_bgtile_info )
         0);
 }
 
+static TILE_GET_INFO( get_infotile_info )
+{
+	int code,attr;
+
+	code=machine.root_device().memregion("user1")->base()[tile_index];
+	attr=machine.root_device().memregion("user2")->base()[tile_index];
+	code+=((attr&7)<<8);
+	SET_TILE_INFO(
+		2,
+        code,
+		(attr & 0xf0) >> 4,
+        0);
+}
+
 static TILE_GET_INFO( get_txttile_info )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *videoram = state->m_videoram;
-	int code=videoram[tile_index*4];
-	int attr=videoram[tile_index*4+2];
+	int code=state->m_textram[tile_index*4];
+	int attr=state->m_textram[tile_index*4+2];
 	int color = attr & 0x07;
 
 	tileinfo.group = color;
@@ -178,6 +206,104 @@ static TILE_GET_INFO( get_txttile_info )
 		code + ((attr & 8) << 5),
 		color,
 		0);
+}
+
+
+static VIDEO_START( panicr )
+{
+	panicr_state *state = machine.driver_data<panicr_state>();
+
+	state->m_bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,1024,16 );
+	state->m_infotilemap = tilemap_create( machine, get_infotile_info,tilemap_scan_rows,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
+
+	state->m_txttilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
+	colortable_configure_tilemap_groups(machine.colortable, state->m_txttilemap, machine.gfx[0], 0);
+}
+
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+{
+	panicr_state *state = machine.driver_data<panicr_state>();
+	UINT8 *spriteram = state->m_spriteram;
+	int offs,flipx,flipy,x,y,color,sprite;
+
+	for (offs = 0; offs<0x1000; offs+=16)
+	{
+		flipx = 0;
+		flipy = spriteram[offs+1] & 0x80;
+		y = spriteram[offs+2];
+		x = spriteram[offs+3];
+		if (spriteram[offs+1] & 0x40) x -= 0x100;
+
+		color = spriteram[offs+1] & 0x0f;
+		sprite = spriteram[offs+0] | (*state->m_spritebank << 8);
+
+		drawgfx_transmask(bitmap,cliprect,machine.gfx[3],
+				sprite,
+				color,flipx,flipy,x,y,
+				colortable_get_transpen_mask(machine.colortable, machine.gfx[3], color, 0));
+	}
+}
+
+static SCREEN_UPDATE_IND16( panicr)
+{
+	panicr_state *state = screen.machine().driver_data<panicr_state>();
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	state->m_txttilemap->mark_all_dirty();
+	state->m_bgtilemap->set_scrollx(0, state->m_scrollx);
+	state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
+	draw_sprites(screen.machine(),bitmap,cliprect);
+	state->m_txttilemap->draw(bitmap, cliprect, 0,0);
+
+	return 0;
+}
+
+
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+READ8_MEMBER(panicr_state::panicr_collision_r)
+{
+	// 0x40 bytes per line, 2 bits per x
+	// implementation is still wrong though :(
+	const bitmap_ind16 &src_bitmap = m_infotilemap->pixmap();
+	int width_mask = src_bitmap.width() - 1;
+	int height_mask = src_bitmap.height() - 1;
+	int y = offset >> 6;
+	int x = (offset & 0x3f) * 4;
+	UINT8 data = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		int p = src_bitmap.pix16(y & height_mask, (i + x + m_scrollx) & width_mask);
+		data <<= 2;
+		data |= p&3;
+	}
+
+	return data;
+}
+
+
+
+WRITE8_MEMBER(panicr_state::panicr_scrollx_lo_w)
+{
+	m_scrollx = (m_scrollx & 0xff00) | (data << 1 & 0xfe) | (data >> 7 & 0x01);
+}
+
+WRITE8_MEMBER(panicr_state::panicr_scrollx_hi_w)
+{
+	m_scrollx = (m_scrollx & 0xff) | (data << 4 & 0x0f00) | (data << 12 & 0xf000);
+}
+
+WRITE8_MEMBER(panicr_state::panicr_output_w)
+{
+	// d6, d7: play counter? (it only triggers on 1st coin)
+	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0);
+	coin_counter_w(machine(), 1, (data & 0x80) ? 1 : 0);
+	
+	// other bits: ?
 }
 
 READ8_MEMBER(panicr_state::t5182shared_r)
@@ -199,11 +325,11 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x08000, 0x0bfff) AM_READ(panicr_collision_r)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x0d000, 0x0d000) AM_WRITE_LEGACY(t5182_sound_irq_w)
-	AM_RANGE(0x0d002, 0x0d002) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
-	AM_RANGE(0x0d004, 0x0d004) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0x0d002, 0x0d002) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0x0d004, 0x0d004) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0x0d006, 0x0d006) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_release_w)
 	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0x0d400, 0x0d400) AM_READ_PORT("P1")
@@ -211,81 +337,35 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
 	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_SHARE("scrollram")
+	AM_RANGE(0x0d802, 0x0d802) AM_WRITE(panicr_scrollx_hi_w)
+	AM_RANGE(0x0d804, 0x0d804) AM_WRITE(panicr_scrollx_lo_w)
+	AM_RANGE(0x0d80a, 0x0d80a) AM_WRITE(panicr_output_w)
+	AM_RANGE(0x0d80c, 0x0d80c) AM_WRITEONLY AM_SHARE("spritebank")
+	AM_RANGE(0x0d818, 0x0d818) AM_WRITENOP // watchdog?
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static VIDEO_START( panicr )
-{
-	panicr_state *state = machine.driver_data<panicr_state>();
-	state->m_bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,1024,16 );
 
-	state->m_txttilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
-	colortable_configure_tilemap_groups(machine.colortable, state->m_txttilemap, machine.gfx[0], 0);
-}
+/***************************************************************************
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
-{
-	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	int offs,flipx,flipy,x,y,color,sprite;
+  Inputs
 
-	for (offs = 0; offs<0x1000; offs+=16)
-	{
-		flipx = 0;
-		flipy = spriteram[offs+1] & 0x80;
-		y = spriteram[offs+2];
-		x = spriteram[offs+3];
-		if (spriteram[offs+1] & 0x40) x -= 0x100;
-
-		color = spriteram[offs+1] & 0x0f;
-		sprite = spriteram[offs+0]+(state->m_scrollram[0x0c]<<8);
-
-		drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
-				sprite,
-				color,flipx,flipy,x,y,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[2], color, 0));
-	}
-}
-
-static SCREEN_UPDATE_IND16( panicr)
-{
-	panicr_state *state = screen.machine().driver_data<panicr_state>();
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_txttilemap ->mark_all_dirty();
-	state->m_bgtilemap->set_scrollx(0, ((state->m_scrollram[0x02]&0x0f)<<12)+((state->m_scrollram[0x02]&0xf0)<<4)+((state->m_scrollram[0x04]&0x7f)<<1)+((state->m_scrollram[0x04]&0x80)>>7) );
-	state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(screen.machine(),bitmap,cliprect);
-	state->m_txttilemap->draw(bitmap, cliprect, 0,0);
-
-	return 0;
-}
-
-static TIMER_DEVICE_CALLBACK( panicr_scanline )
-{
-	int scanline = param;
-
-	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc4/4);
-
-	if(scanline == 0) // <unknown>
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc8/4);
-}
+***************************************************************************/
 
 static INPUT_PORTS_START( panicr )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //left
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) //right
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) //shake 1
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) //shake 2
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Left Flipper")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Right Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Left Shake")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Right Shake")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) //left
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) //right
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) //shake 1
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) //shake 2
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P1 Left Flipper")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P1 Right Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P1 Left Shake")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P1 Right Shake")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("START")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -293,7 +373,7 @@ static INPUT_PORTS_START( panicr )
 	PORT_BIT( 0xe7, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -302,39 +382,39 @@ static INPUT_PORTS_START( panicr )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:5,4")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,6")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x18, 0x18, "Bonus" )		PORT_DIPLOCATION("SW2:5,4")
-	PORT_DIPSETTING(    0x18, "50k & every 1OOk" )
-	PORT_DIPSETTING(    0x10, "1Ok 20k" )
+	PORT_DIPNAME( 0x18, 0x18, "Bonus Points" )				PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "5k 10k" )
+	PORT_DIPSETTING(    0x10, "10k 20k" )
 	PORT_DIPSETTING(    0x08, "20k 40k" )
 	PORT_DIPSETTING(    0x00, "50k 100k" )
-	PORT_DIPNAME( 0x60, 0x40, "Balls" )		PORT_DIPLOCATION("SW2:3,2")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x60, "1" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
@@ -342,6 +422,13 @@ static INPUT_PORTS_START( panicr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 INPUT_PORTS_END
+
+
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
 
 static const gfx_layout charlayout =
 {
@@ -354,12 +441,10 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const gfx_layout tilelayout =
+static const gfx_layout bgtilelayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
-//  8,
-//  { 0, 4, RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+4, RGN_FRAC(2,4)+0, RGN_FRAC(2,4)+4, RGN_FRAC(3,4)+0, RGN_FRAC(3,4)+4 },
 	4,
 	{ RGN_FRAC(2,4)+0, RGN_FRAC(2,4)+4, RGN_FRAC(3,4)+0, RGN_FRAC(3,4)+4 },
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
@@ -369,6 +454,18 @@ static const gfx_layout tilelayout =
 	32*16
 };
 
+static const gfx_layout infotilelayout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ 0, 4, RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+4 },
+	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
+			16+0, 16+1, 16+2, 16+3, 24+0, 24+1, 24+2, 24+3 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	32*16
+};
 
 static const gfx_layout spritelayout =
 {
@@ -384,10 +481,23 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( panicr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x100, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x100, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, infotilelayout, 0x100, 16 ) // palette is just to make it viewable with F4
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x200, 16 )
 GFXDECODE_END
+
+
+static TIMER_DEVICE_CALLBACK( panicr_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc4/4);
+
+	if(scanline == 0) // <unknown>
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc8/4);
+}
 
 static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
@@ -421,6 +531,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 
 MACHINE_CONFIG_END
 
+
 ROM_START( panicr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v20 main cpu */
 	ROM_LOAD16_BYTE("2.19m",   0x0f0000, 0x08000, CRC(3d48b0b5) SHA1(a6e8b38971a8964af463c16f32bb7dbd301dd314) )
@@ -448,9 +559,6 @@ ROM_START( panicr )
 	ROM_LOAD( "5d.bin", 0x00000, 0x4000, CRC(f3466906) SHA1(42b512ba93ba7ac958402d1871c5ae015def3501) ) //tilemaps
 	ROM_REGION( 0x04000, "user2", 0 )
 	ROM_LOAD( "7d.bin", 0x00000, 0x4000, CRC(8032c1e9) SHA1(fcc8579c0117ebe9271cff31e14a30f61a9cf031) ) //attribute maps
-
-	ROM_REGION( 0x04000, "user3", 0 )
-	ROM_COPY( "user2", 0x0000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x0800,  "proms", 0 )
 	ROM_LOAD( "b.14c",   0x00000, 0x100, CRC(145d1e0d) SHA1(8073fd176a1805552a5ac00ca0d9189e6e8936b1) )	// red
@@ -491,9 +599,6 @@ ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
 	ROM_REGION( 0x04000, "user2", 0 )
 	ROM_LOAD( "7d.bin", 0x00000, 0x4000, CRC(8032c1e9) SHA1(fcc8579c0117ebe9271cff31e14a30f61a9cf031) ) //attribute maps
 
-	ROM_REGION( 0x04000, "user3", 0 )
-	ROM_COPY( "user2", 0x0000, 0x0000, 0x4000 )
-
 	ROM_REGION( 0x0800,  "proms", 0 )
 	ROM_LOAD( "b.14c",   0x00000, 0x100, CRC(145d1e0d) SHA1(8073fd176a1805552a5ac00ca0d9189e6e8936b1) )	// red
 	ROM_LOAD( "a.15c",   0x00100, 0x100, CRC(c75772bc) SHA1(ec84052aedc1d53f9caba3232ffff17de69561b2) )	// green
@@ -511,7 +616,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	UINT8 *buf = auto_alloc_array(machine(), UINT8, 0x80000);
 	UINT8 *rom;
 	int size;
-	int i;
+	int i,j;
 
 	rom = machine().root_device().memregion("gfx1")->base();
 	size = machine().root_device().memregion("gfx1")->bytes();
@@ -588,31 +693,28 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 	//rearrange  bg tilemaps a bit....
-
 	rom = machine().root_device().memregion("user1")->base();
 	size = machine().root_device().memregion("user1")->bytes();
 	memcpy(buf,rom, size);
 
+	for(j=0;j<16;j++)
 	{
-		int j;
-		for(j=0;j<16;j++)
-			for (i = 0;i < size/16;i+=8)
-			{
-				memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
-			}
+		for (i = 0;i < size/16;i+=8)
+		{
+			memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
+		}
 	}
 
 	rom = machine().root_device().memregion("user2")->base();
 	size = machine().root_device().memregion("user2")->bytes();
-
 	memcpy(buf,rom, size);
+
+	for(j=0;j<16;j++)
 	{
-		int j;
-		for(j=0;j<16;j++)
-			for (i = 0;i < size/16;i+=8)
-			{
-				memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
-			}
+		for (i = 0;i < size/16;i+=8)
+		{
+			memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
+		}
 	}
 
 	auto_free(machine(), buf);
