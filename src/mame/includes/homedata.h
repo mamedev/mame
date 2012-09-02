@@ -1,4 +1,5 @@
 #include "sound/dac.h"
+#include "sound/sn76496.h"
 
 class homedata_state : public driver_device
 {
@@ -6,7 +7,7 @@ public:
 	homedata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_vreg(*this, "vreg"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram") {}
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_vreg;
@@ -39,7 +40,7 @@ public:
 	device_t *m_audiocpu;
 	dac_device *m_dac;
 	device_t *m_ym;
-	device_t *m_sn;
+	sn76489a_new_device *m_sn;
 	UINT8 m_prot_data;
 	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);
 	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);

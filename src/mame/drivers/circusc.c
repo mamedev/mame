@@ -52,7 +52,6 @@ To enter service mode, keep 1&2 pressed on reset
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
-#include "sound/sn76496.h"
 #include "sound/discrete.h"
 #include "includes/circusc.h"
 
@@ -62,8 +61,6 @@ static MACHINE_START( circusc )
 	circusc_state *state = machine.driver_data<circusc_state>();
 
 	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
-	state->m_sn1 = machine.device("sn1");
-	state->m_sn2 = machine.device("sn2");
 	state->m_dac = machine.device<dac_device>("dac");
 	state->m_discrete = machine.device("fltdisc");
 
@@ -118,12 +115,12 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS3 */
 		case 1:
-			sn76496_w(m_sn1, 0, m_sn_latch);
+			m_sn_1->write(space, 0, m_sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			sn76496_w(m_sn2, 0, m_sn_latch);
+			m_sn_2->write(space, 0, m_sn_latch);
 			break;
 
 		/* CS5 */
@@ -302,6 +299,24 @@ static GFXDECODE_START( circusc )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static const discrete_mixer_desc circusc_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(10)},
@@ -371,10 +386,12 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("sn1", SN76496_NEW, XTAL_14_31818MHz/8)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, XTAL_14_31818MHz/8)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
 
 	MCFG_DAC_ADD("dac")

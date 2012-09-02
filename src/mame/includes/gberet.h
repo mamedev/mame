@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "sound/sn76496.h"
+
 class gberet_state : public driver_device
 {
 public:
@@ -14,7 +16,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
-		m_soundlatch(*this, "soundlatch"){ }
+		m_soundlatch(*this, "soundlatch"),
+		m_sn(*this, "snsnd") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -23,6 +26,9 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_scrollram;
 	optional_shared_ptr<UINT8> m_soundlatch;
+	
+	/* devices */
+	required_device<sn76489a_new_device> m_sn;
 
 	/* video-related */
 	tilemap_t * m_bg_tilemap;

@@ -145,7 +145,7 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 
 WRITE8_MEMBER(gberet_state::gberet_sound_w)
 {
-	sn76496_w(machine().device("snsnd"), 0, *m_soundlatch);
+	m_sn->write(space, 0, *m_soundlatch);
 }
 
 static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8, gberet_state )
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // coin counter not supported
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76489a_new_device, write)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("P2")
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
@@ -381,6 +381,23 @@ GFXDECODE_END
 
 /*************************************
  *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
+/*************************************
+ *
  *  Machine drivers
  *
  *************************************/
@@ -430,8 +447,9 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12) /* type verified on real and bootleg pcb */
+	MCFG_SOUND_ADD("snsnd", SN76489A_NEW, XTAL_18_432MHz/12) /* type verified on real and bootleg pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrgoemon, gberet )
@@ -469,8 +487,9 @@ static MACHINE_CONFIG_START( gberetb, gberet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_20MHz/12) // divider guessed
+	MCFG_SOUND_ADD("snsnd", SN76489A_NEW, XTAL_20MHz/12) // divider guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

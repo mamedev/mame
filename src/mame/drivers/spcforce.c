@@ -36,7 +36,6 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/sn76496.h"
 #include "includes/spcforce.h"
 
 
@@ -49,9 +48,10 @@ WRITE8_MEMBER(spcforce_state::spcforce_SN76496_latch_w)
 READ8_MEMBER(spcforce_state::spcforce_SN76496_select_r)
 {
 
-	if (~m_sn76496_select & 0x40) return sn76496_ready_r(machine().device("sn1"));
-	if (~m_sn76496_select & 0x20) return sn76496_ready_r(machine().device("sn2"));
-	if (~m_sn76496_select & 0x10) return sn76496_ready_r(machine().device("sn3"));
+	   if (~m_sn76496_select & 0x40) return m_sn1->ready_r();
+       if (~m_sn76496_select & 0x20) return m_sn2->ready_r();
+       if (~m_sn76496_select & 0x10) return m_sn3->ready_r();
+
 
 	return 0;
 }
@@ -61,9 +61,10 @@ WRITE8_MEMBER(spcforce_state::spcforce_SN76496_select_w)
 
 	m_sn76496_select = data;
 
-	if (~data & 0x40) sn76496_w(machine().device("sn1"), 0, m_sn76496_latch);
-	if (~data & 0x20) sn76496_w(machine().device("sn2"), 0, m_sn76496_latch);
-	if (~data & 0x10) sn76496_w(machine().device("sn3"), 0, m_sn76496_latch);
+	if (~data & 0x40) m_sn1->write(space, 0, m_sn76496_latch);
+    if (~data & 0x20) m_sn2->write(space, 0, m_sn76496_latch);
+    if (~data & 0x10) m_sn3->write(space, 0, m_sn76496_latch);
+
 }
 
 READ8_MEMBER(spcforce_state::spcforce_t0_r)
@@ -241,6 +242,17 @@ static PALETTE_INIT( spcforce )
 	}
 }
 
+
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static INTERRUPT_GEN( vblank_irq )
 {
 	spcforce_state *state = device->machine().driver_data<spcforce_state>();
@@ -277,14 +289,17 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
+	MCFG_SOUND_ADD("sn1", SN76496_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
+	MCFG_SOUND_ADD("sn3", SN76496_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

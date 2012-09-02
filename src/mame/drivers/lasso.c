@@ -32,7 +32,6 @@ DIP locations verified for:
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/sn76496.h"
 #include "sound/ay8910.h"
 #include "includes/lasso.h"
 
@@ -69,10 +68,10 @@ WRITE8_MEMBER(lasso_state::sound_select_w)
 	UINT8 to_write = BITSWAP8(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		sn76496_w(m_sn_1, 0, to_write);
+		m_sn_1->write(space, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		sn76496_w(m_sn_2, 0, to_write);
+		m_sn_2->write(space, 0, to_write);
 }
 
 
@@ -459,6 +458,22 @@ static GFXDECODE_START( pinbo )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_START( lasso )
 {
@@ -466,9 +481,7 @@ static MACHINE_START( lasso )
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
-	state->m_sn_1 = machine.device("sn76489.1");
-	state->m_sn_2 = machine.device("sn76489.2");
-
+	
 	state->save_item(NAME(state->m_gfxbank));
 }
 
@@ -529,11 +542,13 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn76489.1", SN76489, 2000000)
+	MCFG_SOUND_ADD("sn76489.1", SN76489_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn76489.2", SN76489, 2000000)
+	MCFG_SOUND_ADD("sn76489.2", SN76489_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lasso, base )

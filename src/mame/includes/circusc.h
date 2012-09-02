@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "sound/dac.h"
+#include "sound/sn76496.h"
 
 class circusc_state : public driver_device
 {
@@ -16,7 +17,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram_2(*this, "spriteram_2"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_sn_1(*this, "sn1"),
+		m_sn_2(*this, "sn2"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spritebank;
@@ -34,8 +37,8 @@ public:
 
 	/* devices */
 	cpu_device *m_audiocpu;
-	device_t *m_sn1;
-	device_t *m_sn2;
+	required_device<sn76496_new_device> m_sn_1;
+	required_device<sn76496_new_device> m_sn_2;
 	dac_device *m_dac;
 	device_t *m_discrete;
 

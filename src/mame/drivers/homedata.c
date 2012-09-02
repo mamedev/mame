@@ -222,7 +222,6 @@ Custom: GX61A01
 #include "includes/homedata.h"
 #include "sound/dac.h"
 #include "sound/2203intf.h"
-#include "sound/sn76496.h"
 
 static INTERRUPT_GEN( homedata_irq )
 {
@@ -499,7 +498,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))	/* clock 1->0 */
-		sn76496_w(m_sn, 0, m_upd7807_porta);
+		m_sn->write(space, 0, m_upd7807_porta);
 
 	m_upd7807_portc = data;
 }
@@ -537,7 +536,7 @@ static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("snsnd", sn76489a_new_device, write)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1124,6 +1123,22 @@ static GFXDECODE_START( lemnangl )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 static MACHINE_START( homedata )
 {
@@ -1132,7 +1147,7 @@ static MACHINE_START( homedata )
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_ym = machine.device("ymsnd");
-	state->m_sn = machine.device("snsnd");
+	state->m_sn = machine.device<sn76489a_new_device>("snsnd");
 	state->m_dac = machine.device<dac_device>("dac");
 
 	state->save_item(NAME(state->m_visible_page));
@@ -1265,8 +1280,9 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_SOUND_ADD("snsnd", SN76489A_NEW, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1384,8 +1400,9 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_SOUND_ADD("snsnd", SN76489A_NEW, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

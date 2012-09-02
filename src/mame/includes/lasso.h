@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "sound/sn76496.h"
+
 class lasso_state : public driver_device
 {
 public:
@@ -16,7 +18,9 @@ public:
 		m_chip_data(*this, "chip_data"),
 		m_bitmap_ram(*this, "bitmap_ram"),
 		m_last_colors(*this, "last_colors"),
-		m_track_scroll(*this, "track_scroll"){ }
+		m_track_scroll(*this, "track_scroll"),
+		m_sn_1(*this, "sn76489.1"),
+		m_sn_2(*this, "sn76489.2"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -37,8 +41,8 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
-	device_t *m_sn_1;
-	device_t *m_sn_2;
+	optional_device<sn76489_new_device> m_sn_1;
+	optional_device<sn76489_new_device> m_sn_2;
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pinbo_sound_command_w);
 	DECLARE_READ8_MEMBER(sound_status_r);

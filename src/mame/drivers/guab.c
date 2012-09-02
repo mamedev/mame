@@ -76,8 +76,12 @@ class guab_state : public driver_device
 {
 public:
 	guab_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag) ,
+		m_sn(*this, "snsnd") { }
+		
+	/* devices */
+	required_device<sn76489_new_device> m_sn;
+	
 	struct ef9369 m_pal;
 	emu_timer *m_fdc_timer;
 	struct wd1770 m_fdc;
@@ -651,7 +655,7 @@ WRITE16_MEMBER(guab_state::io_w)
 		}
 		case 0x30:
 		{
-			sn76496_w(machine().device("snsnd"), 0, data & 0xff);
+			m_sn->write(space, 0, data & 0xff);
 			break;
 		}
 		case 0x31:
@@ -774,6 +778,23 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
+/*************************************
+ *
  *  Machine driver
  *
  *************************************/
@@ -813,8 +834,9 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489, 2000000)
+	MCFG_SOUND_ADD("snsnd", SN76489_NEW, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

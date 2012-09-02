@@ -301,13 +301,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 /* the data lines are flipped */
 WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
 {
-	device_t *device = machine().device("sn1");
-	sn76496_w(device, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+		m_sn1->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
 {
-	device_t *device = machine().device("sn2");
-	sn76496_w(device, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+		m_sn2->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -816,6 +814,22 @@ static GFXDECODE_START( monsterb )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 
 /*************************************
  *
@@ -934,11 +948,13 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
+	MCFG_SOUND_ADD("sn1", SN76496_NEW, SINDBADM_SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
+	MCFG_SOUND_ADD("sn2", SN76496_NEW, SINDBADM_SOUND_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/segag80.h"
+#include "sound/sn76496.h"
 
 class segag80r_state : public driver_device
 {
@@ -12,10 +13,15 @@ public:
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_mainram(*this, "mainram"),
-		m_videoram(*this, "videoram"){ }
-
+		m_videoram(*this, "videoram"),
+		m_sn1(*this, "sn1"),
+		m_sn2(*this, "sn2"){ }
+		
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_videoram;
+	
+	optional_device<sn76496_new_device> m_sn1;
+	optional_device<sn76496_new_device> m_sn2;
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;
