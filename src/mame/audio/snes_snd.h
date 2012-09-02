@@ -27,7 +27,6 @@ READ8_DEVICE_HANDLER( spc_io_r );
 WRITE8_DEVICE_HANDLER( spc_io_w );
 READ8_DEVICE_HANDLER( spc_ram_r );
 WRITE8_DEVICE_HANDLER( spc_ram_w );
-READ8_DEVICE_HANDLER( spc_ipl_r );
 READ8_DEVICE_HANDLER( spc_port_out );
 WRITE8_DEVICE_HANDLER( spc_port_in );
 

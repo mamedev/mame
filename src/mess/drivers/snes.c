@@ -84,9 +84,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spc_map, AS_PROGRAM, 8, snes_state )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE_LEGACY("spc700", spc_ram_100_w)
-	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD_LEGACY("spc700", spc_ram_100_r)
-	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD_LEGACY("spc700", spc_ipl_r)
+	AM_RANGE(0x0100, 0xffff) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32, snes_state )

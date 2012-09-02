@@ -1181,13 +1181,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 				spc700->port_in[3] = 0;
 			}
 
-			if ((data & 0x80) != (spc700->ram[0xf1] & 0x80))
-			{
-				if (data & 0x80)
-					memcpy(spc700->ipl_region, device->machine().root_device().memregion("sound_ipl")->base(), 64);
-				else
-					memcpy(spc700->ipl_region, &spc700->ram[0xffc0], 64);
-			}
+			/* bit 7 = IPL ROM enable */
 			break;
 		case 0x2:		/* Register address */
 			break;
@@ -1221,6 +1215,11 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 READ8_DEVICE_HANDLER( spc_ram_r )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
+
+	/* IPL ROM enabled */
+	if(offset >= 0xffc0 && spc700->ram[0xf1] & 0x80)
+		return spc700->ipl_region[offset & 0x3f];
+
 	return spc700->ram[offset];
 }
 
@@ -1229,16 +1228,6 @@ WRITE8_DEVICE_HANDLER( spc_ram_w )
 	snes_sound_state *spc700 = get_safe_token(device);
 
 	spc700->ram[offset] = data;
-
-	/* if RAM is mapped in, mirror accordingly */
-	if ((!(spc700->ram[0xf1] & 0x80)) && (offset >= 0xffc0))
-		spc700->ipl_region[offset - 0xffc0] = data;
-}
-
-READ8_DEVICE_HANDLER( spc_ipl_r )
-{
-	snes_sound_state *spc700 = get_safe_token(device);
-	return spc700->ipl_region[offset];
 }
 
 
@@ -1328,9 +1317,6 @@ static DEVICE_START( snes_sound )
 
 	spc700->ram = auto_alloc_array_clear(device->machine(), UINT8, SNES_SPCRAM_SIZE);
 
-	/* default to ROM visible */
-	spc700->ram[0xf1] = 0x80;
-
 	/* put IPL image at the top of RAM */
 	memcpy(spc700->ipl_region, machine.root_device().memregion("sound_ipl")->base(), 64);
 
@@ -1353,6 +1339,9 @@ static DEVICE_RESET( snes_sound )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 	int ii;
+
+	/* default to ROM visible */
+	spc700->ram[0xf1] = 0x80;
 
 	/* Sort out the ports */
 	for (ii = 0; ii < 4; ii++)
