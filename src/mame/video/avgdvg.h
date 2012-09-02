@@ -1,10 +1,6 @@
 #ifndef __AVGDVG__
 #define __AVGDVG__
 
-extern UINT8 *avgdvg_vectorram;
-extern size_t avgdvg_vectorram_size;
-extern UINT8 *avgdvg_colorram;
-
 CUSTOM_INPUT( avgdvg_done_r );
 WRITE8_HANDLER( avgdvg_go_w );
 WRITE8_HANDLER( avgdvg_reset_w );

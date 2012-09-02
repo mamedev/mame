@@ -152,7 +152,7 @@ DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
-	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM								/* vector_rom */
 	AM_RANGE(0x4300, 0x431f) AM_READ_PORT("IN0")
 	AM_RANGE(0x4320, 0x433f) AM_READ_PORT("IN1")

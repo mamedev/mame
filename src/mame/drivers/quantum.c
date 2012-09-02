@@ -131,13 +131,13 @@ WRITE16_MEMBER(quantum_state::led_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x01cfff) AM_RAM
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE_LEGACY((UINT16 **)&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_SHARE("vectorram")
 	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8("pokey1", pokey_device, read, write, 0x00ff)
 	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8("pokey2", pokey_device, read, write, 0x00ff)
 	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x940000, 0x940001) AM_READ(trackball_r) /* trackball */
 	AM_RANGE(0x948000, 0x948001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x950000, 0x95001f) AM_WRITEONLY AM_BASE_LEGACY((UINT16**)&avgdvg_colorram)
+	AM_RANGE(0x950000, 0x95001f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x958000, 0x958001) AM_WRITE(led_w)
 	AM_RANGE(0x960000, 0x960001) AM_WRITENOP
 	AM_RANGE(0x968000, 0x968001) AM_WRITE_LEGACY(avgdvg_reset_word_w)
