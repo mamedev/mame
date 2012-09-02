@@ -207,8 +207,6 @@
 
         0x400f4:        xxx----- -------- -------- --------				Texture select (0-3)
 
-						xxx----- -------- -------- --------				?
-
         0x40114:        -------- ----x--- -------- --------             Scissor enable
 
         0x40138:        Set to 0x88800000 (0xe0) by mode_viewclip()
@@ -324,6 +322,7 @@
 #include "video/polynew.h"
 #include "video/rgbgen.h"
 #include "sound/rf5c400.h"
+#include "sound/dmadac.h"
 
 #define GFXFIFO_IN_VERBOSE			0
 #define GFXFIFO_OUT_VERBOSE			0
@@ -336,6 +335,8 @@
 #define LOG_DRAW_COMMANDS			0
 
 #define ENABLE_BILINEAR				1
+
+#define DMA_SOUND_BUFFER_SIZE		16000
 
 
 /* Cobra Renderer class */
@@ -707,6 +708,12 @@ public:
 	int m_gfx_status_byte;
 
 	bool m_has_psac;
+
+	INT16 *m_sound_dma_buffer_l;
+	INT16 *m_sound_dma_buffer_r;
+	UINT32 m_sound_dma_ptr;
+
+	dmadac_sound_device *m_dmadac[2];
 
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
@@ -1616,7 +1623,7 @@ ADDRESS_MAP_END
 // Interrupts:
 
 // Serial Transmit      JVS
-// DMA0:                Sound-related (TMS57002?)
+// DMA0:                DMA-driven DAC
 // DMA2:                SCSI?
 // DMA3:                JVS
 // External IRQ0        M2SFIFO
@@ -1913,15 +1920,37 @@ WRITE32_MEMBER(cobra_state::sub_psac2_w)
 
 }
 
-static UINT32 sub_unknown_dma_r(device_t *device, int width)
-{
-	//printf("DMA read from unknown: size %d\n", width);
-	return 0;
-}
-
-static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
+static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
 {
 	//printf("DMA write to unknown: size %d, data %08X\n", width, data);
+
+	/*
+	static FILE *out;
+	if (out == NULL)
+		out = fopen("sound.bin", "wb");
+
+	fputc((data >> 24) & 0xff, out);
+	fputc((data >> 16) & 0xff, out);
+	fputc((data >> 8) & 0xff, out);
+	fputc((data >> 0) & 0xff, out);
+	*/
+
+	cobra_state *cobra = device->machine().driver_data<cobra_state>();
+
+	INT16 ldata = (INT16)(data >> 16);
+	INT16 rdata = (INT16)(data);
+
+	cobra->m_sound_dma_buffer_l[cobra->m_sound_dma_ptr] = ldata;
+	cobra->m_sound_dma_buffer_r[cobra->m_sound_dma_ptr] = rdata;
+	cobra->m_sound_dma_ptr++;
+
+	if (cobra->m_sound_dma_ptr >= DMA_SOUND_BUFFER_SIZE)
+	{
+		cobra->m_sound_dma_ptr = 0;
+		
+		dmadac_transfer(&cobra->m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, cobra->m_sound_dma_buffer_l);
+		dmadac_transfer(&cobra->m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, cobra->m_sound_dma_buffer_r);
+	}
 }
 
 static void sub_jvs_w(device_t *device, UINT8 data)
@@ -3183,6 +3212,15 @@ static MACHINE_RESET( cobra )
 	ide_features[67*2+1] = 0x01;
 
 	cobra->m_renderer->gfx_reset(machine);
+
+	cobra->m_sound_dma_ptr = 0;
+
+	cobra->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
+	cobra->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
+	dmadac_enable(&cobra->m_dmadac[0], 1, 1);
+	dmadac_enable(&cobra->m_dmadac[1], 1, 1);
+	dmadac_set_frequency(&cobra->m_dmadac[0], 1, 44100);
+	dmadac_set_frequency(&cobra->m_dmadac[1], 1, 44100);
 }
 
 static const ide_config ide_intf = 
@@ -3231,6 +3269,12 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SOUND_ADD("rfsnd", RF5C400, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_M48T58_ADD("m48t58")
 
@@ -3284,9 +3328,7 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 
 	ppc_set_dcstore_callback(m_gfxcpu, gfx_cpu_dc_store);
 
-
-	ppc4xx_set_dma_read_handler(m_subcpu, 0, sub_unknown_dma_r);
-	ppc4xx_set_dma_write_handler(m_subcpu, 0, sub_unknown_dma_w);
+	ppc4xx_set_dma_write_handler(m_subcpu, 0, sub_sound_dma_w, 44100);
 	ppc4xx_spu_set_tx_handler(m_subcpu, sub_jvs_w);
 
 
@@ -3295,6 +3337,8 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 
 	m_comram_page = 0;
 
+	m_sound_dma_buffer_l = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_r = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
 
 	// setup fake pagetable until we figure out what really maps there...
 	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);
@@ -3490,6 +3534,8 @@ ROM_START(bujutsu)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
+	ROM_REGION(0x1000000, "rfsnd", ROMREGION_ERASE00)
+
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
@@ -3506,6 +3552,8 @@ ROM_START(racjamdx)
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
+
+	ROM_REGION(0x1000000, "rfsnd", ROMREGION_ERASE00)
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
