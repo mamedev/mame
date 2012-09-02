@@ -119,10 +119,10 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 
 	// bit 7: screen flip
 	segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
-	segaic16_sprites_set_flip(machine(), 0, data & 0x80);
+	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: shadow/highlight control
-	segaic16_sprites_set_shadow(machine(), 0, ~data & 0x40);
+	m_shadow = ~data & 0x40;
 
 	// bit 4: enable display
 	segaic16_set_display_enable(machine(), data & 0x10);
@@ -244,7 +244,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 	}
 
 	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return segaic16_open_bus_r(&space, 0, mem_mask);
+	return open_bus_r(space, 0, mem_mask);
 }
 
 
@@ -305,7 +305,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 	}
 
 	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return segaic16_open_bus_r(&space, 0, mem_mask);
+	return open_bus_r(space, 0, mem_mask);
 }
 
 
@@ -474,8 +474,8 @@ static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("subcpu", 0)
 	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("roadram")
 	AM_RANGE(0xc7c000, 0xc7ffff) AM_RAM AM_SHARE("subram")
@@ -488,9 +488,9 @@ static ADDRESS_MAP_START( sharrier_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("subram")
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x140000, 0x14ffff) AM_READWRITE(sharrier_io_r, sharrier_io_w)
 	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("roadram")
 ADDRESS_MAP_END
@@ -855,7 +855,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hangon_base, shared_base )
 	// video hardware
-	MCFG_SEGA16SP_ADD_HANGON("segaspr1")
+	MCFG_SEGA_HANGON_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_DERIVED( sharrier_base, shared_base )
 	MCFG_CPU_CLOCK(MASTER_CLOCK_10MHz)
 
 	// video hardware
-	MCFG_SEGA16SP_ADD_SHARRIER("segaspr1")
+	MCFG_SEGA_SHARRIER_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 
@@ -1063,7 +1063,7 @@ ROM_START( hangon )
 	ROM_LOAD( "epr-6842.ic23", 0x08000, 0x08000, CRC(f677b568) SHA1(636ca60bd4be9b5c2be09de8ae49db1063aa6c79) )
 	ROM_LOAD( "epr-6843.ic7",  0x10000, 0x08000, CRC(a257f0da) SHA1(9828f8ce4ef245ffb8dbad347f9ca74ed81aa998) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-6819.ic27", 0x000001, 0x8000, CRC(469dad07) SHA1(6d01c0b3506e28832928ad74d518577ff5be323b) )
 	ROM_LOAD16_BYTE( "epr-6820.ic34", 0x000000, 0x8000, CRC(87cbc6de) SHA1(b64652e062e1b88c6f6ae8dd2ffe4533bb27ba45) )
 	ROM_LOAD16_BYTE( "epr-6821.ic28", 0x010001, 0x8000, CRC(15792969) SHA1(b061dbf24e8b511116446794753c8b0cc49e2149) )
@@ -1089,7 +1089,7 @@ ROM_START( hangon )
 	ROM_LOAD( "epr-6831.ic5", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
 	ROM_LOAD( "epr-6832.ic6", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1118,7 +1118,7 @@ ROM_START( hangon1 )
 	ROM_LOAD( "epr-6842.ic23", 0x08000, 0x08000, CRC(f677b568) SHA1(636ca60bd4be9b5c2be09de8ae49db1063aa6c79) )
 	ROM_LOAD( "epr-6843.ic7",  0x10000, 0x08000, CRC(a257f0da) SHA1(9828f8ce4ef245ffb8dbad347f9ca74ed81aa998) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-6819.ic27", 0x000001, 0x8000, CRC(469dad07) SHA1(6d01c0b3506e28832928ad74d518577ff5be323b) )
 	ROM_LOAD16_BYTE( "epr-6820.ic34", 0x000000, 0x8000, CRC(87cbc6de) SHA1(b64652e062e1b88c6f6ae8dd2ffe4533bb27ba45) )
 	ROM_LOAD16_BYTE( "epr-6821.ic28", 0x010001, 0x8000, CRC(15792969) SHA1(b061dbf24e8b511116446794753c8b0cc49e2149) )
@@ -1144,7 +1144,7 @@ ROM_START( hangon1 )
 	ROM_LOAD( "epr-6831.ic5", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
 	ROM_LOAD( "epr-6832.ic6", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1185,7 +1185,7 @@ ROM_START( shangonro )
 	ROM_LOAD( "epr-10651.23", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.7",  0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x00e0000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x00e0000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-10675.22", 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.11", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.21", 0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
@@ -1211,7 +1211,7 @@ ROM_START( shangonro )
 	ROM_LOAD( "epr-10835.55", 0x00000, 0x10000, CRC(da08ca2b) SHA1(2c94c127efd66f6cf86b25e2653637818a99aed1) )
 	ROM_LOAD( "epr-10836.56", 0x10000, 0x10000, CRC(8b10e601) SHA1(75e9bcdd3f096be9bed672d61064b9240690deec) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.119", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1237,7 +1237,7 @@ ROM_START( shangonrb )
 	ROM_LOAD( "epr-10651.23", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.7",  0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x00e0000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x00e0000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-10675.22", 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.11", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "s-hangon.20",  0x020001, 0x010000, CRC(eef23b3d) SHA1(2416fa9991afbdddf25d469082e53858289550db) )
@@ -1263,7 +1263,7 @@ ROM_START( shangonrb )
 	ROM_LOAD( "epr-10835.55", 0x00000, 0x10000, CRC(da08ca2b) SHA1(2c94c127efd66f6cf86b25e2653637818a99aed1) )
 	ROM_LOAD( "epr-10836.56", 0x10000, 0x10000, CRC(8b10e601) SHA1(75e9bcdd3f096be9bed672d61064b9240690deec) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.119", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1299,7 +1299,7 @@ ROM_START( sharrier )
 	ROM_LOAD( "epr-7197.ic46", 0x08000, 0x08000, CRC(39d98bd1) SHA1(5aab91bdd08b0f1ea537cd43ccc2e82fd01dd031) )
 	ROM_LOAD( "epr-7198.ic60", 0x10000, 0x08000, CRC(3da3ea6b) SHA1(9a6ce304a14e6ef0be41d867284a63b941f960fb) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "epr-7230.ic36", 0x00000, 0x8000, CRC(93e2d264) SHA1(ca56de13756ab77408506d88f291da1da8134435) )
 	ROM_LOAD32_BYTE( "epr-7222.ic28", 0x00001, 0x8000, CRC(edbf5fc3) SHA1(a93f8c431075741c181eb422b24c9303487ca16c) )
 	ROM_LOAD32_BYTE( "epr-7214.ic18", 0x00002, 0x8000, CRC(e8c537d8) SHA1(c9b3c0f33272c47d32e6aa349d72f7e355468e0e) )
@@ -1347,7 +1347,7 @@ ROM_START( sharrier )
 	ROM_REGION( 0x10000, "mcu", 0 )	// Internal i8751 MCU code
 	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1380,7 +1380,7 @@ ROM_START( sharrier1 )
 	ROM_LOAD( "epr-7197.ic46", 0x08000, 0x08000, CRC(39d98bd1) SHA1(5aab91bdd08b0f1ea537cd43ccc2e82fd01dd031) )
 	ROM_LOAD( "epr-7198.ic60", 0x10000, 0x08000, CRC(3da3ea6b) SHA1(9a6ce304a14e6ef0be41d867284a63b941f960fb) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "epr-7230.ic36", 0x00000, 0x8000, CRC(93e2d264) SHA1(ca56de13756ab77408506d88f291da1da8134435) )
 	ROM_LOAD32_BYTE( "epr-7222.ic28", 0x00001, 0x8000, CRC(edbf5fc3) SHA1(a93f8c431075741c181eb422b24c9303487ca16c) )
 	ROM_LOAD32_BYTE( "epr-7214.ic18", 0x00002, 0x8000, CRC(e8c537d8) SHA1(c9b3c0f33272c47d32e6aa349d72f7e355468e0e) )
@@ -1428,7 +1428,7 @@ ROM_START( sharrier1 )
 	ROM_REGION( 0x10000, "mcu", 0 )	// Internal i8751 MCU code
 	ROM_LOAD( "315-5163.ic32", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1463,7 +1463,7 @@ ROM_START( enduror )
 	ROM_LOAD( "epr-7645.ic46", 0x08000, 0x08000, CRC(4caa0095) SHA1(a24c741cdca0542e462f17ff94f132c62710e198) )
 	ROM_LOAD( "epr-7646.ic60", 0x10000, 0x08000, CRC(7e432683) SHA1(c8249b23fce77eb456166161c2d9aa34309efe31) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "epr-7678.ic36", 0x00000, 0x8000, CRC(9fb5e656) SHA1(264b0ad017eb0fc7e0b542e6dd160ba964c100fd) )
 	ROM_LOAD32_BYTE( "epr-7670.ic28", 0x00001, 0x8000, CRC(dbbe2f6e) SHA1(310797a61f91d6866e728e0da3b30828e06d1b52) )
 	ROM_LOAD32_BYTE( "epr-7662.ic18", 0x00002, 0x8000, CRC(cb0c13c5) SHA1(856d1234fd8f8146e20fe6c65c0a535b7b7512cd) )
@@ -1507,7 +1507,7 @@ ROM_START( enduror )
 	ROM_LOAD( "epr-7681.rom", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
 	ROM_LOAD( "epr-7680.rom", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
@@ -1542,7 +1542,7 @@ ROM_START( enduror1 )
 	ROM_LOAD( "epr-7645.ic46", 0x08000, 0x08000, CRC(4caa0095) SHA1(a24c741cdca0542e462f17ff94f132c62710e198) )
 	ROM_LOAD( "epr-7646.ic60", 0x10000, 0x08000, CRC(7e432683) SHA1(c8249b23fce77eb456166161c2d9aa34309efe31) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "epr-7678.ic36", 0x00000, 0x8000, CRC(9fb5e656) SHA1(264b0ad017eb0fc7e0b542e6dd160ba964c100fd) )
 	ROM_LOAD32_BYTE( "epr-7670.ic28", 0x00001, 0x8000, CRC(dbbe2f6e) SHA1(310797a61f91d6866e728e0da3b30828e06d1b52) )
 	ROM_LOAD32_BYTE( "epr-7662.ic18", 0x00002, 0x8000, CRC(cb0c13c5) SHA1(856d1234fd8f8146e20fe6c65c0a535b7b7512cd) )
@@ -1587,7 +1587,7 @@ ROM_START( enduror1 )
 	ROM_LOAD( "epr-7762.ic5", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
 	ROM_LOAD( "epr-7763.ic6", 0x08000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
@@ -1619,7 +1619,7 @@ ROM_START( endurobl )
 	ROM_LOAD( "epr-7645.ic46", 0x08000, 0x08000, CRC(4caa0095) SHA1(a24c741cdca0542e462f17ff94f132c62710e198) )
 	ROM_LOAD( "epr-7646.ic60", 0x10000, 0x08000, CRC(7e432683) SHA1(c8249b23fce77eb456166161c2d9aa34309efe31) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "epr-7678.ic36", 0x00000, 0x8000, CRC(9fb5e656) SHA1(264b0ad017eb0fc7e0b542e6dd160ba964c100fd) )
 	ROM_LOAD32_BYTE( "epr-7670.ic28", 0x00001, 0x8000, CRC(dbbe2f6e) SHA1(310797a61f91d6866e728e0da3b30828e06d1b52) )
 	ROM_LOAD32_BYTE( "epr-7662.ic18", 0x00002, 0x8000, CRC(cb0c13c5) SHA1(856d1234fd8f8146e20fe6c65c0a535b7b7512cd) )
@@ -1664,7 +1664,7 @@ ROM_START( endurobl )
 	ROM_LOAD( "epr-7762.ic5", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
 	ROM_LOAD( "epr-7763.ic6", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1694,7 +1694,7 @@ ROM_START( endurob2 )
 	ROM_LOAD( "epr-7645.ic46", 0x08000, 0x08000, CRC(4caa0095) SHA1(a24c741cdca0542e462f17ff94f132c62710e198) )
 	ROM_LOAD( "epr-7646.ic60", 0x10000, 0x08000, CRC(7e432683) SHA1(c8249b23fce77eb456166161c2d9aa34309efe31) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "epr-7678.ic36", 0x00000, 0x8000, CRC(9fb5e656) SHA1(264b0ad017eb0fc7e0b542e6dd160ba964c100fd) )
 	ROM_LOAD32_BYTE( "epr-7670.ic28", 0x00001, 0x8000, CRC(dbbe2f6e) SHA1(310797a61f91d6866e728e0da3b30828e06d1b52) )
 	ROM_LOAD32_BYTE( "epr-7662.ic18", 0x00002, 0x8000, CRC(cb0c13c5) SHA1(856d1234fd8f8146e20fe6c65c0a535b7b7512cd) )
@@ -1738,7 +1738,7 @@ ROM_START( endurob2 )
 	ROM_LOAD( "epr-7681.rom", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
 	ROM_LOAD( "epr-7680.rom", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
-	ROM_REGION( 0x2000, "proms", 0 ) // zoom table
+	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
@@ -1755,14 +1755,13 @@ ROM_END
 DRIVER_INIT_MEMBER(segahang_state,generic)
 {
 	// point globals to allocated memory regions
-	segaic16_spriteram_0 = reinterpret_cast<UINT16 *>(memshare("spriteram")->ptr());
-	segaic16_paletteram = reinterpret_cast<UINT16 *>(memshare("paletteram")->ptr());
 	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
 	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 	segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save states
 	save_item(NAME(m_adc_select));
+	save_item(NAME(m_shadow));
 }
 
 

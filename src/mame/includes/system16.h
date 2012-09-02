@@ -1,17 +1,22 @@
 
 // later, this might be merged with segas1x_state in segas16.h
 
-class segas1x_bootleg_state : public driver_device
+#include "video/sega16sp.h"
+#include "machine/segaic16.h"
+
+class segas1x_bootleg_state : public sega_16bit_common_base
 {
 public:
 	segas1x_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: sega_16bit_common_base(mconfig, type, tag) ,
 		m_textram(*this, "textram"),
 		m_bg0_tileram(*this, "bg0_tileram"),
 		m_bg1_tileram(*this, "bg1_tileram"),
 		m_tileram(*this, "tileram"),
 		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
-		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"){ }
+		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"),
+		m_sprites(*this, "sprites")
+		{ }
 
 	required_shared_ptr<UINT16> m_textram;
 	optional_shared_ptr<UINT16> m_bg0_tileram;
@@ -20,6 +25,7 @@ public:
 	optional_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
 
+	required_device<sega_16bit_sprite_device> m_sprites;
 
 	UINT16 m_coinctrl;
 

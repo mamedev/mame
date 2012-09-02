@@ -428,11 +428,11 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 			break;
 
 		case 3:
-			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "spriteram", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate());
 			break;
 
 		case 2:
-			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_paletteram_w>), this));
+			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segaorun_state::paletteram_w), this));
 			break;
 
 		case 1:
@@ -484,7 +484,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
-	return segaic16_open_bus_r(&space, 0, mem_mask);
+	return open_bus_r(space, 0, mem_mask);
 }
 
 
@@ -657,7 +657,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
-	return segaic16_open_bus_r(&space, 0, mem_mask);
+	return open_bus_r(space, 0, mem_mask);
 }
 
 
@@ -695,7 +695,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			return;
 
 		case 0x70/2:
-			segaic16_sprites_draw_0_w(&space, offset, data, mem_mask);
+			m_sprites->draw_write(space, offset, data, mem_mask);
 			return;
 	}
 	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space.device()), offset * 2, data, mem_mask);
@@ -728,7 +728,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 		}
 	}
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
-	return segaic16_open_bus_r(&space,0,mem_mask);
+	return open_bus_r(space,0,mem_mask);
 }
 
 
@@ -814,7 +814,7 @@ static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16, segaorun_state )
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x200000, 0x201fff) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
 	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
@@ -1111,13 +1111,13 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
-	MCFG_SEGA16SP_ADD_OUTRUN("segaspr1")
+	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( outrun, outrun_base )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA16SP_ADD_OUTRUN("segaspr1")
+	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 321, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
 
-	MCFG_SEGA16SP_ADD_16B("segaspr1")
+	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( shangon_fd1089b, shangon )
@@ -1184,7 +1184,7 @@ ROM_START( outrun )
 	ROM_LOAD( "opr-10266.101", 0x20000, 0x08000, CRC(9f6f1a74) SHA1(09164e858ebeedcff4d389524ddf89e7c216dcae) )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
 	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
 	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
@@ -1245,7 +1245,7 @@ ROM_START( outrunra )
 	ROM_LOAD( "opr-10266.101", 0x20000, 0x08000, CRC(9f6f1a74) SHA1(09164e858ebeedcff4d389524ddf89e7c216dcae) )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
 	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
 	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
@@ -1306,7 +1306,7 @@ ROM_START( outruno )
 	ROM_LOAD( "opr-10266.101", 0x20000, 0x08000, CRC(9f6f1a74) SHA1(09164e858ebeedcff4d389524ddf89e7c216dcae) )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	// VIDEO BD 837-6064-01 uses eproms a fourth of the size of those used on VIDEO BD 837-6064-02, same data
 	ROM_LOAD32_BYTE( "epr-10194.26", 0x00000, 0x08000, CRC(f0eda3bd) SHA1(173e10a10372d42da81e6eb48c3e23a117638c0c) )
 	ROM_LOAD32_BYTE( "epr-10203.38", 0x00001, 0x08000, CRC(8445a622) SHA1(1187dee7db09a42446fc75872d49936310141eb8) )
@@ -1400,7 +1400,7 @@ ROM_START( outrundx )
 	ROM_LOAD( "opr-10266.101", 0x20000, 0x08000, CRC(9f6f1a74) SHA1(09164e858ebeedcff4d389524ddf89e7c216dcae) )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	// VIDEO BD 837-6064-01 uses eproms a fourth of the size of those used on VIDEO BD 837-6064-02, same data
 	ROM_LOAD32_BYTE( "epr-10194.26", 0x00000, 0x08000, CRC(f0eda3bd) SHA1(173e10a10372d42da81e6eb48c3e23a117638c0c) )
 	ROM_LOAD32_BYTE( "epr-10203.38", 0x00001, 0x08000, CRC(8445a622) SHA1(1187dee7db09a42446fc75872d49936310141eb8) )
@@ -1507,7 +1507,7 @@ ROM_START( outrunb )
 	ROM_LOAD( "a-17.bin",	0x10000, 0x10000, CRC(899c781d) SHA1(4f759c316a57a1e42838375525290425d25b53e1) )
 	ROM_LOAD( "a-16.bin",	0x20000, 0x10000, CRC(98dd4d15) SHA1(914ebcb330455ab35968b4add4d94be123a185a5) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "a-18.bin",	0x00000, 0x10000, CRC(77377e00) SHA1(4f376b05692f33d529f4c058dac989136c808ca1) )
 	ROM_LOAD32_BYTE( "a-20.bin",	0x00001, 0x10000, CRC(69ecc975) SHA1(3560e9a31fc71e263a6ff61224b8db2b17836075) )
 	ROM_LOAD32_BYTE( "a-22.bin",	0x00002, 0x10000, CRC(b6a8d0e2) SHA1(6184700dbe2c8c9c91f220e246501b7a865e4a05) )
@@ -1569,7 +1569,7 @@ ROM_START( shangon )
 	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
 	// Super Hang-On Video board 837-6279-01 (mask rom type), same data but mask roms twice the size as "EPR" counterparts
 	ROM_LOAD16_BYTE( "mpr-10794.8",	 0x000001, 0x020000, CRC(7c958e63) SHA1(ef79614e94280607a6cdf6e13db051accfd2add0) )
 	ROM_LOAD16_BYTE( "mpr-10798.16", 0x000000, 0x020000, CRC(7d58f807) SHA1(783c9929d27a0270b3f7d5eb799cee6b2e5b7ae5) )
@@ -1628,7 +1628,7 @@ ROM_START( shangon3 )
 	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x0e0000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
@@ -1689,7 +1689,7 @@ ROM_START( shangon2 )
 	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x0e0000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
@@ -1750,7 +1750,7 @@ ROM_START( shangon1 )
 	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x0e0000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-10676.7",  0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
@@ -1811,7 +1811,7 @@ ROM_START( shangonle )
 	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
-	ROM_REGION16_BE( 0x0e0000, "gfx2", 0 ) // sprites
+	ROM_REGION16_BE( 0x0e0000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
 	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "epr-13945.7",  0x020001, 0x010000, CRC(fbb1eef9) SHA1(2798df2f25706e0d3be01d945274f478d7e5a2ae) )
@@ -1878,7 +1878,7 @@ ROM_START( toutrun )
 	ROM_LOAD( "opr-12324.103", 0x10000, 0x10000, CRC(24607a55) SHA1(69033f2281cd42e88233c23d809b73607fe54853) )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	// Video BD 837-6906-2, Mask Roms twice the size as EPR/OPR counterparts
 	ROM_LOAD32_BYTE( "mpr-12336.9",   0x00000, 0x20000, CRC(dda465c7) SHA1(83acc12a387b004986f084f25964c15a9f88a41a) )
 	ROM_LOAD32_BYTE( "mpr-12337.10",  0x00001, 0x20000, CRC(828233d1) SHA1(d73a200af4245d590e1fd3ac436723f99cc50452) )
@@ -1938,7 +1938,7 @@ ROM_START( toutrun3 )
 	ROM_LOAD( "opr-12324.103", 0x10000, 0x10000, CRC(24607a55) SHA1(69033f2281cd42e88233c23d809b73607fe54853) )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "opr-12307.9",  0x00000, 0x10000, CRC(437dcf09) SHA1(0022ee4d1c3698f77271e570cef98a8a1e5c5d6a) )
 	ROM_LOAD32_BYTE( "opr-12308.10", 0x00001, 0x10000, CRC(0de70cc2) SHA1(c03f8f8cda72daf64af2878bf254840ac6dd17eb) )
 	ROM_LOAD32_BYTE( "opr-12309.11", 0x00002, 0x10000, CRC(deb8c242) SHA1(c05d8ced4eafae52c4795fb1471cd66f5903d1aa) )
@@ -2005,7 +2005,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD( "opr-12324.103", 0x10000, 0x10000, CRC(24607a55) SHA1(69033f2281cd42e88233c23d809b73607fe54853) )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "opr-12307.9",  0x00000, 0x10000, CRC(437dcf09) SHA1(0022ee4d1c3698f77271e570cef98a8a1e5c5d6a) )
 	ROM_LOAD32_BYTE( "opr-12308.10", 0x00001, 0x10000, CRC(0de70cc2) SHA1(c03f8f8cda72daf64af2878bf254840ac6dd17eb) )
 	ROM_LOAD32_BYTE( "opr-12309.11", 0x00002, 0x10000, CRC(deb8c242) SHA1(c05d8ced4eafae52c4795fb1471cd66f5903d1aa) )
@@ -2066,7 +2066,7 @@ ROM_START( toutrun1 )
 	ROM_LOAD( "opr-12324.103", 0x10000, 0x10000, CRC(24607a55) SHA1(69033f2281cd42e88233c23d809b73607fe54853) )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
-	ROM_REGION32_LE( 0x100000, "gfx2", 0 ) // sprites
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
 	ROM_LOAD32_BYTE( "opr-12307.9",  0x00000, 0x10000, CRC(437dcf09) SHA1(0022ee4d1c3698f77271e570cef98a8a1e5c5d6a) )
 	ROM_LOAD32_BYTE( "opr-12308.10", 0x00001, 0x10000, CRC(0de70cc2) SHA1(c03f8f8cda72daf64af2878bf254840ac6dd17eb) )
 	ROM_LOAD32_BYTE( "opr-12309.11", 0x00002, 0x10000, CRC(deb8c242) SHA1(c05d8ced4eafae52c4795fb1471cd66f5903d1aa) )
@@ -2120,8 +2120,6 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 		m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// point globals to allocated memory regions
-	segaic16_spriteram_0 = reinterpret_cast<UINT16 *>(memshare("spriteram")->ptr());
-	segaic16_paletteram = reinterpret_cast<UINT16 *>(memshare("paletteram")->ptr());
 	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
 	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 	segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());

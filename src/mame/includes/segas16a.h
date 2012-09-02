@@ -45,16 +45,17 @@
 #include "machine/segaic16.h"
 #include "sound/2151intf.h"
 #include "video/segaic16.h"
+#include "video/sega16sp.h"
 
 
 // ======================> segas16a_state
 
-class segas16a_state : public driver_device
+class segas16a_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
 	segas16a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: sega_16bit_common_base(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_mcu(*this, "mcu"),
@@ -63,6 +64,7 @@ public:
 		  m_n7751(*this, "n7751"),
 		  m_n7751_i8243(*this, "n7751_8243"),
 		  m_nvram(*this, "nvram"),
+		  m_sprites(*this, "sprites"),
 		  m_workram(*this, "nvram"),
 		  m_video_control(0),
 		  m_mcu_control(0),
@@ -158,6 +160,7 @@ protected:
 	optional_device<n7751_device> m_n7751;
 	optional_device<i8243_device> m_n7751_i8243;
 	required_device<nvram_device> m_nvram;
+	required_device<sega_sys16a_sprite_device> m_sprites;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

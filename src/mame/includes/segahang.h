@@ -41,22 +41,24 @@
 #include "machine/i8255.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "video/sega16sp.h"
 
 
 // ======================> segahang_state
 
-class segahang_state : public driver_device
+class segahang_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
 	segahang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: sega_16bit_common_base(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_subcpu(*this, "subcpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_mcu(*this, "mcu"),
 		  m_i8255_1(*this, "i8255_1"),
 		  m_i8255_2(*this, "i8255_2"),
+		  m_sprites(*this, "sprites"),
 		  m_workram(*this, "workram"),
 		  m_sharrier_video(false),
 		  m_adc_select(0)
@@ -87,6 +89,7 @@ public:
 	DECLARE_DRIVER_INIT(enduror);
 	DECLARE_DRIVER_INIT(endurobl);
 	DECLARE_DRIVER_INIT(endurob2);
+	
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -116,7 +119,8 @@ protected:
 	optional_device<i8751_device> m_mcu;
 	required_device<i8255_device> m_i8255_1;
 	required_device<i8255_device> m_i8255_2;
-
+	required_device<sega_16bit_sprite_device> m_sprites;
+	
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
 
@@ -126,4 +130,5 @@ protected:
 
 	// internal state
 	UINT8					m_adc_select;
+	bool					m_shadow;
 };

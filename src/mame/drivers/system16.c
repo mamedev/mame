@@ -125,8 +125,8 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x411000, 0x411fff) AM_RAM AM_SHARE("bg0_tileram")
 	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_SHARE("bg1_tileram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_nmi_w)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -181,8 +181,8 @@ static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
@@ -259,8 +259,8 @@ static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_SHARE("bg0_tileram")
 	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc41000, 0xc41001) AM_READ(passht4b_service_r)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ(passht4b_io1_r)
 	AM_RANGE(0xc41004, 0xc41005) AM_READ(passht4b_io2_r)
@@ -308,8 +308,8 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_SHARE("bg0_tileram")
 	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -510,10 +510,10 @@ static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
@@ -606,8 +606,8 @@ static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x118018, 0x118019) AM_WRITE(s16bl_bgscrollx_w)
 	AM_RANGE(0x118020, 0x118021) AM_WRITE(s16bl_fgpage_w)
 	AM_RANGE(0x118028, 0x118029) AM_WRITE(s16bl_bgpage_w)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
@@ -624,7 +624,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
@@ -633,7 +633,7 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x718018, 0x718019) AM_WRITE(s16bl_bgscrollx_w)
 	AM_RANGE(0x718020, 0x718021) AM_WRITE(s16bl_fgpage_w)
 	AM_RANGE(0x718028, 0x718029) AM_WRITE(s16bl_bgpage_w)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE") AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
@@ -693,7 +693,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
 static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
@@ -705,7 +705,7 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x718024, 0x718025) AM_WRITE(datsu_page2_w)
 	AM_RANGE(0x718026, 0x718027) AM_WRITE(datsu_page3_w)
 
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x900006, 0x900007) AM_WRITE(sound_command_w)
@@ -719,8 +719,8 @@ static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -811,8 +811,8 @@ static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("DSW2") AM_WRITENOP
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
@@ -840,7 +840,7 @@ static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
 	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
 
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x843000, 0x843001) AM_WRITENOP
 
 	AM_RANGE(0xC46000, 0xC46001) AM_WRITE(s16bl_fgscrolly_w)
@@ -889,8 +889,8 @@ static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_bgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_fgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
@@ -916,8 +916,8 @@ static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_fgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_bgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -956,8 +956,8 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_bgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_fgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w)  AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xC41000, 0xC41001) AM_READ(beautyb_unkx_r )
 	AM_RANGE(0xC41002, 0xC41003) AM_READ(beautyb_unkx_r )
@@ -973,10 +973,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // work ram
-	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
@@ -1117,8 +1117,8 @@ static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc0ffff) AM_NOP
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
@@ -1258,8 +1258,8 @@ static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 
 	/* bootleg video regs */
 	/*AM_RANGE(0xc00000, 0xc00001) AM_NOP
@@ -1300,8 +1300,8 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00006, 0xa00007) AM_WRITE(sound_command_nmi_w)
@@ -2097,38 +2097,19 @@ static MACHINE_CONFIG_FRAGMENT( system16_datsu_sound )
 MACHINE_CONFIG_END
 
 
-static const sega16sp_interface shinobld_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	117,     // xoffs
-	segaic16_sprites_16a_bootleg_shinobld_draw, // draw function
-	0, // use buffer
-};
-
 static MACHINE_CONFIG_DERIVED( shinobib, system16 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shinobib_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", shinobld_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
 
 	MCFG_VIDEO_START( s16a_bootleg_shinobi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC( s16a_bootleg )
 MACHINE_CONFIG_END
-
-static const sega16sp_interface passshtb_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	117,     // xoffs
-	segaic16_sprites_16a_bootleg_passhtb_draw, // draw function
-	0, // use buffer
-};
 
 static MACHINE_CONFIG_DERIVED( passshtb, system16_7759 )
 
@@ -2136,7 +2117,9 @@ static MACHINE_CONFIG_DERIVED( passshtb, system16_7759 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(passshtb_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", passshtb_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
+	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(1,0,3,2,5,4,7,6)
 
 	MCFG_VIDEO_START( s16a_bootleg_passsht )
 	MCFG_SCREEN_MODIFY("screen")
@@ -2151,22 +2134,14 @@ static MACHINE_CONFIG_DERIVED( passsht4b, system16_7759 )
 	MCFG_CPU_PROGRAM_MAP(passht4b_map)
 
 	// wrong
-	MCFG_SEGA16SP_ADD("segaspr1", passshtb_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
+	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(1,0,3,2,5,4,7,6)
 
 	MCFG_VIDEO_START( s16a_bootleg_passsht )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC( s16a_bootleg_passht4b )
 MACHINE_CONFIG_END
-
-static const sega16sp_interface wb3bbl_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	117,     // xoffs
-	segaic16_sprites_16a_bootleg_wb3bl_draw, // draw function
-	0, // use buffer
-};
 
 static MACHINE_CONFIG_DERIVED( wb3bb, system16 )
 
@@ -2174,23 +2149,16 @@ static MACHINE_CONFIG_DERIVED( wb3bb, system16 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wb3bbl_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", wb3bbl_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
+	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(4,0,5,1,6,2,7,3)
+	MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(0)
 
 	MCFG_VIDEO_START( s16a_bootleg_wb3bl )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC( s16a_bootleg )
 MACHINE_CONFIG_END
 
-
-static const sega16sp_interface s16bbl_x121_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	121,     // xoffs
-	segaic16_sprites_16b_draw, // draw function
-	0, // use buffer
-};
 
 static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 
@@ -2211,7 +2179,8 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	MCFG_GFXDECODE(sys16)
 	MCFG_PALETTE_LENGTH(2048*SHADOW_COLORS_MULTIPLIER)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x121_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
 
 	MCFG_PALETTE_INIT( all_black )
 	MCFG_VIDEO_START(system16)
@@ -2233,16 +2202,6 @@ static MACHINE_CONFIG_DERIVED( bayrouteb1, goldnaxeb1 )
 	MCFG_CPU_PROGRAM_MAP(bayrouteb1_map)
 MACHINE_CONFIG_END
 
-static const sega16sp_interface s16bbl_x107_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	107,     // xoffs
-	segaic16_sprites_16b_draw, // draw function
-	0, // use buffer
-};
-
 static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb1 )
 
 	/* basic machine hardware */
@@ -2251,8 +2210,9 @@ static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb1 )
 
 	MCFG_FRAGMENT_ADD(system16_datsu_sound)
 
-	MCFG_DEVICE_REMOVE("segaspr1")
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
+	MCFG_DEVICE_MODIFY("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tturfbl, system16_7759 )
@@ -2271,18 +2231,9 @@ static MACHINE_CONFIG_DERIVED( tturfbl, system16_7759 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 MACHINE_CONFIG_END
-
-static const sega16sp_interface s16bbl_x112_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	112,     // xoffs
-	segaic16_sprites_16b_draw, // draw function
-	0, // use buffer
-};
 
 static MACHINE_CONFIG_DERIVED( dduxbl, system16 )
 
@@ -2290,18 +2241,9 @@ static MACHINE_CONFIG_DERIVED( dduxbl, system16 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dduxbl_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 MACHINE_CONFIG_END
-
-static const sega16sp_interface s16bbl_x124_sega16sp_intf =
-{
-	0,	   // which spriteram
-	1024,  // colorbase
-	0x800, // ramsize
-	124,     // xoffs
-	segaic16_sprites_16b_draw, // draw function
-	0, // use buffer
-};
 
 static MACHINE_CONFIG_DERIVED( eswatbl, system16_7759 )
 
@@ -2309,7 +2251,8 @@ static MACHINE_CONFIG_DERIVED( eswatbl, system16_7759 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(eswatbl_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x124_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fpointbl, system16 )
@@ -2321,7 +2264,8 @@ static MACHINE_CONFIG_DERIVED( fpointbl, system16 )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tetrisbl, system16 )
@@ -2330,7 +2274,8 @@ static MACHINE_CONFIG_DERIVED( tetrisbl, system16 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrisbl_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 MACHINE_CONFIG_END
 
 
@@ -2340,7 +2285,8 @@ static MACHINE_CONFIG_DERIVED( beautyb, system16 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(beautyb_map)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 MACHINE_CONFIG_END
 
 
@@ -2368,7 +2314,8 @@ static MACHINE_CONFIG_START( system18, segas1x_bootleg_state )
 
 	MCFG_VIDEO_START(system18old)
 
-	MCFG_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2448,7 +2395,7 @@ ROM_START( shinobld )
 	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(7cc40b6c) SHA1(ffad7eef7ab2ff9a2e49a8d71b5785a61fa3c675) )
 	ROM_LOAD( "11.bin", 0x20000, 0x10000, CRC(0f6c7b1c) SHA1(defc76592c285b3396e89a3cff7a73f3a948117f) )
 
-	ROM_REGION16_BE( 0x080000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x080000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD16_BYTE( "5.bin", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
 	ROM_LOAD16_BYTE( "8.bin", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
@@ -2473,7 +2420,7 @@ ROM_START( passshtb )
 	ROM_LOAD( "opr11855.b10", 0x10000, 0x10000, CRC(b78762b4) SHA1(d594ef846bd7fed8da91a89906b39c1a2867a1fe) )
 	ROM_LOAD( "opr11856.b11", 0x20000, 0x10000, CRC(ea49f666) SHA1(36ccd32cdcbb7fcc300628bb59c220ec3c324d82) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD16_BYTE( "opr11862.b1",  0x00001, 0x10000, CRC(b6e94727) SHA1(0838e034f1f10d9cd1312c8c94b5c57387c0c271) )
 	ROM_LOAD16_BYTE( "opr11865.b5",  0x00000, 0x10000, CRC(17e8d5d5) SHA1(ac1074b0a705be13c6e3391441e6cfec1d2b3f8a) )
 	ROM_LOAD16_BYTE( "opr11863.b2",  0x20001, 0x10000, CRC(3e670098) SHA1(2cfc83f4294be30cd868738886ac546bd8489962) )
@@ -2499,7 +2446,7 @@ ROM_START( passht4b )
 	ROM_LOAD( "pas4p.12", 0x10000, 0x10000, CRC(bebb9211) SHA1(4f56048f6f70b63f74a4c0d64456213d36ce5b26) )
 	ROM_LOAD( "pas4p.13", 0x20000, 0x10000, CRC(e37506c3) SHA1(e6fbf15d58f321a3d052fefbe5a1901e4a1734ae) )
 
-	ROM_REGION16_BE( 0x60000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x60000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "opr11862.b1",  0x00001, 0x10000, CRC(b6e94727) SHA1(0838e034f1f10d9cd1312c8c94b5c57387c0c271) )
 	ROM_LOAD16_BYTE( "opr11865.b5",  0x00000, 0x10000, CRC(17e8d5d5) SHA1(ac1074b0a705be13c6e3391441e6cfec1d2b3f8a) )
 	ROM_LOAD16_BYTE( "opr11863.b2",  0x20001, 0x10000, CRC(3e670098) SHA1(2cfc83f4294be30cd868738886ac546bd8489962) )
@@ -2524,7 +2471,7 @@ ROM_START( wb3bbl )
 	ROM_LOAD( "wb3_15", 0x10000, 0x10000, CRC(96ff9d52) SHA1(791a9da4860e0d42fba98f80a3c6725ad8c73e33) )
 	ROM_LOAD( "wb3_16", 0x20000, 0x10000, CRC(afaf0d31) SHA1(d4309329a0a543250788146b63b27ff058c02fc3) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD16_BYTE( "epr12090.b1", 0x00001, 0x010000, CRC(aeeecfca) SHA1(496124b170a725ad863c741d4e021ab947511e4c) )
 	ROM_LOAD16_BYTE( "epr12094.b5", 0x00000, 0x010000, CRC(615e4927) SHA1(d23f164973afa770714e284a77ddf10f18cc596b) )
 	ROM_LOAD16_BYTE( "epr12091.b2", 0x20001, 0x010000, CRC(8409a243) SHA1(bcbb9510a6499d8147543d6befa5a49f4ac055d9) )
@@ -2570,7 +2517,7 @@ ROM_START( bayrouteb1 )
 	ROM_LOAD( "bs14.bin", 0x10000, 0x10000, CRC(6bc4d0a8) SHA1(90b9a61c7a140291d72554857ce26d54ebf03fc2) )
 	ROM_LOAD( "bs12.bin", 0x20000, 0x10000, CRC(c1f967a6) SHA1(8eb6bbd9e17dc531830bc798b8485c8ea999e56e) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "br_obj0o.1b", 0x00001, 0x10000, CRC(098a5e82) SHA1(c5922f418773bc3629071e584457839d67a370e9) )
 	ROM_LOAD16_BYTE( "br_obj0e.5b", 0x00000, 0x10000, CRC(85238af9) SHA1(39989a8d9b60c6d55272b5e2c213341a563dd993) )
 	ROM_LOAD16_BYTE( "br_obj1o.2b", 0x20001, 0x10000, CRC(cc641da1) SHA1(28f8a6502702cb9e2cc7f3e98f6c5d201f462fa3) )
@@ -2606,7 +2553,7 @@ ROM_START( bayrouteb2 )
 	ROM_LOAD( "bs12.bin", 0x20000, 0x10000, CRC(c1f967a6) SHA1(8eb6bbd9e17dc531830bc798b8485c8ea999e56e) )
 
 	#if 0 // these look bad
-	ROM_REGION16_BE( 0x080000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x080000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD16_BYTE( "br_11",       0x00001, 0x10000, CRC(65232905) SHA1(cb195a0ce8bff9d1d3e31678060b3aaccfefcd2d) )
 	ROM_LOAD16_BYTE( "br_obj0e.5b", 0x00000, 0x10000, CRC(85238af9) SHA1(39989a8d9b60c6d55272b5e2c213341a563dd993) )
 	ROM_LOAD16_BYTE( "br_obj1o.2b", 0x20001, 0x10000, CRC(cc641da1) SHA1(28f8a6502702cb9e2cc7f3e98f6c5d201f462fa3) )
@@ -2618,7 +2565,7 @@ ROM_START( bayrouteb2 )
 	#endif
 
 	// use the roms from the first bootleg set
-	ROM_REGION16_BE( 0x080000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION16_BE( 0x080000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	ROM_LOAD16_BYTE( "br_obj0o.1b", 0x00001, 0x10000, CRC(098a5e82) SHA1(c5922f418773bc3629071e584457839d67a370e9) )
 	ROM_LOAD16_BYTE( "br_obj0e.5b", 0x00000, 0x10000, CRC(85238af9) SHA1(39989a8d9b60c6d55272b5e2c213341a563dd993) )
 	ROM_LOAD16_BYTE( "br_obj1o.2b", 0x20001, 0x10000, CRC(cc641da1) SHA1(28f8a6502702cb9e2cc7f3e98f6c5d201f462fa3) )
@@ -2718,7 +2665,7 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD( "28.12",  0x40000, 0x10000, CRC(22f0667e) SHA1(2d11b2ce105a3db9c914942cace85aff17deded9) )
 	ROM_LOAD( "27.11", 0x50000, 0x10000, CRC(afb1a7e4) SHA1(726fded9db72a881128b43f449d2baf450131f63) )
 
-	ROM_REGION16_BE( 0x1c0000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "33.17",		0x000001, 0x10000, CRC(28ba70c8) SHA1(a6f33e1404928b6d1006943494646d6cfbd60a4b) )
 	ROM_LOAD16_BYTE( "34.18",		0x020001, 0x10000, CRC(2ed96a26) SHA1(edcf915243e6f92d31cdfc53965438f6b6bff51d) )
 	ROM_LOAD16_BYTE( "37.bin",		0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) )
@@ -2804,7 +2751,7 @@ ROM_START( goldnaxeb2 )
 	ROM_LOAD( "ic2.37",  0x40000, 0x10000, CRC(22f0667e) SHA1(2d11b2ce105a3db9c914942cace85aff17deded9) )
 	ROM_LOAD( "ic16.40", 0x50000, 0x10000, CRC(afb1a7e4) SHA1(726fded9db72a881128b43f449d2baf450131f63) )
 
-	ROM_REGION16_BE( 0x1c0000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "ic73.34", 		0x000001, 0x10000, CRC(28ba70c8) SHA1(a6f33e1404928b6d1006943494646d6cfbd60a4b) ) // mpr12378.b1  [1/4]      IDENTICAL
 	ROM_LOAD16_BYTE( "ic74.33", 		0x020001, 0x10000, CRC(2ed96a26) SHA1(edcf915243e6f92d31cdfc53965438f6b6bff51d) ) // mpr12378.b1  [2/4]      IDENTICAL
 	ROM_LOAD16_BYTE( "ic79.28", 		0x100001, 0x10000, CRC(84dccc5b) SHA1(10263d98d663f1170c3203066f391075a1d64ff5) ) // mpr12378.b1  [3/4]      IDENTICAL
@@ -2847,7 +2794,7 @@ ROM_START( tturfbl )
 	ROM_LOAD( "tt16cf44.rom", 0x10000, 0x10000, CRC(4c467735) SHA1(8338b6605cbe2e076da0b3e3a47630409a79f002) )
 	ROM_LOAD( "tt17d59e.rom", 0x20000, 0x10000, CRC(60c0f2fe) SHA1(3fea4ed757d47628f59ff940e40cb86b3b5b443b) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "12279.1b", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )
 	ROM_LOAD16_BYTE( "12283.5b", 0x00000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )
 	ROM_LOAD16_BYTE( "12278.2b", 0x20001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )
@@ -2875,7 +2822,7 @@ ROM_START( dduxbl )
 	ROM_LOAD( "dduxb15.bin", 0x10000, 0x10000, CRC(ce0d2b30) SHA1(e60521c46f1650c9bdc76f2ceb91a6d61aaa0a09) )
 	ROM_LOAD( "dduxb16.bin", 0x20000, 0x10000, CRC(6de95434) SHA1(7bed2a0261cf6c2fbb3756633f05f0bb2173977c) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", 0 ) //* sprites */
+	ROM_REGION16_BE( 0x100000, "sprites", 0 ) //* sprites */
 	ROM_LOAD16_BYTE( "dduxb06.bin", 0x00000, 0x010000, CRC(b0079e99) SHA1(9bb4d3fa804a3d05a6e06b45a1280d7064e96ac6) )
 	ROM_LOAD16_BYTE( "dduxb10.bin", 0x00001, 0x010000, CRC(0be3aee5) SHA1(48fc779b7398abbb82cd0d0d28705ece75b3c4e3) )
 	ROM_LOAD16_BYTE( "dduxb07.bin", 0x20000, 0x010000, CRC(0217369c) SHA1(b6ec2fa1279a27a602d79e1073c54193745ea816) )
@@ -2903,7 +2850,7 @@ ROM_START( eswatbl )
 	ROM_LOAD( "mpr12625.b12", 0x40000, 0x40000, CRC(3b8c757e) SHA1(0b66e8446d059a12e47e2a6fe8f0a333245bb95c) ) // ic20
 	ROM_LOAD( "mpr12626.b13", 0x80000, 0x40000, CRC(3efca25c) SHA1(0d866bf53a16b52719f73081e933f4db27d72ece) ) // ic21
 
-	ROM_REGION16_BE( 0x1c0000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "ic9",  0x000001, 0x20000, CRC(0d1530bf) SHA1(bb8626cd98761c1c20cee117d00315c85621ba6a) )
 	ROM_CONTINUE(            0x100001, 0x20000 )
 	ROM_LOAD16_BYTE( "ic12", 0x000000, 0x20000, CRC(18ff0799) SHA1(5417223378aef16ee2b4f438d1f8f11a23fe7265) )
@@ -2932,7 +2879,7 @@ ROM_START( fpointbl )
 	ROM_LOAD( "flpoint.005", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
 	ROM_LOAD( "flpoint.004", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
 
-	ROM_REGION16_BE( 0x20000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x20000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "12596.bin", 0x00001, 0x010000, CRC(4a4041f3) SHA1(4c52b30223d8aa80ccdbb196098cb17e64ad6583) )
 	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
 
@@ -2950,7 +2897,7 @@ ROM_START( fpointbj )
 	ROM_LOAD( "flpoint.005", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
 	ROM_LOAD( "flpoint.004", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
 
-	ROM_REGION16_BE( 0x20000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x20000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "12596.bin", 0x00001, 0x010000, CRC(4a4041f3) SHA1(4c52b30223d8aa80ccdbb196098cb17e64ad6583) )
 	ROM_LOAD16_BYTE( "12597.bin", 0x00000, 0x010000, CRC(6961e676) SHA1(7639d2da086b57a9a8d6100fdacf40d97d7c4772) )
 
@@ -2978,7 +2925,7 @@ ROM_START( tetrisbl )
 	ROM_LOAD( "epr12166.b10", 0x10000, 0x10000, CRC(9abd183b) SHA1(621b017cb34973f9227be383e26b5cd41aea9422) )
 	ROM_LOAD( "epr12167.b11", 0x20000, 0x10000, CRC(2495fd4e) SHA1(2db94ead9223a67238a97e724668076fc43e5534) )
 
-	ROM_REGION16_BE( 0x020000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x020000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "obj0-o.rom", 0x00001, 0x10000, CRC(2fb38880) SHA1(0e1b601bbda78d1887951c1f7e752531c281bc83) )
 	ROM_LOAD16_BYTE( "obj0-e.rom", 0x00000, 0x10000, CRC(d6a02cba) SHA1(d80000f92e754e89c6ca7b7273feab448fc9a061) )
 
@@ -3009,7 +2956,7 @@ ROM_START( beautyb )
 	ROM_LOAD( "b53.bin", 0x10000, 0x10000, CRC(aca8e330) SHA1(912e636e3c1e238682ea29620e8e2c6089c77209) )
 	ROM_LOAD( "b63.bin", 0x00000, 0x10000, CRC(f2af2fd5) SHA1(0a95ebb5eae7cdc6535533d73d06419c23d01ac3) )
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
@@ -3036,7 +2983,7 @@ ROM_START( iqpipe )
 	ROM_LOAD( "iqpipe.5", 0x10000, 0x10000, CRC(dfaedd39) SHA1(498f1c34fecd8de497fdce41bb683d00047a868a) )
 	ROM_LOAD( "iqpipe.6", 0x00000, 0x10000, CRC(8e554f8d) SHA1(4b3b0e47c36f37947422f1c31063f11975108cd0) )
 
-	ROM_REGION( 0x020000, "gfx2", ROMREGION_ERASEFF ) /* sprites */
+	ROM_REGION( 0x020000, "sprites", ROMREGION_ERASEFF ) /* sprites */
 	/* no sprites on this */
 
 	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
@@ -3068,7 +3015,7 @@ ROM_START( astormbl )
 	ROM_LOAD( "epr13074.bin", 0x40000, 0x40000, CRC(787afab8) SHA1(a119042bb2dad54e9733bfba4eaab0ac5fc0f9e7) )
 	ROM_LOAD( "epr13075.bin", 0x80000, 0x40000, CRC(4e01b477) SHA1(4178ce4a87ea427c3b0195e64acef6cddfb3485f) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "mpr13082.bin", 0x000001, 0x40000, CRC(a782b704) SHA1(ba15bdfbc267b8d86f03e5310ce60846ff846de3) )
 	ROM_LOAD16_BYTE( "astorm.a11",   0x000000, 0x40000, CRC(7829c4f3) SHA1(3adb7aa7f70163d3848c98316e18b9783c41d663) )
 	ROM_LOAD16_BYTE( "mpr13081.bin", 0x080001, 0x40000, CRC(eb510228) SHA1(4cd387b160ec7050e1300ebe708853742169e643) )
@@ -3130,7 +3077,7 @@ ROM_START( astormb2 )
 	ROM_LOAD( "36.03",  0x80000, 0x20000, CRC(c0f9628d) SHA1(aeacf5e409adfa0b9c28c90d4e89eb1f56cd5f4d) ) // epr13075.bin [1/2]      IDENTICAL
 	ROM_LOAD( "37.031", 0xa0000, 0x20000, CRC(95af904e) SHA1(6574fa874c355c368109b417aab7d0b05c9d215d) ) // epr13075.bin [2/2]      IDENTICAL
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "17.042", 0x000001, 0x20000, CRC(db08beb5) SHA1(c154d22c69b77637d6a9d0f2bffcfb47e6901ec8) ) // mpr13082.bin [1/2]      IDENTICAL
 	ROM_LOAD16_BYTE( "16.043", 0x040001, 0x20000, CRC(41f78977) SHA1(9cf9fcf96722d148c4b2cf7aa33425b6efcd0379) ) // mpr13082.bin [2/2]      IDENTICAL
 	ROM_LOAD16_BYTE( "29.012", 0x000000, 0x20000, CRC(22acf675) SHA1(80fd0d96017bf36d964a79f7e13e73fee7ed370a) ) // mpr13089.bin [1/2]      99.941254%
@@ -3185,7 +3132,7 @@ ROM_START( mwalkbl )
 	ROM_LOAD( "mpr13217.b2", 0x40000, 0x40000, CRC(7d1ac3ec) SHA1(8495357304f1df135bba77ef3b96e79a883b8ff0) )
 	ROM_LOAD( "mpr13218.b3", 0x80000, 0x40000, CRC(56d3393c) SHA1(50a2d065060692c9ecaa56046a781cb21d93e554) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "mpr13224.b11", 0x000001, 0x40000, CRC(c59f107b) SHA1(10fa60fca6e34eda277c483bb1c0e81bb88c8a47) )
 	ROM_LOAD16_BYTE( "mpr13231.a11", 0x000000, 0x40000, CRC(a5e96346) SHA1(a854f4dd5dc16975373255110fdb8ab3d121b1af) )
 	ROM_LOAD16_BYTE( "mpr13223.b10", 0x080001, 0x40000, CRC(364f60ff) SHA1(9ac887ec0b2e32b504b7c6a5f3bb1ce3fe41a15a) )
@@ -3223,7 +3170,7 @@ ROM_START( shdancbl )
 	ROM_LOAD( "ic2",  0x80000, 0x20000, CRC(60095070) SHA1(913c2ee51fb6f838f3c6cbd27032bdf754fbadf1) )
 	ROM_LOAD( "ic16", 0xa0000, 0x20000, CRC(0f0d5dd3) SHA1(76812e2f831256a8b6598257dd84a7f07443642e) )
 
-	ROM_REGION16_BE( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
 
 	// 12719
 	ROM_LOAD16_BYTE( "ic73", 0x000001, 0x10000, CRC(59e77c96) SHA1(08da058529ac83352a4528d3792a21edda348f7a) )

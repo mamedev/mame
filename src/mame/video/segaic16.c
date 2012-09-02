@@ -380,9 +380,7 @@ UINT16 *segaic16_tileram_0;
 UINT16 *segaic16_textram_0;
 UINT16 *segaic16_roadram_0;
 UINT16 *segaic16_rotateram_0;
-UINT16 *segaic16_paletteram;
 
-struct palette_info segaic16_palette;
 struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
 struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
 
@@ -412,101 +410,6 @@ void segaic16_set_display_enable(running_machine &machine, int enable)
 		machine.primary_screen->update_partial(machine.primary_screen->vpos());
 		segaic16_display_enable = enable;
 	}
-}
-
-
-
-/*************************************
- *
- *  Palette computation
- *
- *************************************/
-
-/*
-    Color generation details
-
-    Each color is made up of 5 bits, connected through one or more resistors like so:
-
-    Bit 0 = 1 x 3.9K ohm
-    Bit 1 = 1 x 2.0K ohm
-    Bit 2 = 1 x 1.0K ohm
-    Bit 3 = 2 x 1.0K ohm
-    Bit 4 = 4 x 1.0K ohm
-
-    Another data bit is connected by a tristate buffer to the color output through a
-    470 ohm resistor. The buffer allows the resistor to have no effect (tristate),
-    halve brightness (pull-down) or double brightness (pull-up). The data bit source
-    is bit 15 of each color RAM entry.
-*/
-
-void segaic16_palette_init(int entries)
-{
-	static const int resistances_normal[6] = { 3900, 2000, 1000, 1000/2, 1000/4, 0   };
-	static const int resistances_sh[6]     = { 3900, 2000, 1000, 1000/2, 1000/4, 470 };
-	double weights[2][6];
-	int i;
-	struct palette_info *info = &segaic16_palette;
-
-	/* compute the number of palette entries */
-	info->entries = entries;
-
-	/* compute weight table for regular palette entries */
-	compute_resistor_weights(0, 255, -1.0,
-		6, resistances_normal, weights[0], 0, 0,
-		0, NULL, NULL, 0, 0,
-		0, NULL, NULL, 0, 0);
-
-	/* compute weight table for shadow/hilight palette entries */
-	compute_resistor_weights(0, 255, -1.0,
-		6, resistances_sh, weights[1], 0, 0,
-		0, NULL, NULL, 0, 0,
-		0, NULL, NULL, 0, 0);
-
-	/* compute R, G, B for each weight */
-	for (i = 0; i < 32; i++)
-	{
-		int i4 = (i >> 4) & 1;
-		int i3 = (i >> 3) & 1;
-		int i2 = (i >> 2) & 1;
-		int i1 = (i >> 1) & 1;
-		int i0 = (i >> 0) & 1;
-
-		info->normal[i] = combine_6_weights(weights[0], i0, i1, i2, i3, i4, 0);
-		info->shadow[i] = combine_6_weights(weights[1], i0, i1, i2, i3, i4, 0);
-		info->hilight[i] = combine_6_weights(weights[1], i0, i1, i2, i3, i4, 1);
-	}
-}
-
-
-
-/*************************************
- *
- *  Palette accessors
- *
- *************************************/
-
-WRITE16_HANDLER( segaic16_paletteram_w )
-{
-	UINT16 newval;
-	int r, g, b;
-	struct palette_info *info = &segaic16_palette;
-
-	/* get the new value */
-	newval = segaic16_paletteram[offset];
-	COMBINE_DATA(&newval);
-	segaic16_paletteram[offset] = newval;
-
-	/*     byte 0    byte 1 */
-	/*  sBGR BBBB GGGG RRRR */
-	/*  x000 4321 4321 4321 */
-	r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
-	g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
-	b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
-
-	/* normal colors */
-	palette_set_color_rgb(space->machine(), offset + 0 * info->entries, info->normal[r],  info->normal[g],  info->normal[b]);
-	palette_set_color_rgb(space->machine(), offset + 1 * info->entries, info->shadow[r],  info->shadow[g],  info->shadow[b]);
-	palette_set_color_rgb(space->machine(), offset + 2 * info->entries, info->hilight[r], info->hilight[g], info->hilight[b]);
 }
 
 
@@ -2029,7 +1932,7 @@ void segaic16_rotate_init(running_machine &machine, int which, int type, int col
  *
  *************************************/
 
-void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 *srcbitmap)
+void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap)
 {
 	struct rotate_info *info = &segaic16_rotate[which];
 	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
@@ -2048,7 +1951,7 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bit
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT16 *dest = &bitmap.pix16(y);
-		UINT16 *src = &srcbitmap->pix16(0);
+		UINT16 *src = &srcbitmap.pix16(0);
 		UINT8 *pri = &machine.priority_bitmap.pix8(y);
 		INT32 tx = currx;
 		INT32 ty = curry;
@@ -2059,7 +1962,7 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bit
 			/* fetch the pixel from the source bitmap */
 			int sx = (tx >> 14) & 0x1ff;
 			int sy = (ty >> 14) & 0x1ff;
-			int pix = src[sy * srcbitmap->rowpixels() + sx];
+			int pix = src[sy * srcbitmap.rowpixels() + sx];
 
 			/* non-zero pixels get written; everything else is the scanline color */
 			if (pix != 0xffff)
@@ -2113,6 +2016,3 @@ READ16_HANDLER( segaic16_rotate_control_0_r )
 
 	return 0xffff;
 }
-
-
-DEFINE_LEGACY_DEVICE(SEGA16SP, sega16sp);

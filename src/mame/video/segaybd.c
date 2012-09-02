@@ -45,9 +45,6 @@
 
 void segaybd_state::video_start()
 {
-	// compute palette info
-	segaic16_palette_init(0x2000);
-
 	// initialize the rotation layer
 	segaic16_rotate_init(machine(), 0, SEGAIC16_ROTATE_YBOARD, 0x000);
 }
@@ -67,14 +64,44 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		return 0;
 	}
 
-	// draw the yboard sprites
+	// start the sprites drawing
 	rectangle yboard_clip(0, 511, 0, 511);
-	segaic16_sprites_draw(screen, m_tmp_bitmap, yboard_clip, 1);
+	m_ysprites->bitmap().fill(0xffff);
+	m_ysprites->draw_async(yboard_clip);
+	m_bsprites->draw_async(cliprect);
 
 	// apply rotation
-	segaic16_rotate_draw(machine(), 0, bitmap, cliprect, &m_tmp_bitmap);
+	segaic16_rotate_draw(machine(), 0, bitmap, cliprect, m_ysprites->bitmap());
 
-	// draw the 16B sprites
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	// mix in 16B sprites
+	bitmap_ind16 &sprites = m_bsprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_bsprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			UINT16 *dest = &bitmap.pix(y);
+			UINT16 *src = &sprites.pix(y);
+			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				UINT16 pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+					int priority = (pix >> 11) & 0x1e;
+					if (priority < pri[x])
+					{
+						// if the color is set to maximum, shadow pixels underneath us
+						if ((pix & 0xf) == 0xe)
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 2048 + (pix & 0x3ff);
+					}
+				}
+			}
+		}
+
 	return 0;
 }

@@ -80,6 +80,38 @@
 //**************************************************************************
 
 
+// ======================> sega_16bit_common_base
+
+class sega_16bit_common_base : public driver_device
+{
+public:
+	// construction/destruction
+	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
+
+	// open bus read helpers
+	DECLARE_READ16_MEMBER( open_bus_r );
+	
+	// palette helpers
+	DECLARE_WRITE16_MEMBER( paletteram_w );
+
+protected:
+	// internal helpers
+	void palette_init();
+
+public: // -- stupid system16.c
+	// memory pointers
+	required_shared_ptr<UINT16> m_paletteram;
+protected:
+	
+	// internal state
+	bool		m_open_bus_recurse;			// flag to track recursion through open_bus_r
+	UINT32		m_palette_entries;			// number of palette entries
+	UINT8		m_palette_normal[32];		// RGB translations for normal pixels
+	UINT8		m_palette_shadow[32];		// RGB translations for shadowed pixels
+	UINT8		m_palette_hilight[32];		// RGB translations for hilighted pixels
+};
+
+
 // ======================> sega_315_5195_mapper_device
 
 class sega_315_5195_mapper_device : public device_t
@@ -270,11 +302,6 @@ extern const device_type SEGA_315_5195_MEM_MAPPER;
 extern const device_type SEGA_315_5248_MULTIPLIER;
 extern const device_type SEGA_315_5249_DIVIDER;
 extern const device_type SEGA_315_5250_COMPARE_TIMER;
-
-
-
-/* open bus read helpers */
-READ16_HANDLER( segaic16_open_bus_r );
 
 
 #endif

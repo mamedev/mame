@@ -39,14 +39,14 @@ static void setup_system16_bootleg_spritebanking( running_machine& machine )
 		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 		int i;
 		for (i = 0; i < 16; i++)
-			segaic16_sprites_set_bank(machine, 0, i, default_banklist[i]);
+			state->m_sprites->set_bank(i, default_banklist[i]);
 	}
 	else
 	{
 		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
 		int i;
 		for (i = 0; i < 16; i++)
-			segaic16_sprites_set_bank(machine, 0, i, alternate_banklist[i]);
+			state->m_sprites->set_bank(i, alternate_banklist[i]);
 
 	}
 
@@ -431,10 +431,7 @@ VIDEO_START( system16 )
 		state->m_system18 = 0;
 	}
 
-	segaic16_palette_init(0x800);
 	setup_system16_bootleg_spritebanking(machine);
-
-
 }
 
 VIDEO_START( system18old )
@@ -597,9 +594,6 @@ VIDEO_START( s16a_bootleg )
 	state->m_text_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemaps[0]->set_transparent_pen(0);
 	state->m_bg_tilemaps[1]->set_transparent_pen(0);
-
-	segaic16_palette_init(0x800);
-
 }
 
 VIDEO_START( s16a_bootleg_wb3bl )
@@ -634,6 +628,9 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 	int offset_bg0y = 0;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+
+	// start the sprites drawing
+	state->m_sprites->draw_async(cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	state->m_bg_tilemaps[0]->mark_all_dirty();
@@ -672,8 +669,36 @@ SCREEN_UPDATE_IND16( s16a_bootleg )
 		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
-	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	// mix in sprites
+	bitmap_ind16 &sprites = state->m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			UINT16 *dest = &bitmap.pix(y);
+			UINT16 *src = &sprites.pix(y);
+//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				UINT16 pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+//					int priority = (pix >> 12) & 3;
+					if (1)
+					{
+						// if the color is set to maximum, shadow pixels underneath us
+						if ((pix & 0x03f0) == 0x03f0)
+							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 1024 + (pix & 0x3ff);
+					}
+				}
+			}
+		}
+
 
 	return 0;
 }
@@ -692,6 +717,9 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 	int offset_bg0y = 32;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+
+	// start the sprites drawing
+	state->m_sprites->draw_async(cliprect);
 
 	// I can't bring myself to care about dirty tile marking on something which runs at a bazillion % speed anyway, clean code is better
 	state->m_bg_tilemaps[0]->mark_all_dirty();
@@ -713,8 +741,36 @@ SCREEN_UPDATE_IND16( s16a_bootleg_passht4b )
 		state->m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
-	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	// mix in sprites
+	bitmap_ind16 &sprites = state->m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			UINT16 *dest = &bitmap.pix(y);
+			UINT16 *src = &sprites.pix(y);
+//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				UINT16 pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+//					int priority = (pix >> 12) & 3;
+					if (1)
+					{
+						// if the color is set to maximum, shadow pixels underneath us
+						if ((pix & 0x03f0) == 0x03f0)
+							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 1024 + (pix & 0x3ff);
+					}
+				}
+			}
+		}
+
 
 	return 0;
 }
@@ -731,6 +787,9 @@ SCREEN_UPDATE_IND16( system16 )
 		bitmap.fill(0, cliprect);
 		return 0;
 	}
+
+	// start the sprites drawing
+	state->m_sprites->draw_async(cliprect);
 
 	update_page(screen.machine());
 
@@ -762,8 +821,37 @@ SCREEN_UPDATE_IND16( system16 )
 
 	//draw_sprites(screen.machine(), bitmap, cliprect,0);
 
-	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+
+	// mix in sprites
+	bitmap_ind16 &sprites = state->m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			UINT16 *dest = &bitmap.pix(y);
+			UINT16 *src = &sprites.pix(y);
+//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				UINT16 pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+//					int priority = (pix >> 12) & 3;
+					if (1)
+					{
+						// if the color is set to maximum, shadow pixels underneath us
+						if ((pix & 0x03f0) == 0x03f0)
+							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 1024 + (pix & 0x3ff);
+					}
+				}
+			}
+		}
+
 	return 0;
 }
 
@@ -777,6 +865,9 @@ SCREEN_UPDATE_IND16( system18old )
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 		return 0;
 	}
+
+	// start the sprites drawing
+	state->m_sprites->draw_async(cliprect);
 
 	update_page(screen.machine());
 
@@ -796,8 +887,35 @@ SCREEN_UPDATE_IND16( system18old )
 	state->m_text_layer->draw(bitmap, cliprect, 1, 0x7);
 	state->m_text_layer->draw(bitmap, cliprect, 0, 0xf);
 
-	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	// mix in sprites
+	bitmap_ind16 &sprites = state->m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = state->m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			UINT16 *dest = &bitmap.pix(y);
+			UINT16 *src = &sprites.pix(y);
+//			UINT8 *pri = &screen.machine().priority_bitmap.pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				UINT16 pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+//					int priority = (pix >> 12) & 3;
+					if (1)
+					{
+						// if the color is set to maximum, shadow pixels underneath us
+						if ((pix & 0x03f0) == 0x03f0)
+							dest[x] += (state->m_paletteram[dest[x]] & 0x8000) ? screen.machine().total_colors()*2 : screen.machine().total_colors();
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 1024 + (pix & 0x3ff);
+					}
+				}
+			}
+		}
 
 	return 0;
 }

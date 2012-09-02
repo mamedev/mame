@@ -38,26 +38,28 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/megavdp.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
-#include "machine/megavdp.h"
+#include "video/sega16sp.h"
 
 
 // ======================> segas18_state
 
-class segas18_state : public driver_device
+class segas18_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
 	segas18_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: sega_16bit_common_base(mconfig, type, tag),
 		  m_mapper(*this, "mapper"),
 		  m_maincpu(*this, "maincpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_mcu(*this, "mcu"),
 		  m_vdp(*this, "gen_vdp"),
 		  m_nvram(*this, "nvram"),
+		  m_sprites(*this, "sprites"),
 		  m_workram(*this, "workram"),
 		  m_romboard(ROM_BOARD_INVALID),
 		  m_has_guns(false),
@@ -150,6 +152,7 @@ protected:
 	optional_device<i8751_device> m_mcu;
 	required_device<sega_genesis_vdp_device> m_vdp;
 	required_device<nvram_device> m_nvram;
+	required_device<sega_sys16b_sprite_device> m_sprites;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

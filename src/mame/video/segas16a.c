@@ -46,9 +46,6 @@
 
 void segas16a_state::video_start()
 {
-	// compute palette info
-	segaic16_palette_init(0x800);
-
 	// initialize the tile/text layers
 	segaic16_tilemap_init(machine(), 0, SEGAIC16_TILEMAP_16A, 0x000, 0, 1);
 }
@@ -66,6 +63,9 @@ UINT32 segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
+
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
 
 	// reset priorities
 	machine().priority_bitmap.fill(0, cliprect);
@@ -87,7 +87,35 @@ UINT32 segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
-	// draw the sprites
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	// mix in sprites
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			UINT16 *dest = &bitmap.pix(y);
+			UINT16 *src = &sprites.pix(y);
+			UINT8 *pri = &machine().priority_bitmap.pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				UINT16 pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+					int priority = pix >> 10;
+					if ((1 << priority) > pri[x])
+					{
+						// if color bits are all 1, this triggers shadow/hilight
+						if ((pix & 0x3f0) == 0x3f0)
+							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 1024 + (pix & 0x3ff);
+					}
+				}
+			}
+		}
+
 	return 0;
 }

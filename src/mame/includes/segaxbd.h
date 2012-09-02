@@ -40,22 +40,24 @@
 #include "cpu/z80/z80.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "video/sega16sp.h"
 
 
 // ======================> segaxbd_state
 
-class segaxbd_state : public driver_device
+class segaxbd_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: sega_16bit_common_base(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_subcpu(*this, "subcpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_soundcpu2(*this, "soundcpu2"),
 		  m_mcu(*this, "mcu"),
 		  m_cmptimer_1(*this, "cmptimer_main"),
+		  m_sprites(*this, "sprites"),
 		  m_gprider_hack(false),
 		  m_road_priority(1),
 		  m_scanline_timer(NULL),
@@ -145,6 +147,7 @@ protected:
 	optional_device<z80_device> m_soundcpu2;
 	optional_device<i8751_device> m_mcu;
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
+	required_device<sega_xboard_sprite_device> m_sprites;
 
 	// configuration
 	bool			m_gprider_hack;

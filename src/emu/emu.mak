@@ -99,6 +99,7 @@ EMUOBJS = \
 	$(EMUOBJ)/softlist.o \
 	$(EMUOBJ)/sound.o \
 	$(EMUOBJ)/speaker.o \
+	$(EMUOBJ)/sprite.o \
 	$(EMUOBJ)/tilemap.o \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \

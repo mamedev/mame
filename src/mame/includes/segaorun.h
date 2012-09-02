@@ -41,22 +41,24 @@
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "video/sega16sp.h"
 
 
 // ======================> segaorun_state
 
-class segaorun_state : public driver_device
+class segaorun_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
 	segaorun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: sega_16bit_common_base(mconfig, type, tag),
 		  m_mapper(*this, "mapper"),
 		  m_maincpu(*this, "maincpu"),
 		  m_subcpu(*this, "subcpu"),
 		  m_soundcpu(*this, "soundcpu"),
 		  m_i8255(*this, "i8255"),
 		  m_nvram(*this, "nvram"),
+		  m_sprites(*this, "sprites"),
 		  m_workram(*this, "workram"),
 		  m_custom_map(NULL),
 		  m_shangon_video(false),
@@ -134,6 +136,7 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	required_device<i8255_device> m_i8255;
 	optional_device<nvram_device> m_nvram;
+	required_device<sega_16bit_sprite_device> m_sprites;
 
 	// memory
 	required_shared_ptr<UINT16> m_workram;

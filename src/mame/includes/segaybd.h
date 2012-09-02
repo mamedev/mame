@@ -39,20 +39,23 @@
 #include "cpu/z80/z80.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "video/sega16sp.h"
 
 
 // ======================> segaybd_state
 
-class segaybd_state : public driver_device
+class segaybd_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
 	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: sega_16bit_common_base(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_subx(*this, "subx"),
 		  m_suby(*this, "suby"),
 		  m_soundcpu(*this, "soundcpu"),
+		  m_bsprites(*this, "bsprites"),
+		  m_ysprites(*this, "ysprites"),
 		  m_pdrift_bank(0),
 		  m_scanline_timer(NULL),
 		  m_irq2_scanline(0),
@@ -121,6 +124,8 @@ protected:
 	required_device<m68000_device> m_subx;
 	required_device<m68000_device> m_suby;
 	required_device<z80_device> m_soundcpu;
+	required_device<sega_sys16b_sprite_device> m_bsprites;
+	required_device<sega_yboard_sprite_device> m_ysprites;
 
 	// configuration
 	output_delegate	m_output_cb1;

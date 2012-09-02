@@ -67,11 +67,27 @@ const device_type SEGA_315_5250_COMPARE_TIMER = &device_creator<sega_315_5250_co
 //  MISC HELPERS
 //**************************************************************************
 
-READ16_HANDLER( segaic16_open_bus_r )
-{
-	static UINT8 recurse = 0;
-	UINT16 result;
+//-------------------------------------------------
+//  sega_16bit_common_base - constructor
+//-------------------------------------------------
 
+sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag),
+	  m_paletteram(*this, "paletteram"),
+	  m_open_bus_recurse(false),
+	  m_palette_entries(0)
+{
+	palette_init();
+}
+
+
+//-------------------------------------------------
+//  open_bus_r - return value from reading an
+//	unmapped address
+//-------------------------------------------------
+
+READ16_MEMBER( sega_16bit_common_base::open_bus_r )
+{
 	// Unmapped memory returns the last word on the data bus, which is almost always the opcode
 	// of the next instruction due to prefetch; however, since we may be encrypted, we actually
 	// need to return the encrypted opcode, not the last decrypted data.
@@ -81,14 +97,98 @@ READ16_HANDLER( segaic16_open_bus_r )
 	// return the prefetched value.
 
 	// prevent recursion
-	if (recurse)
+	if (m_open_bus_recurse)
 		return 0xffff;
 
 	// read original encrypted memory at that address
-	recurse = 1;
-	result = space->read_word(cpu_get_pc(&space->device()));
-	recurse = 0;
+	m_open_bus_recurse = true;
+	UINT16 result = space.read_word(cpu_get_pc(&space.device()));
+	m_open_bus_recurse = false;
 	return result;
+}
+
+
+//-------------------------------------------------
+//  palette_init - precompute weighted RGB values
+//	for each input value 0-31
+//-------------------------------------------------
+
+void sega_16bit_common_base::palette_init()
+{
+	//
+	//	Color generation details
+	//
+	//	Each color is made up of 5 bits, connected through one or more resistors like so:
+	//
+	//	Bit 0 = 1 x 3.9K ohm
+	//	Bit 1 = 1 x 2.0K ohm
+	//	Bit 2 = 1 x 1.0K ohm
+	//	Bit 3 = 2 x 1.0K ohm
+	//	Bit 4 = 4 x 1.0K ohm
+	//
+	//	Another data bit is connected by a tristate buffer to the color output through a
+	//	470 ohm resistor. The buffer allows the resistor to have no effect (tristate),
+	//	halve brightness (pull-down) or double brightness (pull-up). The data bit source
+	//	is bit 15 of each color RAM entry.
+	//
+	
+	// compute weight table for regular palette entries
+	static const int resistances_normal[6] = { 3900, 2000, 1000, 1000/2, 1000/4, 0   };
+	double weights_normal[6];
+	compute_resistor_weights(0, 255, -1.0,
+		6, resistances_normal, weights_normal, 0, 0,
+		0, NULL, NULL, 0, 0,
+		0, NULL, NULL, 0, 0);
+
+	// compute weight table for shadow/hilight palette entries
+	static const int resistances_sh[6]     = { 3900, 2000, 1000, 1000/2, 1000/4, 470 };
+	double weights_sh[6];
+	compute_resistor_weights(0, 255, -1.0,
+		6, resistances_sh, weights_sh, 0, 0,
+		0, NULL, NULL, 0, 0,
+		0, NULL, NULL, 0, 0);
+
+	// compute R, G, B for each weight
+	for (int value = 0; value < 32; value++)
+	{
+		int i4 = (value >> 4) & 1;
+		int i3 = (value >> 3) & 1;
+		int i2 = (value >> 2) & 1;
+		int i1 = (value >> 1) & 1;
+		int i0 = (value >> 0) & 1;
+		m_palette_normal[value] = combine_6_weights(weights_normal, i0, i1, i2, i3, i4, 0);
+		m_palette_shadow[value] = combine_6_weights(weights_sh, i0, i1, i2, i3, i4, 0);
+		m_palette_hilight[value] = combine_6_weights(weights_sh, i0, i1, i2, i3, i4, 1);
+	}
+}
+
+
+//-------------------------------------------------
+//  paletteram_w - handle writes to palette RAM
+//-------------------------------------------------
+
+WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	UINT16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  sBGR BBBB GGGG RRRR
+	//  x000 4321 4321 4321
+	int r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
+	int g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
+	int b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
+
+	// normal colors
+	palette_set_color_rgb(machine(), offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	palette_set_color_rgb(machine(), offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	palette_set_color_rgb(machine(), offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
 
@@ -273,7 +373,7 @@ READ8_MEMBER( sega_315_5195_mapper_device::read )
 			logerror("Unknown memory_mapper_r from address %02X\n", offset);
 			break;
 	}
-	return (space.data_width() == 8) ? 0xff : segaic16_open_bus_r(&space, 0, 0xffff);
+	return (space.data_width() == 8) ? 0xff : machine().driver_data<sega_16bit_common_base>()->open_bus_r(space, 0, 0xffff);
 }
 
 
