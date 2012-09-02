@@ -106,13 +106,16 @@ void vic1010_device::device_start()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	UINT8 data = 0;
-
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
-		data |= m_expansion_slot[i]->cd_r(space, offset, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		UINT8 slot_data = m_expansion_slot[i]->cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+
+		if (data != slot_data)
+		{
+			data = slot_data;
+		}
 	}
 
 	return data;

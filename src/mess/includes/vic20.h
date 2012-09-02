@@ -13,6 +13,7 @@
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "machine/ieee488.h"
+#include "machine/petcass.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
 #include "machine/vic20exp.h"
@@ -26,7 +27,6 @@
 #define M6560_TAG		"ub7"
 #define M6561_TAG		"ub7"
 #define IEC_TAG			"iec"
-#define TIMER_C1530_TAG	"c1530"
 #define SCREEN_TAG		"screen"
 #define CONTROL1_TAG	"joy1"
 #define CONTROL2_TAG	"joy2"
@@ -45,9 +45,8 @@ public:
 		  m_joy2(*this, CONTROL2_TAG),
 		  m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
 		  m_user(*this, VIC20_USER_PORT_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_cassette_timer(*this, TIMER_C1530_TAG)
+		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -59,9 +58,8 @@ public:
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<vic20_expansion_slot_device> m_exp;
 	required_device<vic20_user_port_device> m_user;
-	required_device<cassette_image_device> m_cassette;
+	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -71,7 +69,6 @@ public:
 
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( via0_ca2_w );
 
 	DECLARE_READ8_MEMBER( via1_pa_r );
 	DECLARE_READ8_MEMBER( via1_pb_r );

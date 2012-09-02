@@ -88,9 +88,8 @@ void vic1110_device::device_start()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1110_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+UINT8 vic1110_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	UINT8 data = 0;
 	UINT8 sw = ioport("SW")->read();
 
 	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))

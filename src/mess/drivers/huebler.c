@@ -18,14 +18,6 @@
 
 */
 
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/z80ctc.h"
-#include "machine/ram.h"
 #include "includes/huebler.h"
 
 /* Keyboard */
@@ -41,8 +33,8 @@ void amu880_state::scan_keyboard()
 	if (m_key_a8 && !a8)
 	{
 		m_key_d7 = m_key_d6;
-		m_key_a4 = !(BIT(data, 1) & BIT(data, 3));
-		m_key_a5 = !(BIT(data, 2) & BIT(data, 3));
+		m_key_a4 = !(BIT(data, 1) && BIT(data, 3));
+		m_key_a5 = !(BIT(data, 2) && BIT(data, 3));
 	}
 
 	m_key_a8 = a8;

@@ -80,10 +80,8 @@ void vic20_megacart_device::device_reset()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic20_megacart_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+UINT8 vic20_megacart_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	UINT8 data = 0;
-
 	if (!ram1 || !ram2 || !ram3 || !io2 || !io3)
 	{
 		if (m_nvram_en)

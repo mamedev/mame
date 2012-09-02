@@ -94,6 +94,7 @@ struct _mos6560_state
 	/* DMA */
 	mos6560_dma_read          dma_read;
 	mos6560_dma_read_color    dma_read_color;
+	UINT8 last_data;
 
 	/* lightpen */
 	mos6560_lightpen_button_callback lightpen_button_cb;
@@ -215,6 +216,7 @@ static void mos6560_draw_character( device_t *device, int ybegin, int yend, int 
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
+		mos6560->last_data = code;
 		mos6560->bitmap->pix16(y + yoff, xoff + 0) = color[code >> 7];
 		mos6560->bitmap->pix16(y + yoff, xoff + 1) = color[(code >> 6) & 1];
 		mos6560->bitmap->pix16(y + yoff, xoff + 2) = color[(code >> 5) & 1];
@@ -239,6 +241,7 @@ static void mos6560_draw_character_multi( device_t *device, int ybegin, int yend
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
+		mos6560->last_data = code;
 		mos6560->bitmap->pix16(y + yoff, xoff + 0) =
 			mos6560->bitmap->pix16(y + yoff, xoff + 1) = color[code >> 6];
 		mos6560->bitmap->pix16(y + yoff, xoff + 2) =
@@ -299,6 +302,7 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 		for (xoff = mos6560->xpos; (xoff < mos6560->xpos + mos6560->xsize) && (xoff < mos6560->total_xsize); xoff += 8, offs++)
 		{
 			ch = mos6560->dma_read(device->machine(), (mos6560->videoaddr + offs) & 0x3fff);
+			mos6560->last_data = ch;
 			attr = (mos6560->dma_read_color(device->machine(), (mos6560->videoaddr + offs) & 0x3fff)) & 0xf;
 
 			if (mos6560->type == MOS6560_ATTACKUFO)
@@ -485,6 +489,12 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 	return val;
 }
 
+UINT8 mos6560_bus_r( device_t *device )
+{
+	mos6560_state *mos6560 = get_safe_token(device);
+
+	return mos6560->last_data;
+}
 
 /*-------------------------------------------------
  mos6560_raster_interrupt_gen
@@ -873,6 +883,8 @@ static DEVICE_START( mos6560 )
 	device->save_item(NAME(mos6560->monoinverted));
 	device->save_item(NAME(mos6560->multi));
 	device->save_item(NAME(mos6560->multiinverted));
+
+	device->save_item(NAME(mos6560->last_data));
 
 	device->save_item(NAME(*mos6560->bitmap));
 

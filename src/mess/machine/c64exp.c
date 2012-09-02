@@ -359,13 +359,11 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
-	UINT8 data = 0;
-
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(space, offset, ba, roml, romh, io1, io2);
+		data = m_cart->c64_cd_r(space, offset, data, ba, roml, romh, io1, io2);
 	}
 
 	return data;

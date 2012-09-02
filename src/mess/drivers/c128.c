@@ -642,9 +642,24 @@ GFXDECODE_END
  *************************************/
 
 
+READ8_MEMBER( c128_state::sid_potx_r )
+{
+	device_t *sid = machine().device("sid6581");
+
+	return c64_paddle_read(sid, 0);
+}
+
+READ8_MEMBER( c128_state::sid_poty_r )
+{
+	device_t *sid = machine().device("sid6581");
+
+	return c64_paddle_read(sid, 1);
+}
+
 static const sid6581_interface c128_sound_interface =
 {
-	c64_paddle_read
+	DEVCB_DRIVER_MEMBER(c128_state, sid_potx_r),
+	DEVCB_DRIVER_MEMBER(c128_state, sid_poty_r)
 };
 
 
@@ -655,14 +670,6 @@ static const m6502_interface c128_m8502_interface =
 	DEVCB_HANDLER(c128_m6510_port_read),	/* port_read_func */
 	DEVCB_HANDLER(c128_m6510_port_write)	/* port_write_func */
 };
-
-static SLOT_INTERFACE_START( c128dcr_iec_devices )
-	SLOT_INTERFACE("c1571cr", C1571CR)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START( c128d81_iec_devices )
-	SLOT_INTERFACE("c1563", C1563)
-SLOT_INTERFACE_END
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {

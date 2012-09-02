@@ -299,13 +299,11 @@ UINT32 vic10_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram)
+UINT8 vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram)
 {
-	UINT8 data = 0;
-
 	if (m_cart != NULL)
 	{
-		data = m_cart->vic10_cd_r(space, offset, lorom, uprom, exram);
+		data = m_cart->vic10_cd_r(space, offset, data, lorom, uprom, exram);
 	}
 
 	return data;

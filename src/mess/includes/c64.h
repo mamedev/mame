@@ -12,6 +12,7 @@
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
+#include "machine/petcass.h"
 #include "machine/pls100.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
@@ -27,7 +28,6 @@
 #define MOS6526_2_TAG	"u2"
 #define PLA_TAG			"u17"
 #define SCREEN_TAG		"screen"
-#define TIMER_C1531_TAG	"c1531"
 #define CONTROL1_TAG	"joy1"
 #define CONTROL2_TAG	"joy2"
 
@@ -48,8 +48,7 @@ public:
 		  m_exp(*this, C64_EXPANSION_SLOT_TAG),
 		  m_user(*this, C64_USER_PORT_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_cassette_timer(*this, TIMER_C1531_TAG),
+		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		  m_loram(1),
 		  m_hiram(1),
 		  m_charen(1),
@@ -77,8 +76,7 @@ public:
 	required_device<c64_expansion_slot_device> m_exp;
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
-	optional_device<cassette_image_device> m_cassette;
-	optional_device<timer_device> m_cassette_timer;
+	optional_device<pet_datassette_port_device> m_cassette;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -97,6 +95,9 @@ public:
 	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
 	DECLARE_READ8_MEMBER( vic_rdy_cb );
 
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
+
 	DECLARE_WRITE_LINE_MEMBER( cia1_irq_w );
 	DECLARE_READ8_MEMBER( cia1_pa_r );
 	DECLARE_READ8_MEMBER( cia1_pb_r );
@@ -108,6 +109,8 @@ public:
 
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
+
+	DECLARE_WRITE_LINE_MEMBER( tape_read_w );
 
 	DECLARE_WRITE_LINE_MEMBER( iec_srq_w );
 
@@ -178,6 +181,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cpu_w );
 };
 
+
+int c64_paddle_read (device_t *device, int which);
 
 
 #endif

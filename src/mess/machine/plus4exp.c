@@ -322,13 +322,11 @@ const char * plus4_expansion_slot_device::get_default_card_software(const machin
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	UINT8 data = 0;
-
 	if (m_cart != NULL)
 	{
-		data = m_cart->plus4_cd_r(space, offset, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		data = m_cart->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 
 	return data;

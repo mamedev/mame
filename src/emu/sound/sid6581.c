@@ -34,11 +34,14 @@ static void sid_start(device_t *device, SIDTYPE sidtype)
 	_SID6581 *sid = get_sid(device);
 	const sid6581_interface *iface = (const sid6581_interface*) device->static_config();
 
+	// resolve callbacks
+	sid->in_potx_func.resolve(iface->in_potx_cb, *device);
+	sid->in_poty_func.resolve(iface->in_poty_cb, *device);
+
 	sid->device = device;
 	sid->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 1,  device->machine().sample_rate(), (void *) sid, sid_update);
 	sid->PCMfreq = device->machine().sample_rate();
 	sid->clock = device->clock();
-	sid->ad_read = iface ? iface->ad_read : NULL;
 	sid->type = sidtype;
 
 	sid6581_init(sid);

@@ -85,10 +85,8 @@ void c64_super_explode_cartridge_device::device_timer(emu_timer &timer, device_t
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_super_explode_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_super_explode_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
-	UINT8 data = 0;
-
 	if (!roml)
 	{
 		m_exrom = 0;

@@ -571,9 +571,9 @@ bool c1551_device::tpi1_selected(offs_t offset)
 //  plus4_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	UINT8 data = m_exp->cd_r(space, offset, ba, cs0, c1l, c2l, cs1, c1h, c2h);
+	data = m_exp->cd_r(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 
 	if (tpi1_selected(offset))
 	{

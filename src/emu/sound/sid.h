@@ -17,7 +17,9 @@ typedef struct __SID6581
     device_t *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
 
-    int (*ad_read) (device_t *device, int which);
+	devcb_resolved_read8 in_potx_func;
+	devcb_resolved_read8 in_poty_func;
+
     SIDTYPE type;
     UINT32 clock;
 

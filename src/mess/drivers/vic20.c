@@ -123,7 +123,7 @@ enum
 
 READ8_MEMBER( vic20_state::read )
 {
-	UINT8 data = 0;
+	UINT8 data = mos6560_bus_r(m_vic);
 
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -194,9 +194,7 @@ READ8_MEMBER( vic20_state::read )
 		break;
 	}
 
-	data |= m_exp->cd_r(space, offset & 0x1fff, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
-
-	return data;
+	return m_exp->cd_r(space, offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 }
 
 
@@ -450,14 +448,12 @@ READ8_MEMBER( vic20_state::via0_pa_r )
 	data |= m_user->joy1_r() << 3;
 	data |= m_user->joy2_r() << 4;
 	data |= m_user->light_pen_r() << 5;
-	data |= m_user->cassette_switch_r() << 6;
+
+	// cassette switch
+	data |= (m_user->cassette_switch_r() && m_cassette->sense_r()) << 6;
 
 	// joystick
 	data &= ~(ioport("JOY")->read() & 0x3c);
-
-	// cassette switch
-	if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
-		data &= ~0x40;
 
 	return data;
 }
@@ -483,20 +479,6 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
 	m_iec->atn_w(!BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( vic20_state::via0_ca2_w )
-{
-	if (!state)
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->enable(true);
-	}
-	else
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->enable(false);
-	}
-}
-
 static const via6522_interface via0_intf =
 {
 	DEVCB_DRIVER_MEMBER(vic20_state, via0_pa_r),
@@ -509,7 +491,7 @@ static const via6522_interface via0_intf =
 	DEVCB_DEVICE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb1_w),
-	DEVCB_DRIVER_LINE_MEMBER(vic20_state, via0_ca2_w), // CASS MOTOR
+	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
 	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb2_w),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_NMI)
 };
@@ -593,7 +575,7 @@ WRITE8_MEMBER( vic20_state::via1_pb_w )
     */
 
 	// cassette write
-	m_cassette->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	m_cassette->write(BIT(data, 3));
 
 	// keyboard column
 	m_key_col = data;
@@ -615,7 +597,7 @@ static const via6522_interface via1_intf =
 {
 	DEVCB_DRIVER_MEMBER(vic20_state, via1_pa_r),
 	DEVCB_DRIVER_MEMBER(vic20_state, via1_pb_r),
-	DEVCB_NULL, // CASS READ
+	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -632,16 +614,13 @@ static const via6522_interface via1_intf =
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( cassette_tick )
+//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( cassette_tick )
+static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 {
-	vic20_state *state = timer.machine().driver_data<vic20_state>();
-	int data = (state->m_cassette->input() > +0.0) ? 1 : 0;
-
-	state->m_via1->write_ca1(data);
-}
+	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_ca1),
+};
 
 
 //-------------------------------------------------
@@ -808,15 +787,13 @@ void vic20_state::machine_reset()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( vic20_common, vic20_state )
-	MCFG_TIMER_ADD_PERIODIC(TIMER_C1530_TAG, cassette_tick, attotime::from_hz(44100))
-
 	// devices
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
 
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
 
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)

@@ -2,14 +2,13 @@
 
     TODO:
 
-    - cassette
+    - cassette motor is turned on only for a moment while LOADing
+    - c16 function ROM test fails
     - c1551 won't load anything
     - clean up keyboard handling
     - clean up TED
     - dump PLA
     - T6721 speech chip
-    - floating bus read (should return the previous byte read by TED)
-    - SID card (http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card)
 
 */
 
@@ -167,7 +166,7 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 
 UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal, int cs0, int cs1)
 {
-	UINT8 data = 0;
+	UINT8 data = m_ted->bus_r();
 	int c1l = 1, c1h = 1, c2l = 1, c2h = 1;
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u m_rom_en %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1,m_rom_en);
@@ -182,10 +181,9 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 		{
 			data = m_spi_user->read(space, 0);
 		}
-		else
-		{
-			data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 2;
-		}
+
+		data &= ~0x04;
+		data |= m_cassette->sense_r() << 2;
 	}
 	else if (!_6551 && m_acia)
 	{
@@ -216,6 +214,11 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 
 		case CS0_C2_LOW:
 			c2l = 0;
+
+			if (m_c2 != NULL)
+			{
+				data = m_c2[offset & 0x7fff];
+			}
 			break;
 		}
 	}
@@ -246,6 +249,11 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 
 			case CS1_C2_HIGH:
 				c2h = 0;
+
+				if (m_c2 != NULL)
+				{
+					data = m_c2[offset & 0x7fff];
+				}
 				break;
 			}
 		}
@@ -259,9 +267,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
 
-	data |= m_exp->cd_r(space, offset, ba, cs0, c1l, c1h, cs1, c2l, c2h);
-
-	return data;
+	return m_exp->cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -448,23 +454,20 @@ READ8_MEMBER( plus4_state::cpu_r )
         4       CST RD
         5
         6       IEC CLK IN
-        7       IEC DATA IN, CST SENSE (Plus/4)
+        7       IEC DATA IN, CST SENSE
 
     */
 
-	UINT8 data = 0xff;
-	UINT8 c16_port7501 = m6510_get_port(m_maincpu);
+    UINT8 data = 0x2f;
 
-	if (BIT(c16_port7501, 0) || !m_iec->data_r() || ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED))
-		data &= ~0x80;
+    // cassette read
+    data |= m_cassette->read() << 4;
 
-	if (BIT(c16_port7501, 1) || !m_iec->clk_r())
-		data &= ~0x40;
+    // serial clock
+    data |= m_iec->clk_r() << 6;
 
-	if (m_cassette->input() > +0.0)
-		data |=  0x10;
-	else
-		data &= ~0x10;
+    // serial data, cassette sense
+    data |= (m_iec->data_r() && m_cassette->sense_r()) << 7;
 
 	return data;
 }
@@ -486,19 +489,16 @@ READ8_MEMBER( plus4_state::c16_cpu_r )
 
     */
 
-	UINT8 data = 0xff;
-	UINT8 c16_port7501 = m6510_get_port(m_maincpu);
+    UINT8 data = 0x2f;
 
-	if (BIT(c16_port7501, 0) || !m_iec->data_r())
-		data &= ~0x80;
+    // cassette read
+    data |= m_cassette->read() << 4;
 
-	if (BIT(c16_port7501, 1) || !m_iec->clk_r())
-		data &= ~0x40;
+    // serial clock
+    data |= m_iec->clk_r() << 6;
 
-	if (m_cassette->input() > +0.0)
-		data |=  0x10;
-	else
-		data &= ~0x10;
+    // serial data
+    data |= m_iec->data_r() << 7;
 
 	return data;
 }
@@ -515,21 +515,27 @@ WRITE8_MEMBER( plus4_state::cpu_w )
         3       CST MTR
         4
         5
-        6
+        6       (CST WR)
         7
 
     */
 
-	// serial bus
+	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
+
+	// serial data
 	m_iec->data_w(!BIT(data, 0));
+
+	// serial clock
 	m_iec->clk_w(!BIT(data, 1));
+
+	// serial attention
 	m_iec->atn_w(!BIT(data, 2));
 
-	// cassette write
-	m_cassette->output(!BIT(data, 1) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-
 	// cassette motor
-	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->motor_w(BIT(data, 3));
+
+	// cassette write
+	m_cassette->write(!BIT(data, 1));
 }
 
 static const m6502_interface cpu_intf =
@@ -630,21 +636,21 @@ WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
 READ8_MEMBER( plus4_state::ted_ram_r )
 {
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
-	int speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
+	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
 
-	bankswitch(offset, phi0, mux, ras, &speech, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
 
-	return read_memory(space, offset, ba, speech, phi2, user, _6551, addr_clk, keyport, kernal, 1, 1);
+	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, 1, 1);
 }
 
 READ8_MEMBER( plus4_state::ted_rom_r )
 {
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
-	int speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
+	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
 
-	bankswitch(offset, phi0, mux, ras, &speech, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
 
-	return read_memory(space, offset, ba, speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
+	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
 }
 
 READ8_MEMBER( plus4_state::ted_k_r )
@@ -767,6 +773,16 @@ static MOS6529_INTERFACE( spi_kb_intf )
 
 
 //-------------------------------------------------
+//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
+//-------------------------------------------------
+
+static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
+{
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  CBM_IEC_INTERFACE( iec_intf )
 //-------------------------------------------------
 
@@ -845,6 +861,11 @@ void plus4_state::machine_start()
 		m_function = memregion("function")->base();
 	}
 
+	if (memregion("c2") != NULL)
+	{
+		m_c2 = memregion("c2")->base();
+	}
+
 	// state saving
 	save_item(NAME(m_addr));
 	save_item(NAME(m_rom_en));
@@ -915,7 +936,7 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_MOS6529_ADD(MOS6529_USER_TAG, spi_user_intf)
 	MCFG_MOS6529_ADD(MOS6529_KB_TAG, spi_kb_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, plus4_datassette_devices, "c1531", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, NULL)
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, NULL, NULL)
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
@@ -954,7 +975,7 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_MOS6529_ADD(MOS6529_USER_TAG, spi_user_intf)
 	MCFG_MOS6529_ADD(MOS6529_KB_TAG, spi_kb_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, plus4_datassette_devices, "c1531", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, NULL)
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, NULL, NULL)
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
@@ -970,10 +991,31 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16 )
+//  MACHINE_CONFIG( c16n )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c16, pal )
+static MACHINE_CONFIG_DERIVED( c16n, ntsc )
+	MCFG_CPU_MODIFY(MOS7501_TAG)
+	MCFG_CPU_CONFIG(c16_cpu_intf)
+
+	MCFG_DEVICE_REMOVE(MOS6551_TAG)
+	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)
+	MCFG_DEVICE_REMOVE(PLUS4_USER_PORT_TAG)
+
+	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
+	MCFG_DEVICE_CONFIG(c16_iec_intf)
+
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( c16p )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( c16p, pal )
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_CPU_CONFIG(c16_cpu_intf)
 
@@ -994,7 +1036,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c232 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( c232, c16 )
+static MACHINE_CONFIG_DERIVED( c232, c16p )
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -1024,7 +1066,48 @@ ROM_START( c264 )
 	ROM_LOAD( "basic-264.bin", 0x0000, 0x4000, CRC(6a2fc8e3) SHA1(473fce23afa07000cdca899fbcffd6961b36a8a0) )
 	ROM_LOAD( "kernal-264.bin", 0x4000, 0x4000, CRC(8f32abe7) SHA1(d481faf5fcbb331878dc7851c642d04f26a32873) )
 
-	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "function", 0 )
+	ROM_CART_LOAD( "lo", 0x0000, 0x0000, ROM_NOMIRROR )
+	ROM_CART_LOAD( "hi", 0x4000, 0x0000, ROM_NOMIRROR )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "251641-02", 0x00, 0xf5, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c232 )
+//-------------------------------------------------
+
+ROM_START( c232 )
+	ROM_REGION( 0x8000, "kernal", 0 )
+	ROM_LOAD( "318006-01.u4", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_LOAD( "318004-01.u5", 0x4000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
+
+	ROM_REGION( 0x8000, "function", 0 )
+	ROM_CART_LOAD( "lo", 0x0000, 0x0000, ROM_NOMIRROR )
+	ROM_CART_LOAD( "hi", 0x4000, 0x0000, ROM_NOMIRROR )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "251641-02.u7", 0x00, 0xf5, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( v364 )
+//-------------------------------------------------
+
+ROM_START( v364 )
+	ROM_REGION( 0x8000, "kernal", 0 )
+	ROM_LOAD( "318006-01", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+	ROM_LOAD( "kern364p", 0x4000, 0x4000, CRC(84fd4f7a) SHA1(b9a5b5dacd57ca117ef0b3af29e91998bf4d7e5f) )
+
+	ROM_REGION( 0x8000, "function", 0 )
+	ROM_LOAD( "317053-01", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
+	ROM_LOAD( "317054-01", 0x4000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
+
+	ROM_REGION( 0x8000, "c2", 0 )
+	ROM_LOAD( "spk3cc4.bin", 0x0000, 0x4000, CRC(5227c2ee) SHA1(59af401cbb2194f689898271c6e8aafa28a7af11) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02", 0x00, 0xf5, NO_DUMP )
@@ -1082,10 +1165,31 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( c16 )
+//  ROM( c16n )
 //-------------------------------------------------
 
-ROM_START( c16 )
+ROM_START( c16n )
+	ROM_REGION( 0x8000, "kernal", 0 )
+	ROM_DEFAULT_BIOS("r5")
+	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
+	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
+	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+
+	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c16p )
+//-------------------------------------------------
+
+ROM_START( c16p )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
@@ -1096,6 +1200,25 @@ ROM_START( c16 )
 	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
 	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c16h )
+//-------------------------------------------------
+
+ROM_START( c16h )
+	ROM_REGION( 0x8000, "kernal", 0 )
+	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, NO_DUMP )
@@ -1123,71 +1246,18 @@ ROM_START( c116 )
 ROM_END
 
 
-//-------------------------------------------------
-//  ROM( c16h )
-//-------------------------------------------------
-
-ROM_START( c16h )
-	ROM_REGION( 0x8000, "kernal", 0 )
-	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-
-	ROM_DEFAULT_BIOS("r2")
-	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(2) )
-
-	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, NO_DUMP )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( c232 )
-//-------------------------------------------------
-
-ROM_START( c232 )
-	ROM_REGION( 0x8000, "kernal", 0 )
-	ROM_LOAD( "318006-01.u4", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-	ROM_LOAD( "318004-01.u5", 0x4000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
-
-	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u7", 0x00, 0xf5, NO_DUMP )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( v364 )
-//-------------------------------------------------
-
-ROM_START( v364 )
-	ROM_REGION( 0x8000, "kernal", 0 )
-	ROM_LOAD( "318006-01", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-	ROM_LOAD( "kern364p", 0x4000, 0x4000, CRC(84fd4f7a) SHA1(b9a5b5dacd57ca117ef0b3af29e91998bf4d7e5f) )
-
-	ROM_REGION( 0x10000, "function", 0 )
-	ROM_LOAD( "317053-01", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
-	ROM_LOAD( "317054-01", 0x4000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
-	ROM_LOAD( "spk3cc4.bin", 0x8000, 0x4000, CRC(5227c2ee) SHA1(59af401cbb2194f689898271c6e8aafa28a7af11) )
-
-	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02", 0x00, 0xf5, NO_DUMP )
-ROM_END
-
-
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT                    COMPANY                         FULLNAME                        FLAGS
-COMP( 1983, c264,	0,		0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 264 (Prototype)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1984, c264,	0,		0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 264 (Prototype)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1984, c232,	c264,	0,		c232,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 232 (Prototype)",	GAME_SUPPORTS_SAVE )
+COMP( 1984, v364,	c264,	0,		v364,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore V364 (Prototype)",	GAME_SUPPORTS_SAVE )
 COMP( 1984, plus4n,	c264,	0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (NTSC)",				GAME_SUPPORTS_SAVE )
 COMP( 1984, plus4p,	c264,	0,		pal,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1984, c16,	c264,	0,		c16,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16",					GAME_SUPPORTS_SAVE )
-COMP( 1984, c16h,	c264,	0,		c16,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (Hungary)",		GAME_SUPPORTS_SAVE )
-COMP( 1984, c116,	c264,	0,		c16,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 116",				GAME_SUPPORTS_SAVE )
-COMP( 1984, c232,	c264,	0,		c232,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 232 (Prototype)",	GAME_SUPPORTS_SAVE )
-COMP( 1985, v364,	c264,	0,		v364,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore V364 (Prototype)",	GAME_SUPPORTS_SAVE )
+COMP( 1984, c16n,	c264,	0,		c16n,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (NTSC)",			GAME_SUPPORTS_SAVE )
+COMP( 1984, c16p,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (PAL)",			GAME_SUPPORTS_SAVE )
+COMP( 1984, c16h,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (Hungary)",		GAME_SUPPORTS_SAVE )
+COMP( 1984, c116,	c264,	0,		c16p,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 116",				GAME_SUPPORTS_SAVE )

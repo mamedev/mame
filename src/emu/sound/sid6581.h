@@ -20,12 +20,15 @@ typedef enum
 	MOS8580
 } SIDTYPE;
 
+#define MOS6581_INTERFACE(name) \
+	const sid6581_interface (name) =
 
 typedef struct _sid6581_interface sid6581_interface;
 struct _sid6581_interface
 {
-	int (*ad_read)(device_t *device, int channel);
-} ;
+	devcb_read8 in_potx_cb;
+	devcb_read8 in_poty_cb;
+};
 
 
 READ8_DEVICE_HANDLER  ( sid6581_r );

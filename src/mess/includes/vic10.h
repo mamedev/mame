@@ -51,6 +51,7 @@ public:
 	virtual void machine_reset();
 
 	void check_interrupts();
+	UINT8 paddle_read(int which);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -62,12 +63,18 @@ public:
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
 	DECLARE_READ8_MEMBER( vic_rdy_cb );
+
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
+
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
+
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
+
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
 	// video state

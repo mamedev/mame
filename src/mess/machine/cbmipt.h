@@ -3,6 +3,7 @@
 #ifndef CBMIPT_H_
 #define CBMIPT_H_
 
+#include "machine/c2n.h"
 #include "machine/c64_4cga.h"
 #include "machine/c64_4dxh.h"
 #include "machine/c64_4ksa.h"
@@ -68,6 +69,9 @@
 #include "machine/c8280.h"
 #include "machine/d9060.h"
 #include "machine/cmdhd.h"
+#include "machine/diag264_lb_iec.h"
+#include "machine/diag264_lb_tape.h"
+#include "machine/diag264_lb_user.h"
 #include "machine/fd2000.h"
 #include "machine/interpod.h"
 #include "machine/plus4_sid.h"
@@ -147,8 +151,11 @@ INPUT_PORTS_EXTERN( vic_controls );
 
 
 
+SLOT_INTERFACE_EXTERN( cbm_datassette_devices );
 SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 SLOT_INTERFACE_EXTERN( sx1541_iec_devices );
+SLOT_INTERFACE_EXTERN( c128dcr_iec_devices );
+SLOT_INTERFACE_EXTERN( c128d81_iec_devices );
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
 SLOT_INTERFACE_EXTERN( vic20_control_port_devices );
 SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
@@ -157,6 +164,7 @@ SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
 SLOT_INTERFACE_EXTERN( c64_expansion_cards );
 SLOT_INTERFACE_EXTERN( c64_user_port_cards );
 SLOT_INTERFACE_EXTERN( c128_expansion_cards );
+SLOT_INTERFACE_EXTERN( plus4_datassette_devices );
 SLOT_INTERFACE_EXTERN( plus4_expansion_cards );
 SLOT_INTERFACE_EXTERN( plus4_user_port_cards );
 

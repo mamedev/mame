@@ -62,14 +62,10 @@ const rom_entry *plus4_sid_cartridge_device::device_rom_region() const
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-static int paddle_read( device_t *device, int which )
+static MOS6581_INTERFACE( sid_intf )
 {
-	return 0;
-}
-
-static const sid6581_interface sid_intf =
-{
-	paddle_read
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -141,10 +137,8 @@ void plus4_sid_cartridge_device::device_reset()
 //  plus4_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 plus4_sid_cartridge_device::plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+UINT8 plus4_sid_cartridge_device::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	UINT8 data = 0;
-
 	if ((offset >= 0xfe80 && offset < 0xfea0) || (offset >= 0xfd40 && offset < 0xfd60))
 	{
 		data = sid6581_r(m_sid, offset & 0x1f);

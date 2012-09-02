@@ -47,10 +47,8 @@ void vic10_standard_cartridge_device::device_start()
 //  vic10_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic10_standard_cartridge_device::vic10_cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram)
+UINT8 vic10_standard_cartridge_device::vic10_cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram)
 {
-	UINT8 data = 0;
-
 	if (!lorom && (m_lorom != NULL))
 	{
 		data = m_lorom[offset & 0x1fff];

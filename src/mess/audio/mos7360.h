@@ -118,6 +118,8 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	UINT8 bus_r();
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// horrible crap code
@@ -171,6 +173,7 @@ protected:
 	sound_stream *m_stream;
 
 	UINT8 m_reg[0x20];
+	UINT8 m_last_data;
 
 	bitmap_ind16 m_bitmap;
 

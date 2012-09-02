@@ -59,6 +59,9 @@ public:
 	int m_io_dc00_on;
 	DECLARE_DRIVER_INIT(c65);
 	DECLARE_DRIVER_INIT(c65pal);
+
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
 };
 
 

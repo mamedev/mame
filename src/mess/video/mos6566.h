@@ -295,6 +295,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
 
+	UINT8 bus_r();
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -367,6 +369,7 @@ protected:
 	UINT8 m_cycle;
 	UINT16 m_raster_x;
 	UINT16 m_graphic_x;
+	UINT8 m_last_data;
 
 	/* convert multicolor byte to background/foreground for sprite collision */
 	UINT16 m_expandx[256];

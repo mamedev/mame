@@ -22,7 +22,6 @@
 
     - cleanup
     - light pen
-    - 1:1 sync with CPU
     - remove RDY hack
     - VIC IIe
     - http://hitmen.c02.at/temp/palstuff/
@@ -272,7 +271,9 @@ inline void mos6566_device::vic2_clear_interrupt( int mask )
 
 inline UINT8 mos6566_device::read_videoram(offs_t offset)
 {
-	return space(AS_0)->read_byte(offset & 0x3fff);
+	m_last_data = space(AS_0)->read_byte(offset & 0x3fff);
+	
+	return m_last_data;
 }
 
 inline UINT8 mos6566_device::read_colorram(offs_t offset)
@@ -683,6 +684,7 @@ void mos6566_device::device_start()
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_raster_x));
 	save_item(NAME(m_graphic_x));
+	save_item(NAME(m_last_data));
 
 	save_item(NAME(m_dy_start));
 	save_item(NAME(m_dy_stop));
@@ -2815,4 +2817,14 @@ WRITE8_MEMBER( mos6566_device::write )
 
 WRITE_LINE_MEMBER( mos6566_device::lp_w )
 {
+}
+
+
+//-------------------------------------------------
+//  bus_r - data bus read
+//-------------------------------------------------
+
+UINT8 mos6566_device::bus_r()
+{
+	return m_last_data;
 }

@@ -23,6 +23,7 @@
 #include "machine/pic8259.h"
 #include "machine/mm58274c.h"
 #include "machine/upd765.h"
+#include "machine/compiskb.h"
 #include "imagedev/flopdrv.h"
 #include "formats/cpis_dsk.h"
 

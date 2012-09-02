@@ -104,14 +104,14 @@ public:
 	virtual int plus4_rxd_r() { return 1; };
 	virtual int plus4_dcd_r() { return 0; };
 	virtual int plus4_dsr_r() { return 0; };
-	virtual void plus4_txd_w(int level) { };
-	virtual void plus4_dtr_w(int level) { };
-	virtual void plus4_rts_w(int level) { };
-	virtual void plus4_rxc_w(int level) { };
-	virtual void plus4_atn_w(int level) { };
+	virtual void plus4_txd_w(int state) { };
+	virtual void plus4_dtr_w(int state) { };
+	virtual void plus4_rts_w(int state) { };
+	virtual void plus4_rxc_w(int state) { };
+	virtual void plus4_atn_w(int state) { };
 
 	// reset
-	virtual void plus4_breset_w(int level) { };
+	virtual void plus4_breset_w(int state) { };
 
 protected:
 	plus4_user_port_device *m_slot;

@@ -336,14 +336,14 @@ int sid6581_port_r (running_machine &machine, _SID6581 *This, int offset)
 	data=0xff;
 	break;
     case 0x19:						   /* paddle 1 */
-	if (This->ad_read != NULL)
-	    data=This->ad_read (This->device, 0);
+	if (!This->in_potx_func.isnull())
+		data = This->in_potx_func(offset);
 	else
 	    data=0;
 	break;
     case 0x1a:						   /* paddle 2 */
-	if (This->ad_read != NULL)
-	    data=This->ad_read (This->device, 1);
+	if (!This->in_poty_func.isnull())
+		data = This->in_poty_func(offset);
 	else
 	    data=0;
 	break;

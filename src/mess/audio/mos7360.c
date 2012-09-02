@@ -483,6 +483,8 @@ void mos7360_device::draw_character(int ybegin, int yend, int ch, int yoff, int 
 		else
 			code = m_in_ram_func(m_chargenaddr + ch * 8 + y);
 
+		m_last_data = code;
+
 		m_bitmap.pix16(y + yoff, 0 + xoff) = color[code >> 7];
 		m_bitmap.pix16(y + yoff, 1 + xoff) = color[(code >> 6) & 1];
 		m_bitmap.pix16(y + yoff, 2 + xoff) = color[(code >> 5) & 1];
@@ -505,6 +507,8 @@ void mos7360_device::draw_character_multi(int ybegin, int yend, int ch, int yoff
 		else
 			code = m_in_ram_func(m_chargenaddr + ch * 8 + y);
 
+		m_last_data = code;
+
 		m_bitmap.pix16(y + yoff, 0 + xoff) =
 			m_bitmap.pix16(y + yoff, 1 + xoff) = m_multi[code >> 6];
 		m_bitmap.pix16(y + yoff, 2 + xoff) =
@@ -523,6 +527,9 @@ void mos7360_device::draw_bitmap(int ybegin, int yend, int ch, int yoff, int xof
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = m_in_ram_func(m_bitmapaddr + ch * 8 + y);
+		
+		m_last_data = code;
+
 		m_bitmap.pix16(y + yoff, 0 + xoff) = m_c16_bitmap[code >> 7];
 		m_bitmap.pix16(y + yoff, 1 + xoff) = m_c16_bitmap[(code >> 6) & 1];
 		m_bitmap.pix16(y + yoff, 2 + xoff) = m_c16_bitmap[(code >> 5) & 1];
@@ -541,6 +548,8 @@ void mos7360_device::draw_bitmap_multi(int ybegin, int yend, int ch, int yoff, i
 	for (y = ybegin; y <= yend; y++)
 	{
 		code = m_in_ram_func(m_bitmapaddr + ch * 8 + y);
+		
+		m_last_data = code;
 
 		m_bitmap.pix16(y + yoff, 0 + xoff) =
 			m_bitmap.pix16(y + yoff, 1 + xoff) = m_bitmapmulti[code >> 6];
@@ -1140,4 +1149,14 @@ void mos7360_device::raster_interrupt_gen()
 		drawlines(m_lastline, m_rasterline);
 		set_interrupt(2);
 	}
+}
+
+
+//-------------------------------------------------
+//  bus_r - data bus read
+//-------------------------------------------------
+
+UINT8 mos7360_device::bus_r()
+{
+	return m_last_data;
 }

@@ -97,7 +97,7 @@ public:
 	virtual ~c64_expansion_slot_device();
 
 	// computer interface
-	UINT8 cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2);
+	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int ba, int rw, int hiram);
 	int exrom_r(offs_t offset, int ba, int rw, int hiram);
@@ -168,7 +168,7 @@ protected:
 	virtual UINT8* c64_nvram_pointer(running_machine &machine, size_t size);
 
 	// runtime
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2) { return 0; };
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2) { return data; };
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram) { return m_exrom; }

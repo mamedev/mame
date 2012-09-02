@@ -79,5 +79,7 @@ void vcs_control_port_device::device_start()
 
 
 READ8_MEMBER( vcs_control_port_device::joy_r ) { UINT8 data = 0xff; if (m_device != NULL) data = m_device->vcs_joy_r(); return data; }
-READ8_MEMBER( vcs_control_port_device::pot_x_r ) { UINT8 data = 0xff; if (m_device != NULL) data = m_device->vcs_pot_x_r(); return data; }
-READ8_MEMBER( vcs_control_port_device::pot_y_r ) { UINT8 data = 0xff; if (m_device != NULL) data = m_device->vcs_pot_y_r(); return data; }
+UINT8 vcs_control_port_device::pot_x_r() { UINT8 data = 0xff; if (m_device != NULL) data = m_device->vcs_pot_x_r(); return data; }
+READ8_MEMBER( vcs_control_port_device::pot_x_r ) { return pot_x_r(); }
+UINT8 vcs_control_port_device::pot_y_r() { UINT8 data = 0xff; if (m_device != NULL) data = m_device->vcs_pot_y_r(); return data; }
+READ8_MEMBER( vcs_control_port_device::pot_y_r ) { return pot_y_r(); }

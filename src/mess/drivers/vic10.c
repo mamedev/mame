@@ -39,7 +39,7 @@ READ8_MEMBER( vic10_state::read )
 {
 	// TODO this is really handled by the PLA
 
-	UINT8 data = 0;
+	UINT8 data = m_vic->bus_r();
 	int lorom = 1, uprom = 1, exram = 1;
 
 	if (offset < 0x800)
@@ -75,9 +75,7 @@ READ8_MEMBER( vic10_state::read )
 		uprom = 0;
 	}
 
-	data |= m_exp->cd_r(space, offset, lorom, uprom, exram);
-
-	return data;
+	return m_exp->cd_r(space, offset, data, lorom, uprom, exram);
 }
 
 
@@ -253,46 +251,43 @@ static MOS6566_INTERFACE( vic_intf )
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-static int vic10_paddle_read( device_t *device, int which )
+UINT8 vic10_state::paddle_read(int which)
 {
-	running_machine &machine = device->machine();
-	vic10_state *state = device->machine().driver_data<vic10_state>();
-
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = mos6526_pa_r(state->m_cia, 0);
-	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
-	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
+	UINT8 cia0porta = mos6526_pa_r(m_cia, 0);
+	int controller1 = ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = ioport("CTRLSEL")->read() & 0x70;
 	// Notice that only a single input is defined for Mouse & Lightpen in both ports
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = machine.root_device().ioport("PADDLE2")->read();
+				pot2 = ioport("PADDLE2")->read();
 			else
-				pot1 = machine.root_device().ioport("PADDLE1")->read();
+				pot1 = ioport("PADDLE1")->read();
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = machine.root_device().ioport("TRACKY")->read();
+				pot2 = ioport("TRACKY")->read();
 			else
-				pot1 = machine.root_device().ioport("TRACKX")->read();
+				pot1 = ioport("TRACKX")->read();
 			break;
 
 		case 0x03:
-			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	// Joy1 Button 2
+			if (which && (ioport("JOY1_2B")->read() & 0x20))	// Joy1 Button 2
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = machine.root_device().ioport("LIGHTY")->read();
+				pot2 = ioport("LIGHTY")->read();
 			else
-				pot1 = machine.root_device().ioport("LIGHTX")->read();
+				pot1 = ioport("LIGHTX")->read();
 			break;
 
 		case 0x06:
-			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
+			if (which && (ioport("OTHER")->read() & 0x04))	// Lightpen Signal
 				pot2 = 0x00;
 			break;
 
@@ -309,32 +304,32 @@ static int vic10_paddle_read( device_t *device, int which )
 	{
 		case 0x10:
 			if (which)
-				pot4 = machine.root_device().ioport("PADDLE4")->read();
+				pot4 = ioport("PADDLE4")->read();
 			else
-				pot3 = machine.root_device().ioport("PADDLE3")->read();
+				pot3 = ioport("PADDLE3")->read();
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = machine.root_device().ioport("TRACKY")->read();
+				pot4 = ioport("TRACKY")->read();
 			else
-				pot3 = machine.root_device().ioport("TRACKX")->read();
+				pot3 = ioport("TRACKX")->read();
 			break;
 
 		case 0x30:
-			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	// Joy2 Button 2
+			if (which && (ioport("JOY2_2B")->read() & 0x20))	// Joy2 Button 2
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = machine.root_device().ioport("LIGHTY")->read();
+				pot4 = ioport("LIGHTY")->read();
 			else
-				pot3 = machine.root_device().ioport("LIGHTX")->read();
+				pot3 = ioport("LIGHTX")->read();
 			break;
 
 		case 0x60:
-			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
+			if (which && (ioport("OTHER")->read() & 0x04))	// Lightpen Signal
 				pot4 = 0x00;
 			break;
 
@@ -347,7 +342,7 @@ static int vic10_paddle_read( device_t *device, int which )
 			break;
 	}
 
-	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		// Swap
+	if (ioport("CTRLSEL")->read() & 0x80)		// Swap
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;
@@ -369,9 +364,20 @@ static int vic10_paddle_read( device_t *device, int which )
 	}
 }
 
-static const sid6581_interface sid_intf =
+READ8_MEMBER( vic10_state::sid_potx_r )
 {
-	vic10_paddle_read
+	return paddle_read(0);
+}
+
+READ8_MEMBER( vic10_state::sid_poty_r )
+{
+	return paddle_read(1);
+}
+
+static MOS6581_INTERFACE( sid_intf )
+{
+	DEVCB_DRIVER_MEMBER(vic10_state, sid_potx_r),
+	DEVCB_DRIVER_MEMBER(vic10_state, sid_poty_r)
 };
 
 

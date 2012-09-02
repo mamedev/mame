@@ -32,6 +32,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vic_interrupt );
 	DECLARE_READ8_MEMBER( vic_rdy_cb );
 
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
+
 	UINT8 *m_c128_basic;
 	UINT8 *m_c128_kernal;
 	UINT8 *m_c128_chargen;

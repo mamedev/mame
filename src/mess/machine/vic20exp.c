@@ -334,13 +334,11 @@ const char * vic20_expansion_slot_device::get_default_card_software(const machin
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	UINT8 data = 0;
-
 	if (m_cart != NULL)
 	{
-		data = m_cart->vic20_cd_r(space, offset, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		data = m_cart->vic20_cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 
 	return data;

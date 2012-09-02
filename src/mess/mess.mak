@@ -874,6 +874,9 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/plus4user.o	\
 	$(MESS_MACHINE)/plus4_sid.o	\
 	$(MESS_MACHINE)/plus4_std.o	\
+	$(MESS_MACHINE)/diag264_lb_iec.o	\
+	$(MESS_MACHINE)/diag264_lb_tape.o	\
+	$(MESS_MACHINE)/diag264_lb_user.o	\
 	$(MESS_DRIVERS)/cbmb.o		\
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\
@@ -899,6 +902,8 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmipt.o	\
 	$(MESS_MACHINE)/64h156.o	\
+	$(MESS_MACHINE)/petcass.o	\
+	$(MESS_MACHINE)/c2n.o		\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
 	$(MESS_VIDEO)/vic4567.o		\
@@ -1687,6 +1692,7 @@ $(MESSOBJ)/tektroni.a:			\
 $(MESSOBJ)/telenova.a:			\
 	$(MESS_DRIVERS)/compis.o	\
 	$(MESS_MACHINE)/compis.o	\
+	$(MESS_MACHINE)/compiskb.o	\
 
 $(MESSOBJ)/telercas.a:			\
 	$(MESS_DRIVERS)/tmc1800.o	\

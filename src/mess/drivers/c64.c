@@ -50,10 +50,10 @@ void c64_state::check_interrupts()
 {
 	int restore = BIT(ioport("SPECIAL")->read(), 7);
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_cia1_irq | m_vic_irq | m_exp_irq);
-	m_maincpu->set_input_line(INPUT_LINE_NMI, m_cia2_irq | restore | m_exp_nmi);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_cia1_irq || m_vic_irq || m_exp_irq);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, m_cia2_irq || restore || m_exp_nmi);
 
-	mos6526_flag_w(m_cia1, m_cass_rd & m_iec_srq);
+	mos6526_flag_w(m_cia1, m_cass_rd && m_iec_srq);
 }
 
 
@@ -93,7 +93,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 {
 	int io1 = 1, io2 = 1;
 
-	UINT8 data = 0;
+	UINT8 data = m_vic->bus_r();
 
 	if (!casram)
 	{
@@ -155,9 +155,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 		}
 	}
 
-	data |= m_exp->cd_r(space, offset, ba, roml, romh, io1, io2);
-
-	return data;
+	return m_exp->cd_r(space, offset, data, ba, roml, romh, io1, io2);
 }
 
 
@@ -249,7 +247,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 	bankswitch(0xffff, offset, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	return read_memory(space, offset, 0, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, ba, casram, basic, kernal, charom, io, roml, romh);
 }
 
 
@@ -437,125 +435,40 @@ static MOS6567_INTERFACE( vic_intf )
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-static int paddle_read( device_t *device, int which )
+READ8_MEMBER( c64_state::sid_potx_r )
 {
-	running_machine &machine = device->machine();
-	c64_state *state = device->machine().driver_data<c64_state>();
+	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
+	
+	int sela = BIT(cia1_pa, 6);
+	int selb = BIT(cia1_pa, 7);
 
-	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = mos6526_pa_r(state->m_cia1, 0);
-	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
-	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
-	// Notice that only a single input is defined for Mouse & Lightpen in both ports
-	switch (controller1)
-	{
-		case 0x01:
-			if (which)
-				pot2 = machine.root_device().ioport("PADDLE2")->read();
-			else
-				pot1 = machine.root_device().ioport("PADDLE1")->read();
-			break;
+	UINT8 data = 0;
 
-		case 0x02:
-			if (which)
-				pot2 = machine.root_device().ioport("TRACKY")->read();
-			else
-				pot1 = machine.root_device().ioport("TRACKX")->read();
-			break;
+	if (sela) data = m_joy1->pot_x_r();
+	if (selb) data = m_joy2->pot_x_r();
 
-		case 0x03:
-			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	// Joy1 Button 2
-				pot1 = 0x00;
-			break;
-
-		case 0x04:
-			if (which)
-				pot2 = machine.root_device().ioport("LIGHTY")->read();
-			else
-				pot1 = machine.root_device().ioport("LIGHTX")->read();
-			break;
-
-		case 0x06:
-			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
-				pot2 = 0x00;
-			break;
-
-		case 0x00:
-		case 0x07:
-			break;
-
-		default:
-			logerror("Invalid Controller Setting %d\n", controller1);
-			break;
-	}
-
-	switch (controller2)
-	{
-		case 0x10:
-			if (which)
-				pot4 = machine.root_device().ioport("PADDLE4")->read();
-			else
-				pot3 = machine.root_device().ioport("PADDLE3")->read();
-			break;
-
-		case 0x20:
-			if (which)
-				pot4 = machine.root_device().ioport("TRACKY")->read();
-			else
-				pot3 = machine.root_device().ioport("TRACKX")->read();
-			break;
-
-		case 0x30:
-			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	// Joy2 Button 2
-				pot4 = 0x00;
-			break;
-
-		case 0x40:
-			if (which)
-				pot4 = machine.root_device().ioport("LIGHTY")->read();
-			else
-				pot3 = machine.root_device().ioport("LIGHTX")->read();
-			break;
-
-		case 0x60:
-			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
-				pot4 = 0x00;
-			break;
-
-		case 0x00:
-		case 0x70:
-			break;
-
-		default:
-			logerror("Invalid Controller Setting %d\n", controller1);
-			break;
-	}
-
-	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		// Swap
-	{
-		temp = pot1; pot1 = pot3; pot3 = temp;
-		temp = pot2; pot2 = pot4; pot4 = temp;
-	}
-
-	switch (cia0porta & 0xc0)
-	{
-		case 0x40:
-			return which ? pot2 : pot1;
-
-		case 0x80:
-			return which ? pot4 : pot3;
-
-		case 0xc0:
-			return which ? pot2 : pot1;
-
-		default:
-			return 0;
-	}
+	return data;
 }
 
-static const sid6581_interface sid_intf =
+READ8_MEMBER( c64_state::sid_poty_r )
 {
-	paddle_read
+	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
+	
+	int sela = BIT(cia1_pa, 6);
+	int selb = BIT(cia1_pa, 7);
+
+	UINT8 data = 0;
+
+	if (sela) data = m_joy1->pot_y_r();
+	if (selb) data = m_joy2->pot_y_r();
+
+	return data;
+}
+
+static MOS6581_INTERFACE( sid_intf )
+{
+	DEVCB_DRIVER_MEMBER(c64_state, sid_potx_r),
+	DEVCB_DRIVER_MEMBER(c64_state, sid_poty_r)
 };
 
 
@@ -753,7 +666,7 @@ READ8_MEMBER( c64_state::cpu_r )
 
 	UINT8 data = 0x07;
 
-	data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
+	data |= m_cassette->sense_r() << 4;
 
 	return data;
 }
@@ -781,19 +694,10 @@ WRITE8_MEMBER( c64_state::cpu_w )
 	m_charen = BIT(data, 2);
 
 	// cassette write
-	m_cassette->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	m_cassette->write(BIT(data, 3));
 
 	// cassette motor
-	if (!BIT(data, 5))
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
-	}
-	else
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->reset();
-	}
+	m_cassette->motor_w(BIT(data, 5));
 }
 
 static const m6502_interface cpu_intf =
@@ -914,17 +818,20 @@ static const m6502_interface c64gs_cpu_intf =
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( cassette_tick )
+//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( cassette_tick )
+WRITE_LINE_MEMBER( c64_state::tape_read_w )
 {
-	c64_state *state = timer.machine().driver_data<c64_state>();
+	m_cass_rd = state;
 
-	state->m_cass_rd = state->m_cassette->input() > +0.0;
-
-	state->check_interrupts();
+	check_interrupts();
 }
+
+static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, tape_read_w),
+};
 
 
 //-------------------------------------------------
@@ -1115,8 +1022,7 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
-	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)
@@ -1212,8 +1118,7 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
-	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vic20_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vic20_control_port_devices, NULL, NULL)

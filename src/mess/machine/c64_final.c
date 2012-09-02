@@ -95,10 +95,8 @@ void c64_final_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_final_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
+UINT8 c64_final_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
-	UINT8 data = 0;
-
 	if (!roml || !romh || !io1 || !io2)
 	{
 		data = m_roml[offset & 0x3fff];

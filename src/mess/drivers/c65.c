@@ -189,9 +189,24 @@ static PALETTE_INIT( c65 )
  *
  *************************************/
 
-static const sid6581_interface c65_sound_interface =
+READ8_MEMBER( c65_state::sid_potx_r )
 {
-	c64_paddle_read
+	device_t *sid = machine().device("sid_r");
+
+	return c64_paddle_read(sid, 0);
+}
+
+READ8_MEMBER( c65_state::sid_poty_r )
+{
+	device_t *sid = machine().device("sid_r");
+
+	return c64_paddle_read(sid, 1);
+}
+
+static MOS6581_INTERFACE( c65_sound_interface )
+{
+	DEVCB_DRIVER_MEMBER(c65_state, sid_potx_r),
+	DEVCB_DRIVER_MEMBER(c65_state, sid_poty_r)
 };
 
 

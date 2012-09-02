@@ -47,7 +47,9 @@ public:
 
 	// computer interface
 	DECLARE_READ8_MEMBER( joy_r );
+	UINT8 pot_x_r();
 	DECLARE_READ8_MEMBER( pot_x_r );
+	UINT8 pot_y_r();
 	DECLARE_READ8_MEMBER( pot_y_r );
 
 protected:
