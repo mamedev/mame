@@ -949,12 +949,12 @@
 	</software>
 
 	<software name="aburnerj" cloneof="aburner">
-		<description>After Burner (Jpn)</description>
+		<description>After Burner II (Jpn)</description>
 		<year>1989</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-AFB-6200 (SS13)"/>
 		<info name="release" value="19890330"/>
-		<info name="alt_title" value="アフターバーナー"/>
+		<info name="alt_title" value="アフターバーナー ~ After Burner (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-4" />
 			<dataarea name="prg" size="131072">
@@ -7179,7 +7179,7 @@
 		</part>
 	</software>
 
-	<software name="srobot2">
+	<software name="srobot2" supported="partial">
 		<description>Dai-2-ji Super Robot Taisen (Jpn)</description>
 		<year>1991</year>
 		<publisher>Banpresto</publisher>
@@ -10040,7 +10040,7 @@
 		</part>
 	</software>
 
-	<software name="eggerlnd" cloneof="lolo">
+	<software name="eggerlnd">
 		<description>Eggerland - Meikyuu no Fukkatsu (Jpn)</description>
 		<year>1988</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -40840,7 +40840,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="aces">
+	<software name="aces" cloneof="uaircomb">
 		<description>Aces - Iron Eagle 3 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
@@ -46157,6 +46157,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Activision</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="super pitfall ii (u) (prototype) [!].prg" size="32768" crc="82bd6a77" sha1="9f661ece65ee7859cd70ac9e364a2f249a433e0d" offset="00000" status="baddump" />
 			</dataarea>
@@ -48249,7 +48250,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supcart1">
-		<description>Super Cartridge Version 1 - 4 in 1 (Tw)</description>
+		<description>Super Cartridge Ver 1 - 4 in 1 (Tw)</description>
 		<year>1994</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-SC1"/>
@@ -53640,7 +53641,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 
-	<software name="srobot2c1" cloneof="srobot2">
+	<software name="srobot2c1" cloneof="srobot2" supported="partial">
 		<description>Di 2 Ci - Chaoji Ji Qi Ren Dai Zhan (Chi, Alt)</description>
 		<year>19??</year>
 		<publisher>XianFeng Katong</publisher>
@@ -53659,7 +53660,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="srobot2c3" cloneof="srobot2">
+	<software name="srobot2c3" cloneof="srobot2" supported="partial">
 		<description>Di 2 Ci - Chaoji Ji Qi Ren Dai Zhan (Chi, Alt 3)</description>
 		<year>19??</year>
 		<publisher>XianFeng Katong</publisher>
@@ -53678,7 +53679,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="srobot2c2" cloneof="srobot2">
+	<software name="srobot2c2" cloneof="srobot2" supported="partial">
 		<description>Di 2 Ci - Chaoji Ji Qi Ren Dai Zhan (Chi, Alt 2)</description>
 		<year>19??</year>
 		<publisher>XianFeng Katong</publisher>
@@ -53697,7 +53698,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="srobot2c" cloneof="srobot2">
+	<software name="srobot2c" cloneof="srobot2" supported="partial">
 		<description>Di 2 Ci - Chaoji Ji Qi Ren Dai Zhan (Chi)</description>
 		<year>19??</year>
 		<publisher>XianFeng Katong</publisher>
@@ -58137,7 +58138,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="sonic3d5">
+	<software name="sonic3d5" cloneof="ssonic5">
 		<description>Sonic 3d Blast 5 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66418,7 +66419,7 @@ be better to redump them properly. -->
 
 	<software name="strblst2">
 		<description>Street Blaster II Pro (Asia)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-CONY" />

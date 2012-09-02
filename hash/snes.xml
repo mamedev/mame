@@ -56812,7 +56812,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 1 (japan).bs" size="1048576" crc="499fd328" sha1="0b43ca399fe2ddcaf8fae1ba4d1de4e7a625c575" offset="0x000000" />
+				<rom name="bad_bs_excitebike_dump_(alt_data).bs" size="1048576" crc="499fd328" sha1="0b43ca399fe2ddcaf8fae1ba4d1de4e7a625c575" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -56825,7 +56825,7 @@ Alternate board (XL-1)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 1 (japan).bs" size="1048576" crc="cf37df6c" sha1="8cb5406e7c136ea8779f793f052c60cfcdfa024a" offset="0x000000" />
+				<rom name="bad bs excitebike hack.bs" size="1048576" crc="da9ffb05" sha1="ae181856ffe726f870cd1e9008bf2b00229bf7cd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

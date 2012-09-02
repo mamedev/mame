@@ -3298,7 +3298,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="beavisup" cloneof="beavis">
+	<software name="beavisup" cloneof="beavis" supported="no">
 		<description>Beavis and Butt-Head (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Viacom New Media</publisher>
@@ -3706,7 +3706,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="blockb">
+	<software name="blockb" supported="no">
 		<description>Blockbuster World Video Game Championship II (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -3782,7 +3782,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bodycop4" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940208)</description>
+		<description>Body Count (USA, Prototype, 19940208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3805,7 +3805,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software-->
 
 	<software name="bodycop5" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940127)</description>
+		<description>Body Count (USA, Prototype, 19940127)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3816,7 +3816,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bodycop3" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940303)</description>
+		<description>Body Count (USA, Prototype, 19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3839,7 +3839,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software-->
 
 	<software name="bodycop2" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940308)</description>
+		<description>Body Count (USA, Prototype, 19940308)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3850,7 +3850,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bodycop1" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940309)</description>
+		<description>Body Count (USA, Prototype, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3909,7 +3909,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bonkersp5" cloneof="bonkers">
-		<description>Bonkers (Prototype, 19940328)</description>
+		<description>Bonkers (USA, Prototype, 19940328)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3920,7 +3920,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bonkersp4" cloneof="bonkers">
-		<description>Bonkers (Prototype, 19940503)</description>
+		<description>Bonkers (USA, Prototype, 19940503)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3931,7 +3931,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bonkersp3" cloneof="bonkers">
-		<description>Bonkers (Prototype, 19941004)</description>
+		<description>Bonkers (USA, Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3942,7 +3942,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bonkersp2" cloneof="bonkers">
-		<description>Bonkers (Prototype, 19941025)</description>
+		<description>Bonkers (USA, Prototype, 19941025)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -3953,7 +3953,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="bonkersp1" cloneof="bonkers">
-		<description>Bonkers (Prototype, 19941029)</description>
+		<description>Bonkers (USA, Prototype, 19941029)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
