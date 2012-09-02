@@ -236,6 +236,7 @@ public:
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	required_shared_ptr<UINT32> m_work_ram;
+	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
@@ -354,13 +355,11 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 		if (ACCESSING_BITS_0_7)
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
-			{
-				//cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
-			}
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	// CG Board 0 IRQ Ack
-			{
-				//cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
-			}
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+
+			//set_cgboard_id((data >> 4) & 3);
 		}
 		return;
 	}
@@ -454,6 +453,15 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 
 			//printf("lanc2_fpga_w: %02X at %08X\n", value, cpu_get_pc(&space.device()));
 		}
+		else if (ACCESSING_BITS_8_15)
+		{
+			m_lanc2_ram_r = 0;
+			m_lanc2_ram_w = 0;
+		}
+		else if (ACCESSING_BITS_16_23)
+		{
+			m_lanc2_ram[2] = (data >> 20) & 0xf;
+		}
 		else if (ACCESSING_BITS_0_7)
 		{
 			m_lanc2_ram[m_lanc2_ram_w & 0x7fff] = data & 0xff;
@@ -466,17 +474,26 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 	}
 	if (offset == 4)
 	{
+		// TODO: check if these should be transferred via PPC DMA.
+
 		if (mame_stricmp(machine().system().name, "thrilld") == 0)
 		{
-			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
-			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;
-			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;
-			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;
+			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;		// G*71
+			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;		// 3
+			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;		// --**
+			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;		// *
 
-			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;
-			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;
-			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;
-			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;
+			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;		// GC71
+			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;		// 3
+			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;		//   JA
+			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;		// A
+		}
+		else if (mame_stricmp(machine().system().name, "racingj2") == 0)
+		{
+			m_work_ram[(0x3ffc80/4) + 0] = 0x47453838;		// GE88
+			m_work_ram[(0x3ffc80/4) + 1] = 0x38003030;		// 8 00
+			m_work_ram[(0x3ffc80/4) + 2] = 0x39374541;		// 97EA
+			m_work_ram[(0x3ffc80/4) + 3] = 0x410058da;		// A
 		}
 	}
 
@@ -484,6 +501,11 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 }
 
 /*****************************************************************************/
+
+static TIMER_CALLBACK( irq_off )
+{
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
+}
 
 static MACHINE_START( nwktr )
 {
@@ -493,6 +515,8 @@ static MACHINE_START( nwktr )
 
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_work_ram);
+
+	state->m_sound_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_off));
 }
 
 static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
@@ -602,16 +626,16 @@ static INPUT_PORTS_START( nwktr )
 	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG2")		// Acceleration pedal
-	PORT_BIT( 0x7ff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG3")		// Foot brake pedal
-	PORT_BIT( 0x7ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG4")		// Hand brake lever
-	PORT_BIT( 0x7ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG5")		// Clutch pedal
-	PORT_BIT( 0x7ff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
 
@@ -626,14 +650,14 @@ static double adc12138_input_callback( device_t *device, UINT8 input )
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = device->machine().root_device().ioport("ANALOG1")->read() - 0x800; break;
+		case 0:		value = device->machine().root_device().ioport("ANALOG1")->read(); break;
 		case 1:		value = device->machine().root_device().ioport("ANALOG2")->read(); break;
 		case 2:		value = device->machine().root_device().ioport("ANALOG3")->read(); break;
 		case 3:		value = device->machine().root_device().ioport("ANALOG4")->read(); break;
 		case 4:		value = device->machine().root_device().ioport("ANALOG5")->read(); break;
 	}
 
-	return (double)(value) / 2047.0;
+	return (double)(value) / 4095.0;
 }
 
 static const adc12138_interface nwktr_adc_interface = {
@@ -642,10 +666,11 @@ static const adc12138_interface nwktr_adc_interface = {
 
 static void sound_irq_callback(running_machine &machine, int irq)
 {
-	if (irq == 0)
-		generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ1, 1);
-	else
-		generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ2, 1);
+	nwktr_state *state = machine.driver_data<nwktr_state>();
+	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
+
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
+    state->m_sound_irq_timer->adjust(attotime::from_usec(5), line);
 }
 
 static const k056800_interface nwktr_k056800_interface =
@@ -701,7 +726,7 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
 	MCFG_MACHINE_START(nwktr)
 	MCFG_MACHINE_RESET(nwktr)
@@ -740,10 +765,9 @@ static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
 	MCFG_K001604_ADD("k001604", thrilld_k001604_intf)
 MACHINE_CONFIG_END
 
-
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(nwktr_state,nwktr)
+DRIVER_INIT_MEMBER(nwktr_state, nwktr)
 {
 	init_konami_cgboard(machine(), 1, CGBOARD_TYPE_NWKTR);
 	set_cgboard_texture_bank(machine(), 0, "bank5", memregion("user5")->base());
@@ -753,7 +777,6 @@ DRIVER_INIT_MEMBER(nwktr_state,nwktr)
 
 	lanc2_init(machine());
 }
-
 
 /*****************************************************************************/
 
