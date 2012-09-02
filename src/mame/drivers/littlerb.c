@@ -11,23 +11,31 @@ David Haywood
 
 /*
 
-strange vdp/memory access chip..
-at the moment gfx / palettes etc. get drawn then erased, I think it's a blitter, with multiple layers
-some of the 'sprite entries' seem a different size, or alignment, hence the bad sprites on the title
-screen.  no idea how layers are seleced / cleared right now either
+Notes:
 
+VDP (Blitter) handling is not 100% correct
+A brief original video (recorded by Dox) can be seen at https://www.youtube.com/watch?v=8THpeogarUk
 
-maybe it needs read commands working so it knows how many sprites are in
-the list?
+Overall addressing / auto-increment etc. of the VDP device is not fully understood, but for now
+appears to be good enough for the game.
 
-maybe the vdp 'commands' can be used to store and get back
-write addresses?
+How we distinguish between mode setting (clear, copy, cliprect etc.) VDP commands and actual sprite
+commands is not yet understood.  All 'sprite' sections of the blit list seem to be terminated with
+a 0x0000 word, but it isn't clear how the blocks are started, the current method relies on some bits
+of the sprite data offset to determine if we're sprite data, or a command.  Maybe this is just a 
+quirk of the hardware, and you can't have sprites at those offsets?
 
-most graphics are stored as packed 4bpp in RAM, expanded before
-writing to the vdp device.  actual gfx are 8bpp.
+Copy / Scroll are not yet implemented, see the Smileys between scenes in the original video.
+ (Clipping is implemented, but might be per layer, so you do see the sprites vanish, but no
+   smileys are drawn)
+
+How big are the actual framebuffers?  Are both also double buffered?
 
 Sound pitch is directly correlated with irqs, scanline timings and pixel clock,
 so it's surely not 100% correct. Sound sample playbacks looks fine at current time tho.
+
+------
+
 
 
 Dip sw.1
@@ -88,7 +96,7 @@ public:
 		  m_dacl(*this, "dacl"),
 	      m_dacr(*this, "dacr"),
 		m_region4(*this, "region4")
-	{
+	{ 
 		m_1ff80804 = -1;
 	}
 
@@ -111,9 +119,9 @@ public:
 	UINT32 m_lasttype2pc;
 	UINT8 m_sound_index_l,m_sound_index_r;
 	UINT16 m_sound_pointer_l,m_sound_pointer_r;
-
-	bitmap_ind16 m_temp_bitmap_sprites;
-	bitmap_ind16 m_temp_bitmap_sprites_back; // not currently used
+	
+	bitmap_ind16 *m_temp_bitmap_sprites;
+	bitmap_ind16 *m_temp_bitmap_sprites_back;
 
 
 	DECLARE_WRITE16_MEMBER(spritelist_w);
@@ -155,17 +163,17 @@ public:
 	{
 		littlerb_printf("littlerb_1ff80804_w %04x\n", data);
 
-		if ((!(m_spritelist[2] & 0x1000)) && (!(m_spritelist[1] & 0x1000)))
+		if ((!(m_spritelist[2] & 0x1000)) && (!(m_spritelist[1] & 0x1000))) 
 		{
 
 		}
-		else
+		else 
 		{
 			if (!(m_spritelist[2] & 0x1000))
-				m_temp_bitmap_sprites_back.fill(0, m_temp_bitmap_sprites_back.cliprect());
+				m_temp_bitmap_sprites_back->fill(0, m_temp_bitmap_sprites_back->cliprect());
 
 		}
-
+		
 		littlerb_draw_sprites(space.machine());
 
 
@@ -507,9 +515,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "GAME/TEST??" ) // changes what gets uploaded
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -552,8 +558,8 @@ static SCREEN_UPDATE_IND16(littlerb)
 	littlerb_state *state = screen.machine().driver_data<littlerb_state>();
 	bitmap.fill(0, cliprect);
 
-	copybitmap_trans(bitmap, state->m_temp_bitmap_sprites_back, 0, 0, 0, 0, cliprect, 0);
-	copybitmap_trans(bitmap, state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_temp_bitmap_sprites_back, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *state->m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }
@@ -588,10 +594,13 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 VIDEO_START( littlerb )
 {
 	littlerb_state *state = machine.driver_data<littlerb_state>();
+//	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites_back);
+//	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
+
+	state->m_temp_bitmap_sprites_back = auto_bitmap_ind16_alloc(machine,512,512);
+	state->m_temp_bitmap_sprites = auto_bitmap_ind16_alloc(machine,512,512);
 
 
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites_back);
-	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap_sprites);
 	state->m_spritelist = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x20000);
 
 }
@@ -616,13 +625,22 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const re
 			drawxpos = xpos+x;
 			drawypos = ypos+y;
 
+			// odd clipping behavior, count is only increased for visible lines?
+			// I suspect the sprite corruption if you're near the top of the screen
+			// between level changes is related to this too, data offset values are
+			// probably being adjusted as layer is scrolled (and the cliprect is changed)
+			// even if they don't move.
+			if(drawypos>=cliprect.min_y)
+			{
+				fulloffs++;
+			}
+
 			if(cliprect.contains(drawxpos, drawypos))
 			{
 				if(pix&0xff) bitmap.pix16(drawypos, drawxpos) = pix;
 			}
 
 			drawxpos++;
-			fulloffs++;
 		}
 	}
 }
@@ -634,17 +652,18 @@ static void littlerb_draw_sprites(running_machine &machine)
 	int xsize,ysize;
 	UINT16* spriteregion = state->m_spritelist;
 	//littlerb_printf("frame\n");
-	/* the spriteram format is something like this .. */
-//	for (offs=2;offs<0xc00;offs+=6) // this will draw different hud gfx.. meaning not ALL entries are 6 words(?!) command based blitter rather than RAM? (but MODE is 3800 when both the sprite 'list' is written, and gfx data?,
 
 	int layer = 0;
-
+	int yoffset = 0;
 
 	littlerb_printf("m_listoffset %04x\n", state->m_listoffset );
 
 	littlerb_printf("%04x %04x %04x %04x\n", spriteregion[0], spriteregion[1], spriteregion[2], spriteregion[3]);
 
 	littlerb_alt_printf("start\n");
+
+	int minx = 0 , maxx = 0x14f;
+	int miny = 0 , maxy = 0x11f;
 
 	for (offs=0;offs<(state->m_listoffset);)
 	{
@@ -664,39 +683,74 @@ static void littlerb_draw_sprites(running_machine &machine)
 		else if (spriteregion[offs+0] == 0x0040)
 		{
 			littlerb_alt_printf("Control Word %04x %04x %04x %04x %04x %04x ---- ---- ---- ----\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
-
+			
 			// some scroll stuff is here (title -> high score transition)
 			// maybe also copy area operations?
 
-			// probably wrong
-			if ((spriteregion[offs+4]==0x6000) && (spriteregion[offs+3] & 0x1000))
-				state->m_temp_bitmap_sprites_back.fill(0, state->m_temp_bitmap_sprites_back.cliprect());
-			else
-				state->m_temp_bitmap_sprites.fill(0, state->m_temp_bitmap_sprites.cliprect());
 
+			// this isn't understood ... note, we still have a hack before draw_sprites is called too
+
+			// usual start of frame
+			// Control Word 0040 0090 6000 0026 0000 0012 ---- ---- ---- ----
+
+			// happens in the middle of list during boss death, causes sprites to vanish atm
+			// Control Word 0040 ffd6 00aa 00f8 0088 0018 ---- ---- ---- ----
+			if (spriteregion[offs+4]==0x6000)
+			{
+				if (spriteregion[offs+3] & 0x1000)
+					state->m_temp_bitmap_sprites_back->fill(0, state->m_temp_bitmap_sprites_back->cliprect());
+			}
+			else
+			{
+				if (spriteregion[offs+1] != 0xffd6) state->m_temp_bitmap_sprites->fill(0, state->m_temp_bitmap_sprites->cliprect());
+			}
+				
+
+
+			// this is some kind of scroll or copy area..
+			// also some of the other values change
+			// this is set AFTER the graphics which need to be scrolled are sent and causes the credit text to bounce up and down instead of
+			// anything scrolling
+			//yoffset = spriteregion[offs+1] - 0x90;
+			
 
 			offs += 6;
 		}
 		else if (read_dword == 0x00e40020)
 		{
 			littlerb_alt_printf("Control Word %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5], spriteregion[offs+6], spriteregion[offs+7], spriteregion[offs+8], spriteregion[offs+9]);
-
+		
 			if (spriteregion[offs+4]==0x6000)
 				layer = 1;
 			else
 				layer = 0;
+
+
+			minx = spriteregion[offs+6];
+			maxx = spriteregion[offs+8];
+
+			miny = spriteregion[offs+7];
+			maxy = spriteregion[offs+9];
 
 
 			offs += 10;
 		}
 		else if (read_dword == 0x00e40000)
 		{
+			// same as above?
 			littlerb_alt_printf("Control Word %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5], spriteregion[offs+6], spriteregion[offs+7], spriteregion[offs+8], spriteregion[offs+9]);
-
+	
 			if (spriteregion[offs+4]==0x6000)
 				layer = 1;
 			else
 				layer = 0;
+
+			minx = spriteregion[offs+6];
+			maxx = spriteregion[offs+8];
+
+			miny = spriteregion[offs+7];
+			maxy = spriteregion[offs+9];
+
 
 			offs += 10;
 		}
@@ -714,16 +768,55 @@ static void littlerb_draw_sprites(running_machine &machine)
 			if (x&0x400) x-=0x800;
 			if (y&0x200) y-=0x400;
 
+			y+= yoffset;
+
 			xsize = (spriteregion[offs+4] & 0x01ff); // background gfx for many places at 0x1ff wide
 			ysize = (spriteregion[offs+5] & 0x00ff); // player1/player2 texts in service mode sides are 0xff high
 
 
+			rectangle clip;
+
+			clip.min_x = minx;
+			clip.max_x = maxx;
+
+			clip.min_y = miny;
+			clip.max_y = maxy;
+
+			// used between levels, and on boss death to clip sprite at the ground for sinking effect
+
+
+			if (clip.min_x > state->m_temp_bitmap_sprites->cliprect().max_x)
+				clip.min_x =  state->m_temp_bitmap_sprites->cliprect().max_x;
+
+			if (clip.min_x < state->m_temp_bitmap_sprites->cliprect().min_x)
+				clip.min_x =  state->m_temp_bitmap_sprites->cliprect().min_x;
+
+			if (clip.max_x > state->m_temp_bitmap_sprites->cliprect().max_x)
+				clip.max_x =  state->m_temp_bitmap_sprites->cliprect().max_x;
+
+			if (clip.max_x < state->m_temp_bitmap_sprites->cliprect().min_x)
+				clip.max_x =  state->m_temp_bitmap_sprites->cliprect().min_x;
+
+
+			if (clip.min_y > state->m_temp_bitmap_sprites->cliprect().max_y)
+				clip.min_y =  state->m_temp_bitmap_sprites->cliprect().max_y;
+
+			if (clip.min_y < state->m_temp_bitmap_sprites->cliprect().min_y)
+				clip.min_y =  state->m_temp_bitmap_sprites->cliprect().min_y;
+
+			if (clip.max_y > state->m_temp_bitmap_sprites->cliprect().max_y)
+				clip.max_y =  state->m_temp_bitmap_sprites->cliprect().max_y;
+
+			if (clip.max_y < state->m_temp_bitmap_sprites->cliprect().min_y)
+				clip.max_y =  state->m_temp_bitmap_sprites->cliprect().min_y;
+
+
 			littlerb_alt_printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-			if (layer==0) draw_sprite(machine, state->m_temp_bitmap_sprites, state->m_temp_bitmap_sprites.cliprect(),xsize,ysize,fullcode,x,y);
-			else draw_sprite(machine, state->m_temp_bitmap_sprites_back, state->m_temp_bitmap_sprites_back.cliprect(),xsize,ysize,fullcode,x,y);
+			if (layer==0) draw_sprite(machine, *state->m_temp_bitmap_sprites, clip,xsize,ysize,fullcode,x,y);
+			else draw_sprite(machine, *state->m_temp_bitmap_sprites_back, clip,xsize,ysize,fullcode,x,y);
 
-
+				
 			offs += 6;
 		}
 	}
@@ -771,4 +864,4 @@ ROM_START( littlerb )
 ROM_END
 
 
-GAME( 1993, littlerb, 0, littlerb, littlerb, driver_device, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1994, littlerb, 0, littlerb, littlerb, driver_device, 0, ROT0, "TCH", "Little Robin", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
