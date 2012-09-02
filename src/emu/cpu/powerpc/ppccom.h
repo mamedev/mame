@@ -545,6 +545,8 @@ struct _powerpc_state
 	emu_timer *		wdog_timer;
 	UINT32			pit_reload;
 	UINT32			irqstate;
+	emu_timer *		buffered_dma_timer[4];
+	int				buffered_dma_rate[4];
 
 	/* PowerPC 603-specific state */
 	UINT32			mmu603_cmp;

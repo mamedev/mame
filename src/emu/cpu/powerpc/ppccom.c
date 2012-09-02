@@ -39,6 +39,8 @@ static TIMER_CALLBACK( ppc4xx_pit_callback );
 static TIMER_CALLBACK( ppc4xx_spu_callback );
 static TIMER_CALLBACK( decrementer_int_callback );
 
+static TIMER_CALLBACK( ppc4xx_buffered_dma_callback );
+
 static void ppc4xx_set_irq_line(powerpc_state *ppc, UINT32 bitmask, int state);
 
 static void ppc4xx_dma_update_irq_states(powerpc_state *ppc);
@@ -339,6 +341,19 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT32 cap, int tb_d
 		ppc->fit_timer = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_fit_callback), ppc);
 		ppc->pit_timer = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_pit_callback), ppc);
 		ppc->spu.timer = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_spu_callback), ppc);
+	}
+
+	if (cap & PPCCAP_4XX)
+	{
+		ppc->buffered_dma_timer[0] = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_buffered_dma_callback), ppc);
+		ppc->buffered_dma_timer[1] = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_buffered_dma_callback), ppc);
+		ppc->buffered_dma_timer[2] = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_buffered_dma_callback), ppc);
+		ppc->buffered_dma_timer[3] = device->machine().scheduler().timer_alloc(FUNC(ppc4xx_buffered_dma_callback), ppc);
+
+		ppc->buffered_dma_rate[0] = 10000;
+		ppc->buffered_dma_rate[1] = 10000;
+		ppc->buffered_dma_rate[2] = 10000;
+		ppc->buffered_dma_rate[3] = 10000;
 	}
 
 	/* register for save states */
@@ -1749,10 +1764,32 @@ static void ppc4xx_dma_update_irq_states(powerpc_state *ppc)
 
 	/* update the IRQ state for each DMA channel */
 	for (dmachan = 0; dmachan < 4; dmachan++)
+	{
 		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (0x11 << (27 - dmachan))))
 			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
 		else
 			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
+
+		// DMA chaining interrupts
+		switch (dmachan)
+		{
+			case 0:
+				if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & 0x80000))
+					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
+				else
+					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
+				break;
+
+			case 1:
+			case 2:
+			case 3:
+				if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (1 << (7 - dmachan))))
+					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
+				else
+					ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
+				break;
+		}
+	}
 }
 
 
@@ -1773,11 +1810,151 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) != 0)
 		return FALSE;
 
-	/* set the complete bit and handle interrupts */
-	ppc->dcr[DCR4XX_DMASR] |= 1 << (31 - dmachan);
-//  ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
-	ppc4xx_dma_update_irq_states(ppc);
+	// if chained mode
+	if (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CH)
+	{
+		dmaregs[DCR4XX_DMADA0] = dmaregs[DCR4XX_DMASA0];
+		dmaregs[DCR4XX_DMACT0] = dmaregs[DCR4XX_DMACC0];
+		dmaregs[DCR4XX_DMACR0] &= ~PPC4XX_DMACR_CH;
+
+		switch (dmachan)
+		{
+			case 0:
+				ppc->dcr[DCR4XX_DMASR] |= 0x00080000;
+				break;
+
+			case 1:
+			case 2:
+			case 3:
+				ppc->dcr[DCR4XX_DMASR] |= 1 << (7 - dmachan);
+				break;
+		}
+		
+		ppc4xx_dma_update_irq_states(ppc);
+
+		INT64 numdata = dmaregs[DCR4XX_DMACT0];
+		if (numdata == 0)
+			numdata = 65536;
+
+		INT64 time = (numdata * 1000000) / ppc->buffered_dma_rate[dmachan];
+
+		ppc->buffered_dma_timer[dmachan]->adjust(attotime::from_usec(time), dmachan);
+	}
+	else
+	{
+		/* set the complete bit and handle interrupts */
+		ppc->dcr[DCR4XX_DMASR] |= 1 << (31 - dmachan);
+	//  ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
+		ppc4xx_dma_update_irq_states(ppc);
+
+		ppc->buffered_dma_timer[dmachan]->adjust(attotime::never, FALSE);
+	}
 	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    buffered_dma_callback - callback that fires
+    when buffered DMA transfer is ready
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( ppc4xx_buffered_dma_callback )
+{
+	powerpc_state *ppc = (powerpc_state *)ptr;
+	int dmachan = param;
+
+	static const UINT8 dma_transfer_width[4] = { 1, 2, 4, 16 };
+	UINT32 *dmaregs = &ppc->dcr[8 * dmachan];
+	INT32 destinc;
+	UINT8 width;
+
+	width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_PW_MASK) >> 26];
+	destinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_DAI) ? width : 0;
+
+	if (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TD)
+	{
+		/* peripheral to memory */
+
+		switch (width)
+		{
+			/* byte transfer */
+			case 1:
+			do
+			{
+				UINT8 data = 0;
+				if (ppc->ext_dma_read_handler[dmachan] != NULL)
+					data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 1);
+				ppc->program->write_byte(dmaregs[DCR4XX_DMADA0], data);
+				dmaregs[DCR4XX_DMADA0] += destinc;
+			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+			break;
+
+			/* word transfer */
+			case 2:
+			do
+			{
+				UINT16 data = 0;
+				if (ppc->ext_dma_read_handler[dmachan] != NULL)
+					data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 2);
+				ppc->program->write_word(dmaregs[DCR4XX_DMADA0], data);
+				dmaregs[DCR4XX_DMADA0] += destinc;
+			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+			break;
+
+			/* dword transfer */
+			case 4:
+			do
+			{
+				UINT32 data = 0;
+				if (ppc->ext_dma_read_handler[dmachan] != NULL)
+					data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 4);
+				ppc->program->write_dword(dmaregs[DCR4XX_DMADA0], data);
+				dmaregs[DCR4XX_DMADA0] += destinc;
+			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+			break;
+		}
+	}
+	else
+	{
+		/* memory to peripheral */
+
+		// data is read from destination address!
+		switch (width)
+		{
+			/* byte transfer */
+			case 1:
+			do
+			{
+				UINT8 data = ppc->program->read_byte(dmaregs[DCR4XX_DMADA0]);
+				if (ppc->ext_dma_write_handler[dmachan] != NULL)
+					(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 1, data);
+				dmaregs[DCR4XX_DMADA0] += destinc;
+			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+			break;
+
+			/* word transfer */
+			case 2:
+			do
+			{
+				UINT16 data = ppc->program->read_word(dmaregs[DCR4XX_DMADA0]);
+				if (ppc->ext_dma_write_handler[dmachan] != NULL)
+					(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 2, data);
+				dmaregs[DCR4XX_DMADA0] += destinc;
+			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+			break;
+
+			/* dword transfer */
+			case 4:
+			do
+			{
+				UINT32 data = ppc->program->read_dword(dmaregs[DCR4XX_DMADA0]);
+				if (ppc->ext_dma_write_handler[dmachan] != NULL)
+					(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 4, data);
+				dmaregs[DCR4XX_DMADA0] += destinc;
+			} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
+			break;
+		}	
+	}
 }
 
 
@@ -1848,8 +2025,6 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 	/* check for unsupported features */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TCE))
 		fatalerror("ppc4xx_dma_exec: DMA_TCE == 0");
-	if (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CH)
-		fatalerror("ppc4xx_dma_exec: DMA chaining not implemented");
 
 	/* transfer mode */
 	switch ((dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TM_MASK) >> 21)
@@ -1860,93 +2035,21 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 			{
 				/* buffered DMA with external peripheral */
 
-				width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_PW_MASK) >> 26];
-				destinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_DAI) ? width : 0;
+				INT64 numdata = dmaregs[DCR4XX_DMACT0];
+				if (numdata == 0)
+					numdata = 65536;
 
-				if (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TD)
+				INT64 time;
+				if (numdata > 100)
 				{
-					/* peripheral to memory */
-
-					switch (width)
-					{
-						/* byte transfer */
-						case 1:
-							do
-							{
-								UINT8 data = 0;
-								if (ppc->ext_dma_read_handler[dmachan] != NULL)
-									data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 1);
-								ppc->program->write_byte(dmaregs[DCR4XX_DMADA0], data);
-								dmaregs[DCR4XX_DMADA0] += destinc;
-							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
-							break;
-
-						/* word transfer */
-						case 2:
-							do
-							{
-								UINT16 data = 0;
-								if (ppc->ext_dma_read_handler[dmachan] != NULL)
-									data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 2);
-								ppc->program->write_word(dmaregs[DCR4XX_DMADA0], data);
-								dmaregs[DCR4XX_DMADA0] += destinc;
-							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
-							break;
-
-						/* dword transfer */
-						case 4:
-							do
-							{
-								UINT32 data = 0;
-								if (ppc->ext_dma_read_handler[dmachan] != NULL)
-									data = (*ppc->ext_dma_read_handler[dmachan])(ppc->device, 4);
-								ppc->program->write_dword(dmaregs[DCR4XX_DMADA0], data);
-								dmaregs[DCR4XX_DMADA0] += destinc;
-							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
-							break;
-					}
+					time = (numdata * 1000000) / ppc->buffered_dma_rate[dmachan];
 				}
 				else
 				{
-					/* memory to peripheral */
-
-					// data is read from destination address!
-					switch (width)
-					{
-						/* byte transfer */
-						case 1:
-							do
-							{
-								UINT8 data = ppc->program->read_byte(dmaregs[DCR4XX_DMADA0]);
-								if (ppc->ext_dma_write_handler[dmachan] != NULL)
-									(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 1, data);
-								dmaregs[DCR4XX_DMADA0] += destinc;
-							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
-							break;
-
-						/* word transfer */
-						case 2:
-							do
-							{
-								UINT16 data = ppc->program->read_word(dmaregs[DCR4XX_DMADA0]);
-								if (ppc->ext_dma_write_handler[dmachan] != NULL)
-									(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 2, data);
-								dmaregs[DCR4XX_DMADA0] += destinc;
-							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
-							break;
-
-						/* dword transfer */
-						case 4:
-							do
-							{
-								UINT32 data = ppc->program->read_dword(dmaregs[DCR4XX_DMADA0]);
-								if (ppc->ext_dma_write_handler[dmachan] != NULL)
-									(*ppc->ext_dma_write_handler[dmachan])(ppc->device, 4, data);
-								dmaregs[DCR4XX_DMADA0] += destinc;
-							} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
-							break;
-					}
+					time = 0;		// let very short transfers occur instantly
 				}
+
+				ppc->buffered_dma_timer[dmachan]->adjust(attotime::from_usec(time), dmachan);
 			}
 			else		/* buffered DMA with internal peripheral (SPU) */
 			{
@@ -2360,10 +2463,11 @@ void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval)
     specific external DMA read handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_set_dma_read_handler(device_t *device, int channel, ppc4xx_dma_read_handler handler)
+void ppc4xx_set_dma_read_handler(device_t *device, int channel, ppc4xx_dma_read_handler handler, int rate)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc->ext_dma_read_handler[channel] = handler;
+	ppc->buffered_dma_rate[channel] = rate;
 }
 
 /*-------------------------------------------------
@@ -2371,10 +2475,11 @@ void ppc4xx_set_dma_read_handler(device_t *device, int channel, ppc4xx_dma_read_
     specific external DMA write handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_write_handler handler)
+void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_write_handler handler, int rate)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc->ext_dma_write_handler[channel] = handler;
+	ppc->buffered_dma_rate[channel] = rate;
 }
 
 
