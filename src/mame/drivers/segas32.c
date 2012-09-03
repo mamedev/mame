@@ -7,6 +7,7 @@
     Still to do:
         * fix protection
         * fix jpark correctly
+        * f1lap link
 
 ****************************************************************************
 
@@ -350,8 +351,8 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
  *************************************/
 
 #define MASTER_CLOCK		32215900
-#define RFC_CLOCK			50000000
-#define MULTI32_CLOCK		40000000
+#define RFC_CLOCK			XTAL_50MHz
+#define MULTI32_CLOCK		XTAL_40MHz
 
 #define TIMER_0_CLOCK		((MASTER_CLOCK/2)/2048)	/* confirmed */
 #define TIMER_1_CLOCK		((RFC_CLOCK/16)/256)	/* confirmed */
@@ -1566,25 +1567,45 @@ static INPUT_PORTS_START( f1en )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ANALOG1")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 
 	PORT_START("ANALOG2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
 
 	PORT_START("ANALOG3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( f1lap )
-	PORT_INCLUDE( f1en )
+	PORT_INCLUDE( system32_generic )
 
 	PORT_MODIFY("P1_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Gear Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Gear Down")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Overtake")
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2_A")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("SERVICE12_A")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE34_A")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) // service coin mirror
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1594,7 +1615,15 @@ static INPUT_PORTS_START( f1lap )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("Steering Wheel")
+
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
+
+	PORT_START("ANALOG3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 
@@ -4378,7 +4407,7 @@ GAME( 1992, darkedge, 0,        system32,     darkedge, segas32_state, darkedge,
 GAME( 1992, darkedgej,darkedge, system32,     darkedge, segas32_state, darkedge, ROT0, "Sega",   "Dark Edge (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, dbzvrvs,  0,        system32,     dbzvrvs, segas32_state,  dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S.", GAME_IMPERFECT_GRAPHICS)
 GAME( 1991, f1en,     0,        system32,     f1en, segas32_state,     f1en,     ROT0, "Sega",   "F1 Exhaust Note", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, f1lap,    0,        system32,     f1lap, segas32_state,    f1lap,    ROT0, "Sega",   "F1 Super Lap", GAME_NOT_WORKING )
+GAME( 1993, f1lap,    0,        system32,     f1lap, segas32_state,    f1lap,    ROT0, "Sega",   "F1 Super Lap", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, ga2,      0,        system32_v25, ga2, segas32_state,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, ga2u,     ga2,      system32_v25, ga2u, segas32_state,     ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, ga2j,     ga2,      system32_v25, ga2, segas32_state,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", GAME_IMPERFECT_GRAPHICS )
