@@ -1,3 +1,9 @@
+/**************************************************************************
+
+Pinball
+Wico's only game : Af-tor
+
+***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -23,7 +29,17 @@ public:
 
 
 static ADDRESS_MAP_START( wico_map, AS_PROGRAM, 8, wico_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	//AM_RANGE(0x1fe0, 0x1fef) AM_READWRITE(io_r,io_w)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wico_sub_map, AS_PROGRAM, 8, wico_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM // shared ram with other cpu
+	//AM_RANGE(0x1fe0, 0x1fef) AM_READWRITE(io_r,io_w)
+	AM_RANGE(0x4000, 0x40ff) AM_RAM //nvram
+	AM_RANGE(0x8000, 0x9fff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wico )
@@ -41,6 +57,8 @@ static MACHINE_CONFIG_START( wico, wico_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 10000000 / 8)
 	MCFG_CPU_PROGRAM_MAP(wico_map)
+	MCFG_CPU_ADD("cpu2", M6809, 10000000 / 8)
+	MCFG_CPU_PROGRAM_MAP(wico_sub_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

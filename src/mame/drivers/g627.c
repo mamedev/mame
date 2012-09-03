@@ -1,9 +1,10 @@
 /*
+    Pinball
     Midway A084-91313-G627
            A080-91313-G627
            A082-91320-C000
 
-    Only one of it's kind
+    Only one of its kind
 */
 
 
@@ -31,7 +32,17 @@ public:
 
 
 static ADDRESS_MAP_START( g627_map, AS_PROGRAM, 8, g627_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x17ff) AM_ROM
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( g627_io, AS_IO, 8, g627_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//AM_RANGE(0x00, 0x02) AM_WRITE(disp_w)
+	//AM_RANGE(0x03, 0x07) AM_WRITE(port_0x_w)
+	//AM_RANGE(0x10, 0x17) AM_WRITE(port_1x_w)
+	//AM_RANGE(0x21, 0x22) AM_READ(port_2x_r)
+	//AM_RANGE(0x20, 0x25) AM_WRITE(port_2x_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( g627 )
@@ -49,6 +60,7 @@ static MACHINE_CONFIG_START( g627, g627_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
 	MCFG_CPU_PROGRAM_MAP(g627_map)
+	MCFG_CPU_IO_MAP(g627_io)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

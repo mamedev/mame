@@ -1,3 +1,9 @@
+/********************************************************************************
+
+Pinball
+NSM : Hot Fire Birds
+
+*********************************************************************************/
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
@@ -23,7 +29,8 @@ public:
 
 
 static ADDRESS_MAP_START( nsm_map, AS_PROGRAM, 8, nsm_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nsm )

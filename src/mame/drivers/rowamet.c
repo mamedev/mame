@@ -1,3 +1,9 @@
+/************************************************************************************
+
+Pinball
+Rowamet : Heavy Metal
+
+*************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -23,7 +29,20 @@ public:
 
 
 static ADDRESS_MAP_START( rowamet_map, AS_PROGRAM, 8, rowamet_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	//AM_RANGE(0x2800, 0x2806) AM_READ
+	AM_RANGE(0x4000, 0x40ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rowamet_sub_map, AS_PROGRAM, 8, rowamet_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rowamet_sub_io, AS_IO, 8, rowamet_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//AM_RANGE(0x00, 0x00) AM_READWRITE(snd_data_r,mute_w)
+	//AM_RANGE(0x01, 0x01) AM_WRITE(dac_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rowamet )
@@ -41,6 +60,9 @@ static MACHINE_CONFIG_START( rowamet, rowamet_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1888888)
 	MCFG_CPU_PROGRAM_MAP(rowamet_map)
+	MCFG_CPU_ADD("cpu2", Z80, 1888888)
+	MCFG_CPU_PROGRAM_MAP(rowamet_sub_map)
+	MCFG_CPU_IO_MAP(rowamet_sub_io)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -57,6 +79,7 @@ ROM_START(heavymtl)
 
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("hvymtl_s.bin", 0x0000, 0x1000, CRC(c525e6cb) SHA1(144e06fbbdd1f3e45ccca8bace6b04f876b1312c))
+	ROM_FILL(0, 1, 0) // remove erronous FF
 ROM_END
 
 /*-------------------------------------------------------------------
