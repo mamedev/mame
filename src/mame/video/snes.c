@@ -1903,7 +1903,10 @@ READ8_MEMBER( snes_state::snes_vram_read )
 			if (h == 1362)
 				res = m_snes_vram[offset];
 			else
+			{
+				printf("%d %d VRAM read, CHECK!\n",h,v);
 				res = 0;
+			}
 		}
 		else
 			res = m_snes_vram[offset];
@@ -1929,17 +1932,20 @@ WRITE8_MEMBER( snes_state::snes_vram_write )
 				m_snes_vram[offset] = snes_open_bus_r(&space, 0);
 			else
 			{
+				printf("%d %d VRAM write, CHECK!\n",h,v);
 				//no write
 			}
 		}
 		else if (v < snes_ppu.beam.last_visible_line)
 		{
+			printf("%d %d VRAM write, CHECK!\n",h,v);
 			//no write
 		}
 		else if (v == snes_ppu.beam.last_visible_line)
 		{
 			if (h <= 4)
 			{
+				printf("%d %d VRAM write, CHECK!\n",h,v);
 				//no write
 			}
 			else

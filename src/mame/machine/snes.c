@@ -804,6 +804,7 @@ WRITE8_HANDLER( snes_w_io )
 			cpu_set_reg(state->m_maincpu, _5A22_FASTROM, data & 1);
 			break;
 		case TIMEUP:	// IRQ Flag is cleared on both read and write
+			device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, CLEAR_LINE );
 			snes_ram[TIMEUP] = 0;
 			return;
 		/* Following are read-only */
