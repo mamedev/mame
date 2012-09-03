@@ -475,35 +475,6 @@ static DEVICE_START( c140 )
 	info->mixer_buffer_right = info->mixer_buffer_left + info->sample_rate;
 }
 
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( c140 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c140_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( c140 );		break;
-		case DEVINFO_FCT_STOP:							/* nothing */								break;
-		case DEVINFO_FCT_RESET:							/* nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "C140");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Namco PCM");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
 const device_type C140 = &device_creator<c140_device>;
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

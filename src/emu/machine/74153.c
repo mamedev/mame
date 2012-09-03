@@ -176,21 +176,6 @@ static DEVICE_RESET( ttl74153 )
     state->last_output[1] = -1;
 }
 
-DEVICE_GET_INFO(ttl74153)
-{
- switch (state)
- {
-
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(ttl74153_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(ttl74153); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(ttl74153); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "74153"); break;
- }
-}
-
 const device_type TTL74153 = &device_creator<ttl74153_device>;
 
 ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

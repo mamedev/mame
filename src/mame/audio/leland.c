@@ -280,23 +280,6 @@ static DEVICE_START( leland_sound )
 }
 
 
-DEVICE_GET_INFO( leland_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(leland_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(leland_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Leland DAC");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 void leland_dac_update(device_t *device, int dacnum, UINT8 sample)
 {
 	leland_sound_state *state = get_safe_token(device);
@@ -585,41 +568,6 @@ static DEVICE_START( redline_80186_sound )
 	leland_sound_state *state = get_safe_token(device);
 	state->m_is_redline = 1;
 	DEVICE_START_CALL(common_sh_start);
-}
-
-
-DEVICE_GET_INFO( leland_80186_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(leland_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(leland_80186_sound);	break;
-		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME(leland_80186_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Leland 80186 DAC");			break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
-DEVICE_GET_INFO( redline_80186_sound )
-{
-	switch (state)
-	{
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(leland_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(redline_80186_sound);	break;
-		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME(leland_80186_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Redline Racer 80186 DAC");		break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
 }
 
 

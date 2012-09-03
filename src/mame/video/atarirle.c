@@ -371,25 +371,6 @@ static DEVICE_START( atarirle )
 }
 
 
-DEVICE_GET_INFO( atarirle )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(atarirle_data);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(atarirle);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Atari RLE");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Atari RLE Video IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
-	}
-}
-
 const device_type ATARIRLE = &device_creator<atarirle_device>;
 
 atarirle_device::atarirle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

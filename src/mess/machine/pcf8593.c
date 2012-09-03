@@ -445,31 +445,6 @@ NVRAM_HANDLER( pcf8593 )
 #endif
 
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( pcf8593 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( pcf8593 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(pcf8593_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pcf8593);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(pcf8593);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "PCF8593 RTC");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "PCF8593 RTC");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
-	}
-}
-
 const device_type PCF8593 = &device_creator<pcf8593_device>;
 
 pcf8593_device::pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

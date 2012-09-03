@@ -288,27 +288,6 @@ static DEVICE_RESET( namco_06xx )
 }
 
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(namco_06xx)
-{
- switch (state)
- {
-
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namco_06xx_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(namco_06xx); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(namco_06xx); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Namco 06xx"); break;
-
-  case DEVINFO_STR_SHORTNAME: strcpy(info->s, "namco06xx"); break;
- }
-}
-
 const device_type NAMCO_06XX = &device_creator<namco_06xx_device>;
 
 namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

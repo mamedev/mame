@@ -27,8 +27,6 @@
 #define SEGA005_555_TIMER_FREQ		(1.44 / ((15000 + 2 * 4700) * 1.5e-6))
 #define SEGA005_COUNTER_FREQ		(100000)	/* unknown, just a guess */
 
-DEVICE_GET_INFO( sega005_sound );
-
 class sega005_sound_device : public device_t,
                                   public device_sound_interface
 {
@@ -624,20 +622,6 @@ static DEVICE_START( sega005_sound )
 	/* set the initial sound data */
 	state->m_sound_data = 0x00;
 	sega005_update_sound_data(machine);
-}
-
-
-DEVICE_GET_INFO( sega005_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sega005_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "005 Custom");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
 }
 
 

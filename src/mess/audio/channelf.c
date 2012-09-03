@@ -132,23 +132,6 @@ static DEVICE_START(channelf_sound)
 	state->envelope = 0;
 }
 
-
-DEVICE_GET_INFO( channelf_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(channelf_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(channelf_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Channel F");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type CHANNELF = &device_creator<channelf_sound_device>;
 
 channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

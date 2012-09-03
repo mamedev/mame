@@ -136,23 +136,6 @@ MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-/*****************************************************************************
-    DEVICE DEFINITION
-*****************************************************************************/
-DEVICE_GET_INFO(hyprolyb_adpcm)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(hyprolyb_adpcm_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(hyprolyb_adpcm); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(hyprolyb_adpcm); break;
-  
-  case DEVINFO_STR_NAME: strcpy(info->s, "Hyper Olympics Audio"); break;
- }
-}
-
 const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
 
 hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

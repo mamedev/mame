@@ -261,18 +261,6 @@ MACHINE_CONFIG_END
     DEVICE DEFINITION
 *****************************************************************************/
 
-DEVICE_GET_INFO(timeplt_audio)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(timeplt_audio_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(timeplt_audio); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Time Pilot Audio"); break;
- }
-}
-
 const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -435,36 +435,6 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
-
-/**************************************************************
-                         SUBWOOFEr(SOUND)
-**************************************************************/
-
-#if 0
-static DEVICE_START( subwoofer )
-{
-	/* Adjust the lowpass filter of the first three YM2610 channels */
-
-	mixer_set_lowpass_frequency(0, 20);
-	mixer_set_lowpass_frequency(1, 20);
-	mixer_set_lowpass_frequency(2, 20);
-}
-
-static DEVICE_GET_INFO( subwoofer )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(subwoofer);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Subwoofer");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-#endif
-
-
 /***********************************************************
                        MACHINE DRIVERS
 ***********************************************************/

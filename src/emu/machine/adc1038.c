@@ -161,24 +161,6 @@ static DEVICE_RESET( adc1038 )
 	adc1038->sars = 1;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(adc1038)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(adc1038_state); break;
- 
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(adc1038); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(adc1038); break;
-  
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 1038"); break;
- }
-}
-
 const device_type ADC1038 = &device_creator<adc1038_device>;
 
 adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

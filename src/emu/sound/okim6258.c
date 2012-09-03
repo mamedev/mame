@@ -353,34 +353,6 @@ WRITE8_DEVICE_HANDLER( okim6258_ctrl_w )
 }
 
 
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( okim6258 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(okim6258_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(okim6258);		break;
-		case DEVINFO_FCT_STOP:							/* nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(okim6258);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI6258");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "OKI ADPCM");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
 const device_type OKIM6258 = &device_creator<okim6258_device>;
 
 okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

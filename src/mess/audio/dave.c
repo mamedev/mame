@@ -817,23 +817,6 @@ b0 = 1: Enable 1kHz/50Hz/TG latch
 
 
 
-DEVICE_GET_INFO( dave_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dave_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dave_sound);	break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(dave_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Dave");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type DAVE = &device_creator<dave_sound_device>;
 
 dave_sound_device::dave_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

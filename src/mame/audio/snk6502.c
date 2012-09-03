@@ -665,22 +665,6 @@ static DEVICE_START( snk6502_sound )
 	state->m_tone_stream = device->machine().sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, snk6502_tone_update);
 }
 
-DEVICE_GET_INFO( snk6502_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(snk6502_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(snk6502_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "snk6502 Custom");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
 int snk6502_music0_playing(running_machine &machine)
 {
 	device_t *device = machine.device("snk6502");

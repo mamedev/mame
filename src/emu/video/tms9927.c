@@ -307,56 +307,6 @@ static DEVICE_RESET( tms9927 )
 {
 }
 
-
-DEVICE_GET_INFO( tms9927 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms9927_state);			break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tms9927);	break;
-		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME(tms9927);		break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(tms9927);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS9927");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "TMS9927 CRTC");			break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-DEVICE_GET_INFO( crt5027 )
-{
-	switch (state)
-	{
-		case DEVINFO_STR_NAME:							strcpy(info->s, "CRT5027");					break;
-		default:										DEVICE_GET_INFO_CALL(tms9927);				break;
-	}
-}
-
-DEVICE_GET_INFO( crt5037 )
-{
-	switch (state)
-	{
-		case DEVINFO_STR_NAME:							strcpy(info->s, "CRT5037");					break;
-		default:										DEVICE_GET_INFO_CALL(tms9927);				break;
-	}
-}
-
-DEVICE_GET_INFO( crt5057 )
-{
-	switch (state)
-	{
-		case DEVINFO_STR_NAME:							strcpy(info->s, "CRT5057");					break;
-		default:										DEVICE_GET_INFO_CALL(tms9927);				break;
-	}
-}
-
-
 const device_type TMS9927 = &device_creator<tms9927_device>;
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

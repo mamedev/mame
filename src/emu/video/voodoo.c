@@ -5028,64 +5028,6 @@ static DEVICE_RESET( voodoo )
 	soft_reset(v);
 }
 
-
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(voodoo)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(voodoo_state); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(voodoo); break;
-
-  case DEVINFO_FCT_STOP: info->stop = DEVICE_STOP_NAME(voodoo); break;
- }
-}
-
-
-DEVICE_GET_INFO(voodoo_1)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo Graphics"); break;
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_1); break;
-  default: DEVICE_GET_INFO_CALL(voodoo); break;
- }
-}
-
-DEVICE_GET_INFO(voodoo_2)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo 2"); break;
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_2); break;
-  default: DEVICE_GET_INFO_CALL(voodoo); break;
- }
-}
-DEVICE_GET_INFO(voodoo_banshee)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo Banshee"); break;
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_banshee); break;
-  default: DEVICE_GET_INFO_CALL(voodoo); break;
- }
-}
-
-DEVICE_GET_INFO(voodoo_3)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "3dfx Voodoo 3"); break;
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(voodoo_3); break;
-  default: DEVICE_GET_INFO_CALL(voodoo); break;
- }
-}
-
-
 /***************************************************************************
     COMMAND HANDLERS
 ***************************************************************************/

@@ -340,20 +340,6 @@ static DEVICE_START( pv1000_sound )
 }
 
 
-DEVICE_GET_INFO( pv1000_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pv1000_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC D65010G031");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 /* Interrupt is triggering 16 times during vblank. */
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
 static TIMER_CALLBACK( d65010_irq_on_cb )

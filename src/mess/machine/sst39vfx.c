@@ -178,46 +178,6 @@ NVRAM_HANDLER( sst39vfx )
 }
 #endif
 
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( sst39vf020 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( sst39vf020 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sst39vfx_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf020);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							/* Nothing */									break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SST39VF020");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "SST39VFxx");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */									break;
-	}
-}
-
-DEVICE_GET_INFO( sst39vf400a )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SST39VF400A");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf400a);	break;
-
-		default:										DEVICE_GET_INFO_CALL(sst39vf020);				break;
-	}
-}
-
 const device_type SST39VF020 = &device_creator<sst39vf020_device>;
 
 sst39vf020_device::sst39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

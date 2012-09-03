@@ -584,50 +584,6 @@ static DEVICE_RESET( smc91c9x )
 }
 
 
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-static DEVICE_GET_INFO( smc91c9x )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(smc91c9x_state);		break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(smc91c9x); break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(smc91c9x);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					/* provided by subclasses */			break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "SMC91C9X Ethernet Controller");break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-DEVICE_GET_INFO( smc91c94 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "SMC91C94");			break;
-		default:								DEVICE_GET_INFO_CALL(smc91c9x);			break;
-	}
-}
-
-DEVICE_GET_INFO( smc91c96 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "SMC91C96");			break;
-		default:								DEVICE_GET_INFO_CALL(smc91c9x);			break;
-	}
-}
-
 smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {

@@ -2150,24 +2150,6 @@ static DEVICE_RESET( vic3 )
 }
 
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(vic3)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vic3_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vic3); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vic3); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "4567 VIC III"); break;
- }
-}
-
 const device_type VIC3 = &device_creator<vic3_device>;
 
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

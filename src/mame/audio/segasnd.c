@@ -181,22 +181,6 @@ static DEVICE_START( speech_sound )
 }
 
 
-DEVICE_GET_INFO( speech_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(speech_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(speech_sound);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Sega Speech Sound Board");	break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type SEGASPEECH = &device_creator<speech_sound_device>;
 
 speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -899,23 +883,6 @@ static DEVICE_START( usb_sound )
 	state_save_register_item(machine, "usb", NULL, 0, usb->noise_filters[4].capval);
 }
 
-
-DEVICE_GET_INFO( usb_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(usb_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(usb_sound);		break;
-		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME(usb_sound);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Sega Universal Sound Board");	break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
 
 const device_type SEGAUSB = &device_creator<usb_sound_device>;
 

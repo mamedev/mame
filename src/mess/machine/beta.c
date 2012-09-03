@@ -328,36 +328,6 @@ static DEVICE_RESET( beta_disk )
 {
 }
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( beta_disk )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( beta_disk )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(beta_disk_state);							break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(beta_disk);						break;
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(beta_disk);		break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(beta_disk);					break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(beta_disk);					break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Beta Disk Interface");						break;
-		case DEVINFO_STR_SHORTNAME:						strcpy(info->s, "betadisk");								break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Beta Disk Interface");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
-	}
-}
-
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
 beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

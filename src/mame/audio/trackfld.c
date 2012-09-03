@@ -161,20 +161,6 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
     DEVICE DEFINITION
 *****************************************************************************/
 
-DEVICE_GET_INFO(trackfld_audio)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(trackfld_audio_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(trackfld_audio); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(trackfld_audio); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Track And Field Audio"); break;
- }
-}
-
 const device_type TRACKFLD_AUDIO = &device_creator<trackfld_audio_device>;
 
 trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

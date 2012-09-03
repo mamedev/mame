@@ -903,31 +903,6 @@ static DEVICE_RESET(duart68681)
 	duart68681->channel[1].tx_timer->adjust(attotime::never, 1);
 }
 
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO(duart68681)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(duart68681_state);	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(duart68681); break;
-		case DEVINFO_FCT_STOP:					/* nothing */ break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(duart68681);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "DUART 68681");			break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "DUART");				break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
 const device_type DUART68681 = &device_creator<duart68681_device>;
 
 duart68681_device::duart68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

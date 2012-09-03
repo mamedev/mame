@@ -951,25 +951,6 @@ static DEVICE_RESET( mos6560 )
 	mos6560->noisesamples = 1;
 }
 
-
-/*-------------------------------------------------
- Device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(mos6560)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mos6560_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(mos6560); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(mos6560); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "MOS 6560 / 6561 VIC"); break;
- }
-}
-
 const device_type MOS656X = &device_creator<mos6560_device>;
 
 mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

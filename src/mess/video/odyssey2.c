@@ -619,19 +619,6 @@ static DEVICE_START( odyssey2_sound )
 }
 
 
-DEVICE_GET_INFO( odyssey2_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(odyssey2_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "P8244/P8245");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 STREAM_UPDATE( odyssey2_sh_update )
 {
 	odyssey2_state *state = device->machine().driver_data<odyssey2_state>();

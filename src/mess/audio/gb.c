@@ -756,22 +756,6 @@ static DEVICE_START( gameboy_sound )
 }
 
 
-DEVICE_GET_INFO( gameboy_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gb_sound_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gameboy_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "LR35902");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type GAMEBOY = &device_creator<gameboy_sound_device>;
 
 gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

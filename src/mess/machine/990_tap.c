@@ -1066,29 +1066,6 @@ static DEVICE_START(tap_990)
 }
 
 
-DEVICE_GET_INFO( tap_990 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tap_990_t);								break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(tap_990);		break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tap_990);					break;
-		case DEVINFO_FCT_STOP:							/* Nothing */												break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Generic TI990 Tape Controller");								break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "TI990 Tape Controller");								break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
-	}
-}
-
 const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

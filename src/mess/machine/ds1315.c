@@ -239,31 +239,6 @@ static void ds1315_input_raw_data(device_t *device)
 }
 
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( ds1315 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( ds1315 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ds1315_t);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ds1315);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Dallas Semiconductor DS1315");	break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Dallas Semiconductor DS1315");	break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
-	}
-}
-
 const device_type DS1315 = &device_creator<ds1315_device>;
 
 ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

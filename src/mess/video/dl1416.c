@@ -171,47 +171,6 @@ static DEVICE_RESET( dl1416 )
 }
 
 
-DEVICE_GET_INFO( dl1416 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(dl1416_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( dl1416 );				break;
-		case DEVINFO_FCT_STOP:					/* Nothing */							break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( dl1416 );				break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "DL1416");						break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "DL1416");						break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.1");						break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");		break;
-	}
-}
-
-DEVICE_GET_INFO( dl1416b )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "DL1416B");						break;
-	    default: DEVICE_GET_INFO_CALL(dl1416); break;
-	}
-}
-
-DEVICE_GET_INFO( dl1416t )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "DL1416T");						break;
-	    default: DEVICE_GET_INFO_CALL(dl1416); break;
-	}
-}
-
 /*****************************************************************************
     IMPLEMENTATION
 *****************************************************************************/

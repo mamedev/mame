@@ -216,26 +216,6 @@ static DEVICE_RESET( asr733 )
 	asr_field_interrupt(device);
 }
 
-DEVICE_GET_INFO( asr733 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(asr_t);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(asr733);		break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(asr733);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "733 ASR");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "733 ASR Video");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
-	}
-}
-
 const device_type ASR733 = &device_creator<asr733_device>;
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

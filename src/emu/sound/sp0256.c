@@ -1365,31 +1365,6 @@ void sp0256_set_clock(device_t *device, int clock)
     sp->stream->set_sample_rate(clock / CLOCK_DIVIDER);
 }
 
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( sp0256 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sp0256_state); 				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sp0256 );			break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( sp0256 );			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SP0256");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "GI");							break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Joseph Zbiciak, tim lindner"); break;
-	}
-}
-
-
 const device_type SP0256 = &device_creator<sp0256_device>;
 
 sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

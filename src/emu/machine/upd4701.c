@@ -301,24 +301,6 @@ static DEVICE_RESET( upd4701 )
 	upd4701->cf = 1;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(upd4701)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(upd4701_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(upd4701); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(upd4701); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "NEC uPD4701 Encoder"); break;
- }
-}
-
 const device_type UPD4701 = &device_creator<upd4701_device>;
 
 upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

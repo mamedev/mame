@@ -110,28 +110,6 @@ static DEVICE_RESET( e05a03 )
 	e05a03->cndlp = 1;
 }
 
-DEVICE_GET_INFO( e05a03 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(e05a03_state);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(e05a03);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(e05a03);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "E05A03");						break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Epson printer gate array");	break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");			break;
-	}
-}
-
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/

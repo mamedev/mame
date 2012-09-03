@@ -260,34 +260,6 @@ READ_LINE_DEVICE_HANDLER( tms6100_data_r )
 	return tms->data;
 }
 
-/*-------------------------------------------------
-    TMS 6100 device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(tms6100)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tms6100_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms6100); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tms6100); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "TMS6100"); break;
- }
-}
-
-DEVICE_GET_INFO(m58819)
-{
- switch (state)
- {
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(m58819); break;
-  case DEVINFO_STR_NAME: strcpy(info->s, "M58819"); break;
-  default: DEVICE_GET_INFO_CALL(tms6100); break;
- }
-}
-
 const device_type TMS6100 = &device_creator<tms6100_device>;
 
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

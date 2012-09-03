@@ -135,49 +135,12 @@ enum
 //  MACROS
 //**************************************************************************
 
-// macro for declaring the configuration and device classes of a legacy device
-#define _DECLARE_LEGACY_DEVICE(name, basename, deviceclass, basedeviceclass)	\
-																				\
-DEVICE_GET_INFO( basename );													\
-																				\
-class deviceclass : public basedeviceclass										\
-{																				\
-public:																			\
-	deviceclass(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);	\
-};																				\
-																				\
-extern const device_type name
-
-// macro for defining the implementation needed for configuration and device classes
-#define _DEFINE_LEGACY_DEVICE(name, basename, deviceclass, basedeviceclass) 	\
-																				\
-deviceclass::deviceclass(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)	\
-	: basedeviceclass(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(basename))	\
-{																				\
-}																				\
-																				\
-const device_type name = &legacy_device_creator<deviceclass>
-
 // this template function creates a stub which constructs a device
 template<class _DeviceClass>
 device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
 	return global_alloc(_DeviceClass(mconfig, &legacy_device_creator<_DeviceClass>, tag, owner, clock));
 }
-
-
-// reduced macros that are easier to use, and map to the above two macros
-#define DECLARE_LEGACY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_device_base)
-#define DECLARE_LEGACY_SOUND_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_sound_device_base)
-
-#define DEFINE_LEGACY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_device_base)
-#define DEFINE_LEGACY_SOUND_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_sound_device_base)
-
-
-// macros to wrap legacy device functions
-#define DEVICE_GET_INFO_NAME(name)	device_get_config_##name
-#define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_t *device, UINT32 state, deviceinfo *info)
-#define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_START_NAME(name)		device_start_##name
 #define DEVICE_START(name)			void DEVICE_START_NAME(name)(device_t *device)
@@ -195,98 +158,11 @@ device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, 
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-union deviceinfo;
-class machine_config;
 class device_t;
 
 char *get_temp_string_buffer(void);
-resource_pool &machine_get_pool(running_machine &machine);
-
-
-// device interface function types
-typedef void (*device_get_config_func)(const device_t *device, UINT32 state, deviceinfo *info);
-
 typedef void (*device_start_func)(device_t *device);
 typedef void (*device_stop_func)(device_t *device);
 typedef void (*device_reset_func)(device_t *device);
-
-// the actual deviceinfo union
-union deviceinfo
-{
-	INT64					i;							// generic integers
-	void *					p;							// generic pointers
-	genf *  				f;							// generic function pointers
-	char *					s;							// generic strings
-
-	device_start_func		start;						// DEVINFO_FCT_START
-	device_stop_func		stop;						// DEVINFO_FCT_STOP
-	device_reset_func		reset;						// DEVINFO_FCT_RESET
-	const rom_entry *		romregion;					// DEVINFO_PTR_ROM_REGION
-	machine_config_constructor machine_config;			// DEVINFO_PTR_MACHINE_CONFIG
-	ioport_constructor ipt;								// DEVINFO_PTR_INPUT_PORTS
-	address_map_constructor	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	address_map_constructor	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	address_map_constructor	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	address_map_constructor	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-};
-
-
-// ======================> legacy_device_base
-
-// legacy_device_base serves as a common base class for legacy devices
-class legacy_device_base : public device_t
-{
-protected:
-	// construction/destruction
-	legacy_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
-	virtual ~legacy_device_base();
-
-public:
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-
-protected:
-	// device-level overrides
-	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_ptr(DEVINFO_PTR_ROM_REGION)); }
-	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
-	virtual ioport_constructor device_input_ports() const { return reinterpret_cast<ioport_constructor>(get_legacy_ptr(DEVINFO_PTR_INPUT_PORTS)); }
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
-
-	// access to legacy configuration info
-	INT64 get_legacy_int(UINT32 state) const;
-	void *get_legacy_ptr(UINT32 state) const;
-	genf *get_legacy_fct(UINT32 state) const;
-	const char *get_legacy_string(UINT32 state) const;
-
-	// configuration state
-	device_get_config_func		m_get_config_func;
-
-	// internal state
-	void *						m_token;
-};
-
-
-
-// ======================> legacy_sound_device_base
-
-// legacy_sound_device is a legacy_device_base with a sound interface
-class legacy_sound_device_base :	public legacy_device_base,
-									public device_sound_interface
-{
-protected:
-	// construction/destruction
-	legacy_sound_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-};
-
-
 
 #endif	/* __DEVLEGCY_H__ */

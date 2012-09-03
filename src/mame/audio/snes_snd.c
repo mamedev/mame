@@ -1359,24 +1359,6 @@ static DEVICE_RESET( snes_sound )
 	spc700_reset(device);
 }
 
-/*-------------------------------------------------
- Device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(snes_sound)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(snes_sound_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(snes_sound); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(snes_sound); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "SNES Custom DSP (SPC700)"); break;
- }
-}
-
 const device_type SNES = &device_creator<snes_sound_device>;
 
 snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

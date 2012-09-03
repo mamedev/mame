@@ -2808,27 +2808,6 @@ static DEVICE_START( mc68328 )
     mc68328_register_state_save(device);
 }
 
-DEVICE_GET_INFO( mc68328 )
-{
-    switch ( state )
-    {
-        /* --- the following bits of info are returned as 64-bit signed integers --- */
-        case DEVINFO_INT_TOKEN_BYTES:           info->i = sizeof(mc68328_t);                    break;
-
-        /* --- the following bits of info are returned as pointers to data or functions --- */
-        case DEVINFO_FCT_START:                 info->start = DEVICE_START_NAME(mc68328);       break;
-        case DEVINFO_FCT_STOP:                  /* nothing */                                   break;
-        case DEVINFO_FCT_RESET:                 info->reset = DEVICE_RESET_NAME(mc68328);       break;
-
-        /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case DEVINFO_STR_NAME:                  strcpy(info->s, "Motorola MC68328 (DragonBall) Integrated Processor"); break;
-        case DEVINFO_STR_FAMILY:                strcpy(info->s, "MC68328");                     break;
-        case DEVINFO_STR_VERSION:               strcpy(info->s, "1.00");                        break;
-        case DEVINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);                      break;
-        case DEVINFO_STR_CREDITS:               strcpy(info->s, "Copyright the MESS Teams and Ryan Holtz"); break;
-    }
-}
-
 const device_type MC68328 = &device_creator<mc68328_device>;
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

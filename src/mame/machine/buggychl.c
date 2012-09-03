@@ -235,25 +235,6 @@ static DEVICE_RESET( buggychl_mcu )
 	state->m_ddr_c = 0;
 }
 
-/*****************************************************************************
-    DEVICE DEFINITION
-*****************************************************************************/
-
-DEVICE_GET_INFO(buggychl_mcu)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(buggychl_mcu_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(buggychl_mcu); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(buggychl_mcu); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "BuggyChl MCU"); break;
-
- }
-}
-
 const device_type BUGGYCHL_MCU = &device_creator<buggychl_mcu_device>;
 
 buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

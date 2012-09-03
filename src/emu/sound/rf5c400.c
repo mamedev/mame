@@ -558,31 +558,6 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 	}
 }
 
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( rf5c400 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(rf5c400_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( rf5c400 );		break;
-		case DEVINFO_FCT_STOP:							/* nothing */									break;
-		case DEVINFO_FCT_RESET:							/* nothing */									break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RF5C400");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ricoh PCM");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");							break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team & hoot development team"); break;
-	}
-}
-
 const device_type RF5C400 = &device_creator<rf5c400_device>;
 
 rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

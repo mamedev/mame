@@ -659,21 +659,6 @@ static DEVICE_START(digitalker)
 	digitalker_register_for_save(dg);
 }
 
-DEVICE_GET_INFO(digitalker)
-{
-	switch(state) {
-	case DEVINFO_INT_TOKEN_BYTES:	info->i = sizeof(digitalker); break;
-	case DEVINFO_FCT_START:			info->start = DEVICE_START_NAME(digitalker); break;
-	case DEVINFO_FCT_STOP:      	break;
-	case DEVINFO_FCT_RESET:     	break;
-	case DEVINFO_STR_NAME:      	strcpy(info->s, "Digitalker"); break;
-	case DEVINFO_STR_FAMILY:	strcpy(info->s, "National Semiconductor"); break;
-	case DEVINFO_STR_VERSION:	strcpy(info->s, "1.0"); break;
-	case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__); break;
-	case DEVINFO_STR_CREDITS:	strcpy(info->s, "Copyright Olivier Galibert"); break;
-	}
-}
-
 void digitalker_0_cs_w(device_t *device, int line)
 {
 	digitalker *dg = get_safe_token(device);

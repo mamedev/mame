@@ -511,24 +511,6 @@ static DEVICE_RESET( exidy_sound )
 }
 
 
-DEVICE_GET_INFO( exidy_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(exidy_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(exidy_sound);	break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(exidy_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Exidy SFX");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 /*************************************
  *
  *  6532 interface
@@ -903,22 +885,6 @@ static DEVICE_RESET( venture_sound )
 }
 
 
-DEVICE_GET_INFO( venture_sound )
-{
-	switch (state)
-	{
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(exidy_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(venture_sound);	break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(venture_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Exidy SFX+PSG");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type EXIDY_VENTURE = &device_creator<venture_sound_device>;
 
 venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -1183,23 +1149,6 @@ static DEVICE_RESET( victory_sound )
        as the sound CPU checks port A before the main CPU ever writes to it */
 	pia1->set_a_input(0, 0);
 	pia1->ca1_w(1);
-}
-
-
-DEVICE_GET_INFO( victory_sound )
-{
-	switch (state)
-	{
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(exidy_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(victory_sound);	break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(victory_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Exidy SFX+PSG+Speech");		break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
 }
 
 

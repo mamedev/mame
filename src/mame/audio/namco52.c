@@ -224,28 +224,6 @@ static DEVICE_START( namco_52xx )
 }
 
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(namco_52xx)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namco_52xx_state); break;
-
-  case DEVINFO_PTR_ROM_REGION: info->romregion = ROM_NAME(namco_52xx); break;
-
-  case DEVINFO_PTR_MACHINE_CONFIG: info->machine_config = MACHINE_CONFIG_NAME(namco_52xx); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(namco_52xx); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Namco 52xx"); break;
-
-  case DEVINFO_STR_SHORTNAME: strcpy(info->s, "namco52"); break;
- }
-}
-
 const device_type NAMCO_52XX = &device_creator<namco_52xx_device>;
 
 namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

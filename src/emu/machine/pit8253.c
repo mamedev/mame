@@ -1154,40 +1154,6 @@ static DEVICE_RESET( pit8253 ) {
 	}
 }
 
-
-DEVICE_GET_INFO( pit8253 ) {
-	switch ( state ) {
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(pit8253_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pit8253);	break;
-		case DEVINFO_FCT_STOP:						/* nothing */								break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(pit8253);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "Intel PIT8253");			break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "PIT8253");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.00");					break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
-	}
-}
-
-
-DEVICE_GET_INFO( pit8254 ) {
-	switch ( state ) {
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "Intel PIT8254");			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pit8254);	break;
-
-		default:									DEVICE_GET_INFO_CALL(pit8253);				break;
-	}
-}
-
-
 const device_type PIT8253 = &device_creator<pit8253_device>;
 
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

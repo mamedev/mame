@@ -191,22 +191,6 @@ static DEVICE_START( renegade_adpcm )
 	state->m_adpcm.reset();
 }
 
-DEVICE_GET_INFO( renegade_adpcm )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(renegade_adpcm_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(renegade_adpcm);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Renegade Custom ADPCM");		break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type RENEGADE_ADPCM = &device_creator<renegade_adpcm_device>;
 
 renegade_adpcm_device::renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -658,24 +658,6 @@ static DEVICE_RESET( vdc8563 )
 	vdc8563->changed = 0;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(vdc8563)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vdc8563_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vdc8563); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vdc8563); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "8563 / 8568 VDC"); break;
- }
-}
-
 const device_type VDC8563 = &device_creator<vdc8563_device>;
 
 vdc8563_device::vdc8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -2004,59 +2004,6 @@ void tms5220_set_frequency(device_t *device, int frequency)
 	tms->clock = frequency;
 }
 
-
-
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(tms5220)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tms5220_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5220); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tms5220); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5220"); break;
- }
-}
-
-DEVICE_GET_INFO(tms5220c)
-{
- switch (state)
- {
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5220c); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5220C"); break;
-  default: DEVICE_GET_INFO_CALL(tms5220); break;
- }
-}
-
-DEVICE_GET_INFO(tmc0285)
-{
- switch (state)
- {
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tmc0285); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "TMC0285"); break;
-  default: DEVICE_GET_INFO_CALL(tms5220); break;
- }
-}
-
-DEVICE_GET_INFO(tms5200)
-{
- switch (state)
- {
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tms5200); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "TMS5200"); break;
-  default: DEVICE_GET_INFO_CALL(tms5220); break;
- }
-}
-
 const device_type TMS5220C = &device_creator<tms5220c_device>;
 
 tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

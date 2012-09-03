@@ -82,23 +82,6 @@ static DEVICE_START(s2636_sound)
     token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, s2636_update);
 }
 
-
-DEVICE_GET_INFO( s2636_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(s2636_sound);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(s2636_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "S2636");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type S2636_SOUND = &device_creator<s2636_sound_device>;
 
 s2636_sound_device::s2636_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

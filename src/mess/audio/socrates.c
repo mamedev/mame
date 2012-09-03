@@ -143,25 +143,6 @@ void socrates_snd_reg4_w(device_t *device, int data)
  * Generic get_info
  **************************************************************************/
 
-DEVICE_GET_INFO( socrates_snd )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(SocratesASIC);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( socrates_snd );	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Socrates Sound");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Socrates Sound");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Jonathan Gevaryahu and The MESS Team"); break;
-	}
-}
-
 const device_type SOCRATES = &device_creator<socrates_snd_device>;
 
 socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -174,32 +174,6 @@ WRITE8_DEVICE_HANDLER( y8950_control_port_w ) { y8950_w(device, 0, data); }
 WRITE8_DEVICE_HANDLER( y8950_write_port_w ) { y8950_w(device, 1, data); }
 
 
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( y8950 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(y8950_state);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( y8950 );				break;
-		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( y8950 );				break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( y8950 );				break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Y8950");							break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
 const device_type Y8950 = &device_creator<y8950_device>;
 
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

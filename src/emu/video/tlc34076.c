@@ -281,20 +281,6 @@ static DEVICE_START( tlc34076 )
 	state_save_register_global(device->machine(), state->dacbits);
 }
 
-DEVICE_GET_INFO(tlc34076)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tlc34076_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tlc34076); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tlc34076); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "TLC34076"); break;
- }
-}
-
 const device_type TLC34076 = &device_creator<tlc34076_device>;
 
 tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

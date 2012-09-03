@@ -164,21 +164,6 @@ static DEVICE_RESET( k056800 )
 	k056800->sound_cpu_irq1_enable = 0;
 }
 
-
-DEVICE_GET_INFO(k056800)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(k056800_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(k056800); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(k056800); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Konami 056800 MIRAC"); break;
- }
-}
-
 const device_type K056800 = &device_creator<k056800_device>;
 
 k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

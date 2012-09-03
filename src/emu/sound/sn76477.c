@@ -2467,23 +2467,6 @@ static DEVICE_STOP( sn76477 )
 		close_wav_file(sn);
 }
 
-
-DEVICE_GET_INFO( sn76477 )
-{
-	switch (state)
-	{
-	case DEVINFO_INT_TOKEN_BYTES:	info->i = sizeof(sn76477_state); break;
-	case DEVINFO_FCT_START:			info->start = DEVICE_START_NAME( sn76477 ); break;
-	case DEVINFO_FCT_STOP:			info->stop = DEVICE_STOP_NAME( sn76477 ); break;
-	case DEVINFO_STR_NAME:			strcpy(info->s, "SN76477"); break;
-	case DEVINFO_STR_FAMILY:	strcpy(info->s, "Analog"); break;
-	case DEVINFO_STR_VERSION:	strcpy(info->s, "2.1"); break;
-	case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__); break;
-	case DEVINFO_STR_CREDITS:	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
 const device_type SN76477 = &device_creator<sn76477_device>;
 
 sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

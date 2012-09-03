@@ -152,25 +152,6 @@ static DEVICE_RESET( nmk112 )
 	}
 }
 
-
-/*****************************************************************************
-    DEVICE DEFINITION
-*****************************************************************************/
-
-DEVICE_GET_INFO(nmk112)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(nmk112_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(nmk112); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(nmk112); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "NMK 112"); break;
- }
-}
-
 const device_type NMK112 = &device_creator<nmk112_device>;
 
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

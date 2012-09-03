@@ -329,8 +329,6 @@ extern const device_type APOLLO_MONO19I;
 	MCFG_FRAGMENT_ADD(apollo_mono19i) \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
 
-DEVICE_GET_INFO( apollo_mono19i );
-
 MACHINE_CONFIG_EXTERN( apollo_mono19i );
 
 class apollo_mono15i_device : public apollo_mono_device
@@ -352,8 +350,6 @@ extern const device_type APOLLO_MONO15I;
 #define MCFG_APOLLO_MONO15I_ADD( _tag) \
 	MCFG_FRAGMENT_ADD(apollo_mono15i) \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO15I, 0)
-
-DEVICE_GET_INFO( apollo_mono15i );
 
 MACHINE_CONFIG_EXTERN( apollo_mono15i );
 

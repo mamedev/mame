@@ -194,23 +194,6 @@ static DEVICE_START( seibu_adpcm )
 	state->m_adpcm.reset();
 }
 
-DEVICE_GET_INFO( seibu_adpcm )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(seibu_adpcm_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(seibu_adpcm);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Seibu ADPCM");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 // "decrypt" is a bit flowery here, as it's probably just line-swapping to
 // simplify PCB layout/routing rather than intentional protection, but it
 // still fits, especially since the Z80s for all these games are truly encrypted.

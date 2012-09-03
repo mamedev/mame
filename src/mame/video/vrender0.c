@@ -601,19 +601,6 @@ static DEVICE_RESET( vr0video )
 	vr0->LastPalUpdate = 0xffffffff;
 }
 
-DEVICE_GET_INFO(vr0video)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vr0video_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vr0video); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vr0video); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "VRender0"); break;
- }
-}
 const device_type VIDEO_VRENDER0 = &device_creator<vr0video_device>;
 
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

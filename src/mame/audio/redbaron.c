@@ -226,24 +226,6 @@ static DEVICE_START( redbaron_sound )
 	state->m_channel = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
 }
 
-
-DEVICE_GET_INFO( redbaron_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(redbaron_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(redbaron_sound);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Red Baron Custom");			break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 const device_type REDBARON = &device_creator<redbaron_sound_device>;
 
 redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

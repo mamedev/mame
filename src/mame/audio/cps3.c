@@ -117,23 +117,6 @@ static DEVICE_START( cps3_sound )
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
 }
 
-DEVICE_GET_INFO( cps3_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cps3_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cps3_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "CPS3 Custom");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 WRITE32_DEVICE_HANDLER( cps3_sound_w )
 {
 	cps3_sound_state *state = get_safe_token(device);

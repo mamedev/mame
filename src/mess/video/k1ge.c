@@ -892,37 +892,6 @@ static DEVICE_RESET( k1ge )
 }
 
 
-DEVICE_GET_INFO( k1ge )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof( k1ge_t ); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( k1ge ); break;
-		case DEVINFO_FCT_STOP:					break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME( k1ge ); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy( info->s, "SNK K1GE" ); break;
-		case DEVINFO_STR_FAMILY:				strcpy( info->s, "KxGE" ); break;
-		case DEVINFO_STR_VERSION:				strcpy( info->s, "1.0" ); break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy( info->s, __FILE__ );
-		case DEVINFO_STR_CREDITS:				strcpy( info->s, "Copyright the MESS team" ); break;
-	}
-}
-
-
-DEVICE_GET_INFO( k2ge )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( k2ge ); break;
-		default:								DEVICE_GET_INFO_CALL( k1ge ); break;
-	}
-}
-
 const device_type K1GE = &device_creator<k1ge_device>;
 
 k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

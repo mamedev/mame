@@ -735,32 +735,6 @@ UINT8 applefdc_get_lines(device_t *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO(applefdc_base) - device get info
-    callback
--------------------------------------------------*/
-
-static DEVICE_GET_INFO(applefdc_base)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(applefdc_token);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							/* Nothing */								break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(applefdc);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Apple FDC");						break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-	}
-}
-
-
-
-/*-------------------------------------------------
     DEVICE_START(oldfdc) - device start
     callback
 -------------------------------------------------*/
@@ -768,27 +742,6 @@ static DEVICE_GET_INFO(applefdc_base)
 static DEVICE_START(oldfdc)
 {
 	applefdc_start(device, APPLEFDC_APPLE2);
-}
-
-
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO(applefdc) - device get info
-    callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO(applefdc)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple FDC");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(oldfdc);	break;
-
-		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
-	}
 }
 
 
@@ -804,28 +757,6 @@ static DEVICE_START(iwm)
 }
 
 
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO(iwm) - device get info
-    callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO(iwm)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple IWM (Integrated Woz Machine)");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(iwm);	break;
-
-		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
-	}
-}
-
-
-
 /*-------------------------------------------------
     DEVICE_START(iwm) - device start
     callback
@@ -836,26 +767,6 @@ static DEVICE_START(swim)
 	applefdc_start(device, APPLEFDC_SWIM);
 }
 
-
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO(swim) - device get info
-    callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO(swim)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple SWIM (Steve Woz Integrated Machine)");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(swim);	break;
-
-		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
-	}
-}
 
 applefdc_base_device::applefdc_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)

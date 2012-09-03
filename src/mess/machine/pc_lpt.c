@@ -115,31 +115,6 @@ static DEVICE_RESET( pc_lpt )
 	lpt->data = 0xff;
 }
 
-DEVICE_GET_INFO( pc_lpt )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pc_lpt_state);			break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_CONFIG_NAME(pc_lpt);	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pc_lpt);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(pc_lpt);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "PC-LPT");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Parallel port");		break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");	break;
-	}
-}
-
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/

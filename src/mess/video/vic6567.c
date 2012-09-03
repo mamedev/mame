@@ -2800,24 +2800,6 @@ static DEVICE_RESET( vic2 )
 }
 
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(vic2)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(vic2_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(vic2); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(vic2); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "6567 / 6569 VIC II"); break;
- }
-}
-
 const device_type VIC2 = &device_creator<vic2_device>;
 
 vic2_device::vic2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

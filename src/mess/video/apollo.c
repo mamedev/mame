@@ -834,48 +834,6 @@ static DEVICE_RESET( apollo_mono15i ) {
 	DEVICE_RESET_CALL(apollo_mono19i);
 }
 
-/*-------------------------------------------------
- DEVICE_GET_INFO( apollo_mono19i/15i )
- -------------------------------------------------*/
-
-DEVICE_GET_INFO( apollo_mono19i ) {
-	switch (state) {
-	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case DEVINFO_INT_TOKEN_BYTES:          info->i = sizeof(screen_data_t); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-	case DEVINFO_FCT_START:                info->start = DEVICE_START_NAME(apollo_mono19i); break;
-	case DEVINFO_FCT_STOP:                 /* Nothing */ break;
-	case DEVINFO_FCT_RESET:                info->reset = DEVICE_RESET_NAME(apollo_mono19i); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME:                 strcpy(info->s, "Apollo 19\" Monochrome Screen"); break;
-	case DEVINFO_STR_FAMILY:               strcpy(info->s, "Terminal"); break;
-	case DEVINFO_STR_VERSION:              strcpy(info->s, "1.0"); break;
-	case DEVINFO_STR_SOURCE_FILE:          strcpy(info->s, __FILE__); break;
-	case DEVINFO_STR_CREDITS:              strcpy(info->s, "Copyright the MESS Team"); break;
-	}
-}
-
-DEVICE_GET_INFO( apollo_mono15i ) {
-	switch (state) {
-	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case DEVINFO_INT_TOKEN_BYTES:          info->i = sizeof(screen_data_t); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-	case DEVINFO_FCT_START:                info->start = DEVICE_START_NAME(apollo_mono15i); break;
-	case DEVINFO_FCT_STOP:                 /* Nothing */ break;
-	case DEVINFO_FCT_RESET:                info->reset = DEVICE_RESET_NAME(apollo_mono15i); 	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME:                 strcpy(info->s, "Apollo 15\" Monochrome Screen"); break;
-	case DEVINFO_STR_FAMILY:               strcpy(info->s, "Terminal"); break;
-	case DEVINFO_STR_VERSION:              strcpy(info->s, "1.0"); break;
-	case DEVINFO_STR_SOURCE_FILE:          strcpy(info->s, __FILE__); break;
-	case DEVINFO_STR_CREDITS:              strcpy(info->s, "Copyright the MESS Team"); break;
-	}
-}
-
 apollo_mono_device::apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {

@@ -313,20 +313,6 @@ static DEVICE_RESET( tc0140syt )
 	}
 }
 
-DEVICE_GET_INFO(tc0140syt)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(tc0140syt_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(tc0140syt); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(tc0140syt); break;
-
- case DEVINFO_STR_NAME: strcpy(info->s, "Taito TC0140SYT"); break;
- }
-}
-
 const device_type TC0140SYT = &device_creator<tc0140syt_device>;
 
 tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

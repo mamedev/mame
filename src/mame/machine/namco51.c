@@ -440,31 +440,6 @@ static DEVICE_RESET( namco_51xx )
 }
 
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(namco_51xx)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namco_51xx_state); break;
-
-  case DEVINFO_PTR_ROM_REGION: info->romregion = ROM_NAME(namco_51xx); break;
-
-  case DEVINFO_PTR_MACHINE_CONFIG: info->machine_config = MACHINE_CONFIG_NAME(namco_51xx); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(namco_51xx); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(namco_51xx); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Namco 51xx"); break;
-
-  case DEVINFO_STR_SHORTNAME: strcpy(info->s, "namco51"); break;
-
- }
-}
-
 const device_type NAMCO_51XX = &device_creator<namco_51xx_device>;
 
 namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

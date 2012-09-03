@@ -414,59 +414,6 @@ NVRAM_HANDLER( at45dbxx )
 #endif
 
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( at45db041 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( at45db041 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(at45dbxx_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db041);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(at45dbxx);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AT45DB041");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "AT45DBxx");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
-	}
-}
-
-DEVICE_GET_INFO( at45db081 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AT45DB081");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db081);	break;
-
-		default:										DEVICE_GET_INFO_CALL(at45db041);				break;
-	}
-}
-
-DEVICE_GET_INFO( at45db161 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AT45DB161");				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db161);	break;
-
-		default:										DEVICE_GET_INFO_CALL(at45db041);				break;
-	}
-}
-
 const device_type AT45DB041 = &device_creator<at45db041_device>;
 
 at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

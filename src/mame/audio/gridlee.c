@@ -80,24 +80,6 @@ static DEVICE_START( gridlee_sound )
 }
 
 
-DEVICE_GET_INFO( gridlee_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gridlee_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gridlee_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Gridlee Custom");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
-
 WRITE8_DEVICE_HANDLER( gridlee_sound_w )
 {
 	gridlee_sound_state *state = get_safe_token(device);

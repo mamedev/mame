@@ -82,23 +82,6 @@ static DEVICE_START(vc4000_sound)
     token->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, vc4000_update);
 }
 
-
-DEVICE_GET_INFO( vc4000_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vc4000_sound);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vc4000_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "VC 4000 Custom");				break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type VC4000 = &device_creator<vc4000_sound_device>;
 
 vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

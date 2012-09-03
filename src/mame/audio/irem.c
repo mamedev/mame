@@ -486,21 +486,6 @@ MACHINE_CONFIG_DERIVED( m62_audio, irem_audio_base )
 	MCFG_CPU_PROGRAM_MAP(m62_sound_map)
 MACHINE_CONFIG_END
 
-/*****************************************************************************
-    DEVICE DEFINITION
-*****************************************************************************/
-DEVICE_GET_INFO(irem_audio)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(irem_audio_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(irem_audio); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Irem Audio"); break;
- }
-}
-
 const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
 
 irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

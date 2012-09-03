@@ -365,18 +365,6 @@ static DEVICE_START( s2636 )
 	device->save_item(NAME(*s2636->collision_bitmap));
 }
 
-DEVICE_GET_INFO(s2636)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(s2636_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(s2636); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Signetics 2636"); break;
- }
-}
-
 const device_type S2636 = &device_creator<s2636_device>;
 
 s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

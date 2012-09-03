@@ -1039,28 +1039,6 @@ static DEVICE_START( mc6854 )
 
 
 
-/************************** configuration ****************************/
-
-
-DEVICE_GET_INFO( mc6854 ) {
-	switch ( state ) {
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mc6854_t);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mc6854);	break;
-		case DEVINFO_FCT_STOP:				/* nothing */					break;
-		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(mc6854);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:				strcpy(info->s, "Motorola MC6854 ADLC");		break;
-		case DEVINFO_STR_FAMILY:			strcpy(info->s, "MC6854");				break;
-		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.00");				break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams");  break;
-	}
-}
-
 const device_type MC6854 = &device_creator<mc6854_device>;
 
 mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

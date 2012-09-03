@@ -99,25 +99,6 @@ static DEVICE_START( strataflash )
 		strata->prot_regs[i] = device->machine().rand();
 }
 
-DEVICE_GET_INFO( strataflash )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(strata_t);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(strataflash);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Intel 28F640J5");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 28F640J5");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
-	}
-}
-
 const device_type STRATAFLASH = &device_creator<strataflash_device>;
 
 strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

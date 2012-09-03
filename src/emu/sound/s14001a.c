@@ -629,25 +629,6 @@ void s14001a_set_volume(device_t *device, int volume)
 	chip->VSU1000_amp = volume;
 }
 
-DEVICE_GET_INFO( s14001a )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(S14001AChip);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME( s14001a );		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "S14001A");						break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "TSI S14001A");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.32");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Jonathan Gevaryahu"); break;
-	}
-}
-
 const device_type S14001A = &device_creator<s14001a_device>;
 
 s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

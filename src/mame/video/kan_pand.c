@@ -325,20 +325,6 @@ static DEVICE_RESET( kaneko_pandora )
 	pandora->clear_bitmap = 1;
 }
 
-DEVICE_GET_INFO(kaneko_pandora)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(kaneko_pandora_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(kaneko_pandora); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(kaneko_pandora); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Kaneko Pandora - PX79C480FP-3"); break;
- }
-}
-
 const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

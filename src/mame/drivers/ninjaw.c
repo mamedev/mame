@@ -673,19 +673,6 @@ static DEVICE_START( subwoofer )
 	return 0;
 }
 
-static DEVICE_GET_INFO( subwoofer )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(subwoofer);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Subwoofer");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
 class subwoofer_device : public device_t,
                                   public device_sound_interface
 {

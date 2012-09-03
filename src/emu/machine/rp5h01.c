@@ -222,24 +222,6 @@ static DEVICE_RESET( rp5h01 )
 	rp5h01->old_clock = -1;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(rp5h01)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(rp5h01_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(rp5h01); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(rp5h01); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "RP5H01"); break;
- }
-}
-
 const device_type RP5H01 = &device_creator<rp5h01_device>;
 
 rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

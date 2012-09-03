@@ -266,20 +266,6 @@ static DEVICE_RESET( mb87078 )
 	mb87078_reset_comp_w(device, 1);
 }
 
-DEVICE_GET_INFO(mb87078)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mb87078_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(mb87078); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(mb87078); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Fujitsu MB87078"); break;
- }
-}
-
 const device_type MB87078 = &device_creator<mb87078_device>;
 
 mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -88,6 +88,3 @@ private:
 };
 
 extern const device_type GAELCO_SERIAL;
-
-
-//DEVICE_GET_INFO( gaelco_serial );

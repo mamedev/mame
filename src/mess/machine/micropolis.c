@@ -377,25 +377,6 @@ void micropolis_reset(device_t *device)
 	DEVICE_RESET_CALL( micropolis );
 }
 
-
-/***************************************************************************
-    DEVICE GETINFO
-***************************************************************************/
-
-DEVICE_GET_INFO(micropolis)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(micropolis_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(micropolis); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(micropolis); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "MICROPOLIS"); break;
- }
-}
-
 const device_type MICROPOLIS = &device_creator<micropolis_device>;
 
 micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -381,20 +381,6 @@ static DEVICE_RESET( saa5050 )
 }
 
 
-DEVICE_GET_INFO(saa5050)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(saa5050_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(saa5050); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(saa5050); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "SAA5050"); break;
- }
-}
-
 const device_type SAA5050 = &device_creator<saa5050_device>;
 
 saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

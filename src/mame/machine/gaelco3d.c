@@ -498,28 +498,6 @@ static DEVICE_STOP( gaelco_serial )
 	osd_sharedmem_free(state->m_os_shmem);
 }
 
-DEVICE_GET_INFO( gaelco_serial )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gaelco_serial_state);	break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gaelco_serial);break;
-		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME(gaelco_serial);break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(gaelco_serial);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "gaelco_serial");		break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "SERIAL");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
 const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 
 gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

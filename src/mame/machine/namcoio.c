@@ -544,20 +544,6 @@ static DEVICE_RESET( namcoio )
 	namcoio_set_reset_line(device, PULSE_LINE);
 }
 
-DEVICE_GET_INFO(namcoio)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(namcoio_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(namcoio); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(namcoio); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Namco 56xx, 58xx & 59xx"); break;
- }
-}
-
 const device_type NAMCO56XX = &device_creator<namcoio_device>;
 
 namcoio_device::namcoio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

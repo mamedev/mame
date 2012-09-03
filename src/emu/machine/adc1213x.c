@@ -354,42 +354,6 @@ static DEVICE_RESET( adc12138 )
 	adc1213x->acq_time = ADC1213X_ACQUISITION_TIME_10_CCLK;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(adc12138)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(adc12138_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(adc12138); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(adc12138); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converter 12138"); break;
- }
-}
-
-DEVICE_GET_INFO(adc12130)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converter 12130"); break;
-  default: DEVICE_GET_INFO_CALL(adc12138); break;
- }
-}
-
-DEVICE_GET_INFO(adc12132)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converter 12132"); break;
-  default: DEVICE_GET_INFO_CALL(adc12138); break;
- }
-}
-
 const device_type ADC12130 = &device_creator<adc12130_device>;
 
 adc12130_device::adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

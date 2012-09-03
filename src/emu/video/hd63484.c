@@ -1577,20 +1577,6 @@ static DEVICE_RESET( hd63484 )
 	hd63484->fifo_counter = 0;
 }
 
-DEVICE_GET_INFO(hd63484)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(hd63484_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(hd63484); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(hd63484); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "HD63484"); break;
- }
-}
-
 const device_type HD63484 = &device_creator<hd63484_device>;
 
 hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

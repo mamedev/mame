@@ -505,51 +505,6 @@ static DEVICE_RESET( adc0831 )
 	adc083x->state = STATE_IDLE;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(adc0831)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(adc0831_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(adc0831); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(adc0831); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0831"); break;
- }
-}
-
-DEVICE_GET_INFO(adc0832)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0832"); break;
-  default: DEVICE_GET_INFO_CALL(adc0831); break;
- }
-}
-
-DEVICE_GET_INFO(adc0834)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0834"); break;
-  default: DEVICE_GET_INFO_CALL(adc0831); break;
- }
-}
-
-DEVICE_GET_INFO(adc0838)
-{
- switch (state)
- {
-  case DEVINFO_STR_NAME: strcpy(info->s, "A/D Converters 0838"); break;
-  default: DEVICE_GET_INFO_CALL(adc0831); break;
- }
-}
-
 const device_type ADC0831 = &device_creator<adc0831_device>;
 
 adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -320,24 +320,6 @@ static DEVICE_RESET( tx1_sound )
 	state->m_step0 = state->m_step1 = state->m_step2 = 0;
 }
 
-DEVICE_GET_INFO( tx1_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tx1_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tx1_sound);		break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(tx1_sound);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "TX-1 Custom");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 /*************************************
  *
  *  Buggy Boy
@@ -591,30 +573,11 @@ static DEVICE_RESET( buggyboy_sound )
 	state->m_noise_lfsrd = 0;
 }
 
-DEVICE_GET_INFO( buggyboy_sound )
-{
-	switch (state)
-	{
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tx1_sound_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(buggyboy_sound);	break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(buggyboy_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Buggy Boy Custom");			break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
-
 const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BUGGYBOY, "Buggy Boy Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Custom", tag, owner, clock)
 {
-	m_token = global_alloc_array_clear(UINT8, sizeof(tx1_sound_state));
 }
 
 //-------------------------------------------------
@@ -665,6 +628,12 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *ta
 	m_token = global_alloc_array_clear(UINT8, sizeof(tx1_sound_state));
 }
 
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tx1_sound_state));
+}
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

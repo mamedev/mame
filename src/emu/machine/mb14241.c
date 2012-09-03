@@ -68,20 +68,6 @@ static DEVICE_RESET( mb14241 )
 	mb14241->shift_count = 0;
 }
 
-DEVICE_GET_INFO(mb14241)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mb14241_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(mb14241); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(mb14241); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "MB14241"); break;
- }
-}
-
 const device_type MB14241 = &device_creator<mb14241_device>;
 
 mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

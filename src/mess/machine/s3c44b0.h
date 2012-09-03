@@ -103,8 +103,6 @@ struct _s3c44b0_interface
     PROTOTYPES
 *******************************************************************************/
 
-DEVICE_GET_INFO( s3c44b0 );
-
 VIDEO_START( s3c44b0 );
 SCREEN_UPDATE_RGB32( s3c44b0 );
 

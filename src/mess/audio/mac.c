@@ -188,22 +188,6 @@ void mac_sh_updatebuffer(device_t *device)
 }
 
 
-DEVICE_GET_INFO( mac_sound )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:		info->i = sizeof(mac_sound);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mac_sound);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:				strcpy(info->s, "Mac Custom");					break;
-		case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type MAC_SOUND = &device_creator<mac_sound_device>;
 
 mac_sound_device::mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

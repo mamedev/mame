@@ -30,6 +30,7 @@ class es5505_device : public device_t,
 {
 public:
 	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	es5505_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	~es5505_device() { global_free(m_token); }
 
 	// access to legacy token
@@ -67,15 +68,10 @@ READ8_DEVICE_HANDLER( es5506_r );
 WRITE8_DEVICE_HANDLER( es5506_w );
 void es5506_voice_bank_w(device_t *device, int voice, int bank);
 
-class es5506_device : public device_t,
-                                  public device_sound_interface
+class es5506_device : public es5505_device
 {
 public:
 	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~es5506_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -87,7 +83,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	void *m_token;
 };
 
 extern const device_type ES5506;

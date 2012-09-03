@@ -47,35 +47,6 @@ WRITE8_DEVICE_HANDLER( tia_sound_w )
 	tia_write(info->chip, offset, data);
 }
 
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-DEVICE_GET_INFO( tia )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tia_state);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tia );		break;
-		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( tia );			break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "TIA");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Atari custom");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
 const device_type TIA = &device_creator<tia_device>;
 
 tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

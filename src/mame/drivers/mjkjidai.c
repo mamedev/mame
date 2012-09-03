@@ -101,21 +101,6 @@ static DEVICE_START( mjkjidai_adpcm )
 	state->m_adpcm.reset();
 }
 
-DEVICE_GET_INFO( mjkjidai_adpcm )
-{
-	switch (state)
-	{
-		case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mjkjidai_adpcm_state); break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mjkjidai_adpcm);break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Custom ADPCM");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
-	}
-}
-
 const device_type MJKJIDAI = &device_creator<mjkjidai_adpcm_device>;
 
 mjkjidai_adpcm_device::mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

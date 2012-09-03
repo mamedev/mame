@@ -913,26 +913,6 @@ WRITE32_DEVICE_HANDLER( amiga_akiko32_w )
 	}
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(akiko)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(akiko_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(akiko); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(akiko); break;
-
-  case DEVINFO_FCT_STOP: info->stop = DEVICE_STOP_NAME(akiko); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Akiko"); break;
- }
-}
-
 const device_type AKIKO = &device_creator<akiko_device>;
 
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

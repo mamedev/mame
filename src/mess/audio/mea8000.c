@@ -701,27 +701,6 @@ static DEVICE_START( mea8000 )
 }
 
 
-/************************** configuration ****************************/
-
-DEVICE_GET_INFO( mea8000 ) {
-	switch ( state ) {
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mea8000_t);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mea8000);	break;
-		case DEVINFO_FCT_STOP:				/* nothing */					break;
-		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(mea8000);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:				strcpy(info->s, "Philips / Signetics MEA 8000 speech synthesizer");		break;
-		case DEVINFO_STR_FAMILY:			strcpy(info->s, "MEA8000");				break;
-		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.00");				break;
-		case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams");  break;
-	}
-}
-
 const device_type MEA8000 = &device_creator<mea8000_device>;
 
 mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

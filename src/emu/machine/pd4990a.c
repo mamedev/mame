@@ -521,24 +521,6 @@ static DEVICE_RESET( upd4990a )
 	upd4990a->command_line = 0;
 }
 
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(upd4990a)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(upd4990a_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(upd4990a); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(upd4990a); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "NEC uPD4990A"); break;
- }
-}
-
 const device_type UPD4990A = &device_creator<upd4990a_device>;
 
 upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

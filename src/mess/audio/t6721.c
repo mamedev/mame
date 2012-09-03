@@ -284,25 +284,6 @@ static DEVICE_RESET( t6721 )
 	t6721->writeindex = 0;
 }
 
-
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-DEVICE_GET_INFO(t6721)
-{
- switch (state)
- {
-  case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(t6721_state); break;
-
-  case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(t6721); break;
-
-  case DEVINFO_FCT_RESET: info->reset = DEVICE_RESET_NAME(t6721); break;
-
-  case DEVINFO_STR_NAME: strcpy(info->s, "Toshiba 6721A"); break;
- }
-}
-
 const device_type T6721 = &device_creator<t6721_device>;
 
 t6721_device::t6721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
