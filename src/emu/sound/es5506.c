@@ -1570,26 +1570,6 @@ static DEVICE_START( es5505 )
 }
 
 
-
-/**********************************************************************************************
-
-     DEVICE_STOP( es5505 ) -- stop emulation of the ES5505
-
-***********************************************************************************************/
-
-static DEVICE_STOP( es5505 )
-{
-	DEVICE_STOP_CALL( es5506 );
-}
-
-
-static DEVICE_RESET( es5505 )
-{
-	DEVICE_RESET_CALL( es5506 );
-}
-
-
-
 /**********************************************************************************************
 
      es5505_reg_write -- handle a write to the selected ES5505 register
@@ -2153,75 +2133,20 @@ void es5505_voice_bank_w(device_t *device, int voice, int bank)
 	chip->voice[voice].exbank=bank;
 }
 
-const device_type ES5505 = &device_creator<es5505_device>;
+const device_type ES5506 = &device_creator<es5506_device>;
 
-es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ES5505, "ES5505", tag, owner, clock),
+es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_array_clear(UINT8, sizeof(es5506_state));
 }
 
-es5505_device::es5505_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+es5506_device::es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_array_clear(UINT8, sizeof(es5506_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void es5505_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void es5505_device::device_start()
-{
-	DEVICE_START_NAME( es5505 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void es5505_device::device_reset()
-{
-	DEVICE_RESET_NAME( es5505 )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void es5505_device::device_stop()
-{
-	DEVICE_STOP_NAME( es5505 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void es5505_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-
-const device_type ES5506 = &device_creator<es5506_device>;
-
-es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: es5505_device(mconfig, ES5506, "ES5506", tag, owner, clock)
-{
 }
 
 //-------------------------------------------------
@@ -2272,3 +2197,18 @@ void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 }
 
 
+const device_type ES5505 = &device_creator<es5505_device>;
+
+es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: es5506_device(mconfig, ES5505, "ES5505", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void es5505_device::device_start()
+{
+	DEVICE_START_NAME( es5505 )(this);
+}
