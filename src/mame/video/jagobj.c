@@ -12,25 +12,15 @@
 #define LOG_OBJECTS			0
 
 
-static UINT16 *scanline;
-static UINT16 *clutbase;
-static UINT8 *blend_y, *blend_cc;
-
-
-
 /*************************************
  *
  *  Object processor init
  *
  *************************************/
 
-void jagobj_init(running_machine &machine)
+void jaguar_state::jagobj_init()
 {
 	int i;
-
-	/* allocate memory for tables */
-	blend_y = auto_alloc_array(machine, UINT8, 256 * 256);
-	blend_cc = auto_alloc_array(machine, UINT8, 256 * 256);
 
 	/* fill tables */
 	for (i = 0; i < 256 * 256; i++)
@@ -45,7 +35,7 @@ void jagobj_init(running_machine &machine)
 		y += dy;
 		if (y < 0) y = 0;
 		else if (y > 0xff) y = 0xff;
-		blend_y[i] = y;
+		m_blend_y[i] = y;
 
 		c1 += dc1;
 		if (c1 < 0) c1 = 0;
@@ -53,7 +43,7 @@ void jagobj_init(running_machine &machine)
 		c2 += dc2;
 		if (c2 < 0) c2 = 0;
 		else if (c2 > 0x0f) c2 = 0x0f;
-		blend_cc[i] = (c2 << 4) | c1;
+		m_blend_cc[i] = (c2 << 4) | c1;
 	}
 }
 
@@ -66,7 +56,7 @@ void jagobj_init(running_machine &machine)
  *************************************/
 
 #define BLEND(dst, src)		\
-	(dst) = (blend_cc[((dst) & 0xff00) | (((src) >> 8) & 0xff)] << 8) | blend_y[(((dst) & 0xff) << 8) | ((src) & 0xff)];
+	(dst) = (m_blend_cc[((dst) & 0xff00) | (((src) >> 8) & 0xff)] << 8) | m_blend_y[(((dst) & 0xff) << 8) | ((src) & 0xff)];
 
 
 
@@ -76,7 +66,7 @@ void jagobj_init(running_machine &machine)
  *
  *************************************/
 
-INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
+inline void jaguar_state::bitmap_4_draw(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos, UINT16 *clutbase)
 {
 	if (firstpix & 7)
 	{
@@ -182,56 +172,56 @@ INLINE void bitmap_4_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 	}
 }
 
-static void bitmap_4_0(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_0(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 0, 1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 0, 1, clutbase);
 }
 
-static void bitmap_4_1(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_1(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 1, -1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 1, -1, clutbase);
 }
 
-static void bitmap_4_2(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_2(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 2, 1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 2, 1, clutbase);
 }
 
-static void bitmap_4_3(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_3(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 3, -1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 3, -1, clutbase);
 }
 
-static void bitmap_4_4(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_4(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 4, 1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 4, 1, clutbase);
 }
 
-static void bitmap_4_5(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_5(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 5, -1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 5, -1, clutbase);
 }
 
-static void bitmap_4_6(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_6(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 6, 1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 6, 1, clutbase);
 }
 
-static void bitmap_4_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_4_7(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_4_draw(firstpix, iwidth, src, xpos, 7, -1);
+	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 7, -1, clutbase);
 }
 
-static void (*const bitmap4[8])(INT32, INT32, UINT32 *, INT32) =
+void (jaguar_state::*const jaguar_state::bitmap4[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *) =
 {
-	bitmap_4_0,
-	bitmap_4_1,
-	bitmap_4_2,
-	bitmap_4_3,
-	bitmap_4_4,
-	bitmap_4_5,
-	bitmap_4_6,
-	bitmap_4_7
+	&jaguar_state::bitmap_4_0,
+	&jaguar_state::bitmap_4_1,
+	&jaguar_state::bitmap_4_2,
+	&jaguar_state::bitmap_4_3,
+	&jaguar_state::bitmap_4_4,
+	&jaguar_state::bitmap_4_5,
+	&jaguar_state::bitmap_4_6,
+	&jaguar_state::bitmap_4_7
 };
 
 
@@ -242,7 +232,7 @@ static void (*const bitmap4[8])(INT32, INT32, UINT32 *, INT32) =
  *
  *************************************/
 
-INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
+inline void jaguar_state::bitmap_8_draw(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos, UINT16 *clutbase)
 {
 	if (firstpix & 3)
 	{
@@ -312,56 +302,56 @@ INLINE void bitmap_8_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos,
 	}
 }
 
-static void bitmap_8_0(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_0(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 0, 1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 0, 1, clutbase);
 }
 
-static void bitmap_8_1(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_1(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 1, -1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 1, -1, clutbase);
 }
 
-static void bitmap_8_2(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_2(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 2, 1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 2, 1, clutbase);
 }
 
-static void bitmap_8_3(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_3(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 3, -1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 3, -1, clutbase);
 }
 
-static void bitmap_8_4(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_4(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 4, 1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 4, 1, clutbase);
 }
 
-static void bitmap_8_5(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_5(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 5, -1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 5, -1, clutbase);
 }
 
-static void bitmap_8_6(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_6(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 6, 1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 6, 1, clutbase);
 }
 
-static void bitmap_8_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_8_7(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT16 *clutbase)
 {
-	bitmap_8_draw(firstpix, iwidth, src, xpos, 7, -1);
+	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 7, -1, clutbase);
 }
 
-static void (*const bitmap8[8])(INT32, INT32, UINT32 *, INT32) =
+void (jaguar_state::*const jaguar_state::bitmap8[8])(UINT16 *, INT32, INT32, UINT32 *, INT32, UINT16 *) =
 {
-	bitmap_8_0,
-	bitmap_8_1,
-	bitmap_8_2,
-	bitmap_8_3,
-	bitmap_8_4,
-	bitmap_8_5,
-	bitmap_8_6,
-	bitmap_8_7
+	&jaguar_state::bitmap_8_0,
+	&jaguar_state::bitmap_8_1,
+	&jaguar_state::bitmap_8_2,
+	&jaguar_state::bitmap_8_3,
+	&jaguar_state::bitmap_8_4,
+	&jaguar_state::bitmap_8_5,
+	&jaguar_state::bitmap_8_6,
+	&jaguar_state::bitmap_8_7
 };
 
 
@@ -372,7 +362,7 @@ static void (*const bitmap8[8])(INT32, INT32, UINT32 *, INT32) =
  *
  *************************************/
 
-INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
+inline void jaguar_state::bitmap_16_draw(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
 {
 	if (firstpix & 1)
 	{
@@ -419,56 +409,56 @@ INLINE void bitmap_16_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 	}
 }
 
-static void bitmap_16_0(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_0(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 0, 1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 0, 1);
 }
 
-static void bitmap_16_1(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_1(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 1, -1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 1, -1);
 }
 
-static void bitmap_16_2(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_2(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 2, 1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 2, 1);
 }
 
-static void bitmap_16_3(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_3(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 3, -1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 3, -1);
 }
 
-static void bitmap_16_4(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_4(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 4, 1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 4, 1);
 }
 
-static void bitmap_16_5(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_5(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 5, -1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 5, -1);
 }
 
-static void bitmap_16_6(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_6(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 6, 1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 6, 1);
 }
 
-static void bitmap_16_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_16_7(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_16_draw(firstpix, iwidth, src, xpos, 7, -1);
+	bitmap_16_draw(scanline, firstpix, iwidth, src, xpos, 7, -1);
 }
 
-static void (*const bitmap16[8])(INT32, INT32, UINT32 *, INT32) =
+void (jaguar_state::*const jaguar_state::bitmap16[8])(UINT16 *, INT32, INT32, UINT32 *, INT32) =
 {
-	bitmap_16_0,
-	bitmap_16_1,
-	bitmap_16_2,
-	bitmap_16_3,
-	bitmap_16_4,
-	bitmap_16_5,
-	bitmap_16_6,
-	bitmap_16_7
+	&jaguar_state::bitmap_16_0,
+	&jaguar_state::bitmap_16_1,
+	&jaguar_state::bitmap_16_2,
+	&jaguar_state::bitmap_16_3,
+	&jaguar_state::bitmap_16_4,
+	&jaguar_state::bitmap_16_5,
+	&jaguar_state::bitmap_16_6,
+	&jaguar_state::bitmap_16_7
 };
 
 
@@ -481,7 +471,7 @@ static void (*const bitmap16[8])(INT32, INT32, UINT32 *, INT32) =
  *
  *************************************/
 
-INLINE void bitmap_32_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
+inline void jaguar_state::bitmap_32_draw(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos, UINT8 flags, INT32 dxpos)
 {
 	iwidth -= firstpix;
 
@@ -497,61 +487,61 @@ INLINE void bitmap_32_draw(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos
 	}
 }
 
-static void bitmap_32_0(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_0(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 0, 1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 0, 1);
 }
 
-static void bitmap_32_1(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_1(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 1, -1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 1, -1);
 }
 
-static void bitmap_32_2(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_2(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 2, 1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 2, 1);
 }
 
-static void bitmap_32_3(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_3(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 3, -1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 3, -1);
 }
 
-static void bitmap_32_4(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_4(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 4, 1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 4, 1);
 }
 
-static void bitmap_32_5(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_5(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 5, -1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 5, -1);
 }
 
-static void bitmap_32_6(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_6(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 6, 1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 6, 1);
 }
 
-static void bitmap_32_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
+void jaguar_state::bitmap_32_7(UINT16 *scanline, INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 {
-	bitmap_32_draw(firstpix, iwidth, src, xpos, 7, -1);
+	bitmap_32_draw(scanline, firstpix, iwidth, src, xpos, 7, -1);
 }
 
-static void (*const bitmap32[8])(INT32, INT32, UINT32 *, INT32) =
+void (jaguar_state::*const jaguar_state::bitmap32[8])(UINT16 *, INT32, INT32, UINT32 *, INT32) =
 {
-	bitmap_32_0,
-	bitmap_32_1,
-	bitmap_32_2,
-	bitmap_32_3,
-	bitmap_32_4,
-	bitmap_32_5,
-	bitmap_32_6,
-	bitmap_32_7
+	&jaguar_state::bitmap_32_0,
+	&jaguar_state::bitmap_32_1,
+	&jaguar_state::bitmap_32_2,
+	&jaguar_state::bitmap_32_3,
+	&jaguar_state::bitmap_32_4,
+	&jaguar_state::bitmap_32_5,
+	&jaguar_state::bitmap_32_6,
+	&jaguar_state::bitmap_32_7
 };
 
 
 
-INLINE UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
+static inline UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
 {
 	int ppl		= 32 / depth;
 	UINT32 data	= src[((i & ppl) / ppl) + ((i / (ppl<<1)) * (pitch<<1))];
@@ -567,7 +557,7 @@ INLINE UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
  *
  *************************************/
 
-static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc, int logit)
+UINT32 *jaguar_state::process_bitmap(UINT16 *scanline, UINT32 *objdata, int vc, int logit)
 {
 	/* extract minimal data */
 	UINT32 upper = objdata[0];
@@ -576,7 +566,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 	UINT32 height = (lower >> 14) & 0x3ff;
 	UINT32 link = (lower >> 24) | ((upper & 0x7ff) << 8);
 	UINT32 data = (upper >> 11);
-	UINT32 *src = (UINT32 *)get_jaguar_memory(machine, data << 3);
+	UINT32 *src = (UINT32 *)memory_base(data << 3);
 
 	if (logit)
 	{
@@ -625,7 +615,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 			/* 1bpp case */
 			case 0:
 			{
-				UINT16 *clut = (UINT16 *)jaguar_gpu_clut + _index;
+				UINT16 *clut = (UINT16 *)&m_gpu_clut[0] + _index;
 
 				/* non-blending */
 				if (!(flags & 2))
@@ -658,7 +648,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 			/* 2bpp case */
 			case 1:
 			{
-				UINT16 *clut = (UINT16 *)jaguar_gpu_clut + (_index & 0xfc);
+				UINT16 *clut = (UINT16 *)&m_gpu_clut[0] + (_index & 0xfc);
 
 				/* non-blending */
 				if (!(flags & 2))
@@ -694,8 +684,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				clutbase = (UINT16 *)jaguar_gpu_clut + (_index & 0xf8);
-				(*bitmap4[flags])(firstpix, iwidth, src, xpos);
+				(this->*bitmap4[flags])(scanline, firstpix, iwidth, src, xpos, (UINT16 *)&m_gpu_clut[0] + (_index & 0xf8));
 				break;
 
 			/* 8bpp case */
@@ -704,8 +693,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				clutbase = (UINT16 *)jaguar_gpu_clut;
-				(*bitmap8[flags])(firstpix, iwidth, src, xpos);
+				(this->*bitmap8[flags])(scanline, firstpix, iwidth, src, xpos, (UINT16 *)&m_gpu_clut[0]);
 				break;
 
 			/* 16bpp case */
@@ -714,7 +702,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				(*bitmap16[flags])(firstpix, iwidth, src, xpos);
+				(this->*bitmap16[flags])(scanline, firstpix, iwidth, src, xpos);
 				break;
 
 			/* 32bpp case */
@@ -723,7 +711,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 				if (pitch != 1)
 					logerror("Unhandled pitch = %d\n", pitch);
 
-				(*bitmap32[flags])(firstpix, iwidth, src, xpos);
+				(this->*bitmap32[flags])(scanline, firstpix, iwidth, src, xpos);
 				break;
 
 			default:
@@ -736,7 +724,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
 		objdata[1] = lower - (1 << 14);
 	}
 
-	return (UINT32 *)get_jaguar_memory(machine, link << 3);
+	return (UINT32 *)memory_base(link << 3);
 }
 
 
@@ -747,7 +735,7 @@ static UINT32 *process_bitmap(running_machine &machine, UINT32 *objdata, int vc,
  *
  *************************************/
 
-static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, int vc, int logit)
+UINT32 *jaguar_state::process_scaled_bitmap(UINT16 *scanline, UINT32 *objdata, int vc, int logit)
 {
 	/* extract data */
 	UINT32 upper = objdata[0];
@@ -756,7 +744,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
 	UINT32 height = (lower >> 14) & 0x3ff;
 	UINT32 link = (lower >> 24) | ((upper & 0x7ff) << 8);
 	UINT32 data = (upper >> 11);
-	UINT32 *src = (UINT32 *)get_jaguar_memory(machine, data << 3);
+	UINT32 *src = (UINT32 *)memory_base(data << 3);
 
 	/* third phrase */
 	UINT32 lower3 = objdata[5];
@@ -829,7 +817,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
 			{
 				case 0:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut + _index;
+					UINT16 *clut = (UINT16 *)&m_gpu_clut[0] + _index;
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -851,7 +839,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
 
 				case 1:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut + (_index & 0xfc);
+					UINT16 *clut = (UINT16 *)&m_gpu_clut[0] + (_index & 0xfc);
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -873,7 +861,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
 
 				case 2:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut + (_index & 0xf8);
+					UINT16 *clut = (UINT16 *)&m_gpu_clut[0] + (_index & 0xf8);
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -895,7 +883,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
 
 				case 3:
 				{
-					UINT16 *clut = (UINT16 *)jaguar_gpu_clut;
+					UINT16 *clut = (UINT16 *)&m_gpu_clut[0];
 
 					/* render in phrases */
 					while (xpix < iwidth)
@@ -952,7 +940,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
 		objdata[5] = (lower3 & ~0xff0000) | ((remainder & 0xff) << 16);
 	}
 
-	return (UINT32 *)get_jaguar_memory(machine, link << 3);
+	return (UINT32 *)memory_base(link << 3);
 }
 
 
@@ -963,7 +951,7 @@ static UINT32 *process_scaled_bitmap(running_machine &machine, UINT32 *objdata, 
  *
  *************************************/
 
-static UINT32 *process_branch(running_machine &machine, UINT32 *objdata, int vc, int logit)
+UINT32 *jaguar_state::process_branch(UINT32 *objdata, int vc, int logit)
 {
 	UINT32 upper = objdata[0];
 	UINT32 lower = objdata[1];
@@ -998,7 +986,7 @@ static UINT32 *process_branch(running_machine &machine, UINT32 *objdata, int vc,
 		/* 3: branch if object processor flag is set */
 		case 3:
 			if (logit) logerror("        branch if object flag set to %06X\n", link << 3);
-			taken = gpu_regs[OBF] & 1;
+			taken = m_gpu_regs[OBF] & 1;
 			break;
 
 		/* 4: branch on second half of display line */
@@ -1014,7 +1002,7 @@ static UINT32 *process_branch(running_machine &machine, UINT32 *objdata, int vc,
 	}
 
 	/* handle the branch */
-	return taken ? (UINT32 *)get_jaguar_memory(machine, link << 3) : (objdata + 2);
+	return taken ? (UINT32 *)memory_base(link << 3) : (objdata + 2);
 }
 
 
@@ -1025,7 +1013,7 @@ static UINT32 *process_branch(running_machine &machine, UINT32 *objdata, int vc,
  *
  *************************************/
 
-static void process_object_list(running_machine &machine, int vc, UINT16 *_scanline)
+void jaguar_state::process_object_list(int vc, UINT16 *scanline)
 {
 	int done = 0, count = 0;
 	UINT32 *objdata;
@@ -1033,14 +1021,13 @@ static void process_object_list(running_machine &machine, int vc, UINT16 *_scanl
 	int x;
 
 	/* erase the scanline first */
-	scanline = _scanline;
 	for (x = 0; x < 760; x++)
-		scanline[x] = gpu_regs[BG];
+		scanline[x] = m_gpu_regs[BG];
 
 	logit = LOG_OBJECTS;
 
 	/* fetch the object pointer */
-	objdata = (UINT32 *)get_jaguar_memory(machine, (gpu_regs[OLP_H] << 16) | gpu_regs[OLP_L]);
+	objdata = (UINT32 *)memory_base((m_gpu_regs[OLP_H] << 16) | m_gpu_regs[OLP_L]);
 	while (!done && objdata && count++ < 100)
 	{
 		/* the low 3 bits determine the command */
@@ -1050,25 +1037,25 @@ static void process_object_list(running_machine &machine, int vc, UINT16 *_scanl
 			case 0:
 				if (logit)
 					logerror("bitmap = %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3]);
-				objdata = process_bitmap(machine, objdata, vc, logit);
+				objdata = process_bitmap(scanline, objdata, vc, logit);
 				break;
 
 			/* scaled bitmap object */
 			case 1:
 				if (logit)
 					logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
-				objdata = process_scaled_bitmap(machine, objdata, vc, logit);
+				objdata = process_scaled_bitmap(scanline, objdata, vc, logit);
 				break;
 
 
 			/* GPU interrupt */
 			case 2:
-				gpu_regs[OB_HH]=(objdata[1]&0xffff0000)>>16;
-				gpu_regs[OB_HL]=objdata[1]&0xffff;
-				gpu_regs[OB_LH]=(objdata[0]&0xffff0000)>>16;
-				gpu_regs[OB_LL]=objdata[0]&0xffff;
-				cpu_irq_state |= 2;
-				update_cpu_irq(machine);
+				m_gpu_regs[OB_HH]=(objdata[1]&0xffff0000)>>16;
+				m_gpu_regs[OB_HL]=objdata[1]&0xffff;
+				m_gpu_regs[OB_LH]=(objdata[0]&0xffff0000)>>16;
+				m_gpu_regs[OB_LL]=objdata[0]&0xffff;
+				m_cpu_irq_state |= 2;
+				update_cpu_irq();
 				done=1;
 				break;
 
@@ -1076,7 +1063,7 @@ static void process_object_list(running_machine &machine, int vc, UINT16 *_scanl
 			case 3:
 				if (logit)
 					logerror("branch = %08X-%08X\n", objdata[0], objdata[1]);
-				objdata = process_branch(machine, objdata, vc, logit);
+				objdata = process_branch(objdata, vc, logit);
 				break;
 
 			/* stop */
@@ -1090,8 +1077,8 @@ static void process_object_list(running_machine &machine, int vc, UINT16 *_scanl
 				if (interrupt)
 				{
 //                  fprintf(stderr, "stop int=%d\n", interrupt);
-					cpu_irq_state |= 4;
-					update_cpu_irq(machine);
+					m_cpu_irq_state |= 4;
+					update_cpu_irq();
 				}
 				break;
 			}

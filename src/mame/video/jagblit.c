@@ -35,7 +35,7 @@
 #define PIXEL_SHIFT_1(a)      ((~a##_x >> 16) & 7)
 #define PIXEL_OFFSET_1(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width / 8 + (((UINT32)a##_x >> 19) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 19) & 7))
 #define ZDATA_OFFSET_1(a)     0 /* huh? */
-#define READ_RDATA_1(r,a,p)   ((p) ? (((((UINT8 *)&blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 19) & 7)]) >> PIXEL_SHIFT_1(a)) & 0x01) : (blitter_regs[r] & 0x01))
+#define READ_RDATA_1(r,a,p)   ((p) ? (((((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 19) & 7)]) >> PIXEL_SHIFT_1(a)) & 0x01) : (m_blitter_regs[r] & 0x01))
 #define READ_PIXEL_1(a)       (((((UINT8 *)a##_base_mem)[PIXEL_OFFSET_1(a)]) >> PIXEL_SHIFT_1(a)) & 0x01)
 #define READ_ZDATA_1(a)       0 /* huh? */
 #define WRITE_PIXEL_1(a,d)    do { UINT8 *pix = &((UINT8 *)a##_base_mem)[PIXEL_OFFSET_1(a)]; *pix = (*pix & ~(0x01 << PIXEL_SHIFT_1(a))) | ((d) << PIXEL_SHIFT_1(a)); } while (0)
@@ -44,7 +44,7 @@
 #define PIXEL_SHIFT_2(a)      ((~a##_x >> 15) & 6)
 #define PIXEL_OFFSET_2(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width / 4 + (((UINT32)a##_x >> 18) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 18) & 7))
 #define ZDATA_OFFSET_2(a)     0 /* huh? */
-#define READ_RDATA_2(r,a,p)   ((p) ? (((((UINT8 *)&blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 18) & 7)]) >> PIXEL_SHIFT_2(a)) & 0x03) : (blitter_regs[r] & 0x03))
+#define READ_RDATA_2(r,a,p)   ((p) ? (((((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 18) & 7)]) >> PIXEL_SHIFT_2(a)) & 0x03) : (m_blitter_regs[r] & 0x03))
 #define READ_PIXEL_2(a)       (((((UINT8 *)a##_base_mem)[PIXEL_OFFSET_2(a)]) >> PIXEL_SHIFT_2(a)) & 0x03)
 #define READ_ZDATA_2(a)       0 /* huh? */
 #define WRITE_PIXEL_2(a,d)    do { UINT8 *pix = &((UINT8 *)a##_base_mem)[PIXEL_OFFSET_2(a)]; *pix = (*pix & ~(0x03 << PIXEL_SHIFT_2(a))) | ((d) << PIXEL_SHIFT_2(a)); } while (0)
@@ -53,7 +53,7 @@
 #define PIXEL_SHIFT_4(a)      ((~a##_x >> 14) & 4)
 #define PIXEL_OFFSET_4(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width / 2 + (((UINT32)a##_x >> 17) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 17) & 7))
 #define ZDATA_OFFSET_4(a)     0 /* huh? */
-#define READ_RDATA_4(r,a,p)   ((p) ? (((((UINT8 *)&blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 17) & 7)]) >> PIXEL_SHIFT_4(a)) & 0x0f) : (blitter_regs[r] & 0x0f))
+#define READ_RDATA_4(r,a,p)   ((p) ? (((((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 17) & 7)]) >> PIXEL_SHIFT_4(a)) & 0x0f) : (m_blitter_regs[r] & 0x0f))
 #define READ_PIXEL_4(a)       (((((UINT8 *)a##_base_mem)[PIXEL_OFFSET_4(a)]) >> PIXEL_SHIFT_4(a)) & 0x0f)
 #define READ_ZDATA_4(a)       0 /* huh? */
 #define WRITE_PIXEL_4(a,d)    do { UINT8 *pix = &((UINT8 *)a##_base_mem)[PIXEL_OFFSET_4(a)]; *pix = (*pix & ~(0x0f << PIXEL_SHIFT_4(a))) | ((d) << PIXEL_SHIFT_4(a)); } while (0)
@@ -61,7 +61,7 @@
 
 #define PIXEL_OFFSET_8(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width + (((UINT32)a##_x >> 16) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 16) & 7))
 #define ZDATA_OFFSET_8(a)     (PIXEL_OFFSET_8(a) + a##_zoffs * 8)
-#define READ_RDATA_8(r,a,p)   ((p) ? (((UINT8 *)&blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 16) & 7)]) : (blitter_regs[r] & 0xff))
+#define READ_RDATA_8(r,a,p)   ((p) ? (((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 16) & 7)]) : (m_blitter_regs[r] & 0xff))
 #define READ_PIXEL_8(a)       (((UINT8 *)a##_base_mem)[PIXEL_OFFSET_8(a)])
 #define READ_ZDATA_8(a)       (((UINT8 *)a##_base_mem)[ZDATA_OFFSET_8(a)])
 #define WRITE_PIXEL_8(a,d)    do { ((UINT8 *)a##_base_mem)[PIXEL_OFFSET_8(a)] = (d); } while (0)
@@ -69,7 +69,7 @@
 
 #define PIXEL_OFFSET_16(a)    BYTE_XOR_BE(((UINT32)a##_y >> 16) * a##_width + (((UINT32)a##_x >> 16) & ~3) * (1 + a##_pitch) + (((UINT32)a##_x >> 16) & 3))
 #define ZDATA_OFFSET_16(a)    (PIXEL_OFFSET_16(a) + a##_zoffs * 4)
-#define READ_RDATA_16(r,a,p)  ((p) ? (((UINT16 *)&blitter_regs[r])[BYTE_XOR_BE(((UINT32)a##_x >> 16) & 3)]) : (blitter_regs[r] & 0xffff))
+#define READ_RDATA_16(r,a,p)  ((p) ? (((UINT16 *)&m_blitter_regs[r])[BYTE_XOR_BE(((UINT32)a##_x >> 16) & 3)]) : (m_blitter_regs[r] & 0xffff))
 #define READ_PIXEL_16(a)      (((UINT16 *)a##_base_mem)[PIXEL_OFFSET_16(a)])
 #define READ_ZDATA_16(a)      (((UINT16 *)a##_base_mem)[ZDATA_OFFSET_16(a)])
 #define WRITE_PIXEL_16(a,d)   do { ((UINT16 *)a##_base_mem)[PIXEL_OFFSET_16(a)] = (d); } while (0)
@@ -77,7 +77,7 @@
 
 #define PIXEL_OFFSET_32(a)    (((UINT32)a##_y >> 16) * a##_width + (((UINT32)a##_x >> 16) & ~1) * (1 + a##_pitch) + (((UINT32)a##_x >> 16) & 1))
 #define ZDATA_OFFSET_32(a)    (PIXEL_OFFSET_32(a) + a##_zoffs * 2)
-#define READ_RDATA_32(r,a,p)  ((p) ? (blitter_regs[r + (((UINT32)a##_x >> 16) & 1)]) : blitter_regs[r])
+#define READ_RDATA_32(r,a,p)  ((p) ? (m_blitter_regs[r + (((UINT32)a##_x >> 16) & 1)]) : m_blitter_regs[r])
 #define READ_PIXEL_32(a)      (((UINT32 *)a##_base_mem)[PIXEL_OFFSET_32(a)])
 #define READ_ZDATA_32(a)      (((UINT32 *)a##_base_mem)[ZDATA_OFFSET_32(a)])
 #define WRITE_PIXEL_32(a,d)   do { ((UINT32 *)a##_base_mem)[PIXEL_OFFSET_32(a)] = (d); } while (0)
@@ -130,43 +130,43 @@
 	} while (0)
 #endif
 
-static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags)
+void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 {
-	UINT32 a1_base = blitter_regs[A1_BASE];
+	UINT32 a1_base = m_blitter_regs[A1_BASE];
 	INT32 a1_pitch = (A1FIXED & 3) ^ ((A1FIXED & 2) >> 1);
 	INT32 a1_zoffs = (A1FIXED >> 6) & 7;
 	INT32 a1_width = ((4 | ((a1flags >> 9) & 3)) << ((a1flags >> 11) & 15)) >> 2;
 	INT32 a1_xadd = (A1FIXED >> 16) & 0x03;
 	INT32 a1_yadd = (A1FIXED >> 18) & 0x01;
-	INT32 a1_x = (blitter_regs[A1_PIXEL] << 16) | (blitter_regs[A1_FPIXEL] & 0xffff);
-	INT32 a1_y = (blitter_regs[A1_PIXEL] & 0xffff0000) | (blitter_regs[A1_FPIXEL] >> 16);
+	INT32 a1_x = (m_blitter_regs[A1_PIXEL] << 16) | (m_blitter_regs[A1_FPIXEL] & 0xffff);
+	INT32 a1_y = (m_blitter_regs[A1_PIXEL] & 0xffff0000) | (m_blitter_regs[A1_FPIXEL] >> 16);
 	INT32 a1_xstep = 0;
 	INT32 a1_ystep = 0;
 	UINT32 a1_xmask = 0xffffffff;
 	UINT32 a1_ymask = 0xffffffff;
 
-	UINT32 a2_base = blitter_regs[A2_BASE];
+	UINT32 a2_base = m_blitter_regs[A2_BASE];
 	INT32 a2_pitch = (A2FIXED & 3) ^ ((A2FIXED & 2) >> 1);
 	INT32 a2_zoffs = (A2FIXED >> 6) & 7;
 	INT32 a2_width = ((4 | ((a2flags >> 9) & 3)) << ((a2flags >> 11) & 15)) >> 2;
 	INT32 a2_xadd = (A2FIXED >> 16) & 0x03;
 	INT32 a2_yadd = (A2FIXED >> 18) & 0x01;
-	INT32 a2_x = (blitter_regs[A2_PIXEL] << 16);
-	INT32 a2_y = (blitter_regs[A2_PIXEL] & 0xffff0000);
+	INT32 a2_x = (m_blitter_regs[A2_PIXEL] << 16);
+	INT32 a2_y = (m_blitter_regs[A2_PIXEL] & 0xffff0000);
 	INT32 a2_xstep = 0;
 	INT32 a2_ystep = 0;
 	UINT32 a2_xmask = 0xffffffff;
 	UINT32 a2_ymask = 0xffffffff;
 
-	int inner_count = blitter_regs[B_COUNT] & 0xffff;
-	int outer_count = blitter_regs[B_COUNT] >> 16;
+	int inner_count = m_blitter_regs[B_COUNT] & 0xffff;
+	int outer_count = m_blitter_regs[B_COUNT] >> 16;
 	int inner, outer;
 
 	UINT8 a1_phrase_mode = 0;
 	UINT8 a2_phrase_mode = 0;
 
-	void *a1_base_mem = get_jaguar_memory(machine, a1_base);
-	void *a2_base_mem = get_jaguar_memory(machine, a2_base);
+	void *a1_base_mem = memory_base(a1_base);
+	void *a2_base_mem = memory_base(a2_base);
 
 	void *asrc_base_mem =	(COMMAND & 0x00000800) ? a1_base_mem : a2_base_mem;
 	UINT32 asrcflags =		(COMMAND & 0x00000800) ? A1FIXED : A2FIXED;
@@ -195,9 +195,21 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 	{
 		if (LOG_BAD_BLITS)
 		{
-		logerror("%s:Blit!\n", machine.describe_context());
+		logerror("%s:Blit!\n", machine().describe_context());
 		logerror("  a1_base  = %08X\n", a1_base);
 		logerror("  a2_base  = %08X\n", a2_base);
+		}
+		return;
+	}
+
+	// ignore nonsensical blits
+	if (outer_count > 2000 || inner_count > 2000)
+	{
+		if (LOG_BAD_BLITS)
+		{
+		logerror("%s:Blit!\n", machine().describe_context());
+		logerror("  inner_count = %08X\n", inner_count);
+		logerror("  outer_count = %08X\n", inner_count);
 		}
 		return;
 	}
@@ -210,8 +222,8 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 	a1_phrase_mode = (a1_xadd == 0);
 	if (a1_xadd == 3)
 	{
-		a1_xadd = (blitter_regs[A1_INC] << 16) | (blitter_regs[A1_FINC] & 0xffff);
-		a1_yadd = (blitter_regs[A1_INC] & 0xffff0000) | (blitter_regs[A1_FINC] >> 16);
+		a1_xadd = (m_blitter_regs[A1_INC] << 16) | (m_blitter_regs[A1_FINC] & 0xffff);
+		a1_yadd = (m_blitter_regs[A1_INC] & 0xffff0000) | (m_blitter_regs[A1_FINC] >> 16);
 	}
 	else if (a1_xadd == 2)
 		a1_xadd = 0;
@@ -236,25 +248,25 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 	/* set up the A2 mask */
 	if (A2FIXED & 0x00008000)
 	{
-		a2_xmask = ((blitter_regs[A2_MASK] & 0x0000ffff) << 16) | 0xffff;
-		a2_ymask = (blitter_regs[A2_MASK] & 0xffff0000) | 0xffff;
+		a2_xmask = ((m_blitter_regs[A2_MASK] & 0x0000ffff) << 16) | 0xffff;
+		a2_ymask = (m_blitter_regs[A2_MASK] & 0xffff0000) | 0xffff;
 	}
 
 	/* modify outer loop steps based on command */
 	if (command & 0x00000100)
 	{
-		a1_xstep = blitter_regs[A1_FSTEP] & 0xffff;
-		a1_ystep = blitter_regs[A1_FSTEP] >> 16;
+		a1_xstep = m_blitter_regs[A1_FSTEP] & 0xffff;
+		a1_ystep = m_blitter_regs[A1_FSTEP] >> 16;
 	}
 	if (command & 0x00000200)
 	{
-		a1_xstep += blitter_regs[A1_STEP] << 16;
-		a1_ystep += blitter_regs[A1_STEP] & 0xffff0000;
+		a1_xstep += m_blitter_regs[A1_STEP] << 16;
+		a1_ystep += m_blitter_regs[A1_STEP] & 0xffff0000;
 	}
 	if (command & 0x00000400)
 	{
-		a2_xstep = blitter_regs[A2_STEP] << 16;
-		a2_ystep = blitter_regs[A2_STEP] & 0xffff0000;
+		a2_xstep = m_blitter_regs[A2_STEP] << 16;
+		a2_ystep = m_blitter_regs[A2_STEP] & 0xffff0000;
 	}
 
 	asrc_phrase_mode	= (COMMAND & 0x00000800) ? a1_phrase_mode : a2_phrase_mode;
@@ -275,7 +287,7 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 
 	if (LOG_BLITS)
 	{
-	logerror("%s:Blit!\n", machine.describe_context());
+	logerror("%s:Blit!\n", machine().describe_context());
 	logerror("  a1_base  = %08X\n", a1_base);
 	logerror("  a1_pitch = %d\n", a1_pitch);
 	logerror("  a1_psize = %d\n", 1 << ((A1FIXED >> 3) & 7));
@@ -357,8 +369,8 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 				if (COMMAND & 0x00000040)
 				{
 				if (adest_x < 0 || adest_y < 0 ||
-					(adest_x >> 16) >= (blitter_regs[A1_CLIP] & 0x7fff) ||
-					(adest_y >> 16) >= ((blitter_regs[A1_CLIP] >> 16) & 0x7fff))
+					(adest_x >> 16) >= (m_blitter_regs[A1_CLIP] & 0x7fff) ||
+					(adest_y >> 16) >= ((m_blitter_regs[A1_CLIP] >> 16) & 0x7fff))
 						inhibit = 1;
 				}
 
@@ -417,7 +429,7 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 				if (COMMAND & 0x40000000)
 				{
 					int intensity = srcdata & 0x00ff;
-					intensity += (INT8) (blitter_regs[B_Z3] >> 16);
+					intensity += (INT8) (m_blitter_regs[B_Z3] >> 16);
 					if (intensity < 0)
 						intensity = 0;
 					else if (intensity > 0xff)
@@ -474,7 +486,7 @@ static void FUNCNAME(running_machine &machine, UINT32 command, UINT32 a1flags, U
 	a2_x =	(COMMAND & 0x00000800) ? adest_x : asrc_x;
 	a2_y =	(COMMAND & 0x00000800) ? adest_y : asrc_y;
 
-	blitter_regs[A1_PIXEL] = (a1_y & 0xffff0000) | ((a1_x >> 16) & 0xffff);
-	blitter_regs[A1_FPIXEL] = (a1_y << 16) | (a1_x & 0xffff);
-	blitter_regs[A2_PIXEL] = (a2_y & 0xffff0000) | ((a2_x >> 16) & 0xffff);
+	m_blitter_regs[A1_PIXEL] = (a1_y & 0xffff0000) | ((a1_x >> 16) & 0xffff);
+	m_blitter_regs[A1_FPIXEL] = (a1_y << 16) | (a1_x & 0xffff);
+	m_blitter_regs[A2_PIXEL] = (a2_y & 0xffff0000) | ((a2_x >> 16) & 0xffff);
 }
