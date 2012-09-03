@@ -178,6 +178,7 @@ public:
 
 
 void darkedge_fd1149_vblank(device_t *device);
+void f1lap_fd1149_vblank(device_t *device);
 
 
 extern const UINT8 ga2_v25_opcode_table[];

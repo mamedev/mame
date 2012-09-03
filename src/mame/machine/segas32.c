@@ -221,7 +221,6 @@ void darkedge_fd1149_vblank(device_t *device)
 	}
 }
 
-
 WRITE16_MEMBER(segas32_state::darkedge_protection_w)
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
@@ -234,6 +233,24 @@ READ16_MEMBER(segas32_state::darkedge_protection_r)
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
 		cpu_get_pc(&space.device()), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
+}
+
+/******************************************************************************
+ ******************************************************************************
+  F1 Super Lap
+ ******************************************************************************
+ ******************************************************************************/
+
+void f1lap_fd1149_vblank(device_t *device)
+{
+	address_space *space = device->memory().space(AS_PROGRAM);
+
+	space->write_byte(0x20F7C6, 0);
+
+	// needed to start a game
+	UINT8 val = space->read_byte(0x20EE81);
+	if (val == 0xff)  space->write_byte(0x20EE81,0);
+
 }
 
 

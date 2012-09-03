@@ -1583,6 +1583,18 @@ static INPUT_PORTS_START( f1lap )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Gear Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Gear Down")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_Z)
+
+	PORT_MODIFY("SERVICE34_A")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) // service coin mirror
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) // seems to be a service switch mirror
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
 INPUT_PORTS_END
 
 
@@ -2780,7 +2792,6 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     F1 Super Lap
-    Requires 2 linked system 32 boards to function
     protected via FD1149 317-0210
 */
 ROM_START( f1lap )
@@ -4211,9 +4222,19 @@ DRIVER_INIT_MEMBER(segas32_state,f1en)
 }
 
 
+
+
 DRIVER_INIT_MEMBER(segas32_state,f1lap)
 {
 	segas32_common_init(machine(), read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
+
+	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x800000, 0x800fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x801000, 0x801003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
+
+//	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
+	m_system32_prot_vblank = f1lap_fd1149_vblank;
+
 	m_sw1_output = f1lap_sw1_output;
 }
 

@@ -956,8 +956,9 @@ static UINT32 am2ImmediateQuick(v60_state *cpustate)
 
 static UINT32 am2Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 1 (cpustate->PC=%06x)", cpustate->PC);
-	return 0; /* never reached, fatalerror won't return */
+	// f1lap trips this, why?
+	logerror("CPU - AM2 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	return 0;
 }
 
 static UINT32 am2Error2(v60_state *cpustate)
