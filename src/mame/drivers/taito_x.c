@@ -224,11 +224,12 @@ its place. The East Technology games on this hardware follow Daisenpu.
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
-1) 'superman' and 'supermanj'
+1) 'superman', 'supermanu' and 'supermanj'
 
   - Region stored at 0x07fffe.w
   - Sets :
-      * 'superman' : region = 0x0002
+      * 'superman'  : region = 0x0002
+      * 'supermanu' : region = 0x0001
       * 'supermanj' : region = 0x0000
   - These 2 games are 100% the same, only region differs !
   - Coinage relies on the region (code at 0x003b8a) :
@@ -240,6 +241,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
     but boss are far much harder when "Difficulty" Dip Swicth
     is set to "Easy" : put a watch on 0xf00a76.w for level 1 boss
     and you'll notice that MSB is set to 0x01 instead of 0x00
+  - 'supermanu' has no Notice screen or FBI logo & statement
 
 
 2) 'twinhawk'
@@ -271,12 +273,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Same other notes as for 'twinhawk'
 
 
-5) 'gigandes' and 'gigandesj'
+5) 'gigandes' and 'gigandesa'
 
   - No region (not a Taito game anyway)
   - No notice screen
   - Constant bonus life at 50k, 250k then every 200k
-  - Bogus "Test Mode" in 'gigandes' (while it is correct for 'gigandesj') :
+  - Bogus "Test Mode" in 'gigandesa' (while it is correct for 'gigandes') :
       * screen is flipped while it shouldn't and it isn't flipped while it should
       * displays cabinet type instead of number of controls
   - DSWA bit 4 effect remains unknown but it MUST remain OFF !
@@ -629,6 +631,13 @@ static INPUT_PORTS_START( superman )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( supermanu )
+	PORT_INCLUDE( superman )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US_LOC(SW1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supermanj )
@@ -1029,48 +1038,82 @@ Notes:
       All Z80 CPU's running at 6.000MHz (12/2)
       YM2203 running at 3.000Mz (12/4)
       VSync 60Hz
+
+NOTE: There is an alternate version that uses a daughter card to replace the 8Mbit mask roms
+      with two 4Mbit mask roms. These roms are B61-02 through B61-05, high and low for each.
+
 */
 
 ROM_START( superman )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "a10_09.bin", 0x00000, 0x20000, CRC(640f1d58) SHA1(e768d32eae1dba39c23189996fbd5454c8627809) )
-	ROM_LOAD16_BYTE( "a05_07.bin", 0x00001, 0x20000, CRC(fddb9953) SHA1(8b562712810a5a72f4647f1ba1314a1be2e249e7) )
-	ROM_LOAD16_BYTE( "a08_08.bin", 0x40000, 0x20000, CRC(79fc028e) SHA1(bf42b3f84dcad8fd9085c702a78dc895cc12d670) )
-	ROM_LOAD16_BYTE( "a03_13.bin", 0x40001, 0x20000, CRC(9f446a44) SHA1(16f7cd6438e47fdaac93a368df5c093f6ff0f1f0) )
+	ROM_LOAD16_BYTE( "b61_09.a10", 0x00000, 0x20000, CRC(640f1d58) SHA1(e768d32eae1dba39c23189996fbd5454c8627809) )
+	ROM_LOAD16_BYTE( "b61_07.a5",  0x00001, 0x20000, CRC(fddb9953) SHA1(8b562712810a5a72f4647f1ba1314a1be2e249e7) )
+	ROM_LOAD16_BYTE( "b61_08.a8",  0x40000, 0x20000, CRC(79fc028e) SHA1(bf42b3f84dcad8fd9085c702a78dc895cc12d670) )
+	ROM_LOAD16_BYTE( "b61_13.a3",  0x40001, 0x20000, CRC(9f446a44) SHA1(16f7cd6438e47fdaac93a368df5c093f6ff0f1f0) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "d18_10.bin", 0x00000, 0x4000, CRC(6efe79e8) SHA1(7a76efaaeab71473f4b0b23a89141f203488ce1d) )
+	ROM_LOAD( "b61_10.d18", 0x00000, 0x4000, CRC(6efe79e8) SHA1(7a76efaaeab71473f4b0b23a89141f203488ce1d) )
 	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "f01_14.bin", 0x000000, 0x80000, CRC(89368c3e) SHA1(8d227439ab321fd5d432d860544daea0e78ce588) ) /* Plane 0, 1 */
-	ROM_LOAD( "h01_15.bin", 0x080000, 0x80000, CRC(910cc4f9) SHA1(9ecfa84123a8f9d048f0a689647e92f25af73899) )
-	ROM_LOAD( "j01_16.bin", 0x100000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
-	ROM_LOAD( "k01_17.bin", 0x180000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
+	ROM_LOAD( "b61-14.f1", 0x000000, 0x80000, CRC(89368c3e) SHA1(8d227439ab321fd5d432d860544daea0e78ce588) ) /* Plane 0, 1 */
+	ROM_LOAD( "b61-15.h1", 0x080000, 0x80000, CRC(910cc4f9) SHA1(9ecfa84123a8f9d048f0a689647e92f25af73899) )
+	ROM_LOAD( "b61-16.j1", 0x100000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
+	ROM_LOAD( "b61-17.k1", 0x180000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "e18_01.bin", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
+	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
+
+	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
+	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
 ROM_END
 
-ROM_START( supermanj )
+ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage difference, see notes above */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "a10_09.bin", 0x00000, 0x20000, CRC(640f1d58) SHA1(e768d32eae1dba39c23189996fbd5454c8627809) )
-	ROM_LOAD16_BYTE( "a05_07.bin", 0x00001, 0x20000, CRC(fddb9953) SHA1(8b562712810a5a72f4647f1ba1314a1be2e249e7) )
-	ROM_LOAD16_BYTE( "a08_08.bin", 0x40000, 0x20000, CRC(79fc028e) SHA1(bf42b3f84dcad8fd9085c702a78dc895cc12d670) )
-	ROM_LOAD16_BYTE( "b61-06.a3",  0x40001, 0x20000, CRC(714a0b68) SHA1(b0b42c55d2404c7c193eb8cab3bd92e321947845) )
+	ROM_LOAD16_BYTE( "b61_09.a10", 0x00000, 0x20000, CRC(640f1d58) SHA1(e768d32eae1dba39c23189996fbd5454c8627809) )
+	ROM_LOAD16_BYTE( "b61_07.a5",  0x00001, 0x20000, CRC(fddb9953) SHA1(8b562712810a5a72f4647f1ba1314a1be2e249e7) )
+	ROM_LOAD16_BYTE( "b61_08.a8",  0x40000, 0x20000, CRC(79fc028e) SHA1(bf42b3f84dcad8fd9085c702a78dc895cc12d670) )
+	ROM_LOAD16_BYTE( "b61_12.a3",  0x40001, 0x20000, CRC(064d3bfe) SHA1(75abf924a6e44203169d2fa15852caa0bf57db30) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "d18_10.bin", 0x00000, 0x4000, CRC(6efe79e8) SHA1(7a76efaaeab71473f4b0b23a89141f203488ce1d) )
+	ROM_LOAD( "b61_10.d18", 0x00000, 0x4000, CRC(6efe79e8) SHA1(7a76efaaeab71473f4b0b23a89141f203488ce1d) )
 	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "f01_14.bin", 0x000000, 0x80000, CRC(89368c3e) SHA1(8d227439ab321fd5d432d860544daea0e78ce588) ) /* Plane 0, 1 */
-	ROM_LOAD( "h01_15.bin", 0x080000, 0x80000, CRC(910cc4f9) SHA1(9ecfa84123a8f9d048f0a689647e92f25af73899) )
-	ROM_LOAD( "j01_16.bin", 0x100000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
-	ROM_LOAD( "k01_17.bin", 0x180000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
+	ROM_LOAD( "b61-14.f1", 0x000000, 0x80000, CRC(89368c3e) SHA1(8d227439ab321fd5d432d860544daea0e78ce588) ) /* Plane 0, 1 */
+	ROM_LOAD( "b61-15.h1", 0x080000, 0x80000, CRC(910cc4f9) SHA1(9ecfa84123a8f9d048f0a689647e92f25af73899) )
+	ROM_LOAD( "b61-16.j1", 0x100000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
+	ROM_LOAD( "b61-17.k1", 0x180000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
-	ROM_LOAD( "e18_01.bin", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
+	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
+
+	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
+	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+ROM_END
+
+ROM_START( supermanj ) /* Shows a Japan copyright notice */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "b61_09.a10", 0x00000, 0x20000, CRC(640f1d58) SHA1(e768d32eae1dba39c23189996fbd5454c8627809) )
+	ROM_LOAD16_BYTE( "b61_07.a5",  0x00001, 0x20000, CRC(fddb9953) SHA1(8b562712810a5a72f4647f1ba1314a1be2e249e7) )
+	ROM_LOAD16_BYTE( "b61_08.a8",  0x40000, 0x20000, CRC(79fc028e) SHA1(bf42b3f84dcad8fd9085c702a78dc895cc12d670) )
+	ROM_LOAD16_BYTE( "b61_06.a3",  0x40001, 0x20000, CRC(714a0b68) SHA1(b0b42c55d2404c7c193eb8cab3bd92e321947845) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "b61_10.d18", 0x00000, 0x4000, CRC(6efe79e8) SHA1(7a76efaaeab71473f4b0b23a89141f203488ce1d) )
+	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "b61-14.f1", 0x000000, 0x80000, CRC(89368c3e) SHA1(8d227439ab321fd5d432d860544daea0e78ce588) ) /* Plane 0, 1 */
+	ROM_LOAD( "b61-15.h1", 0x080000, 0x80000, CRC(910cc4f9) SHA1(9ecfa84123a8f9d048f0a689647e92f25af73899) )
+	ROM_LOAD( "b61-16.j1", 0x100000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
+	ROM_LOAD( "b61-17.k1", 0x180000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
+
+	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
+	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
 ROM_END
 
 /*
@@ -1133,32 +1176,8 @@ ROM_END
 
 ROM_START( gigandes )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "1.10a",      0x00000, 0x20000, CRC(290c50e0) SHA1(ac8008619891a5b54ba2069e4e18836976532c99) )
-	ROM_LOAD16_BYTE( "3.5a",       0x00001, 0x20000, CRC(9cef82af) SHA1(6dad850de699d40dfba54bde6baca75bb0059c83) )
-	ROM_LOAD16_BYTE( "east_2.8a",  0x40000, 0x20000, CRC(dd94b4d0) SHA1(2efff9fd51b28fd1fb46d16b359f0991af91054e) )
-	ROM_LOAD16_BYTE( "east_4.3a",  0x40001, 0x20000, CRC(a647310a) SHA1(49db488a36f6c74729825bdf0214bcd30773eaf4) )
-
-	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "east_5.17d", 0x00000, 0x4000, CRC(b24ab5f4) SHA1(e4730df984e9686c538df5fc626b795bda1db939) )
-	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
-
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "east_8.3f", 0x000000, 0x80000, CRC(75eece28) SHA1(7ce66cd8bca7dd214367beae067727c8735c0f7e) ) /* Plane 0, 1 */
-	ROM_LOAD( "east_7.3h", 0x080000, 0x80000, CRC(b179a76a) SHA1(cff2caf1eb0dda8a1b8283b9950b908b102f61de) )
-	ROM_LOAD( "east_9.3j", 0x100000, 0x80000, CRC(5c5e6898) SHA1(f348ac752a571902c55f36e21aa3fb9ef97528e3) ) /* Plane 2, 3 */
-	ROM_LOAD( "east_6.3k", 0x180000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
-
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )      /* Delta-T samples */
-	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
-
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "east-10.16e", 0x00000, 0x80000, CRC(ca0ac419) SHA1(b29f30a8ff1286c65b741353b6551918a45bcafe) )
-ROM_END
-
-ROM_START( gigandesj )
-	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "east_1.10a", 0x00000, 0x20000, CRC(ae74e4e5) SHA1(1CAC0A0E591B63142D8D249C67F803256FB28C2A) )
-	ROM_LOAD16_BYTE( "east_3.5a",  0x00001, 0x20000, CRC(8bcf2116) SHA1(9255D7E0AB568AD7A894421D3260FA80B8A0A5D0) )
+	ROM_LOAD16_BYTE( "east_1.10a", 0x00000, 0x20000, CRC(ae74e4e5) SHA1(1CAC0A0E591B63142D8D249C67F803256FB28C2A) ) /* 'fixed' test mode, see notes above */
+	ROM_LOAD16_BYTE( "east_3.5a",  0x00001, 0x20000, CRC(8bcf2116) SHA1(9255D7E0AB568AD7A894421D3260FA80B8A0A5D0) ) /* 'fixed' test mode, see notes above */
 	ROM_LOAD16_BYTE( "east_2.8a",  0x40000, 0x20000, CRC(dd94b4d0) SHA1(2efff9fd51b28fd1fb46d16b359f0991af91054e) )
 	ROM_LOAD16_BYTE( "east_4.3a",  0x40001, 0x20000, CRC(a647310a) SHA1(49db488a36f6c74729825bdf0214bcd30773eaf4) )
 
@@ -1173,6 +1192,30 @@ ROM_START( gigandesj )
 	ROM_LOAD( "east_6.3k", 0x180000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
 
 	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "east-10.16e", 0x00000, 0x80000, CRC(ca0ac419) SHA1(b29f30a8ff1286c65b741353b6551918a45bcafe) )
+ROM_END
+
+ROM_START( gigandesa )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "east-1.10a", 0x00000, 0x20000, CRC(290c50e0) SHA1(ac8008619891a5b54ba2069e4e18836976532c99) ) /* 'buggy' test mode, see notes above */
+	ROM_LOAD16_BYTE( "east-3.5a",  0x00001, 0x20000, CRC(9cef82af) SHA1(6dad850de699d40dfba54bde6baca75bb0059c83) ) /* 'buggy' test mode, see notes above */
+	ROM_LOAD16_BYTE( "east_2.8a",  0x40000, 0x20000, CRC(dd94b4d0) SHA1(2efff9fd51b28fd1fb46d16b359f0991af91054e) )
+	ROM_LOAD16_BYTE( "east_4.3a",  0x40001, 0x20000, CRC(a647310a) SHA1(49db488a36f6c74729825bdf0214bcd30773eaf4) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "east_5.17d", 0x00000, 0x4000, CRC(b24ab5f4) SHA1(e4730df984e9686c538df5fc626b795bda1db939) )
+	ROM_CONTINUE(           0x10000, 0xc000 ) /* banked stuff */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "east_8.3f", 0x000000, 0x80000, CRC(75eece28) SHA1(7ce66cd8bca7dd214367beae067727c8735c0f7e) ) /* Plane 0, 1 */
+	ROM_LOAD( "east_7.3h", 0x080000, 0x80000, CRC(b179a76a) SHA1(cff2caf1eb0dda8a1b8283b9950b908b102f61de) )
+	ROM_LOAD( "east_9.3j", 0x100000, 0x80000, CRC(5c5e6898) SHA1(f348ac752a571902c55f36e21aa3fb9ef97528e3) ) /* Plane 2, 3 */
+	ROM_LOAD( "east_6.3k", 0x180000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )      /* Delta-T samples */
 	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -1230,12 +1273,13 @@ DRIVER_INIT_MEMBER(taitox_state,kyustrkr)
 }
 
 
-GAME( 1988, superman,  0,        superman, superman, driver_device,  0,        ROT0,   "Taito Corporation", "Superman", 0 )
-GAME( 1988, supermanj, superman, superman, supermanj, driver_device, 0,        ROT0,   "Taito Corporation", "Superman (Japan)", 0 )
-GAME( 1989, twinhawk,  0,        daisenpu, twinhawk, driver_device,  0,        ROT270, "Taito Corporation Japan", "Twin Hawk (World)", 0 )
+GAME( 1988, superman,  0,        superman, superman,  driver_device, 0,        ROT0,   "Taito Corporation",         "Superman (World)", 0 )
+GAME( 1988, supermanu, superman, superman, supermanu, driver_device, 0,        ROT0,   "Taito Corporation",         "Superman (US)", 0 )
+GAME( 1988, supermanj, superman, superman, supermanj, driver_device, 0,        ROT0,   "Taito Corporation",         "Superman (Japan)", 0 )
+GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  driver_device, 0,        ROT270, "Taito Corporation Japan",   "Twin Hawk (World)", 0 )
 GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, driver_device, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
-GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu, driver_device,  0,        ROT270, "Taito Corporation", "Daisenpu (Japan)", 0 )
-GAME( 1989, gigandes,  0,        gigandes, gigandes, driver_device,  0,        ROT0,   "East Technology", "Gigandes", 0 )
-GAME( 1989, gigandesj, gigandes, gigandes, gigandes, driver_device,  0,        ROT0,   "East Technology", "Gigandes (Japan)", 0 )
-GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr, taitox_state,  kyustrkr, ROT180, "East Technology", "Last Striker / Kyuukyoku no Striker", 0 )
-GAME( 1992, ballbros,  0,        ballbros, ballbros, driver_device,  0,        ROT0,   "East Technology", "Balloon Brothers", 0 )
+GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  driver_device, 0,        ROT270, "Taito Corporation",         "Daisenpu (Japan)", 0 )
+GAME( 1989, gigandes,  0,        gigandes, gigandes,  driver_device, 0,        ROT0,   "East Technology",           "Gigandes", 0 )
+GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  driver_device, 0,        ROT0,   "East Technology",           "Gigandes (earlier)", 0 )
+GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr,  taitox_state,  kyustrkr, ROT180, "East Technology",           "Last Striker / Kyuukyoku no Striker", 0 )
+GAME( 1992, ballbros,  0,        ballbros, ballbros,  driver_device, 0,        ROT0,   "East Technology",           "Balloon Brothers", 0 )
