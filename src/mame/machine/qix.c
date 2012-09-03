@@ -10,11 +10,12 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/sn76496.h"
 #include "includes/qix.h"
 
 
 
+	
+	
 /*************************************
  *
  *  Static function prototypes
@@ -499,10 +500,12 @@ static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
+ static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 {
+	qix_state *state = device->machine().driver_data<qix_state>();
+	
 	/* write to the sound chip */
-	sn76496_w(device->machine().device("sn1"), 0, data);
+	state->m_sn1->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
@@ -513,8 +516,10 @@ static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 
 static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 {
+	qix_state *state = device->machine().driver_data<qix_state>();
+	
 	/* write to the sound chip */
-	sn76496_w(device->machine().device("sn2"), 0, data);
+	state->m_sn2->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
