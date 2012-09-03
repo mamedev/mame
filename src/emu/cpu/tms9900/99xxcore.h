@@ -4642,7 +4642,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms99xx_state);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -4651,11 +4651,11 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;/*TODO: compute this value*/break;
 
 #if (USE_16_BIT_ACCESSORS)
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
 #else
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
 #endif
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:
 #if (TMS99XX_MODEL == TI990_10_ID)
 			/* this CPU has a mapper to expand the address space */
 			info->i = 21;
@@ -4670,12 +4670,12 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 			info->i = 16;
 #endif
 			break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:
 #if (TMS99XX_MODEL == TI990_10_ID)
 			/* 3 MSBs do exist, although they are not connected (don't ask...) */
 			info->i = 15;
@@ -4696,7 +4696,7 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 			info->i = 15;
 #endif
 			break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 /* not implemented */
 /*      case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = get_irq_line(INPUT_LINE_NMI); break;
@@ -4768,11 +4768,11 @@ void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, TMS99XX_device_get_name);		break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 9900L"); break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "C TMS9900 emulator by Edward Swartz, initially converted for Mame by M.Coates, updated by R. Nabet"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, TMS99XX_device_get_name);		break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Texas Instruments 9900L"); break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "C TMS9900 emulator by Edward Swartz, initially converted for Mame by M.Coates, updated by R. Nabet"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",

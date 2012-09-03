@@ -2485,7 +2485,7 @@ static CPU_GET_INFO( mcs51 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51_state_t);				break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;								break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;						break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;						break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;								break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 12;								break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;								break;
@@ -2494,15 +2494,15 @@ static CPU_GET_INFO( mcs51 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 20; /* rough guess */				break;
 		case CPUINFO_INT_INPUT_LINES:       			info->i = 3;								break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;						break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;						break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 8;						break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 9; /* due to sfr mapping */					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 18; /* 128k for ds5002fp */							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 8;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 9; /* due to sfr mapping */					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 18; /* 128k for ds5002fp */							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;							break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;								break;
 		case CPUINFO_INT_PC:							info->i = PC;								break;
@@ -2536,15 +2536,15 @@ static CPU_GET_INFO( mcs51 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8051);				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mcs51_state->icount;				break;
 
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map8 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map8 = NULL;	break;
 
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "MCS-51");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Steve Ellenoff"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "MCS-51");					break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Steve Ellenoff"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -2586,8 +2586,8 @@ CPU_GET_INFO( i8031 )
 {
 	switch (state)
 	{
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8031");					break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8031");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2597,9 +2597,9 @@ CPU_GET_INFO( i8051 )
 {
 	switch (state)
 	{
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2610,9 +2610,9 @@ CPU_GET_INFO( i8032 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8052);				break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8032");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8032");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
 }
@@ -2622,10 +2622,10 @@ CPU_GET_INFO( i8052 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8052);				break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8052");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8052");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
 }
@@ -2634,9 +2634,9 @@ CPU_GET_INFO( i8751 )
 {
 	switch (state)
 	{
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8751");					break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8751");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
 }
@@ -2646,10 +2646,10 @@ CPU_GET_INFO( i8752 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8052);				break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8752");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8752");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
 }
@@ -2665,10 +2665,10 @@ CPU_GET_INFO( i80c31 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c31);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I80C31");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C31");					break;
 		default:										CPU_GET_INFO_CALL(i8031);					break;
 	}
 }
@@ -2679,7 +2679,7 @@ CPU_GET_INFO( i80c51 )
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c51);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I80C51");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C51");					break;
 		default:										CPU_GET_INFO_CALL(i8051);					break;
 	}
 }
@@ -2690,7 +2690,7 @@ CPU_GET_INFO( i80c32 )
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c52);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c52);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I80C32");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");					break;
 		default:										CPU_GET_INFO_CALL(i8032);					break;
 	}
 }
@@ -2700,7 +2700,7 @@ CPU_GET_INFO( i80c52 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c52);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I80C52");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");					break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c52);			break;
 		default:										CPU_GET_INFO_CALL(i8052);					break;
 	}
@@ -2711,7 +2711,7 @@ CPU_GET_INFO( i87c51 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c51);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I87C51");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C51");					break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);			break;
 		default:										CPU_GET_INFO_CALL(i8751);					break;
 	}
@@ -2722,7 +2722,7 @@ CPU_GET_INFO( i87c52 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c52);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I87C52");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");					break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c52);			break;
 		default:										CPU_GET_INFO_CALL(i8752);					break;
 	}
@@ -2737,7 +2737,7 @@ CPU_GET_INFO( at89c4051 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c51);			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "AT89C4051");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "AT89C4051");				break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);			break;
 		default:										CPU_GET_INFO_CALL(i8051);					break;
 	}
@@ -2748,11 +2748,11 @@ CPU_GET_INFO( ds5002fp )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ds5002fp);		break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "DS5002FP");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Dallas");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Manuel Abadia"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "DS5002FP");				break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Dallas");					break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Manuel Abadia"); break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ds5002fp);			break;
 		default:										CPU_GET_INFO_CALL(i8051);					break;
 	}

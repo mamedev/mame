@@ -655,7 +655,7 @@ static CPU_GET_INFO( v25v35 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(v25_state_t);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -663,15 +663,15 @@ static CPU_GET_INFO( v25v35 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 80;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 20;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 17;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 20;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 17;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:						info->i = (nec_state->pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:			info->i = nec_state->nmi_state;				break;
@@ -712,11 +712,11 @@ static CPU_GET_INFO( v25v35 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_state->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC V-Series");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Bryan McPhail (V25/V35 support added by Alex W. Jackson)"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "NEC");					break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "NEC V-Series");		break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Bryan McPhail (V25/V35 support added by Alex W. Jackson)"); break;
 
 		case CPUINFO_STR_FLAGS:
             flags = CompressFlags();
@@ -765,14 +765,14 @@ CPU_GET_INFO( v25 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v25);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "V25");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "V25");					break;
 
 		default:										CPU_GET_INFO_CALL(v25v35);				break;
 	}
@@ -788,14 +788,14 @@ CPU_GET_INFO( v35 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v35);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "V35");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "V35");					break;
 
 		default:										CPU_GET_INFO_CALL(v25v35);				break;
 	}

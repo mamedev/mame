@@ -891,7 +891,7 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(apexc_state);			break;
 	case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-	case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
+	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 	case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -899,15 +899,15 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_INT_MIN_CYCLES:					info->i = 2;	/* IIRC */				break;
 	case CPUINFO_INT_MAX_CYCLES:					info->i = 75;	/* IIRC */				break;
 
-	case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 15;	/*13+2 ignored bits to make double word address*/	break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-	case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-	case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = /*5*/8;	/* no I/O bus, but we use address 0 for punchtape I/O */	break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = /*0*/1;	/*0 is quite enough but the MAME core does not understand*/	break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 15;	/*13+2 ignored bits to make double word address*/	break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = /*5*/8;	/* no I/O bus, but we use address 0 for punchtape I/O */	break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = /*0*/1;	/*0 is quite enough but the MAME core does not understand*/	break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:
@@ -932,11 +932,11 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(apexc);			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
-	case DEVINFO_STR_NAME:							strcpy(info->s, "APEXC"); break;
-	case DEVINFO_STR_FAMILY:					strcpy(info->s, "APEC"); break;
-	case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0"); break;
-	case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__); break;
-	case DEVINFO_STR_CREDITS:					strcpy(info->s, "Raphael Nabet"); break;
+	case CPUINFO_STR_NAME:							strcpy(info->s, "APEXC"); break;
+	case CPUINFO_STR_FAMILY:					strcpy(info->s, "APEC"); break;
+	case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0"); break;
+	case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__); break;
+	case CPUINFO_STR_CREDITS:					strcpy(info->s, "Raphael Nabet"); break;
 
 	case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c", (cpustate->running) ? 'R' : 'S'); break;
 

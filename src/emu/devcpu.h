@@ -58,10 +58,29 @@ const int MAX_REGS = 256;
 enum
 {
 	// --- the following bits of info are returned as 64-bit signed integers ---
-	CPUINFO_INT_FIRST = DEVINFO_INT_FIRST,
-
+	CPUINFO_INT_FIRST = 0x00000,
+		CPUINFO_INT_ENDIANNESS = CPUINFO_INT_FIRST,		// R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE
+		CPUINFO_INT_DATABUS_WIDTH,						// R/O: data bus size for each address space (8,16,32,64)
+		CPUINFO_INT_DATABUS_WIDTH_0 = CPUINFO_INT_DATABUS_WIDTH + 0,
+		CPUINFO_INT_DATABUS_WIDTH_1 = CPUINFO_INT_DATABUS_WIDTH + 1,
+		CPUINFO_INT_DATABUS_WIDTH_2 = CPUINFO_INT_DATABUS_WIDTH + 2,
+		CPUINFO_INT_DATABUS_WIDTH_3 = CPUINFO_INT_DATABUS_WIDTH + 3,
+		CPUINFO_INT_DATABUS_WIDTH_LAST = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
+		CPUINFO_INT_ADDRBUS_WIDTH,						// R/O: address bus size for each address space (12-32)
+		CPUINFO_INT_ADDRBUS_WIDTH_0 = CPUINFO_INT_ADDRBUS_WIDTH + 0,
+		CPUINFO_INT_ADDRBUS_WIDTH_1 = CPUINFO_INT_ADDRBUS_WIDTH + 1,
+		CPUINFO_INT_ADDRBUS_WIDTH_2 = CPUINFO_INT_ADDRBUS_WIDTH + 2,
+		CPUINFO_INT_ADDRBUS_WIDTH_3 = CPUINFO_INT_ADDRBUS_WIDTH + 3,
+		CPUINFO_INT_ADDRBUS_WIDTH_LAST = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
+		CPUINFO_INT_ADDRBUS_SHIFT,						// R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1)
+		CPUINFO_INT_ADDRBUS_SHIFT_0 = CPUINFO_INT_ADDRBUS_SHIFT + 0,
+		CPUINFO_INT_ADDRBUS_SHIFT_1 = CPUINFO_INT_ADDRBUS_SHIFT + 1,
+		CPUINFO_INT_ADDRBUS_SHIFT_2 = CPUINFO_INT_ADDRBUS_SHIFT + 2,
+		CPUINFO_INT_ADDRBUS_SHIFT_3 = CPUINFO_INT_ADDRBUS_SHIFT + 3,
+		CPUINFO_INT_ADDRBUS_SHIFT_LAST = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
+		
 		// CPU-specific additionsg
-		CPUINFO_INT_CONTEXT_SIZE = DEVINFO_INT_CLASS_SPECIFIC,	// R/O: size of CPU context in bytes
+		CPUINFO_INT_CONTEXT_SIZE = 0x04000,	// R/O: size of CPU context in bytes
 		CPUINFO_INT_INPUT_LINES,							// R/O: number of input lines
 		CPUINFO_INT_DEFAULT_IRQ_VECTOR,						// R/O: default IRQ vector
 		CPUINFO_INT_CLOCK_MULTIPLIER,						// R/O: internal clock multiplier
@@ -96,19 +115,32 @@ enum
 	CPUINFO_INT_CPU_SPECIFIC = 0x08000,						// R/W: CPU-specific values start here
 
 	// --- the following bits of info are returned as pointers to data or functions ---
-	CPUINFO_PTR_FIRST = DEVINFO_PTR_FIRST,
+	CPUINFO_PTR_FIRST = 0x10000,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP = CPUINFO_PTR_FIRST,				// R/O: address_map_constructor map
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_0 = CPUINFO_PTR_INTERNAL_MEMORY_MAP + 0,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_1 = CPUINFO_PTR_INTERNAL_MEMORY_MAP + 1,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_2 = CPUINFO_PTR_INTERNAL_MEMORY_MAP + 2,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_3 = CPUINFO_PTR_INTERNAL_MEMORY_MAP + 3,
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 
+		CPUINFO_PTR_DEFAULT_MEMORY_MAP,					// R/O: address_map_constructor map
+		CPUINFO_PTR_DEFAULT_MEMORY_MAP_0 = CPUINFO_PTR_DEFAULT_MEMORY_MAP + 0,
+		CPUINFO_PTR_DEFAULT_MEMORY_MAP_1 = CPUINFO_PTR_DEFAULT_MEMORY_MAP + 1,
+		CPUINFO_PTR_DEFAULT_MEMORY_MAP_2 = CPUINFO_PTR_DEFAULT_MEMORY_MAP + 2,
+		CPUINFO_PTR_DEFAULT_MEMORY_MAP_3 = CPUINFO_PTR_DEFAULT_MEMORY_MAP + 3,
+		CPUINFO_PTR_DEFAULT_MEMORY_MAP_LAST = CPUINFO_PTR_DEFAULT_MEMORY_MAP + ADDRESS_SPACES - 1,
+		
 		// CPU-specific additions
-		CPUINFO_PTR_INSTRUCTION_COUNTER = DEVINFO_PTR_CLASS_SPECIFIC,
+		CPUINFO_PTR_INSTRUCTION_COUNTER = 0x14000,
 															// R/O: int *icount
 
-	CPUINFO_PTR_CPU_SPECIFIC = DEVINFO_PTR_DEVICE_SPECIFIC,	// R/W: CPU-specific values start here
+	CPUINFO_PTR_CPU_SPECIFIC = 0x18000,	// R/W: CPU-specific values start here
 
 	// --- the following bits of info are returned as pointers to functions ---
-	CPUINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
+	CPUINFO_FCT_FIRST = 0x20000,
 
 		// CPU-specific additions
-		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	// R/O: void (*set_info)(legacy_cpu_device *device, UINT32 state, INT64 data, void *ptr)
+		CPUINFO_FCT_SET_INFO = 0x24000,	// R/O: void (*set_info)(legacy_cpu_device *device, UINT32 state, INT64 data, void *ptr)
 		CPUINFO_FCT_INIT,									// R/O: void (*init)(legacy_cpu_device *device, int index, int clock, int (*irqcallback)(legacy_cpu_device *device, int))
 		CPUINFO_FCT_RESET,									// R/O: void (*reset)(legacy_cpu_device *device)
 		CPUINFO_FCT_EXIT,									// R/O: void (*exit)(legacy_cpu_device *device)
@@ -125,17 +157,22 @@ enum
 		CPUINFO_FCT_IMPORT_STRING,							// R/O: void (*import_string)(legacy_cpu_device *device, const device_state_entry &entry, astring &string)
 		CPUINFO_FCT_EXPORT_STRING,							// R/O: void (*export_string)(legacy_cpu_device *device, const device_state_entry &entry, astring &string)
 
-	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	// R/W: CPU-specific values start here
+	CPUINFO_FCT_CPU_SPECIFIC = 0x28000,	// R/W: CPU-specific values start here
 
 	// --- the following bits of info are returned as NULL-terminated strings ---
-	CPUINFO_STR_FIRST = DEVINFO_STR_FIRST,
-
+	CPUINFO_STR_FIRST = 0x30000,
+		CPUINFO_STR_NAME = CPUINFO_STR_FIRST,			// R/O: name of the device
+		CPUINFO_STR_SHORTNAME,							// R/O: search path of device, used for media loading
+		CPUINFO_STR_FAMILY,								// R/O: family of the device
+		CPUINFO_STR_VERSION,							// R/O: version of the device
+		CPUINFO_STR_SOURCE_FILE,						// R/O: file containing the device implementation
+		CPUINFO_STR_CREDITS,							// R/O: credits for the device implementation
 		// CPU-specific additions
-		CPUINFO_STR_REGISTER = DEVINFO_STR_CLASS_SPECIFIC + 10,			// R/O: string representation of up to MAX_REGs registers
+		CPUINFO_STR_REGISTER = 0x34000 + 10,			// R/O: string representation of up to MAX_REGs registers
 		CPUINFO_STR_FLAGS = CPUINFO_STR_REGISTER + STATE_GENFLAGS,		// R/O: string representation of the main flags value
 		CPUINFO_STR_REGISTER_LAST = CPUINFO_STR_REGISTER + MAX_REGS - 1,
 
-	CPUINFO_STR_CPU_SPECIFIC = DEVINFO_STR_DEVICE_SPECIFIC	// R/W: CPU-specific values start here
+	CPUINFO_STR_CPU_SPECIFIC = 0x38000	// R/W: CPU-specific values start here
 };
 
 
@@ -267,6 +304,12 @@ const device_type name = &legacy_device_creator<basename##_device>
 #define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach).device(tag))->set_input_line_and_vector(line, state, vec)
 
 
+// this template function creates a stub which constructs a device
+template<class _DeviceClass>
+device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+{
+	return global_alloc(_DeviceClass(mconfig, &legacy_device_creator<_DeviceClass>, tag, owner, clock));
+}
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -321,14 +364,14 @@ union cpuinfo
 	cpu_string_io_func		import_string;				// CPUINFO_FCT_IMPORT_STRING
 	cpu_string_io_func		export_string;				// CPUINFO_FCT_EXPORT_STRING
 	int *					icount;						// CPUINFO_PTR_INSTRUCTION_COUNTER
-	address_map_constructor	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	internal_map64;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
-	address_map_constructor	default_map8;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	address_map_constructor	default_map16;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	address_map_constructor	default_map32;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
-	address_map_constructor	default_map64;				// DEVINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	internal_map8;				// CPUINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	internal_map16;				// CPUINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	internal_map32;				// CPUINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	internal_map64;				// CPUINFO_PTR_INTERNAL_MEMORY_MAP
+	address_map_constructor	default_map8;				// CPUINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	default_map16;				// CPUINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	default_map32;				// CPUINFO_PTR_DEFAULT_MEMORY_MAP
+	address_map_constructor	default_map64;				// CPUINFO_PTR_DEFAULT_MEMORY_MAP
 };
 
 
@@ -367,9 +410,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_ptr(DEVINFO_PTR_ROM_REGION)); }
-	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
-	virtual ioport_constructor device_input_ports() const { return reinterpret_cast<ioport_constructor>(get_legacy_ptr(DEVINFO_PTR_INPUT_PORTS)); }
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_stop();

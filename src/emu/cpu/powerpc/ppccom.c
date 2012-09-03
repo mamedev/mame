@@ -1409,7 +1409,7 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					/* provided by core */					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1417,9 +1417,9 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 64;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
@@ -1545,11 +1545,11 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "PowerPC");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "PowerPC");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:						/* provided by core */					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC");				break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "PowerPC");				break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
+		case CPUINFO_STR_SOURCE_FILE:						/* provided by core */					break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 
@@ -2521,14 +2521,14 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3);		break;
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4);		break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 31;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 31;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							/* provided per-CPU */					break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_ppc4xx); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_ppc4xx); break;
 
 		/* --- everything else is handled generically --- */
 		default:										ppccom_get_info(ppc, state, info);		break;

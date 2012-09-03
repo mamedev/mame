@@ -500,7 +500,7 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(dsp56k_core);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0x0000;						break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -508,15 +508,15 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;	// ?                    break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;	// ?                    break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -1;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = -1;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:	info->i = DSP56K_IRQ_MODA;				break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:	info->i = DSP56K_IRQ_MODB;				break;
@@ -591,17 +591,17 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_FCT_WRITE:							info->write = NULL;						break;
 		case CPUINFO_FCT_READOP:						info->readop = NULL;					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:
 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);						break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:
 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Motorola DSP56156");	break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "0.1");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Andrew Gardner");		break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;
+		case CPUINFO_STR_FAMILY:						strcpy(info->s, "Motorola DSP56156");	break;
+		case CPUINFO_STR_VERSION:						strcpy(info->s, "0.1");					break;
+		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:						strcpy(info->s, "Andrew Gardner");		break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s%s %s%s%s%s%s%s%s%s %s%s",

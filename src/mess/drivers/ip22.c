@@ -1629,20 +1629,6 @@ static const mips3_config config =
 	32768	/* data cache size */
 };
 
-#ifdef UNUSED_FUNCTION
-static void ip22_harddisk_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* harddisk */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
-
-		default: harddisk_device_getinfo(devclass, state, info); break;
-	}
-}
-#endif
-
 static const pc_lpt_interface ip22_lpt_config =
 {
 	DEVCB_NULL /* no idea if the lpt irq is connected and where */

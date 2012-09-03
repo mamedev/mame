@@ -1207,7 +1207,7 @@ CPU_GET_INFO( i8085 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(i8085_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -1215,12 +1215,12 @@ CPU_GET_INFO( i8085 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 4;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i808x);				break;
@@ -1236,11 +1236,11 @@ CPU_GET_INFO( i8085 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "8085A");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-85");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.1");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "8085A");				break;
+		case CPUINFO_STR_FAMILY:						strcpy(info->s, "MCS-85");				break;
+		case CPUINFO_STR_VERSION:						strcpy(info->s, "1.1");					break;
+		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:						strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 	}
 }
 
@@ -1261,8 +1261,8 @@ CPU_GET_INFO( i8080 )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8080);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "8080");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-80");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "8080");				break;
+		case CPUINFO_STR_FAMILY:						strcpy(info->s, "MCS-80");				break;
 
 		default:										CPU_GET_INFO_CALL(i8085); break;
 	}
@@ -1285,8 +1285,8 @@ CPU_GET_INFO( i8080a )
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8080);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "8080A");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-80");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "8080A");				break;
+		case CPUINFO_STR_FAMILY:						strcpy(info->s, "MCS-80");				break;
 
 		default:										CPU_GET_INFO_CALL(i8085); break;
 	}

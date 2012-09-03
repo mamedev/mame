@@ -768,26 +768,26 @@ CPU_GET_INFO( h8_3334 )
 	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i           = 10;							break;
 
 		// Bus sizes
-	case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;						break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;						break;
-	case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;						break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;						break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
-	case DEVINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;						break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 16;						break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;						break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;						break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;						break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;						break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;						break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
+	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;						break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 16;						break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;						break;
 
 		// Internal maps
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(h8_3334_internal_map); break;
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL;	break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(h8_3334_internal_map); break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL;	break;
 
 		// CPU misc parameters
-	case DEVINFO_STR_NAME:					strcpy(info->s, "H8/3334");						break;
-	case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);						break;
+	case CPUINFO_STR_NAME:					strcpy(info->s, "H8/3334");						break;
+	case CPUINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);						break;
 	case CPUINFO_STR_FLAGS:					strcpy(info->s, h8_get_ccr_str(h8));				break;
-	case DEVINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
+	case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
 	case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
 	case CPUINFO_INT_INPUT_LINES:				info->i = 16;									break;

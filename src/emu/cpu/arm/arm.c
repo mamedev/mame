@@ -1498,7 +1498,7 @@ CPU_GET_INFO( arm )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ARM_REGS);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1506,15 +1506,15 @@ CPU_GET_INFO( arm )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 3;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 4;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 26;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 26;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:	info->i = cpustate->pendingIrq;			break;
 		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:	info->i = cpustate->pendingFiq;			break;
@@ -1564,11 +1564,11 @@ CPU_GET_INFO( arm )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "ARM");					break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Acorn Risc Machine");	break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.3");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "ARM");					break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Acorn Risc Machine");	break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.3");					break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c",
@@ -1632,14 +1632,14 @@ CPU_GET_INFO( arm_be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(arm_be);					break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(arm_be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-        case DEVINFO_STR_NAME:							strcpy(info->s, "ARM (big endian)");				break;
+        case CPUINFO_STR_NAME:							strcpy(info->s, "ARM (big endian)");				break;
 
 		default:										CPU_GET_INFO_CALL(arm);								break;
 	}

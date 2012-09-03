@@ -607,7 +607,7 @@ CPU_GET_INFO( scmp )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(scmp_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -615,17 +615,17 @@ CPU_GET_INFO( scmp )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 5;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 131593;						break; // DLY instruction max time
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 0;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 0;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 0;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 0;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(scmp);				break;
@@ -641,11 +641,11 @@ CPU_GET_INFO( scmp )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "INS 8050 SC/MP");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "National Semiconductor SC/MP");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "INS 8050 SC/MP");				break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "National Semiconductor SC/MP");			break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case CPUINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
 	}
 }
 
@@ -660,7 +660,7 @@ CPU_GET_INFO( ins8060 )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "INS 8060 SC/MP II");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "INS 8060 SC/MP II");				break;
 
 		default:										CPU_GET_INFO_CALL(scmp);			break;
 	}

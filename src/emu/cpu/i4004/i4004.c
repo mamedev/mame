@@ -577,7 +577,7 @@ CPU_GET_INFO( i4004 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(i4004_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -585,17 +585,17 @@ CPU_GET_INFO( i4004 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 8;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 12;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 12;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 12;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 12;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break; // Only lower 4 bits used
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break; // Only lower 4 bits used
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 6;							break; // 4 I/O for each ROM chip and 4 OUT for each RAM
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break; // There could be 4 chips in 16 banks for RAM
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i4004);				break;
@@ -611,11 +611,11 @@ CPU_GET_INFO( i4004 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "4004");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 4004");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "4004");				break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Intel 4004");			break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
+		case CPUINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Miodrag Milanovic"); break;
 
 		case CPUINFO_IS_OCTAL:						info->i = true;							break;
 	}

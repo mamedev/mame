@@ -1367,22 +1367,22 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs48_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = MCS48_INPUT_IRQ;				break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 12;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			/*info->i = 6 or 7 or 8;*/				break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 9;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 12;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			/*info->i = 6 or 7 or 8;*/				break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 9;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	info->i = cpustate->ea;					break;
@@ -1399,15 +1399,15 @@ static CPU_GET_INFO( mcs48 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	/* set per-core */						break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		/* set per-core */						break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	/* set per-core */						break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:		/* set per-core */						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							/* set per-core */						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 8039");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
+		case CPUINFO_STR_NAME:							/* set per-core */						break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Intel 8039");			break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 	}
 }
 
@@ -1426,7 +1426,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			info->i = 3 * cycle_states;
 			break;
 
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:
 			if (ramsize == 64)
 				info->i = 6;
 			else if (ramsize == 128)
@@ -1459,7 +1459,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:
 			if (romsize == 0)
 				info->internal_map8 = NULL;
 			else if (romsize == 1024)
@@ -1472,7 +1472,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 				fatalerror("mcs48_generic_get_info: Invalid RAM size");
 			break;
 
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:
 			if (ramsize == 64)
 				info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);
 			else if (ramsize == 128)
@@ -1484,7 +1484,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:
+		case CPUINFO_STR_NAME:
 			strcpy(info->s, name);
 			break;
 

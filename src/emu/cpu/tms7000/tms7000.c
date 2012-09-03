@@ -273,7 +273,7 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_INT_CONTEXT_SIZE:	info->i = sizeof(tms7000_state);	break;
         case CPUINFO_INT_INPUT_LINES:	info->i = 3;	break;
         case CPUINFO_INT_DEFAULT_IRQ_VECTOR:	info->i = 0;	break;
-        case DEVINFO_INT_ENDIANNESS:	info->i = ENDIANNESS_BIG;	break;
+        case CPUINFO_INT_ENDIANNESS:	info->i = ENDIANNESS_BIG;	break;
         case CPUINFO_INT_CLOCK_MULTIPLIER:	info->i = 1;	break;
         case CPUINFO_INT_CLOCK_DIVIDER:	info->i = 1;	break;
         case CPUINFO_INT_MIN_INSTRUCTION_BYTES:	info->i = 1;	break;
@@ -281,15 +281,15 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_INT_MIN_CYCLES:	info->i = 1;	break;
         case CPUINFO_INT_MAX_CYCLES:	info->i = 48;	break; /* 48 represents the multiply instruction, the next highest is 17 */
 
-        case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;	break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;	break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;	break;
-        case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;	break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;	break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;	break;
-        case DEVINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;	break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 8;	break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;	break;
+        case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;	break;
+        case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;	break;
+        case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;	break;
+        case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;	break;
+        case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;	break;
+        case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;	break;
+        case CPUINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;	break;
+        case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 8;	break;
+        case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;	break;
 
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ1_LINE:	info->i = cpustate->irq_state[TMS7000_IRQ1_LINE]; break;
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ2_LINE:	info->i = cpustate->irq_state[TMS7000_IRQ2_LINE]; break;
@@ -315,14 +315,14 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_FCT_BURN:	info->burn = NULL;	/* Not supported */break;
         case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms7000);	break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &cpustate->icount;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case DEVINFO_STR_NAME:	strcpy(info->s, "TMS7000"); break;
-        case DEVINFO_STR_FAMILY:	strcpy(info->s, "Texas Instriuments TMS7000"); break;
-        case DEVINFO_STR_VERSION:	strcpy(info->s, "1.0"); break;
-        case DEVINFO_STR_SOURCE_FILE:	strcpy(info->s, __FILE__); break;
-        case DEVINFO_STR_CREDITS:	strcpy(info->s, "Copyright tim lindner"); break;
+        case CPUINFO_STR_NAME:	strcpy(info->s, "TMS7000"); break;
+        case CPUINFO_STR_FAMILY:	strcpy(info->s, "Texas Instriuments TMS7000"); break;
+        case CPUINFO_STR_VERSION:	strcpy(info->s, "1.0"); break;
+        case CPUINFO_STR_SOURCE_FILE:	strcpy(info->s, __FILE__); break;
+        case CPUINFO_STR_CREDITS:	strcpy(info->s, "Copyright tim lindner"); break;
 
         case CPUINFO_STR_FLAGS:
                 sprintf(info->s,  "%c%c%c%c%c%c%c%c",

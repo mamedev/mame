@@ -2684,7 +2684,7 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(z180_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -2692,12 +2692,12 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 20;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 20;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;			break;
 		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:		info->i = cpustate->irq_state[0];		break;
@@ -2727,11 +2727,11 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:		info->p = (void *)cpustate->cc[Z180_TABLE_ex];	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.4");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "0.4");					break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 	}
 }
 

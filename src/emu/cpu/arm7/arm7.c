@@ -786,7 +786,7 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(arm_state);                 break;
         case CPUINFO_INT_INPUT_LINES:                   info->i = ARM7_NUM_LINES;               break;
         case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-        case DEVINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
+        case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
         case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
         case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
         case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
@@ -794,15 +794,15 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_INT_MIN_CYCLES:                    info->i = 3;                            break;
         case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
 
-        case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 32;                   break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                   break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                    break;
-        case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:    info->i = 0;                    break;
-        case DEVINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 0;                    break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:      info->i = 0;                    break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:      info->i = 0;                    break;
+        case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 32;                   break;
+        case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                   break;
+        case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                    break;
+        case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:    info->i = 0;                    break;
+        case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:    info->i = 0;                    break;
+        case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:    info->i = 0;                    break;
+        case CPUINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 0;                    break;
+        case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:      info->i = 0;                    break;
+        case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:      info->i = 0;                    break;
 
         /* interrupt lines/exceptions */
         case CPUINFO_INT_INPUT_STATE + ARM7_IRQ_LINE:                   info->i = cpustate->pendingIrq; break;
@@ -876,11 +876,11 @@ CPU_GET_INFO( arm7 )
 	case CPUINFO_FCT_TRANSLATE:	    	info->translate = CPU_TRANSLATE_NAME(arm7);		break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case DEVINFO_STR_NAME:                  strcpy(info->s, "ARM7");                        break;
-        case DEVINFO_STR_FAMILY:           strcpy(info->s, "Acorn Risc Machine");          break;
-        case DEVINFO_STR_VERSION:          strcpy(info->s, "2.0");                         break;
-        case DEVINFO_STR_SOURCE_FILE:             strcpy(info->s, __FILE__);                      break;
-        case DEVINFO_STR_CREDITS:          strcpy(info->s, "Copyright Steve Ellenoff, sellenoff@hotmail.com"); break;
+        case CPUINFO_STR_NAME:                  strcpy(info->s, "ARM7");                        break;
+        case CPUINFO_STR_FAMILY:           strcpy(info->s, "Acorn Risc Machine");          break;
+        case CPUINFO_STR_VERSION:          strcpy(info->s, "2.0");                         break;
+        case CPUINFO_STR_SOURCE_FILE:             strcpy(info->s, __FILE__);                      break;
+        case CPUINFO_STR_CREDITS:          strcpy(info->s, "Copyright Steve Ellenoff, sellenoff@hotmail.com"); break;
 
         case CPUINFO_STR_FLAGS:
             sprintf(info->s, "%c%c%c%c%c%c%c%c %s",
@@ -951,10 +951,10 @@ CPU_GET_INFO( arm7_be )
 {
 	switch (state)
 	{
-		case DEVINFO_INT_ENDIANNESS:		info->i = ENDIANNESS_BIG;								break;
+		case CPUINFO_INT_ENDIANNESS:		info->i = ENDIANNESS_BIG;								break;
 		case CPUINFO_FCT_RESET:				info->reset = CPU_RESET_NAME(arm7_be);					break;
 		case CPUINFO_FCT_DISASSEMBLE:		info->disassemble = CPU_DISASSEMBLE_NAME(arm7_be);		break;
-		case DEVINFO_STR_NAME:				strcpy(info->s, "ARM7 (big endian)");					break;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "ARM7 (big endian)");					break;
 		default:							CPU_GET_INFO_CALL(arm7);
 	}
 }
@@ -964,7 +964,7 @@ CPU_GET_INFO( arm7500 )
     switch (state)
     {
         case CPUINFO_FCT_RESET:		info->reset = CPU_RESET_NAME(arm7500);		break;
-        case DEVINFO_STR_NAME:		strcpy(info->s, "ARM7500");				break;
+        case CPUINFO_STR_NAME:		strcpy(info->s, "ARM7500");				break;
 		default:					CPU_GET_INFO_CALL(arm7);
 		break;
     }
@@ -975,7 +975,7 @@ CPU_GET_INFO( arm9 )
     switch (state)
     {
         case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(arm9);                       break;
-        case DEVINFO_STR_NAME:             strcpy(info->s, "ARM9");                        break;
+        case CPUINFO_STR_NAME:             strcpy(info->s, "ARM9");                        break;
 	default:	CPU_GET_INFO_CALL(arm7);
 		break;
     }
@@ -986,7 +986,7 @@ CPU_GET_INFO( arm920t )
     switch (state)
     {
         case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(arm920t);                       break;
-        case DEVINFO_STR_NAME:             strcpy(info->s, "ARM920T");                        break;
+        case CPUINFO_STR_NAME:             strcpy(info->s, "ARM920T");                        break;
 	default:	CPU_GET_INFO_CALL(arm7);
 		break;
     }
@@ -997,7 +997,7 @@ CPU_GET_INFO( pxa255 )
     switch (state)
     {
         case CPUINFO_FCT_RESET:            info->reset = CPU_RESET_NAME(pxa255);                       break;
-        case DEVINFO_STR_NAME:             strcpy(info->s, "PXA255");                        break;
+        case CPUINFO_STR_NAME:             strcpy(info->s, "PXA255");                        break;
 	default:	CPU_GET_INFO_CALL(arm7);
 		break;
     }
@@ -1008,7 +1008,7 @@ CPU_GET_INFO( sa1110 )
     switch (state)
     {
         case CPUINFO_FCT_RESET:            info->reset = CPU_RESET_NAME(sa1110);                       break;
-        case DEVINFO_STR_NAME:             strcpy(info->s, "SA1110");                        break;
+        case CPUINFO_STR_NAME:             strcpy(info->s, "SA1110");                        break;
 	default:	CPU_GET_INFO_CALL(arm7);
 		break;
     }

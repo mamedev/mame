@@ -832,7 +832,7 @@ static CPU_GET_INFO( z8 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(z8_state);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -840,15 +840,15 @@ static CPU_GET_INFO( z8 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 6;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 20;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 2;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 2;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:				info->setinfo = CPU_SET_INFO_NAME(z8);			break;
@@ -864,11 +864,11 @@ static CPU_GET_INFO( z8 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Zilog Z8");			break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team"); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "Z8");					break;
+		case CPUINFO_STR_FAMILY:						strcpy(info->s, "Zilog Z8");			break;
+		case CPUINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
+		case CPUINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team"); break;
 	}
 }
 
@@ -881,10 +881,10 @@ CPU_GET_INFO( z8601 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8601");								break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "Z8601");								break;
 
 		default:										CPU_GET_INFO_CALL(z8);									break;
 	}
@@ -895,10 +895,10 @@ CPU_GET_INFO( ub8830d )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "UB8830D");								break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "UB8830D");								break;
 
 		default:										CPU_GET_INFO_CALL(z8);									break;
 	}
@@ -909,10 +909,10 @@ CPU_GET_INFO( z8611 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8611");								break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "Z8611");								break;
 
 		default:										CPU_GET_INFO_CALL(z8);									break;
 	}

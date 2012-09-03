@@ -965,27 +965,6 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "4c52.u34",  0x0000, 0x0800, CRC(cbeb2e96) SHA1(f0e17adcd278fb376c9f90833c7fbbb60193dbe3))
 ROM_END
 
-
-#ifdef UNUSED_FUNCTION
-static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CASSETTE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 0;	/* INVALID */ break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 0;	/* INVALID */ break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0;	/* INVALID */ break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
-		case MESS_DEVINFO_INT_RESET_ON_LOAD:					info->i = 1; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
-	}
-}
-#endif
-
 DRIVER_INIT_MEMBER(intv_state,intv)
 {
 

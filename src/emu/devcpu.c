@@ -97,21 +97,21 @@ legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type 
 	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space_config); spacenum++)
 	{
 		m_space_config[spacenum].m_name = (spacenum == 1) ? "data" : (spacenum == 2) ? "i/o" : "program";
-		m_space_config[spacenum].m_endianness = static_cast<endianness_t>(get_legacy_int(DEVINFO_INT_ENDIANNESS));
-		m_space_config[spacenum].m_databus_width = get_legacy_int(DEVINFO_INT_DATABUS_WIDTH + spacenum);
-		m_space_config[spacenum].m_addrbus_width = get_legacy_int(DEVINFO_INT_ADDRBUS_WIDTH + spacenum);
-		m_space_config[spacenum].m_addrbus_shift = get_legacy_int(DEVINFO_INT_ADDRBUS_SHIFT + spacenum);
+		m_space_config[spacenum].m_endianness = static_cast<endianness_t>(get_legacy_int(CPUINFO_INT_ENDIANNESS));
+		m_space_config[spacenum].m_databus_width = get_legacy_int(CPUINFO_INT_DATABUS_WIDTH + spacenum);
+		m_space_config[spacenum].m_addrbus_width = get_legacy_int(CPUINFO_INT_ADDRBUS_WIDTH + spacenum);
+		m_space_config[spacenum].m_addrbus_shift = get_legacy_int(CPUINFO_INT_ADDRBUS_SHIFT + spacenum);
 		m_space_config[spacenum].m_logaddr_width = get_legacy_int(CPUINFO_INT_LOGADDR_WIDTH + spacenum);
 		if (m_space_config[spacenum].m_logaddr_width == 0)
 			m_space_config[spacenum].m_logaddr_width = m_space_config[spacenum].m_addrbus_width;
 		m_space_config[spacenum].m_page_shift = get_legacy_int(CPUINFO_INT_PAGE_SHIFT + spacenum);
-		m_space_config[spacenum].m_internal_map = reinterpret_cast<address_map_constructor>(get_legacy_fct(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
-		m_space_config[spacenum].m_default_map = reinterpret_cast<address_map_constructor>(get_legacy_fct(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));
+		m_space_config[spacenum].m_internal_map = reinterpret_cast<address_map_constructor>(get_legacy_fct(CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
+		m_space_config[spacenum].m_default_map = reinterpret_cast<address_map_constructor>(get_legacy_fct(CPUINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));
 	}
 
 	// set the real name
-	m_name = get_legacy_string(DEVINFO_STR_NAME);
-	m_shortname = get_legacy_string(DEVINFO_STR_SHORTNAME);
+	m_name = get_legacy_string(CPUINFO_STR_NAME);
+	m_shortname = get_legacy_string(CPUINFO_STR_SHORTNAME);
 	m_searchpath = m_shortname;
 
 	int tokenbytes = get_legacy_int(CPUINFO_INT_CONTEXT_SIZE);
@@ -413,6 +413,7 @@ genf *legacy_cpu_device::get_legacy_fct(UINT32 state) const
 //  get_legacy_string - return a legacy
 //  string value
 //-------------------------------------------------
+extern char *get_temp_string_buffer(void);
 
 const char *legacy_cpu_device::get_legacy_string(UINT32 state) const
 {

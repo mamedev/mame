@@ -2135,7 +2135,7 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(upd7810_state);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -2143,15 +2143,15 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = (IRR & INTNMI) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF1:	info->i = (IRR & INTF1) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -2224,11 +2224,11 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "uPD7810");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC uPD7810");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.3");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7810");				break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "NEC uPD7810");			break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "0.3");					break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s:%s:%s:%s:%s:%s",
@@ -2309,7 +2309,7 @@ CPU_GET_INFO( upd7807 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7807);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
 
 		default:										CPU_GET_INFO_CALL(upd7810);				break;
 	}
@@ -2320,7 +2320,7 @@ CPU_GET_INFO( upd7801 ) {
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7801);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);		break;
 
-		case DEVINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
 
 		default:										CPU_GET_INFO_CALL(upd7810);				break;
 	}
@@ -2333,7 +2333,7 @@ CPU_GET_INFO( upd78c05 ) {
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd78c05);			break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);		break;
 
-		case DEVINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
 
 		/* These registers are not present in the uPD78C05 cpu */
 		case CPUINFO_STR_REGISTER + UPD7810_A2:
@@ -2377,7 +2377,7 @@ CPU_GET_INFO( upd78c06 ) {
 	switch ( state ) {
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd78c06);			break;
 
-		case DEVINFO_STR_NAME:							strcpy(info->s, "uPD78C06");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C06");			break;
 
 		default:										CPU_GET_INFO_CALL(upd78c05);				break;
 	}

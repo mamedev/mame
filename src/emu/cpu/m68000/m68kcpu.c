@@ -1195,7 +1195,7 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68ki_cpu_core);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -1203,9 +1203,9 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 4;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (m68k->virq_state >> 1) & 1;	break;
@@ -1231,11 +1231,11 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							/* set per-core */						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.95");				break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO+OG)"); break;
+		case CPUINFO_STR_NAME:							/* set per-core */						break;
+		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
+		case CPUINFO_STR_VERSION:					strcpy(info->s, "4.95");				break;
+		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO+OG)"); break;
 	}
 }
 
@@ -1959,7 +1959,7 @@ CPU_GET_INFO( m68000 )
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68000);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "68000");						break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "68000");						break;
 
 		default:									CPU_GET_INFO_CALL(m68k);						break;
 	}
@@ -1983,7 +1983,7 @@ CPU_GET_INFO( m68301 )
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68301);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "68301");						break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "68301");						break;
 
 		default:									CPU_GET_INFO_CALL(m68k);						break;
 	}
@@ -2149,15 +2149,15 @@ CPU_GET_INFO( m68307 )
 {
 	switch (state)
 	{
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 24;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 24;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68307);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "68307");						break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "68307");						break;
 
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m68307_internal_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m68307_internal_map); break;
 
 
 		default:									CPU_GET_INFO_CALL(m68k);						break;
@@ -2206,14 +2206,14 @@ CPU_GET_INFO( m68008 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 20;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 20;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68008");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68008");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2224,14 +2224,14 @@ CPU_GET_INFO( m68008plcc )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 22;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 22;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68008");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68008");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2282,7 +2282,7 @@ CPU_GET_INFO( m68010 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68010);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68010");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68010");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2332,14 +2332,14 @@ CPU_GET_INFO( m68020 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68020");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68020");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2370,7 +2370,7 @@ CPU_GET_INFO( m68020pmmu )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020pmmu);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68020, 68851");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68020, 68851");				break;
 
 		default:										CPU_GET_INFO_CALL(m68020);				break;
 	}
@@ -2401,7 +2401,7 @@ CPU_GET_INFO( m68020hmmu )
 		case CPUINFO_FCT_TRANSLATE:	info->translate = CPU_TRANSLATE_NAME(m68khmmu);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:		strcpy(info->s, "68020, Apple HMMU");			break;
+		case CPUINFO_STR_NAME:		strcpy(info->s, "68020, Apple HMMU");			break;
 
 		default:			CPU_GET_INFO_CALL(m68020);				break;
 	}
@@ -2448,13 +2448,13 @@ CPU_GET_INFO( m68ec020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec020);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
 
 		default:										CPU_GET_INFO_CALL(m68020);				break;
 	}
@@ -2505,14 +2505,14 @@ CPU_GET_INFO( m68030 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68030);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68030");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68030");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2563,7 +2563,7 @@ CPU_GET_INFO( m68ec030 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec030);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68EC030");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC030");				break;
 
 		default:										CPU_GET_INFO_CALL(m68030);				break;
 	}
@@ -2614,14 +2614,14 @@ CPU_GET_INFO( m68040 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68040);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68040");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68040");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2671,7 +2671,7 @@ CPU_GET_INFO( m68ec040 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec040);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68EC040");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC040");				break;
 
 		default:										CPU_GET_INFO_CALL(m68040);				break;
 	}
@@ -2721,7 +2721,7 @@ CPU_GET_INFO( m68lc040 )
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68lc040);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "68LC040");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68LC040");				break;
 
 		default:										CPU_GET_INFO_CALL(m68040);				break;
 	}
@@ -2745,13 +2745,13 @@ CPU_GET_INFO( scc68070 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(scc68070);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SCC68070");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "SCC68070");			break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2876,16 +2876,16 @@ CPU_GET_INFO( m68340 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(m68340_internal_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(m68340_internal_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68340);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Freescale 68340");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "Freescale 68340");				break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
@@ -2935,14 +2935,14 @@ CPU_GET_INFO( mcf5206e )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(coldfire);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "MCF5206E");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "MCF5206E");			break;
 
 		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
