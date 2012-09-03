@@ -2768,7 +2768,7 @@ static void s3_write_fg(UINT32 offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = vga.memory[(VGA_START_ADDRESS + (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
+		src = vga.memory[((s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
 		break;
 	}
 
@@ -2849,7 +2849,7 @@ static void s3_write_bg(UINT32 offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = vga.memory[(VGA_START_ADDRESS + (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
+		src = vga.memory[((s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x) % vga.svga_intf.vram_size];
 		break;
 	}
 
@@ -3134,7 +3134,7 @@ WRITE16_HANDLER(s3_cmd_w)
 						s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 				break;
 			}
-			offset = VGA_START_ADDRESS;
+			offset = 0;
 			offset += (VGA_LINE_LENGTH * s3.curr_y);
 			offset += s3.curr_x;
 			for(y=0;y<=s3.rect_height;y++)
@@ -3183,10 +3183,10 @@ WRITE16_HANDLER(s3_cmd_w)
 					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			break;
 		case 0xc000:  // BitBLT
-			offset = VGA_START_ADDRESS;
+			offset = 0;
 			offset += (VGA_LINE_LENGTH * s3.dest_y);
 			offset += s3.dest_x;
-			src = VGA_START_ADDRESS;
+			src = 0;
 			src += (VGA_LINE_LENGTH * s3.curr_y);
 			src += s3.curr_x;
 			for(y=0;y<=s3.rect_height;y++)
@@ -3241,10 +3241,10 @@ WRITE16_HANDLER(s3_cmd_w)
 					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		case 0xe000:  // Pattern Fill
-			offset = VGA_START_ADDRESS;
+			offset = 0;
 			offset += (VGA_LINE_LENGTH * s3.dest_y);
 			offset += s3.dest_x;
-			src = VGA_START_ADDRESS;
+			src = 0;
 			src += (VGA_LINE_LENGTH * s3.curr_y);
 			src += s3.curr_x;
 			if(data & 0x0020)
@@ -3540,6 +3540,7 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
  */
 	case 0xf000:
 		s3.multifunc_sel = data & 0x000f;
+		logerror("S3: Multifunction select write %04x\n",data);
 	default:
 		logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
 	}
@@ -3557,7 +3558,7 @@ static void s3_wait_draw()
 		data_size = 16;
 	if(s3.bus_size == 2)  // 32-bit
 		data_size = 32;
-	off = VGA_START_ADDRESS;
+	off = 0;
 	off += (VGA_LINE_LENGTH * s3.curr_y);
 	off += s3.curr_x;
 	if(s3.current_cmd & 0x02) // "across plane mode"
