@@ -541,17 +541,17 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 			UINT32 lower = ppc->spr[SPROEA_IBAT0U + 2*batnum + 1];
 			int privbit = ((intention & TRANSLATE_USER_MASK) == 0) ? 3 : 2;
 
-//          printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
+//            printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
 
 			// is this pair valid?
 			if (lower & 0x40)
 			{
-				UINT32 mask = (~lower & 0x3f) << 17;
+				UINT32 mask = ((lower & 0x3f) << 17) ^ 0xfffe0000;
 				UINT32 addrout;
 				UINT32 key = (upper >> privbit) & 1;
 
 				/* check for a hit against this bucket */
-				if ((*address & 0xfffe0000) == (upper & 0xfffe0000))
+				if ((*address & mask) == (upper & mask))
 				{
 					/* verify protection; if we fail, return false and indicate a protection violation */
 					if (!page_access_allowed(transtype, key, upper & 3))
@@ -560,8 +560,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 					}
 
 					/* otherwise we're good */
-					addrout = (lower & 0xff100000) | (*address & ~0xfffe0000);
-					addrout |= ((*address & mask) | (lower & mask));
+					addrout = (lower & mask) | (*address & ~mask);
 					*address = addrout; // top 9 bits from top 9 of PBN
 					return 0x001;
 				}
@@ -2535,4 +2534,5 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		default:										ppccom_get_info(ppc, state, info);		break;
 	}
 }
+
 
