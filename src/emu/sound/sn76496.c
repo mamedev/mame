@@ -870,7 +870,7 @@ WRITE8_MEMBER( sn76496_base_device::stereo_w )
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
-WRITE8_MEMBER( sn76496_base_device::write )
+void sn76496_base_device::write(UINT8 data)
 {
 	int n, r, c;
 
@@ -934,6 +934,11 @@ WRITE8_MEMBER( sn76496_base_device::write )
 			}
 			break;
 	}
+}
+
+WRITE8_MEMBER( sn76496_base_device::write )
+{
+	write(data);
 }
 
 inline bool sn76496_base_device::in_noise_mode()

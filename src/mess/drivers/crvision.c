@@ -497,16 +497,11 @@ INPUT_PORTS_END
     TMS9928a_interface tms9918_intf
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER(crvision_vdp_interrupt)
+static TMS9928A_INTERFACE( vdp_intf )
 {
-	cputag_set_input_line(device->machine(), M6502_TAG, INPUT_LINE_IRQ0, state);
-}
-
-static TMS9928A_INTERFACE(crvision_tms9928a_interface)
-{
-	"screen",
+	SCREEN_TAG,
 	0x4000,
-	DEVCB_LINE(crvision_vdp_interrupt)
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
 
 /*-------------------------------------------------
@@ -616,11 +611,11 @@ static const pia6821_interface pia_intf =
 	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_r),		// input A
 	DEVCB_DRIVER_MEMBER(crvision_state, pia_pb_r),		// input B
 	DEVCB_LINE_VCC,										// input CA1 (+5V)
-	DEVCB_DEVICE_LINE(SN76489_TAG, sn76496_ready_r),	// input CB1
+	DEVCB_DEVICE_LINE_MEMBER(SN76489_TAG, sn76496_base_device, ready_r),	// input CB1
 	DEVCB_LINE_VCC,										// input CA2 (+5V)
 	DEVCB_LINE_VCC,										// input CB2 (+5V)
 	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_w),		// output A
-	DEVCB_DEVICE_HANDLER(SN76489_TAG, sn76496_w),		// output B
+	DEVCB_DEVICE_MEMBER(SN76489_TAG, sn76496_base_device, write),		// output B
 	DEVCB_NULL,											// output CA2
 	DEVCB_NULL,											// output CB2 (SN76489 pin CE_)
 	DEVCB_NULL,											// irq A
@@ -723,14 +718,14 @@ WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
 READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
-	return sn76496_ready_r(m_psg) & (m_centronics->not_busy_r() | m_pia->ca2_output_z());
+	return m_psg->ready_r() && (m_centronics->not_busy_r() || m_pia->ca2_output_z());
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 {
 	if (m_pia->ca2_output_z())
 	{
-		if (!state) sn76496_w(m_psg, 0, m_keylatch);
+		if (!state) m_psg->write(m_keylatch);
 	}
 	else
 	{
@@ -806,6 +801,15 @@ static const centronics_interface lasr2001_centronics_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, cb1_w)
+};
+
+/*-------------------------------------------------
+    sn76496_config psg_intf
+-------------------------------------------------*/
+
+static const sn76496_config psg_intf =
+{
+	DEVCB_NULL
 };
 
 /***************************************************************************
@@ -972,7 +976,8 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489, XTAL_2MHz)
+	MCFG_SOUND_ADD(SN76489_TAG, SN76489A_NEW, XTAL_2MHz)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
@@ -1000,8 +1005,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, creativision )
     // video hardware
-	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9918, crvision_tms9928a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9918, vdp_intf )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9918_device, screen_update )
 MACHINE_CONFIG_END
 
@@ -1011,8 +1016,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
 	// video hardware
-	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929, crvision_tms9928a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929, vdp_intf )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929_device, screen_update )
 MACHINE_CONFIG_END
 
@@ -1022,7 +1027,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, 17734470/9)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_17_73447MHz/9)
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
 
 	// devices
@@ -1032,13 +1037,14 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware
-	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929A, crvision_tms9928a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929A, vdp_intf )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, 17734470/9)
+	MCFG_SOUND_ADD(SN76489_TAG, SN76489A_NEW, XTAL_17_73447MHz/9)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)

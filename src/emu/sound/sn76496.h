@@ -189,6 +189,7 @@ public:
 		device_t *owner, UINT32 clock);
 	DECLARE_READ_LINE_MEMBER( ready_r );
 	DECLARE_WRITE8_MEMBER( stereo_w );
+	void write(UINT8 data);
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
