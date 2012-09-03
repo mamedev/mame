@@ -1,6 +1,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/i8085/i8085.h"
 
 class micropin_state : public driver_device
 {
@@ -23,7 +24,25 @@ public:
 
 
 static ADDRESS_MAP_START( micropin_map, AS_PROGRAM, 8, micropin_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	//AM_RANGE(0x4000, 0x4005)
+	//AM_RANGE(0x5000, 0x5003) AM_READWRITE("pia", pia6821_device, read, write)
+	//AM_RANGE(0x5100, 0x5103)
+	//AM_RANGE(0x5200, 0x5203)
+	AM_RANGE(0x6400, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pentacup2_map, AS_PROGRAM, 8, micropin_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pentacup2_io, AS_IO, 8, micropin_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//AM_RANGE(0x00, 0x0e) AM_WRITE
+	//AM_RANGE(0x0f, 0x0f) AM_WRITE
+	//AM_WRITE(0x00, 0x05) AM_READ
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( micropin )
@@ -43,6 +62,13 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	MCFG_CPU_PROGRAM_MAP(micropin_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( pentacup2, micropin_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8085A, 2000000)
+	MCFG_CPU_PROGRAM_MAP(pentacup2_map)
+	MCFG_CPU_IO_MAP(pentacup2_io)
+MACHINE_CONFIG_END
+
 /*-------------------------------------------------------------------
 / Pentacup
 /-------------------------------------------------------------------*/
@@ -55,7 +81,6 @@ ROM_START(pentacup)
 	ROM_LOAD("ic6.bin", 0x7400, 0x0400, CRC(4715ac34) SHA1(b6d8c20c487db8d7275e36f5793666cc591a6691))
 	ROM_LOAD("ic7.bin", 0x7800, 0x0400, CRC(c58d13c0) SHA1(014958bc69ff326392a5a7782703af0980e6e170))
 	ROM_LOAD("ic8.bin", 0x7c00, 0x0400, CRC(9f67bc65) SHA1(504008d4c7c23a14fdf247c9e6fc00e95d907d7b))
-	ROM_RELOAD(0xfc00, 0x0400)
 ROM_END
 
 ROM_START(pentacup2)
@@ -68,4 +93,4 @@ ROM_END
 
 
 GAME(1978,  pentacup,  0,         micropin,  micropin, micropin_state,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 1)",     GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  pentacup2, pentacup,  micropin,  micropin, micropin_state,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 2)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  pentacup2, pentacup,  pentacup2,  micropin, micropin_state,  micropin,  ROT0,  "Micropin",    "Pentacup (rev. 2)",     GAME_IS_SKELETON_MECHANICAL)

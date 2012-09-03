@@ -27,7 +27,8 @@ public:
 
 
 static ADDRESS_MAP_START( de_1_map, AS_PROGRAM, 8, de_1_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( de_1 )
