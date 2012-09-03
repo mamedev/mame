@@ -12,8 +12,9 @@ class cball_state : public driver_device
 {
 public:
 	cball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag),
+		m_video_ram(*this, "video_ram")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -40,7 +41,6 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_MEMBER(cball_state::cball_vram_w)
 {
-
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -112,14 +112,12 @@ static PALETTE_INIT( cball )
 
 READ8_MEMBER(cball_state::cball_wram_r)
 {
-
 	return m_video_ram[0x380 + offset];
 }
 
 
 WRITE8_MEMBER(cball_state::cball_wram_w)
 {
-
 	m_video_ram[0x380 + offset] = data;
 }
 
@@ -261,6 +259,7 @@ ROM_START( cball )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_LOW ( "canball.6m", 0x0000, 0x0200, NO_DUMP )
+	ROM_FILL(                        0x0000, 0x0200, 0 )
 	ROM_LOAD_NIB_HIGH( "canball.6l", 0x0000, 0x0200, CRC(5b1c9e88) SHA1(6e9630db9907170c53942a21302bcf8b721590a3) )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) /* sprites */
