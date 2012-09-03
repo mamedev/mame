@@ -41,13 +41,22 @@ enum
 	S3C2410_CORE_PIN_OM1
 };
 
-DEVICE_GET_INFO( s3c2410 );
-
-class s3c2410_device : public legacy_device_base
+class s3c2410_device : public device_t
 {
 public:
-	s3c2410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
-	
+	s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~s3c2410_device() { global_free(m_token); }
+   
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+public:		
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

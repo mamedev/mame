@@ -110,7 +110,13 @@ static void s3c24xx_dma_request_pwm( device_t *device);
 INLINE s3c24xx_t *get_token( device_t *device)
 {
 	assert(device != NULL);
-	return (s3c24xx_t *)downcast<legacy_device_base *>(device)->token();
+#if defined(DEVICE_S3C2400)
+	return (s3c24xx_t *)downcast<s3c2400_device *>(device)->token();
+#elif defined(DEVICE_S3C2410)
+	return (s3c24xx_t *)downcast<s3c2410_device *>(device)->token();
+#elif defined(DEVICE_S3C2440)
+	return (s3c24xx_t *)downcast<s3c2440_device *>(device)->token();
+#endif
 }
 
 /***************************************************************************
@@ -3700,21 +3706,4 @@ static DEVICE_START( s3c24xx )
 		space->install_ram( 0x40000000, 0x40000fff, s3c24xx->steppingstone);
 	}
 	#endif
-}
-
-static DEVICE_GET_INFO( s3c24xx )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:           info->i = sizeof(s3c24xx_t);                    break;
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:                 info->start = DEVICE_START_NAME(s3c24xx);       break;
-		case DEVINFO_FCT_RESET:                 info->reset = DEVICE_RESET_NAME(s3c24xx);       break;
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FAMILY:                strcpy(info->s, "S3C24XX");                     break;
-		case DEVINFO_STR_VERSION:               strcpy(info->s, "1.00");                        break;
-		case DEVINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);                      break;
-		case DEVINFO_STR_CREDITS:               strcpy(info->s, "Copyright the MESS Team");	break;
-	}
 }

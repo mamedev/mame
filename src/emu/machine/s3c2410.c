@@ -69,17 +69,40 @@ DEVICE_START( s3c2410 )
 	s3c24xx_video_start( device, device->machine());
 }
 
-DEVICE_GET_INFO( s3c2410 )
+const device_type S3C2410 = &device_creator<s3c2410_device>;
+
+s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+       : device_t(mconfig, S3C2410, "Samsung S3C2410", tag, owner, clock)
 {
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START: info->start = DEVICE_START_NAME(s3c2410); break;
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME: strcpy(info->s, "Samsung S3C2410"); break;
-		/* --- default --- */
-		default: DEVICE_GET_INFO_CALL(s3c24xx); break;
-	}
+	m_token = global_alloc_array_clear(UINT8, sizeof(s3c24xx_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void s3c2410_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s3c2410_device::device_start()
+{
+	DEVICE_START_NAME( s3c2410 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void s3c2410_device::device_reset()
+{
+	DEVICE_RESET_NAME( s3c24xx )(this);
 }
 
 void s3c2410_uart_fifo_w( device_t *device, int uart, UINT8 data)
@@ -108,9 +131,3 @@ void s3c2410_request_eint( device_t *device, UINT32 number)
 	s3c24xx_request_eint( device, number);
 }
 
-s3c2410_device::s3c2410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_device_base(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(s3c2410))
-{
-}
-
-const device_type S3C2410 = &legacy_device_creator<s3c2410_device>;
