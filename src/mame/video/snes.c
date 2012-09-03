@@ -1671,7 +1671,7 @@ VIDEO_START( snes )
 	snes_ppu.beam.latch_horz = 0;
 	snes_ppu.beam.current_vert = 0;
 	snes_ppu.beam.current_horz = 0;
-	snes_ppu.beam.last_visible_line = 240;
+	snes_ppu.beam.last_visible_line = 225; /* TODO: PAL setting */
 	snes_ppu.mode = 0;
 	snes_ppu.ppu1_version = 1;	// 5C77 chip version number, read by STAT77, only '1' is known
 	snes_ppu.ppu2_version = 3;	// 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
@@ -1904,7 +1904,7 @@ READ8_MEMBER( snes_state::snes_vram_read )
 				res = m_snes_vram[offset];
 			else
 			{
-				printf("%d %d VRAM read, CHECK!\n",h,v);
+				//printf("%d %d VRAM read, CHECK!\n",h,v);
 				res = 0;
 			}
 		}
@@ -1932,20 +1932,20 @@ WRITE8_MEMBER( snes_state::snes_vram_write )
 				m_snes_vram[offset] = snes_open_bus_r(&space, 0);
 			else
 			{
-				printf("%d %d VRAM write, CHECK!\n",h,v);
+				//printf("%d %d VRAM write, CHECK!\n",h,v);
 				//no write
 			}
 		}
 		else if (v < snes_ppu.beam.last_visible_line)
 		{
-			printf("%d %d VRAM write, CHECK!\n",h,v);
+			//printf("%d %d VRAM write, CHECK!\n",h,v);
 			//no write
 		}
 		else if (v == snes_ppu.beam.last_visible_line)
 		{
 			if (h <= 4)
 			{
-				printf("%d %d VRAM write, CHECK!\n",h,v);
+				//printf("%d %d VRAM write, CHECK!\n",h,v);
 				//no write
 			}
 			else

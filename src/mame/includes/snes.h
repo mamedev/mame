@@ -47,8 +47,8 @@
 
 /* Useful definitions */
 #define SNES_SCR_WIDTH        256		/* 32 characters 8 pixels wide */
-#define SNES_SCR_HEIGHT_NTSC  224		/* Can be 224 or 240 height */
-#define SNES_SCR_HEIGHT_PAL   274		/* ??? */
+#define SNES_SCR_HEIGHT_NTSC  225		/* Can be 224 or 240 height */
+#define SNES_SCR_HEIGHT_PAL   240		/* ??? */
 #define SNES_VTOTAL_NTSC      262		/* Maximum number of lines for NTSC systems */
 #define SNES_VTOTAL_PAL       312		/* Maximum number of lines for PAL systems */
 #define SNES_HTOTAL           341		/* Maximum number pixels per line (incl. hblank) */
