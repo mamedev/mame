@@ -141,7 +141,7 @@ INLINE cem3394_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CEM3394);
-	return (cem3394_state *)downcast<legacy_device_base *>(device)->token();
+	return (cem3394_state *)downcast<cem3394_device *>(device)->token();
 }
 
 
@@ -586,4 +586,42 @@ DEVICE_GET_INFO( cem3394 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(CEM3394, cem3394);
+const device_type CEM3394 = &device_creator<cem3394_device>;
+
+cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(cem3394_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cem3394_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cem3394_device::device_start()
+{
+	DEVICE_START_NAME( cem3394 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

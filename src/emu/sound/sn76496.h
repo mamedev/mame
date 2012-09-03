@@ -9,16 +9,156 @@ READ_LINE_DEVICE_HANDLER( sn76496_ready_r );
 WRITE8_DEVICE_HANDLER( sn76496_w );
 WRITE8_DEVICE_HANDLER( sn76496_stereo_w );
 
-DECLARE_LEGACY_SOUND_DEVICE(SN76496, sn76496);
-DECLARE_LEGACY_SOUND_DEVICE(U8106, u8106);
-DECLARE_LEGACY_SOUND_DEVICE(Y2404, y2404);
-DECLARE_LEGACY_SOUND_DEVICE(SN76489, sn76489);
-DECLARE_LEGACY_SOUND_DEVICE(SN76489A, sn76489a);
-DECLARE_LEGACY_SOUND_DEVICE(SN76494, sn76494);
-DECLARE_LEGACY_SOUND_DEVICE(SN94624, sn94624);
-DECLARE_LEGACY_SOUND_DEVICE(NCR7496, ncr7496);
-DECLARE_LEGACY_SOUND_DEVICE(GAMEGEAR, gamegear);
-DECLARE_LEGACY_SOUND_DEVICE(SEGAPSG, segapsg);
+class sn76496_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sn76496_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~sn76496_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SN76496;
+
+class u8106_device : public sn76496_device
+{
+public:
+	u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type U8106;
+
+class y2404_device : public sn76496_device
+{
+public:
+	y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type Y2404;
+
+class sn76489_device : public sn76496_device
+{
+public:
+	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type SN76489;
+
+class sn76489a_device : public sn76496_device
+{
+public:
+	sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type SN76489A;
+
+class sn76494_device : public sn76496_device
+{
+public:
+	sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type SN76494;
+
+class sn94624_device : public sn76496_device
+{
+public:
+	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type SN94624;
+
+class ncr7496_device : public sn76496_device
+{
+public:
+	ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type NCR7496;
+
+class gamegear_device : public sn76496_device
+{
+public:
+	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type GAMEGEAR;
+
+class segapsg_device : public sn76496_device
+{
+public:
+	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type SEGAPSG;
+
 
 /*****************************************************************
     New class implementation

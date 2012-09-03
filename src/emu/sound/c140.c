@@ -109,7 +109,7 @@ INLINE c140_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C140);
-	return (c140_state *)downcast<legacy_device_base *>(device)->token();
+	return (c140_state *)downcast<c140_device *>(device)->token();
 }
 
 
@@ -504,4 +504,42 @@ DEVICE_GET_INFO( c140 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(C140, c140);
+const device_type C140 = &device_creator<c140_device>;
+
+c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, C140, "C140", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(c140_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void c140_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c140_device::device_start()
+{
+	DEVICE_START_NAME( c140 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

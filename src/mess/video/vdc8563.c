@@ -162,7 +162,7 @@ INLINE vdc8563_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == VDC8563);
 
-	return (vdc8563_state *)downcast<legacy_device_base *>(device)->token();
+	return (vdc8563_state *)downcast<vdc8563_device *>(device)->token();
 }
 
 INLINE const vdc8563_interface *get_interface( device_t *device )
@@ -676,4 +676,40 @@ DEVICE_GET_INFO(vdc8563)
  }
 }
 
-DEFINE_LEGACY_DEVICE(VDC8563, vdc8563);
+const device_type VDC8563 = &device_creator<vdc8563_device>;
+
+vdc8563_device::vdc8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VDC8563, "8563 / 8568 VDC", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vdc8563_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vdc8563_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vdc8563_device::device_start()
+{
+	DEVICE_START_NAME( vdc8563 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vdc8563_device::device_reset()
+{
+	DEVICE_RESET_NAME( vdc8563 )(this);
+}
+
+

@@ -35,7 +35,26 @@ struct _deco16ic_interface
 	int				   _8x8_gfxregion, _16x16_gfxregion;
 };
 
-DECLARE_LEGACY_DEVICE(DECO16IC, deco16ic);
+class deco16ic_device : public device_t
+{
+public:
+	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~deco16ic_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type DECO16IC;
+
 
 
 /***************************************************************************

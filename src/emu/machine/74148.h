@@ -65,6 +65,25 @@ int  ttl74148_output_r(device_t *device);
 int  ttl74148_output_valid_r(device_t *device);
 int  ttl74148_enable_output_r(device_t *device);
 
-DECLARE_LEGACY_DEVICE(TTL74148, ttl74148);
+class ttl74148_device : public device_t
+{
+public:
+	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~ttl74148_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TTL74148;
+
 
 #endif

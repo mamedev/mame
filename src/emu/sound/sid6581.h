@@ -34,7 +34,44 @@ struct _sid6581_interface
 READ8_DEVICE_HANDLER  ( sid6581_r );
 WRITE8_DEVICE_HANDLER ( sid6581_w );
 
-DECLARE_LEGACY_SOUND_DEVICE(SID6581, sid6581);
-DECLARE_LEGACY_SOUND_DEVICE(SID8580, sid8580);
+class sid6581_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sid6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~sid6581_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SID6581;
+
+class sid8580_device : public sid6581_device
+{
+public:
+	sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type SID8580;
+
 
 #endif /* __SID6581_H__ */

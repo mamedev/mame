@@ -50,7 +50,7 @@ INLINE redbaron_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == REDBARON);
 
-	return (redbaron_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (redbaron_sound_state *)downcast<redbaron_sound_device *>(device)->token();
 }
 
 
@@ -244,4 +244,42 @@ DEVICE_GET_INFO( redbaron_sound )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(REDBARON, redbaron_sound);
+const device_type REDBARON = &device_creator<redbaron_sound_device>;
+
+redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, REDBARON, "Red Baron Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(redbaron_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void redbaron_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void redbaron_sound_device::device_start()
+{
+	DEVICE_START_NAME( redbaron_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

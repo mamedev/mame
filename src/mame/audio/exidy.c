@@ -120,7 +120,7 @@ INLINE exidy_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == EXIDY || device->type() == EXIDY_VENTURE || device->type() == EXIDY_VICTORY);
 
-	return (exidy_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (exidy_sound_state *)downcast<exidy_sound_device *>(device)->token();
 }
 
 /*************************************
@@ -419,7 +419,63 @@ static DEVICE_START( exidy_sound )
 	DEVICE_START_CALL(common_sh_start);
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(EXIDY, exidy_sound);
+const device_type EXIDY = &device_creator<exidy_sound_device>;
+
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(exidy_sound_state));
+}
+
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(exidy_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void exidy_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void exidy_sound_device::device_start()
+{
+	DEVICE_START_NAME( exidy_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+static DEVICE_RESET( exidy_sound );
+
+void exidy_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( exidy_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void exidy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 /*************************************
  *
@@ -863,7 +919,52 @@ DEVICE_GET_INFO( venture_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VENTURE, venture_sound);
+const device_type EXIDY_VENTURE = &device_creator<venture_sound_device>;
+
+venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void venture_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void venture_sound_device::device_start()
+{
+	DEVICE_START_NAME( venture_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void venture_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( venture_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void venture_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, driver_device )
@@ -1102,7 +1203,52 @@ DEVICE_GET_INFO( victory_sound )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
+const device_type EXIDY_VICTORY = &device_creator<victory_sound_device>;
+
+victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void victory_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void victory_sound_device::device_start()
+{
+	DEVICE_START_NAME( victory_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void victory_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( victory_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void victory_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, driver_device )

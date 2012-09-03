@@ -116,7 +116,7 @@ INLINE dl1416_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == DL1416B || device->type() == DL1416T);
 
-	return (dl1416_state *)downcast<legacy_device_base *>(device)->token();
+	return (dl1416_state *)downcast<dl1416_device *>(device)->token();
 }
 
 
@@ -335,5 +335,54 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(DL1416B, dl1416b);
-DEFINE_LEGACY_DEVICE(DL1416T, dl1416t);
+dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(dl1416_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void dl1416_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void dl1416_device::device_start()
+{
+	DEVICE_START_NAME( dl1416 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void dl1416_device::device_reset()
+{
+	DEVICE_RESET_NAME( dl1416 )(this);
+}
+
+
+const device_type DL1416B = &device_creator<dl1416b_device>;
+
+dl1416b_device::dl1416b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: dl1416_device(mconfig, DL1416B, "DL1416B", tag, owner, clock)
+{
+}
+
+
+const device_type DL1416T = &device_creator<dl1416t_device>;
+
+dl1416t_device::dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: dl1416_device(mconfig, DL1416T, "DL1416T", tag, owner, clock)
+{
+}
+
+

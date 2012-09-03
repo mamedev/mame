@@ -44,7 +44,26 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_init_w ); /* centronics init */
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(E05A03, e05a03);
+class e05a03_device : public device_t
+{
+public:
+	e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~e05a03_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type E05A03;
+
 
 #define MCFG_E05A03_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, E05A03, 0) \

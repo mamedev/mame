@@ -135,7 +135,30 @@ WRITE8_DEVICE_HANDLER( micro3d_upd7759_w );
 
 void micro3d_noise_sh_w(running_machine &machine, UINT8 data);
 
-DECLARE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);
+class micro3d_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~micro3d_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MICRO3D;
+
 
 
 /*----------- defined in video/micro3d.c -----------*/

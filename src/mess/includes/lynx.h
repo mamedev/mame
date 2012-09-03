@@ -158,8 +158,46 @@ MACHINE_CONFIG_EXTERN( lynx_cartslot );
 
 /*----------- defined in audio/lynx.c -----------*/
 
-DECLARE_LEGACY_SOUND_DEVICE(LYNX, lynx_sound);
-DECLARE_LEGACY_SOUND_DEVICE(LYNX2, lynx2_sound);
+class lynx_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~lynx_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type LYNX;
+
+class lynx2_sound_device : public lynx_sound_device
+{
+public:
+	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type LYNX2;
+
 
 void lynx_audio_write(device_t *device, int offset, UINT8 data);
 UINT8 lynx_audio_read(device_t *device, int offset);

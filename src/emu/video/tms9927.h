@@ -13,10 +13,52 @@
 #include "devlegcy.h"
 
 
-DECLARE_LEGACY_DEVICE(TMS9927, tms9927);
-DECLARE_LEGACY_DEVICE(CRT5027, crt5027);
-DECLARE_LEGACY_DEVICE(CRT5037, crt5037);
-DECLARE_LEGACY_DEVICE(CRT5057, crt5057);
+class tms9927_device : public device_t
+{
+public:
+	tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~tms9927_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TMS9927;
+
+class crt5027_device : public tms9927_device
+{
+public:
+	crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type CRT5027;
+
+class crt5037_device : public tms9927_device
+{
+public:
+	crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type CRT5037;
+
+class crt5057_device : public tms9927_device
+{
+public:
+	crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type CRT5057;
+
 
 
 #define MCFG_TMS9927_ADD(_tag, _clock, _config) \

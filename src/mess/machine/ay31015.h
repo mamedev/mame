@@ -104,5 +104,24 @@ void ay31015_set_transmit_data( device_t *device, UINT8 data );
     DEVICE INTERFACE
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(AY31015, ay31015);
+class ay31015_device : public device_t
+{
+public:
+	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~ay31015_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type AY31015;
+
 #endif

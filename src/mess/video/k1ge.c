@@ -63,7 +63,7 @@ INLINE k1ge_t *get_safe_token( device_t *device )
 	assert( device != NULL );
 	assert( device->type() == K1GE || device->type() == K2GE );
 
-	return ( k1ge_t *) downcast<legacy_device_base *>(device)->token();
+	return ( k1ge_t *) downcast<k1ge_device *>(device)->token();
 }
 
 
@@ -923,5 +923,63 @@ DEVICE_GET_INFO( k2ge )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(K1GE, k1ge);
-DEFINE_LEGACY_DEVICE(K2GE, k2ge);
+const device_type K1GE = &device_creator<k1ge_device>;
+
+k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K1GE, "", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof( k1ge_t ));
+}
+
+k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof( k1ge_t ));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k1ge_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k1ge_device::device_start()
+{
+	DEVICE_START_NAME( k1ge )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k1ge_device::device_reset()
+{
+	DEVICE_RESET_NAME( k1ge )(this);
+}
+
+
+const device_type K2GE = &device_creator<k2ge_device>;
+
+k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: k1ge_device(mconfig, K2GE, "", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k2ge_device::device_start()
+{
+	DEVICE_START_NAME( k2ge )(this);
+}
+
+

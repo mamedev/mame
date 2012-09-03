@@ -38,7 +38,27 @@ DEVICE_IMAGE_UNLOAD( xegs_cart );
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ATARI_FDC, atari_fdc);
+class atari_fdc_device : public device_t
+{
+public:
+	atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~atari_fdc_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type ATARI_FDC;
+
 
 #define MCFG_ATARI_FDC_ADD(_tag)	\
 	MCFG_DEVICE_ADD((_tag),  ATARI_FDC, 0)

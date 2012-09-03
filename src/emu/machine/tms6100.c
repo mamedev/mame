@@ -107,7 +107,7 @@ INLINE tms6100_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TMS6100 ||
 			device->type() == M58819);
-	return (tms6100_state *)downcast<legacy_device_base *>(device)->token();
+	return (tms6100_state *)downcast<tms6100_device *>(device)->token();
 }
 
 /**********************************************************************************************
@@ -288,5 +288,62 @@ DEVICE_GET_INFO(m58819)
  }
 }
 
-DEFINE_LEGACY_DEVICE(TMS6100, tms6100);
-DEFINE_LEGACY_DEVICE(M58819, m58819);
+const device_type TMS6100 = &device_creator<tms6100_device>;
+
+tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tms6100_state));
+}
+tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tms6100_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tms6100_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms6100_device::device_start()
+{
+	DEVICE_START_NAME( tms6100 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tms6100_device::device_reset()
+{
+	DEVICE_RESET_NAME( tms6100 )(this);
+}
+
+
+const device_type M58819 = &device_creator<m58819_device>;
+
+m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms6100_device(mconfig, M58819, "M58819", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void m58819_device::device_start()
+{
+	DEVICE_START_NAME( m58819 )(this);
+}
+
+

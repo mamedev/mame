@@ -141,7 +141,7 @@ INLINE ay31015_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AY31015);
-	return (ay31015_t *) downcast<legacy_device_base *>(device)->token();
+	return (ay31015_t *) downcast<ay31015_device *>(device)->token();
 }
 
 
@@ -742,4 +742,40 @@ DEVICE_GET_INFO( ay31015 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(AY31015, ay31015);
+const device_type AY31015 = &device_creator<ay31015_device>;
+
+ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(ay31015_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ay31015_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ay31015_device::device_start()
+{
+	DEVICE_START_NAME( ay31015 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ay31015_device::device_reset()
+{
+	DEVICE_RESET_NAME( ay31015 )(this);
+}
+
+

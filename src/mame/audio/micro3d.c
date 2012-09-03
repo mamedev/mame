@@ -185,7 +185,7 @@ void micro3d_noise_sh_w(running_machine &machine, UINT8 data)
 	if (~data & 8)
 	{
 		device_t *device = machine.device(data & 4 ? "noise_2" : "noise_1");
-		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
+		noise_state *nstate = (noise_state *)downcast<micro3d_sound_device *>(device)->token();
 
 		if (state->m_dac_data != nstate->dac[data & 3])
 		{
@@ -214,7 +214,7 @@ INLINE noise_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == MICRO3D);
 
-	return (noise_state *)downcast<legacy_device_base *>(device)->token();
+	return (noise_state *)downcast<micro3d_sound_device *>(device)->token();
 }
 
 static STREAM_UPDATE( micro3d_stream_update )
@@ -419,4 +419,51 @@ WRITE8_DEVICE_HANDLER( micro3d_upd7759_w )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);
+const device_type MICRO3D = &device_creator<micro3d_sound_device>;
+
+micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MICRO3D, "Microprose Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(noise_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void micro3d_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void micro3d_sound_device::device_start()
+{
+	DEVICE_START_NAME( micro3d_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void micro3d_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( micro3d_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

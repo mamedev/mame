@@ -22,7 +22,7 @@ static vc4000_sound *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VC4000);
-	return (vc4000_sound *) downcast<legacy_device_base *>(device)->token();
+	return (vc4000_sound *) downcast<vc4000_sound_device *>(device)->token();
 }
 
 
@@ -99,4 +99,42 @@ DEVICE_GET_INFO( vc4000_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(VC4000, vc4000_sound);
+const device_type VC4000 = &device_creator<vc4000_sound_device>;
+
+vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VC4000, "VC 4000 Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vc4000_sound));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vc4000_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vc4000_sound_device::device_start()
+{
+	DEVICE_START_NAME( vc4000_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void vc4000_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

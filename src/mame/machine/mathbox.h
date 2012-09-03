@@ -26,4 +26,23 @@ READ8_DEVICE_HANDLER( mathbox_lo_r );
 READ8_DEVICE_HANDLER( mathbox_hi_r );
 
 /* ----- device interface ----- */
-DECLARE_LEGACY_DEVICE(MATHBOX, mathbox);
+class mathbox_device : public device_t
+{
+public:
+	mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mathbox_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MATHBOX;
+

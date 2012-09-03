@@ -43,32 +43,40 @@ struct _latch8_config
 	latch8_devread			devread[8];
 };
 
-
-DEVICE_GET_INFO( latch8 );
-
-class latch8_device : public legacy_device_base
+class latch8_device : public device_t
 {
 public:
-       latch8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
-	   
-	   latch8_config m_inline_config;
-	   
-	   void set_maskout(UINT32 maskout) { m_inline_config.maskout = maskout; } 
-	   void set_xorvalue(UINT32 xorvalue) { m_inline_config.xorvalue = xorvalue; } 
-	   void set_nosync(UINT32 nosync) { m_inline_config.nosync = nosync; } 
-	   
-	   void set_discrete_node(const char *dev_tag, int bit, UINT32 node) { m_inline_config.node_device[bit] = dev_tag;  m_inline_config.node_map[bit] = node;  } 
-	   void set_devread(int bit, const char *tag, read8_device_func handler, int from_bit) 
-	   {
-			m_inline_config.devread[bit].from_bit = from_bit; 
-			m_inline_config.devread[bit].tag = tag; 
-			m_inline_config.devread[bit].devread_handler = handler;			
-	   }
-	   void set_read(int bit, read8_space_func handler, int from_bit) 
-	   {
-			m_inline_config.devread[bit].from_bit = from_bit; 
-			m_inline_config.devread[bit].read_handler = handler;			
-	   }		
+	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~latch8_device() { global_free(m_token); }
+   
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+	latch8_config m_inline_config;
+   
+	void set_maskout(UINT32 maskout) { m_inline_config.maskout = maskout; } 
+	void set_xorvalue(UINT32 xorvalue) { m_inline_config.xorvalue = xorvalue; } 
+	void set_nosync(UINT32 nosync) { m_inline_config.nosync = nosync; } 
+	
+	void set_discrete_node(const char *dev_tag, int bit, UINT32 node) { m_inline_config.node_device[bit] = dev_tag;  m_inline_config.node_map[bit] = node;  } 
+	void set_devread(int bit, const char *tag, read8_device_func handler, int from_bit) 
+	{
+		m_inline_config.devread[bit].from_bit = from_bit; 
+		m_inline_config.devread[bit].tag = tag; 
+		m_inline_config.devread[bit].devread_handler = handler;			
+	}
+	void set_read(int bit, read8_space_func handler, int from_bit) 
+	{
+		m_inline_config.devread[bit].from_bit = from_bit; 
+		m_inline_config.devread[bit].read_handler = handler;			
+	}		
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
 };
 
 extern const device_type LATCH8;

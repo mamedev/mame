@@ -22,7 +22,26 @@ struct _decocomn_interface
 	const char         *screen;
 };
 
-DECLARE_LEGACY_DEVICE(DECOCOMN, decocomn);
+class decocomn_device : public device_t
+{
+public:
+	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~decocomn_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type DECOCOMN;
+
 
 
 /***************************************************************************

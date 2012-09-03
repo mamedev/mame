@@ -61,7 +61,7 @@ INLINE saa5050_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == SAA5050);
 
-	return (saa5050_state *)downcast<legacy_device_base *>(device)->token();
+	return (saa5050_state *)downcast<saa5050_device *>(device)->token();
 }
 
 INLINE const saa5050_interface *get_interface( device_t *device )
@@ -395,4 +395,40 @@ DEVICE_GET_INFO(saa5050)
  }
 }
 
-DEFINE_LEGACY_DEVICE(SAA5050, saa5050);
+const device_type SAA5050 = &device_creator<saa5050_device>;
+
+saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(saa5050_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void saa5050_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void saa5050_device::device_start()
+{
+	DEVICE_START_NAME( saa5050 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void saa5050_device::device_reset()
+{
+	DEVICE_RESET_NAME( saa5050 )(this);
+}
+
+

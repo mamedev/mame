@@ -75,7 +75,7 @@ INLINE nesapu_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NES);
-	return (nesapu_state *)downcast<legacy_device_base *>(device)->token();
+	return (nesapu_state *)downcast<nesapu_device *>(device)->token();
 }
 
 /* INTERNAL FUNCTIONS */
@@ -792,4 +792,42 @@ DEVICE_GET_INFO( nesapu )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(NES, nesapu);
+const device_type NES = &device_creator<nesapu_device>;
+
+nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NES, "N2A03", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(nesapu_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void nesapu_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void nesapu_device::device_start()
+{
+	DEVICE_START_NAME( nesapu )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

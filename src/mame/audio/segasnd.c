@@ -141,14 +141,36 @@ INLINE double step_cr_filter(filter_state *state, double input)
     SPEECH BOARD
 ***************************************************************************/
 
-DECLARE_LEGACY_SOUND_DEVICE(SEGASPEECH, speech_sound);
+class speech_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~speech_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SEGASPEECH;
+
 
 INLINE speech_state *get_safe_speech(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SEGASPEECH);
 
-	return (speech_state *)downcast<legacy_device_base *>(device)->token();
+	return (speech_state *)downcast<speech_sound_device *>(device)->token();
 }
 
 static DEVICE_START( speech_sound )
@@ -175,7 +197,45 @@ DEVICE_GET_INFO( speech_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(SEGASPEECH, speech_sound);
+const device_type SEGASPEECH = &device_creator<speech_sound_device>;
+
+speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(speech_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void speech_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void speech_sound_device::device_start()
+{
+	DEVICE_START_NAME( speech_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void speech_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 
@@ -348,14 +408,37 @@ MACHINE_CONFIG_END
     UNIVERSAL SOUND BOARD
 ***************************************************************************/
 
-static DECLARE_LEGACY_SOUND_DEVICE(SEGAUSB, usb_sound);
+class usb_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~usb_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SEGAUSB;
+
 
 INLINE usb_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SEGAUSB);
 
-	return (usb_state *)downcast<legacy_device_base *>(device)->token();
+	return (usb_state *)downcast<usb_sound_device *>(device)->token();
 }
 
 /*************************************
@@ -817,7 +900,7 @@ static DEVICE_START( usb_sound )
 }
 
 
-static DEVICE_GET_INFO( usb_sound )
+DEVICE_GET_INFO( usb_sound )
 {
 	switch (state)
 	{
@@ -834,7 +917,54 @@ static DEVICE_GET_INFO( usb_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(SEGAUSB, usb_sound);
+const device_type SEGAUSB = &device_creator<usb_sound_device>;
+
+usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(usb_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void usb_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void usb_sound_device::device_start()
+{
+	DEVICE_START_NAME( usb_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void usb_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( usb_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void usb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 

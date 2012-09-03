@@ -59,7 +59,29 @@ void svision_irq( running_machine &machine );
 
 /*----------- defined in audio/svision.c -----------*/
 
-DECLARE_LEGACY_SOUND_DEVICE(SVISION, svision_sound);
+class svision_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~svision_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SVISION;
+
 
 int *svision_dma_finished(device_t *device);
 void svision_sound_decrement(device_t *device);

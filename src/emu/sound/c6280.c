@@ -86,7 +86,7 @@ INLINE c6280_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C6280);
-	return (c6280_t *)downcast<legacy_device_base *>(device)->token();
+	return (c6280_t *)downcast<c6280_device *>(device)->token();
 }
 
 
@@ -372,4 +372,42 @@ DEVICE_GET_INFO( c6280 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(C6280, c6280);
+const device_type C6280 = &device_creator<c6280_device>;
+
+c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(c6280_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void c6280_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c6280_device::device_start()
+{
+	DEVICE_START_NAME( c6280 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

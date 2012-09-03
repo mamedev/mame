@@ -180,7 +180,7 @@ INLINE gb_sound_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAMEBOY);
-	return (gb_sound_t *) downcast<legacy_device_base *>(device)->token();
+	return (gb_sound_t *) downcast<gameboy_sound_device *>(device)->token();
 }
 
 
@@ -772,4 +772,42 @@ DEVICE_GET_INFO( gameboy_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(GAMEBOY, gameboy_sound);
+const device_type GAMEBOY = &device_creator<gameboy_sound_device>;
+
+gameboy_sound_device::gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GAMEBOY, "LR35902", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(gb_sound_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void gameboy_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gameboy_sound_device::device_start()
+{
+	DEVICE_START_NAME( gameboy_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

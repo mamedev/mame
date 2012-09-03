@@ -37,7 +37,26 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(MOS6530, mos6530);
+class mos6530_device : public device_t
+{
+public:
+	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mos6530_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MOS6530;
+
 
 #define MCFG_MOS6530_ADD(_tag, _clock, _config) \
 	MCFG_DEVICE_ADD((_tag), MOS6530, _clock)	\

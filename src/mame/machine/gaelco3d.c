@@ -208,14 +208,14 @@ INLINE gaelco_serial_state *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAELCO_SERIAL);
-	return (gaelco_serial_state *) downcast<legacy_device_base *>(device)->token();
+	return (gaelco_serial_state *) downcast<gaelco_serial_device *>(device)->token();
 }
 
 INLINE const gaelco_serial_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAELCO_SERIAL);
-	return (gaelco_serial_interface *) downcast<legacy_device_base *>(device)->static_config();
+	return (gaelco_serial_interface *) downcast<gaelco_serial_device *>(device)->static_config();
 }
 
 INLINE void shmem_lock(shmem_t *shmem)
@@ -520,4 +520,49 @@ DEVICE_GET_INFO( gaelco_serial )
 }
 
 
-DEFINE_LEGACY_DEVICE(GAELCO_SERIAL, gaelco_serial);
+const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
+
+gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(gaelco_serial_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void gaelco_serial_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gaelco_serial_device::device_start()
+{
+	DEVICE_START_NAME( gaelco_serial )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void gaelco_serial_device::device_reset()
+{
+	DEVICE_RESET_NAME( gaelco_serial )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void gaelco_serial_device::device_stop()
+{
+	DEVICE_STOP_NAME( gaelco_serial )(this);
+}
+
+

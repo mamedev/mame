@@ -107,7 +107,7 @@ INLINE pit8253_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert((device->type() == PIT8253) || (device->type() == PIT8254));
 
-	return (pit8253_t *) downcast<legacy_device_base *>(device)->token();
+	return (pit8253_t *) downcast<pit8253_device *>(device)->token();
 }
 
 
@@ -1188,5 +1188,62 @@ DEVICE_GET_INFO( pit8254 ) {
 }
 
 
-DEFINE_LEGACY_DEVICE(PIT8253, pit8253);
-DEFINE_LEGACY_DEVICE(PIT8254, pit8254);
+const device_type PIT8253 = &device_creator<pit8253_device>;
+
+pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PIT8253, "Intel PIT8253", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pit8253_t));
+}
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pit8253_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pit8253_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pit8253_device::device_start()
+{
+	DEVICE_START_NAME( pit8253 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pit8253_device::device_reset()
+{
+	DEVICE_RESET_NAME( pit8253 )(this);
+}
+
+
+const device_type PIT8254 = &device_creator<pit8254_device>;
+
+pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: pit8253_device(mconfig, PIT8254, "Intel PIT8254", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pit8254_device::device_start()
+{
+	DEVICE_START_NAME( pit8254 )(this);
+}
+
+

@@ -56,7 +56,7 @@ static void s3c44b0_bdma_request_iis( device_t *device);
 INLINE s3c44b0_t *get_token( device_t *device)
 {
 	assert(device != NULL);
-	return (s3c44b0_t *)downcast<legacy_device_base *>(device)->token();
+	return (s3c44b0_t *)downcast<s3c44b0_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -2054,4 +2054,40 @@ DEVICE_GET_INFO( s3c44b0 )
     }
 }
 
-DEFINE_LEGACY_DEVICE(S3C44B0, s3c44b0);
+const device_type S3C44B0 = &device_creator<s3c44b0_device>;
+
+s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(s3c44b0_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void s3c44b0_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s3c44b0_device::device_start()
+{
+	DEVICE_START_NAME( s3c44b0 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void s3c44b0_device::device_reset()
+{
+	DEVICE_RESET_NAME( s3c44b0 )(this);
+}
+
+

@@ -199,7 +199,7 @@ struct _omti8621_state {
 INLINE omti8621_state *get_safe_token(device_t *device) {
 	assert(device != NULL);
 	assert(device->type() == OMTI8621);
-	return (omti8621_state *) downcast<legacy_device_base *>(device)->token();
+	return (omti8621_state *) downcast<omti8621_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -1359,4 +1359,40 @@ DEVICE_GET_INFO( omti8621 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(OMTI8621, omti8621);
+const device_type OMTI8621 = &device_creator<omti8621_device>;
+
+omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, OMTI8621, "OMTI 8621", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(omti8621_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void omti8621_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void omti8621_device::device_start()
+{
+	DEVICE_START_NAME( omti8621 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void omti8621_device::device_reset()
+{
+	DEVICE_RESET_NAME( omti8621 )(this);
+}
+
+

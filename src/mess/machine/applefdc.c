@@ -165,7 +165,7 @@ INLINE void assert_is_applefdc(device_t *device)
 INLINE applefdc_token *get_token(device_t *device)
 {
 	assert_is_applefdc(device);
-	return (applefdc_token *) downcast<legacy_device_base *>(device)->token();
+	return (applefdc_token *) downcast<applefdc_base_device *>(device)->token();
 }
 
 
@@ -857,6 +857,80 @@ DEVICE_GET_INFO(swim)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(APPLEFDC, applefdc);
-DEFINE_LEGACY_DEVICE(IWM, iwm);
-DEFINE_LEGACY_DEVICE(SWIM, swim);
+applefdc_base_device::applefdc_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(applefdc_token));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void applefdc_base_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void applefdc_base_device::device_reset()
+{
+	DEVICE_RESET_NAME( applefdc )(this);
+}
+
+
+const device_type APPLEFDC = &device_creator<applefdc_device>;
+
+applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: applefdc_base_device(mconfig, APPLEFDC, "Apple FDC", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void applefdc_device::device_start()
+{
+	DEVICE_START_NAME( oldfdc )(this);
+}
+
+
+const device_type IWM = &device_creator<iwm_device>;
+
+iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: applefdc_base_device(mconfig, IWM, "Apple IWM (Integrated Woz Machine)", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void iwm_device::device_start()
+{
+	DEVICE_START_NAME( iwm )(this);
+}
+
+
+const device_type SWIM = &device_creator<swim_device>;
+
+swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: applefdc_base_device(mconfig, SWIM, "Apple SWIM (Steve Woz Integrated Machine)", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void swim_device::device_start()
+{
+	DEVICE_START_NAME( swim )(this);
+}
+
+

@@ -77,7 +77,7 @@ struct pic8259
 INLINE pic8259_t *get_safe_token(device_t *device) {
 	assert( device != NULL );
 	assert( device->type() == PIC8259 );
-	return ( pic8259_t *) downcast<legacy_device_base *>(device)->token();
+	return ( pic8259_t *) downcast<pic8259_device *>(device)->token();
 }
 
 
@@ -469,4 +469,40 @@ DEVICE_GET_INFO( pic8259 ) {
 }
 
 
-DEFINE_LEGACY_DEVICE(PIC8259, pic8259);
+const device_type PIC8259 = &device_creator<pic8259_device>;
+
+pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PIC8259, "Intel PIC8259", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pic8259_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pic8259_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pic8259_device::device_start()
+{
+	DEVICE_START_NAME( pic8259 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pic8259_device::device_reset()
+{
+	DEVICE_RESET_NAME( pic8259 )(this);
+}
+
+

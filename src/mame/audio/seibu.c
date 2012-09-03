@@ -183,7 +183,7 @@ static STREAM_UPDATE( seibu_adpcm_callback )
 static DEVICE_START( seibu_adpcm )
 {
 	running_machine &machine = device->machine();
-	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<seibu_adpcm_device *>(device)->token();
 	const seibu_adpcm_interface *intf;
 
 	intf = (const seibu_adpcm_interface *)device->static_config();
@@ -229,7 +229,7 @@ void seibu_adpcm_decrypt(running_machine &machine, const char *region)
 
 WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 {
-	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<seibu_adpcm_device *>(device)->token();
 
 	if (state->m_stream)
 		state->m_stream->update();
@@ -246,7 +246,7 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 
 WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 {
-	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<seibu_adpcm_device *>(device)->token();
 
 	// sequence is 00 02 01 each time.
 	if (state->m_stream)
@@ -619,4 +619,42 @@ ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8, driver_device )
 ADDRESS_MAP_END
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SEIBU_ADPCM, seibu_adpcm);
+const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
+
+seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(seibu_adpcm_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void seibu_adpcm_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void seibu_adpcm_device::device_start()
+{
+	DEVICE_START_NAME( seibu_adpcm )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void seibu_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

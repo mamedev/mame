@@ -26,7 +26,7 @@ struct _latch8_t
 INLINE latch8_t *get_safe_token(device_t *device) {
 	assert( device != NULL );
 	assert( device->type() == LATCH8 );
-	return ( latch8_t * ) downcast<legacy_device_base *>(device)->token();
+	return ( latch8_t * ) downcast<latch8_device *>(device)->token();
 }
 
 static void update(device_t *device, UINT8 new_val, UINT8 mask)
@@ -253,10 +253,39 @@ DEVICE_GET_INFO( latch8 )
 	}
 }
 
-latch8_device::latch8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
-       : legacy_device_base(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(latch8))
+const device_type LATCH8 = &device_creator<latch8_device>;
+
+latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+       : device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock)
 {
+	m_token = global_alloc_array_clear(UINT8, sizeof(latch8_t));
 	memset((void*)&m_inline_config,0,sizeof(m_inline_config));
 }
 
-const device_type LATCH8 = &legacy_device_creator<latch8_device>;
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void latch8_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void latch8_device::device_start()
+{
+	DEVICE_START_NAME( latch8 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void latch8_device::device_reset()
+{
+	DEVICE_RESET_NAME( latch8 )(this);
+}

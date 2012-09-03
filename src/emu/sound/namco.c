@@ -80,7 +80,7 @@ INLINE namco_sound *get_safe_token(device_t *device)
 	assert(device->type() == NAMCO ||
 		   device->type() == NAMCO_15XX ||
 		   device->type() == NAMCO_CUS30);
-	return (namco_sound *)downcast<legacy_device_base *>(device)->token();
+	return (namco_sound *)downcast<namco_device *>(device)->token();
 }
 
 /* update the decoded waveform data */
@@ -891,6 +891,62 @@ DEVICE_GET_INFO( namco_cus30 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(NAMCO, namco);
-DEFINE_LEGACY_SOUND_DEVICE(NAMCO_15XX, namco_15xx);
-DEFINE_LEGACY_SOUND_DEVICE(NAMCO_CUS30, namco_cus30);
+const device_type NAMCO = &device_creator<namco_device>;
+
+namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NAMCO, "Namco", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(namco_sound));
+}
+
+namco_device::namco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(namco_sound));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void namco_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void namco_device::device_start()
+{
+	DEVICE_START_NAME( namco )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void namco_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type NAMCO_15XX = &device_creator<namco_15xx_device>;
+
+namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: namco_device(mconfig, NAMCO_15XX, "Namco 15XX", tag, owner, clock)
+{
+}
+
+const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
+
+namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: namco_device(mconfig, NAMCO_CUS30, "Namco CUS30", tag, owner, clock)
+{
+}

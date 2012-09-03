@@ -25,6 +25,29 @@ void upd7759_start_w(device_t *device, UINT8 data);
 int upd7759_busy_r(device_t *device);
 WRITE8_DEVICE_HANDLER( upd7759_port_w );
 
-DECLARE_LEGACY_SOUND_DEVICE(UPD7759, upd7759);
+class upd7759_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~upd7759_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type UPD7759;
+
 
 #endif /* __UPD7759_H__ */

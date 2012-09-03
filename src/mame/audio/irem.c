@@ -28,7 +28,7 @@ INLINE irem_audio_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == IREM_AUDIO);
 
-	return (irem_audio_state *)downcast<legacy_device_base *>(device)->token();
+	return (irem_audio_state *)downcast<irem_audio_device *>(device)->token();
 }
 
 
@@ -501,4 +501,42 @@ DEVICE_GET_INFO(irem_audio)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(IREM_AUDIO, irem_audio);
+const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
+
+irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(irem_audio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void irem_audio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void irem_audio_device::device_start()
+{
+	DEVICE_START_NAME( irem_audio )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void irem_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

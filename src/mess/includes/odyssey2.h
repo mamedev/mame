@@ -127,7 +127,24 @@ STREAM_UPDATE( odyssey2_sh_update );
 void odyssey2_ef9341_w( running_machine &machine, int command, int b, UINT8 data );
 UINT8 odyssey2_ef9341_r( running_machine &machine, int command, int b );
 
-DECLARE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);
+class odyssey2_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	odyssey2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+};
+
+extern const device_type ODYSSEY2;
+
 
 /*----------- defined in machine/odyssey2.c -----------*/
 

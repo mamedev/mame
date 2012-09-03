@@ -150,7 +150,7 @@ static DEVICE_RESET(apollo_config)
  device get info callback
  -------------------------------------------------*/
 
-static DEVICE_GET_INFO(apollo_config)
+DEVICE_GET_INFO(apollo_config)
 {
 	switch (state)
 	{
@@ -167,9 +167,58 @@ static DEVICE_GET_INFO(apollo_config)
 	}
 }
 
-static DECLARE_LEGACY_DEVICE(APOLLO_CONF, apollo_config);
+class apollo_config_device : public device_t
+{
+public:
+	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+};
 
-DEFINE_LEGACY_DEVICE(APOLLO_CONF, apollo_config);
+extern const device_type APOLLO_CONF;
+
+
+const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
+
+apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void apollo_config_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void apollo_config_device::device_start()
+{
+	DEVICE_START_NAME( apollo_config )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void apollo_config_device::device_reset()
+{
+	DEVICE_RESET_NAME( apollo_config )(this);
+}
+
+
 
 //##########################################################################
 // machine/apollo_csr.c - APOLLO DS3500 CPU Control and Status registers

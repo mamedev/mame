@@ -253,7 +253,7 @@ INLINE scsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SCSP);
-	return (scsp_state *)downcast<legacy_device_base *>(device)->token();
+	return (scsp_state *)downcast<scsp_device *>(device)->token();
 }
 
 static unsigned char DecodeSCI(scsp_state *scsp,unsigned char irq)
@@ -1387,4 +1387,42 @@ DEVICE_GET_INFO( scsp )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SCSP, scsp);
+const device_type SCSP = &device_creator<scsp_device>;
+
+scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SCSP, "SCSP", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(scsp_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void scsp_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void scsp_device::device_start()
+{
+	DEVICE_START_NAME( scsp )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void scsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

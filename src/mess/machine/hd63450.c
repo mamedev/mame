@@ -53,7 +53,7 @@ INLINE hd63450_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == HD63450);
 
-	return (hd63450_t *)downcast<legacy_device_base *>(device)->token();
+	return (hd63450_t *)downcast<hd63450_device *>(device)->token();
 }
 
 static DEVICE_START(hd63450)
@@ -485,4 +485,31 @@ DEVICE_GET_INFO(hd63450)
 READ16_DEVICE_HANDLER(hd63450_r) { return hd63450_read(device,offset,mem_mask); }
 WRITE16_DEVICE_HANDLER(hd63450_w) { hd63450_write(device,offset,data,mem_mask); }
 
-DEFINE_LEGACY_DEVICE(HD63450, hd63450);
+const device_type HD63450 = &device_creator<hd63450_device>;
+
+hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(hd63450_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void hd63450_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void hd63450_device::device_start()
+{
+	DEVICE_START_NAME( hd63450 )(this);
+}
+
+

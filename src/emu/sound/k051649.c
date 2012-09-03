@@ -61,7 +61,7 @@ INLINE k051649_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == K051649);
-	return (k051649_state *)downcast<legacy_device_base *>(device)->token();
+	return (k051649_state *)downcast<k051649_device *>(device)->token();
 }
 
 /* build a table to divide by the number of voices */
@@ -310,4 +310,51 @@ DEVICE_GET_INFO( k051649 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(K051649, k051649);
+const device_type K051649 = &device_creator<k051649_device>;
+
+k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k051649_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k051649_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k051649_device::device_start()
+{
+	DEVICE_START_NAME( k051649 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k051649_device::device_reset()
+{
+	DEVICE_RESET_NAME( k051649 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

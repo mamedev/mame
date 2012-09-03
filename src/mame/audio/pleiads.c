@@ -75,7 +75,7 @@ INLINE pleiads_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == PLEIADS || device->type() == POPFLAME || device->type() == NAUGHTYB);
 
-	return (pleiads_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (pleiads_sound_state *)downcast<pleiads_sound_device *>(device)->token();
 }
 
 
@@ -731,6 +731,123 @@ DEVICE_GET_INFO( popflame_sound )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(PLEIADS, pleiads_sound);
-DEFINE_LEGACY_SOUND_DEVICE(NAUGHTYB, naughtyb_sound);
-DEFINE_LEGACY_SOUND_DEVICE(POPFLAME, popflame_sound);
+const device_type PLEIADS = &device_creator<pleiads_sound_device>;
+
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PLEIADS, "Pleiads Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pleiads_sound_state));
+}
+
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pleiads_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pleiads_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pleiads_sound_device::device_start()
+{
+	DEVICE_START_NAME( pleiads_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void pleiads_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type NAUGHTYB = &device_creator<naughtyb_sound_device>;
+
+naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Custom", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void naughtyb_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void naughtyb_sound_device::device_start()
+{
+	DEVICE_START_NAME( naughtyb_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void naughtyb_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type POPFLAME = &device_creator<popflame_sound_device>;
+
+popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Custom", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void popflame_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void popflame_sound_device::device_start()
+{
+	DEVICE_START_NAME( popflame_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void popflame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

@@ -91,7 +91,7 @@ INLINE qsound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == QSOUND);
-	return (qsound_state *)downcast<legacy_device_base *>(device)->token();
+	return (qsound_state *)downcast<qsound_device *>(device)->token();
 }
 
 
@@ -399,4 +399,51 @@ DEVICE_GET_INFO( qsound )
 
 /**************** end of file ****************/
 
-DEFINE_LEGACY_SOUND_DEVICE(QSOUND, qsound);
+const device_type QSOUND = &device_creator<qsound_device>;
+
+qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(qsound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void qsound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void qsound_device::device_start()
+{
+	DEVICE_START_NAME( qsound )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void qsound_device::device_stop()
+{
+	DEVICE_STOP_NAME( qsound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

@@ -61,6 +61,25 @@ void ttl74153_input_line_w(device_t *device, int section, int input_line, int da
 void ttl74153_enable_w(device_t *device, int section, int data);
 int ttl74153_output_r(device_t *device, int section);
 
-DECLARE_LEGACY_DEVICE(TTL74153, ttl74153);
+class ttl74153_device : public device_t
+{
+public:
+	ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~ttl74153_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TTL74153;
+
 
 #endif

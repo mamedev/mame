@@ -16,7 +16,26 @@
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(PCF8593, pcf8593);
+class pcf8593_device : public device_t
+{
+public:
+	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~pcf8593_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type PCF8593;
+
 
 #define MCFG_PCF8593_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PCF8593, 0) \

@@ -46,6 +46,26 @@ public:
 READ32_DEVICE_HANDLER( amiga_akiko32_r );
 WRITE32_DEVICE_HANDLER( amiga_akiko32_w );
 
-DECLARE_LEGACY_DEVICE(AKIKO, akiko);
+class akiko_device : public device_t
+{
+public:
+	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~akiko_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type AKIKO;
+
 
 #endif /* __CUBOCD32_H__ */

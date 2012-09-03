@@ -29,7 +29,26 @@ struct _vdc8563_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(VDC8563, vdc8563);
+class vdc8563_device : public device_t
+{
+public:
+	vdc8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~vdc8563_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type VDC8563;
+
 
 #define MCFG_VDC8563_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, VDC8563, 0) \

@@ -43,7 +43,25 @@ typedef struct vdt911_init_params_t
 PALETTE_INIT( vdt911 );
 
 void vdt911_init(running_machine &machine);
-DECLARE_LEGACY_DEVICE(VDT911, vdt911);
+class vdt911_device : public device_t
+{
+public:
+	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~vdt911_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type VDT911;
+
 
 #define MCFG_VDT911_VIDEO_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, VDT911, 0) \

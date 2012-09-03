@@ -26,7 +26,7 @@ INLINE vr0_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VRENDER0);
-	return (vr0_state *)downcast<legacy_device_base *>(device)->token();
+	return (vr0_state *)downcast<vrender0_device *>(device)->token();
 }
 
 static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
@@ -267,4 +267,42 @@ DEVICE_GET_INFO( vrender0 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(VRENDER0, vrender0);
+const device_type VRENDER0 = &device_creator<vrender0_device>;
+
+vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vr0_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vrender0_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vrender0_device::device_start()
+{
+	DEVICE_START_NAME( vrender0 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void vrender0_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

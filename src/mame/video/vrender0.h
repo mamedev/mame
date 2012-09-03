@@ -17,7 +17,26 @@ struct _vr0video_interface
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(VIDEO_VRENDER0, vr0video);
+class vr0video_device : public device_t
+{
+public:
+	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~vr0video_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type VIDEO_VRENDER0;
+
 
 #define MCFG_VIDEO_VRENDER0_ADD(_tag, _interface) \
 MCFG_DEVICE_ADD(_tag, VIDEO_VRENDER0, 0) \

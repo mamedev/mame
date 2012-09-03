@@ -293,10 +293,37 @@ typedef int (*apollo_netserver_transmit)(device_t *, const UINT8 *, int);
 void apollo_netserver_init(const char *root_path,  apollo_netserver_transmit tx_data);
 
 /*----------- video/apollo.c -----------*/
+class apollo_mono_device : public device_t
+{
+public:
+	apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~apollo_mono_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+private:
+	// internal state
+	void *m_token;
+};
+
 
 #define APOLLO_SCREEN_TAG "apollo_screen"
 
-DECLARE_LEGACY_DEVICE(APOLLO_MONO19I, apollo_mono19i);
+class apollo_mono19i_device : public apollo_mono_device
+{
+public:
+	apollo_mono19i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+};
+
+extern const device_type APOLLO_MONO19I;
+
 
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
 	MCFG_FRAGMENT_ADD(apollo_mono19i) \
@@ -306,7 +333,21 @@ DEVICE_GET_INFO( apollo_mono19i );
 
 MACHINE_CONFIG_EXTERN( apollo_mono19i );
 
-DECLARE_LEGACY_DEVICE(APOLLO_MONO15I, apollo_mono15i);
+class apollo_mono15i_device : public apollo_mono_device
+{
+public:
+	apollo_mono15i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+};
+
+extern const device_type APOLLO_MONO15I;
+
 
 #define MCFG_APOLLO_MONO15I_ADD( _tag) \
 	MCFG_FRAGMENT_ADD(apollo_mono15i) \

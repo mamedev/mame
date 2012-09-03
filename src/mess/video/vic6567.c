@@ -269,7 +269,7 @@ INLINE vic2_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == VIC2);
 
-	return (vic2_state *)downcast<legacy_device_base *>(device)->token();
+	return (vic2_state *)downcast<vic2_device *>(device)->token();
 }
 
 INLINE const vic2_interface *get_interface( device_t *device )
@@ -2818,4 +2818,40 @@ DEVICE_GET_INFO(vic2)
  }
 }
 
-DEFINE_LEGACY_DEVICE(VIC2, vic2);
+const device_type VIC2 = &device_creator<vic2_device>;
+
+vic2_device::vic2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VIC2, "6567 / 6569 VIC II", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vic2_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vic2_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vic2_device::device_start()
+{
+	DEVICE_START_NAME( vic2 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vic2_device::device_reset()
+{
+	DEVICE_RESET_NAME( vic2 )(this);
+}
+
+

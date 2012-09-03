@@ -15,7 +15,7 @@ INLINE filter_rc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == FILTER_RC);
-	return (filter_rc_state *)downcast<legacy_device_base *>(device)->token();
+	return (filter_rc_state *)downcast<filter_rc_device *>(device)->token();
 }
 
 const flt_rc_config flt_rc_ac_default = {FLT_RC_AC, 10000, 0, 0, CAP_U(1)};
@@ -137,4 +137,42 @@ DEVICE_GET_INFO( filter_rc )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(FILTER_RC, filter_rc);
+const device_type FILTER_RC = &device_creator<filter_rc_device>;
+
+filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, FILTER_RC, "RC Filter", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(filter_rc_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void filter_rc_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void filter_rc_device::device_start()
+{
+	DEVICE_START_NAME( filter_rc )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void filter_rc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

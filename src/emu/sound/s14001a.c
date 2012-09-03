@@ -268,7 +268,7 @@ INLINE S14001AChip *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == S14001A);
-	return (S14001AChip *)downcast<legacy_device_base *>(device)->token();
+	return (S14001AChip *)downcast<s14001a_device *>(device)->token();
 }
 
 
@@ -648,4 +648,42 @@ DEVICE_GET_INFO( s14001a )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(S14001A, s14001a);
+const device_type S14001A = &device_creator<s14001a_device>;
+
+s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(S14001AChip));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void s14001a_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s14001a_device::device_start()
+{
+	DEVICE_START_NAME( s14001a )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void s14001a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

@@ -69,7 +69,7 @@ INLINE zsg2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ZSG2);
-	return (zsg2_state *)downcast<legacy_device_base *>(device)->token();
+	return (zsg2_state *)downcast<zsg2_device *>(device)->token();
 }
 
 static STREAM_UPDATE( update_stereo )
@@ -257,4 +257,42 @@ DEVICE_GET_INFO( zsg2 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(ZSG2, zsg2);
+const device_type ZSG2 = &device_creator<zsg2_device>;
+
+zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(zsg2_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void zsg2_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void zsg2_device::device_start()
+{
+	DEVICE_START_NAME( zsg2 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

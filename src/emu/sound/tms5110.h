@@ -56,13 +56,115 @@ int tms5110_ready_r(device_t *device);
 
 void tms5110_set_frequency(device_t *device, int frequency);
 
-DECLARE_LEGACY_SOUND_DEVICE(TMS5110, tms5110);
-DECLARE_LEGACY_SOUND_DEVICE(TMS5100, tms5100);
-DECLARE_LEGACY_SOUND_DEVICE(TMS5110A, tms5110a);
-DECLARE_LEGACY_SOUND_DEVICE(CD2801, cd2801);
-DECLARE_LEGACY_SOUND_DEVICE(TMC0281, tmc0281);
-DECLARE_LEGACY_SOUND_DEVICE(CD2802, cd2802);
-DECLARE_LEGACY_SOUND_DEVICE(M58817, m58817);
+class tms5110_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~tms5110_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TMS5110;
+
+class tms5100_device : public tms5110_device
+{
+public:
+	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type TMS5100;
+
+class tms5110a_device : public tms5110_device
+{
+public:
+	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type TMS5110A;
+
+class cd2801_device : public tms5110_device
+{
+public:
+	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type CD2801;
+
+class tmc0281_device : public tms5110_device
+{
+public:
+	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type TMC0281;
+
+class cd2802_device : public tms5110_device
+{
+public:
+	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type CD2802;
+
+class m58817_device : public tms5110_device
+{
+public:
+	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type M58817;
+
 
 
 /* PROM controlled TMS5110 interface */
@@ -92,6 +194,24 @@ WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w );
 WRITE8_DEVICE_HANDLER( tmsprom_bit_w );
 WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w );
 
-DECLARE_LEGACY_DEVICE(TMSPROM, tmsprom);
+class tmsprom_device : public device_t
+{
+public:
+	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~tmsprom_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TMSPROM;
+
 
 #endif /* __TMS5110_H__ */

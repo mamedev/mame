@@ -35,7 +35,7 @@ INLINE beta_disk_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == BETA_DISK);
 
-	return (beta_disk_state *)downcast<legacy_device_base *>(device)->token();
+	return (beta_disk_state *)downcast<beta_disk_device *>(device)->token();
 }
 
 
@@ -358,4 +358,61 @@ DEVICE_GET_INFO( beta_disk )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(BETA_DISK, beta_disk);
+const device_type BETA_DISK = &device_creator<beta_disk_device>;
+
+beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(beta_disk_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void beta_disk_device::device_config_complete()
+{
+	m_shortname = "betadisk";
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void beta_disk_device::device_start()
+{
+	DEVICE_START_NAME( beta_disk )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void beta_disk_device::device_reset()
+{
+	DEVICE_RESET_NAME( beta_disk )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor beta_disk_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( beta_disk  );
+}
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  the device's ROM definitions
+//-------------------------------------------------
+
+const rom_entry *beta_disk_device::device_rom_region() const
+{
+	return ROM_NAME(beta_disk );
+}
+
+

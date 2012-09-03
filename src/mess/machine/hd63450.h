@@ -24,7 +24,25 @@ void hd63450_set_timer(device_t* device, int channel, attotime tm);
 int hd63450_get_vector(device_t* device, int channel);
 int hd63450_get_error_vector(device_t* device, int channel);
 
-DECLARE_LEGACY_DEVICE(HD63450, hd63450);
+class hd63450_device : public device_t
+{
+public:
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~hd63450_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type HD63450;
+
 
 #define MCFG_HD63450_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, HD63450, 0) \

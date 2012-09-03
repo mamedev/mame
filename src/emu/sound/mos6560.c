@@ -125,7 +125,7 @@ INLINE mos6560_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == MOS656X);
 
-	return (mos6560_state *)downcast<legacy_device_base *>(device)->token();
+	return (mos6560_state *)downcast<mos6560_device *>(device)->token();
 }
 
 INLINE const mos6560_interface *get_interface( device_t *device )
@@ -970,4 +970,51 @@ DEVICE_GET_INFO(mos6560)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);
+const device_type MOS656X = &device_creator<mos6560_device>;
+
+mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MOS656X, "MOS 6560 / 6561 VIC", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mos6560_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mos6560_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mos6560_device::device_start()
+{
+	DEVICE_START_NAME( mos6560 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mos6560_device::device_reset()
+{
+	DEVICE_RESET_NAME( mos6560 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void mos6560_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

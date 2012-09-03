@@ -75,7 +75,7 @@ INLINE adc0831_state *get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( ( device->type() == ADC0831 ) || ( device->type() == ADC0832 ) || ( device->type() == ADC0834 ) || ( device->type() == ADC0838 ) );
-	return (adc0831_state *) downcast<legacy_device_base *>(device)->token();
+	return (adc0831_state *) downcast<adc0831_device *>(device)->token();
 }
 
 INLINE const adc083x_interface *get_interface( device_t *device )
@@ -550,7 +550,69 @@ DEVICE_GET_INFO(adc0838)
  }
 }
 
-DEFINE_LEGACY_DEVICE(ADC0831, adc0831);
-DEFINE_LEGACY_DEVICE(ADC0832, adc0832);
-DEFINE_LEGACY_DEVICE(ADC0834, adc0834);
-DEFINE_LEGACY_DEVICE(ADC0838, adc0838);
+const device_type ADC0831 = &device_creator<adc0831_device>;
+
+adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ADC0831, "A/D Converters 0831", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(adc0831_state));
+}
+adc0831_device::adc0831_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(adc0831_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void adc0831_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void adc0831_device::device_start()
+{
+	DEVICE_START_NAME( adc0831 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void adc0831_device::device_reset()
+{
+	DEVICE_RESET_NAME( adc0831 )(this);
+}
+
+
+const device_type ADC0832 = &device_creator<adc0832_device>;
+
+adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc0831_device(mconfig, ADC0832, "A/D Converters 0832", tag, owner, clock)
+{
+}
+
+
+const device_type ADC0834 = &device_creator<adc0834_device>;
+
+adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc0831_device(mconfig, ADC0834, "A/D Converters 0834", tag, owner, clock)
+{
+}
+
+
+const device_type ADC0838 = &device_creator<adc0838_device>;
+
+adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc0831_device(mconfig, ADC0838, "A/D Converters 0838", tag, owner, clock)
+{
+}
+
+

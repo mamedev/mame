@@ -158,28 +158,408 @@ struct _k037122_interface
 	int            gfx_index;
 };
 
-DECLARE_LEGACY_DEVICE(K007121, k007121);
-DECLARE_LEGACY_DEVICE(K007342, k007342);
-DECLARE_LEGACY_DEVICE(K007420, k007420);
-DECLARE_LEGACY_DEVICE(K052109, k052109);
-DECLARE_LEGACY_DEVICE(K051960, k051960);
-DECLARE_LEGACY_DEVICE(K053244, k05324x);
+class k007121_device : public device_t
+{
+public:
+	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k007121_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K007121;
+
+class k007342_device : public device_t
+{
+public:
+	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k007342_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K007342;
+
+class k007420_device : public device_t
+{
+public:
+	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k007420_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K007420;
+
+class k052109_device : public device_t
+{
+public:
+	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k052109_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K052109;
+
+class k051960_device : public device_t
+{
+public:
+	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k051960_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K051960;
+
+class k05324x_device : public device_t
+{
+public:
+	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k05324x_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K053244;
+
 #define K053245 K053244
-DECLARE_LEGACY_DEVICE(K053246, k053247);
+class k053247_device : public device_t
+{
+public:
+	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k053247_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K053246;
+
 #define K053247 K053246
-DECLARE_LEGACY_DEVICE(K055673, k055673);
-DECLARE_LEGACY_DEVICE(K051316, k051316);
-DECLARE_LEGACY_DEVICE(K053936, k053936);
-DECLARE_LEGACY_DEVICE(K053251, k053251);
-DECLARE_LEGACY_DEVICE(K054000, k054000);
-DECLARE_LEGACY_DEVICE(K051733, k051733);
-DECLARE_LEGACY_DEVICE(K056832, k056832);
-DECLARE_LEGACY_DEVICE(K055555, k055555);
-DECLARE_LEGACY_DEVICE(K054338, k054338);
-DECLARE_LEGACY_DEVICE(K001006, k001006);
-DECLARE_LEGACY_DEVICE(K001005, k001005);
-DECLARE_LEGACY_DEVICE(K001604, k001604);
-DECLARE_LEGACY_DEVICE(K037122, k037122);
+class k055673_device : public device_t
+{
+public:
+	k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k055673_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K055673;
+
+class k051316_device : public device_t
+{
+public:
+	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k051316_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K051316;
+
+class k053936_device : public device_t
+{
+public:
+	k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k053936_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K053936;
+
+class k053251_device : public device_t
+{
+public:
+	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k053251_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K053251;
+
+class k054000_device : public device_t
+{
+public:
+	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k054000_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K054000;
+
+class k051733_device : public device_t
+{
+public:
+	k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k051733_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K051733;
+
+class k056832_device : public device_t
+{
+public:
+	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k056832_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K056832;
+
+class k055555_device : public device_t
+{
+public:
+	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k055555_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K055555;
+
+class k054338_device : public device_t
+{
+public:
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k054338_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K054338;
+
+class k001006_device : public device_t
+{
+public:
+	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k001006_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K001006;
+
+class k001005_device : public device_t
+{
+public:
+	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k001005_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K001005;
+
+class k001604_device : public device_t
+{
+public:
+	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k001604_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K001604;
+
+class k037122_device : public device_t
+{
+public:
+	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k037122_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K037122;
+
 
 
 /***************************************************************************

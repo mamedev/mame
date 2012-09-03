@@ -157,7 +157,7 @@ INLINE YMF278BChip *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YMF278B);
-	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
+	return (YMF278BChip *)downcast<ymf278b_device *>(device)->token();
 }
 
 static void ymf278b_write_memory(YMF278BChip *chip, UINT32 offset, UINT8 data)
@@ -1111,4 +1111,51 @@ DEVICE_GET_INFO( ymf278b )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(YMF278B, ymf278b);
+const device_type YMF278B = &device_creator<ymf278b_device>;
+
+ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(YMF278BChip));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ymf278b_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ymf278b_device::device_start()
+{
+	DEVICE_START_NAME( ymf278b )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ymf278b_device::device_reset()
+{
+	DEVICE_RESET_NAME( ymf278b )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

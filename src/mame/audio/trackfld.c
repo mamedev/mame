@@ -26,7 +26,7 @@ INLINE trackfld_audio_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TRACKFLD_AUDIO);
 
-	return (trackfld_audio_state *)downcast<legacy_device_base *>(device)->token();
+	return (trackfld_audio_state *)downcast<trackfld_audio_device *>(device)->token();
 }
 
 
@@ -175,4 +175,51 @@ DEVICE_GET_INFO(trackfld_audio)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(TRACKFLD_AUDIO, trackfld_audio);
+const device_type TRACKFLD_AUDIO = &device_creator<trackfld_audio_device>;
+
+trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TRACKFLD_AUDIO, "Track And Field Audio", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(trackfld_audio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void trackfld_audio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void trackfld_audio_device::device_start()
+{
+	DEVICE_START_NAME( trackfld_audio )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void trackfld_audio_device::device_reset()
+{
+	DEVICE_RESET_NAME( trackfld_audio )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void trackfld_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

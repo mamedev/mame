@@ -46,7 +46,41 @@ void msm5205_set_volume(device_t *device,int volume);
 
 void msm5205_change_clock_w(device_t *device, INT32 clock);
 
-DECLARE_LEGACY_SOUND_DEVICE(MSM5205, msm5205);
-DECLARE_LEGACY_SOUND_DEVICE(MSM6585, msm6585);
+class msm5205_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~msm5205_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MSM5205;
+
+class msm6585_device : public msm5205_device
+{
+public:
+	msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type MSM6585;
+
 
 #endif /* __MSM5205_H__ */

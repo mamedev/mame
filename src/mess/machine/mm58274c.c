@@ -78,7 +78,7 @@ INLINE mm58274c_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == MM58274C);
 
-	return (mm58274c_t *)downcast<legacy_device_base *>(device)->token();
+	return (mm58274c_t *)downcast<mm58274c_device *>(device)->token();
 }
 
 static attotime interrupt_period_table(int val)
@@ -538,4 +538,40 @@ DEVICE_GET_INFO( mm58274c )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MM58274C, mm58274c);
+const device_type MM58274C = &device_creator<mm58274c_device>;
+
+mm58274c_device::mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MM58274C, "National Semiconductor MM58274C", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mm58274c_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mm58274c_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mm58274c_device::device_start()
+{
+	DEVICE_START_NAME( mm58274c )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mm58274c_device::device_reset()
+{
+	DEVICE_RESET_NAME( mm58274c )(this);
+}
+
+

@@ -188,9 +188,66 @@ void leland_rotate_memory(running_machine &machine, const char *cpuname);
 
 /*----------- defined in audio/leland.c -----------*/
 
-DECLARE_LEGACY_SOUND_DEVICE(LELAND, leland_sound);
-DECLARE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
-DECLARE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
+class leland_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	leland_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	leland_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~leland_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type LELAND;
+
+class leland_80186_sound_device : public leland_sound_device
+{
+public:
+	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+};
+
+extern const device_type LELAND_80186;
+
+class redline_80186_sound_device : public leland_80186_sound_device
+{
+public:
+	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+};
+
+extern const device_type REDLINE_80186;
+
 
 void leland_dac_update(device_t *device, int dacnum, UINT8 sample);
 

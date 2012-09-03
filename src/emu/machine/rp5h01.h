@@ -14,7 +14,26 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(RP5H01, rp5h01);
+class rp5h01_device : public device_t
+{
+public:
+	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~rp5h01_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type RP5H01;
+
 
 #define MCFG_RP5H01_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, RP5H01, 0)

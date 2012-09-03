@@ -31,7 +31,26 @@ struct _adc1038_interface
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ADC1038, adc1038);
+class adc1038_device : public device_t
+{
+public:
+	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~adc1038_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type ADC1038;
+
 
 #define MCFG_ADC1038_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, ADC1038, 0) \

@@ -15,7 +15,38 @@ struct _gaelcosnd_interface
 WRITE16_DEVICE_HANDLER( gaelcosnd_w );
 READ16_DEVICE_HANDLER( gaelcosnd_r );
 
-DECLARE_LEGACY_SOUND_DEVICE(GAELCO_GAE1, gaelco_gae1);
-DECLARE_LEGACY_SOUND_DEVICE(GAELCO_CG1V, gaelco_cg1v);
+class gaelco_gae1_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~gaelco_gae1_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type GAELCO_GAE1;
+
+class gaelco_cg1v_device : public gaelco_gae1_device
+{
+public:
+	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type GAELCO_CG1V;
+
 
 #endif /* __GALELCO_H__ */

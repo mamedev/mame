@@ -52,7 +52,7 @@ INLINE tlc34076_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TLC34076);
 
-	return (tlc34076_state *)downcast<legacy_device_base *>(device)->token();
+	return (tlc34076_state *)downcast<tlc34076_device *>(device)->token();
 }
 
 /*************************************
@@ -295,4 +295,40 @@ DEVICE_GET_INFO(tlc34076)
  }
 }
 
-DEFINE_LEGACY_DEVICE(TLC34076, tlc34076);
+const device_type TLC34076 = &device_creator<tlc34076_device>;
+
+tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TLC34076, "TLC34076", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tlc34076_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tlc34076_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tlc34076_device::device_start()
+{
+	DEVICE_START_NAME( tlc34076 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tlc34076_device::device_reset()
+{
+	DEVICE_RESET_NAME( tlc34076 )(this);
+}
+
+

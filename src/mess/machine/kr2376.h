@@ -36,7 +36,25 @@
 typedef void (*kr2376_on_strobe_changed_func) (device_t *device, int level);
 #define KR2376_ON_STROBE_CHANGED(name) void name(device_t *device, int level)
 
-DECLARE_LEGACY_DEVICE(KR2376, kr2376);
+class kr2376_device : public device_t
+{
+public:
+	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~kr2376_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type KR2376;
+
 
 #define MCFG_KR2376_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, KR2376, 0) \

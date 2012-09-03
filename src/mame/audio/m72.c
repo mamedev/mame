@@ -83,7 +83,7 @@ INLINE m72_audio_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == M72);
 
-	return (m72_audio_state *)downcast<legacy_device_base *>(device)->token();
+	return (m72_audio_state *)downcast<m72_audio_device *>(device)->token();
 }
 
 
@@ -271,4 +271,51 @@ DEVICE_GET_INFO( m72_audio )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(M72, m72_audio);
+const device_type M72 = &device_creator<m72_audio_device>;
+
+m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, M72, "M72 Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(m72_audio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void m72_audio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void m72_audio_device::device_start()
+{
+	DEVICE_START_NAME( m72_audio )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void m72_audio_device::device_reset()
+{
+	DEVICE_RESET_NAME( m72_audio )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void m72_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

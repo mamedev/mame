@@ -23,7 +23,26 @@ struct _k056800_interface
 	k056800_irq_cb       irq_cb;
 };
 
-DECLARE_LEGACY_DEVICE(K056800, k056800);
+class k056800_device : public device_t
+{
+public:
+	k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~k056800_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K056800;
+
 
 
 /***************************************************************************

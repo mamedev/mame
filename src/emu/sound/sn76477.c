@@ -264,7 +264,7 @@ INLINE sn76477_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SN76477);
-	return (sn76477_state *)downcast<legacy_device_base *>(device)->token();
+	return (sn76477_state *)downcast<sn76477_device *>(device)->token();
 }
 
 
@@ -2484,4 +2484,51 @@ DEVICE_GET_INFO( sn76477 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SN76477, sn76477);
+const device_type SN76477 = &device_creator<sn76477_device>;
+
+sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SN76477, "SN76477", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(sn76477_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void sn76477_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sn76477_device::device_start()
+{
+	DEVICE_START_NAME( sn76477 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void sn76477_device::device_stop()
+{
+	DEVICE_STOP_NAME( sn76477 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

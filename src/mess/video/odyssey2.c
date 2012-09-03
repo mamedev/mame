@@ -824,4 +824,41 @@ UINT8 odyssey2_ef9341_r( running_machine &machine, int command, int b )
 }
 #endif
 
-DEFINE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);
+const device_type ODYSSEY2 = &device_creator<odyssey2_sound_device>;
+
+odyssey2_sound_device::odyssey2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ODYSSEY2, "P8244/P8245", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void odyssey2_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void odyssey2_sound_device::device_start()
+{
+	DEVICE_START_NAME( odyssey2_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void odyssey2_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

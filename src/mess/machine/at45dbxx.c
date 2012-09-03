@@ -81,7 +81,7 @@ INLINE at45dbxx_t *get_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == AT45DB041 || device->type() == AT45DB081 || device->type() == AT45DB161);
 
-	return (at45dbxx_t *) downcast<legacy_device_base *>(device)->token();
+	return (at45dbxx_t *) downcast<at45db041_device *>(device)->token();
 }
 
 
@@ -467,6 +467,79 @@ DEVICE_GET_INFO( at45db161 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(AT45DB041, at45db041);
-DEFINE_LEGACY_DEVICE(AT45DB081, at45db081);
-DEFINE_LEGACY_DEVICE(AT45DB161, at45db161);
+const device_type AT45DB041 = &device_creator<at45db041_device>;
+
+at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, AT45DB041, "AT45DB041", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(at45dbxx_t));
+}
+at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(at45dbxx_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void at45db041_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void at45db041_device::device_start()
+{
+	DEVICE_START_NAME( at45db041 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void at45db041_device::device_reset()
+{
+	DEVICE_RESET_NAME( at45dbxx )(this);
+}
+
+
+const device_type AT45DB081 = &device_creator<at45db081_device>;
+
+at45db081_device::at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: at45db041_device(mconfig, AT45DB081, "AT45DB081", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void at45db081_device::device_start()
+{
+	DEVICE_START_NAME( at45db081 )(this);
+}
+
+
+const device_type AT45DB161 = &device_creator<at45db161_device>;
+
+at45db161_device::at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: at45db041_device(mconfig, AT45DB161, "AT45DB161", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void at45db161_device::device_start()
+{
+	DEVICE_START_NAME( at45db161 )(this);
+}
+
+

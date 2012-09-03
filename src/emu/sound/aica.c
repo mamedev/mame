@@ -217,7 +217,7 @@ INLINE aica_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AICA);
-	return (aica_state *)downcast<legacy_device_base *>(device)->token();
+	return (aica_state *)downcast<aica_device *>(device)->token();
 }
 
 static unsigned char DecodeSCI(aica_state *AICA, unsigned char irq)
@@ -1380,4 +1380,51 @@ DEVICE_GET_INFO( aica )
 
 
 
-DEFINE_LEGACY_SOUND_DEVICE(AICA, aica);
+const device_type AICA = &device_creator<aica_device>;
+
+aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, AICA, "AICA", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(aica_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void aica_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void aica_device::device_start()
+{
+	DEVICE_START_NAME( aica )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void aica_device::device_stop()
+{
+	DEVICE_STOP_NAME( aica )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

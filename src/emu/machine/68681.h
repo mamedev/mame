@@ -15,7 +15,26 @@ struct _duart68681_config
 	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
 };
 
-DECLARE_LEGACY_DEVICE(DUART68681, duart68681);
+class duart68681_device : public device_t
+{
+public:
+	duart68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~duart68681_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type DUART68681;
+
 
 #define MCFG_DUART68681_ADD(_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, DUART68681, _clock) \

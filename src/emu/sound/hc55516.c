@@ -57,7 +57,7 @@ INLINE hc55516_state *get_safe_token(device_t *device)
 	assert(device->type() == HC55516 ||
 		   device->type() == MC3417 ||
 		   device->type() == MC3418);
-	return (hc55516_state *)downcast<legacy_device_base *>(device)->token();
+	return (hc55516_state *)downcast<hc55516_device *>(device)->token();
 }
 
 
@@ -344,6 +344,111 @@ DEVICE_GET_INFO( mc3418 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(HC55516, hc55516);
-DEFINE_LEGACY_SOUND_DEVICE(MC3417, mc3417);
-DEFINE_LEGACY_SOUND_DEVICE(MC3418, mc3418);
+const device_type HC55516 = &device_creator<hc55516_device>;
+
+hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HC55516, "HC-55516", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(hc55516_state));
+}
+hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(hc55516_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void hc55516_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void hc55516_device::device_start()
+{
+	DEVICE_START_NAME( hc55516 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void hc55516_device::device_reset()
+{
+	DEVICE_RESET_NAME( hc55516 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void hc55516_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type MC3417 = &device_creator<mc3417_device>;
+
+mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: hc55516_device(mconfig, MC3417, "MC3417", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc3417_device::device_start()
+{
+	DEVICE_START_NAME( mc3417 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void mc3417_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type MC3418 = &device_creator<mc3418_device>;
+
+mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: hc55516_device(mconfig, MC3418, "MC3418", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc3418_device::device_start()
+{
+	DEVICE_START_NAME( mc3418 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void mc3418_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

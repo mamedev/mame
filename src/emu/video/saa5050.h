@@ -26,7 +26,26 @@ struct _saa5050_interface
 	int rev;
 };
 
-DECLARE_LEGACY_DEVICE(SAA5050, saa5050);
+class saa5050_device : public device_t
+{
+public:
+	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~saa5050_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SAA5050;
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

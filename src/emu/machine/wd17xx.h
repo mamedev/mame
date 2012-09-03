@@ -17,30 +17,214 @@
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(FD1771, fd1771);
-DECLARE_LEGACY_DEVICE(FD1781, fd1781);
-DECLARE_LEGACY_DEVICE(FD1791, fd1791);
-DECLARE_LEGACY_DEVICE(FD1792, fd1792);
-DECLARE_LEGACY_DEVICE(FD1793, fd1793);
-DECLARE_LEGACY_DEVICE(FD1794, fd1794);
-DECLARE_LEGACY_DEVICE(FD1795, fd1795);
-DECLARE_LEGACY_DEVICE(FD1797, fd1797);
-DECLARE_LEGACY_DEVICE(FD1761, fd1761);
-DECLARE_LEGACY_DEVICE(FD1762, fd1762);
-DECLARE_LEGACY_DEVICE(FD1763, fd1763);
-DECLARE_LEGACY_DEVICE(FD1764, fd1764);
-DECLARE_LEGACY_DEVICE(FD1765, fd1765);
-DECLARE_LEGACY_DEVICE(FD1767, fd1767);
-DECLARE_LEGACY_DEVICE(WD2791, wd2791);
-DECLARE_LEGACY_DEVICE(WD2793, wd2793);
-DECLARE_LEGACY_DEVICE(WD2795, wd2795);
-DECLARE_LEGACY_DEVICE(WD2797, wd2797);
-DECLARE_LEGACY_DEVICE(WD1770, wd1770);
-DECLARE_LEGACY_DEVICE(WD1772, wd1772);
-DECLARE_LEGACY_DEVICE(WD1773, wd1773);
-DECLARE_LEGACY_DEVICE(MB8866, mb8866);
-DECLARE_LEGACY_DEVICE(MB8876, mb8876);
-DECLARE_LEGACY_DEVICE(MB8877, mb8877);
+class wd1770_device : public device_t
+{
+public:
+	wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~wd1770_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type WD1770;
+
+class fd1771_device : public wd1770_device
+{
+public:
+	fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1771;
+
+class fd1781_device : public wd1770_device
+{
+public:
+	fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1781;
+
+class fd1791_device : public wd1770_device
+{
+public:
+	fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1791;
+
+class fd1792_device : public wd1770_device
+{
+public:
+	fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1792;
+
+class fd1793_device : public wd1770_device
+{
+public:
+	fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1793;
+
+class fd1794_device : public wd1770_device
+{
+public:
+	fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1794;
+
+class fd1795_device : public wd1770_device
+{
+public:
+	fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1795;
+
+class fd1797_device : public wd1770_device
+{
+public:
+	fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1797;
+
+class fd1761_device : public wd1770_device
+{
+public:
+	fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1761;
+
+class fd1762_device : public wd1770_device
+{
+public:
+	fd1762_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1762;
+
+class fd1763_device : public wd1770_device
+{
+public:
+	fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1763;
+
+class fd1764_device : public wd1770_device
+{
+public:
+	fd1764_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1764;
+
+class fd1765_device : public wd1770_device
+{
+public:
+	fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1765;
+
+class fd1767_device : public wd1770_device
+{
+public:
+	fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type FD1767;
+
+class wd2791_device : public wd1770_device
+{
+public:
+	wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type WD2791;
+
+class wd2793_device : public wd1770_device
+{
+public:
+	wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type WD2793;
+
+class wd2795_device : public wd1770_device
+{
+public:
+	wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type WD2795;
+
+class wd2797_device : public wd1770_device
+{
+public:
+	wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type WD2797;
+
+class wd1772_device : public wd1770_device
+{
+public:
+	wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type WD1772;
+
+class wd1773_device : public wd1770_device
+{
+public:
+	wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type WD1773;
+
+class mb8866_device : public wd1770_device
+{
+public:
+	mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type MB8866;
+
+class mb8876_device : public wd1770_device
+{
+public:
+	mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type MB8876;
+
+class mb8877_device : public wd1770_device
+{
+public:
+	mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type MB8877;
+
 
 
 

@@ -8,8 +8,38 @@
 #define K1GE_SCREEN_HEIGHT	199
 
 
-DECLARE_LEGACY_DEVICE(K1GE, k1ge);
-DECLARE_LEGACY_DEVICE(K2GE, k2ge);
+class k1ge_device : public device_t
+{
+public:
+	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~k1ge_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type K1GE;
+
+class k2ge_device : public k1ge_device
+{
+public:
+	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type K2GE;
+
 
 
 #define MCFG_K1GE_ADD(_tag, _clock, _config ) \

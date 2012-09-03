@@ -101,7 +101,7 @@ INLINE x1_010_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == X1_010);
-	return (x1_010_state *)downcast<legacy_device_base *>(device)->token();
+	return (x1_010_state *)downcast<x1_010_device *>(device)->token();
 }
 
 
@@ -311,4 +311,42 @@ DEVICE_GET_INFO( x1_010 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(X1_010, x1_010);
+const device_type X1_010 = &device_creator<x1_010_device>;
+
+x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(x1_010_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void x1_010_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void x1_010_device::device_start()
+{
+	DEVICE_START_NAME( x1_010 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

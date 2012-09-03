@@ -27,6 +27,29 @@ TODO:
 #include "sound/okiadpcm.h"
 #include "includes/mjkjidai.h"
 
+class mjkjidai_adpcm_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mjkjidai_adpcm_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MJKJIDAI;
+
 /* Start of ADPCM custom chip code */
 typedef struct _mjkjidai_adpcm_state mjkjidai_adpcm_state;
 struct _mjkjidai_adpcm_state
@@ -70,7 +93,7 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 static DEVICE_START( mjkjidai_adpcm )
 {
 	running_machine &machine = device->machine();
-	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<mjkjidai_adpcm_device *>(device)->token();
 
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
@@ -93,8 +116,45 @@ DEVICE_GET_INFO( mjkjidai_adpcm )
 	}
 }
 
-DECLARE_LEGACY_SOUND_DEVICE(MJKJIDAI, mjkjidai_adpcm);
-DEFINE_LEGACY_SOUND_DEVICE(MJKJIDAI, mjkjidai_adpcm);
+const device_type MJKJIDAI = &device_creator<mjkjidai_adpcm_device>;
+
+mjkjidai_adpcm_device::mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MJKJIDAI, "Custom ADPCM", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mjkjidai_adpcm_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mjkjidai_adpcm_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mjkjidai_adpcm_device::device_start()
+{
+	DEVICE_START_NAME( mjkjidai_adpcm )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void mjkjidai_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int length)
@@ -108,7 +168,7 @@ static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int le
 WRITE8_MEMBER(mjkjidai_state::adpcm_w)
 {
 	device_t *device = machine().device("adpcm");
-	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<mjkjidai_adpcm_device *>(device)->token();
 	mjkjidai_adpcm_play (state, (data & 0x07) * 0x1000, 0x1000 * 2);
 }
 /* End of ADPCM custom chip code */

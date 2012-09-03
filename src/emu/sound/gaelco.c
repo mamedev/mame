@@ -78,7 +78,7 @@ INLINE gaelco_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAELCO_GAE1 || device->type() == GAELCO_CG1V);
-	return (gaelco_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (gaelco_sound_state *)downcast<gaelco_gae1_device *>(device)->token();
 }
 
 /*============================================================================
@@ -339,5 +339,64 @@ DEVICE_GET_INFO( gaelco_cg1v )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(GAELCO_GAE1, gaelco_gae1);
-DEFINE_LEGACY_SOUND_DEVICE(GAELCO_CG1V, gaelco_cg1v);
+const device_type GAELCO_GAE1 = &device_creator<gaelco_gae1_device>;
+
+gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(gaelco_sound_state));
+}
+
+gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(gaelco_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void gaelco_gae1_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gaelco_gae1_device::device_start()
+{
+	DEVICE_START_NAME( gaelco )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void gaelco_gae1_device::device_stop()
+{
+	DEVICE_STOP_NAME( gaelco )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void gaelco_gae1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type GAELCO_CG1V = &device_creator<gaelco_cg1v_device>;
+
+gaelco_cg1v_device::gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: gaelco_gae1_device(mconfig, GAELCO_CG1V, "Gaelco CG1V", tag, owner, clock)
+{
+}

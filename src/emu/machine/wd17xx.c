@@ -411,7 +411,7 @@ INLINE wd1770_state *get_safe_token(device_t *device)
 		device->type() == WD1770 || device->type() == WD1772 || device->type() == WD1773 ||
 		device->type() == MB8866 || device->type() == MB8876 || device->type() == MB8877);
 
-	return (wd1770_state *)downcast<legacy_device_base *>(device)->token();
+	return (wd1770_state *)downcast<wd1770_device *>(device)->token();
 }
 
 
@@ -2328,27 +2328,238 @@ DEVICE_GET_INFO(mb8877)
  }
 }
 
-DEFINE_LEGACY_DEVICE(FD1771, fd1771);
-DEFINE_LEGACY_DEVICE(FD1781, fd1781);
-DEFINE_LEGACY_DEVICE(FD1791, fd1791);
-DEFINE_LEGACY_DEVICE(FD1792, fd1792);
-DEFINE_LEGACY_DEVICE(FD1793, fd1793);
-DEFINE_LEGACY_DEVICE(FD1794, fd1794);
-DEFINE_LEGACY_DEVICE(FD1795, fd1795);
-DEFINE_LEGACY_DEVICE(FD1797, fd1797);
-DEFINE_LEGACY_DEVICE(FD1761, fd1761);
-DEFINE_LEGACY_DEVICE(FD1762, fd1762);
-DEFINE_LEGACY_DEVICE(FD1763, fd1763);
-DEFINE_LEGACY_DEVICE(FD1764, fd1764);
-DEFINE_LEGACY_DEVICE(FD1765, fd1765);
-DEFINE_LEGACY_DEVICE(FD1767, fd1767);
-DEFINE_LEGACY_DEVICE(WD2791, wd2791);
-DEFINE_LEGACY_DEVICE(WD2793, wd2793);
-DEFINE_LEGACY_DEVICE(WD2795, wd2795);
-DEFINE_LEGACY_DEVICE(WD2797, wd2797);
-DEFINE_LEGACY_DEVICE(WD1770, wd1770);
-DEFINE_LEGACY_DEVICE(WD1772, wd1772);
-DEFINE_LEGACY_DEVICE(WD1773, wd1773);
-DEFINE_LEGACY_DEVICE(MB8866, mb8866);
-DEFINE_LEGACY_DEVICE(MB8876, mb8876);
-DEFINE_LEGACY_DEVICE(MB8877, mb8877);
+const device_type FD1771 = &device_creator<fd1771_device>;
+
+fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1771, "FD1771", tag, owner, clock)
+{
+}
+
+
+const device_type FD1781 = &device_creator<fd1781_device>;
+
+fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1781, "FD1781", tag, owner, clock)
+{
+}
+
+
+const device_type FD1791 = &device_creator<fd1791_device>;
+
+fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1791, "FD1791", tag, owner, clock)
+{
+}
+
+
+const device_type FD1792 = &device_creator<fd1792_device>;
+
+fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1792, "FD1792", tag, owner, clock)
+{
+}
+
+
+const device_type FD1793 = &device_creator<fd1793_device>;
+
+fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1793, "FD1793", tag, owner, clock)
+{
+}
+
+
+const device_type FD1794 = &device_creator<fd1794_device>;
+
+fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1794, "FD1794", tag, owner, clock)
+{
+}
+
+
+const device_type FD1795 = &device_creator<fd1795_device>;
+
+fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1795, "FD1795", tag, owner, clock)
+{
+}
+
+
+const device_type FD1797 = &device_creator<fd1797_device>;
+
+fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1797, "FD1797", tag, owner, clock)
+{
+}
+
+
+const device_type FD1761 = &device_creator<fd1761_device>;
+
+fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1761, "FD1761", tag, owner, clock)
+{
+}
+
+
+const device_type FD1762 = &device_creator<fd1762_device>;
+
+fd1762_device::fd1762_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1762, "FD1762", tag, owner, clock)
+{
+}
+
+
+const device_type FD1763 = &device_creator<fd1763_device>;
+
+fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1763, "FD1763", tag, owner, clock)
+{
+}
+
+
+const device_type FD1764 = &device_creator<fd1764_device>;
+
+fd1764_device::fd1764_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1764, "FD1764", tag, owner, clock)
+{
+}
+
+
+const device_type FD1765 = &device_creator<fd1765_device>;
+
+fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1765, "FD1765", tag, owner, clock)
+{
+}
+
+
+const device_type FD1767 = &device_creator<fd1767_device>;
+
+fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, FD1767, "FD1767", tag, owner, clock)
+{
+}
+
+
+const device_type WD2791 = &device_creator<wd2791_device>;
+
+wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, WD2791, "WD2791", tag, owner, clock)
+{
+}
+
+
+const device_type WD2793 = &device_creator<wd2793_device>;
+
+wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, WD2793, "WD2793", tag, owner, clock)
+{
+}
+
+
+const device_type WD2795 = &device_creator<wd2795_device>;
+
+wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, WD2795, "WD2795", tag, owner, clock)
+{
+}
+
+
+const device_type WD2797 = &device_creator<wd2797_device>;
+
+wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, WD2797, "WD2797", tag, owner, clock)
+{
+}
+
+
+const device_type WD1770 = &device_creator<wd1770_device>;
+
+wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, WD1770, "WD1770", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(wd1770_state));
+}
+wd1770_device::wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(wd1770_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void wd1770_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void wd1770_device::device_start()
+{
+	DEVICE_START_NAME( wd1770 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void wd1770_device::device_reset()
+{
+	DEVICE_RESET_NAME( wd1770 )(this);
+}
+
+
+const device_type WD1772 = &device_creator<wd1772_device>;
+
+wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, WD1772, "WD1772", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void wd1772_device::device_start()
+{
+	DEVICE_START_NAME( wd1772 )(this);
+}
+
+
+const device_type WD1773 = &device_creator<wd1773_device>;
+
+wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, WD1773, "WD1773", tag, owner, clock)
+{
+}
+
+
+const device_type MB8866 = &device_creator<mb8866_device>;
+
+mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, MB8866, "MB8866", tag, owner, clock)
+{
+}
+
+
+const device_type MB8876 = &device_creator<mb8876_device>;
+
+mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, MB8876, "MB8876", tag, owner, clock)
+{
+}
+
+
+const device_type MB8877 = &device_creator<mb8877_device>;
+
+mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: wd1770_device(mconfig, MB8877, "MB8877", tag, owner, clock)
+{
+}
+
+

@@ -32,10 +32,51 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ADC0831, adc0831);
-DECLARE_LEGACY_DEVICE(ADC0832, adc0832);
-DECLARE_LEGACY_DEVICE(ADC0834, adc0834);
-DECLARE_LEGACY_DEVICE(ADC0838, adc0838);
+class adc0831_device : public device_t
+{
+public:
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc0831_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~adc0831_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type ADC0831;
+
+class adc0832_device : public adc0831_device
+{
+public:
+	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type ADC0832;
+
+class adc0834_device : public adc0831_device
+{
+public:
+	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type ADC0834;
+
+class adc0838_device : public adc0831_device
+{
+public:
+	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type ADC0838;
+
 
 #define MCFG_ADC0831_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, ADC0831, 0) \

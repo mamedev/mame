@@ -113,7 +113,7 @@ struct _screen_data {
 INLINE screen_data_t *get_safe_token(device_t *device) {
 	assert(device != NULL);
 	assert(device->type() == APOLLO_MONO15I || device->type() == APOLLO_MONO19I );
-	return (screen_data_t *)downcast<legacy_device_base *>(device)->token();
+	return (screen_data_t *)downcast<apollo_mono15i_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -876,5 +876,81 @@ DEVICE_GET_INFO( apollo_mono15i ) {
 	}
 }
 
-DEFINE_LEGACY_DEVICE(APOLLO_MONO19I, apollo_mono19i);
-DEFINE_LEGACY_DEVICE(APOLLO_MONO15I, apollo_mono15i);
+apollo_mono_device::apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(screen_data_t));
+}
+
+const device_type APOLLO_MONO19I = &device_creator<apollo_mono19i_device>;
+
+apollo_mono19i_device::apollo_mono19i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: apollo_mono_device(mconfig, APOLLO_MONO19I, "Apollo 19\" Monochrome Screen", tag, owner, clock)
+{	
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void apollo_mono19i_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void apollo_mono19i_device::device_start()
+{
+	DEVICE_START_NAME( apollo_mono19i )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void apollo_mono19i_device::device_reset()
+{
+	DEVICE_RESET_NAME( apollo_mono19i )(this);
+}
+
+
+const device_type APOLLO_MONO15I = &device_creator<apollo_mono15i_device>;
+
+apollo_mono15i_device::apollo_mono15i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: apollo_mono_device(mconfig, APOLLO_MONO15I, "Apollo 15\" Monochrome Screen", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void apollo_mono15i_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void apollo_mono15i_device::device_start()
+{
+	DEVICE_START_NAME( apollo_mono15i )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void apollo_mono15i_device::device_reset()
+{
+	DEVICE_RESET_NAME( apollo_mono15i )(this);
+}
+
+

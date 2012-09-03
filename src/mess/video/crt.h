@@ -24,7 +24,25 @@ void crt_plot(device_t *device, int x, int y);
 void crt_eof(device_t *device);
 void crt_update(device_t *device, bitmap_ind16 &bitmap);
 
-DECLARE_LEGACY_DEVICE(CRT, crt);
+class crt_device : public device_t
+{
+public:
+	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~crt_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type CRT;
+
 
 #define MCFG_CRT_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, CRT, 0) \

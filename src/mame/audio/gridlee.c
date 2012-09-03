@@ -41,7 +41,7 @@ INLINE gridlee_sound_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == GRIDLEE);
 
-	return (gridlee_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (gridlee_sound_state *)downcast<gridlee_sound_device *>(device)->token();
 }
 
 static STREAM_UPDATE( gridlee_stream_update )
@@ -197,4 +197,42 @@ fclose(f);
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(GRIDLEE, gridlee_sound);
+const device_type GRIDLEE = &device_creator<gridlee_sound_device>;
+
+gridlee_sound_device::gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GRIDLEE, "Gridlee Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(gridlee_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void gridlee_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gridlee_sound_device::device_start()
+{
+	DEVICE_START_NAME( gridlee_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void gridlee_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

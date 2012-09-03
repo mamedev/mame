@@ -72,7 +72,7 @@ INLINE pcf8593_t *get_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == PCF8593);
 
-	return (pcf8593_t *) downcast<legacy_device_base *>(device)->token();
+	return (pcf8593_t *) downcast<pcf8593_device *>(device)->token();
 }
 
 
@@ -470,4 +470,40 @@ DEVICE_GET_INFO( pcf8593 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(PCF8593, pcf8593);
+const device_type PCF8593 = &device_creator<pcf8593_device>;
+
+pcf8593_device::pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PCF8593, "PCF8593 RTC", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pcf8593_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pcf8593_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pcf8593_device::device_start()
+{
+	DEVICE_START_NAME( pcf8593 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pcf8593_device::device_reset()
+{
+	DEVICE_RESET_NAME( pcf8593 )(this);
+}
+
+

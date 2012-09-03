@@ -71,6 +71,29 @@ READ_LINE_DEVICE_HANDLER( sp0256_sby_r );
 READ16_DEVICE_HANDLER( spb640_r );
 WRITE16_DEVICE_HANDLER( spb640_w );
 
-DECLARE_LEGACY_SOUND_DEVICE(SP0256, sp0256);
+class sp0256_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~sp0256_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type SP0256;
+
 
 #endif /* __SP0256_H__ */

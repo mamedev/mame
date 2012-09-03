@@ -111,7 +111,7 @@ INLINE mc6843_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MC6843 );
-	return (mc6843_t*) downcast<legacy_device_base *>(device)->token();
+	return (mc6843_t*) downcast<mc6843_device *>(device)->token();
 }
 
 
@@ -851,5 +851,41 @@ DEVICE_GET_INFO( mc6843 ) {
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MC6843, mc6843);
+const device_type MC6843 = &device_creator<mc6843_device>;
+
+mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MC6843, "Motorola MC6843 floppy controller", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mc6843_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc6843_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc6843_device::device_start()
+{
+	DEVICE_START_NAME( mc6843 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc6843_device::device_reset()
+{
+	DEVICE_RESET_NAME( mc6843 )(this);
+}
+
+
 

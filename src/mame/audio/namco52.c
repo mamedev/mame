@@ -66,7 +66,7 @@ INLINE namco_52xx_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == NAMCO_52XX);
 
-	return (namco_52xx_state *)downcast<legacy_device_base *>(device)->token();
+	return (namco_52xx_state *)downcast<namco_52xx_device *>(device)->token();
 }
 
 
@@ -246,4 +246,52 @@ DEVICE_GET_INFO(namco_52xx)
  }
 }
 
-DEFINE_LEGACY_DEVICE(NAMCO_52XX, namco_52xx);
+const device_type NAMCO_52XX = &device_creator<namco_52xx_device>;
+
+namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NAMCO_52XX, "Namco 52xx", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(namco_52xx_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void namco_52xx_device::device_config_complete()
+{
+	m_shortname = "namco52";
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void namco_52xx_device::device_start()
+{
+	DEVICE_START_NAME( namco_52xx )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor namco_52xx_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( namco_52xx  );
+}
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  the device's ROM definitions
+//-------------------------------------------------
+
+const rom_entry *namco_52xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_52xx );
+}
+
+

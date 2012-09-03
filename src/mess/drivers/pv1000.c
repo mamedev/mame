@@ -9,8 +9,62 @@
 #include "imagedev/cartslot.h"
 
 
-DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
-DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
+class pv1000_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides	
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+};
+
+extern const device_type PV1000;
+
+const device_type PV1000 = &device_creator<pv1000_sound_device>;
+
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pv1000_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+static DEVICE_START( pv1000_sound );
+void pv1000_sound_device::device_start()
+{
+	DEVICE_START_NAME( pv1000_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 class pv1000_state : public driver_device

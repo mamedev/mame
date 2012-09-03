@@ -71,7 +71,7 @@ INLINE kaneko_pandora_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == KANEKO_PANDORA);
 
-	return (kaneko_pandora_state *)downcast<legacy_device_base *>(device)->token();
+	return (kaneko_pandora_state *)downcast<kaneko_pandora_device *>(device)->token();
 }
 
 INLINE const kaneko_pandora_interface *get_interface( device_t *device )
@@ -339,4 +339,40 @@ DEVICE_GET_INFO(kaneko_pandora)
  }
 }
 
-DEFINE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);
+const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
+
+kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, KANEKO_PANDORA, "Kaneko Pandora - PX79C480FP-3", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(kaneko_pandora_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void kaneko_pandora_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void kaneko_pandora_device::device_start()
+{
+	DEVICE_START_NAME( kaneko_pandora )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void kaneko_pandora_device::device_reset()
+{
+	DEVICE_RESET_NAME( kaneko_pandora )(this);
+}
+
+

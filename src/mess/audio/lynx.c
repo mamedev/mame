@@ -115,7 +115,7 @@ INLINE lynx_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == LYNX || device->type() == LYNX2);
-	return (lynx_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (lynx_sound_state *)downcast<lynx_sound_device *>(device)->token();
 }
 
 static void lynx_audio_reset_channel(LYNX_AUDIO *This)
@@ -536,5 +536,81 @@ DEVICE_GET_INFO( lynx2_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(LYNX, lynx_sound);
-DEFINE_LEGACY_SOUND_DEVICE(LYNX2, lynx2_sound);
+const device_type LYNX = &device_creator<lynx_sound_device>;
+
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, LYNX, "Mikey", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(lynx_sound_state));
+}
+
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(lynx_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void lynx_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void lynx_sound_device::device_start()
+{
+	DEVICE_START_NAME( lynx_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void lynx_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( lynx_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type LYNX2 = &device_creator<lynx2_sound_device>;
+
+lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: lynx_sound_device(mconfig, LYNX2, "Mikey (Lynx II)", tag, owner, clock)
+{
+}
+
+void lynx2_sound_device::device_start()
+{
+	DEVICE_START_NAME( lynx2_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void lynx2_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

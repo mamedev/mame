@@ -61,7 +61,7 @@ INLINE ttl74153_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TTL74153);
 
-	return (ttl74153_state *)downcast<legacy_device_base *>(device)->token();
+	return (ttl74153_state *)downcast<ttl74153_device *>(device)->token();
 }
 
 
@@ -191,4 +191,40 @@ DEVICE_GET_INFO(ttl74153)
  }
 }
 
-DEFINE_LEGACY_DEVICE(TTL74153, ttl74153);
+const device_type TTL74153 = &device_creator<ttl74153_device>;
+
+ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TTL74153, "74153", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(ttl74153_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ttl74153_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ttl74153_device::device_start()
+{
+	DEVICE_START_NAME( ttl74153 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ttl74153_device::device_reset()
+{
+	DEVICE_RESET_NAME( ttl74153 )(this);
+}
+
+

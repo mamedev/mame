@@ -127,7 +127,7 @@ INLINE tap_990_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TI990_TAPE_CTRL);
 
-	return (tap_990_t *)downcast<legacy_device_base *>(device)->token();
+	return (tap_990_t *)downcast<tap_990_device *>(device)->token();
 }
 
 
@@ -1089,4 +1089,41 @@ DEVICE_GET_INFO( tap_990 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(TI990_TAPE_CTRL, tap_990);
+const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
+
+tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI990 Tape Controller", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tap_990_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tap_990_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tap_990_device::device_start()
+{
+	DEVICE_START_NAME( tap_990 )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor tap_990_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( tap_990  );
+}
+
+

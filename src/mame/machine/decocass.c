@@ -1966,7 +1966,7 @@ INLINE tape_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == DECOCASS_TAPE);
 
-	return (tape_state *)downcast<legacy_device_base *>(device)->token();
+	return (tape_state *)downcast<decocass_tape_device *>(device)->token();
 }
 
 
@@ -2305,4 +2305,40 @@ DEVICE_GET_INFO( decocass_tape )
 }
 
 
-DEFINE_LEGACY_DEVICE(DECOCASS_TAPE, decocass_tape);
+const device_type DECOCASS_TAPE = &device_creator<decocass_tape_device>;
+
+decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECOCASS_TAPE, "DECO Cassette Tape", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tape_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void decocass_tape_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void decocass_tape_device::device_start()
+{
+	DEVICE_START_NAME( decocass_tape )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void decocass_tape_device::device_reset()
+{
+	DEVICE_RESET_NAME( decocass_tape )(this);
+}
+
+

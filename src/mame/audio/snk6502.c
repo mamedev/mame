@@ -386,7 +386,7 @@ INLINE snk6502_sound_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == SNK6502);
 
-	return (snk6502_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (snk6502_sound_state *)downcast<snk6502_sound_device *>(device)->token();
 }
 
 INLINE void validate_tone_channel(snk6502_sound_state *state, int channel)
@@ -1266,4 +1266,42 @@ WRITE8_HANDLER( fantasy_speech_w )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SNK6502, snk6502_sound);
+const device_type SNK6502 = &device_creator<snk6502_sound_device>;
+
+snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SNK6502, "snk6502 Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(snk6502_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void snk6502_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void snk6502_sound_device::device_start()
+{
+	DEVICE_START_NAME( snk6502_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

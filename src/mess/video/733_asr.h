@@ -19,7 +19,26 @@ GFXDECODE_EXTERN( asr733 );
 PALETTE_INIT( asr733 );
 
 void asr733_init(running_machine &machine);
-DECLARE_LEGACY_DEVICE(ASR733, asr733);
+class asr733_device : public device_t
+{
+public:
+	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~asr733_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type ASR733;
+
 
 #define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, ASR733, 0) \

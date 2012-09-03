@@ -17,9 +17,42 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ADC12130, adc12130);
-DECLARE_LEGACY_DEVICE(ADC12132, adc12132);
-DECLARE_LEGACY_DEVICE(ADC12138, adc12138);
+class adc12138_device : public device_t
+{
+public:
+	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~adc12138_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type ADC12138;
+
+class adc12130_device : public adc12138_device
+{
+public:
+	adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type ADC12130;
+
+class adc12132_device : public adc12138_device
+{
+public:
+	adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type ADC12132;
 
 #define MCFG_ADC12130_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, ADC12130, 0) \

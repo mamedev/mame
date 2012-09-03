@@ -25,7 +25,26 @@ struct _tlc34076_config
 
 extern const tlc34076_config tlc34076_6_bit_intf;
 
-DECLARE_LEGACY_DEVICE(TLC34076, tlc34076);
+class tlc34076_device : public device_t
+{
+public:
+	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~tlc34076_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TLC34076;
+
 
 
 /***************************************************************************

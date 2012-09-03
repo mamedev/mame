@@ -151,7 +151,7 @@ INLINE atarirle_data *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == ATARIRLE);
 
-	return (atarirle_data *)downcast<legacy_device_base *>(device)->token();
+	return (atarirle_data *)downcast<atarirle_device *>(device)->token();
 }
 
 
@@ -390,7 +390,34 @@ DEVICE_GET_INFO( atarirle )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(ATARIRLE, atarirle);
+const device_type ATARIRLE = &device_creator<atarirle_device>;
+
+atarirle_device::atarirle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ATARIRLE, "Atari RLE", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(atarirle_data));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void atarirle_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void atarirle_device::device_start()
+{
+	DEVICE_START_NAME( atarirle )(this);
+}
+
+
 
 /*---------------------------------------------------------------
     atarirle_control_w: Write handler for MO control bits.

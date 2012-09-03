@@ -39,7 +39,27 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(PC_LPT, pc_lpt);
+class pc_lpt_device : public device_t
+{
+public:
+	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~pc_lpt_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type PC_LPT;
+
 
 #define MCFG_PC_LPT_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, PC_LPT, 0) \

@@ -19,7 +19,7 @@ static gmaster_sound *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GMASTER);
-	return (gmaster_sound *) downcast<legacy_device_base *>(device)->token();
+	return (gmaster_sound *) downcast<gmaster_sound_device *>(device)->token();
 }
 
 
@@ -83,4 +83,42 @@ DEVICE_GET_INFO( gmaster_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(GMASTER, gmaster_sound);
+const device_type GMASTER = &device_creator<gmaster_sound_device>;
+
+gmaster_sound_device::gmaster_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GMASTER, "Game Master Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(gmaster_sound));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void gmaster_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gmaster_sound_device::device_start()
+{
+	DEVICE_START_NAME( gmaster_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void gmaster_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

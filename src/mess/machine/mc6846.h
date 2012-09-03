@@ -9,7 +9,26 @@
 #ifndef MC6846_H
 #define MC6846_H
 
-DECLARE_LEGACY_DEVICE(MC6846, mc6846);
+class mc6846_device : public device_t
+{
+public:
+	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mc6846_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MC6846;
+
 
 /* ---------- configuration ------------ */
 

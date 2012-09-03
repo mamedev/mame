@@ -29,7 +29,7 @@ INLINE geebee_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == GEEBEE);
 
-	return (geebee_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (geebee_sound_state *)downcast<geebee_sound_device *>(device)->token();
 }
 
 static TIMER_CALLBACK( volume_decay )
@@ -160,4 +160,42 @@ DEVICE_GET_INFO( geebee_sound )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(GEEBEE, geebee_sound);
+const device_type GEEBEE = &device_creator<geebee_sound_device>;
+
+geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GEEBEE, "Gee Bee Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(geebee_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void geebee_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void geebee_sound_device::device_start()
+{
+	DEVICE_START_NAME( geebee_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void geebee_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

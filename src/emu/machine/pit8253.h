@@ -37,8 +37,38 @@ struct pit8253_config
 	} timer[3];
 };
 
-DECLARE_LEGACY_DEVICE(PIT8253, pit8253);
-DECLARE_LEGACY_DEVICE(PIT8254, pit8254);
+class pit8253_device : public device_t
+{
+public:
+	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~pit8253_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type PIT8253;
+
+class pit8254_device : public pit8253_device
+{
+public:
+	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type PIT8254;
+
 
 
 /***************************************************************************

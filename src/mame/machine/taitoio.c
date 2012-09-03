@@ -74,7 +74,7 @@ INLINE tc0220ioc_state *tc0220ioc_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0220IOC);
 
-	return (tc0220ioc_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0220ioc_state *)downcast<tc0220ioc_device *>(device)->token();
 }
 
 INLINE const tc0220ioc_interface *tc0220ioc_get_interface( device_t *device )
@@ -231,7 +231,7 @@ INLINE tc0510nio_state *tc0510nio_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0510NIO);
 
-	return (tc0510nio_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0510nio_state *)downcast<tc0510nio_device *>(device)->token();
 }
 
 INLINE const tc0510nio_interface *tc0510nio_get_interface( device_t *device )
@@ -382,7 +382,7 @@ INLINE tc0640fio_state *tc0640fio_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0640FIO);
 
-	return (tc0640fio_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0640fio_state *)downcast<tc0640fio_device *>(device)->token();
 }
 
 INLINE const tc0640fio_interface *tc0640fio_get_interface( device_t *device )
@@ -574,6 +574,114 @@ DEVICE_GET_INFO( tc0640fio )
 }
 
 
-DEFINE_LEGACY_DEVICE(TC0220IOC, tc0220ioc);
-DEFINE_LEGACY_DEVICE(TC0510NIO, tc0510nio);
-DEFINE_LEGACY_DEVICE(TC0640FIO, tc0640fio);
+const device_type TC0220IOC = &device_creator<tc0220ioc_device>;
+
+tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0220ioc_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0220ioc_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0220ioc_device::device_start()
+{
+	DEVICE_START_NAME( tc0220ioc )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0220ioc_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0220ioc )(this);
+}
+
+
+const device_type TC0510NIO = &device_creator<tc0510nio_device>;
+
+tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0510nio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0510nio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0510nio_device::device_start()
+{
+	DEVICE_START_NAME( tc0510nio )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0510nio_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0510nio )(this);
+}
+
+
+const device_type TC0640FIO = &device_creator<tc0640fio_device>;
+
+tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0640fio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0640fio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0640fio_device::device_start()
+{
+	DEVICE_START_NAME( tc0640fio )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0640fio_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0640fio )(this);
+}
+
+

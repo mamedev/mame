@@ -126,7 +126,7 @@ INLINE mea8000_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MEA8000);
-	return (mea8000_t*) downcast<legacy_device_base *>(device)->token();
+	return (mea8000_t*) downcast<mea8000_device *>(device)->token();
 }
 
 
@@ -722,4 +722,40 @@ DEVICE_GET_INFO( mea8000 ) {
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MEA8000, mea8000);
+const device_type MEA8000 = &device_creator<mea8000_device>;
+
+mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MEA8000, "Philips / Signetics MEA 8000 speech synthesizer", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mea8000_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mea8000_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mea8000_device::device_start()
+{
+	DEVICE_START_NAME( mea8000 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mea8000_device::device_reset()
+{
+	DEVICE_RESET_NAME( mea8000 )(this);
+}
+
+

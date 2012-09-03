@@ -1349,7 +1349,7 @@ INLINE k007121_state *k007121_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K007121);
 
-	return (k007121_state *)downcast<legacy_device_base *>(device)->token();
+	return (k007121_state *)downcast<k007121_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -1612,7 +1612,7 @@ INLINE k007342_state *k007342_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K007342);
 
-	return (k007342_state *)downcast<legacy_device_base *>(device)->token();
+	return (k007342_state *)downcast<k007342_device *>(device)->token();
 }
 
 INLINE const k007342_interface *k007342_get_interface( device_t *device )
@@ -1896,7 +1896,7 @@ INLINE k007420_state *k007420_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K007420);
 
-	return (k007420_state *)downcast<legacy_device_base *>(device)->token();
+	return (k007420_state *)downcast<k007420_device *>(device)->token();
 }
 
 INLINE const k007420_interface *k007420_get_interface( device_t *device )
@@ -2173,7 +2173,7 @@ INLINE k052109_state *k052109_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K052109);
 
-	return (k052109_state *)downcast<legacy_device_base *>(device)->token();
+	return (k052109_state *)downcast<k052109_device *>(device)->token();
 }
 
 INLINE const k052109_interface *k052109_get_interface( device_t *device )
@@ -2807,7 +2807,7 @@ INLINE k051960_state *k051960_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K051960);
 
-	return (k051960_state *)downcast<legacy_device_base *>(device)->token();
+	return (k051960_state *)downcast<k051960_device *>(device)->token();
 }
 
 INLINE const k051960_interface *k051960_get_interface( device_t *device )
@@ -3349,7 +3349,7 @@ INLINE k05324x_state *k05324x_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert((device->type() == K053244 || device->type() == K053245));
 
-	return (k05324x_state *)downcast<legacy_device_base *>(device)->token();
+	return (k05324x_state *)downcast<k05324x_device *>(device)->token();
 }
 
 INLINE const k05324x_interface *k05324x_get_interface( device_t *device )
@@ -4139,7 +4139,7 @@ INLINE k053247_state *k053247_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
 
-	return (k053247_state *)downcast<legacy_device_base *>(device)->token();
+	return (k053247_state *)downcast<k053247_device *>(device)->token();
 }
 
 INLINE const k053247_interface *k053247_get_interface( device_t *device )
@@ -5137,7 +5137,7 @@ INLINE k051316_state *k051316_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K051316);
 
-	return (k051316_state *)downcast<legacy_device_base *>(device)->token();
+	return (k051316_state *)downcast<k051316_device *>(device)->token();
 }
 
 INLINE const k051316_interface *k051316_get_interface( device_t *device )
@@ -5425,7 +5425,7 @@ INLINE k053936_state *k053936_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K053936);
 
-	return (k053936_state *)downcast<legacy_device_base *>(device)->token();
+	return (k053936_state *)downcast<k053936_device *>(device)->token();
 }
 
 INLINE const k053936_interface *k053936_get_interface( device_t *device )
@@ -5650,7 +5650,7 @@ INLINE k053251_state *k053251_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K053251);
 
-	return (k053251_state *)downcast<legacy_device_base *>(device)->token();
+	return (k053251_state *)downcast<k053251_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -5801,7 +5801,7 @@ INLINE k054000_state *k054000_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K054000);
 
-	return (k054000_state *)downcast<legacy_device_base *>(device)->token();
+	return (k054000_state *)downcast<k054000_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -5913,7 +5913,7 @@ INLINE k051733_state *k051733_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K051733);
 
-	return (k051733_state *)downcast<legacy_device_base *>(device)->token();
+	return (k051733_state *)downcast<k051733_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -6119,7 +6119,7 @@ INLINE k056832_state *k056832_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K056832);
 
-	return (k056832_state *)downcast<legacy_device_base *>(device)->token();
+	return (k056832_state *)downcast<k056832_device *>(device)->token();
 }
 
 INLINE const k056832_interface *k056832_get_interface( device_t *device )
@@ -8032,7 +8032,7 @@ INLINE k055555_state *k055555_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K055555);
 
-	return (k055555_state *)downcast<legacy_device_base *>(device)->token();
+	return (k055555_state *)downcast<k055555_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -8159,7 +8159,7 @@ INLINE k054338_state *k054338_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K054338);
 
-	return (k054338_state *)downcast<legacy_device_base *>(device)->token();
+	return (k054338_state *)downcast<k054338_device *>(device)->token();
 }
 
 INLINE const k054338_interface *k054338_get_interface( device_t *device )
@@ -8471,7 +8471,7 @@ INLINE k001006_state *k001006_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K001006);
 
-	return (k001006_state *)downcast<legacy_device_base *>(device)->token();
+	return (k001006_state *)downcast<k001006_device *>(device)->token();
 }
 
 INLINE const k001006_interface *k001006_get_interface( device_t *device )
@@ -8681,7 +8681,7 @@ INLINE k001005_state *k001005_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K001005);
 
-	return (k001005_state *)downcast<legacy_device_base *>(device)->token();
+	return (k001005_state *)downcast<k001005_device *>(device)->token();
 }
 
 INLINE const k001005_interface *k001005_get_interface( device_t *device )
@@ -9574,7 +9574,7 @@ INLINE k001604_state *k001604_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K001604);
 
-	return (k001604_state *)downcast<legacy_device_base *>(device)->token();
+	return (k001604_state *)downcast<k001604_device *>(device)->token();
 }
 
 INLINE const k001604_interface *k001604_get_interface( device_t *device )
@@ -9987,7 +9987,7 @@ INLINE k037122_state *k037122_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K037122);
 
-	return (k037122_state *)downcast<legacy_device_base *>(device)->token();
+	return (k037122_state *)downcast<k037122_device *>(device)->token();
 }
 
 INLINE const k037122_interface *k037122_get_interface( device_t *device )
@@ -10710,23 +10710,743 @@ DEVICE_GET_INFO( k037122 )
 }
 
 
-DEFINE_LEGACY_DEVICE(K007121, k007121);
-DEFINE_LEGACY_DEVICE(K007342, k007342);
-DEFINE_LEGACY_DEVICE(K007420, k007420);
-DEFINE_LEGACY_DEVICE(K052109, k052109);
-DEFINE_LEGACY_DEVICE(K051960, k051960);
-DEFINE_LEGACY_DEVICE(K053244, k05324x);
-DEFINE_LEGACY_DEVICE(K053246, k053247);
-DEFINE_LEGACY_DEVICE(K055673, k055673);
-DEFINE_LEGACY_DEVICE(K051316, k051316);
-DEFINE_LEGACY_DEVICE(K053936, k053936);
-DEFINE_LEGACY_DEVICE(K053251, k053251);
-DEFINE_LEGACY_DEVICE(K054000, k054000);
-DEFINE_LEGACY_DEVICE(K051733, k051733);
-DEFINE_LEGACY_DEVICE(K056832, k056832);
-DEFINE_LEGACY_DEVICE(K055555, k055555);
-DEFINE_LEGACY_DEVICE(K054338, k054338);
-DEFINE_LEGACY_DEVICE(K001006, k001006);
-DEFINE_LEGACY_DEVICE(K001005, k001005);
-DEFINE_LEGACY_DEVICE(K001604, k001604);
-DEFINE_LEGACY_DEVICE(K037122, k037122);
+const device_type K007121 = &device_creator<k007121_device>;
+
+k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K007121, "Konami 007121", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k007121_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k007121_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k007121_device::device_start()
+{
+	DEVICE_START_NAME( k007121 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k007121_device::device_reset()
+{
+	DEVICE_RESET_NAME( k007121 )(this);
+}
+
+
+const device_type K007342 = &device_creator<k007342_device>;
+
+k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K007342, "Konami 007342", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k007342_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k007342_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k007342_device::device_start()
+{
+	DEVICE_START_NAME( k007342 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k007342_device::device_reset()
+{
+	DEVICE_RESET_NAME( k007342 )(this);
+}
+
+
+const device_type K007420 = &device_creator<k007420_device>;
+
+k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K007420, "Konami 007420", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k007420_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k007420_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k007420_device::device_start()
+{
+	DEVICE_START_NAME( k007420 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k007420_device::device_reset()
+{
+	DEVICE_RESET_NAME( k007420 )(this);
+}
+
+
+const device_type K052109 = &device_creator<k052109_device>;
+
+k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K052109, "Konami 052109", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k052109_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k052109_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k052109_device::device_start()
+{
+	DEVICE_START_NAME( k052109 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k052109_device::device_reset()
+{
+	DEVICE_RESET_NAME( k052109 )(this);
+}
+
+
+const device_type K051960 = &device_creator<k051960_device>;
+
+k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K051960, "Konami 051960", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k051960_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k051960_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k051960_device::device_start()
+{
+	DEVICE_START_NAME( k051960 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k051960_device::device_reset()
+{
+	DEVICE_RESET_NAME( k051960 )(this);
+}
+
+
+const device_type K053244 = &device_creator<k05324x_device>;
+
+k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053244, "Konami 053244 & 053245", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k05324x_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k05324x_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k05324x_device::device_start()
+{
+	DEVICE_START_NAME( k05324x )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k05324x_device::device_reset()
+{
+	DEVICE_RESET_NAME( k05324x )(this);
+}
+
+
+const device_type K053246 = &device_creator<k053247_device>;
+
+k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053246, "Konami 053246 & 053247", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k053247_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k053247_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k053247_device::device_start()
+{
+	DEVICE_START_NAME( k053247 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k053247_device::device_reset()
+{
+	DEVICE_RESET_NAME( k053247 )(this);
+}
+
+
+const device_type K055673 = &device_creator<k055673_device>;
+
+k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K055673, "Konami 055673", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k053247_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k055673_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k055673_device::device_start()
+{
+	DEVICE_START_NAME( k055673 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k055673_device::device_reset()
+{
+	DEVICE_RESET_NAME( k053247 )(this);
+}
+
+
+const device_type K051316 = &device_creator<k051316_device>;
+
+k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K051316, "Konami 051316", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k051316_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k051316_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k051316_device::device_start()
+{
+	DEVICE_START_NAME( k051316 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k051316_device::device_reset()
+{
+	DEVICE_RESET_NAME( k051316 )(this);
+}
+
+
+const device_type K053936 = &device_creator<k053936_device>;
+
+k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053936, "Konami 053936", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k053936_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k053936_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k053936_device::device_start()
+{
+	DEVICE_START_NAME( k053936 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k053936_device::device_reset()
+{
+	DEVICE_RESET_NAME( k053936 )(this);
+}
+
+
+const device_type K053251 = &device_creator<k053251_device>;
+
+k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053251, "Konami 053251", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k053251_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k053251_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k053251_device::device_start()
+{
+	DEVICE_START_NAME( k053251 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k053251_device::device_reset()
+{
+	DEVICE_RESET_NAME( k053251 )(this);
+}
+
+
+const device_type K054000 = &device_creator<k054000_device>;
+
+k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K054000, "Konami 054000", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k054000_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k054000_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k054000_device::device_start()
+{
+	DEVICE_START_NAME( k054000 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k054000_device::device_reset()
+{
+	DEVICE_RESET_NAME( k054000 )(this);
+}
+
+
+const device_type K051733 = &device_creator<k051733_device>;
+
+k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K051733, "Konami 051733", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k051733_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k051733_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k051733_device::device_start()
+{
+	DEVICE_START_NAME( k051733 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k051733_device::device_reset()
+{
+	DEVICE_RESET_NAME( k051733 )(this);
+}
+
+
+const device_type K056832 = &device_creator<k056832_device>;
+
+k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K056832, "Konami 056832", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k056832_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k056832_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k056832_device::device_start()
+{
+	DEVICE_START_NAME( k056832 )(this);
+}
+
+
+const device_type K055555 = &device_creator<k055555_device>;
+
+k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K055555, "Konami 055555", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k055555_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k055555_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k055555_device::device_start()
+{
+	DEVICE_START_NAME( k055555 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k055555_device::device_reset()
+{
+	DEVICE_RESET_NAME( k055555 )(this);
+}
+
+
+const device_type K054338 = &device_creator<k054338_device>;
+
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k054338_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k054338_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k054338_device::device_start()
+{
+	DEVICE_START_NAME( k054338 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k054338_device::device_reset()
+{
+	DEVICE_RESET_NAME( k054338 )(this);
+}
+
+
+const device_type K001006 = &device_creator<k001006_device>;
+
+k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K001006, "Konami 001006", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k001006_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k001006_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k001006_device::device_start()
+{
+	DEVICE_START_NAME( k001006 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k001006_device::device_reset()
+{
+	DEVICE_RESET_NAME( k001006 )(this);
+}
+
+
+const device_type K001005 = &device_creator<k001005_device>;
+
+k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K001005, "Konami 001005", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k001005_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k001005_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k001005_device::device_start()
+{
+	DEVICE_START_NAME( k001005 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k001005_device::device_reset()
+{
+	DEVICE_RESET_NAME( k001005 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void k001005_device::device_stop()
+{
+	DEVICE_STOP_NAME( k001005 )(this);
+}
+
+
+const device_type K001604 = &device_creator<k001604_device>;
+
+k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K001604, "Konami 001604", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k001604_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k001604_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k001604_device::device_start()
+{
+	DEVICE_START_NAME( k001604 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k001604_device::device_reset()
+{
+	DEVICE_RESET_NAME( k001604 )(this);
+}
+
+
+const device_type K037122 = &device_creator<k037122_device>;
+
+k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K037122, "Konami 0371222", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k037122_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k037122_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k037122_device::device_start()
+{
+	DEVICE_START_NAME( k037122 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k037122_device::device_reset()
+{
+	DEVICE_RESET_NAME( k037122 )(this);
+}
+
+

@@ -116,7 +116,7 @@ INLINE mb87078_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == MB87078);
 
-	return (mb87078_state *)downcast<legacy_device_base *>(device)->token();
+	return (mb87078_state *)downcast<mb87078_device *>(device)->token();
 }
 
 INLINE const mb87078_interface *get_interface( device_t *device )
@@ -280,4 +280,40 @@ DEVICE_GET_INFO(mb87078)
  }
 }
 
-DEFINE_LEGACY_DEVICE(MB87078, mb87078);
+const device_type MB87078 = &device_creator<mb87078_device>;
+
+mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MB87078, "Fujitsu MB87078", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mb87078_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mb87078_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mb87078_device::device_start()
+{
+	DEVICE_START_NAME( mb87078 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mb87078_device::device_reset()
+{
+	DEVICE_RESET_NAME( mb87078 )(this);
+}
+
+

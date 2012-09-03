@@ -28,9 +28,57 @@
 #define APPLEFDC_PH2	0x04
 #define APPLEFDC_PH3	0x08
 
-DECLARE_LEGACY_DEVICE(APPLEFDC, applefdc);
-DECLARE_LEGACY_DEVICE(IWM, iwm);
-DECLARE_LEGACY_DEVICE(SWIM, swim);
+class applefdc_base_device : public device_t
+{
+public:
+	applefdc_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~applefdc_base_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start() { }
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+class applefdc_device : public applefdc_base_device
+{
+public:
+	applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type APPLEFDC;
+
+class iwm_device : public applefdc_base_device
+{
+public:
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type IWM;
+
+class swim_device : public applefdc_base_device
+{
+public:
+	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type SWIM;
+
 
 
 

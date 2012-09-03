@@ -61,7 +61,7 @@ INLINE t6w28_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == T6W28);
-	return (t6w28_state *)downcast<legacy_device_base *>(device)->token();
+	return (t6w28_state *)downcast<t6w28_device *>(device)->token();
 }
 
 
@@ -392,4 +392,42 @@ DEVICE_GET_INFO( t6w28 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(T6W28, t6w28);
+const device_type T6W28 = &device_creator<t6w28_device>;
+
+t6w28_device::t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, T6W28, "T6W28", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(t6w28_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void t6w28_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void t6w28_device::device_start()
+{
+	DEVICE_START_NAME( t6w28 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void t6w28_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

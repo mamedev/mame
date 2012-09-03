@@ -156,7 +156,7 @@ INLINE smc91c9x_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == SMC91C94 || device->type() == SMC91C96);
 
-	return (smc91c9x_state *)downcast<legacy_device_base *>(device)->token();
+	return (smc91c9x_state *)downcast<smc91c9x_device *>(device)->token();
 }
 
 
@@ -628,7 +628,55 @@ DEVICE_GET_INFO( smc91c96 )
 	}
 }
 
+smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(smc91c9x_state));
+}
 
-DEFINE_LEGACY_DEVICE(SMC91C94, smc91c94);
-DEFINE_LEGACY_DEVICE(SMC91C96, smc91c96);
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void smc91c9x_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void smc91c9x_device::device_start()
+{
+	DEVICE_START_NAME( smc91c9x )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void smc91c9x_device::device_reset()
+{
+	DEVICE_RESET_NAME( smc91c9x )(this);
+}
+
+
+const device_type SMC91C94 = &device_creator<smc91c94_device>;
+
+smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: smc91c9x_device(mconfig, SMC91C94, "SMC91C94", tag, owner, clock)
+{
+}
+
+
+const device_type SMC91C96 = &device_creator<smc91c96_device>;
+
+smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: smc91c9x_device(mconfig, SMC91C96, "SMC91C96", tag, owner, clock)
+{
+}
+
+
 

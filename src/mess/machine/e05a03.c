@@ -56,7 +56,7 @@ INLINE e05a03_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == E05A03);
 
-	return (e05a03_state *)downcast<legacy_device_base *>(device)->token();
+	return (e05a03_state *)downcast<e05a03_device *>(device)->token();
 }
 
 
@@ -238,4 +238,40 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_init_w )
 	e05a03_resi_w(device, state);
 }
 
-DEFINE_LEGACY_DEVICE(E05A03, e05a03);
+const device_type E05A03 = &device_creator<e05a03_device>;
+
+e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, E05A03, "E05A03", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(e05a03_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void e05a03_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void e05a03_device::device_start()
+{
+	DEVICE_START_NAME( e05a03 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void e05a03_device::device_reset()
+{
+	DEVICE_RESET_NAME( e05a03 )(this);
+}
+
+

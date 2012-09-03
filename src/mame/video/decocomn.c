@@ -26,7 +26,7 @@ INLINE decocomn_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == DECOCOMN);
 
-	return (decocomn_state *)downcast<legacy_device_base *>(device)->token();
+	return (decocomn_state *)downcast<decocomn_device *>(device)->token();
 }
 
 INLINE const decocomn_interface *get_interface( device_t *device )
@@ -162,4 +162,40 @@ DEVICE_GET_INFO( decocomn )
 }
 
 
-DEFINE_LEGACY_DEVICE(DECOCOMN, decocomn);
+const device_type DECOCOMN = &device_creator<decocomn_device>;
+
+decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECOCOMN, "Data East Common Video Functions", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(decocomn_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void decocomn_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void decocomn_device::device_start()
+{
+	DEVICE_START_NAME( decocomn )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void decocomn_device::device_reset()
+{
+	DEVICE_RESET_NAME( decocomn )(this);
+}
+
+

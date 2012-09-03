@@ -2829,4 +2829,40 @@ DEVICE_GET_INFO( mc68328 )
     }
 }
 
-DEFINE_LEGACY_DEVICE(MC68328, mc68328);
+const device_type MC68328 = &device_creator<mc68328_device>;
+
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MC68328, "Motorola MC68328 (DragonBall) Integrated Processor", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mc68328_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc68328_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc68328_device::device_start()
+{
+	DEVICE_START_NAME( mc68328 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc68328_device::device_reset()
+{
+	DEVICE_RESET_NAME( mc68328 )(this);
+}
+
+

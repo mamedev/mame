@@ -572,7 +572,7 @@ INLINE pc080sn_state *pc080sn_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == PC080SN);
 
-	return (pc080sn_state *)downcast<legacy_device_base *>(device)->token();
+	return (pc080sn_state *)downcast<pc080sn_device *>(device)->token();
 }
 
 INLINE const pc080sn_interface *pc080sn_get_interface( device_t *device )
@@ -1064,7 +1064,7 @@ INLINE pc090oj_state *pc090oj_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == PC090OJ);
 
-	return (pc090oj_state *)downcast<legacy_device_base *>(device)->token();
+	return (pc090oj_state *)downcast<pc090oj_device *>(device)->token();
 }
 
 INLINE const pc090oj_interface *pc090oj_get_interface( device_t *device )
@@ -1272,7 +1272,7 @@ INLINE tc0080vco_state *tc0080vco_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0080VCO);
 
-	return (tc0080vco_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0080vco_state *)downcast<tc0080vco_device *>(device)->token();
 }
 
 INLINE const tc0080vco_interface *tc0080vco_get_interface( device_t *device )
@@ -1955,7 +1955,7 @@ INLINE tc0100scn_state *tc0100scn_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0100SCN);
 
-	return (tc0100scn_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0100scn_state *)downcast<tc0100scn_device *>(device)->token();
 }
 
 INLINE const tc0100scn_interface *tc0100scn_get_interface( device_t *device )
@@ -2559,7 +2559,7 @@ INLINE tc0280grd_state *tc0280grd_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert((device->type() == TC0280GRD) || (device->type() == TC0430GRW));
 
-	return (tc0280grd_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0280grd_state *)downcast<tc0280grd_device *>(device)->token();
 }
 
 INLINE const tc0280grd_interface *tc0280grd_get_interface( device_t *device )
@@ -2729,7 +2729,7 @@ INLINE tc0360pri_state *tc0360pri_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0360PRI);
 
-	return (tc0360pri_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0360pri_state *)downcast<tc0360pri_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -2821,7 +2821,7 @@ INLINE tc0480scp_state *tc0480scp_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0480SCP);
 
-	return (tc0480scp_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0480scp_state *)downcast<tc0480scp_device *>(device)->token();
 }
 
 INLINE const tc0480scp_interface *tc0480scp_get_interface( device_t *device )
@@ -3762,7 +3762,7 @@ INLINE tc0150rod_state *tc0150rod_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0150ROD);
 
-	return (tc0150rod_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0150rod_state *)downcast<tc0150rod_device *>(device)->token();
 }
 
 INLINE const tc0150rod_interface *tc0150rod_get_interface( device_t *device )
@@ -4574,7 +4574,7 @@ INLINE tc0110pcr_state *tc0110pcr_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0110PCR);
 
-	return (tc0110pcr_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0110pcr_state *)downcast<tc0110pcr_device *>(device)->token();
 }
 
 INLINE const tc0110pcr_interface *tc0110pcr_get_interface( device_t *device )
@@ -4805,7 +4805,7 @@ INLINE tc0180vcu_state *tc0180vcu_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0180VCU);
 
-	return (tc0180vcu_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0180vcu_state *)downcast<tc0180vcu_device *>(device)->token();
 }
 
 INLINE const tc0180vcu_interface *tc0180vcu_get_interface( device_t *device )
@@ -5340,13 +5340,346 @@ DEVICE_GET_INFO( tc0180vcu )
 }
 
 
-DEFINE_LEGACY_DEVICE(PC080SN, pc080sn);
-DEFINE_LEGACY_DEVICE(PC090OJ, pc090oj);
-DEFINE_LEGACY_DEVICE(TC0080VCO, tc0080vco);
-DEFINE_LEGACY_DEVICE(TC0100SCN, tc0100scn);
-DEFINE_LEGACY_DEVICE(TC0280GRD, tc0280grd);
-DEFINE_LEGACY_DEVICE(TC0360PRI, tc0360pri);
-DEFINE_LEGACY_DEVICE(TC0480SCP, tc0480scp);
-DEFINE_LEGACY_DEVICE(TC0150ROD, tc0150rod);
-DEFINE_LEGACY_DEVICE(TC0110PCR, tc0110pcr);
-DEFINE_LEGACY_DEVICE(TC0180VCU, tc0180vcu);
+const device_type PC080SN = &device_creator<pc080sn_device>;
+
+pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pc080sn_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pc080sn_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc080sn_device::device_start()
+{
+	DEVICE_START_NAME( pc080sn )(this);
+}
+
+
+const device_type PC090OJ = &device_creator<pc090oj_device>;
+
+pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pc090oj_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pc090oj_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc090oj_device::device_start()
+{
+	DEVICE_START_NAME( pc090oj )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pc090oj_device::device_reset()
+{
+	DEVICE_RESET_NAME( pc090oj )(this);
+}
+
+
+const device_type TC0080VCO = &device_creator<tc0080vco_device>;
+
+tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0080vco_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0080vco_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0080vco_device::device_start()
+{
+	DEVICE_START_NAME( tc0080vco )(this);
+}
+
+
+const device_type TC0100SCN = &device_creator<tc0100scn_device>;
+
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0100scn_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0100scn_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0100scn_device::device_start()
+{
+	DEVICE_START_NAME( tc0100scn )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0100scn_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0100scn )(this);
+}
+
+
+const device_type TC0280GRD = &device_creator<tc0280grd_device>;
+
+tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0280grd_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0280grd_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0280grd_device::device_start()
+{
+	DEVICE_START_NAME( tc0280grd )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0280grd_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0280grd )(this);
+}
+
+
+const device_type TC0360PRI = &device_creator<tc0360pri_device>;
+
+tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0360pri_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0360pri_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0360pri_device::device_start()
+{
+	DEVICE_START_NAME( tc0360pri )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0360pri_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0360pri )(this);
+}
+
+
+const device_type TC0480SCP = &device_creator<tc0480scp_device>;
+
+tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0480scp_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0480scp_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0480scp_device::device_start()
+{
+	DEVICE_START_NAME( tc0480scp )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0480scp_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0480scp )(this);
+}
+
+
+const device_type TC0150ROD = &device_creator<tc0150rod_device>;
+
+tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0150rod_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0150rod_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0150rod_device::device_start()
+{
+	DEVICE_START_NAME( tc0150rod )(this);
+}
+
+
+const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
+
+tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0110pcr_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0110pcr_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0110pcr_device::device_start()
+{
+	DEVICE_START_NAME( tc0110pcr )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0110pcr_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0110pcr )(this);
+}
+
+
+const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
+
+tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0180vcu_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0180vcu_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0180vcu_device::device_start()
+{
+	DEVICE_START_NAME( tc0180vcu )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0180vcu_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0180vcu )(this);
+}
+
+

@@ -230,7 +230,7 @@ INLINE leland_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == LELAND || device->type() == LELAND_80186 || device->type() == REDLINE_80186);
 
-	return (leland_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (leland_sound_state *)downcast<leland_sound_device *>(device)->token();
 }
 
 static STREAM_UPDATE( leland_update )
@@ -623,9 +623,141 @@ DEVICE_GET_INFO( redline_80186_sound )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(LELAND, leland_sound);
-DEFINE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
-DEFINE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
+const device_type LELAND = &device_creator<leland_sound_device>;
+
+leland_sound_device::leland_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, LELAND, "Leland DAC", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(leland_sound_state));
+}
+
+leland_sound_device::leland_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(leland_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void leland_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void leland_sound_device::device_start()
+{
+	DEVICE_START_NAME( leland_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void leland_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type LELAND_80186 = &device_creator<leland_80186_sound_device>;
+
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: leland_sound_device(mconfig, LELAND_80186, "Leland 80186 DAC", tag, owner, clock)
+{
+}
+
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: leland_sound_device(mconfig, type, name, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void leland_80186_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void leland_80186_sound_device::device_start()
+{
+	DEVICE_START_NAME( leland_80186_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void leland_80186_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( leland_80186_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void leland_80186_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type REDLINE_80186 = &device_creator<redline_80186_sound_device>;
+
+redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: leland_80186_sound_device(mconfig, REDLINE_80186, "Redline Racer 80186 DAC", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void redline_80186_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void redline_80186_sound_device::device_start()
+{
+	DEVICE_START_NAME( redline_80186_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void redline_80186_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 static void leland_80186_reset(device_t *device)

@@ -288,7 +288,7 @@ INLINE digitalker *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DIGITALKER);
-	return (digitalker *)downcast<legacy_device_base *>(device)->token();
+	return (digitalker *)downcast<digitalker_device *>(device)->token();
 }
 
 
@@ -705,4 +705,42 @@ WRITE8_DEVICE_HANDLER( digitalker_data_w )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(DIGITALKER, digitalker);
+const device_type DIGITALKER = &device_creator<digitalker_device>;
+
+digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(digitalker));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void digitalker_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void digitalker_device::device_start()
+{
+	DEVICE_START_NAME( digitalker )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

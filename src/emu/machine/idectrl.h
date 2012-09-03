@@ -186,7 +186,26 @@ WRITE16_DEVICE_HANDLER( ide_controller16_w );
 
 /* ----- device interface ----- */
 
-DECLARE_LEGACY_DEVICE(IDE_CONTROLLER, ide_controller);
+class ide_controller_device : public device_t
+{
+public:
+	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~ide_controller_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type IDE_CONTROLLER;
+
 
 
 #endif	/* __IDECTRL_H__ */

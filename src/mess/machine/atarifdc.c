@@ -74,7 +74,7 @@ INLINE atari_fdc_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == ATARI_FDC);
 
-	return (atari_fdc_t *)downcast<legacy_device_base *>(device)->token();
+	return (atari_fdc_t *)downcast<atari_fdc_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -840,4 +840,50 @@ DEVICE_GET_INFO( atari_fdc )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(ATARI_FDC, atari_fdc);
+const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
+
+atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(atari_fdc_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void atari_fdc_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void atari_fdc_device::device_start()
+{
+	DEVICE_START_NAME( atari_fdc )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void atari_fdc_device::device_reset()
+{
+	DEVICE_RESET_NAME( atari_fdc )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor atari_fdc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( atari_fdc  );
+}
+
+

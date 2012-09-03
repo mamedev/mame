@@ -30,7 +30,7 @@ INLINE cps3_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == CPS3);
 
-	return (cps3_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (cps3_sound_state *)downcast<cps3_sound_device *>(device)->token();
 }
 
 static STREAM_UPDATE( cps3_stream_update )
@@ -188,4 +188,42 @@ READ32_DEVICE_HANDLER( cps3_sound_r )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(CPS3, cps3_sound);
+const device_type CPS3 = &device_creator<cps3_sound_device>;
+
+cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CPS3, "CPS3 Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(cps3_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cps3_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cps3_sound_device::device_start()
+{
+	DEVICE_START_NAME( cps3_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

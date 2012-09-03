@@ -201,7 +201,7 @@ INLINE deco16ic_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == DECO16IC);
 
-	return (deco16ic_state *)downcast<legacy_device_base *>(device)->token();
+	return (deco16ic_state *)downcast<deco16ic_device *>(device)->token();
 }
 
 INLINE const deco16ic_interface *get_interface( device_t *device )
@@ -1010,4 +1010,40 @@ DEVICE_GET_INFO( deco16ic )
 }
 
 
-DEFINE_LEGACY_DEVICE(DECO16IC, deco16ic);
+const device_type DECO16IC = &device_creator<deco16ic_device>;
+
+deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO16IC, "Data East IC 55 / 56 / 74 / 141", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(deco16ic_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void deco16ic_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void deco16ic_device::device_start()
+{
+	DEVICE_START_NAME( deco16ic )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void deco16ic_device::device_reset()
+{
+	DEVICE_RESET_NAME( deco16ic )(this);
+}
+
+

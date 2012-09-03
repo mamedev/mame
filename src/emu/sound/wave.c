@@ -109,4 +109,41 @@ DEVICE_GET_INFO( wave )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(WAVE, wave);
+const device_type WAVE = &device_creator<wave_device>;
+
+wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, WAVE, "Cassette", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void wave_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void wave_device::device_start()
+{
+	DEVICE_START_NAME( wave )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

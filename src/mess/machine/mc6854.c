@@ -225,7 +225,7 @@ INLINE mc6854_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MC6854 );
-	return (mc6854_t*) downcast<legacy_device_base *>(device)->token();
+	return (mc6854_t*) downcast<mc6854_device *>(device)->token();
 }
 
 
@@ -1061,4 +1061,40 @@ DEVICE_GET_INFO( mc6854 ) {
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MC6854, mc6854);
+const device_type MC6854 = &device_creator<mc6854_device>;
+
+mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MC6854, "Motorola MC6854 ADLC", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mc6854_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc6854_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc6854_device::device_start()
+{
+	DEVICE_START_NAME( mc6854 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc6854_device::device_reset()
+{
+	DEVICE_RESET_NAME( mc6854 )(this);
+}
+
+

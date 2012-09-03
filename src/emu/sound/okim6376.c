@@ -91,7 +91,7 @@ INLINE okim6376_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == OKIM6376);
-	return (okim6376_state *)downcast<legacy_device_base *>(device)->token();
+	return (okim6376_state *)downcast<okim6376_device *>(device)->token();
 }
 
 
@@ -646,4 +646,51 @@ DEVICE_GET_INFO( okim6376 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(OKIM6376, okim6376);
+const device_type OKIM6376 = &device_creator<okim6376_device>;
+
+okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(okim6376_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void okim6376_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void okim6376_device::device_start()
+{
+	DEVICE_START_NAME( okim6376 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void okim6376_device::device_reset()
+{
+	DEVICE_RESET_NAME( okim6376 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

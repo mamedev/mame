@@ -49,7 +49,28 @@ INPUT_PORTS_EXTERN( tf20 );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(TF20, tf20);
+class tf20_device : public device_t
+{
+public:
+	tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~tf20_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TF20;
+
 
 #define MCFG_TF20_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TF20, 0) \

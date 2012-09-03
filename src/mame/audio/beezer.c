@@ -126,7 +126,7 @@ INLINE beezer_sound_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == BEEZER);
 
-	return (beezer_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (beezer_sound_state *)downcast<beezer_sound_device *>(device)->token();
 }
 
 /*************************************
@@ -395,7 +395,54 @@ static DEVICE_START( beezer_sound )
 	DEVICE_START_CALL(common_sh_start);
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(BEEZER, beezer_sound);
+const device_type BEEZER = &device_creator<beezer_sound_device>;
+
+beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(beezer_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void beezer_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void beezer_sound_device::device_start()
+{
+	DEVICE_START_NAME( beezer_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+static DEVICE_RESET( beezer_sound );
+void beezer_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( beezer_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void beezer_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 /*************************************
  *

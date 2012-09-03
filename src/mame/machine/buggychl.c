@@ -27,7 +27,7 @@ INLINE buggychl_mcu_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == BUGGYCHL_MCU);
 
-	return (buggychl_mcu_state *)downcast<legacy_device_base *>(device)->token();
+	return (buggychl_mcu_state *)downcast<buggychl_mcu_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -254,4 +254,40 @@ DEVICE_GET_INFO(buggychl_mcu)
  }
 }
 
-DEFINE_LEGACY_DEVICE(BUGGYCHL_MCU, buggychl_mcu);
+const device_type BUGGYCHL_MCU = &device_creator<buggychl_mcu_device>;
+
+buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BUGGYCHL_MCU, "BuggyChl MCU", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(buggychl_mcu_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void buggychl_mcu_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void buggychl_mcu_device::device_start()
+{
+	DEVICE_START_NAME( buggychl_mcu )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void buggychl_mcu_device::device_reset()
+{
+	DEVICE_RESET_NAME( buggychl_mcu )(this);
+}
+
+

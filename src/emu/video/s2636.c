@@ -119,7 +119,7 @@ INLINE s2636_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == S2636);
 
-	return (s2636_state *)downcast<legacy_device_base *>(device)->token();
+	return (s2636_state *)downcast<s2636_device *>(device)->token();
 }
 
 INLINE const s2636_interface *get_interface( device_t *device )
@@ -377,4 +377,31 @@ DEVICE_GET_INFO(s2636)
  }
 }
 
-DEFINE_LEGACY_DEVICE(S2636, s2636);
+const device_type S2636 = &device_creator<s2636_device>;
+
+s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(s2636_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void s2636_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s2636_device::device_start()
+{
+	DEVICE_START_NAME( s2636 )(this);
+}
+
+

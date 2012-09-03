@@ -74,7 +74,7 @@ INLINE strata_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == STRATAFLASH);
 
-	return (strata_t *)downcast<legacy_device_base *>(device)->token();
+	return (strata_t *)downcast<strataflash_device *>(device)->token();
 }
 
 static DEVICE_START( strataflash )
@@ -118,7 +118,34 @@ DEVICE_GET_INFO( strataflash )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(STRATAFLASH, strataflash);
+const device_type STRATAFLASH = &device_creator<strataflash_device>;
+
+strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(strata_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void strataflash_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void strataflash_device::device_start()
+{
+	DEVICE_START_NAME( strataflash )(this);
+}
+
+
 
 /*
     load the FEEPROM contents from file

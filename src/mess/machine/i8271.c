@@ -183,7 +183,7 @@ INLINE i8271_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == I8271);
 
-	return (i8271_t *)downcast<legacy_device_base *>(device)->token();
+	return (i8271_t *)downcast<i8271_device *>(device)->token();
 }
 
 
@@ -1596,4 +1596,40 @@ DEVICE_GET_INFO( i8271 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(I8271, i8271);
+const device_type I8271 = &device_creator<i8271_device>;
+
+i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(i8271_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8271_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8271_device::device_start()
+{
+	DEVICE_START_NAME( i8271 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void i8271_device::device_reset()
+{
+	DEVICE_RESET_NAME( i8271 )(this);
+}
+
+

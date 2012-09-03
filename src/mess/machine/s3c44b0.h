@@ -35,7 +35,26 @@ enum
 	S3C44B0_GPIO_PORT_G
 };
 
-DECLARE_LEGACY_DEVICE(S3C44B0, s3c44b0);
+class s3c44b0_device : public device_t
+{
+public:
+	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~s3c44b0_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type S3C44B0;
+
 
 /*******************************************************************************
     TYPE DEFINITIONS

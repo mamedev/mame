@@ -123,14 +123,36 @@ struct _renegade_adpcm_state
 	UINT8 *m_base;
 } _renegade_adpcm_state_dummy;
 
-DECLARE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
+class renegade_adpcm_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~renegade_adpcm_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type RENEGADE_ADPCM;
+
 
 INLINE renegade_adpcm_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RENEGADE_ADPCM);
 
-	return (renegade_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	return (renegade_adpcm_state *)downcast<renegade_adpcm_device *>(device)->token();
 }
 
 static STREAM_UPDATE( renegade_adpcm_callback )
@@ -185,7 +207,45 @@ DEVICE_GET_INFO( renegade_adpcm )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
+const device_type RENEGADE_ADPCM = &device_creator<renegade_adpcm_device>;
+
+renegade_adpcm_device::renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, RENEGADE_ADPCM, "Renegade Custom ADPCM", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(renegade_adpcm_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void renegade_adpcm_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void renegade_adpcm_device::device_start()
+{
+	DEVICE_START_NAME( renegade_adpcm )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void renegade_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 WRITE8_MEMBER(renegade_state::adpcm_play_w)

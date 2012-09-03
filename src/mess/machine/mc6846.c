@@ -87,7 +87,7 @@ INLINE mc6846_t* get_safe_token( device_t *device )
 {
 	assert( device != NULL );
 	assert( device->type() == MC6846 );
-	return (mc6846_t*) downcast<legacy_device_base *>(device)->token();
+	return (mc6846_t*) downcast<mc6846_device *>(device)->token();
 }
 
 
@@ -631,4 +631,40 @@ DEVICE_GET_INFO( mc6846 ) {
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MC6846, mc6846);
+const device_type MC6846 = &device_creator<mc6846_device>;
+
+mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mc6846_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc6846_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc6846_device::device_start()
+{
+	DEVICE_START_NAME( mc6846 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mc6846_device::device_reset()
+{
+	DEVICE_RESET_NAME( mc6846 )(this);
+}
+
+

@@ -50,7 +50,7 @@ INLINE tf20_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TF20);
 
-	return (tf20_state *)downcast<legacy_device_base *>(device)->token();
+	return (tf20_state *)downcast<tf20_device *>(device)->token();
 }
 
 
@@ -384,4 +384,61 @@ DEVICE_GET_INFO( tf20 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(TF20, tf20);
+const device_type TF20 = &device_creator<tf20_device>;
+
+tf20_device::tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TF20, "TF-20", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tf20_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tf20_device::device_config_complete()
+{
+	m_shortname = "tf20";
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tf20_device::device_start()
+{
+	DEVICE_START_NAME( tf20 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tf20_device::device_reset()
+{
+	DEVICE_RESET_NAME( tf20 )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor tf20_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( tf20  );
+}
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  the device's ROM definitions
+//-------------------------------------------------
+
+const rom_entry *tf20_device::device_rom_region() const
+{
+	return ROM_NAME(tf20 );
+}
+
+

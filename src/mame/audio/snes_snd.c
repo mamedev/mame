@@ -238,7 +238,7 @@ INLINE snes_sound_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == SNES);
 
-	return (snes_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (snes_sound_state *)downcast<snes_sound_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -1377,4 +1377,51 @@ DEVICE_GET_INFO(snes_sound)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(SNES, snes_sound);
+const device_type SNES = &device_creator<snes_sound_device>;
+
+snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(snes_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void snes_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void snes_sound_device::device_start()
+{
+	DEVICE_START_NAME( snes_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void snes_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( snes_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void snes_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

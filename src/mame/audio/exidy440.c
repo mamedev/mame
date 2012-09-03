@@ -124,7 +124,30 @@ static void decode_and_filter_cvsd(device_t *device, UINT8 *data, int bytes, int
 static void fir_filter(device_t *device, INT32 *input, INT16 *output, int count);
 
 
-DECLARE_LEGACY_SOUND_DEVICE(EXIDY440, exidy440_sound);
+class exidy440_sound_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~exidy440_sound_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type EXIDY440;
+
 
 /*************************************
  *
@@ -137,7 +160,7 @@ INLINE exidy440_audio_state *get_safe_token(device_t *device)
 	assert(device != NULL);
         assert(device->type() == EXIDY440);
 
-        return (exidy440_audio_state *)downcast<legacy_device_base *>(device)->token();
+        return (exidy440_audio_state *)downcast<exidy440_sound_device *>(device)->token();
 }
 
 static DEVICE_START( exidy440_sound )
@@ -984,7 +1007,54 @@ DEVICE_GET_INFO( exidy440_sound )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(EXIDY440, exidy440_sound);
+const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
+
+exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(exidy440_audio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void exidy440_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void exidy440_sound_device::device_start()
+{
+	DEVICE_START_NAME( exidy440_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void exidy440_sound_device::device_stop()
+{
+	DEVICE_STOP_NAME( exidy440_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 

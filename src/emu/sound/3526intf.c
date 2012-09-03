@@ -39,7 +39,7 @@ INLINE ym3526_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM3526);
-	return (ym3526_state *)downcast<legacy_device_base *>(device)->token();
+	return (ym3526_state *)downcast<ym3526_device *>(device)->token();
 }
 
 
@@ -171,4 +171,60 @@ DEVICE_GET_INFO( ym3526 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(YM3526, ym3526);
+const device_type YM3526 = &device_creator<ym3526_device>;
+
+ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(ym3526_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ym3526_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ym3526_device::device_start()
+{
+	DEVICE_START_NAME( ym3526 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ym3526_device::device_reset()
+{
+	DEVICE_RESET_NAME( ym3526 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ym3526_device::device_stop()
+{
+	DEVICE_STOP_NAME( ym3526 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

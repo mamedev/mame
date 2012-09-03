@@ -73,7 +73,7 @@ INLINE astrocade_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ASTROCADE);
-	return (astrocade_state *)downcast<legacy_device_base *>(device)->token();
+	return (astrocade_state *)downcast<astrocade_device *>(device)->token();
 }
 
 
@@ -331,4 +331,51 @@ DEVICE_GET_INFO( astrocade )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(ASTROCADE, astrocade);
+const device_type ASTROCADE = &device_creator<astrocade_device>;
+
+astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(astrocade_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void astrocade_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void astrocade_device::device_start()
+{
+	DEVICE_START_NAME( astrocade )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void astrocade_device::device_reset()
+{
+	DEVICE_RESET_NAME( astrocade )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void astrocade_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

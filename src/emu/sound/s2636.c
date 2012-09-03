@@ -22,7 +22,7 @@ static s2636_sound *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == S2636_SOUND);
-	return (s2636_sound *) downcast<legacy_device_base *>(device)->token();
+	return (s2636_sound *) downcast<s2636_sound_device *>(device)->token();
 }
 
 
@@ -99,4 +99,42 @@ DEVICE_GET_INFO( s2636_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(S2636_SOUND, s2636_sound);
+const device_type S2636_SOUND = &device_creator<s2636_sound_device>;
+
+s2636_sound_device::s2636_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S2636_SOUND, "S2636", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(s2636_sound));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void s2636_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s2636_sound_device::device_start()
+{
+	DEVICE_START_NAME( s2636_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void s2636_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

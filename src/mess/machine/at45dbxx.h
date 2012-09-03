@@ -20,17 +20,57 @@
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(AT45DB041, at45db041);
+class at45db041_device : public device_t
+{
+public:
+	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~at45db041_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type AT45DB041;
+
 
 #define MCFG_AT45DB041_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB041, 0) \
 
-DECLARE_LEGACY_DEVICE(AT45DB081, at45db081);
+class at45db081_device : public at45db041_device
+{
+public:
+	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type AT45DB081;
+
 
 #define MCFG_AT45DB081_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB081, 0) \
 
-DECLARE_LEGACY_DEVICE(AT45DB161, at45db161);
+class at45db161_device : public at45db041_device
+{
+public:
+	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type AT45DB161;
+
 
 #define MCFG_AT45DB161_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB161, 0) \

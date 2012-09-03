@@ -21,7 +21,7 @@ INLINE segapcm_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SEGAPCM);
-	return (segapcm_state *)downcast<legacy_device_base *>(device)->token();
+	return (segapcm_state *)downcast<segapcm_device *>(device)->token();
 }
 
 static STREAM_UPDATE( SEGAPCM_update )
@@ -176,4 +176,42 @@ DEVICE_GET_INFO( segapcm )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SEGAPCM, segapcm);
+const device_type SEGAPCM = &device_creator<segapcm_device>;
+
+segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGAPCM, "Sega PCM", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(segapcm_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void segapcm_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void segapcm_device::device_start()
+{
+	DEVICE_START_NAME( segapcm )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

@@ -61,7 +61,7 @@ static void decode_command(er59256_t *er59256);
 INLINE er59256_t *get_token(device_t *device)
 {
 	assert(device->type() == ER59256);
-	return (er59256_t *) downcast<legacy_device_base *>(device)->token();
+	return (er59256_t *) downcast<er59256_device *>(device)->token();
 }
 
 
@@ -248,4 +248,40 @@ DEVICE_GET_INFO( er59256 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(ER59256, er59256);
+const device_type ER59256 = &device_creator<er59256_device>;
+
+er59256_device::er59256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ER59256, "Microchip ER59256 serial eeprom.", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(er59256_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void er59256_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void er59256_device::device_start()
+{
+	DEVICE_START_NAME( er59256 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void er59256_device::device_stop()
+{
+	DEVICE_STOP_NAME( er59256 )(this);
+}
+
+

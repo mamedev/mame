@@ -82,7 +82,7 @@ INLINE k053252_state *k053252_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K053252);
 
-	return (k053252_state *)downcast<legacy_device_base *>(device)->token();
+	return (k053252_state *)downcast<k053252_device *>(device)->token();
 }
 
 INLINE const k053252_interface *k053252_get_interface( device_t *device )
@@ -252,5 +252,41 @@ DEVICE_GET_INFO( k053252 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(K053252, k053252);
+const device_type K053252 = &device_creator<k053252_device>;
+
+k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053252, "Konami 053252", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k053252_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k053252_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k053252_device::device_start()
+{
+	DEVICE_START_NAME( k053252 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k053252_device::device_reset()
+{
+	DEVICE_RESET_NAME( k053252 )(this);
+}
+
+
 

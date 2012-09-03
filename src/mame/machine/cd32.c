@@ -81,7 +81,7 @@ INLINE akiko_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == AKIKO);
 
-	return (akiko_state *)downcast<legacy_device_base *>(device)->token();
+	return (akiko_state *)downcast<akiko_device *>(device)->token();
 }
 
 static DEVICE_STOP( akiko )
@@ -933,4 +933,49 @@ DEVICE_GET_INFO(akiko)
  }
 }
 
-DEFINE_LEGACY_DEVICE(AKIKO, akiko);
+const device_type AKIKO = &device_creator<akiko_device>;
+
+akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, AKIKO, "Akiko", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(akiko_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void akiko_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void akiko_device::device_start()
+{
+	DEVICE_START_NAME( akiko )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void akiko_device::device_reset()
+{
+	DEVICE_RESET_NAME( akiko )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void akiko_device::device_stop()
+{
+	DEVICE_STOP_NAME( akiko )(this);
+}
+
+

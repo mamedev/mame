@@ -137,7 +137,7 @@ INLINE ymz280b_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YMZ280B);
-	return (ymz280b_state *)downcast<legacy_device_base *>(device)->token();
+	return (ymz280b_state *)downcast<ymz280b_device *>(device)->token();
 }
 
 
@@ -1073,4 +1073,51 @@ DEVICE_GET_INFO( ymz280b )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(YMZ280B, ymz280b);
+const device_type YMZ280B = &device_creator<ymz280b_device>;
+
+ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(ymz280b_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ymz280b_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ymz280b_device::device_start()
+{
+	DEVICE_START_NAME( ymz280b )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ymz280b_device::device_reset()
+{
+	DEVICE_RESET_NAME( ymz280b )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

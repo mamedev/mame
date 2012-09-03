@@ -535,7 +535,7 @@ INLINE mc68328_t* mc68328_get_safe_token( device_t *device )
 {
     assert( device != NULL );
     assert( device->type() == MC68328 );
-    return (mc68328_t*) downcast<legacy_device_base *>(device)->token();
+    return (mc68328_t*) downcast<mc68328_device *>(device)->token();
 }
 
 #endif // __MC68328_PRIVATE_H_

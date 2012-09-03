@@ -60,7 +60,7 @@ INLINE uPD7002_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == UPD7002);
 
-	return (uPD7002_t *)downcast<legacy_device_base *>(device)->token();
+	return (uPD7002_t *)downcast<uPD7002_device *>(device)->token();
 }
 
 READ8_DEVICE_HANDLER ( uPD7002_EOC_r )
@@ -230,4 +230,40 @@ DEVICE_GET_INFO( uPD7002 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(UPD7002, uPD7002);
+const device_type UPD7002 = &device_creator<uPD7002_device>;
+
+uPD7002_device::uPD7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, UPD7002, "uPD7002", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(uPD7002_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void uPD7002_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void uPD7002_device::device_start()
+{
+	DEVICE_START_NAME( uPD7002 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void uPD7002_device::device_reset()
+{
+	DEVICE_RESET_NAME( uPD7002 )(this);
+}
+
+

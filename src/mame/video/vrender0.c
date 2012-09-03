@@ -95,7 +95,7 @@ INLINE vr0video_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == VIDEO_VRENDER0);
 
-	return (vr0video_state *)downcast<legacy_device_base *>(device)->token();
+	return (vr0video_state *)downcast<vr0video_device *>(device)->token();
 }
 
 INLINE const vr0video_interface *get_interface( device_t *device )
@@ -614,4 +614,40 @@ DEVICE_GET_INFO(vr0video)
   case DEVINFO_STR_NAME: strcpy(info->s, "VRender0"); break;
  }
 }
-DEFINE_LEGACY_DEVICE(VIDEO_VRENDER0, vr0video);
+const device_type VIDEO_VRENDER0 = &device_creator<vr0video_device>;
+
+vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VIDEO_VRENDER0, "VRender0", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vr0video_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vr0video_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vr0video_device::device_start()
+{
+	DEVICE_START_NAME( vr0video )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vr0video_device::device_reset()
+{
+	DEVICE_RESET_NAME( vr0video )(this);
+}
+
+

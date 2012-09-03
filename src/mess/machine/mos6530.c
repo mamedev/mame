@@ -82,7 +82,7 @@ INLINE mos6530_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MOS6530);
-	return (mos6530_state *)downcast<legacy_device_base *>(device)->token();
+	return (mos6530_state *)downcast<mos6530_device *>(device)->token();
 }
 
 
@@ -455,4 +455,40 @@ DEVICE_GET_INFO( mos6530 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(MOS6530, mos6530);
+const device_type MOS6530 = &device_creator<mos6530_device>;
+
+mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MOS6530, "MOS6530", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mos6530_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mos6530_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mos6530_device::device_start()
+{
+	DEVICE_START_NAME( mos6530 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mos6530_device::device_reset()
+{
+	DEVICE_RESET_NAME( mos6530 )(this);
+}
+
+

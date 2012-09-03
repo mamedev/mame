@@ -48,7 +48,7 @@ INLINE rp5h01_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == RP5H01));
-	return (rp5h01_state *)downcast<legacy_device_base *>(device)->token();
+	return (rp5h01_state *)downcast<rp5h01_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -240,4 +240,40 @@ DEVICE_GET_INFO(rp5h01)
  }
 }
 
-DEFINE_LEGACY_DEVICE(RP5H01, rp5h01);
+const device_type RP5H01 = &device_creator<rp5h01_device>;
+
+rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, RP5H01, "RP5H01", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(rp5h01_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void rp5h01_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void rp5h01_device::device_start()
+{
+	DEVICE_START_NAME( rp5h01 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void rp5h01_device::device_reset()
+{
+	DEVICE_RESET_NAME( rp5h01 )(this);
+}
+
+

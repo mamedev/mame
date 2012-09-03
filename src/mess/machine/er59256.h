@@ -14,7 +14,26 @@
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(ER59256, er59256);
+class er59256_device : public device_t
+{
+public:
+	er59256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~er59256_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type ER59256;
+
 
 #define MCFG_ER59256_ADD(_tag)	\
 	MCFG_DEVICE_ADD((_tag), ER59256, 0)

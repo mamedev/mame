@@ -18,10 +18,60 @@
     MACROS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(UPD765A, upd765a);
-DECLARE_LEGACY_DEVICE(UPD765B, upd765b);
-DECLARE_LEGACY_DEVICE(SMC37C78, smc37c78);
-DECLARE_LEGACY_DEVICE(UPD72065, upd72065);
+class upd765a_device : public device_t
+{
+public:
+	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd765a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~upd765a_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type UPD765A;
+
+class upd765b_device : public upd765a_device
+{
+public:
+	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type UPD765B;
+
+class smc37c78_device : public upd765a_device
+{
+public:
+	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type SMC37C78;
+
+class upd72065_device : public upd765a_device
+{
+public:
+	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type UPD72065;
+
 
 /***************************************************************************
     TYPE DEFINITIONS

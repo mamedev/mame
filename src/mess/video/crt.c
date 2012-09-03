@@ -64,7 +64,7 @@ INLINE crt_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == CRT);
 
-	return (crt_t *)downcast<legacy_device_base *>(device)->token();
+	return (crt_t *)downcast<crt_device *>(device)->token();
 }
 
 static DEVICE_START( crt )
@@ -118,7 +118,34 @@ DEVICE_GET_INFO( crt )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(CRT, crt);
+const device_type CRT = &device_creator<crt_device>;
+
+crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CRT, "CRT Video", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(crt_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void crt_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void crt_device::device_start()
+{
+	DEVICE_START_NAME( crt )(this);
+}
+
+
 
 /*
     crt_plot

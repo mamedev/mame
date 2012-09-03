@@ -20,7 +20,7 @@ INLINE channelf_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CHANNELF);
-	return (channelf_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (channelf_sound_state *)downcast<channelf_sound_device *>(device)->token();
 }
 
 void channelf_sound_w(device_t *device, int mode)
@@ -149,4 +149,42 @@ DEVICE_GET_INFO( channelf_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(CHANNELF, channelf_sound);
+const device_type CHANNELF = &device_creator<channelf_sound_device>;
+
+channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CHANNELF, "Channel F", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(channelf_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void channelf_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void channelf_sound_device::device_start()
+{
+	DEVICE_START_NAME( channelf_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void channelf_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

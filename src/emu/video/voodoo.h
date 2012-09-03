@@ -128,8 +128,66 @@ READ32_DEVICE_HANDLER( banshee_rom_r );
 
 /* ----- device interface ----- */
 
-DECLARE_LEGACY_DEVICE(VOODOO_1, voodoo_1);
-DECLARE_LEGACY_DEVICE(VOODOO_2, voodoo_2);
-DECLARE_LEGACY_DEVICE(VOODOO_BANSHEE, voodoo_banshee);
-DECLARE_LEGACY_DEVICE(VOODOO_3, voodoo_3);
+class voodoo_device : public device_t
+{
+public:
+	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~voodoo_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_stop();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+class voodoo_1_device : public voodoo_device
+{
+public:
+	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type VOODOO_1;
+
+class voodoo_2_device : public voodoo_device
+{
+public:
+	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type VOODOO_2;
+
+class voodoo_banshee_device : public voodoo_device
+{
+public:
+	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type VOODOO_BANSHEE;
+
+class voodoo_3_device : public voodoo_device
+{
+public:
+	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+extern const device_type VOODOO_3;
+
 #endif

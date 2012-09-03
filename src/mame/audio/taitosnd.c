@@ -39,7 +39,7 @@ INLINE tc0140syt_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TC0140SYT);
 
-	return (tc0140syt_state *)downcast<legacy_device_base *>(device)->token();
+	return (tc0140syt_state *)downcast<tc0140syt_device *>(device)->token();
 }
 
 INLINE const tc0140syt_interface *get_interface( device_t *device )
@@ -327,4 +327,40 @@ DEVICE_GET_INFO(tc0140syt)
  }
 }
 
-DEFINE_LEGACY_DEVICE(TC0140SYT, tc0140syt);
+const device_type TC0140SYT = &device_creator<tc0140syt_device>;
+
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0140syt_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0140syt_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0140syt_device::device_start()
+{
+	DEVICE_START_NAME( tc0140syt )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0140syt_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0140syt )(this);
+}
+
+

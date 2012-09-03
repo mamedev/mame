@@ -239,7 +239,7 @@ INLINE vdt_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == VDT911);
 
-	return (vdt_t *)downcast<legacy_device_base *>(device)->token();
+	return (vdt_t *)downcast<vdt911_device *>(device)->token();
 }
 
 /*
@@ -287,7 +287,34 @@ DEVICE_GET_INFO( vdt911 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(VDT911, vdt911);
+const device_type VDT911 = &device_creator<vdt911_device>;
+
+vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vdt_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vdt911_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vdt911_device::device_start()
+{
+	DEVICE_START_NAME( vdt911 )(this);
+}
+
+
 
 /*
     timer callback to toggle blink state

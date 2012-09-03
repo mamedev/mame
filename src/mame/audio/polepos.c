@@ -51,7 +51,7 @@ INLINE polepos_sound_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == POLEPOS);
 
-	return (polepos_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (polepos_sound_state *)downcast<polepos_sound_device *>(device)->token();
 }
 
 /************************************/
@@ -369,4 +369,51 @@ DISCRETE_SOUND_START(polepos)
 DISCRETE_SOUND_END
 
 
-DEFINE_LEGACY_SOUND_DEVICE(POLEPOS, polepos_sound);
+const device_type POLEPOS = &device_creator<polepos_sound_device>;
+
+polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, POLEPOS, "Pole Position Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(polepos_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void polepos_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void polepos_sound_device::device_start()
+{
+	DEVICE_START_NAME( polepos_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void polepos_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( polepos_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

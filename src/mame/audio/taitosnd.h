@@ -15,7 +15,26 @@ struct _tc0140syt_interface
 	const char         *slave;
 };
 
-DECLARE_LEGACY_DEVICE(TC0140SYT, tc0140syt);
+class tc0140syt_device : public device_t
+{
+public:
+	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~tc0140syt_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TC0140SYT;
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

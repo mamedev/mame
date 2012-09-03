@@ -106,7 +106,7 @@ INLINE duart68681_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == DUART68681);
 
-	return (duart68681_state *)downcast<legacy_device_base *>(device)->token();
+	return (duart68681_state *)downcast<duart68681_device *>(device)->token();
 }
 
 static void duart68681_update_interrupts(duart68681_state *duart68681)
@@ -928,4 +928,40 @@ DEVICE_GET_INFO(duart68681)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(DUART68681, duart68681);
+const device_type DUART68681 = &device_creator<duart68681_device>;
+
+duart68681_device::duart68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DUART68681, "DUART 68681", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(duart68681_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void duart68681_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void duart68681_device::device_start()
+{
+	DEVICE_START_NAME( duart68681 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void duart68681_device::device_reset()
+{
+	DEVICE_RESET_NAME( duart68681 )(this);
+}
+
+

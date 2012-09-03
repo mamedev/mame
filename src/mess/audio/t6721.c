@@ -103,7 +103,7 @@ INLINE t6721_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == T6721);
 
-	return (t6721_state *)downcast<legacy_device_base *>(device)->token();
+	return (t6721_state *)downcast<t6721_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -303,4 +303,40 @@ DEVICE_GET_INFO(t6721)
  }
 }
 
-DEFINE_LEGACY_DEVICE(T6721, t6721);
+const device_type T6721 = &device_creator<t6721_device>;
+
+t6721_device::t6721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, T6721, "Toshiba 6721A", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(t6721_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void t6721_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void t6721_device::device_start()
+{
+	DEVICE_START_NAME( t6721 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void t6721_device::device_reset()
+{
+	DEVICE_RESET_NAME( t6721 )(this);
+}
+
+

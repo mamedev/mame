@@ -23,7 +23,7 @@ INLINE mb14241_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == MB14241);
 
-	return (mb14241_state *)downcast<legacy_device_base *>(device)->token();
+	return (mb14241_state *)downcast<mb14241_device *>(device)->token();
 }
 
 /*****************************************************************************
@@ -82,4 +82,40 @@ DEVICE_GET_INFO(mb14241)
  }
 }
 
-DEFINE_LEGACY_DEVICE(MB14241, mb14241);
+const device_type MB14241 = &device_creator<mb14241_device>;
+
+mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MB14241, "MB14241", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(mb14241_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mb14241_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mb14241_device::device_start()
+{
+	DEVICE_START_NAME( mb14241 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mb14241_device::device_reset()
+{
+	DEVICE_RESET_NAME( mb14241 )(this);
+}
+
+

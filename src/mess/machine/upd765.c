@@ -171,7 +171,7 @@ INLINE upd765_t *get_safe_token(device_t *device)
 	assert(device->type() == UPD765A || device->type() == UPD765B ||
 		device->type() == SMC37C78 || device->type() == UPD72065);
 
-	return (upd765_t *)downcast<legacy_device_base *>(device)->token();
+	return (upd765_t *)downcast<upd765a_device *>(device)->token();
 }
 
 static device_t *current_image(device_t *device)
@@ -2540,7 +2540,96 @@ DEVICE_GET_INFO( upd72065 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(UPD765A, upd765a);
-DEFINE_LEGACY_DEVICE(UPD765B, upd765b);
-DEFINE_LEGACY_DEVICE(SMC37C78, smc37c78);
-DEFINE_LEGACY_DEVICE(UPD72065, upd72065);
+const device_type UPD765A = &device_creator<upd765a_device>;
+
+upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, UPD765A, "UPD765A", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(upd765_t));
+}
+upd765a_device::upd765a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(upd765_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void upd765a_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void upd765a_device::device_start()
+{
+	DEVICE_START_NAME( upd765a )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void upd765a_device::device_reset()
+{
+	DEVICE_RESET_NAME( upd765 )(this);
+}
+
+
+const device_type UPD765B = &device_creator<upd765b_device>;
+
+upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: upd765a_device(mconfig, UPD765B, "UPD765B", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void upd765b_device::device_start()
+{
+	DEVICE_START_NAME( upd765b )(this);
+}
+
+
+const device_type SMC37C78 = &device_creator<smc37c78_device>;
+
+smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: upd765a_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void smc37c78_device::device_start()
+{
+	DEVICE_START_NAME( smc37c78 )(this);
+}
+
+
+const device_type UPD72065 = &device_creator<upd72065_device>;
+
+upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: upd765a_device(mconfig, UPD72065, "UPD72065", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void upd72065_device::device_start()
+{
+	DEVICE_START_NAME( upd72065 )(this);
+}
+
+

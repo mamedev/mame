@@ -3394,7 +3394,7 @@ INLINE teletext_t *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == SAA505X);
 
-	return (teletext_t *)downcast<legacy_device_base *>(device)->token();
+	return (teletext_t *)downcast<saa505x_device *>(device)->token();
 }
 
 static DEVICE_START( saa505x )
@@ -3425,7 +3425,34 @@ DEVICE_GET_INFO( saa505x )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(SAA505X, saa505x);
+const device_type SAA505X = &device_creator<saa505x_device>;
+
+saa505x_device::saa505x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SAA505X, "SAA505x Video", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(teletext_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void saa505x_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void saa505x_device::device_start()
+{
+	DEVICE_START_NAME( saa505x )(this);
+}
+
+
 
 void teletext_data_w(device_t *device, int offset, int data)
 {

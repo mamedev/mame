@@ -42,10 +42,73 @@ double tms5220_time_to_ready(device_t *device);
 
 void tms5220_set_frequency(device_t *device, int frequency);
 
-DECLARE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
-DECLARE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);
-DECLARE_LEGACY_SOUND_DEVICE(TMC0285, tmc0285);
-DECLARE_LEGACY_SOUND_DEVICE(TMS5200, tms5200);
+class tms5220_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~tms5220_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type TMS5220;
+
+class tms5220c_device : public tms5220_device
+{
+public:
+	tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type TMS5220C;
+
+class tmc0285_device : public tms5220_device
+{
+public:
+	tmc0285_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type TMC0285;
+
+class tms5200_device : public tms5220_device
+{
+public:
+	tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type TMS5200;
+
 
 
 /***************************************************************************

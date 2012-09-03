@@ -135,7 +135,7 @@ INLINE sp0256_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SP0256);
-	return (sp0256_state *)downcast<legacy_device_base *>(device)->token();
+	return (sp0256_state *)downcast<sp0256_device *>(device)->token();
 }
 
 
@@ -1390,4 +1390,51 @@ DEVICE_GET_INFO( sp0256 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SP0256, sp0256);
+const device_type SP0256 = &device_creator<sp0256_device>;
+
+sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SP0256, "SP0256", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(sp0256_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void sp0256_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sp0256_device::device_start()
+{
+	DEVICE_START_NAME( sp0256 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sp0256_device::device_reset()
+{
+	DEVICE_RESET_NAME( sp0256 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

@@ -116,7 +116,7 @@ INLINE upd71071_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == UPD71071);
 
-	return (upd71071_t*)downcast<legacy_device_base *>(device)->token();
+	return (upd71071_t*)downcast<upd71071_device *>(device)->token();
 }
 
 static TIMER_CALLBACK(dma_transfer_timer)
@@ -441,4 +441,31 @@ DEVICE_GET_INFO(upd71071)
 READ8_DEVICE_HANDLER(upd71071_r) { return upd71071_read(device,offset); }
 WRITE8_DEVICE_HANDLER(upd71071_w) { upd71071_write(device,offset,data); }
 
-DEFINE_LEGACY_DEVICE(UPD71071, upd71071);
+const device_type UPD71071 = &device_creator<upd71071_device>;
+
+upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, UPD71071, "NEC uPD71071", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(upd71071_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void upd71071_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void upd71071_device::device_start()
+{
+	DEVICE_START_NAME( upd71071 )(this);
+}
+
+

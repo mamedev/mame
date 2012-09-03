@@ -38,7 +38,7 @@ INLINE timeplt_audio_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == TIMEPLT_AUDIO);
 
-	return (timeplt_audio_state *)downcast<legacy_device_base *>(device)->token();
+	return (timeplt_audio_state *)downcast<timeplt_audio_device *>(device)->token();
 }
 
 
@@ -273,4 +273,42 @@ DEVICE_GET_INFO(timeplt_audio)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(TIMEPLT_AUDIO, timeplt_audio);
+const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
+
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(timeplt_audio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void timeplt_audio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void timeplt_audio_device::device_start()
+{
+	DEVICE_START_NAME( timeplt_audio )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void timeplt_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

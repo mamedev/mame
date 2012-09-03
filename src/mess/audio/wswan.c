@@ -52,7 +52,7 @@ INLINE wswan_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == WSWAN);
-	return (wswan_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (wswan_sound_state *)downcast<wswan_sound_device *>(device)->token();
 }
 
 static void wswan_ch_set_freq( running_machine &machine, struct CHAN *ch, UINT16 freq )
@@ -265,4 +265,42 @@ DEVICE_GET_INFO( wswan_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(WSWAN, wswan_sound);
+const device_type WSWAN = &device_creator<wswan_sound_device>;
+
+wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, WSWAN, "WonderSwan Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(wswan_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void wswan_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void wswan_sound_device::device_start()
+{
+	DEVICE_START_NAME( wswan_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void wswan_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

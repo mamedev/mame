@@ -13,7 +13,7 @@ INLINE tia_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TIA);
-	return (tia_state *)downcast<legacy_device_base *>(device)->token();
+	return (tia_state *)downcast<tia_device *>(device)->token();
 }
 
 
@@ -76,4 +76,51 @@ DEVICE_GET_INFO( tia )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(TIA, tia);
+const device_type TIA = &device_creator<tia_device>;
+
+tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TIA, "TIA", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tia_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tia_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tia_device::device_start()
+{
+	DEVICE_START_NAME( tia )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void tia_device::device_stop()
+{
+	DEVICE_STOP_NAME( tia )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

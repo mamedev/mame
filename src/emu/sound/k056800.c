@@ -29,7 +29,7 @@ INLINE k056800_state *k056800_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == K056800);
 
-	return (k056800_state *)downcast<legacy_device_base *>(device)->token();
+	return (k056800_state *)downcast<k056800_device *>(device)->token();
 }
 
 INLINE const k056800_interface *k056800_get_interface( device_t *device )
@@ -179,4 +179,40 @@ DEVICE_GET_INFO(k056800)
  }
 }
 
-DEFINE_LEGACY_DEVICE(K056800, k056800);
+const device_type K056800 = &device_creator<k056800_device>;
+
+k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K056800, "Konami 056800 MIRAC", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(k056800_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k056800_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k056800_device::device_start()
+{
+	DEVICE_START_NAME( k056800 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k056800_device::device_reset()
+{
+	DEVICE_RESET_NAME( k056800 )(this);
+}
+
+

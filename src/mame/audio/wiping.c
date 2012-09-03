@@ -61,7 +61,7 @@ INLINE wiping_sound_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == WIPING);
 
-	return (wiping_sound_state *)downcast<legacy_device_base *>(device)->token();
+	return (wiping_sound_state *)downcast<wiping_sound_device *>(device)->token();
 }
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
@@ -278,4 +278,42 @@ WRITE8_DEVICE_HANDLER( wiping_sound_w )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(WIPING, wiping_sound);
+const device_type WIPING = &device_creator<wiping_sound_device>;
+
+wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, WIPING, "Wiping Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(wiping_sound_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void wiping_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void wiping_sound_device::device_start()
+{
+	DEVICE_START_NAME( wiping_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

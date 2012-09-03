@@ -58,7 +58,7 @@ INLINE hd63484_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == HD63484);
 
-	return (hd63484_state *)downcast<legacy_device_base *>(device)->token();
+	return (hd63484_state *)downcast<hd63484_device *>(device)->token();
 }
 
 INLINE const hd63484_interface *get_interface( device_t *device )
@@ -1591,4 +1591,40 @@ DEVICE_GET_INFO(hd63484)
  }
 }
 
-DEFINE_LEGACY_DEVICE(HD63484, hd63484);
+const device_type HD63484 = &device_creator<hd63484_device>;
+
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HD63484, "HD63484", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(hd63484_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void hd63484_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void hd63484_device::device_start()
+{
+	DEVICE_START_NAME( hd63484 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void hd63484_device::device_reset()
+{
+	DEVICE_RESET_NAME( hd63484 )(this);
+}
+
+

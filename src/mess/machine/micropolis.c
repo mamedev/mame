@@ -113,7 +113,7 @@ INLINE micropolis_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == MICROPOLIS);
 
-	return (micropolis_state *)downcast<legacy_device_base *>(device)->token();
+	return (micropolis_state *)downcast<micropolis_device *>(device)->token();
 }
 
 
@@ -396,4 +396,40 @@ DEVICE_GET_INFO(micropolis)
  }
 }
 
-DEFINE_LEGACY_DEVICE(MICROPOLIS, micropolis);
+const device_type MICROPOLIS = &device_creator<micropolis_device>;
+
+micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(micropolis_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void micropolis_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void micropolis_device::device_start()
+{
+	DEVICE_START_NAME( micropolis )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void micropolis_device::device_reset()
+{
+	DEVICE_RESET_NAME( micropolis )(this);
+}
+
+

@@ -316,7 +316,7 @@ INLINE voodoo_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert((device->type() == VOODOO_1) || (device->type() == VOODOO_2) || (device->type() == VOODOO_BANSHEE) ||  (device->type() == VOODOO_3));
 
-	return (voodoo_state *)downcast<legacy_device_base *>(device)->token();
+	return (voodoo_state *)downcast<voodoo_device *>(device)->token();
 }
 
 
@@ -5713,10 +5713,109 @@ static void dump_rasterizer_stats(voodoo_state *v)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(VOODOO_1, voodoo_1);
-DEFINE_LEGACY_DEVICE(VOODOO_2, voodoo_2);
-DEFINE_LEGACY_DEVICE(VOODOO_BANSHEE, voodoo_banshee);
-DEFINE_LEGACY_DEVICE(VOODOO_3, voodoo_3);
+voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(voodoo_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void voodoo_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void voodoo_device::device_reset()
+{
+	DEVICE_RESET_NAME( voodoo )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void voodoo_device::device_stop()
+{
+	DEVICE_STOP_NAME( voodoo )(this);
+}
+
+
+const device_type VOODOO_1 = &device_creator<voodoo_1_device>;
+
+voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: voodoo_device(mconfig, VOODOO_1, "3dfx Voodoo Graphics", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void voodoo_1_device::device_start()
+{
+	DEVICE_START_NAME( voodoo_1 )(this);
+}
+
+
+const device_type VOODOO_2 = &device_creator<voodoo_2_device>;
+
+voodoo_2_device::voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: voodoo_device(mconfig, VOODOO_2, "3dfx Voodoo 2", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void voodoo_2_device::device_start()
+{
+	DEVICE_START_NAME( voodoo_2 )(this);
+}
+
+
+const device_type VOODOO_BANSHEE = &device_creator<voodoo_banshee_device>;
+
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: voodoo_device(mconfig, VOODOO_BANSHEE, "3dfx Voodoo Banshee", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void voodoo_banshee_device::device_start()
+{
+	DEVICE_START_NAME( voodoo_banshee )(this);
+}
+
+
+const device_type VOODOO_3 = &device_creator<voodoo_3_device>;
+
+voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: voodoo_device(mconfig, VOODOO_3, "3dfx Voodoo 3", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void voodoo_3_device::device_start()
+{
+	DEVICE_START_NAME( voodoo_3 )(this);
+}
+
+
 
 /***************************************************************************
     GENERIC RASTERIZERS

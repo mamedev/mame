@@ -38,7 +38,7 @@ INLINE adc1038_state *adc1038_get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == ADC1038);
 
-	return (adc1038_state *)downcast<legacy_device_base *>(device)->token();
+	return (adc1038_state *)downcast<adc1038_device *>(device)->token();
 }
 
 INLINE const adc1038_interface *adc1038_get_interface( device_t *device )
@@ -179,4 +179,40 @@ DEVICE_GET_INFO(adc1038)
  }
 }
 
-DEFINE_LEGACY_DEVICE(ADC1038, adc1038);
+const device_type ADC1038 = &device_creator<adc1038_device>;
+
+adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ADC1038, "A/D Converters 1038", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(adc1038_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void adc1038_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void adc1038_device::device_start()
+{
+	DEVICE_START_NAME( adc1038 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void adc1038_device::device_reset()
+{
+	DEVICE_RESET_NAME( adc1038 )(this);
+}
+
+

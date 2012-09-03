@@ -144,7 +144,7 @@ INLINE namcoio_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == NAMCO56XX || device->type() == NAMCO58XX || device->type() == NAMCO59XX);
 
-	return (namcoio_state *)downcast<legacy_device_base *>(device)->token();
+	return (namcoio_state *)downcast<namcoio_device *>(device)->token();
 }
 
 INLINE const namcoio_interface *get_interface( device_t *device )
@@ -558,4 +558,40 @@ DEVICE_GET_INFO(namcoio)
  }
 }
 
-DEFINE_LEGACY_DEVICE(NAMCO56XX, namcoio);
+const device_type NAMCO56XX = &device_creator<namcoio_device>;
+
+namcoio_device::namcoio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NAMCO56XX, "Namco 56xx, 58xx & 59xx", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(namcoio_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void namcoio_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void namcoio_device::device_start()
+{
+	DEVICE_START_NAME( namcoio )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void namcoio_device::device_reset()
+{
+	DEVICE_RESET_NAME( namcoio )(this);
+}
+
+

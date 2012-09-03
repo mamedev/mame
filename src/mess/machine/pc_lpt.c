@@ -72,7 +72,7 @@ INLINE pc_lpt_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == PC_LPT);
 
-	return (pc_lpt_state *)downcast<legacy_device_base *>(device)->token();
+	return (pc_lpt_state *)downcast<pc_lpt_device *>(device)->token();
 }
 
 
@@ -252,7 +252,53 @@ WRITE8_DEVICE_HANDLER( pc_lpt_w )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(PC_LPT, pc_lpt);
+const device_type PC_LPT = &device_creator<pc_lpt_device>;
+
+pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC_LPT, "PC-LPT", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pc_lpt_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pc_lpt_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc_lpt_device::device_start()
+{
+	DEVICE_START_NAME( pc_lpt )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pc_lpt_device::device_reset()
+{
+	DEVICE_RESET_NAME( pc_lpt )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor pc_lpt_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( pc_lpt  );
+}
+
+
 
 static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
 {

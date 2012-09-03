@@ -18,7 +18,7 @@ INLINE hyprolyb_adpcm_state *get_safe_token( device_t *device )
 	assert(device != NULL);
 	assert(device->type() == HYPROLYB_ADPCM);
 
-	return (hyprolyb_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	return (hyprolyb_adpcm_state *)downcast<hyprolyb_adpcm_device *>(device)->token();
 }
 
 static DEVICE_START( hyprolyb_adpcm )
@@ -153,4 +153,51 @@ DEVICE_GET_INFO(hyprolyb_adpcm)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(HYPROLYB_ADPCM, hyprolyb_adpcm);
+const device_type HYPROLYB_ADPCM = &device_creator<hyprolyb_adpcm_device>;
+
+hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, HYPROLYB_ADPCM, "Hyper Olympics Audio", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(hyprolyb_adpcm_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void hyprolyb_adpcm_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void hyprolyb_adpcm_device::device_start()
+{
+	DEVICE_START_NAME( hyprolyb_adpcm )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void hyprolyb_adpcm_device::device_reset()
+{
+	DEVICE_RESET_NAME( hyprolyb_adpcm )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void hyprolyb_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

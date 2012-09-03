@@ -171,7 +171,7 @@ INLINE saa1099_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SAA1099);
-	return (saa1099_state *)downcast<legacy_device_base *>(device)->token();
+	return (saa1099_state *)downcast<saa1099_device *>(device)->token();
 }
 
 
@@ -463,4 +463,42 @@ DEVICE_GET_INFO( saa1099 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SAA1099, saa1099);
+const device_type SAA1099 = &device_creator<saa1099_device>;
+
+saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(saa1099_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void saa1099_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void saa1099_device::device_start()
+{
+	DEVICE_START_NAME( saa1099 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

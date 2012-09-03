@@ -34,7 +34,7 @@ INLINE pf10_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == PF10);
 
-	return (pf10_state *)downcast<legacy_device_base *>(device)->token();
+	return (pf10_state *)downcast<pf10_device *>(device)->token();
 }
 
 
@@ -158,4 +158,60 @@ WRITE_LINE_DEVICE_HANDLER( pf10_rxd2_w )
 	logerror("%s: pf10_rxd2_w %u\n", device->machine().describe_context(), state);
 }
 
-DEFINE_LEGACY_DEVICE(PF10, pf10);
+const device_type PF10 = &device_creator<pf10_device>;
+
+pf10_device::pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PF10, "PF-10", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pf10_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pf10_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pf10_device::device_start()
+{
+	DEVICE_START_NAME( pf10 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pf10_device::device_reset()
+{
+	DEVICE_RESET_NAME( pf10 )(this);
+}
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor pf10_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( pf10  );
+}
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  the device's ROM definitions
+//-------------------------------------------------
+
+const rom_entry *pf10_device::device_rom_region() const
+{
+	return ROM_NAME(pf10 );
+}
+
+

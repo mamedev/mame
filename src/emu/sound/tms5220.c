@@ -472,7 +472,7 @@ INLINE tms5220_state *get_safe_token(device_t *device)
 		   device->type() == TMS5220C ||
 		   device->type() == TMC0285 ||
 		   device->type() == TMS5200);
-	return (tms5220_state *)downcast<legacy_device_base *>(device)->token();
+	return (tms5220_state *)downcast<tms5220_device *>(device)->token();
 }
 
 /* Static function prototypes */
@@ -2057,10 +2057,141 @@ DEVICE_GET_INFO(tms5200)
  }
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
-DEFINE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);
-DEFINE_LEGACY_SOUND_DEVICE(TMC0285, tmc0285);
-DEFINE_LEGACY_SOUND_DEVICE(TMS5200, tms5200);
+const device_type TMS5220C = &device_creator<tms5220c_device>;
+
+tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5220_device(mconfig, TMS5220C, "TMS5220C", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5220c_device::device_start()
+{
+	DEVICE_START_NAME( tms5220c )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tms5220c_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type TMS5220 = &device_creator<tms5220_device>;
+
+tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMS5220, "TMS5220", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tms5220_state));
+}
+tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tms5220_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tms5220_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5220_device::device_start()
+{
+	DEVICE_START_NAME( tms5220 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tms5220_device::device_reset()
+{
+	DEVICE_RESET_NAME( tms5220 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tms5220_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type TMC0285 = &device_creator<tmc0285_device>;
+
+tmc0285_device::tmc0285_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5220_device(mconfig, TMC0285, "TMC0285", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tmc0285_device::device_start()
+{
+	DEVICE_START_NAME( tmc0285 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tmc0285_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type TMS5200 = &device_creator<tms5200_device>;
+
+tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms5220_device(mconfig, TMS5200, "TMS5200", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5200_device::device_start()
+{
+	DEVICE_START_NAME( tms5200 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tms5200_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 
 /******************************************************************************

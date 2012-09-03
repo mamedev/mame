@@ -58,7 +58,7 @@ INLINE vt_video_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == VT100_VIDEO);
 
-	return (vt_video_t *)downcast<legacy_device_base *>(device)->token();
+	return (vt_video_t *)downcast<vt100_video_device *>(device)->token();
 }
 
 INLINE const vt_video_interface *get_interface(device_t *device)
@@ -473,4 +473,40 @@ DEVICE_GET_INFO( vt100_video )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(VT100_VIDEO, vt100_video);
+const device_type VT100_VIDEO = &device_creator<vt100_video_device>;
+
+vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vt_video_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vt100_video_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vt100_video_device::device_start()
+{
+	DEVICE_START_NAME( vt_video )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vt100_video_device::device_reset()
+{
+	DEVICE_RESET_NAME( vt_video )(this);
+}
+
+

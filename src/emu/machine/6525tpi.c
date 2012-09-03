@@ -141,7 +141,7 @@ INLINE tpi6525_state *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == TPI6525);
 
-	return (tpi6525_state *)downcast<legacy_device_base *>(device)->token();
+	return (tpi6525_state *)downcast<tpi6525_device *>(device)->token();
 }
 
 
@@ -619,4 +619,40 @@ UINT8 tpi6525_get_ddr_c(device_t *device)
 	return tpi6525->ddr_c;
 }
 
-DEFINE_LEGACY_DEVICE(TPI6525, tpi6525);
+const device_type TPI6525 = &device_creator<tpi6525_device>;
+
+tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tpi6525_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tpi6525_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tpi6525_device::device_start()
+{
+	DEVICE_START_NAME( tpi6525 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tpi6525_device::device_reset()
+{
+	DEVICE_RESET_NAME( tpi6525 )(this);
+}
+
+

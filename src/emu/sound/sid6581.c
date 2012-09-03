@@ -16,7 +16,7 @@ static _SID6581 *get_sid(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SID6581) || (device->type() == SID8580));
-	return (_SID6581 *) downcast<legacy_device_base *>(device)->token();
+	return (_SID6581 *) downcast<sid6581_device *>(device)->token();
 }
 
 
@@ -125,5 +125,84 @@ DEVICE_GET_INFO( sid8580 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SID6581, sid6581);
-DEFINE_LEGACY_SOUND_DEVICE(SID8580, sid8580);
+const device_type SID6581 = &device_creator<sid6581_device>;
+
+sid6581_device::sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SID6581, "SID6581", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(_SID6581));
+}
+sid6581_device::sid6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(_SID6581));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void sid6581_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sid6581_device::device_start()
+{
+	DEVICE_START_NAME( sid6581 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sid6581_device::device_reset()
+{
+	DEVICE_RESET_NAME( sid )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sid6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type SID8580 = &device_creator<sid8580_device>;
+
+sid8580_device::sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sid6581_device(mconfig, SID8580, "SID8580", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sid8580_device::device_start()
+{
+	DEVICE_START_NAME( sid8580 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sid8580_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

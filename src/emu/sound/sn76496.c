@@ -160,7 +160,7 @@ INLINE sn76496_state *get_safe_token(device_t *device)
 		   device->type() == NCR7496 ||
 		   device->type() == GAMEGEAR ||
 		   device->type() == SEGAPSG);
-	return (sn76496_state *)downcast<legacy_device_base *>(device)->token();
+	return (sn76496_state *)downcast<sn76496_device *>(device)->token();
 }
 
 READ_LINE_DEVICE_HANDLER( sn76496_ready_r )
@@ -603,16 +603,294 @@ DEVICE_GET_INFO( segapsg )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SN76496, sn76496);
-DEFINE_LEGACY_SOUND_DEVICE(U8106, u8106);
-DEFINE_LEGACY_SOUND_DEVICE(Y2404, y2404);
-DEFINE_LEGACY_SOUND_DEVICE(SN76489, sn76489);
-DEFINE_LEGACY_SOUND_DEVICE(SN76489A, sn76489a);
-DEFINE_LEGACY_SOUND_DEVICE(SN76494, sn76494);
-DEFINE_LEGACY_SOUND_DEVICE(SN94624, sn94624);
-DEFINE_LEGACY_SOUND_DEVICE(NCR7496, ncr7496);
-DEFINE_LEGACY_SOUND_DEVICE(GAMEGEAR, gamegear);
-DEFINE_LEGACY_SOUND_DEVICE(SEGAPSG, segapsg);
+const device_type SN76496 = &device_creator<sn76496_device>;
+
+sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SN76496, "SN76496", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(sn76496_state));
+}
+sn76496_device::sn76496_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(sn76496_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void sn76496_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sn76496_device::device_start()
+{
+	DEVICE_START_NAME( sn76496 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sn76496_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type U8106 = &device_creator<u8106_device>;
+
+u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, U8106, "U8106", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void u8106_device::device_start()
+{
+	DEVICE_START_NAME( u8106 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void u8106_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type Y2404 = &device_creator<y2404_device>;
+
+y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, Y2404, "Y2404", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void y2404_device::device_start()
+{
+	DEVICE_START_NAME( y2404 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void y2404_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type SN76489 = &device_creator<sn76489_device>;
+
+sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, SN76489, "SN76489", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sn76489_device::device_start()
+{
+	DEVICE_START_NAME( sn76489 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sn76489_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type SN76489A = &device_creator<sn76489a_device>;
+
+sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, SN76489A, "SN76489A", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sn76489a_device::device_start()
+{
+	DEVICE_START_NAME( sn76489a )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sn76489a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type SN76494 = &device_creator<sn76494_device>;
+
+sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, SN76494, "SN76494", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sn76494_device::device_start()
+{
+	DEVICE_START_NAME( sn76494 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sn76494_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type SN94624 = &device_creator<sn94624_device>;
+
+sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, SN94624, "SN94624", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sn94624_device::device_start()
+{
+	DEVICE_START_NAME( sn94624 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void sn94624_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type NCR7496 = &device_creator<ncr7496_device>;
+
+ncr7496_device::ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, NCR7496, "NCR7496", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ncr7496_device::device_start()
+{
+	DEVICE_START_NAME( ncr7496 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ncr7496_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type GAMEGEAR = &device_creator<gamegear_device>;
+
+gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, GAMEGEAR, "Game Gear PSG", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void gamegear_device::device_start()
+{
+	DEVICE_START_NAME( gamegear )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void gamegear_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type SEGAPSG = &device_creator<segapsg_device>;
+
+segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sn76496_device(mconfig, SEGAPSG, "SEGA VDP PSG", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void segapsg_device::device_start()
+{
+	DEVICE_START_NAME( segapsg )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void segapsg_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 /*****************************************************************
     New class implementation

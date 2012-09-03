@@ -49,7 +49,7 @@ INLINE upd4701_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD4701));
-	return (upd4701_state *)downcast<legacy_device_base *>(device)->token();
+	return (upd4701_state *)downcast<upd4701_device *>(device)->token();
 }
 
 
@@ -319,4 +319,40 @@ DEVICE_GET_INFO(upd4701)
  }
 }
 
-DEFINE_LEGACY_DEVICE(UPD4701, upd4701);
+const device_type UPD4701 = &device_creator<upd4701_device>;
+
+upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, UPD4701, "NEC uPD4701 Encoder", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(upd4701_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void upd4701_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void upd4701_device::device_start()
+{
+	DEVICE_START_NAME( upd4701 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void upd4701_device::device_reset()
+{
+	DEVICE_RESET_NAME( upd4701 )(this);
+}
+
+

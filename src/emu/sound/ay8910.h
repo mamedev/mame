@@ -119,14 +119,123 @@ void ay8910_set_clock_ym(void *chip, int clock);
 void ay8910_write_ym(void *chip, int addr, int data);
 int ay8910_read_ym(void *chip);
 
-DECLARE_LEGACY_SOUND_DEVICE(AY8910, ay8910);
-DECLARE_LEGACY_SOUND_DEVICE(AY8912, ay8912);
-DECLARE_LEGACY_SOUND_DEVICE(AY8913, ay8913);
-DECLARE_LEGACY_SOUND_DEVICE(AY8914, ay8914);
-DECLARE_LEGACY_SOUND_DEVICE(AY8930, ay8930);
-DECLARE_LEGACY_SOUND_DEVICE(YM2149, ym2149);
-DECLARE_LEGACY_SOUND_DEVICE(YM3439, ym3439);
-DECLARE_LEGACY_SOUND_DEVICE(YMZ284, ymz284);
-DECLARE_LEGACY_SOUND_DEVICE(YMZ294, ymz294);
+class ay8910_device : public device_t,
+                                  public device_sound_interface
+{
+public:
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~ay8910_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_stop();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type AY8910;
+
+class ay8912_device : public ay8910_device
+{
+public:
+	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type AY8912;
+
+class ay8913_device : public ay8910_device
+{
+public:
+	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type AY8913;
+
+class ay8914_device : public ay8910_device
+{
+public:
+	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type AY8914;
+
+class ay8930_device : public ay8910_device
+{
+public:
+	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type AY8930;
+
+class ym2149_device : public ay8910_device
+{
+public:
+	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ym2149_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type YM2149;
+
+class ym3439_device : public ym2149_device
+{
+public:
+	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type YM3439;
+
+class ymz284_device : public ym2149_device
+{
+public:
+	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type YMZ284;
+
+class ymz294_device : public ym2149_device
+{
+public:
+	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+};
+
+extern const device_type YMZ294;
+
 
 #endif /* __AY8910_H__ */

@@ -205,7 +205,7 @@ INLINE es5506_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ES5505 || device->type() == ES5506);
-	return (es5506_state *)downcast<legacy_device_base *>(device)->token();
+	return (es5506_state *)downcast<es5505_device *>(device)->token();
 }
 
 
@@ -2207,5 +2207,117 @@ DEVICE_GET_INFO( es5506 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(ES5505, es5505);
-DEFINE_LEGACY_SOUND_DEVICE(ES5506, es5506);
+const device_type ES5505 = &device_creator<es5505_device>;
+
+es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ES5505, "ES5505", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(es5506_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void es5505_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void es5505_device::device_start()
+{
+	DEVICE_START_NAME( es5505 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void es5505_device::device_reset()
+{
+	DEVICE_RESET_NAME( es5505 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void es5505_device::device_stop()
+{
+	DEVICE_STOP_NAME( es5505 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void es5505_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
+const device_type ES5506 = &device_creator<es5506_device>;
+
+es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(es5506_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void es5506_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void es5506_device::device_start()
+{
+	DEVICE_START_NAME( es5506 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void es5506_device::device_reset()
+{
+	DEVICE_RESET_NAME( es5506 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void es5506_device::device_stop()
+{
+	DEVICE_STOP_NAME( es5506 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

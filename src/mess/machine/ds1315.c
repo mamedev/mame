@@ -65,7 +65,7 @@ INLINE ds1315_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DS1315);
-	return (ds1315_t *) downcast<legacy_device_base *>(device)->token();
+	return (ds1315_t *) downcast<ds1315_device *>(device)->token();
 }
 
 
@@ -264,4 +264,31 @@ DEVICE_GET_INFO( ds1315 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(DS1315, ds1315);
+const device_type DS1315 = &device_creator<ds1315_device>;
+
+ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DS1315, "Dallas Semiconductor DS1315", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(ds1315_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ds1315_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ds1315_device::device_start()
+{
+	DEVICE_START_NAME( ds1315 )(this);
+}
+
+

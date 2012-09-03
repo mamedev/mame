@@ -28,7 +28,26 @@
 #include "devlegcy.h"
 #include "devcb.h"
 
-DECLARE_LEGACY_DEVICE(PIC8259, pic8259);
+class pic8259_device : public device_t
+{
+public:
+	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~pic8259_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type PIC8259;
+
 
 /***************************************************************************
     TYPE DEFINITIONS

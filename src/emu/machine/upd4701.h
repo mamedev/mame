@@ -15,7 +15,26 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(UPD4701, upd4701);
+class upd4701_device : public device_t
+{
+public:
+	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~upd4701_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type UPD4701;
+
 
 #define MCFG_UPD4701_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, UPD4701, 0)

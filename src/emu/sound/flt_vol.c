@@ -13,7 +13,7 @@ INLINE filter_volume_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == FILTER_VOLUME);
-	return (filter_volume_state *)downcast<legacy_device_base *>(device)->token();
+	return (filter_volume_state *)downcast<filter_volume_device *>(device)->token();
 }
 
 
@@ -72,4 +72,42 @@ DEVICE_GET_INFO( filter_volume )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(FILTER_VOLUME, filter_volume);
+const device_type FILTER_VOLUME = &device_creator<filter_volume_device>;
+
+filter_volume_device::filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, FILTER_VOLUME, "Volume Filter", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(filter_volume_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void filter_volume_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void filter_volume_device::device_start()
+{
+	DEVICE_START_NAME( filter_volume )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void filter_volume_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

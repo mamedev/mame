@@ -58,7 +58,7 @@ INLINE KDAC_A_PCM *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == K007232);
-	return (KDAC_A_PCM *)downcast<legacy_device_base *>(device)->token();
+	return (KDAC_A_PCM *)downcast<k007232_device *>(device)->token();
 }
 
 
@@ -473,4 +473,42 @@ DEVICE_GET_INFO( k007232 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(K007232, k007232);
+const device_type K007232 = &device_creator<k007232_device>;
+
+k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K007232, "K007232", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(KDAC_A_PCM));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k007232_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k007232_device::device_start()
+{
+	DEVICE_START_NAME( k007232 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

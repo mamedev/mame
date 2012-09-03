@@ -50,8 +50,40 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w );
 
 
 /* ----- device interface ----- */
+class smc91c9x_device : public device_t
+{
+public:
+	smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	~smc91c9x_device() { global_free(m_token); }
 
-DECLARE_LEGACY_DEVICE(SMC91C94, smc91c94);
-DECLARE_LEGACY_DEVICE(SMC91C96, smc91c96);
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+
+class smc91c94_device : public smc91c9x_device
+{
+public:
+	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type SMC91C94;
+
+class smc91c96_device : public smc91c9x_device
+{
+public:
+	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type SMC91C96;
+
 
 #endif

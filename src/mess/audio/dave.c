@@ -100,7 +100,7 @@ INLINE dave_t *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DAVE);
-	return (dave_t *) downcast<legacy_device_base *>(device)->token();
+	return (dave_t *) downcast<dave_sound_device *>(device)->token();
 }
 
 
@@ -834,4 +834,51 @@ DEVICE_GET_INFO( dave_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(DAVE, dave_sound);
+const device_type DAVE = &device_creator<dave_sound_device>;
+
+dave_sound_device::dave_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DAVE, "Dave", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(dave_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void dave_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void dave_sound_device::device_start()
+{
+	DEVICE_START_NAME( dave_sound )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void dave_sound_device::device_reset()
+{
+	DEVICE_RESET_NAME( dave_sound )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void dave_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

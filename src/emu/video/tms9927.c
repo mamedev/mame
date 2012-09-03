@@ -64,7 +64,7 @@ INLINE tms9927_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS9927);
-	return (tms9927_state *)downcast<legacy_device_base *>(device)->token();
+	return (tms9927_state *)downcast<tms9927_device *>(device)->token();
 }
 
 
@@ -357,7 +357,78 @@ DEVICE_GET_INFO( crt5057 )
 }
 
 
-DEFINE_LEGACY_DEVICE(TMS9927, tms9927);
-DEFINE_LEGACY_DEVICE(CRT5027, crt5027);
-DEFINE_LEGACY_DEVICE(CRT5037, crt5037);
-DEFINE_LEGACY_DEVICE(CRT5057, crt5057);
+const device_type TMS9927 = &device_creator<tms9927_device>;
+
+tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tms9927_state));
+}
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tms9927_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tms9927_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms9927_device::device_start()
+{
+	DEVICE_START_NAME( tms9927 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tms9927_device::device_reset()
+{
+	DEVICE_RESET_NAME( tms9927 )(this);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void tms9927_device::device_stop()
+{
+	DEVICE_STOP_NAME( tms9927 )(this);
+}
+
+
+const device_type CRT5027 = &device_creator<crt5027_device>;
+
+crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9927_device(mconfig, CRT5027, "CRT5027", tag, owner, clock)
+{
+}
+
+
+const device_type CRT5037 = &device_creator<crt5037_device>;
+
+crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9927_device(mconfig, CRT5037, "CRT5037", tag, owner, clock)
+{
+}
+
+
+const device_type CRT5057 = &device_creator<crt5057_device>;
+
+crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock)
+{
+}
+
+

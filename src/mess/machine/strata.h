@@ -2,7 +2,25 @@
     strata.h: header file for strata.c
 */
 
-DECLARE_LEGACY_DEVICE(STRATAFLASH, strataflash);
+class strataflash_device : public device_t
+{
+public:
+	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~strataflash_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type STRATAFLASH;
+
 
 #define MCFG_STRATAFLASH_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, STRATAFLASH, 0)

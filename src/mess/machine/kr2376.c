@@ -88,7 +88,7 @@ INLINE kr2376_t *get_safe_token(device_t *device)
 	assert(device != NULL);
 	assert(device->type() == KR2376);
 
-	return (kr2376_t *)downcast<legacy_device_base *>(device)->token();
+	return (kr2376_t *)downcast<kr2376_device *>(device)->token();
 }
 
 /*-------------------------------------------------
@@ -393,4 +393,31 @@ DEVICE_GET_INFO( kr2376 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(KR2376, kr2376);
+const device_type KR2376 = &device_creator<kr2376_device>;
+
+kr2376_device::kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(kr2376_t));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void kr2376_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void kr2376_device::device_start()
+{
+	DEVICE_START_NAME( kr2376 )(this);
+}
+
+

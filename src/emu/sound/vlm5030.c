@@ -214,7 +214,7 @@ INLINE vlm5030_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VLM5030);
-	return (vlm5030_state *)downcast<legacy_device_base *>(device)->token();
+	return (vlm5030_state *)downcast<vlm5030_device *>(device)->token();
 }
 
 static int get_bits(vlm5030_state *chip, int sbit,int bits)
@@ -715,4 +715,51 @@ DEVICE_GET_INFO( vlm5030 )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(VLM5030, vlm5030);
+const device_type VLM5030 = &device_creator<vlm5030_device>;
+
+vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(vlm5030_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vlm5030_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vlm5030_device::device_start()
+{
+	DEVICE_START_NAME( vlm5030 )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vlm5030_device::device_reset()
+{
+	DEVICE_RESET_NAME( vlm5030 )(this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+

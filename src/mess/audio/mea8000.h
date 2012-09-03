@@ -11,7 +11,26 @@
 
 #include "devlegcy.h"
 
-DECLARE_LEGACY_DEVICE(MEA8000, mea8000);
+class mea8000_device : public device_t
+{
+public:
+	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mea8000_device() { global_free(m_token); }
+
+	// access to legacy token
+	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+private:
+	// internal state
+	void *m_token;
+};
+
+extern const device_type MEA8000;
+
 
 /* ---------- configuration ------------ */
 
