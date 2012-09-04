@@ -1,6 +1,13 @@
+/*****************************************************************************************
+
+Pinball
+Mephisto
+
+******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/mcs51/mcs51.h"
 
 // mephisto_state was also defined in mess/drivers/mephisto.c
 class mephisto_pinball_state : public driver_device
@@ -24,10 +31,18 @@ public:
 
 
 static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_pinball_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	//AM_RANGE(0x12000, 0x1201f) io (switches & lamps)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mephisto_cpu2, AS_PROGRAM, 8, mephisto_pinball_state )
+	AM_RANGE(0x00000, 0x07fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mephisto_cpu2_io, AS_IO, 8, mephisto_pinball_state )
+	//AM_RANGE(0x0000, 0x07ff) AM_WRITE
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mephisto )
@@ -45,6 +60,9 @@ static MACHINE_CONFIG_START( mephisto, mephisto_pinball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
+	MCFG_CPU_ADD("cpu2", I8051, 12000000)
+	MCFG_CPU_PROGRAM_MAP(mephisto_cpu2)
+	MCFG_CPU_IO_MAP(mephisto_cpu2_io)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -55,8 +73,10 @@ ROM_START(mephistp)
 	ROM_LOAD("cpu_ver1.2", 0x00000, 0x8000, CRC(845c8eb4) SHA1(2a705629990950d4e2d3a66a95e9516cf112cc88))
 	ROM_RELOAD(0x08000, 0x8000)
 	ROM_RELOAD(0xf8000, 0x8000)
+
 	ROM_REGION(0x20000, "cpu2", 0)
 	ROM_LOAD("ic15_02", 0x00000, 0x8000, CRC(2accd446) SHA1(7297e4825c33e7cf23f86fe39a0242e74874b1e2))
+
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("ic14_s0", 0x00000, 0x8000, CRC(7cea3018) SHA1(724fe7a4456cbf2ac01466d946668ee86f4410ae))
 	ROM_LOAD("ic13_s1", 0x08000, 0x8000, CRC(5a9e0f1d) SHA1(dbfd307706c51f8809f4867a199b4b62beb64379))
@@ -73,8 +93,10 @@ ROM_START(mephistp1)
 	ROM_LOAD("cpu_ver1.1", 0x00000, 0x8000, CRC(ce584902) SHA1(dd05d008bbd9b6588cb204e8d901537ffe7ddd43))
 	ROM_RELOAD(0x08000, 0x8000)
 	ROM_RELOAD(0xf8000, 0x8000)
+
 	ROM_REGION(0x20000, "cpu2", 0)
 	ROM_LOAD("ic15_02", 0x00000, 0x8000, CRC(2accd446) SHA1(7297e4825c33e7cf23f86fe39a0242e74874b1e2))
+
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("ic14_s0", 0x00000, 0x8000, CRC(7cea3018) SHA1(724fe7a4456cbf2ac01466d946668ee86f4410ae))
 	ROM_LOAD("ic13_s1", 0x08000, 0x8000, CRC(5a9e0f1d) SHA1(dbfd307706c51f8809f4867a199b4b62beb64379))

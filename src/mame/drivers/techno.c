@@ -31,7 +31,7 @@ static ADDRESS_MAP_START( techno_map, AS_PROGRAM, 16, techno_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0xffff) AM_ROM
-	AM_RANGE(0x10000, 0x17800) AM_NOP // io
+	AM_RANGE(0x10000, 0x17801) AM_NOP // io
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( techno )

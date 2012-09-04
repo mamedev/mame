@@ -1,5 +1,10 @@
-/*  Allied Leisure Cocktail Pinball
-All tables use the same base roms and some playfields even interchange between games */
+/**************************************************************************
+
+  Allied Leisure Cocktail Pinball
+  All tables use the same base roms and some playfields even interchange
+  between games.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -25,7 +30,6 @@ public:
 
 
 static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8, allied_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1400, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -49,7 +53,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( allied )
-    ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "alliedu5.bin", 0x1400, 0x0400, CRC(e4fb64fb) SHA1(a3d9de7cbfb42180a860e0bbbeaeba96d8bd1e20))
 	ROM_LOAD( "alliedu6.bin", 0x1800, 0x0400, CRC(dca980dd) SHA1(3817d75413854d889fc1ce4fd6a51d820d1e0534))
 	ROM_LOAD( "alliedu3.bin", 0x1c00, 0x0400, CRC(13f42789) SHA1(baa0f73fda08a3c5d6f1423fb329e4febb07ef97))
