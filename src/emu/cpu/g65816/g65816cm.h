@@ -109,6 +109,7 @@ struct _g65816i_cpu_struct
 	uint destination;
 	int ICount;
 	int cpu_type;
+	UINT8 rw8_cycles, rw16_cycles, rw24_cycles;
 };
 
 extern void (*const *const g65816i_opcodes[])(g65816i_cpu_struct *cpustate);
@@ -194,14 +195,14 @@ INLINE void g65816i_set_execution_mode(g65816i_cpu_struct *cpustate, uint mode)
 /* ======================================================================== */
 
 #define CLK_OP			1
-#define CLK_R8			1
-#define CLK_R16			2
-#define CLK_R24			3
-#define CLK_W8			1
-#define CLK_W16			2
-#define CLK_W24			3
-#define CLK_RMW8		3
-#define CLK_RMW16		5
+#define CLK_R8			cpustate->rw8_cycles
+#define CLK_R16			cpustate->rw16_cycles
+#define CLK_R24			cpustate->rw24_cycles
+#define CLK_W8			cpustate->rw8_cycles
+#define CLK_W16			cpustate->rw16_cycles
+#define CLK_W24			cpustate->rw24_cycles
+#define CLK_RMW8		cpustate->rw8_cycles+cpustate->rw8_cycles + 1
+#define CLK_RMW16		cpustate->rw16_cycles+cpustate->rw16_cycles + 1
 
 #define CLK_IMPLIED		1
 #define CLK_IMPLIED		1

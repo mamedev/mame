@@ -368,6 +368,10 @@ static CPU_INIT( g65816 )
 	device->save_item(NAME(cpustate->fastROM));
 
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(g65816_restore_state), cpustate));
+
+	cpustate->rw8_cycles = 1;
+	cpustate->rw16_cycles = 2;
+	cpustate->rw24_cycles = 3;
 }
 
 /**************************************************************************
@@ -555,6 +559,9 @@ static CPU_INIT( 5a22 )
 	CPU_INIT_CALL(g65816);
 
 	cpustate->cpu_type = CPU_TYPE_5A22;
+	cpustate->rw8_cycles = 0;
+	cpustate->rw16_cycles = 0;
+	cpustate->rw24_cycles = 0;
 }
 
 static CPU_RESET( 5a22 )
