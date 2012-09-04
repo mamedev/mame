@@ -259,7 +259,6 @@ ROM_START( cball )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_LOW ( "canball.6m", 0x0000, 0x0200, NO_DUMP )
-	ROM_FILL(                        0x0000, 0x0200, 0 )
 	ROM_LOAD_NIB_HIGH( "canball.6l", 0x0000, 0x0200, CRC(5b1c9e88) SHA1(6e9630db9907170c53942a21302bcf8b721590a3) )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) /* sprites */
