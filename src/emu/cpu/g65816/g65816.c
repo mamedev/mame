@@ -536,7 +536,9 @@ int bus_5A22_cycle_burst(g65816i_cpu_struct *cpustate, uint addr)
 		return 0;
 
 	if(addr & 0x408000) {
-		if(addr & 0x800000) return (cpustate->fastROM & 1) ? 6 : 8;
+		if(addr & 0x800000)
+			return (cpustate->fastROM & 1) ? 6 : 8;
+
 		return 8;
 	}
 	if((addr + 0x6000) & 0x4000) return 8;

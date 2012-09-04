@@ -663,7 +663,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			DST     = OPER_8_IMM(cpustate);											\
 			if(!(SRC & BIT))												\
 			{																\
-				CLK(1);														\
+				CLK(2);														\
 				BRANCH(cpustate, DST);												\
 			}
 
@@ -674,7 +674,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			DST     = OPER_8_IMM(cpustate);											\
 			if(SRC & BIT)													\
 			{																\
-				CLK(1);														\
+				CLK(2);														\
 				BRANCH(cpustate, DST);												\
 			}
 
@@ -684,7 +684,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			DST     = OPER_8_IMM(cpustate);											\
 			if(COND)														\
 			{																\
-				CLK(1);														\
+				CLK(2);														\
 				BRANCH(cpustate, DST);												\
 			}
 
@@ -719,7 +719,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			DST     = EA_IMM(cpustate);												\
 			if(SRC != REG_A)												\
 			{																\
-				CLK(1);														\
+				CLK(2);														\
 				BRANCH(cpustate, read_8_IMM(DST));									\
 			}
 
@@ -812,7 +812,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			DST    = EA_IMM(cpustate);												\
 			if(REG_Y != 0)													\
 			{																\
-				CLK(1);														\
+				CLK(2);														\
 				BRANCH(cpustate, read_8_IMM(DST));									\
 			}
 
@@ -826,7 +826,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			DST = EA_IMM(cpustate);													\
 			if(SRC != 0)													\
 			{																\
-				CLK(1);														\
+				CLK(2);														\
 				BRANCH(cpustate, read_8_IMM(DST));									\
 			}
 
@@ -1369,114 +1369,142 @@ static CPU_EXECUTE( spc700 )
 			case 0x01: OP_TCALL ( 8, 0            ); break; /* TCALL 0       */
 			case 0x02: OP_SET   ( 4, BIT_0        ); break; /* SET 0         */
 			case 0x03: OP_BBS   ( 5, BIT_0        ); break; /* BBS 0         */
+
 			case 0x04: OP_OR    ( 3, DP           ); break; /* ORA dp        */
 			case 0x05: OP_OR    ( 4, ABS          ); break; /* ORA abs       */
 			case 0x06: OP_OR    ( 3, XI           ); break; /* ORA xi        */
 			case 0x07: OP_OR    ( 6, DXI          ); break; /* ORA dxi       */
+
 			case 0x08: OP_OR    ( 2, IMM          ); break; /* ORA imm       */
 			case 0x09: OP_ORM   ( 6, DP , DP      ); break; /* ORM dp dp     */
 			case 0x0a: OP_OR1   ( 5               ); break; /* OR1 bit       */
 			case 0x0b: OP_ASLM  ( 4, DP           ); break; /* ASL dp        */
-			case 0x0c: OP_ASLM  ( 4, ABS          ); break; /* ASL abs       */
+
+			case 0x0c: OP_ASLM  ( 5, ABS          ); break; /* ASL abs       */
 			case 0x0d: OP_PHP   ( 4               ); break; /* PHP           */
 			case 0x0e: OP_TSET1 ( 6, ABS          ); break; /* TSET1 abs     */
 			case 0x0f: OP_BRK   ( 8               ); break; /* BRK           */
+
 			case 0x10: OP_BCC   ( 2, COND_PL()    ); break; /* BPL           */
 			case 0x11: OP_TCALL ( 8, 1            ); break; /* TCALL 1       */
 			case 0x12: OP_CLR   ( 4, BIT_0        ); break; /* CLR 0         */
 			case 0x13: OP_BBC   ( 5, BIT_0        ); break; /* BBC 0         */
+
 			case 0x14: OP_OR    ( 4, DPX          ); break; /* ORA dpx       */
 			case 0x15: OP_OR    ( 5, ABX          ); break; /* ORA abx       */
 			case 0x16: OP_OR    ( 5, ABY          ); break; /* ORA aby       */
 			case 0x17: OP_OR    ( 6, DIY          ); break; /* ORA diy       */
-			case 0x18: OP_ORM   ( 6, IMM, DP      ); break; /* ORM dp, imm   */
-			case 0x19: OP_ORM   ( 6, YI, XI       ); break; /* ORM xi, yi    */
+
+			case 0x18: OP_ORM   ( 5, IMM, DP      ); break; /* ORM dp, imm   */
+			case 0x19: OP_ORM   ( 5, YI, XI       ); break; /* ORM xi, yi    */
 			case 0x1a: OP_DECW  ( 6               ); break; /* DECW di       */
 			case 0x1b: OP_ASLM  ( 5, DPX          ); break; /* ASL dpx       */
+
 			case 0x1c: OP_ASL   ( 2               ); break; /* ASL a         */
 			case 0x1d: OP_DECR  ( 2, REG_X        ); break; /* DEC x         */
 			case 0x1e: OP_CMPR  ( 4, REG_X, ABS   ); break; /* CMP x, abs    */
 			case 0x1f: OP_JMP   ( 6, AXI          ); break; /* JMP axi       */
+
 			case 0x20: OP_CLRP  ( 2               ); break; /* CLRP          */
 			case 0x21: OP_TCALL ( 8, 2            ); break; /* TCALL 2       */
 			case 0x22: OP_SET   ( 4, BIT_1        ); break; /* SET 1         */
 			case 0x23: OP_BBS   ( 5, BIT_1        ); break; /* BBS 1         */
+
 			case 0x24: OP_AND   ( 3, DP           ); break; /* AND dp        */
 			case 0x25: OP_AND   ( 4, ABS          ); break; /* AND abs       */
 			case 0x26: OP_AND   ( 3, XI           ); break; /* AND xi        */
 			case 0x27: OP_AND   ( 6, DXI          ); break; /* AND dxi       */
+
 			case 0x28: OP_AND   ( 2, IMM          ); break; /* AND imm       */
 			case 0x29: OP_ANDM  ( 6, DP , DP      ); break; /* AND dp, dp    */
 			case 0x2a: OP_ORN1  ( 5               ); break; /* OR1 !bit      */
 			case 0x2b: OP_ROLM  ( 4, DP           ); break; /* ROL dp        */
+
 			case 0x2c: OP_ROLM  ( 5, ABS          ); break; /* ROL abs       */
 			case 0x2d: OP_PUSH  ( 4, REG_A        ); break; /* PUSH a        */
 			case 0x2e: OP_CBNE  ( 5, DP           ); break; /* CBNE dp       */
 			case 0x2f: OP_BRA   ( 4               ); break; /* BRA           */
+
 			case 0x30: OP_BCC   ( 2, COND_MI()    ); break; /* BMI           */
 			case 0x31: OP_TCALL ( 8, 3            ); break; /* TCALL 3       */
 			case 0x32: OP_CLR   ( 4, BIT_1        ); break; /* CLR 1         */
 			case 0x33: OP_BBC   ( 5, BIT_1        ); break; /* BBC 1         */
+
 			case 0x34: OP_AND   ( 4, DPX          ); break; /* AND dpx       */
 			case 0x35: OP_AND   ( 5, ABX          ); break; /* AND abx       */
 			case 0x36: OP_AND   ( 5, ABY          ); break; /* AND aby       */
 			case 0x37: OP_AND   ( 6, DIY          ); break; /* AND diy       */
+
 			case 0x38: OP_ANDM  ( 5, IMM, DP      ); break; /* AND dp, imm   */
 			case 0x39: OP_ANDM  ( 5, YI , XI      ); break; /* AND xi, yi    */
 			case 0x3a: OP_INCW  ( 6               ); break; /* INCW di       */
 			case 0x3b: OP_ROLM  ( 5, DPX          ); break; /* ROL dpx       */
+
 			case 0x3c: OP_ROL   ( 2               ); break; /* ROL acc       */
 			case 0x3d: OP_INCR  ( 2, REG_X        ); break; /* INC x         */
 			case 0x3e: OP_CMPR  ( 3, REG_X, DP    ); break; /* CMP x, dp     */
 			case 0x3f: OP_CALL  ( 8               ); break; /* CALL abs      */
+
 			case 0x40: OP_SETP  ( 2               ); break; /* RTI           */
 			case 0x41: OP_TCALL ( 8, 4            ); break; /* TCALL 4       */
 			case 0x42: OP_SET   ( 4, BIT_2        ); break; /* SET 2         */
 			case 0x43: OP_BBS   ( 5, BIT_2        ); break; /* BBS 2         */
+
 			case 0x44: OP_EOR   ( 3, DP           ); break; /* EOR dp        */
 			case 0x45: OP_EOR   ( 4, ABS          ); break; /* EOR abs       */
 			case 0x46: OP_EOR   ( 3, XI           ); break; /* EOR xi        */
 			case 0x47: OP_EOR   ( 6, DXI          ); break; /* EOR dxi       */
+
 			case 0x48: OP_EOR   ( 2, IMM          ); break; /* EOR imm       */
 			case 0x49: OP_EORM  ( 6, DP, DP       ); break; /* EOR dp, dp    */
-			case 0x4a: OP_AND1  ( 5               ); break; /* AND1 bit      */
+			case 0x4a: OP_AND1  ( 4               ); break; /* AND1 bit      */
 			case 0x4b: OP_LSRM  ( 4, DP           ); break; /* LSR dp        */
+
 			case 0x4c: OP_LSRM  ( 5, ABS          ); break; /* LSR abs       */
 			case 0x4d: OP_PUSH  ( 4, REG_X        ); break; /* PUSH x        */
 			case 0x4e: OP_TCLR1 ( 6, ABS          ); break; /* TCLR1 abs     */
 			case 0x4f: OP_PCALL ( 6               ); break; /* PCALL         */
+
 			case 0x50: OP_BCC   ( 2, COND_VC()    ); break; /* BVC           */
 			case 0x51: OP_TCALL ( 8, 5            ); break; /* TCALL 5       */
 			case 0x52: OP_CLR   ( 4, BIT_2        ); break; /* CLR 2         */
 			case 0x53: OP_BBC   ( 5, BIT_2        ); break; /* BBC 2         */
+
 			case 0x54: OP_EOR   ( 4, DPX          ); break; /* EOR dpx       */
 			case 0x55: OP_EOR   ( 5, ABX          ); break; /* EOR abx       */
 			case 0x56: OP_EOR   ( 5, ABY          ); break; /* EOR aby       */
 			case 0x57: OP_EOR   ( 6, DIY          ); break; /* EOR diy       */
+
 			case 0x58: OP_EORM  ( 5, IMM, DP      ); break; /* EOR dp, imm   */
 			case 0x59: OP_EORM  ( 5, YI , XI      ); break; /* EOR xi, yi    */
 			case 0x5a: OP_CMPW  ( 4, DP           ); break; /* CMPW dp       */
 			case 0x5b: OP_LSRM  ( 5, DPX          ); break; /* LSR dpx       */
+
 			case 0x5c: OP_LSR   ( 2               ); break; /* LSR           */
 			case 0x5d: OP_MOVRR ( 2, REG_A, REG_X ); break; /* MOV X, A      */
 			case 0x5e: OP_CMPR  ( 4, REG_Y, ABS   ); break; /* CMP Y, abs    */
 			case 0x5f: OP_JMP   ( 3, ABS          ); break; /* JMP abs       */
+
 			case 0x60: OP_CLRC  ( 2               ); break; /* CLRC          */
 			case 0x61: OP_TCALL ( 8, 6            ); break; /* TCALL 6       */
 			case 0x62: OP_SET   ( 4, BIT_3        ); break; /* SET 3         */
 			case 0x63: OP_BBS   ( 5, BIT_3        ); break; /* BBS 3         */
+
 			case 0x64: OP_CMPR  ( 3, REG_A, DP    ); break; /* CMP A, dp     */
 			case 0x65: OP_CMPR  ( 4, REG_A, ABS   ); break; /* CMP A, abs    */
 			case 0x66: OP_CMPR  ( 3, REG_A, XI    ); break; /* CMP A, xi     */
 			case 0x67: OP_CMPR  ( 6, REG_A, DXI   ); break; /* CMP A, dxi    */
+
 			case 0x68: OP_CMPR  ( 2, REG_A, IMM   ); break; /* CMP A, imm    */
 			case 0x69: OP_CMPM  ( 6, DP, DP       ); break; /* CMP dp, dp    */
 			case 0x6a: OP_ANDN1 ( 4               ); break; /* AND1 !bit     */
 			case 0x6b: OP_RORM  ( 4, DP           ); break; /* ROR dp        */
+
 			case 0x6c: OP_RORM  ( 5, ABS          ); break; /* ROR abs       */
 			case 0x6d: OP_PUSH  ( 4, REG_Y        ); break; /* PUSH Y        */
 			case 0x6e: OP_DBNZM ( 5               ); break; /* DBNZ dp       */
 			case 0x6f: OP_RET   ( 5               ); break; /* RET           */
+
 			case 0x70: OP_BCC   ( 2, COND_VS()    ); break; /* BVS           */
 			case 0x71: OP_TCALL ( 8, 7            ); break; /* TCALL 7       */
 			case 0x72: OP_CLR   ( 4, BIT_3        ); break; /* CLR 3         */
@@ -1485,78 +1513,97 @@ static CPU_EXECUTE( spc700 )
 			case 0x75: OP_CMPR  ( 5, REG_A, ABX   ); break; /* CMP A, abx    */
 			case 0x76: OP_CMPR  ( 5, REG_A, ABY   ); break; /* CMP A, aby    */
 			case 0x77: OP_CMPR  ( 6, REG_A, DIY   ); break; /* CMP A, diy    */
+
 			case 0x78: OP_CMPM  ( 5, IMM, DP      ); break; /* CMP dp, imm   */
 			case 0x79: OP_CMPM  ( 5, YI, XI       ); break; /* CMP xi, yi    */
 			case 0x7a: OP_ADDW  ( 5               ); break; /* ADDW di       */
 			case 0x7b: OP_RORM  ( 5, DPX          ); break; /* ROR dpx       */
+
 			case 0x7c: OP_ROR   ( 2               ); break; /* ROR A         */
 			case 0x7d: OP_MOVRR ( 2, REG_X, REG_A ); break; /* MOV A, X      */
 			case 0x7e: OP_CMPR  ( 3, REG_Y, DP    ); break; /* CMP Y, dp     */
 			case 0x7f: OP_RETI  ( 6               ); break; /* RETI          */
+
 			case 0x80: OP_SETC  ( 2               ); break; /* SETC          */
 			case 0x81: OP_TCALL ( 8, 8            ); break; /* TCALL 8       */
 			case 0x82: OP_SET   ( 4, BIT_4        ); break; /* SET 4         */
 			case 0x83: OP_BBS   ( 5, BIT_4        ); break; /* BBS 4         */
+
 			case 0x84: OP_ADC   ( 3, DP           ); break; /* ADC dp        */
 			case 0x85: OP_ADC   ( 4, ABS          ); break; /* ADC abs       */
 			case 0x86: OP_ADC   ( 3, XI           ); break; /* ADC xi        */
 			case 0x87: OP_ADC   ( 6, DXI          ); break; /* ADC dxi       */
+
 			case 0x88: OP_ADC   ( 2, IMM          ); break; /* ADC imm       */
 			case 0x89: OP_ADCM  ( 6, DP, DP       ); break; /* ADC dp, dp    */
-			case 0x8a: OP_EOR1  ( 4               ); break; /* EOR1 bit      */
+			case 0x8a: OP_EOR1  ( 5               ); break; /* EOR1 bit      */
 			case 0x8b: OP_DECM  ( 4, DP           ); break; /* DEC dp        */
+
 			case 0x8c: OP_DECM  ( 5, ABS          ); break; /* DEC abs       */
 			case 0x8d: OP_MOVMR ( 2, IMM, REG_Y   ); break; /* MOV Y, imm    */
 			case 0x8e: OP_PLP   ( 4               ); break; /* POP PSW       */
 			case 0x8f: OP_MOVMM ( 5, IMM, DP      ); break; /* MOV dp, imm   */
+
 			case 0x90: OP_BCC   ( 2, COND_CC()    ); break; /* BCC           */
 			case 0x91: OP_TCALL ( 8, 9            ); break; /* TCALL 9       */
 			case 0x92: OP_CLR   ( 4, BIT_4        ); break; /* CLR 4         */
 			case 0x93: OP_BBC   ( 5, BIT_4        ); break; /* BBC 4         */
+
 			case 0x94: OP_ADC   ( 4, DPX          ); break; /* ADC dpx       */
 			case 0x95: OP_ADC   ( 5, ABX          ); break; /* ADC abx       */
 			case 0x96: OP_ADC   ( 5, ABY          ); break; /* ADC aby       */
 			case 0x97: OP_ADC   ( 6, DIY          ); break; /* ADC diy       */
+
 			case 0x98: OP_ADCM  ( 5, IMM, DP      ); break; /* ADC dp, imm   */
 			case 0x99: OP_ADCM  ( 5, YI, XI       ); break; /* ADC xi, yi    */
 			case 0x9a: OP_SUBW  ( 5               ); break; /* SUBW dp       */
 			case 0x9b: OP_DECM  ( 5, DPX          ); break; /* DEC dpx       */
+
 			case 0x9c: OP_DECR  ( 2, REG_A        ); break; /* DEC A         */
 			case 0x9d: OP_MOVSX ( 2               ); break; /* MOV X, SP     */
 			case 0x9e: OP_DIV   (12               ); break; /* DIV YA, X     */
 			case 0x9f: OP_XCN   ( 5               ); break; /* XCN A         */
+
 			case 0xa0: OP_EI    ( 3               ); break; /* EI            */
 			case 0xa1: OP_TCALL ( 8, 10           ); break; /* TCALL 10      */
 			case 0xa2: OP_SET   ( 4, BIT_5        ); break; /* SET 5         */
 			case 0xa3: OP_BBS   ( 5, BIT_5        ); break; /* BBS 5         */
+
 			case 0xa4: OP_SBC   ( 3, DP           ); break; /* SBC dp        */
 			case 0xa5: OP_SBC   ( 4, ABS          ); break; /* SBC abs       */
 			case 0xa6: OP_SBC   ( 3, XI           ); break; /* SBC xi        */
 			case 0xa7: OP_SBC   ( 6, DXI          ); break; /* SBC dxi       */
+
 			case 0xa8: OP_SBC   ( 2, IMM          ); break; /* SBC imm       */
 			case 0xa9: OP_SBCM  ( 6, DP, DP       ); break; /* SBC dp, dp    */
 			case 0xaa: OP_MOV1C ( 4               ); break; /* MOV1 bit->C   */
 			case 0xab: OP_INCM  ( 4, DP           ); break; /* INC dp        */
+
 			case 0xac: OP_INCM  ( 5, ABS          ); break; /* INC abs       */
 			case 0xad: OP_CMPR  ( 2, REG_Y, IMM   ); break; /* CMP Y, imm    */
 			case 0xae: OP_PULL  ( 4, REG_A        ); break; /* POP A         */
 			case 0xaf: OP_MOVRM ( 4, REG_A, XII   ); break; /* MOV xii, A    */
+
 			case 0xb0: OP_BCC   ( 2, COND_CS()    ); break; /* BCS           */
 			case 0xb1: OP_TCALL ( 8, 11           ); break; /* TCALL 11      */
 			case 0xb2: OP_CLR   ( 4, BIT_5        ); break; /* CLR 5         */
 			case 0xb3: OP_BBC   ( 5, BIT_5        ); break; /* BBC 5         */
+
 			case 0xb4: OP_SBC   ( 4, DPX          ); break; /* SBC dpx       */
 			case 0xb5: OP_SBC   ( 5, ABX          ); break; /* SBC abx       */
 			case 0xb6: OP_SBC   ( 5, ABY          ); break; /* SBC aby       */
 			case 0xb7: OP_SBC   ( 6, DIY          ); break; /* SBC diy       */
+
 			case 0xb8: OP_SBCM  ( 5, IMM, DP      ); break; /* SBC dp, imm   */
 			case 0xb9: OP_SBCM  ( 5, YI, XI       ); break; /* SBC xi, yi    */
 			case 0xba: OP_MOVWMR( 5               ); break; /* MOVW YA, dp   */
 			case 0xbb: OP_INCM  ( 5, DPX          ); break; /* INC dpx       */
+
 			case 0xbc: OP_INCR  ( 2, REG_A        ); break; /* INC A         */
 			case 0xbd: OP_MOVXS ( 2               ); break; /* MOV SP, X     */
 			case 0xbe: OP_DAS   ( 3               ); break; /* DAS A         */
 			case 0xbf: OP_MOVMR ( 4, XII, REG_A   ); break; /* MOV A, xii    */
+
 			case 0xc0: OP_DI    ( 3               ); break; /* DI            */
 			case 0xc1: OP_TCALL ( 8, 12           ); break; /* TCALL 12      */
 			case 0xc2: OP_SET   ( 4, BIT_6        ); break; /* SET 6         */
@@ -1565,54 +1612,67 @@ static CPU_EXECUTE( spc700 )
 			case 0xc5: OP_MOVRM ( 5, REG_A, ABS   ); break; /* MOV abs, A    */
 			case 0xc6: OP_MOVRM ( 4, REG_A, XI    ); break; /* MOV xi, A     */
 			case 0xc7: OP_MOVRM ( 7, REG_A, DXI   ); break; /* MOV dxi, A    */
+
 			case 0xc8: OP_CMPR  ( 2, REG_X, IMM   ); break; /* CMP X, imm    */
 			case 0xc9: OP_MOVRM ( 5, REG_X, ABS   ); break; /* MOV abs, X    */
 			case 0xca: OP_MOV1M ( 6               ); break; /* MOV1 C->bit   */
 			case 0xcb: OP_MOVRM ( 4, REG_Y, DP    ); break; /* MOV dp, Y     */
+
 			case 0xcc: OP_MOVRM ( 5, REG_Y, ABS   ); break; /* MOV abs, Y    */
 			case 0xcd: OP_MOVMR ( 2, IMM, REG_X   ); break; /* MOV X, imm    */
 			case 0xce: OP_PULL  ( 4, REG_X        ); break; /* POP X         */
 			case 0xcf: OP_MUL   ( 9               ); break; /* MUL YA        */
+
 			case 0xd0: OP_BCC   ( 2, COND_NE()    ); break; /* BNE           */
 			case 0xd1: OP_TCALL ( 8, 13           ); break; /* TCALL 13      */
 			case 0xd2: OP_CLR   ( 4, BIT_6        ); break; /* CLR 6         */
 			case 0xd3: OP_BBC   ( 5, BIT_6        ); break; /* BBC 6         */
+
 			case 0xd4: OP_MOVRM ( 5, REG_A, DPX   ); break; /* MOV dpx, A    */
 			case 0xd5: OP_MOVRM ( 6, REG_A, ABX   ); break; /* MOV abx, A    */
 			case 0xd6: OP_MOVRM ( 6, REG_A, ABY   ); break; /* MOV aby, A    */
 			case 0xd7: OP_MOVRM ( 7, REG_A, DIY   ); break; /* MOV diy, A    */
+
 			case 0xd8: OP_MOVRM ( 4, REG_X, DP    ); break; /* MOV dp, X     */
 			case 0xd9: OP_MOVRM ( 5, REG_X, DPY   ); break; /* MOV dpy, X    */
 			case 0xda: OP_MOVWRM( 5               ); break; /* MOVW dp, YA   */
 			case 0xdb: OP_MOVRM ( 5, REG_Y, DPX   ); break; /* MOV dpx, Y    */
+
 			case 0xdc: OP_DECR  ( 2, REG_Y        ); break; /* DEC Y         */
 			case 0xdd: OP_MOVRR ( 2, REG_Y, REG_A ); break; /* MOV A, Y      */
 			case 0xde: OP_CBNE  ( 6, DPX          ); break; /* CBNE dpx      */
 			case 0xdf: OP_DAA   ( 3               ); break; /* DAA           */
+
 			case 0xe0: OP_CLRV  ( 2               ); break; /* CLRV          */
 			case 0xe1: OP_TCALL ( 8, 14           ); break; /* TCALL 14      */
 			case 0xe2: OP_SET   ( 4, BIT_7        ); break; /* SET 7         */
 			case 0xe3: OP_BBS   ( 5, BIT_7        ); break; /* BBS 7         */
+
 			case 0xe4: OP_MOVMR ( 3, DP, REG_A    ); break; /* MOV A, dp     */
 			case 0xe5: OP_MOVMR ( 4, ABS, REG_A   ); break; /* MOV A, abs    */
 			case 0xe6: OP_MOVMR ( 3, XI, REG_A    ); break; /* MOV A, xi     */
 			case 0xe7: OP_MOVMR ( 6, DXI, REG_A   ); break; /* MOV A, dxi    */
+
 			case 0xe8: OP_MOVMR ( 2, IMM, REG_A   ); break; /* CMP A, imm    */
 			case 0xe9: OP_MOVMR ( 4, ABS, REG_X   ); break; /* MOV X, abs    */
 			case 0xea: OP_NOT1  ( 5               ); break; /* NOT1          */
 			case 0xeb: OP_MOVMR ( 3, DP, REG_Y    ); break; /* MOV Y, dp     */
+
 			case 0xec: OP_MOVMR ( 4, ABS, REG_Y   ); break; /* MOV Y, abs    */
 			case 0xed: OP_NOTC  ( 3               ); break; /* NOTC          */
 			case 0xee: OP_PULL  ( 4, REG_Y        ); break; /* POP Y         */
-			case 0xef: OP_SLEEP ( 3               ); break; /* SLEEP         */
+			case 0xef: OP_SLEEP ( 1               ); break; /* SLEEP         */
+
 			case 0xf0: OP_BCC   ( 2, COND_EQ()    ); break; /* BEQ           */
 			case 0xf1: OP_TCALL ( 8, 15           ); break; /* TCALL1 5      */
 			case 0xf2: OP_CLR   ( 4, BIT_7        ); break; /* CLR 7         */
 			case 0xf3: OP_BBC   ( 5, BIT_7        ); break; /* BBC 7         */
+
 			case 0xf4: OP_MOVMR ( 4, DPX, REG_A   ); break; /* MOV A, dpx    */
 			case 0xf5: OP_MOVMR ( 5, ABX, REG_A   ); break; /* MOV A, abx    */
 			case 0xf6: OP_MOVMR ( 5, ABY, REG_A   ); break; /* MOV A, aby    */
 			case 0xf7: OP_MOVMR ( 6, DIY, REG_A   ); break; /* MOV A, diy    */
+
 			case 0xf8: OP_MOVMR ( 3, DP, REG_X    ); break; /* MOV X, dp     */
 			case 0xf9: OP_MOVMR ( 4, DPY, REG_X   ); break; /* MOV X, dpy    */
 			case 0xfa: OP_MOVMM ( 5, DP, DP       ); break; /* MOV dp, dp    */
@@ -1620,7 +1680,7 @@ static CPU_EXECUTE( spc700 )
 			case 0xfc: OP_INCR  ( 2, REG_Y        ); break; /* INC Y         */
 			case 0xfd: OP_MOVRR ( 2, REG_A, REG_Y ); break; /* MOV Y, A      */
 			case 0xfe: OP_DBNZR ( 4               ); break; /* DBNZ Y        */
-			case 0xff: OP_STOP  ( 3               ); break; /* STOP          */
+			case 0xff: OP_STOP  ( 1               ); break; /* STOP          */
 		}
 	}
 }
