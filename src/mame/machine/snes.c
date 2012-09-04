@@ -291,40 +291,6 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(nextscan));
 }
 
-/* FIXME: multiplication should take 8 CPU cycles & division 16 CPU cycles, but
-using these timers breaks e.g. Chrono Trigger intro and Super Tennis gameplay.
-On the other hand, timers are needed for the translation of Breath of Fire 2
-to work. More weirdness: we might need to leave 8 CPU cycles for division at
-first, since using 16 produces bugs (see e.g. Triforce pieces in Zelda 3 intro) */
-
-static TIMER_CALLBACK(snes_div_callback)
-{
-	UINT16 value, dividend, remainder;
-	dividend = remainder = 0;
-	value = (snes_ram[WRDIVH] << 8) + snes_ram[WRDIVL];
-	if (snes_ram[WRDVDD] > 0)
-	{
-		dividend = value / snes_ram[WRDVDD];
-		remainder = value % snes_ram[WRDVDD];
-	}
-	else
-	{
-		dividend = 0xffff;
-		remainder = value;
-	}
-	snes_ram[RDDIVL] = dividend & 0xff;
-	snes_ram[RDDIVH] = (dividend >> 8) & 0xff;
-	snes_ram[RDMPYL] = remainder & 0xff;
-	snes_ram[RDMPYH] = (remainder >> 8) & 0xff;
-}
-
-
-static TIMER_CALLBACK(snes_mult_callback)
-{
-	UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
-	snes_ram[RDMPYL] = c & 0xff;
-	snes_ram[RDMPYH] = (c >> 8) & 0xff;
-}
 
 /*************************************
 
@@ -555,11 +521,6 @@ READ8_HANDLER( snes_r_io )
 			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
 			return snes_ram[WRIO];
-		case RDDIVL:		/* Quotient of divide result (low) */
-		case RDDIVH:		/* Quotient of divide result (high) */
-		case RDMPYL:		/* Product/Remainder of mult/div result (low) */
-		case RDMPYH:		/* Product/Remainder of mult/div result (high) */
-			return snes_ram[offset];
 		case JOY1L:			/* Joypad 1 status register (low) */
 			if(state->m_is_nss && state->m_input_disabled)
 				return 0;
@@ -740,42 +701,6 @@ WRITE8_HANDLER( snes_w_io )
 				snes_latch_counters(space->machine());
 			}
 			break;
-		case WRMPYA:	/* Multiplier A */
-			break;
-		case WRMPYB:	/* Multiplier B */
-			snes_ram[WRMPYB] = data;
-//          state->m_mult_timer->adjust(state->m_maincpu->cycles_to_attotime(8));
-			{
-				UINT32 c = snes_ram[WRMPYA] * snes_ram[WRMPYB];
-				snes_ram[RDMPYL] = c & 0xff;
-				snes_ram[RDMPYH] = (c >> 8) & 0xff;
-			}
-			break;
-		case WRDIVL:	/* Dividend (low) */
-		case WRDIVH:	/* Dividend (high) */
-			break;
-		case WRDVDD:	/* Divisor */
-			snes_ram[WRDVDD] = data;
-//          state->m_div_timer->adjust(state->m_maincpu->cycles_to_attotime(16));
-			{
-				UINT16 value, dividend, remainder;
-				value = (snes_ram[WRDIVH] << 8) + snes_ram[WRDIVL];
-				if (snes_ram[WRDVDD] > 0)
-				{
-					dividend = value / data;
-					remainder = value % data;
-				}
-				else
-				{
-					dividend = 0xffff;
-					remainder = value;
-				}
-				snes_ram[RDDIVL] = dividend & 0xff;
-				snes_ram[RDDIVH] = (dividend >> 8) & 0xff;
-				snes_ram[RDMPYL] = remainder & 0xff;
-				snes_ram[RDMPYH] = (remainder >> 8) & 0xff;
-			}
-			break;
 		case HTIMEL:	/* H-Count timer settings (low)  */
 			state->m_htime = (state->m_htime & 0xff00) | (data <<  0);
 			state->m_htime &= 0x1ff;
@@ -813,10 +738,10 @@ WRITE8_HANDLER( snes_w_io )
 		case MPYM:		/* Multiplication result (mid) */
 		case MPYH:		/* Multiplication result (high) */
 		case RDIO:
-		case RDDIVL:
-		case RDDIVH:
-		case RDMPYL:
-		case RDMPYH:
+//		case RDDIVL:
+//		case RDDIVH:
+//		case RDMPYL:
+//		case RDMPYH:
 		case JOY1L:
 		case JOY1H:
 		case JOY2L:
@@ -1620,10 +1545,10 @@ static void snes_init_timers( running_machine &machine )
 	state->m_nmi_timer->adjust(attotime::never);
 	state->m_hirq_timer = machine.scheduler().timer_alloc(FUNC(snes_hirq_tick_callback));
 	state->m_hirq_timer->adjust(attotime::never);
-	state->m_div_timer = machine.scheduler().timer_alloc(FUNC(snes_div_callback));
-	state->m_div_timer->adjust(attotime::never);
-	state->m_mult_timer = machine.scheduler().timer_alloc(FUNC(snes_mult_callback));
-	state->m_mult_timer->adjust(attotime::never);
+	//state->m_div_timer = machine.scheduler().timer_alloc(FUNC(snes_div_callback));
+	//state->m_div_timer->adjust(attotime::never);
+	//state->m_mult_timer = machine.scheduler().timer_alloc(FUNC(snes_mult_callback));
+	//state->m_mult_timer->adjust(attotime::never);
 	state->m_io_timer = machine.scheduler().timer_alloc(FUNC(snes_update_io));
 	state->m_io_timer->adjust(attotime::never);
 
@@ -1762,9 +1687,9 @@ MACHINE_START( snes )
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;
-	snes_ram[WRMPYA] = 0xff;
-	snes_ram[WRDIVL] = 0xff;
-	snes_ram[WRDIVH] = 0xff;
+//	snes_ram[WRMPYA] = 0xff;
+//	snes_ram[WRDIVL] = 0xff;
+//	snes_ram[WRDIVH] = 0xff;
 
 	switch (state->m_has_addon_chip)
 	{

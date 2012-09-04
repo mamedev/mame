@@ -110,6 +110,13 @@ struct _g65816i_cpu_struct
 	int ICount;
 	int cpu_type;
 	UINT8 rw8_cycles, rw16_cycles, rw24_cycles;
+
+	/* 5A22 specific registers */
+	UINT8 wrmpya, wrmpyb;
+	UINT16 rdmpy;
+	UINT16 wrdiv;
+	UINT8 dvdd;
+	UINT16 rddiv;
 };
 
 extern void (*const *const g65816i_opcodes[])(g65816i_cpu_struct *cpustate);

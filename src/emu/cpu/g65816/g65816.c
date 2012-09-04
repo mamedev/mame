@@ -571,7 +571,108 @@ static CPU_RESET( 5a22 )
 	CPU_RESET_CALL(g65816);
 
 	cpustate->fastROM = 0;
+	cpustate->wrmpya = 0xff;
+	cpustate->wrdiv = 0xffff;
 }
+
+/* TODO: multiplication / division should actually occur inside CPU_EXECUTE */
+/* (Old note, for reference): multiplication should take 8 CPU cycles &
+division 16 CPU cycles, but using these timers breaks e.g. Chrono Trigger
+intro and Super Tennis gameplay. On the other hand, timers are needed for the
+translation of Breath of Fire 2 to work. More weirdness: we might need to leave
+8 CPU cycles for division at first, since using 16 produces bugs (see e.g.
+Triforce pieces in Zelda 3 intro) */
+
+static WRITE8_HANDLER( wrmpya_w )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+
+	cpustate->wrmpya = data;
+}
+
+static WRITE8_HANDLER( wrmpyb_w )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+
+	cpustate->wrmpyb = data;
+	cpustate->rdmpy = cpustate->wrmpya * cpustate->wrmpyb;
+	/* TODO: cpustate->rddiv == 0? */
+}
+
+static WRITE8_HANDLER( wrdivl_w )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+
+	cpustate->wrdiv = (data) | (cpustate->wrdiv & 0xff00);
+}
+
+static WRITE8_HANDLER( wrdivh_w )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+
+	cpustate->wrdiv = (data << 8) | (cpustate->wrdiv & 0xff);
+}
+
+static WRITE8_HANDLER( wrdvdd_w )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	UINT16 quotient, remainder;
+
+	cpustate->dvdd = data;
+
+	if(cpustate->dvdd != 0)
+	{
+		quotient = cpustate->wrdiv / cpustate->dvdd;
+		remainder = cpustate->wrdiv % cpustate->dvdd;
+	}
+	else
+	{
+		quotient = 0xffff;
+		remainder = 0x000c;
+	}
+
+	cpustate->rddiv = quotient;
+	cpustate->rdmpy = remainder;
+}
+
+static READ8_HANDLER( rddivl_r )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	return cpustate->rddiv & 0xff;
+}
+
+static READ8_HANDLER( rddivh_r )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	return cpustate->rddiv >> 8;
+}
+
+static READ8_HANDLER( rdmpyl_r )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	return cpustate->rdmpy & 0xff;
+}
+
+static READ8_HANDLER( rdmpyh_r )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	return cpustate->rdmpy >> 8;
+}
+
+
+static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, legacy_cpu_device)
+	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrmpya_w)
+	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrmpyb_w)
+	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdivl_w)
+	AM_RANGE(0x4205, 0x4205) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdivh_w)
+	AM_RANGE(0x4206, 0x4206) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdvdd_w)
+
+	AM_RANGE(0x4214, 0x4214) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rddivl_r)
+	AM_RANGE(0x4215, 0x4215) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rddivh_r)
+	AM_RANGE(0x4216, 0x4216) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rdmpyl_r)
+	AM_RANGE(0x4217, 0x4217) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rdmpyh_r)
+
+ADDRESS_MAP_END
 
 CPU_SET_INFO( _5a22 )
 {
@@ -600,6 +701,7 @@ CPU_GET_INFO( _5a22 )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "5A22");			break;
 		case CPUINFO_INT_REGISTER + _5A22_FASTROM:		info->i = g65816_get_reg(cpustate, _5A22_FASTROM); break;
 		case CPUINFO_STR_REGISTER + _5A22_FASTROM:		sprintf(info->s, "fastROM:%d", cpustate->fastROM & 1 ? 1 : 0); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(_5a22_map); break;
 
 		default:										CPU_GET_INFO_CALL(g65816);				break;
 	}

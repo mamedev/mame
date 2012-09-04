@@ -146,11 +146,11 @@
 #define OLDJOY2        0x4017
 #define NMITIMEN       0x4200
 #define WRIO           0x4201
-#define WRMPYA         0x4202
-#define WRMPYB         0x4203
-#define WRDIVL         0x4204
-#define WRDIVH         0x4205
-#define WRDVDD         0x4206
+//#define WRMPYA         0x4202
+//#define WRMPYB         0x4203
+//#define WRDIVL         0x4204
+//#define WRDIVH         0x4205
+//#define WRDVDD         0x4206
 #define HTIMEL         0x4207
 #define HTIMEH         0x4208
 #define VTIMEL         0x4209
@@ -162,10 +162,10 @@
 #define TIMEUP         0x4211
 #define HVBJOY         0x4212
 #define RDIO           0x4213
-#define RDDIVL         0x4214
-#define RDDIVH         0x4215
-#define RDMPYL         0x4216
-#define RDMPYH         0x4217
+//#define RDDIVL         0x4214
+//#define RDDIVH         0x4215
+//#define RDMPYL         0x4216
+//#define RDMPYH         0x4217
 #define JOY1L          0x4218
 #define JOY1H          0x4219
 #define JOY2L          0x421A
@@ -439,8 +439,8 @@ public:
 	emu_timer             *m_hblank_timer;
 	emu_timer             *m_nmi_timer;
 	emu_timer             *m_hirq_timer;
-	emu_timer             *m_div_timer;
-	emu_timer             *m_mult_timer;
+//	emu_timer             *m_div_timer;
+//	emu_timer             *m_mult_timer;
 	emu_timer             *m_io_timer;
 
 	/* DMA/HDMA-related */
