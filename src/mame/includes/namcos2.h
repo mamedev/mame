@@ -85,28 +85,106 @@ enum
 	NAMCOFL_FINAL_LAP_R
 };
 
+class namcos2_state : public driver_device
+{
+public:
+	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		  m_dpram(*this, "dpram"),
+		  m_spriteram(*this, "spriteram"),
+		  m_paletteram(*this, "paletteram"),
+		  m_rozram(*this, "rozram")
+	{ }
+	DECLARE_READ16_MEMBER(dpram_word_r);
+	DECLARE_WRITE16_MEMBER(dpram_word_w);
+	DECLARE_READ8_MEMBER(dpram_byte_r);
+	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	DECLARE_DRIVER_INIT(cosmogng);
+	DECLARE_DRIVER_INIT(sgunner2);
+	DECLARE_DRIVER_INIT(kyukaidk);
+	DECLARE_DRIVER_INIT(bubbletr);
+	DECLARE_DRIVER_INIT(suzuk8h2);
+	DECLARE_DRIVER_INIT(burnforc);
+	DECLARE_DRIVER_INIT(gollygho);
+	DECLARE_DRIVER_INIT(rthun2j);
+	DECLARE_DRIVER_INIT(sws);
+	DECLARE_DRIVER_INIT(finehour);
+	DECLARE_DRIVER_INIT(finallap);
+	DECLARE_DRIVER_INIT(dirtfoxj);
+	DECLARE_DRIVER_INIT(marvlanj);
+	DECLARE_DRIVER_INIT(sws92);
+	DECLARE_DRIVER_INIT(dsaber);
+	DECLARE_DRIVER_INIT(assault);
+	DECLARE_DRIVER_INIT(mirninja);
+	DECLARE_DRIVER_INIT(finalap2);
+	DECLARE_DRIVER_INIT(valkyrie);
+	DECLARE_DRIVER_INIT(fourtrax);
+	DECLARE_DRIVER_INIT(finalap3);
+	DECLARE_DRIVER_INIT(luckywld);
+	DECLARE_DRIVER_INIT(assaultj);
+	DECLARE_DRIVER_INIT(dsaberj);
+	DECLARE_DRIVER_INIT(suzuka8h);
+	DECLARE_DRIVER_INIT(phelios);
+	DECLARE_DRIVER_INIT(sws93);
+	DECLARE_DRIVER_INIT(metlhawk);
+	DECLARE_DRIVER_INIT(sws92g);
+	DECLARE_DRIVER_INIT(assaultp_hack);
+	DECLARE_DRIVER_INIT(assaultp);
+	DECLARE_DRIVER_INIT(ordyne);
+	DECLARE_DRIVER_INIT(marvland);
+	DECLARE_DRIVER_INIT(rthun2);
+	
+	virtual void video_start();
+	void video_start_finallap();
+	void video_start_luckywld();
+	void video_start_metlhawk();
+	void video_start_sgunner();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	DECLARE_READ16_MEMBER( paletteram_word_r );
+	DECLARE_WRITE16_MEMBER( paletteram_word_w );
+	DECLARE_READ16_MEMBER( spriteram_word_r );
+	DECLARE_WRITE16_MEMBER( spriteram_word_w );
+	DECLARE_READ16_MEMBER( rozram_word_r );
+	DECLARE_WRITE16_MEMBER( rozram_word_w );
+	DECLARE_READ16_MEMBER( roz_ctrl_word_r );
+	DECLARE_WRITE16_MEMBER( roz_ctrl_word_w );
+
+	void update_palette();
+	void apply_clip( rectangle &clip, const rectangle &cliprect );
+	void draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
+	void draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	UINT16 get_palette_register( int which );
+
+	required_shared_ptr<UINT8> m_dpram;	/* 2Kx8 */
+	optional_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<UINT16> m_rozram;
+
+	UINT16 m_roz_ctrl[0x8];
+	tilemap_t *m_tilemap_roz;
+
+};
+
 /*----------- defined in video/namcos2.c -----------*/
 
 #define NAMCOS21_NUM_COLORS 0x8000
 
 VIDEO_START( namcos2 );
-SCREEN_UPDATE_IND16( namcos2_default );
 
 VIDEO_START( finallap );
-SCREEN_UPDATE_IND16( finallap );
 
 VIDEO_START( luckywld );
-SCREEN_UPDATE_IND16( luckywld );
 
 VIDEO_START( metlhawk );
-SCREEN_UPDATE_IND16( metlhawk );
 
 VIDEO_START( sgunner );
-SCREEN_UPDATE_IND16( sgunner );
-
-extern UINT16 *namcos2_sprite_ram;
-WRITE16_HANDLER( namcos2_sprite_ram_w );
-READ16_HANDLER( namcos2_sprite_ram_r );
 
 int namcos2_GetPosIrqScanline( running_machine &machine );
 
@@ -116,23 +194,12 @@ READ16_HANDLER( namcos2_gfx_ctrl_r );
 /**************************************************************/
 /*  Shared video palette function handlers                    */
 /**************************************************************/
-READ16_HANDLER( namcos2_68k_video_palette_r );
-WRITE16_HANDLER( namcos2_68k_video_palette_w );
 
 #define VIRTUAL_PALETTE_BANKS 30
-extern UINT16 *namcos2_68k_palette_ram;
-extern size_t namcos2_68k_palette_size;
 
 /**************************************************************/
 /*  ROZ - Rotate & Zoom memory function handlers              */
 /**************************************************************/
-
-WRITE16_HANDLER( namcos2_68k_roz_ctrl_w );
-READ16_HANDLER( namcos2_68k_roz_ctrl_r );
-
-WRITE16_HANDLER( namcos2_68k_roz_ram_w );
-READ16_HANDLER( namcos2_68k_roz_ram_r );
-extern UINT16 *namcos2_68k_roz_ram;
 
 /*----------- defined in machine/namcos2.c -----------*/
 

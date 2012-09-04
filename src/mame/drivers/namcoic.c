@@ -416,13 +416,13 @@ static void zdrawgfxzoom(
 }
 
 void
-namcos2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
+namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
 	if( pri==0 )
 	{
-		machine.priority_bitmap.fill(0, cliprect );
+		machine().priority_bitmap.fill(0, cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -447,12 +447,12 @@ namcos2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const recta
         *   Sprite colour index         D04-D07
         *   Sprite Size X               D10-D15
         */
-		int word3 = namcos2_sprite_ram[offset+(loop*4)+3];
+		int word3 = m_spriteram[offset+(loop*4)+3];
 		if( (word3&0xf)==pri )
 		{
-			int word0 = namcos2_sprite_ram[offset+(loop*4)+0];
-			int word1 = namcos2_sprite_ram[offset+(loop*4)+1];
-			int offset4 = namcos2_sprite_ram[offset+(loop*4)+2];
+			int word0 = m_spriteram[offset+(loop*4)+0];
+			int word1 = m_spriteram[offset+(loop*4)+1];
+			int offset4 = m_spriteram[offset+(loop*4)+2];
 
 			int sizey=((word0>>10)&0x3f)+1;
 			int sizex=(word3>>10)&0x3f;
@@ -472,7 +472,7 @@ namcos2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const recta
 				int scaley = (sizey<<16)/((word0&0x0200)?0x20:0x10);
 				if(scalex && scaley)
 				{
-					gfx_element *gfx = machine.gfx[rgn];
+					gfx_element *gfx = machine().gfx[rgn];
 
 					if( (word0&0x0200)==0 )
 						gfx_element_set_source_clip(gfx, (word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
@@ -495,8 +495,7 @@ namcos2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const recta
 	}
 } /* namcos2_draw_sprites */
 
-void
-namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void namcos2_state::draw_sprites_metalhawk(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	/**
      * word#0
@@ -528,12 +527,12 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, c
      *  --------xxxx---- color
      *  x--------------- unknown
      */
-	const UINT16 *pSource = namcos2_sprite_ram;
+	const UINT16 *pSource = m_spriteram;
 	rectangle rect;
 	int loop;
 	if( pri==0 )
 	{
-		machine.priority_bitmap.fill(0, cliprect );
+		machine().priority_bitmap.fill(0, cliprect );
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -606,7 +605,7 @@ namcos2_draw_sprites_metalhawk(running_machine &machine, bitmap_ind16 &bitmap, c
 			zdrawgfxzoom(
 				bitmap,
 				rect,
-				machine.gfx[0],
+				machine().gfx[0],
 				sprn, color,
 				flipx,flipy,
 				sx,sy,

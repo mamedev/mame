@@ -467,53 +467,6 @@ $a00000 checks have been seen on the Final Lap boards.
 /*************************************************************/
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
 /*************************************************************/
-class namcos2_state : public driver_device
-{
-public:
-	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{ }
-	DECLARE_READ16_MEMBER(namcos2_68k_dpram_word_r);
-	DECLARE_WRITE16_MEMBER(namcos2_68k_dpram_word_w);
-	DECLARE_READ8_MEMBER(namcos2_dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(namcos2_dpram_byte_w);
-	DECLARE_DRIVER_INIT(cosmogng);
-	DECLARE_DRIVER_INIT(sgunner2);
-	DECLARE_DRIVER_INIT(kyukaidk);
-	DECLARE_DRIVER_INIT(bubbletr);
-	DECLARE_DRIVER_INIT(suzuk8h2);
-	DECLARE_DRIVER_INIT(burnforc);
-	DECLARE_DRIVER_INIT(gollygho);
-	DECLARE_DRIVER_INIT(rthun2j);
-	DECLARE_DRIVER_INIT(sws);
-	DECLARE_DRIVER_INIT(finehour);
-	DECLARE_DRIVER_INIT(finallap);
-	DECLARE_DRIVER_INIT(dirtfoxj);
-	DECLARE_DRIVER_INIT(marvlanj);
-	DECLARE_DRIVER_INIT(sws92);
-	DECLARE_DRIVER_INIT(dsaber);
-	DECLARE_DRIVER_INIT(assault);
-	DECLARE_DRIVER_INIT(mirninja);
-	DECLARE_DRIVER_INIT(finalap2);
-	DECLARE_DRIVER_INIT(valkyrie);
-	DECLARE_DRIVER_INIT(fourtrax);
-	DECLARE_DRIVER_INIT(finalap3);
-	DECLARE_DRIVER_INIT(luckywld);
-	DECLARE_DRIVER_INIT(assaultj);
-	DECLARE_DRIVER_INIT(dsaberj);
-	DECLARE_DRIVER_INIT(suzuka8h);
-	DECLARE_DRIVER_INIT(phelios);
-	DECLARE_DRIVER_INIT(sws93);
-	DECLARE_DRIVER_INIT(metlhawk);
-	DECLARE_DRIVER_INIT(sws92g);
-	DECLARE_DRIVER_INIT(assaultp_hack);
-	DECLARE_DRIVER_INIT(assaultp);
-	DECLARE_DRIVER_INIT(ordyne);
-	DECLARE_DRIVER_INIT(marvland);
-	DECLARE_DRIVER_INIT(rthun2);
-};
-
-static UINT8 *namcos2_dpram;	/* 2Kx8 */
 
 static void
 GollyGhostUpdateLED_c4( int data )
@@ -574,16 +527,16 @@ GollyGhostUpdateDiorama_c0( int data )
 	}
 }
 
-READ16_MEMBER(namcos2_state::namcos2_68k_dpram_word_r)
+READ16_MEMBER(namcos2_state::dpram_word_r)
 {
-	return namcos2_dpram[offset];
+	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos2_state::namcos2_68k_dpram_word_w)
+WRITE16_MEMBER(namcos2_state::dpram_word_w)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		namcos2_dpram[offset] = data&0xff;
+		m_dpram[offset] = data&0xff;
 
 		if( namcos2_gametype==NAMCOS2_GOLLY_GHOST )
 		{
@@ -608,14 +561,14 @@ WRITE16_MEMBER(namcos2_state::namcos2_68k_dpram_word_w)
 }
 
 
-READ8_MEMBER(namcos2_state::namcos2_dpram_byte_r)
+READ8_MEMBER(namcos2_state::dpram_byte_r)
 {
-	return namcos2_dpram[offset];
+	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos2_state::namcos2_dpram_byte_w)
+WRITE8_MEMBER(namcos2_state::dpram_byte_w)
 {
-	namcos2_dpram[offset] = data;
+	m_dpram[offset] = data;
 }
 
 /*************************************************************/
@@ -638,9 +591,9 @@ static ADDRESS_MAP_START( namcos2_68k_default_cpu_board_am, AS_PROGRAM, 16, namc
 	AM_RANGE(0x200000, 0x3fffff) AM_READ_LEGACY(namcos2_68k_data_rom_r)
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram16_r,namco_tilemapvideoram16_w)
 	AM_RANGE(0x420000, 0x42003f) AM_READWRITE_LEGACY(namco_tilemapcontrol16_r,namco_tilemapcontrol16_w)
-	AM_RANGE(0x440000, 0x44ffff) AM_READWRITE_LEGACY(namcos2_68k_video_palette_r,namcos2_68k_video_palette_w) AM_BASE_LEGACY(&namcos2_68k_palette_ram) AM_SIZE_LEGACY(&namcos2_68k_palette_size)
-	AM_RANGE(0x460000, 0x460fff) AM_READWRITE(namcos2_68k_dpram_word_r,namcos2_68k_dpram_word_w)
-	AM_RANGE(0x468000, 0x468fff) AM_READWRITE(namcos2_68k_dpram_word_r,namcos2_68k_dpram_word_w) /* mirror */
+	AM_RANGE(0x440000, 0x44ffff) AM_READWRITE(paletteram_word_r,paletteram_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x460000, 0x460fff) AM_READWRITE(dpram_word_r,dpram_word_w)
+	AM_RANGE(0x468000, 0x468fff) AM_READWRITE(dpram_word_r,dpram_word_w) /* mirror */
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(namcos2_68k_serial_comms_ram_r,namcos2_68k_serial_comms_ram_w) AM_BASE_LEGACY(&namcos2_68k_serial_comms_ram)
 	AM_RANGE(0x4a0000, 0x4a000f) AM_READWRITE_LEGACY(namcos2_68k_serial_comms_ctrl_r,namcos2_68k_serial_comms_ctrl_w)
 ADDRESS_MAP_END
@@ -648,10 +601,10 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_default_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(namcos2_sprite_ram_r,namcos2_sprite_ram_w) AM_BASE_LEGACY(&namcos2_sprite_ram)
+	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(spriteram_word_r, spriteram_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE_LEGACY(namcos2_gfx_ctrl_r,namcos2_gfx_ctrl_w)
-	AM_RANGE(0xc80000, 0xc9ffff) AM_READWRITE_LEGACY(namcos2_68k_roz_ram_r,namcos2_68k_roz_ram_w) AM_BASE_LEGACY(&namcos2_68k_roz_ram)
-	AM_RANGE(0xcc0000, 0xcc000f) AM_READWRITE_LEGACY(namcos2_68k_roz_ctrl_r,namcos2_68k_roz_ctrl_w)
+	AM_RANGE(0xc80000, 0xc9ffff) AM_READWRITE(rozram_word_r,rozram_word_w) AM_SHARE("rozram")
+	AM_RANGE(0xcc0000, 0xcc000f) AM_READWRITE(roz_ctrl_word_r, roz_ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE_LEGACY(namcos2_68k_key_r,namcos2_68k_key_w)
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
@@ -676,7 +629,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_finallap_am, AS_PROGRAM, 16, namcos2_state )
 	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(namcos2_flap_prot_r)
-	AM_RANGE(0x800000, 0x80ffff) AM_READ_LEGACY(namcos2_sprite_ram_r) AM_WRITE_LEGACY(namcos2_sprite_ram_w) AM_BASE_LEGACY(&namcos2_sprite_ram)
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(spriteram_word_r, spriteram_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x840000, 0x840001) AM_READ_LEGACY(namcos2_gfx_ctrl_r) AM_WRITE_LEGACY(namcos2_gfx_ctrl_w)
 	AM_RANGE(0x880000, 0x89ffff) AM_READ_LEGACY(namco_road16_r) AM_WRITE_LEGACY(namco_road16_w)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
@@ -725,7 +678,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_metlhawk_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(namcos2_sprite_ram_r,namcos2_sprite_ram_w) AM_BASE_LEGACY(&namcos2_sprite_ram) \
+	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(spriteram_word_r, spriteram_word_w) AM_SHARE("spriteram") \
 	AM_RANGE(0xc40000, 0xc4ffff) AM_READWRITE_LEGACY(namco_rozvideoram16_r,namco_rozvideoram16_w) \
 	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(namco_rozcontrol16_r,namco_rozcontrol16_w) \
 	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE_LEGACY(namcos2_gfx_ctrl_r,namcos2_gfx_ctrl_w) /* ??? */ \
@@ -785,8 +738,8 @@ static ADDRESS_MAP_START( sound_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE_LEGACY("c140", c140_r,c140_w)
-	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(namcos2_dpram_byte_r,namcos2_dpram_byte_w) AM_BASE_LEGACY(&namcos2_dpram)
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(namcos2_dpram_byte_r,namcos2_dpram_byte_w) /* mirror */
+	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(dpram_byte_r,dpram_byte_w) AM_SHARE("dpram")
+	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(dpram_byte_r,dpram_byte_w) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_WRITENOP /* Amplifier enable on 1st write */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE_LEGACY(namcos2_sound_bankselect_w)
@@ -817,7 +770,7 @@ static ADDRESS_MAP_START( mcu_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("MCUDI1")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("MCUDI2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("MCUDI3")
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(namcos2_dpram_byte_r,namcos2_dpram_byte_w) AM_BASE_LEGACY(&namcos2_dpram)
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dpram_byte_r,dpram_byte_w) AM_SHARE("dpram")
 	AM_RANGE(0x6000, 0x6fff) AM_READNOP /* watchdog */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1680,12 +1633,10 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(namcos2_default)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
 	MCFG_GFXDECODE(namcos2)
 	MCFG_PALETTE_LENGTH(0x2000)
-
-	MCFG_VIDEO_START(namcos2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1756,12 +1707,10 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(namcos2_default)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
 	MCFG_GFXDECODE(namcos2)
 	MCFG_PALETTE_LENGTH(0x2000)
-
-	MCFG_VIDEO_START(namcos2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1805,12 +1754,12 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(finallap)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 
 	MCFG_GFXDECODE(finallap)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(finallap)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_finallap)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1854,12 +1803,12 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(sgunner)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
 	MCFG_GFXDECODE(sgunner)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(sgunner)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_sgunner)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1903,12 +1852,12 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(luckywld)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 
 	MCFG_GFXDECODE(luckywld)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(luckywld)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_luckywld)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1952,12 +1901,12 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(metlhawk)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 
 	MCFG_GFXDECODE(metlhawk)
 	MCFG_PALETTE_LENGTH(0x2000)
 
-	MCFG_VIDEO_START(metlhawk)
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_metlhawk)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

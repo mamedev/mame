@@ -1090,7 +1090,7 @@ READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_r){ return 0; }
 static ADDRESS_MAP_START( namcos21_68k_master, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(NAMCOS2_68K_eeprom_R,NAMCOS2_68K_eeprom_W)// AM_BASE_LEGACY(&namcos2_eeprom) AM_SIZE_LEGACY(&namcos2_eeprom_size)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(NAMCOS2_68K_eeprom_R,NAMCOS2_68K_eeprom_W)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE_LEGACY(namcos2_68k_master_C148_r,namcos2_68k_master_C148_w)
 	NAMCO21_68K_COMMON
 ADDRESS_MAP_END
@@ -1320,7 +1320,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspcomram_control_w)
 static ADDRESS_MAP_START( am_master_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(NAMCOS2_68K_eeprom_R,NAMCOS2_68K_eeprom_W)// AM_BASE_LEGACY(&namcos2_eeprom) AM_SIZE_LEGACY(&namcos2_eeprom_size)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(NAMCOS2_68K_eeprom_R,NAMCOS2_68K_eeprom_W)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE_LEGACY(namcos2_68k_master_C148_r,namcos2_68k_master_C148_w)
 	AM_RANGE(0x250000, 0x25ffff) AM_RAM AM_SHARE("winrun_polydata")
 	AM_RANGE(0x260000, 0x26ffff) AM_RAM /* unused? */
@@ -1429,7 +1429,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( driveyes_68k_master, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(NAMCOS2_68K_eeprom_R,NAMCOS2_68K_eeprom_W)// AM_BASE_LEGACY(&namcos2_eeprom) AM_SIZE_LEGACY(&namcos2_eeprom_size)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(NAMCOS2_68K_eeprom_R,NAMCOS2_68K_eeprom_W)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE_LEGACY(namcos2_68k_master_C148_r,namcos2_68k_master_C148_w)
 	AM_RANGE(0x250000, 0x25ffff) AM_RAM AM_SHARE("winrun_polydata")
 	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_SHARE("winrun_dspbios")
