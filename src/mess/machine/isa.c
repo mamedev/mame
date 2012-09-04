@@ -640,6 +640,19 @@ WRITE_LINE_MEMBER( isa16_device::drq5_w ) { m_out_drq5_func(state); }
 WRITE_LINE_MEMBER( isa16_device::drq6_w ) { m_out_drq6_func(state); }
 WRITE_LINE_MEMBER( isa16_device::drq7_w ) { m_out_drq7_func(state); }
 
+UINT16 isa16_device::dack16_r(int line)
+{
+	if (m_dma_device[line])
+		return dynamic_cast<device_isa16_card_interface *>(m_dma_device[line])->dack16_r(line);
+	return 0xffff;
+}
+
+void isa16_device::dack16_w(int line,UINT16 data)
+{
+	if (m_dma_device[line])
+		return dynamic_cast<device_isa16_card_interface *>(m_dma_device[line])->dack16_w(line,data);
+}
+
 //-------------------------------------------------
 //  device_isa16_card_interface - constructor
 //-------------------------------------------------
@@ -661,4 +674,13 @@ device_isa16_card_interface::~device_isa16_card_interface()
 void device_isa16_card_interface::set_isa_device()
 {
 	m_isa = dynamic_cast<isa16_device *>(m_isa_dev);
+}
+
+UINT16 device_isa16_card_interface::dack16_r(int line)
+{
+	return 0;
+}
+
+void device_isa16_card_interface::dack16_w(int line,UINT16 data)
+{
 }

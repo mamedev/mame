@@ -182,7 +182,7 @@ WRITE8_MEMBER(at_state::pc_dma_write_byte)
 READ8_MEMBER(at_state::pc_dma_read_word)
 {
 	UINT16 result;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
 	result = space.read_word(page_offset + ( offset << 1 ) );
 	m_dma_high_byte = result & 0xFF00;
@@ -193,28 +193,27 @@ READ8_MEMBER(at_state::pc_dma_read_word)
 
 WRITE8_MEMBER(at_state::pc_dma_write_word)
 {
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
 	space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
 }
-
 
 READ8_MEMBER( at_state::pc_dma8237_0_dack_r ) { return m_isabus->dack_r(0); }
 READ8_MEMBER( at_state::pc_dma8237_1_dack_r ) { return m_isabus->dack_r(1); }
 READ8_MEMBER( at_state::pc_dma8237_2_dack_r ) { return m_isabus->dack_r(2); }
 READ8_MEMBER( at_state::pc_dma8237_3_dack_r ) { return m_isabus->dack_r(3); }
-READ8_MEMBER( at_state::pc_dma8237_5_dack_r ) { return m_isabus->dack_r(5); }
-READ8_MEMBER( at_state::pc_dma8237_6_dack_r ) { return m_isabus->dack_r(6); }
-READ8_MEMBER( at_state::pc_dma8237_7_dack_r ) { return m_isabus->dack_r(7); }
+READ8_MEMBER( at_state::pc_dma8237_5_dack_r ) { UINT16 ret = m_isabus->dack16_r(5); m_dma_high_byte = ret & 0xff00; return ret; }
+READ8_MEMBER( at_state::pc_dma8237_6_dack_r ) { UINT16 ret = m_isabus->dack16_r(6); m_dma_high_byte = ret & 0xff00; return ret; }
+READ8_MEMBER( at_state::pc_dma8237_7_dack_r ) { UINT16 ret = m_isabus->dack16_r(7); m_dma_high_byte = ret & 0xff00; return ret; }
 
 
 WRITE8_MEMBER( at_state::pc_dma8237_0_dack_w ){ m_isabus->dack_w(0, data); }
 WRITE8_MEMBER( at_state::pc_dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
 WRITE8_MEMBER( at_state::pc_dma8237_2_dack_w ){ m_isabus->dack_w(2, data); }
 WRITE8_MEMBER( at_state::pc_dma8237_3_dack_w ){ m_isabus->dack_w(3, data); }
-WRITE8_MEMBER( at_state::pc_dma8237_5_dack_w ){ m_isabus->dack_w(5, data); }
-WRITE8_MEMBER( at_state::pc_dma8237_6_dack_w ){ m_isabus->dack_w(6, data); }
-WRITE8_MEMBER( at_state::pc_dma8237_7_dack_w ){ m_isabus->dack_w(7, data); }
+WRITE8_MEMBER( at_state::pc_dma8237_5_dack_w ){ m_isabus->dack16_w(5, m_dma_high_byte | data); }
+WRITE8_MEMBER( at_state::pc_dma8237_6_dack_w ){ m_isabus->dack16_w(6, m_dma_high_byte | data); }
+WRITE8_MEMBER( at_state::pc_dma8237_7_dack_w ){ m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
 WRITE_LINE_MEMBER( at_state::at_dma8237_out_eop ) { m_isabus->eop_w(state == ASSERT_LINE ? 0 : 1 ); }
 

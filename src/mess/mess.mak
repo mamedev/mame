@@ -137,7 +137,7 @@ SOUNDS += YM2612
 SOUNDS += YM3812
 SOUNDS += YM3526
 #SOUNDS += Y8950
-#SOUNDS += YMF262
+SOUNDS += YMF262
 #SOUNDS += YMF271
 #SOUNDS += YMF278B
 #SOUNDS += YMZ280B
@@ -1449,6 +1449,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_VIDEO)/isa_mda.o		\
 	$(MESS_VIDEO)/crtc_ega.o	\
 	$(MESS_VIDEO)/isa_ega.o		\
+	$(MESS_VIDEO)/isa_vga.o		\
 	$(MESS_VIDEO)/isa_svga_tseng.o		\
 	$(MESS_VIDEO)/isa_svga_s3.o	\
 	$(MESS_VIDEO)/isa_svga_cirrus.o	\
