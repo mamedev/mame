@@ -36,10 +36,12 @@ ADDRESS_MAP_END
  * different memory locations */
 static const m6502_interface apple3_m6502_interface =
 {
-	NULL,	/* read_indexed_func */
-	NULL,	/* write_indexed_func */
-	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read),				/* port_read_func */
-	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_write)				/* port_write_func */
+	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read),	/* read_indexed_func */
+	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_write),	/* write_indexed_func */
+    DEVCB_NULL, /* port_read_func */
+    DEVCB_NULL, /* port_write_func */
+    0x00,
+    0x00
 };
 
 static const floppy_interface apple3_floppy_interface =

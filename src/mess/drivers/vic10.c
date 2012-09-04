@@ -471,7 +471,7 @@ static const mos6526_interface cia_intf =
 
 
 //-------------------------------------------------
-//  m6502_interface cpu_intf
+//  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( vic10_state::cpu_r )
@@ -481,19 +481,21 @@ READ8_MEMBER( vic10_state::cpu_r )
         bit     description
 
         P0      EXPANSION PORT
-        P1      1
-        P2      1
+        P1      
+        P2      
         P3
         P4      CASS SENS
-        P5
+        P5		0
 
     */
 
-	UINT8 data = 0x06;
+	UINT8 data = 0;
 
+	// expansion port
 	data |= m_exp->p0_r();
 
-	data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
+	// cassette sense
+	data |= m_cassette->sense_r() << 4;
 
 	return data;
 }
@@ -519,40 +521,31 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 	}
 
 	// cassette write
-	m_cassette->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	m_cassette->write(BIT(data, 3));
 
 	// cassette motor
-	if (!BIT(data, 5))
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
-	}
-	else
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_cassette_timer->reset();
-	}
+	m_cassette->motor_w(BIT(data, 5));
 }
 
-static const m6502_interface cpu_intf =
+static M6510_INTERFACE( cpu_intf )
 {
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(vic10_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(vic10_state, cpu_w)
+	DEVCB_DRIVER_MEMBER(vic10_state, cpu_w),
+	0x10,
+	0x20
 };
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( cassette_tick )
+//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( cassette_tick )
+static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 {
-	vic10_state *state = timer.machine().driver_data<vic10_state>();
-
-	mos6526_flag_w(state->m_cia, state->m_cassette->input() > +0.0);
-}
+	DEVCB_DEVICE_LINE(MOS6526_TAG, mos6526_flag_w)
+};
 
 
 //-------------------------------------------------
@@ -638,8 +631,7 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 
 	// devices
 	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6566_CLOCK, cia_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
-	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, expansion_intf, vic10_expansion_cards, NULL, NULL)
 
 	// software list

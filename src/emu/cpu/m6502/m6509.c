@@ -84,8 +84,8 @@ struct _m6509_Regs {
 
 	int 	icount;
 
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
+	devcb_resolved_read8 rdmem_id;					/* readmem callback for indexed instructions */
+	devcb_resolved_write8 wrmem_id;					/* writemem callback for indexed instructions */
 };
 
 INLINE m6509_Regs *get_safe_token(device_t *device)
@@ -135,16 +135,11 @@ static ADDRESS_MAP_START(m6509_mem, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE_LEGACY(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
-static UINT8 default_rdmem_id(address_space *space, offs_t address) { return space->read_byte(address); }
-static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
-
 static CPU_INIT( m6509 )
 {
 	m6509_Regs *cpustate = get_safe_token(device);
 	const m6502_interface *intf = (const m6502_interface *)device->static_config();
 
-	cpustate->rdmem_id = default_rdmem_id;
-	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = device->space(AS_PROGRAM);
@@ -152,11 +147,16 @@ static CPU_INIT( m6509 )
 
 	if ( intf )
 	{
-		if ( intf->read_indexed_func )
-			cpustate->rdmem_id = intf->read_indexed_func;
+		cpustate->rdmem_id.resolve(intf->read_indexed_func, *device);
+		cpustate->wrmem_id.resolve(intf->write_indexed_func, *device);
+	}
+	else
+	{
+		devcb_read8 nullrcb = DEVCB_NULL;
+		devcb_write8 nullwcb = DEVCB_NULL;
 
-		if ( intf->write_indexed_func )
-			cpustate->wrmem_id = intf->write_indexed_func;
+		cpustate->rdmem_id.resolve(nullrcb, *device);
+		cpustate->wrmem_id.resolve(nullwcb, *device);		
 	}
 }
 

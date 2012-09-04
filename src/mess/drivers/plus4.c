@@ -438,7 +438,7 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  m6502_interface cpu_intf
+//  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( plus4_state::cpu_r )
@@ -489,7 +489,7 @@ READ8_MEMBER( plus4_state::c16_cpu_r )
 
     */
 
-    UINT8 data = 0x2f;
+    UINT8 data = 0;
 
     // cassette read
     data |= m_cassette->read() << 4;
@@ -538,20 +538,24 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	m_cassette->write(!BIT(data, 1));
 }
 
-static const m6502_interface cpu_intf =
+static M6510_INTERFACE( cpu_intf )
 {
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(plus4_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w)
+	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w),
+	0x00,
+	0xc0
 };
 
-static const m6502_interface c16_cpu_intf =
+static M6510_INTERFACE( c16_cpu_intf )
 {
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(plus4_state, c16_cpu_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w)
+	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w),
+	0x00,
+	0xc0
 };
 
 //-------------------------------------------------

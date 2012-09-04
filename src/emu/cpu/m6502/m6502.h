@@ -59,8 +59,8 @@ enum
 typedef struct _m6502_interface m6502_interface;
 struct _m6502_interface
 {
-	read8_space_func		read_indexed_func;
-	write8_space_func		write_indexed_func;
+	devcb_read8				read_indexed_func;
+	devcb_write8			write_indexed_func;
 	devcb_read8				in_port_func;
 	devcb_write8			out_port_func;
 	UINT8					external_port_pullup;

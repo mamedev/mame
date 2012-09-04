@@ -64,8 +64,8 @@
 
 #define PPC cpustate->ppc.d
 
-#define RDMEM_ID(a)		cpustate->rdmem_id(cpustate->space,a)
-#define WRMEM_ID(a,d)	cpustate->wrmem_id(cpustate->space,a,d)
+#define RDMEM_ID(a)		(cpustate->rdmem_id.isnull() ? cpustate->space->read_byte(a) : cpustate->rdmem_id(a))
+#define WRMEM_ID(a,d)	(cpustate->wrmem_id.isnull() ? cpustate->space->write_byte(a,d) : cpustate->wrmem_id(a,d))
 
 /***************************************************************
  *  RDOP    read an opcode

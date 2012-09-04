@@ -70,7 +70,7 @@ const rom_entry *c1551_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  m6502_interface m6510t_intf
+//  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( c1551_device::port_r )
@@ -131,12 +131,14 @@ WRITE8_MEMBER( c1551_device::port_w )
 	m_ga->ds_w((data >> 5) & 0x03);
 }
 
-static const m6502_interface m6510t_intf =
+static M6510_INTERFACE( cpu_intf )
 {
-	NULL,			// read_indexed_func
-	NULL,			// write_indexed_func
+	DEVCB_NULL,			// read_indexed_func
+	DEVCB_NULL,			// write_indexed_func
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, port_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, port_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, port_w),
+	0x00,
+	0x00
 };
 
 
@@ -406,7 +408,7 @@ static PLUS4_EXPANSION_INTERFACE( expansion_intf )
 static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1551_mem)
-	MCFG_CPU_CONFIG(m6510t_intf)
+	MCFG_CPU_CONFIG(cpu_intf)
 	MCFG_QUANTUM_PERFECT_CPU(M6510T_TAG)
 
 	MCFG_PLS100_ADD(PLA_TAG)

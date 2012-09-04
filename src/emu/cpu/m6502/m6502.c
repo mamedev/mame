@@ -76,8 +76,8 @@ struct _m6502_Regs
 	int		int_occured;
 	int		icount;
 
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
+	devcb_resolved_read8 rdmem_id;					/* readmem callback for indexed instructions */
+	devcb_resolved_write8 wrmem_id;					/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
 	UINT8	 port;
@@ -104,9 +104,6 @@ INLINE m6502_Regs *get_safe_token(device_t *device)
 		   device->type() == DECO16);
 	return (m6502_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
-
-static UINT8 default_rdmem_id(address_space *space, offs_t offset) { return space->read_byte(offset); }
-static void default_wdmem_id(address_space *space, offs_t offset, UINT8 data) { space->write_byte(offset, data); }
 
 /***************************************************************
  * include the opcode macros, functions and tables
@@ -144,26 +141,27 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_acknowledge_
 	cpustate->direct = &cpustate->space->direct();
 	cpustate->subtype = subtype;
 	cpustate->insn = insn;
-	cpustate->rdmem_id = default_rdmem_id;
-	cpustate->wrmem_id = default_wdmem_id;
 
 	if ( intf )
 	{
-		if ( intf->read_indexed_func )
-			cpustate->rdmem_id = intf->read_indexed_func;
-
-		if ( intf->write_indexed_func )
-			cpustate->wrmem_id = intf->write_indexed_func;
-
+		cpustate->rdmem_id.resolve(intf->read_indexed_func, *device);
+		cpustate->wrmem_id.resolve(intf->write_indexed_func, *device);
 		cpustate->in_port_func.resolve(intf->in_port_func, *device);
 		cpustate->out_port_func.resolve(intf->out_port_func, *device);
+		
 		cpustate->pullup = intf->external_port_pullup;
 		cpustate->pulldown = intf->external_port_pulldown;
 	}
 	else
 	{
-		devcb_write8 nullcb = DEVCB_NULL;
-		cpustate->out_port_func.resolve(nullcb, *device);
+		devcb_read8 nullrcb = DEVCB_NULL;
+		devcb_write8 nullwcb = DEVCB_NULL;
+
+		cpustate->rdmem_id.resolve(nullrcb, *device);
+		cpustate->wrmem_id.resolve(nullwcb, *device);
+		cpustate->in_port_func.resolve(nullrcb, *device);
+		cpustate->out_port_func.resolve(nullwcb, *device);
+
 		cpustate->pullup = 0;
 		cpustate->pulldown = 0;
 	}
@@ -393,7 +391,7 @@ static READ8_HANDLER( m6510_read_0000 )
 				UINT8 output = cpustate->port & cpustate->ddr;
 				UINT8 pulldown = ~(cpustate->pulldown & ~cpustate->ddr);
 
-				result = (input | mask | output) & pulldown;
+				result = (input | mask | output) & (input | pulldown);
 			}
 			break;
 	}

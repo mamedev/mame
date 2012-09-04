@@ -651,7 +651,7 @@ static const mos6526_interface cia2_intf =
 
 
 //-------------------------------------------------
-//  m6502_interface cpu_intf
+//  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( c64_state::cpu_r )
@@ -705,8 +705,8 @@ WRITE8_MEMBER( c64_state::cpu_w )
 
 static M6510_INTERFACE( cpu_intf )
 {
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c64_state, cpu_r),
 	DEVCB_DRIVER_MEMBER(c64_state, cpu_w),
 	0x17,
@@ -715,7 +715,7 @@ static M6510_INTERFACE( cpu_intf )
 
 
 //-------------------------------------------------
-//  m6502_interface sx64_cpu_intf
+//  M6510_INTERFACE( sx64_cpu_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( sx64_state::cpu_r )
@@ -759,8 +759,8 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 
 static M6510_INTERFACE( sx64_cpu_intf )
 {
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(sx64_state, cpu_r),
 	DEVCB_DRIVER_MEMBER(sx64_state, cpu_w),
 	0x07,
@@ -769,7 +769,7 @@ static M6510_INTERFACE( sx64_cpu_intf )
 
 
 //-------------------------------------------------
-//  m6502_interface c64gs_cpu_intf
+//  M6510_INTERFACE( c64gs_cpu_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( c64gs_state::cpu_r )
@@ -811,10 +811,10 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 	m_charen = BIT(data, 2);
 }
 
-static const m6502_interface c64gs_cpu_intf =
+static M6510_INTERFACE( c64gs_cpu_intf )
 {
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_r),
 	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_w),
 	0x07,

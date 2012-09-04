@@ -78,8 +78,8 @@ struct	_m65ce02_Regs {
 	legacy_cpu_device *device;
 	address_space *space;
 	direct_read_data *direct;
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
+	devcb_resolved_read8 rdmem_id;					/* readmem callback for indexed instructions */
+	devcb_resolved_write8 wrmem_id;					/* writemem callback for indexed instructions */
 };
 
 INLINE m65ce02_Regs *get_safe_token(device_t *device)
@@ -95,16 +95,11 @@ INLINE m65ce02_Regs *get_safe_token(device_t *device)
 
 #include "t65ce02.c"
 
-static UINT8 default_rdmem_id(address_space *space, offs_t address) { return space->read_byte(address); }
-static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
-
 static CPU_INIT( m65ce02 )
 {
 	m65ce02_Regs *cpustate = get_safe_token(device);
 	const m6502_interface *intf = (const m6502_interface *)device->static_config();
 
-	cpustate->rdmem_id = default_rdmem_id;
-	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = device->space(AS_PROGRAM);
@@ -112,11 +107,16 @@ static CPU_INIT( m65ce02 )
 
 	if ( intf )
 	{
-		if ( intf->read_indexed_func )
-			cpustate->rdmem_id = intf->read_indexed_func;
+		cpustate->rdmem_id.resolve(intf->read_indexed_func, *device);
+		cpustate->wrmem_id.resolve(intf->write_indexed_func, *device);
+	}
+	else
+	{
+		devcb_read8 nullrcb = DEVCB_NULL;
+		devcb_write8 nullwcb = DEVCB_NULL;
 
-		if ( intf->write_indexed_func )
-			cpustate->wrmem_id = intf->write_indexed_func;
+		cpustate->rdmem_id.resolve(nullrcb, *device);
+		cpustate->wrmem_id.resolve(nullwcb, *device);
 	}
 }
 

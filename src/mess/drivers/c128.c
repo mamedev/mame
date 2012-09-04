@@ -663,12 +663,14 @@ static const sid6581_interface c128_sound_interface =
 };
 
 
-static const m6502_interface c128_m8502_interface =
+static M6510_INTERFACE( c128_m8502_interface )
 {
-	NULL,					/* read_indexed_func */
-	NULL,					/* write_indexed_func */
+	DEVCB_NULL,					/* read_indexed_func */
+	DEVCB_NULL,					/* write_indexed_func */
 	DEVCB_HANDLER(c128_m6510_port_read),	/* port_read_func */
-	DEVCB_HANDLER(c128_m6510_port_write)	/* port_write_func */
+	DEVCB_HANDLER(c128_m6510_port_write),	/* port_write_func */
+	0x00,
+	0x00
 };
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )

@@ -197,12 +197,14 @@ static MACHINE_RESET(sbc6510)
 {
 }
 
-static const m6502_interface sbc6510_m6510_interface =
+static M6510_INTERFACE( sbc6510_m6510_interface )
 {
-	NULL,
-	NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	0x00,
+	0x00
 };
 
 READ8_MEMBER( sbc6510_state::psg_a_r )

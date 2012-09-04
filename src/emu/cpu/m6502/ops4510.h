@@ -59,3 +59,8 @@
 				UINT8 op = RDOP();								\
 				(*cpustate->insn[op])(cpustate);							\
   }
+
+#undef RDMEM_ID
+#undef WRMEM_ID
+#define RDMEM_ID(a)   (cpustate->rdmem_id.isnull() ? cpustate->space->read_byte(M4510_MEM(a)) : cpustate->rdmem_id(M4510_MEM(a)))
+#define WRMEM_ID(a,d) (cpustate->wrmem_id.isnull() ? cpustate->space->write_byte(M4510_MEM(a),d) : cpustate->wrmem_id(M4510_MEM(a),d))

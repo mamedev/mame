@@ -8,6 +8,7 @@
 #include "includes/cbm.h"
 #include "machine/6526cia.h"
 #include "machine/cbmipt.h"
+#include "machine/petcass.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
@@ -31,8 +32,7 @@ public:
 		  m_cia(*this, MOS6526_TAG),
 		  m_exp(*this, VIC10_EXPANSION_SLOT_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_cassette_timer(*this, TIMER_C1531_TAG),
+		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		  m_cia_irq(CLEAR_LINE),
 		  m_vic_irq(CLEAR_LINE),
 		  m_exp_irq(CLEAR_LINE)
@@ -44,8 +44,7 @@ public:
 	required_device<mos6526_device> m_cia;
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
-	optional_device<cassette_image_device> m_cassette;
-	optional_device<timer_device> m_cassette_timer;
+	optional_device<pet_datassette_port_device> m_cassette;
 
 	virtual void machine_start();
 	virtual void machine_reset();

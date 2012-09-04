@@ -148,8 +148,8 @@ struct _m4510_Regs {
 	direct_read_data *direct;
 	int 	icount;
 
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
+	devcb_resolved_read8 rdmem_id;					/* readmem callback for indexed instructions */
+	devcb_resolved_write8 wrmem_id;					/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
 	UINT8    port;
@@ -184,25 +184,12 @@ INLINE int m4510_cpu_readop_arg(m4510_Regs *cpustate)
 #define M4510
 #include "t65ce02.c"
 
-static UINT8 default_rdmem_id(address_space *space, offs_t address)
-{
-	m4510_Regs *cpustate = get_safe_token(&space->device());
-	return space->read_byte(M4510_MEM(address));
-}
-static void default_wrmem_id(address_space *space, offs_t address, UINT8 data)
-{
-	m4510_Regs *cpustate = get_safe_token(&space->device());
-	space->write_byte(M4510_MEM(address), data);
-}
-
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
 	const m6502_interface *intf = (const m6502_interface *)device->static_config();
 
 	cpustate->interrupt_inhibit = 0;
-	cpustate->rdmem_id = default_rdmem_id;
-	cpustate->wrmem_id = default_wrmem_id;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = device->space(AS_PROGRAM);
@@ -210,12 +197,8 @@ static CPU_INIT( m4510 )
 
 	if ( intf )
 	{
-		if ( intf->read_indexed_func )
-			cpustate->rdmem_id = intf->read_indexed_func;
-
-		if ( intf->write_indexed_func )
-			cpustate->wrmem_id = intf->write_indexed_func;
-
+		cpustate->rdmem_id.resolve(intf->read_indexed_func, *device);
+		cpustate->wrmem_id.resolve(intf->write_indexed_func, *device);
 		cpustate->in_port_func.resolve(intf->in_port_func, *device);
 		cpustate->out_port_func.resolve(intf->out_port_func, *device);
 	}
@@ -223,6 +206,9 @@ static CPU_INIT( m4510 )
 	{
 		devcb_read8 nullrcb = DEVCB_NULL;
 		devcb_write8 nullwcb = DEVCB_NULL;
+
+		cpustate->rdmem_id.resolve(nullrcb, *device);
+		cpustate->wrmem_id.resolve(nullwcb, *device);
 		cpustate->in_port_func.resolve(nullrcb, *device);
 		cpustate->out_port_func.resolve(nullwcb, *device);
 	}
