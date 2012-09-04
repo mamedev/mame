@@ -187,7 +187,7 @@ public:
 
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[MIN(x, MAX_UNADORNED_OPTIONS)]; }
-
+	int options_count();
 private:
 	// internal helpers
 	void reset();

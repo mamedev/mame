@@ -377,10 +377,16 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 		set_value(name, value, OPTION_PRIORITY_CMDLINE, error_string);
 	}
 	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	update_slot_options();
-	while (add_slot_options(false));
-	add_device_options(true);
-	result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+
+	int num = 0;
+	do {
+		num = options_count();
+		update_slot_options();
+		while (add_slot_options(false));
+		add_device_options(false);
+		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
+	} while(num != options_count());
+
 	return result;
 }
 
@@ -510,9 +516,13 @@ void emu_options::set_system_name(const char *name)
 		}
 		// then add the options
 		add_device_options(true);
-		update_slot_options();
-		while (add_slot_options(false));
-		add_device_options(true);
+		int num = 0;
+		do {
+			num = options_count();		
+			update_slot_options();
+			while (add_slot_options(false));
+			add_device_options(false);
+		} while(num != options_count());
 	}
 }
 

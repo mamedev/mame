@@ -811,3 +811,15 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	curentry.set_value(data, priority);
 	return true;
 }
+
+//-------------------------------------------------
+//  options_count - take number of existing 
+//  number of options in structure
+//-------------------------------------------------
+
+int core_options::options_count()
+{
+	int number = 0;
+	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next()) number++;
+	return number;
+}
