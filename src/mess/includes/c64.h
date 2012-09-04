@@ -67,7 +67,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pls100_device> m_pla;
 	required_device<mos6566_device> m_vic;
-	required_device<device_t> m_sid;
+	required_device<sid6581_device> m_sid;
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	optional_device<cbm_iec_device> m_iec;

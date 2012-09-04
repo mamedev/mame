@@ -203,10 +203,16 @@ READ8_MEMBER( c65_state::sid_poty_r )
 	return c64_paddle_read(sid, 1);
 }
 
-static MOS6581_INTERFACE( c65_sound_interface )
+static MOS6581_INTERFACE( sidr_intf )
 {
 	DEVCB_DRIVER_MEMBER(c65_state, sid_potx_r),
 	DEVCB_DRIVER_MEMBER(c65_state, sid_poty_r)
+};
+
+static MOS6581_INTERFACE( sidl_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -321,10 +327,11 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("sid_r", SID8580, 985248)
-	MCFG_SOUND_CONFIG(c65_sound_interface)
+	MCFG_SOUND_CONFIG(sidr_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_SOUND_ADD("sid_l", SID8580, 985248)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_CONFIG(sidl_intf)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -355,9 +362,10 @@ static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("sid_r", SID8580, 1022727)
-	MCFG_SOUND_CONFIG(c65_sound_interface)
+	MCFG_SOUND_CONFIG(sidr_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_SOUND_REPLACE("sid_l", SID8580, 1022727)
+	MCFG_SOUND_CONFIG(sidl_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* cia */

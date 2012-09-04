@@ -33,7 +33,8 @@ static void sid_start(device_t *device, SIDTYPE sidtype)
 {
 	_SID6581 *sid = get_sid(device);
 	const sid6581_interface *iface = (const sid6581_interface*) device->static_config();
-
+	assert(iface);
+	
 	// resolve callbacks
 	sid->in_potx_func.resolve(iface->in_potx_cb, *device);
 	sid->in_poty_func.resolve(iface->in_poty_cb, *device);
