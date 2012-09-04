@@ -739,9 +739,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_BASE_LEGACY(_base) \
 	curentry->set_baseptr(_base); \
 
-#define AM_SIZE_LEGACY(_size) \
-	curentry->set_sizeptr(_size); \
-
 
 // common shortcuts
 #define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)

@@ -111,7 +111,8 @@ class apollo_state : public driver_device
 public:
 	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag),
-            m_ctape(*this, APOLLO_CTAPE_TAG)
+            m_ctape(*this, APOLLO_CTAPE_TAG),
+            m_messram_ptr(*this, "messram")
             { }
 
     required_device<sc499_device> m_ctape;
@@ -177,6 +178,8 @@ public:
 	DECLARE_DRIVER_INIT(dsp3500);
 	DECLARE_DRIVER_INIT(dn5500);
 	DECLARE_DRIVER_INIT(apollo);
+
+	required_shared_ptr<UINT32> m_messram_ptr;
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
