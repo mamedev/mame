@@ -148,27 +148,8 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 
 static void init_wunit_generic(running_machine &machine)
 {
-	midwunit_state *state = machine.driver_data<midwunit_state>();
-	UINT8 *base;
-	int i, j, len;
-
 	/* register for state saving */
 	register_state_saving(machine);
-
-	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = state->memregion("gfx1")->base();
-	len = state->memregion("gfx1")->bytes();
-	for (i = 0; i < len / 0x400000; i++)
-	{
-		memcpy(state->m_decode_memory, base, 0x400000);
-		for (j = 0; j < 0x100000; j++)
-		{
-			*base++ = state->m_decode_memory[0x000000 + j];
-			*base++ = state->m_decode_memory[0x100000 + j];
-			*base++ = state->m_decode_memory[0x200000 + j];
-			*base++ = state->m_decode_memory[0x300000 + j];
-		}
-	}
 
 	/* init sound */
 	dcs_init(machine);

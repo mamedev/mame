@@ -40,8 +40,6 @@ enum
 
 
 /* graphics-related variables */
-       UINT8 *	midtunit_gfx_rom;
-       size_t	midtunit_gfx_rom_size;
        UINT8	midtunit_gfx_rom_large;
 static UINT16	midtunit_control;
 
@@ -54,6 +52,8 @@ static UINT8	videobank_select;
 static UINT16	dma_register[18];
 static struct
 {
+	UINT8 *		gfxrom;
+
 	UINT32		offset;			/* source offset, in bits */
 	INT32		rowbits;		/* source bits to skip each row */
 	INT32		xpos;			/* x position, clipped */
@@ -96,6 +96,7 @@ VIDEO_START( midtunit )
 
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
+	dma_state.gfxrom = machine.driver_data<midtunit_state>()->m_gfxrom->base();
 
 	/* register for state saving */
 	state_save_register_global(machine, midtunit_control);
@@ -130,7 +131,7 @@ VIDEO_START( midxunit )
 
 READ16_MEMBER(midtunit_state::midtunit_gfxrom_r)
 {
-	UINT8 *base = &midtunit_gfx_rom[gfxbank_offset[(offset >> 21) & 1]];
+	UINT8 *base = m_gfxrom->base() + gfxbank_offset[(offset >> 21) & 1];
 	offset = (offset & 0x01fffff) * 2;
 	return base[offset] | (base[offset + 1] << 8);
 }
@@ -138,7 +139,7 @@ READ16_MEMBER(midtunit_state::midtunit_gfxrom_r)
 
 READ16_MEMBER(midtunit_state::midwunit_gfxrom_r)
 {
-	UINT8 *base = &midtunit_gfx_rom[gfxbank_offset[0]];
+	UINT8 *base = m_gfxrom->base() + gfxbank_offset[0];
 	offset *= 2;
 	return base[offset] | (base[offset + 1] << 8);
 }
@@ -357,7 +358,7 @@ typedef void (*dma_draw_func)(void);
 #define DMA_DRAW_FUNC_BODY(name, bitsperpixel, extractor, xflip, skip, scale, zero, nonzero) \
 {																				\
 	int height = dma_state.height << 8;											\
-	UINT8 *base = midtunit_gfx_rom;													\
+	UINT8 *base = dma_state.gfxrom;													\
 	UINT32 offset = dma_state.offset;											\
 	UINT16 pal = dma_state.palette;												\
 	UINT16 color = pal | dma_state.color;										\

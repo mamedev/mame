@@ -291,26 +291,8 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 
 DRIVER_INIT_MEMBER(midxunit_state,revx)
 {
-	UINT8 *base;
-	int i, j, len;
-
 	/* register for state saving */
 	register_state_saving(machine());
-
-	/* load the graphics ROMs -- quadruples */
-	midtunit_gfx_rom = base = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
-	for (i = 0; i < len / 0x200000; i++)
-	{
-		memcpy(m_decode_memory, base, 0x200000);
-		for (j = 0; j < 0x80000; j++)
-		{
-			*base++ = m_decode_memory[0x000000 + j];
-			*base++ = m_decode_memory[0x080000 + j];
-			*base++ = m_decode_memory[0x100000 + j];
-			*base++ = m_decode_memory[0x180000 + j];
-		}
-	}
 
 	/* init sound */
 	dcs_init(machine());

@@ -409,22 +409,8 @@ READ16_MEMBER(midtunit_state::jdredd_hack_r)
 
 static void init_tunit_generic(running_machine &machine, int sound)
 {
-	offs_t gfx_chunk = midtunit_gfx_rom_size / 4;
-	UINT8 *base;
-	int i;
-
 	/* register for state saving */
 	register_state_saving(machine);
-
-	/* load the graphics ROMs -- quadruples */
-	base = machine.root_device().memregion("gfx1")->base();
-	for (i = 0; i < midtunit_gfx_rom_size; i += 4)
-	{
-		midtunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
-		midtunit_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];
-		midtunit_gfx_rom[i + 2] = base[2 * gfx_chunk + i / 4];
-		midtunit_gfx_rom[i + 3] = base[3 * gfx_chunk + i / 4];
-	}
 
 	/* load sound ROMs and set up sound handlers */
 	chip_type = sound;
