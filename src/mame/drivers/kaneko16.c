@@ -242,7 +242,8 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 //  AM_RANGE(0x480000, 0x480001) AM_RAM     // ?
 	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_reg_r, kaneko16_bg15_reg_w) AM_SHARE("bg15_reg")	// High Color Background
 	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_SHARE("bg15_select")
-	AM_RANGE(0x600000, 0x60003f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
+	AM_RANGE(0x600000, 0x60001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
+	/* writes to 0x600020 - 0x60003f too, mirror, or is it only hooked up on bytes or similar? */
 	AM_RANGE(0x680000, 0x680001) AM_READ_PORT("P1")
 	AM_RANGE(0x680002, 0x680003) AM_READ_PORT("P2")
 	AM_RANGE(0x680004, 0x680005) AM_READ_PORT("SYSTEM")
