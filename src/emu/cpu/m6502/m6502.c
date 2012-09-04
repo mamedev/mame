@@ -80,7 +80,10 @@ struct _m6502_Regs
 	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
-	UINT8    port;
+	UINT8	 port;
+	UINT8    mask;
+	UINT8	 pullup;
+	UINT8	 pulldown;
 
 	devcb_resolved_read8	in_port_func;
 	devcb_resolved_write8	out_port_func;
@@ -154,11 +157,15 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_acknowledge_
 
 		cpustate->in_port_func.resolve(intf->in_port_func, *device);
 		cpustate->out_port_func.resolve(intf->out_port_func, *device);
+		cpustate->pullup = intf->external_port_pullup;
+		cpustate->pulldown = intf->external_port_pulldown;
 	}
 	else
 	{
 		devcb_write8 nullcb = DEVCB_NULL;
 		cpustate->out_port_func.resolve(nullcb, *device);
+		cpustate->pullup = 0;
+		cpustate->pulldown = 0;
 	}
 
 	device->save_item(NAME(cpustate->pc.w.l));
@@ -176,7 +183,10 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_acknowledge_
 	if (subtype == SUBTYPE_6510)
 	{
 		device->save_item(NAME(cpustate->port));
+		device->save_item(NAME(cpustate->mask));
 		device->save_item(NAME(cpustate->ddr));
+		device->save_item(NAME(cpustate->pullup));
+		device->save_item(NAME(cpustate->pulldown));
 	}
 }
 
@@ -355,6 +365,7 @@ static CPU_RESET( m6510 )
 
 	CPU_RESET_CALL(m6502);
 	cpustate->port = 0xff;
+	cpustate->mask = 0xff;
 	cpustate->ddr = 0x00;
 }
 
@@ -374,11 +385,19 @@ static READ8_HANDLER( m6510_read_0000 )
 		case 0x0000:	/* DDR */
 			result = cpustate->ddr;
 			break;
+
 		case 0x0001:	/* Data Port */
-			result = cpustate->in_port_func(cpustate->ddr);
-			result = (cpustate->ddr & cpustate->port) | (~cpustate->ddr & result);
+			{
+				UINT8 input = cpustate->in_port_func(0) & ~cpustate->ddr;
+				UINT8 mask = cpustate->mask & ~cpustate->ddr;
+				UINT8 output = cpustate->port & cpustate->ddr;
+				UINT8 pulldown = ~(cpustate->pulldown & ~cpustate->ddr);
+
+				result = (input | mask | output) & pulldown;
+			}
 			break;
 	}
+
 	return result;
 }
 
@@ -389,14 +408,24 @@ static WRITE8_HANDLER( m6510_write_0000 )
 	switch(offset)
 	{
 		case 0x0000:	/* DDR */
-			cpustate->ddr = data;
+			if (cpustate->ddr != data)
+			{
+				cpustate->ddr = data;
+				cpustate->mask = cpustate->port;
+			}
 			break;
+
 		case 0x0001:	/* Data Port */
 			cpustate->port = data;
 			break;
 	}
 
-	cpustate->out_port_func(cpustate->ddr, cpustate->port & cpustate->ddr);
+	UINT8 output = (cpustate->port & cpustate->ddr) | (cpustate->pullup & ~cpustate->ddr);
+
+	cpustate->out_port_func(0, output);
+
+	// TODO assert write with floating data lines
+	//WRMEM(offset, 0xff);
 }
 
 static ADDRESS_MAP_START(m6510_mem, AS_PROGRAM, 8, legacy_cpu_device)

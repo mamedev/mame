@@ -53,6 +53,9 @@ enum
 
 
 /* Optional interface to set callbacks */
+#define M6510_INTERFACE(name) \
+   	const m6502_interface (name) =
+
 typedef struct _m6502_interface m6502_interface;
 struct _m6502_interface
 {
@@ -60,6 +63,8 @@ struct _m6502_interface
 	write8_space_func		write_indexed_func;
 	devcb_read8				in_port_func;
 	devcb_write8			out_port_func;
+	UINT8					external_port_pullup;
+	UINT8					external_port_pulldown;
 };
 
 DECLARE_LEGACY_CPU_DEVICE(M6502, m6502);

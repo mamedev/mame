@@ -2,10 +2,9 @@
 
     TODO:
 
+	- floating bus writes to peripheral registers in m6502.c
 	- sort out kernals between PAL/NTSC
     - tsuit215 test failures
-
-        - CPUPORT (0=FF 1=FF 0=00 1=FF 1=FF 1=FF, AFTER 00 17, RIGHT 00 DF)
         - IRQ (WRONG $DC0D)
         - NMI (WRONG $DD0D)
         - all CIA tests
@@ -187,6 +186,12 @@ WRITE8_MEMBER( c64_state::write )
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 
 	bankswitch(offset, va, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+
+	if (offset < 0x0002)
+	{
+		// write to internal CPU register
+		data = m_vic->bus_r();
+	}
 
 	if (!casram)
 	{
@@ -658,9 +663,9 @@ READ8_MEMBER( c64_state::cpu_r )
         P0      1
         P1      1
         P2      1
-        P3
+        P3		
         P4      CASS SENS
-        P5
+        P5		0
 
     */
 
@@ -686,9 +691,7 @@ WRITE8_MEMBER( c64_state::cpu_w )
 
     */
 
-	// HACK apply pull-up resistors
-	data |= (offset ^ 0x07) & 0x07;
-
+    // memory banking
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -700,12 +703,14 @@ WRITE8_MEMBER( c64_state::cpu_w )
 	m_cassette->motor_w(BIT(data, 5));
 }
 
-static const m6502_interface cpu_intf =
+static M6510_INTERFACE( cpu_intf )
 {
 	NULL,
 	NULL,
 	DEVCB_DRIVER_MEMBER(c64_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(c64_state, cpu_w)
+	DEVCB_DRIVER_MEMBER(c64_state, cpu_w),
+	0x17,
+	0x20
 };
 
 
@@ -722,13 +727,13 @@ READ8_MEMBER( sx64_state::cpu_r )
         P0      1
         P1      1
         P2      1
-        P3      1
-        P4      1
-        P5      1
+        P3      
+        P4      
+        P5      
 
     */
 
-	return 0x3f;
+	return 0x07;
 }
 
 WRITE8_MEMBER( sx64_state::cpu_w )
@@ -746,20 +751,20 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 
     */
 
-	// HACK apply pull-up resistors
-	data |= (offset ^ 0x07) & 0x07;
-
+    // memory banking
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
 }
 
-static const m6502_interface sx64_cpu_intf =
+static M6510_INTERFACE( sx64_cpu_intf )
 {
 	NULL,
 	NULL,
 	DEVCB_DRIVER_MEMBER(sx64_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(sx64_state, cpu_w)
+	DEVCB_DRIVER_MEMBER(sx64_state, cpu_w),
+	0x07,
+	0x00
 };
 
 
@@ -776,13 +781,13 @@ READ8_MEMBER( c64gs_state::cpu_r )
         P0      1
         P1      1
         P2      1
-        P3      1
-        P4      1
-        P5      1
+        P3      
+        P4      
+        P5      
 
     */
 
-	return 0x3f;
+	return 0x07;
 }
 
 WRITE8_MEMBER( c64gs_state::cpu_w )
@@ -800,9 +805,7 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 
     */
 
-	// HACK apply pull-up resistors
-	data |= (offset ^ 0x07) & 0x07;
-
+    // memory banking
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -813,7 +816,9 @@ static const m6502_interface c64gs_cpu_intf =
 	NULL,
 	NULL,
 	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_w)
+	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_w),
+	0x07,
+	0x00
 };
 
 
