@@ -725,9 +725,6 @@ WRITE8_HANDLER( snes_w_io )
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
 				space->machine().scheduler().timer_set(space->machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
 			break;
-		case MEMSEL:	/* Access cycle designation in memory (2) area */
-			cpu_set_reg(state->m_maincpu, _5A22_FASTROM, data & 1);
-			break;
 		case TIMEUP:	// IRQ Flag is cleared on both read and write
 			device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, CLEAR_LINE );
 			snes_ram[TIMEUP] = 0;

@@ -157,7 +157,7 @@
 #define VTIMEH         0x420A
 #define MDMAEN         0x420B
 #define HDMAEN         0x420C
-#define MEMSEL         0x420D
+//#define MEMSEL         0x420D
 #define RDNMI          0x4210
 #define TIMEUP         0x4211
 #define HVBJOY         0x4212

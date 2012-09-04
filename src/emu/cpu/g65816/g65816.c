@@ -627,6 +627,12 @@ static WRITE8_HANDLER( wrdvdd_w )
 	cpustate->rdmpy = remainder;
 }
 
+static WRITE8_HANDLER( memsel_w )
+{
+	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
+	cpustate->fastROM = data & 1;
+}
+
 static READ8_HANDLER( rddivl_r )
 {
 	g65816i_cpu_struct *cpustate = get_safe_token(&space->device());
@@ -658,6 +664,8 @@ static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdivl_w)
 	AM_RANGE(0x4205, 0x4205) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdivh_w)
 	AM_RANGE(0x4206, 0x4206) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdvdd_w)
+
+	AM_RANGE(0x420d, 0x420d) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(memsel_w)
 
 	AM_RANGE(0x4214, 0x4214) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rddivl_r)
 	AM_RANGE(0x4215, 0x4215) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rddivh_r)
