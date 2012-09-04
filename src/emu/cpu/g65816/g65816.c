@@ -620,16 +620,8 @@ static WRITE8_HANDLER( wrdvdd_w )
 
 	cpustate->dvdd = data;
 
-	if(cpustate->dvdd != 0)
-	{
-		quotient = cpustate->wrdiv / cpustate->dvdd;
-		remainder = cpustate->wrdiv % cpustate->dvdd;
-	}
-	else
-	{
-		quotient = 0xffff;
-		remainder = 0x000c;
-	}
+	quotient = (cpustate->dvdd == 0) ? 0xffff : cpustate->wrdiv / cpustate->dvdd;
+	remainder = (cpustate->dvdd == 0) ? 0x000c : cpustate->wrdiv % cpustate->dvdd;
 
 	cpustate->rddiv = quotient;
 	cpustate->rdmpy = remainder;
