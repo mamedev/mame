@@ -1989,7 +1989,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE_LEGACY(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE_LEGACY(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram16")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
@@ -2027,7 +2027,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE_LEGACY(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE_LEGACY(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram16")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
@@ -2065,7 +2065,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16_LEGACY(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16_LEGACY(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
 	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE16_LEGACY(x68k_exp_r, x68k_exp_w,0xffffffff)  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w)
 	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram32")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM

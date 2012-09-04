@@ -764,7 +764,7 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size) /* 8MB RAM */
+		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
 		AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
@@ -812,7 +812,7 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size) /* 8MB RAM */
+		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
@@ -851,7 +851,7 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size) /* 8MB RAM */
+		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size) /* 8MB RAM */
+		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
@@ -935,7 +935,7 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size) /* 8MB RAM */
+		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN5500_RAM_BASE, DN5500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_BASE_LEGACY(&messram_ptr.u32) AM_SIZE_LEGACY(&messram_size)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
