@@ -356,7 +356,6 @@ Notes:
 #include "includes/itech32.h"
 #include "sound/es5506.h"
 #include "machine/timekpr.h"
-#include "devconv.h"
 
 
 #define FULL_LOGGING				0

@@ -284,7 +284,6 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
-#include "memconv.h"
 #include "devconv.h"
 #include "machine/idectrl.h"
 #include "machine/timekpr.h"
