@@ -35,7 +35,11 @@ class mz2000_state : public driver_device
 {
 public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_cass(*this, CASSETTE_TAG)
+		{ }
+
+	required_device<cassette_image_device> m_cass;
 
 	UINT8 m_ipl_enable;
 	UINT8 m_tvram_enable;
@@ -273,7 +277,6 @@ WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
 
 WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 {
-
 	m_gvram_bank = data & 3;
 }
 
@@ -563,6 +566,7 @@ static READ8_DEVICE_HANDLER( mz2000_porta_r )
 
 static READ8_DEVICE_HANDLER( mz2000_portb_r )
 {
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 	/*
     x--- ---- break key
     -x-- ---- read tape data
@@ -571,12 +575,14 @@ static READ8_DEVICE_HANDLER( mz2000_portb_r )
     ---- x--- end of tape reached
     ---- ---x "blank" control
     */
-	UINT8 res = 0xff ^ 0xe0;
+	UINT8 res = 0x80;
 
-	res |= ((device->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.00) ? 0x40 : 0x00;
-	res |= (((device->machine().device<cassette_image_device>(CASSETTE_TAG))->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
+	res |= (state->m_cass->input() > 0.0038) ? 0x40 : 0x00;
+	res |= ((state->m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
+	res |= (state->m_cass->get_position() >= state->m_cass->get_length()) ? 0x08 : 0x00;
+	res |= (device->machine().primary_screen->vblank()) ? 0x00 : 0x01;
 
-	popmessage("%02x",res);
+//	popmessage("%02x",res);
 
 	return res;
 }
@@ -590,6 +596,7 @@ static READ8_DEVICE_HANDLER( mz2000_portc_r )
 static WRITE8_DEVICE_HANDLER( mz2000_porta_w )
 {
 	/*
+	TODO: it's likely to be a 0->1 transition
     x--- ---- tape "APSS"
     -x-- ---- tape "APLAY"
     --x- ---- tape "AREW"
@@ -599,14 +606,23 @@ static WRITE8_DEVICE_HANDLER( mz2000_porta_w )
     ---- --x- tape ff
     ---- ---x tape rewind
     */
-	//printf("A W %02x\n",data);
+	mz2000_state *state = device->machine().driver_data<mz2000_state>();
 
-	// ...
+	if((data & 8) == 0) // stop
+	{
+		state->m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		state->m_cass->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+	}
+	if((data & 4) == 0) // play
+	{
+		state->m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		state->m_cass->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	}
 }
 
 static WRITE8_DEVICE_HANDLER( mz2000_portb_w )
 {
-	printf("B W %02x\n",data);
+	//printf("B W %02x\n",data);
 
 	// ...
 }
@@ -623,7 +639,7 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
         ---- -x-- beeper state
         ---- --x- 0->1 transition = Work RAM reset
     */
-	printf("C W %02x\n",data);
+	//printf("C W %02x\n",data);
 
 	if(((state->m_old_portc & 8) == 0) && data & 8)
 		state->m_ipl_enable = 1;
@@ -762,7 +778,7 @@ static const cassette_interface mz2000_cassette_interface =
 
 static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_17_73447MHz/5) /* TODO: was 4 MHz, but otherwise cassette won't work */
 	MCFG_CPU_PROGRAM_MAP(mz2000_map)
 	MCFG_CPU_IO_MAP(mz2000_io)
 
