@@ -62,13 +62,13 @@ static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
 	-1, -1, -1, -1,  1,  3, -1, -1, -1, -1, -1,	-1, -1, -1,  2,  1, /* 0x */
-	 2, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1,  1, -1, -1, -1, /* 1x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
+	 2, -1, -1, -1,  3, -1,  3,  3, -1, -1, -1,	-1,  1, -1, -1,  1, /* 1x */
+	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 3x */
 	 2,  3,  3, -1, -1, -1, -1, -1,  3, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 5x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 6x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 7x */
+	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1,	-1, -1,  1, -1,  1, /* 7x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 8x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 9x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ax */
@@ -350,23 +350,71 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.flags = 0;
                 break;
 
-            case 0x1c:  // 8-bit DMA with autoinit
-//              printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
-                m_dsp.dma_transferred = 0;
-                m_dsp.dma_autoinit = 1;
-                m_dsp.dma_timer_started = false;
-                m_dsp.dma_throttled = false;
-                drq_w(1);
-				m_dsp.flags = 0;
-            	break;
+			case 0x17:  // 2-bit ADPCM w/new reference
+				m_dsp.adpcm_new_ref = true;
+				m_dsp.adpcm_step = 0;
+			case 0x16:  // 2-bit ADPCM
+				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+				m_dsp.dma_transferred = 0;
+				m_dsp.dma_autoinit = 0;
+				m_dsp.dma_timer_started = false;
+				m_dsp.dma_throttled = false;
+				drq_w(1);
+				m_dsp.flags = ADPCM2;
+				break;
 
-            case 0x40:  // set time constant
-                m_dsp.frequency = (1000000 / (256 - m_dsp.fifo[1]));
-                printf("Set time constant: %02x -> %d\n", m_dsp.fifo[1], m_dsp.frequency);
-                break;
+			case 0x1c:  // 8-bit DMA with autoinit
+				//              printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
+				m_dsp.dma_transferred = 0;
+				m_dsp.dma_autoinit = 1;
+				m_dsp.dma_timer_started = false;
+				m_dsp.dma_throttled = false;
+				drq_w(1);
+				m_dsp.flags = 0;
+				break;
+
+			case 0x24: // 8-bit ADC DMA
+				m_dsp.adc_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+				//                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.adc_length);
+				m_dsp.adc_transferred = 0;
+				m_dsp.dma_autoinit = 0;
+				drq_w(1);
+				logerror("SB: ADC capture unimplemented\n");
+				break;
+
+			case 0x40:  // set time constant
+				m_dsp.frequency = (1000000 / (256 - m_dsp.fifo[1]));
+				//printf("Set time constant: %02x -> %d\n", m_dsp.fifo[1], m_dsp.frequency);
+				break;
 
 			case 0x48:	// set DMA block size (for auto-init)
-                m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+				break;
+
+			case 0x75:  // 4-bit ADPCM w/new reference
+				m_dsp.adpcm_new_ref = true;
+				m_dsp.adpcm_step = 0;
+			case 0x74:  // 4-bit ADPCM
+				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+				m_dsp.dma_transferred = 0;
+				m_dsp.dma_autoinit = 0;
+				m_dsp.dma_timer_started = false;
+				m_dsp.dma_throttled = false;
+				drq_w(1);
+				m_dsp.flags = ADPCM4;
+				break;
+
+			case 0x77:  // 2.6-bit ADPCM w/new reference
+				m_dsp.adpcm_new_ref = true;
+				m_dsp.adpcm_step = 0;
+			case 0x76:  // 2.6-bit ADPCM
+				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+				m_dsp.dma_transferred = 0;
+				m_dsp.dma_autoinit = 0;
+				m_dsp.dma_timer_started = false;
+				m_dsp.dma_throttled = false;
+				drq_w(1);
+				m_dsp.flags = ADPCM3;
 				break;
 
             case 0xd0:  // halt 8-bit DMA
@@ -436,6 +484,39 @@ void sb_device::process_fifo(UINT8 cmd)
 				{
 					switch(cmd)
 					{
+						case 0x1f:  // 2-bit autoinit ADPCM w/new reference
+							m_dsp.adpcm_new_ref = true;
+							m_dsp.adpcm_step = 0;
+							m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+							m_dsp.dma_transferred = 0;
+							m_dsp.dma_autoinit = 1;
+							m_dsp.dma_timer_started = false;
+							m_dsp.dma_throttled = false;
+							drq_w(1);
+							m_dsp.flags = ADPCM2;
+							break;
+						case 0x7d:  // 4-bit autoinit ADPCM w/new reference
+							m_dsp.adpcm_new_ref = true;
+							m_dsp.adpcm_step = 0;
+							m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+							m_dsp.dma_transferred = 0;
+							m_dsp.dma_autoinit = 1;
+							m_dsp.dma_timer_started = false;
+							m_dsp.dma_throttled = false;
+							drq_w(1);
+							m_dsp.flags = ADPCM4;
+							break;
+						case 0x7f:  // 2.6-bit autoinit ADPCM w/new reference
+							m_dsp.adpcm_new_ref = true;
+							m_dsp.adpcm_step = 0;
+							m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+							m_dsp.dma_transferred = 0;
+							m_dsp.dma_autoinit = 1;
+							m_dsp.dma_timer_started = false;
+							m_dsp.dma_throttled = false;
+							drq_w(1);
+							m_dsp.flags = ADPCM3;
+							break;		
 						case 0xda: // stop 8-bit autoinit
 							m_dsp.dma_autoinit = 0;
 							break;
@@ -557,6 +638,28 @@ WRITE8_MEMBER(sb_device::dsp_cmd_w)
 	process_fifo(m_dsp.fifo[0]);
 }
 
+void sb_device::adpcm_decode(UINT8 sample, int size)
+{
+	int sign = (sample & (1 << (size - 1))) ? -1: 1;
+	int shift = (size == 2) ? 2 : 0;
+	INT16 dec_sample = m_dsp.adpcm_ref + sign * (sample << (m_dsp.adpcm_step + shift));
+
+	if(dec_sample > 255)
+		dec_sample = 255;
+	else if(dec_sample < 0)
+		dec_sample = 0;
+	m_dsp.adpcm_ref = dec_sample;
+	m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+	m_dacr->write_unsigned8(m_dsp.adpcm_ref);
+	sample &= (1 << (size - 1)) - 1;
+	if(sample >= ((size << 1) - 3))
+	{
+		if(m_dsp.adpcm_step < 3)
+			m_dsp.adpcm_step++;
+	}
+	else if(!sample && m_dsp.adpcm_step)
+		m_dsp.adpcm_step--;
+}
 
 READ8_MEMBER ( sb_device::joy_port_r )
 {
@@ -1018,8 +1121,50 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 			m_dacl->write_unsigned16(lsample + 32768);
 			m_dacr->write_unsigned16(rsample + 32768);
 			break;
-		default: // ADPCM, ...?
-			logerror("SB: unimplemented sample type %x", m_dsp.flags);
+		case ADPCM2:
+			if(m_dsp.adpcm_new_ref)
+			{
+				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
+				m_dsp.adpcm_new_ref = false;
+				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				break;
+			}
+			lsample = m_dsp.data[m_dsp.d_rptr++];
+			adpcm_decode(lsample >> 6, 2);
+			adpcm_decode((lsample >> 4) & 3, 2);
+			adpcm_decode((lsample >> 2) & 3, 2);
+			adpcm_decode(lsample & 3, 2);
+			break;
+		case ADPCM3:
+			if(m_dsp.adpcm_new_ref)
+			{
+				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
+				m_dsp.adpcm_new_ref = false;
+				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				break;
+			}	
+			lsample = m_dsp.data[m_dsp.d_rptr++];
+			adpcm_decode(lsample >> 5, 3);
+			adpcm_decode((lsample >> 2) & 7, 3);
+			adpcm_decode(lsample & 3, 2);
+			break;
+		case ADPCM4:
+			if(m_dsp.adpcm_new_ref)
+			{
+				m_dsp.adpcm_ref = m_dsp.data[m_dsp.d_rptr++];
+				m_dsp.adpcm_new_ref = false;
+				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
+				break;
+			}	
+			lsample = m_dsp.data[m_dsp.d_rptr++];
+			adpcm_decode(lsample >> 4, 4);
+			adpcm_decode(lsample & 15, 4);
+			break;
+		default:
+			logerror("SB: unimplemented sample type %x\n", m_dsp.flags);
 	}
     m_dsp.d_rptr %= 128;
 

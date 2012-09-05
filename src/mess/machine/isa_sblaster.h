@@ -9,8 +9,10 @@
 
 #define SIXTEENBIT	0x01
 #define STEREO		0x02
-#define ADPCM		0x04
-#define SIGNED		0x08
+#define SIGNED		0x04
+#define ADPCM2		0x08
+#define ADPCM3		0x10
+#define ADPCM4		0x20
 
 #define IRQ_DMA8	0x01
 #define IRQ_DMA16	0x02
@@ -43,6 +45,9 @@ struct sb8_dsp_state
     bool dma_throttled;
 	UINT8 flags;
 	UINT8 irq_active;
+	bool adpcm_new_ref;
+	UINT8 adpcm_ref;
+	UINT8 adpcm_step;
 };
 
 // ======================> sb8_device (parent)
@@ -85,6 +90,7 @@ protected:
 		virtual void drq16_w(int state) { }
 		virtual void drq_w(int state) { }
 		virtual void irq_w(int state, int source) { }
+		void adpcm_decode(UINT8 sample, int size);
 
         struct sb8_dsp_state m_dsp;
         UINT8 m_dack_out;
