@@ -365,6 +365,20 @@ const UINT32 TILEMAP_FLIPY = TILE_FLIPY;			// draw the tilemap vertically flippe
 // set this value for a scroll row/column to fully disable it
 const UINT32 TILE_LINE_DISABLED = 0x80000000;
 
+// standard mappers
+enum tilemap_standard_mapper
+{
+	TILEMAP_SCAN_ROWS = 0,
+	TILEMAP_SCAN_ROWS_FLIP_X,
+	TILEMAP_SCAN_ROWS_FLIP_Y,
+	TILEMAP_SCAN_ROWS_FLIP_XY,
+	TILEMAP_SCAN_COLS,
+	TILEMAP_SCAN_COLS_FLIP_X,
+	TILEMAP_SCAN_COLS_FLIP_Y,
+	TILEMAP_SCAN_COLS_FLIP_XY,
+	TILEMAP_STANDARD_COUNT
+};
+
 
 
 //**************************************************************************
@@ -602,21 +616,6 @@ private:
 
 private:
 	tilemap_manager &			m_manager;				// reference to the owning manager
-};
-
-
-// constants
-enum tilemap_standard_mapper
-{
-	TILEMAP_SCAN_ROWS = 0,
-	TILEMAP_SCAN_ROWS_FLIP_X,
-	TILEMAP_SCAN_ROWS_FLIP_Y,
-	TILEMAP_SCAN_ROWS_FLIP_XY,
-	TILEMAP_SCAN_COLS,
-	TILEMAP_SCAN_COLS_FLIP_X,
-	TILEMAP_SCAN_COLS_FLIP_Y,
-	TILEMAP_SCAN_COLS_FLIP_XY,
-	TILEMAP_STANDARD_COUNT
 };
 
 
