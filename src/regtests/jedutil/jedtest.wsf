@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<package>
+    <job id="Test"><?job debug="true" error="true"?>
+        <runtime>
+            <description>This script runs regresion tests on the jedutil tool.</description>
+        </runtime>
+
+        <script language="JScript">
+            <![CDATA[
+                var g_Verbose = false;
+
+                function diffFiles(file1, file2)
+                {
+                    var WshShell = WScript.CreateObject("WScript.Shell");
+                    var oExec;
+                    
+                    if (g_Verbose)
+                    {                    
+                        WScript.Echo("Diff File 1: " + file1);
+                        WScript.Echo("Diff File 2: " + file2);
+                        WScript.Echo();
+                    }
+                    
+                    oExec = WshShell.Exec("diff " + file1 + " " + file2);
+
+                    while (!oExec.Status)
+                    {
+                        WScript.Sleep(100);
+                    }
+                    
+                    if (g_Verbose)
+                    {
+                        WScript.StdOut.WriteLine(oExec.StdOut.ReadAll());
+                        WScript.StdErr.WriteLine(oExec.StdErr.ReadAll());
+                    }
+
+                    return oExec.ExitCode;
+                }
+
+                function runCommandAndCaptureOutput(command, outputFile)
+                {
+                    var WshShell = WScript.CreateObject("WScript.Shell");
+                    var fullCommand;
+                    
+                    fullCommand = "%comspec% /c ";
+                    fullCommand += command;
+                    fullCommand += " > ";
+                    fullCommand += outputFile;
+                    fullCommand += " 2>&1";
+                    
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("Running the command : " + command);
+                        WScript.Echo("Output File:          " + outputFile);
+                        WScript.Echo();
+                    }
+
+                    WshShell.Run(fullCommand, 0, true);
+                }
+
+                function findJedTests(jedsPath, baselinePath, outputPath)
+                {
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
+                    var folder = fso.GetFolder(jedsPath)
+                    var folderCollection = new Enumerator(folder.files);
+                    var jedArray = new Array();
+                    
+                    while (!folderCollection.atEnd())
+                    {
+                        ++jedArray.length;
+
+                        jedArray[jedArray.length - 1] = new Object;
+                        
+                        jedArray[jedArray.length - 1].name = fso.GetBaseName(folderCollection.item().name);
+                        jedArray[jedArray.length - 1].jedfile = folderCollection.item().path;
+                        jedArray[jedArray.length - 1].baselineFile = baselinePath + "\\" +
+                                                                     jedArray[jedArray.length - 1].name +
+                                                                     ".txt";
+                        jedArray[jedArray.length - 1].outputFile = outputPath + "\\" +
+                                                                   jedArray[jedArray.length - 1].name +
+                                                                   ".txt";
+ 
+                        folderCollection.moveNext();
+                    }
+                    
+                    return jedArray;
+                }
+            
+                function runViewJedTests(jedArray, jedUtilApp)
+                {
+                    var command;
+                
+                    for (i = 0; i < jedArray.length; ++i)
+                    {
+                        command = jedUtilApp + " -view " + jedArray[i].jedfile + " " +
+                                  jedArray[i].name;
+                    
+                        if (g_Verbose)
+                        {
+                            WScript.Echo("Viewing the JED file: " + jedArray[i].jedfile);
+                            WScript.Echo();
+                        }
+                    
+                        runCommandAndCaptureOutput(command, jedArray[i].outputFile);
+                    }
+                }
+                
+                function runDiffJedTests(jedArray)
+                {
+                    var result = true;
+                    
+                    for (i = 0; i < jedArray.length; ++i)
+                    {
+                        if (g_Verbose)
+                        {
+                            WScript.Echo("Diffing the output from viewing the JED file: " + jedArray[i].jedfile);
+                        }
+                        
+                        if (diffFiles(jedArray[i].baselineFile, jedArray[i].outputFile))
+                        {
+                            WScript.Echo("Results are different for " + jedArray[i].name);
+                            WScript.Echo();                        
+                            
+                            result = false;
+                        }
+                    }
+                    
+                    return result;
+                }
+            
+                function main()
+                {
+                    var result = 0;
+                    var WshShell = WScript.CreateObject("WScript.Shell");
+                    var fso = new ActiveXObject("Scripting.FileSystemObject");
+                    var jedsPath = WshShell.CurrentDirectory + "\\jeds";
+                    var baselinePath = WshShell.CurrentDirectory + "\\baseline";
+                    var outputPath = WshShell.CurrentDirectory + "\\output";
+                    var jedUtilApp = WshShell.CurrentDirectory + "\\..\\..\\..\\jedutil.exe";
+                    var jedArray = new Array();
+
+                    if (g_Verbose)
+                    {
+                        WScript.Echo("JED Path:      " + jedsPath);
+                        WScript.Echo("Baseline Path: " + baselinePath);
+                        WScript.Echo("Output Path:   " + outputPath);
+                        WScript.Echo("jedutil App:   " + jedUtilApp);
+                        WScript.Echo();
+                    }
+                  
+                    if (fso.FolderExists(outputPath))
+                    {
+                        if (g_Verbose)
+                        {
+                            WScript.Echo("Emptying the output directory");
+                            WScript.Echo();
+                        }
+                    
+                        fso.DeleteFile(outputPath + "\\*.*");
+                    }
+                    else
+                    {
+                        if (g_Verbose)
+                        {
+                            WScript.Echo("Creating the output directory");
+                            WScript.Echo();
+                        }
+                        
+                        fso.CreateFolder(outputPath);
+                    }
+                    
+                    jedArray = findJedTests(jedsPath, baselinePath, outputPath);
+
+                    runViewJedTests(jedArray, jedUtilApp);
+
+                    if (!runDiffJedTests(jedArray))
+                    {
+                        result = 1;
+                    }
+
+                    if (!result)
+                    {
+                        WScript.Echo("All tests ran successfully.");
+                    }
+
+                    return result;
+                }
+
+                try
+                {
+                    var result = main();
+
+                    WScript.Quit(result);
+                }
+                catch (e)
+                {
+                    WScript.Echo("Error Occurred");
+                    WScript.Echo("");
+                    WScript.Echo("Name:        " + e.name);
+                    WScript.Echo("Message:     " + e.message);
+                    WScript.Echo("Number:      " + e.number);
+                    WScript.Echo("Description: " + e.description);
+
+                    WScript.Quit(1);
+                }
+            ]]>
+        </script>
+    </job>
+</package>
