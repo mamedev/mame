@@ -123,7 +123,7 @@ enum
 
 READ8_MEMBER( vic20_state::read )
 {
-	UINT8 data = mos6560_bus_r(m_vic);
+	UINT8 data = m_vic->bus_r();
 
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -250,7 +250,7 @@ WRITE8_MEMBER( vic20_state::write )
 			break;
 
 		case COLOR:
-			m_color_ram[offset & 0x3ff] = data;
+			m_color_ram[offset & 0x3ff] = data & 0x0f;
 			break;
 
 		case IO2: io2 = 0; break;
@@ -269,36 +269,6 @@ WRITE8_MEMBER( vic20_state::write )
 //**************************************************************************
 //  VIDEO
 //**************************************************************************
-
-static const unsigned char mos6560_palette[] =
-{
-// ripped from vice, a very excellent emulator
-// black, white, red, cyan
-	0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0xf0, 0xf0,
-// purple, green, blue, yellow
-	0x60, 0x00, 0x60, 0x00, 0xa0, 0x00, 0x00, 0x00, 0xf0, 0xd0, 0xd0, 0x00,
-// orange, light orange, pink, light cyan,
-	0xc0, 0xa0, 0x00, 0xff, 0xa0, 0x00, 0xf0, 0x80, 0x80, 0x00, 0xff, 0xff,
-// light violett, light green, light blue, light yellow
-	0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0xa0, 0xff, 0xff, 0xff, 0x00
-};
-
-static PALETTE_INIT( vic20 )
-{
-	int i;
-
-	for (i = 0; i < sizeof(mos6560_palette) / 3; i++)
-	{
-		palette_set_color_rgb(machine, i, mos6560_palette[i * 3], mos6560_palette[i * 3 + 1], mos6560_palette[i * 3 + 2]);
-	}
-}
-
-static SCREEN_UPDATE_IND16( vic20 )
-{
-	vic20_state *state = screen.machine().driver_data<vic20_state>();
-	mos6560_video_update(state->m_vic, bitmap, cliprect);
-	return 0;
-}
 
 static INTERRUPT_GEN( vic20_raster_interrupt )
 {
@@ -644,52 +614,44 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 #define VC20ADDR2MOS6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
 #define MOS6560ADDR2VC20ADDR(a) (((a) > 0x2000) ? ((a) & 0x1fff) : ((a) | 0x8000))
 
-static int vic20_dma_read_color( running_machine &machine, int offset )
+READ8_MEMBER( vic20_state::vic_dma_read_color )
 {
-	vic20_state *state = machine.driver_data<vic20_state>();
-
-	return state->m_color_ram[offset & 0x3ff];
+	return m_color_ram[offset & 0x3ff];
 }
 
-static int vic20_dma_read( running_machine &machine, int offset )
+READ8_MEMBER( vic20_state::vic_dma_read )
 {
-	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	return program->read_byte(MOS6560ADDR2VC20ADDR(offset));
 }
 
-static UINT8 vic20_lightx_cb( running_machine &machine )
+READ8_MEMBER( vic20_state::vic_lightx_cb )
 {
-	return (machine.root_device().ioport("LIGHTX")->read_safe(0) & ~0x01);
+	return (ioport("LIGHTX")->read_safe(0) & ~0x01);
 }
 
-static UINT8 vic20_lighty_cb( running_machine &machine )
+READ8_MEMBER( vic20_state::vic_lighty_cb )
 {
-	return (machine.root_device().ioport("LIGHTY")->read_safe(0) & ~0x01);
+	return (ioport("LIGHTY")->read_safe(0) & ~0x01);
 }
 
-static UINT8 vic20_lightbut_cb( running_machine &machine )
+READ8_MEMBER( vic20_state::vic_lightbut_cb )
 {
-	return (((machine.root_device().ioport("CTRLSEL")->read() & 0xf0) == 0x20) && (machine.root_device().ioport("JOY")->read() & 0x40));
-}
-
-static UINT8 vic20_paddle0_cb( running_machine &machine )
-{
-	return machine.root_device().ioport("PADDLE0")->read();
-}
-
-static UINT8 vic20_paddle1_cb( running_machine &machine )
-{
-	return machine.root_device().ioport("PADDLE1")->read();
+	return (((ioport("CTRLSEL")->read() & 0xf0) == 0x20) && (ioport("JOY")->read() & 0x40));
 }
 
 static const mos6560_interface vic_ntsc_intf =
 {
 	SCREEN_TAG,
 	MOS6560,
-	vic20_lightx_cb, vic20_lighty_cb, vic20_lightbut_cb,	// lightgun cb
-	vic20_paddle0_cb, vic20_paddle1_cb,		// paddle cb
-	vic20_dma_read, vic20_dma_read_color	// DMA
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_lightx_cb),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_lighty_cb),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_lightbut_cb),
+	DEVCB_INPUT_PORT("PADDLE0"),
+	DEVCB_INPUT_PORT("PADDLE1"),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_dma_read),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_dma_read_color)
 };
 
 
@@ -701,9 +663,13 @@ static const mos6560_interface vic_pal_intf =
 {
 	SCREEN_TAG,
 	MOS6561,
-	vic20_lightx_cb, vic20_lighty_cb, vic20_lightbut_cb,	// lightgun cb
-	vic20_paddle0_cb, vic20_paddle1_cb,		// paddle cb
-	vic20_dma_read, vic20_dma_read_color	// DMA
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_lightx_cb),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_lighty_cb),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_lightbut_cb),
+	DEVCB_INPUT_PORT("PADDLE0"),
+	DEVCB_INPUT_PORT("PADDLE1"),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_dma_read),
+	DEVCB_DRIVER_MEMBER(vic20_state, vic_dma_read_color)
 };
 
 
@@ -820,20 +786,9 @@ static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
 	MCFG_CPU_PERIODIC_INT(vic20_raster_interrupt, MOS656X_HRETRACERATE)
 
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE)
-	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1)
-	MCFG_SCREEN_UPDATE_STATIC( vic20 )
-
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( vic20 )
-
-	// sound hardware
+	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS656X_ADD(M6560_TAG, vic_ntsc_intf)
+	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_ntsc_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -857,26 +812,15 @@ static MACHINE_CONFIG_DERIVED( vic20_pal, vic20_common )
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
 	MCFG_CPU_PERIODIC_INT(vic20_raster_interrupt, MOS656X_HRETRACERATE)
 
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE)
-	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1)
-	MCFG_SCREEN_UPDATE_STATIC( vic20 )
-
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT( vic20 )
-
-	// devices
-	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6561_CLOCK, expansion_intf, vic20_expansion_cards, NULL, NULL)
-
-	// sound hardware
+	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS656X_ADD(M6560_TAG, vic_pal_intf)
+	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_pal_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6561_CLOCK, expansion_intf, vic20_expansion_cards, NULL, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")

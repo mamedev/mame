@@ -52,7 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
-	required_device<device_t> m_vic;
+	required_device<mos6560_device> m_vic;
 	required_device<cbm_iec_device> m_iec;
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
@@ -67,6 +67,12 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_READ8_MEMBER( vic_lightx_cb );
+	DECLARE_READ8_MEMBER( vic_lighty_cb );
+	DECLARE_READ8_MEMBER( vic_lightbut_cb );
+	DECLARE_READ8_MEMBER( vic_dma_read );
+	DECLARE_READ8_MEMBER( vic_dma_read_color );
+	
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
 

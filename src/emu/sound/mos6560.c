@@ -92,17 +92,17 @@ struct _mos6560_state
 	int total_xsize, total_ysize, total_lines, total_vretracerate;
 
 	/* DMA */
-	mos6560_dma_read          dma_read;
-	mos6560_dma_read_color    dma_read_color;
+	devcb_resolved_read8	dma_read;
+	devcb_resolved_read8	dma_read_color;
 	UINT8 last_data;
 
 	/* lightpen */
-	mos6560_lightpen_button_callback lightpen_button_cb;
-	mos6560_lightpen_x_callback lightpen_x_cb;
-	mos6560_lightpen_y_callback lightpen_y_cb;
+	devcb_resolved_read8	lightpen_button_cb;
+	devcb_resolved_read8	lightpen_x_cb;
+	devcb_resolved_read8	lightpen_y_cb;
 
 	/* paddles */
-	mos6560_paddle_callback        paddle_cb[2];
+	devcb_resolved_read8	paddle_cb[2];
 
 	/* sound part */
 	int tone1pos, tone2pos, tone3pos,
@@ -154,9 +154,9 @@ INLINE const mos6560_interface *get_interface( device_t *device )
 
 /* 2008-05 FP: lightpen code needs to read input port from vc20.c */
 
-#define LIGHTPEN_BUTTON		((mos6560->lightpen_button_cb != NULL) ? mos6560->lightpen_button_cb(device->machine()) : 0)
-#define LIGHTPEN_X_VALUE	((mos6560->lightpen_x_cb != NULL) ? mos6560->lightpen_x_cb(device->machine()) : 0)
-#define LIGHTPEN_Y_VALUE	((mos6560->lightpen_y_cb != NULL) ? mos6560->lightpen_y_cb(device->machine()) : 0)
+#define LIGHTPEN_BUTTON		((!mos6560->lightpen_button_cb.isnull()) ? mos6560->lightpen_button_cb(0) : 0)
+#define LIGHTPEN_X_VALUE	((!mos6560->lightpen_x_cb.isnull()) ? mos6560->lightpen_x_cb(0) : 0)
+#define LIGHTPEN_Y_VALUE	((!mos6560->lightpen_y_cb.isnull()) ? mos6560->lightpen_y_cb(0) : 0)
 
 /* lightpen delivers values from internal counters
  * they do not start with the visual area or frame area */
@@ -198,6 +198,37 @@ INLINE const mos6560_interface *get_interface( device_t *device )
 #define BACKGROUNDCOLOR (mos6560->reg[0x0f] >> 4)
 #define FRAMECOLOR (mos6560->reg[0x0f] & 0x07)
 
+
+static const rgb_t PALETTE[] =
+{
+/* ripped from vice, a very excellent emulator */
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0xff, 0xff, 0xff),
+	MAKE_RGB(0xf0, 0x00, 0x00),
+	MAKE_RGB(0x00, 0xf0, 0xf0),
+
+	MAKE_RGB(0x60, 0x00, 0x60),
+	MAKE_RGB(0x00, 0xa0, 0x00),
+	MAKE_RGB(0x00, 0x00, 0xf0),
+	MAKE_RGB(0xd0, 0xd0, 0x00),
+
+	MAKE_RGB(0xc0, 0xa0, 0x00),
+	MAKE_RGB(0xff, 0xa0, 0x00),
+	MAKE_RGB(0xf0, 0x80, 0x80),
+	MAKE_RGB(0x00, 0xff, 0xff),
+
+	MAKE_RGB(0xff, 0x00, 0xff),
+	MAKE_RGB(0x00, 0xff, 0x00),
+	MAKE_RGB(0x00, 0xa0, 0xff),
+	MAKE_RGB(0xff, 0xff, 0x00)
+};
+
+PALETTE_INIT( mos6560 )
+{
+	palette_set_colors(machine, 0, PALETTE, ARRAY_LENGTH(PALETTE));
+}
+
+
 /*****************************************************************************
     IMPLEMENTATION
 *****************************************************************************/
@@ -215,7 +246,7 @@ static void mos6560_draw_character( device_t *device, int ybegin, int yend, int 
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
+		code = mos6560->dma_read((mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
 		mos6560->last_data = code;
 		mos6560->bitmap->pix16(y + yoff, xoff + 0) = color[code >> 7];
 		mos6560->bitmap->pix16(y + yoff, xoff + 1) = color[(code >> 6) & 1];
@@ -240,7 +271,7 @@ static void mos6560_draw_character_multi( device_t *device, int ybegin, int yend
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = mos6560->dma_read(device->machine(), (mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
+		code = mos6560->dma_read((mos6560->chargenaddr + ch * mos6560->charheight + y) & 0x3fff);
 		mos6560->last_data = code;
 		mos6560->bitmap->pix16(y + yoff, xoff + 0) =
 			mos6560->bitmap->pix16(y + yoff, xoff + 1) = color[code >> 6];
@@ -301,9 +332,9 @@ static void mos6560_drawlines( device_t *device, int first, int last )
 
 		for (xoff = mos6560->xpos; (xoff < mos6560->xpos + mos6560->xsize) && (xoff < mos6560->total_xsize); xoff += 8, offs++)
 		{
-			ch = mos6560->dma_read(device->machine(), (mos6560->videoaddr + offs) & 0x3fff);
+			ch = mos6560->dma_read((mos6560->videoaddr + offs) & 0x3fff);
 			mos6560->last_data = ch;
-			attr = (mos6560->dma_read_color(device->machine(), (mos6560->videoaddr + offs) & 0x3fff)) & 0xf;
+			attr = (mos6560->dma_read_color((mos6560->videoaddr + offs) & 0x3fff)) & 0xf;
 
 			if (mos6560->type == MOS6560_ATTACKUFO)
 			{
@@ -479,7 +510,7 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 		break;
 	case 8:						   /* poti 1 */
 	case 9:						   /* poti 2 */
-		val = (mos6560->paddle_cb != NULL) ? mos6560->paddle_cb[offset - 8](device->machine()) : mos6560->reg[offset];
+		val = (!mos6560->paddle_cb->isnull()) ? mos6560->paddle_cb[offset - 8](0) : mos6560->reg[offset];
 		break;
 	default:
 		val = mos6560->reg[offset];
@@ -489,9 +520,9 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 	return val;
 }
 
-UINT8 mos6560_bus_r( device_t *device )
+UINT8 mos6560_device::bus_r()
 {
-	mos6560_state *mos6560 = get_safe_token(device);
+	mos6560_state *mos6560 = get_safe_token(this);
 
 	return mos6560->last_data;
 }
@@ -525,6 +556,11 @@ UINT32 mos6560_video_update( device_t *device, bitmap_ind16 &bitmap, const recta
 
 	copybitmap(bitmap, *mos6560->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
+}
+
+UINT32 mos6560_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return mos6560_video_update(this, bitmap, cliprect);
 }
 
 /*****************************************************************************
@@ -820,18 +856,14 @@ static DEVICE_START( mos6560 )
 
 	mos6560->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
-	assert(intf->dma_read != NULL);
-	assert(intf->dma_read_color != NULL);
-
-	mos6560->dma_read = intf->dma_read;
-	mos6560->dma_read_color = intf->dma_read_color;
-
-	mos6560->lightpen_button_cb = intf->button_cb;
-	mos6560->lightpen_x_cb = intf->x_cb;
-	mos6560->lightpen_y_cb = intf->y_cb;
-
-	mos6560->paddle_cb[0] = intf->paddle0_cb;
-	mos6560->paddle_cb[1] = intf->paddle1_cb;
+	// resolve callbacks
+	mos6560->dma_read.resolve(intf->dma_read, *device);
+	mos6560->dma_read_color.resolve(intf->dma_read_color, *device);
+	mos6560->lightpen_button_cb.resolve(intf->button_cb, *device);
+	mos6560->lightpen_x_cb.resolve(intf->x_cb, *device);
+	mos6560->lightpen_y_cb.resolve(intf->y_cb, *device);
+	mos6560->paddle_cb[0].resolve(intf->paddle0_cb, *device);
+	mos6560->paddle_cb[1].resolve(intf->paddle1_cb, *device);
 
 	switch (mos6560->type)
 	{

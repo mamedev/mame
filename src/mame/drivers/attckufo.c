@@ -66,39 +66,10 @@ public:
 
 	DECLARE_READ8_MEMBER(attckufo_io_r);
 	DECLARE_WRITE8_MEMBER(attckufo_io_w);
+
+	DECLARE_READ8_MEMBER(dma_read);
+	DECLARE_READ8_MEMBER(dma_read_color);
 };
-
-
-
-static const rgb_t attckufo_palette[] =
-{
-/* ripped from vice, a very excellent emulator */
-	MAKE_RGB(0x00, 0x00, 0x00),
-	MAKE_RGB(0xff, 0xff, 0xff),
-	MAKE_RGB(0xf0, 0x00, 0x00),
-	MAKE_RGB(0x00, 0xf0, 0xf0),
-
-	MAKE_RGB(0x60, 0x00, 0x60),
-	MAKE_RGB(0x00, 0xa0, 0x00),
-	MAKE_RGB(0x00, 0x00, 0xf0),
-	MAKE_RGB(0xd0, 0xd0, 0x00),
-
-	MAKE_RGB(0xc0, 0xa0, 0x00),
-	MAKE_RGB(0xff, 0xa0, 0x00),
-	MAKE_RGB(0xf0, 0x80, 0x80),
-	MAKE_RGB(0x00, 0xff, 0xff),
-
-	MAKE_RGB(0xff, 0x00, 0xff),
-	MAKE_RGB(0x00, 0xff, 0x00),
-	MAKE_RGB(0x00, 0xa0, 0xff),
-	MAKE_RGB(0xff, 0xff, 0x00)
-};
-
-static PALETTE_INIT( attckufo )
-{
-	palette_set_colors(machine, 0, attckufo_palette, ARRAY_LENGTH(attckufo_palette));
-}
-
 
 READ8_MEMBER(attckufo_state::attckufo_io_r)
 {
@@ -172,25 +143,24 @@ static SCREEN_UPDATE_IND16( attckufo )
 	return 0;
 }
 
-static int attckufo_dma_read( running_machine &machine, int offset )
+READ8_MEMBER(attckufo_state::dma_read)
 {
-	attckufo_state *state = machine.driver_data<attckufo_state>();
-	return state->m_maincpu->space(AS_PROGRAM)->read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM)->read_byte(offset);
 }
 
-static int attckufo_dma_read_color( running_machine &machine, int offset )
+READ8_MEMBER(attckufo_state::dma_read_color)
 {
-	attckufo_state *state = machine.driver_data<attckufo_state>();
-	return state->m_maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
+	return m_maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
 }
 
 static const mos6560_interface attckufo_6560_intf =
 {
 	"screen",	/* screen */
 	MOS6560_ATTACKUFO,
-	NULL, NULL, NULL,	/* lightgun cb */
-	NULL, NULL,		/* paddle cb */
-	attckufo_dma_read, attckufo_dma_read_color	/* DMA */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,	/* lightgun cb */
+	DEVCB_NULL, DEVCB_NULL,		/* paddle cb */
+	DEVCB_DRIVER_MEMBER(attckufo_state, dma_read),
+	DEVCB_DRIVER_MEMBER(attckufo_state, dma_read_color)	/* DMA */
 };
 
 
@@ -209,8 +179,8 @@ static MACHINE_CONFIG_START( attckufo, attckufo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1)
 	MCFG_SCREEN_UPDATE_STATIC(attckufo)
 
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(attckufo_palette))
-	MCFG_PALETTE_INIT(attckufo)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(mos6560)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -15,15 +15,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*mos6560_lightpen_x_callback)(running_machine &machine);
-typedef UINT8 (*mos6560_lightpen_y_callback)(running_machine &machine);
-typedef UINT8 (*mos6560_lightpen_button_callback)(running_machine &machine);
-typedef UINT8 (*mos6560_paddle_callback)(running_machine &machine);
-
-typedef int (*mos6560_dma_read)(running_machine &machine, int);
-typedef int (*mos6560_dma_read_color)(running_machine &machine, int);
-
-
 typedef enum
 {
 	MOS6560_ATTACKUFO,        // this is a 6560VIC derivative, missing some of the features
@@ -34,18 +25,18 @@ typedef enum
 typedef struct _mos6560_interface mos6560_interface;
 struct _mos6560_interface
 {
-	const char         *screen;
+	const char		*screen;
 
-	mos6560_type type;
+	mos6560_type	type;
 
-	mos6560_lightpen_x_callback        x_cb;
-	mos6560_lightpen_y_callback        y_cb;
-	mos6560_lightpen_button_callback   button_cb;
+	devcb_read8		x_cb;
+	devcb_read8		y_cb;
+	devcb_read8		button_cb;
 
-	mos6560_paddle_callback        paddle0_cb, paddle1_cb;
+	devcb_read8		paddle0_cb, paddle1_cb;
 
-	mos6560_dma_read          dma_read;
-	mos6560_dma_read_color    dma_read_color;
+	devcb_read8		dma_read;
+	devcb_read8		dma_read_color;
 };
 
 /***************************************************************************
@@ -97,6 +88,11 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+
+	UINT8 bus_r();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -121,6 +117,29 @@ extern const device_type MOS656X;
 	MCFG_SOUND_ADD(_tag, MOS656X, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _config) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
+	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16) \
+	MCFG_PALETTE_INIT(mos6560) \
+	MCFG_SOUND_ADD(_tag, MOS656X, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
+
+#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _config) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+	MCFG_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE) \
+	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16) \
+	MCFG_PALETTE_INIT(mos6560) \
+	MCFG_SOUND_ADD(_tag, MOS656X, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 /***************************************************************************
     I/O PROTOTYPES
@@ -129,9 +148,9 @@ extern const device_type MOS656X;
 WRITE8_DEVICE_HANDLER( mos6560_port_w );
 READ8_DEVICE_HANDLER( mos6560_port_r );
 
-UINT8 mos6560_bus_r( device_t *device );
 void mos6560_raster_interrupt_gen( device_t *device );
 UINT32 mos6560_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
+extern PALETTE_INIT( mos6560 );
 
 #endif /* __MOS6560_H__ */
