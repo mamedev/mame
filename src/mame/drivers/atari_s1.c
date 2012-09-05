@@ -1,18 +1,20 @@
-/*
-    Atari Generation/System 1
-*/
+/***********************************************************************************
 
+    Pinball
+    Atari Generation/System 1
+
+************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 
-extern const char layout_pinball[];
+//extern const char layout_pinball[];
 class atari_s1_state : public driver_device
 {
 public:
 	atari_s1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu")
 	{ }
 
 protected:
@@ -27,11 +29,19 @@ public:
 };
 
 static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
+	//AM_RANGE(0x1080, 0x1080) AM_READWRITE(latch1080_r,latch1080_w)
+	//AM_RANGE(0x1084, 0x1084) AM_READWRITE(latch1084_r,latch1084_w)
+	//AM_RANGE(0x1088, 0x1088) AM_READWRITE(latch1088_r,latch1088_w)
+	//AM_RANGE(0x108c, 0x108c) AM_READWRITE(latch108c_r,latch108c_w)
+	//AM_RANGE(0x2000, 0x200f) AM_READWRITE(dipg1_r,dipg1_w)
+	//AM_RANGE(0x2010, 0x204f) AM_READ(swg1_r)
+	//AM_RANGE(0x3000, 0x3000) AM_WRITE(soundg1_w)
+	//AM_RANGE(0x4000, 0x4000) AM_WRITE(watchdog_w)
+	//AM_RANGE(0x508c, 0x508c) AM_WRITE(latch508c_w)
+	//AM_RANGE(0x6000, 0x6000) AM_WRITE(audiog1_w)
+	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( atari_s1 )
@@ -67,7 +77,6 @@ ROM_END
 //  ROM_REGION(0x10000, "maincpu", 0)
 //  ROM_LOAD("atarianb.e00", 0x7000, 0x0800, CRC(74fc86e4) SHA1(135d75e5c03feae0929fa84caa3c802353cdd94e))
 //  ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
-//  ROM_RELOAD(0xf800, 0x0800)
 //ROM_END
 
 /*-------------------------------------------------------------------
