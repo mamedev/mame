@@ -4275,7 +4275,7 @@ ROM_START( mspacmat )
 ROM_END
 
 
-// a graphics-only hack for Ms. Pac-Man that was sold as romkit by Two-Bit Score
+// a graphics-only hack for Ms. Pac-Man that was sold as romkit by Two-Bit Score back in 1989
 ROM_START( msheartb )
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code+64k for decrypted code */
 	ROM_LOAD( "pacman.6e",    0x0000, 0x1000, CRC(c1e6ab10) SHA1(e87e059c5be45753f7e9f33dff851f16d6751181) )
@@ -6234,7 +6234,7 @@ GAME( 1981, nmouseb,  nmouse,   nmouse,   nmouse,   pacman_state,  eyes,     ROT
 GAME( 1981, mspacman, 0,        mspacman, mspacman, pacman_state,  mspacman, ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmnf, mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man (with speedup hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmat, mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT90,  "hack", "Ms. Pac Attack", GAME_SUPPORTS_SAVE )
-GAME( 199?, msheartb, mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT90,  "hack (Two-Bit Score)", "Ms. Pac-Man Heart Burn", GAME_SUPPORTS_SAVE )
+GAME( 1989, msheartb, mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT90,  "hack (Two-Bit Score)", "Ms. Pac-Man Heart Burn", GAME_SUPPORTS_SAVE )
 GAME( 1981, woodpeck, 0,        woodpek,  woodpek,  pacman_state,  woodpek,  ROT90,  "Amenip (Palcom Queen River)", "Woodpecker (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, woodpeca, woodpeck, woodpek,  woodpek,  pacman_state,  woodpek,  ROT90,  "Amenip", "Woodpecker (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmab, mspacman, woodpek,  mspacman, driver_device, 0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg)", GAME_SUPPORTS_SAVE )
