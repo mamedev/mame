@@ -18,7 +18,11 @@ Memory map:
     ???????? Cartridge port
 
 TODO:
-    - Mostly everything besides CPU, RAM and ROM
+    - Mouse input
+    - Sound
+    - German keyboard layout
+    - Cartridge
+    - Dump the MCU and rewrites everything using low-level emulation
     - Check with different countries ROMs
 
 Not very much is known about this computer released in 1997.
@@ -116,10 +120,19 @@ public:
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mouse_pos_w);
 	DECLARE_INPUT_CHANGED_MEMBER(send_input);
+	DECLARE_WRITE16_MEMBER(gfx_base_w);
+	DECLARE_WRITE16_MEMBER(gfx_dest_w);
+	DECLARE_WRITE16_MEMBER(gfx_color_w);
+	DECLARE_WRITE16_MEMBER(gfx_idx_w);
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
 
+private:
+	UINT16		m_gfx_y;
+	UINT16		m_gfx_x;
+	UINT32		m_gfx_base;
+	UINT8		m_gfx_color[2];
 	UINT16		m_mouse_posx;
 	UINT16		m_mouse_posy;
 	struct
@@ -211,6 +224,47 @@ WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
 	}
 }
 
+WRITE16_MEMBER(geniusiq_state::gfx_color_w)
+{
+	m_gfx_color[offset & 1] = data & 0x0f;
+}
+
+WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
+{
+	if (offset)
+		m_gfx_y = data;
+	else
+		m_gfx_x = data;
+}
+
+WRITE16_MEMBER(geniusiq_state::gfx_base_w)
+{
+	if (offset)
+		m_gfx_base = (m_gfx_base & 0xffff0000) | (data<<0);
+	else
+		m_gfx_base = (m_gfx_base & 0x0000ffff) | (data<<16);
+}
+
+WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
+{
+	UINT16 *gfx = ((UINT16 *)(*memregion("maincpu"))) + ((m_gfx_base + data*32)>>1);
+
+	// first 16 bits are used to define the character size
+	UINT8 gfx_heigh = (gfx[0]>>0) & 0xff;
+	UINT8 gfx_width = (gfx[0]>>8) & 0xff;
+
+	for(int y=0; y<gfx_heigh; y++)
+		for(int x=0; x<gfx_width; x++)
+		{
+			UINT16 src = gfx[y + 1];
+			UINT32 dst = (m_gfx_y + y)*512 + (m_gfx_x + x);
+			UINT8 pen = m_gfx_color[BIT(src,15-x)];
+			int bit_pos = (3 - (dst & 3)) << 2;
+
+			m_vram[dst>>2] = (m_vram[dst>>2] & ~(0x0f << bit_pos)) | (pen << bit_pos);
+		}
+}
+
 READ16_MEMBER( geniusiq_state::input_r )
 {
 	/*
@@ -263,13 +317,19 @@ static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE8(flash_r, flash_w, 0x00ff)
 	AM_RANGE(0x600300, 0x600301) AM_READ(input_r)
 	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
+	//AM_RANGE(0x600600, 0x600605)                      // sound ??
+	AM_RANGE(0x600606, 0x600609) AM_WRITE(gfx_base_w)
+	AM_RANGE(0x60060a, 0x60060b) AM_WRITE(gfx_idx_w)
+	//AM_RANGE(0x600802, 0x600803)                      // cartridge state
 	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
 	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)			// unknown, read at start and expect that bit 2 changes several times before continue
 	AM_RANGE(0x601010, 0x601011) AM_READ(unk0_r)		// loop at start if bit 1 is set
+	AM_RANGE(0x601018, 0x60101b) AM_WRITE(gfx_dest_w)
+	AM_RANGE(0x60101c, 0x60101f) AM_WRITE(gfx_color_w)
 	AM_RANGE(0x601060, 0x601063) AM_WRITE(mouse_pos_w)
 	AM_RANGE(0x601100, 0x6011ff) AM_RAM		AM_SHARE("mouse_gfx")	// mouse cursor gfx (12x16)
+	//AM_RANGE(0xa00000, 0xa?????)                      // cartridge ??
 	// 0x600000 : some memory mapped hardware
-	// Somewhere : cartridge port
 ADDRESS_MAP_END
 
 
@@ -281,6 +341,7 @@ static INPUT_CHANGED( trigger_irq )
 /* Input ports */
 static INPUT_PORTS_START( geniusiq )
 	PORT_START( "IN0" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x00 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x01 )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x02 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_LSHIFT )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x03 )
@@ -437,11 +498,18 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER( geniusiq_state )
 {
 	m_keyboard.head = m_keyboard.tail = 0;
+
+	m_gfx_y = 0;
+	m_gfx_x = 0;
+	m_gfx_base = 0;
+	m_gfx_color[0] = m_gfx_color[1] = 0;
+	m_mouse_posx = 0;
+	m_mouse_posy = 0;
 }
 
 static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) // The main crystal is at 32MHz, not sure whats the CPU freq
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
