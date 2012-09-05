@@ -2,6 +2,15 @@
 #include "includes/namcos2.h" /* for game-specific hacks */
 #include "includes/namcoic.h"
 
+
+//****************************************************************************
+//  CONSTANTS
+//****************************************************************************
+
+// device type definition
+const device_type NAMCO_C45_ROAD = &device_creator<namco_c45_road_device>;
+
+
 /**************************************************************************************/
 static struct
 {
@@ -1278,185 +1287,193 @@ WRITE16_MEMBER( namcos2_shared_state::c169_roz_videoram_w )
  *      0x1fe00..0x1ffdf    ---- --xx xxxx xxxx     zoomx
  *      0x1fffd             always 0xffff 0xffff?
  */
-static UINT16 *mpRoadRAM; /* at 0x880000 in Final Lap; at 0xa00000 in Lucky&Wild */
-static int mRoadGfxBank;
-static tilemap_t *mpRoadTilemap;
-static pen_t mRoadTransparentColor;
-static int mbRoadNeedTransparent;
 
-#define ROAD_COLS			64
-#define ROAD_ROWS			512
-#define ROAD_TILE_SIZE		16
-#define ROAD_TILEMAP_WIDTH	(ROAD_TILE_SIZE*ROAD_COLS)
-#define ROAD_TILEMAP_HEIGHT (ROAD_TILE_SIZE*ROAD_ROWS)
-
-#define ROAD_TILE_COUNT_MAX	(0xfa00/0x40) /* 0x3e8 */
-#define WORDS_PER_ROAD_TILE (0x40/2)
-
-static const gfx_layout RoadTileLayout =
+const gfx_layout namco_c45_road_device::s_tile_layout =
 {
 	ROAD_TILE_SIZE,	ROAD_TILE_SIZE,
 	ROAD_TILE_COUNT_MAX,
 	2,
 	{ NATIVE_ENDIAN_VALUE_LE_BE(8,0), NATIVE_ENDIAN_VALUE_LE_BE(0,8) },
-	{/* x offset */
+	{// x offset
 		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
 		0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17
 	},
-	{/* y offset */
+	{// y offset
 		0x000,0x020,0x040,0x060,0x080,0x0a0,0x0c0,0x0e0,
 		0x100,0x120,0x140,0x160,0x180,0x1a0,0x1c0,0x1e0
 	},
-	0x200, /* offset to next tile */
+	0x200 // offset to next tile
 };
 
-static TILE_GET_INFO( get_road_info )
-{
-	UINT16 data = mpRoadRAM[tile_index];
-	/* ------xx xxxxxxxx tile number
-     * xxxxxx-- -------- palette select
-     */
-	int tile = (data&0x3ff);
-	int color = (data>>10);
+//-------------------------------------------------
+//  namco_c45_road_device -- constructor
+//-------------------------------------------------
 
-	SET_TILE_INFO( mRoadGfxBank, tile, color , 0 );
-} /* get_road_info */
-
-READ16_HANDLER( namco_road16_r )
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock),
+	  m_transparent_color(~0),
+	  m_gfx(NULL),
+	  m_tilemap(NULL)
 {
-	return mpRoadRAM[offset];
 }
 
-WRITE16_HANDLER( namco_road16_w )
+
+//-------------------------------------------------
+//  read -- read from RAM
+//-------------------------------------------------
+
+READ16_MEMBER( namco_c45_road_device::read )
 {
-	COMBINE_DATA( &mpRoadRAM[offset] );
-	if( offset<0x10000/2 )
-	{
-		mpRoadTilemap->mark_tile_dirty( offset );
-	}
+	return m_ram[offset];
+}
+
+
+//-------------------------------------------------
+//  write -- write to RAM
+//-------------------------------------------------
+
+WRITE16_MEMBER( namco_c45_road_device::write )
+{
+	COMBINE_DATA(&m_ram[offset]);
+	
+	// first half maps to the tilemap
+	if (offset < 0x10000/2)
+		m_tilemap->mark_tile_dirty(offset);
+	
+	// second half maps to the gfx elements
 	else
 	{
 		offset -= 0x10000/2;
-		gfx_element_mark_dirty(space->machine().gfx[mRoadGfxBank], offset/WORDS_PER_ROAD_TILE);
+		gfx_element_mark_dirty(m_gfx, offset / WORDS_PER_ROAD_TILE);
 	}
 }
 
-void
-namco_road_init(running_machine &machine, int gfxbank )
+
+//-------------------------------------------------
+//  draw -- render to the target bitmap
+//-------------------------------------------------
+
+void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	gfx_element *pGfx;
+	const UINT8 *clut = (const UINT8 *)memregion("clut")->base();
+	bitmap_ind16 &source_bitmap = m_tilemap->pixmap();
+	unsigned yscroll = m_ram[0x1fdfe/2];
 
-	mbRoadNeedTransparent = 0;
-	mRoadGfxBank = gfxbank;
+	// loop over scanlines
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		// skip if we are not the right priority
+		int screenx	= m_ram[0x1fa00/2 + y + 15];
+		if (pri != ((screenx & 0xf000) >> 12))
+			continue;
 
-	mpRoadRAM = auto_alloc_array(machine, UINT16, 0x20000/2);
+		// skip if we don't have a valid zoom factor
+		unsigned zoomx = m_ram[0x1fe00/2 + y + 15] & 0x3ff;
+		if (zoomx == 0)
+			continue;
 
-	pGfx = gfx_element_alloc( machine, &RoadTileLayout, 0x10000+(UINT8 *)mpRoadRAM, 0x3f, 0xf00);
+		// skip if we don't have a valid source increment
+		unsigned sourcey = m_ram[0x1fc00/2 + y + 15] + yscroll;
+		const UINT16 *source_gfx = &source_bitmap.pix(sourcey & (ROAD_TILEMAP_HEIGHT - 1));
+		unsigned dsourcex = (ROAD_TILEMAP_WIDTH << 16) / zoomx;
+		if (dsourcex == 0)
+			continue;
 
-	machine.gfx[gfxbank] = pGfx;
-	mpRoadTilemap = tilemap_create(machine,
-		get_road_info,TILEMAP_SCAN_ROWS,
-		ROAD_TILE_SIZE,ROAD_TILE_SIZE,
-		ROAD_COLS,ROAD_ROWS);
+		// mask off priority bits and sign-extend
+		screenx &= 0x0fff; 
+		if (screenx & 0x0800)
+			screenx |= ~0x7ff;
 
-	state_save_register_global_pointer(machine, mpRoadRAM,   0x20000 / 2);
-} /* namco_road_init */
+		// adjust the horizontal placement
+		screenx -= 64; // needs adjustment to left
 
-void
-namco_road_set_transparent_color(pen_t pen)
-{
-	mbRoadNeedTransparent = 1;
-	mRoadTransparentColor = pen;
+		int numpixels = (44 * ROAD_TILE_SIZE << 16) / dsourcex;
+		unsigned sourcex = 0;
+		
+		// crop left
+		int clip_pixels = cliprect.min_x - screenx;
+		if (clip_pixels > 0)
+		{
+			numpixels -= clip_pixels;
+			sourcex += dsourcex*clip_pixels;
+			screenx = cliprect.min_x;
+		}
+
+		// crop right
+		clip_pixels = (screenx + numpixels) - (cliprect.max_x + 1);
+		if (clip_pixels > 0)
+			numpixels -= clip_pixels;
+
+		// TBA: work out palette mapping for Final Lap, Suzuka
+
+		// BUT: support transparent color for Thunder Ceptor
+		UINT16 *dest = &bitmap.pix(y);
+		if (m_transparent_color != ~0)
+		{
+			while (numpixels-- > 0)
+			{
+				int pen = source_gfx[sourcex >> 16];
+				if (colortable_entry_get_value(machine().colortable, pen) != m_transparent_color)
+				{
+					if (clut != NULL)
+						pen = (pen & ~0xff) | clut[pen & 0xff];
+					dest[screenx] = pen;
+				}
+				screenx++;
+				sourcex += dsourcex;
+			}
+		}
+		else
+		{
+			while (numpixels-- > 0)
+			{
+				int pen = source_gfx[sourcex >> 16];
+				if (clut != NULL)
+					pen = (pen & ~0xff) | clut[pen & 0xff];
+				dest[screenx++] = pen;
+				sourcex += dsourcex;
+			}
+		}
+	}
 }
 
-void
-namco_road_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+
+//-------------------------------------------------
+//  device_start -- device startup
+//-------------------------------------------------
+
+void namco_c45_road_device::device_start()
 {
-	const UINT8 *clut = (const UINT8 *)machine.root_device().memregion("user3")->base();
-	unsigned yscroll;
-	int i;
+	// create a gfx_element describing the road graphics
+	m_gfx = gfx_element_alloc(machine(), &s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00);
 
-	bitmap_ind16 &SourceBitmap = mpRoadTilemap->pixmap();
-	yscroll = mpRoadRAM[0x1fdfe/2];
+	// create a tilemap for the road
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
+		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);
+} 
 
-	for( i=cliprect.min_y; i<=cliprect.max_y; i++ )
-	{
-		int screenx	= mpRoadRAM[0x1fa00/2+i+15];
-		if( pri == ((screenx&0xf000)>>12) )
-		{
-			unsigned zoomx	= mpRoadRAM[0x1fe00/2+i+15]&0x3ff;
-			if( zoomx )
-			{
-				unsigned sourcey = mpRoadRAM[0x1fc00/2+i+15]+yscroll;
-				const UINT16 *pSourceGfx = &SourceBitmap.pix16(sourcey&(ROAD_TILEMAP_HEIGHT-1));
-				unsigned dsourcex = (ROAD_TILEMAP_WIDTH<<16)/zoomx;
-				if( dsourcex )
-				{
-					UINT16 *pDest = &bitmap.pix16(i);
-					unsigned sourcex = 0;
-					int numpixels = (44*ROAD_TILE_SIZE<<16)/dsourcex;
-					int clipPixels;
 
-					screenx &= 0x0fff; /* mask off priority bits */
-					if( screenx&0x0800 )
-					{
-						/* sign extend */
-						screenx |= ~0x7ff;
-					}
+//-------------------------------------------------
+//  device_stop -- device shutdown
+//-------------------------------------------------
 
-					/* adjust the horizontal placement */
-					screenx -= 64; /*needs adjustment to left*/
+void namco_c45_road_device::device_stop()
+{
+	gfx_element_free(m_gfx);
+}
 
-					clipPixels = cliprect.min_x - screenx;
-					if( clipPixels>0 )
-					{ /* crop left */
-						numpixels -= clipPixels;
-						sourcex += dsourcex*clipPixels;
-						screenx = cliprect.min_x;
-					}
 
-					clipPixels = (screenx+numpixels) - (cliprect.max_x+1);
-					if( clipPixels>0 )
-					{ /* crop right */
-						numpixels -= clipPixels;
-					}
+//-------------------------------------------------
+//  get_road_info -- tilemap callback
+//-------------------------------------------------
 
-					/* TBA: work out palette mapping for Final Lap, Suzuka */
+TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
+{
+	// ------xx xxxxxxxx tile number
+    // xxxxxx-- -------- palette select
+	UINT16 data = m_ram[tile_index];
+	int tile = data & 0x3ff;
+	int color = data >> 10;
+	SET_TILE_INFO_MEMBER(*m_gfx, tile, color, 0);
+}
 
-					/* BUT: support transparent color for Thunder Ceptor */
-					if( mbRoadNeedTransparent )
-					{
-						while( numpixels-- > 0 )
-						{
-							int pen = pSourceGfx[sourcex>>16];
-
-							if(colortable_entry_get_value(machine.colortable, pen) != mRoadTransparentColor)
-							{
-								if( clut )
-								{
-									pen = (pen&~0xff)|clut[pen&0xff];
-								}
-								pDest[screenx] = pen;
-							}
-							screenx++;
-							sourcex += dsourcex;
-						}
-					}
-					else
-					{
-						while( numpixels-- > 0 )
-						{
-							int pen = pSourceGfx[sourcex>>16];
-							if( clut )
-							{
-								pen = (pen&~0xff)|clut[pen&0xff];
-							}
-							pDest[screenx++] = pen;
-							sourcex += dsourcex;
-						}
-					}
-				} /* dsourcex!=0 */
-			} /* zoomx!=0 */
-		} /* priority */
-	} /* next scanline */
-} /* namco_road_draw */

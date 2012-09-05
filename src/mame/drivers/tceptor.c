@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM			// M68K ERROR 0
 	AM_RANGE(0x300000, 0x300001) AM_WRITEONLY
 	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_SHARE("sprite_ram")
-	AM_RANGE(0x500000, 0x51ffff) AM_WRITE_LEGACY(namco_road16_w)
+	AM_RANGE(0x500000, 0x51ffff) AM_DEVWRITE("c45_road", namco_c45_road_device, write)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(m68k_irq_enable_w)	// not sure
 	AM_RANGE(0x700000, 0x703fff) AM_READWRITE(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("m68k_shared_ram")
 ADDRESS_MAP_END
@@ -394,6 +394,8 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_GFXDECODE(tceptor)
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_DEFAULT_LAYOUT(layout_horizont)
+
+	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 
 	MCFG_SCREEN_ADD("2dscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)

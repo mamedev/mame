@@ -393,9 +393,7 @@ VIDEO_START( tceptor )
 	/* allocate temp bitmaps */
 	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap);
 
-	namco_road_init(machine, gfx_index);
-
-	namco_road_set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
+	state->m_c45_road->set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
 
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,  8, 8, 34, 28);
 
@@ -540,8 +538,8 @@ SCREEN_UPDATE_IND16( tceptor_2d )
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		namco_road_draw(screen.machine(), bitmap, cliprect, pri * 2);
-		namco_road_draw(screen.machine(), bitmap, cliprect, pri * 2 + 1);
+		state->m_c45_road->draw(bitmap, cliprect, pri * 2);
+		state->m_c45_road->draw(bitmap, cliprect, pri * 2 + 1);
 		draw_sprites(screen.machine(), bitmap, cliprect, pri);
 	}
 

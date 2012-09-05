@@ -415,6 +415,14 @@ struct tile_data
 		flags = _flags;
 		gfxnum = _gfxnum;
 	}
+
+	void set(running_machine &machine, const gfx_element &gfx, int rawcode, int rawcolor, int _flags)
+	{
+		int code = rawcode % gfx.total_elements;
+		pen_data = gfx_element_get_data(&gfx, code);
+		palette_base = gfx.color_base + gfx.color_granularity * rawcolor;
+		flags = _flags;
+	}
 };
 
 

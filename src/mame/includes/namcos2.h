@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "namcoic.h"
+
 /* CPU reference numbers */
 
 #define CPU_MASTER	0
@@ -84,6 +86,7 @@ enum
 	NAMCOFL_SPEED_RACER,
 	NAMCOFL_FINAL_LAP_R
 };
+
 
 // fix me -- most of this should be devices eventually
 class namcos2_shared_state : public driver_device
@@ -165,7 +168,6 @@ protected:
 	int m_c355_obj_palxor;
 	UINT16 m_c355_obj_position[4];
 
-
 public:
 	// general
 	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
@@ -181,7 +183,8 @@ public:
 		  m_paletteram(*this, "paletteram"),
 		  m_spriteram(*this, "spriteram"),
 		  m_rozram(*this, "rozram"),
-		  m_roz_ctrl(*this, "rozctrl")
+		  m_roz_ctrl(*this, "rozctrl"),
+		  m_c45_road(*this, "c45_road")
 	{ }
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
@@ -260,6 +263,7 @@ public:
 	tilemap_t *m_tilemap_roz;
 	UINT16 m_gfx_ctrl;
 
+	optional_device<namco_c45_road_device> m_c45_road;
 };
 
 /*----------- defined in video/namcos2.c -----------*/

@@ -448,7 +448,6 @@ void namcos2_state::video_start_finallap()
 {
 	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
 	draw_sprite_init();
-	namco_road_init(machine(), 3);
 }
 
 UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -466,7 +465,7 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 		{
 			namco_tilemap_draw( bitmap, clip, pri/2 );
 		}
-		namco_road_draw(machine(), bitmap,clip,pri );
+		m_c45_road->draw(bitmap,clip,pri);
 		draw_sprites(bitmap,clip,pri,m_gfx_ctrl );
 	}
 	return 0;
@@ -481,10 +480,6 @@ void namcos2_state::video_start_luckywld()
 	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
 		c169_roz_init(1, "gfx5");
-	}
-	if( m_gametype!=NAMCOS2_STEEL_GUNNER_2 )
-	{
-		namco_road_init(machine(), 3);
 	}
 } /* luckywld */
 
@@ -503,7 +498,7 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 		{
 			namco_tilemap_draw( bitmap, clip, pri/2 );
 		}
-		namco_road_draw(machine(), bitmap,clip,pri );
+		m_c45_road->draw(bitmap,clip,pri);
 		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 		{
 			c169_roz_draw(bitmap, clip, pri);

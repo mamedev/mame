@@ -631,7 +631,7 @@ static ADDRESS_MAP_START( common_finallap_am, AS_PROGRAM, 16, namcos2_state )
 	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(namcos2_flap_prot_r)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x840000, 0x840001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w)
-	AM_RANGE(0x880000, 0x89ffff) AM_READ_LEGACY(namco_road16_r) AM_WRITE_LEGACY(namco_road16_w)
+	AM_RANGE(0x880000, 0x89ffff) AM_DEVREADWRITE("c45_road", namco_c45_road_device, read, write)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
@@ -708,7 +708,7 @@ static ADDRESS_MAP_START( common_luckywld_am, AS_PROGRAM, 16, namcos2_state )
 	AM_RANGE(0x81a000, 0x81a001) AM_WRITENOP /* enable? */
 	AM_RANGE(0x840000, 0x840001) AM_READNOP
 	AM_RANGE(0x900000, 0x900007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w)
-	AM_RANGE(0xa00000, 0xa1ffff) AM_READWRITE_LEGACY(namco_road16_r,namco_road16_w)
+	AM_RANGE(0xa00000, 0xa1ffff) AM_DEVREADWRITE("c45_road", namco_c45_road_device, read, write)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(c169_roz_videoram_r,c169_roz_videoram_w) AM_SHARE("rozvideoram")
 	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(c169_roz_control_r,c169_roz_control_w)
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE_LEGACY(namcos2_68k_key_r,namcos2_68k_key_w)
@@ -1760,6 +1760,8 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_finallap)
+	
+	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1858,6 +1860,8 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, video_start_luckywld)
+
+	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2509,7 +2513,7 @@ ROM_START( finallap )
 	ROM_REGION16_BE( 0x200000, "user1", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* No DAT files present in ZIP archive */
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2564,7 +2568,7 @@ ROM_START( finallapd )
 	ROM_REGION16_BE( 0x200000, "user1", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* No DAT files present in ZIP archive */
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2619,7 +2623,7 @@ ROM_START( finallapc )
 	ROM_REGION16_BE( 0x200000, "user1", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* No DAT files present in ZIP archive */
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2674,7 +2678,7 @@ ROM_START( finallapjc )
 	ROM_REGION16_BE( 0x200000, "user1", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* No DAT files present in ZIP archive */
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2729,7 +2733,7 @@ ROM_START( finallapjb )
 	ROM_REGION16_BE( 0x200000, "user1", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* No DAT files present in ZIP archive */
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2788,7 +2792,7 @@ ROM_START( finalap2 )
 	NAMCOS2_DATA_LOAD_E_256K( "fls2dat0",  0x000000, CRC(f1af432c) SHA1(c514261a49ceb5c3ba0246519ba5d02e9a20d950) )
 	NAMCOS2_DATA_LOAD_O_256K( "fls2dat1",  0x000000, CRC(8719533e) SHA1(98d2767da6f7f67da7af15e8cfed95adb04b7427) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2845,7 +2849,7 @@ ROM_START( finalap2j )
 	NAMCOS2_DATA_LOAD_E_256K( "fls2dat0",  0x000000, CRC(f1af432c) SHA1(c514261a49ceb5c3ba0246519ba5d02e9a20d950) )
 	NAMCOS2_DATA_LOAD_O_256K( "fls2dat1",  0x000000, CRC(8719533e) SHA1(98d2767da6f7f67da7af15e8cfed95adb04b7427) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2902,7 +2906,7 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	NAMCOS2_DATA_LOAD_E_128K( "flt1d0",  0x000000, CRC(80004966) SHA1(112b2a9b0ea792d5dbff1b9cf904da788aeede29) )
 	NAMCOS2_DATA_LOAD_O_128K( "flt1d1",  0x000000, CRC(a2e93e8c) SHA1(9c8a5431a79153a70eb6939d16e0a5a6be235e75) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -2963,7 +2967,7 @@ ROM_START( finalap3a )
 	NAMCOS2_DATA_LOAD_E_128K( "flt1d0",  0x000000, CRC(80004966) SHA1(112b2a9b0ea792d5dbff1b9cf904da788aeede29) )
 	NAMCOS2_DATA_LOAD_O_128K( "flt1d1",  0x000000, CRC(a2e93e8c) SHA1(9c8a5431a79153a70eb6939d16e0a5a6be235e75) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -3027,7 +3031,7 @@ ROM_START( finalap3j )
 	NAMCOS2_DATA_LOAD_E_128K( "flt1d0",  0x000000, CRC(80004966) SHA1(112b2a9b0ea792d5dbff1b9cf904da788aeede29) )
 	NAMCOS2_DATA_LOAD_O_128K( "flt1d1",  0x000000, CRC(a2e93e8c) SHA1(9c8a5431a79153a70eb6939d16e0a5a6be235e75) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -3089,7 +3093,7 @@ ROM_START( finalap3jc )
 	NAMCOS2_DATA_LOAD_E_128K( "flt1_d0.13s",  0x000000, CRC(80004966) SHA1(112b2a9b0ea792d5dbff1b9cf904da788aeede29) )
 	NAMCOS2_DATA_LOAD_O_128K( "flt1_d1.13p",  0x000000, CRC(a2e93e8c) SHA1(9c8a5431a79153a70eb6939d16e0a5a6be235e75) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* PROM for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "fl1_3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -3376,7 +3380,7 @@ ROM_START( fourtrax )
 	NAMCOS2_DATA_LOAD_E_256K( "fx_dat2.13p", 0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
 	NAMCOS2_DATA_LOAD_O_256K( "fx_dat3.13n", 0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "fx1_1.5b", 0, 0x100, CRC(85ffd753) SHA1(7dbc8c295204877f41289141a146aa4f5f9f9c96) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -4383,7 +4387,7 @@ ROM_START( suzuka8h )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d1.bin",  0x000000, CRC(9825D5BF) SHA1(720F0E90C69A2E0C48889D510A15102768226A67) )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d3.bin",  0x100000, CRC(F46D301F) SHA1(70797FD584735844539553EFCAD53E11239EC10E) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "ehs1_landdt.10w", 0, 0x100,             CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -4435,7 +4439,7 @@ ROM_START( suzuka8hj )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d1.bin",  0x000000, CRC(9825d5bf) SHA1(720f0e90c69a2e0c48889d510a15102768226a67) )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d3.bin",  0x100000, CRC(f46d301f) SHA1(70797fd584735844539553efcad53e11239ec10e) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "ehs1_landdt.10w", 0, 0x100,             CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -4495,7 +4499,7 @@ ROM_START( suzuk8h2 )
 	NAMCOS2_DATA_LOAD_E_512K( "ehs1-dat2.13p",  0x100000, CRC(087da1f3) SHA1(e9c4ba0383e883502c0f45ae6e6d5daba4eccb01) )
 	NAMCOS2_DATA_LOAD_O_512K( "ehs1-dat3.13n",  0x100000, CRC(85aecb3f) SHA1(00ab6104dee0cd0fbdb0235b88b41e4d26794f98) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "ehs1-landdt.10w", 0, 0x100,             CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
@@ -4928,7 +4932,7 @@ ROM_START( luckywld )
 	ROM_LOAD( "lw1voi1.3m",  0x000000, 0x080000, CRC(b3e57993) SHA1(ff7071fc2e2c00f0cf819860c2a9be353474920a) )
 	ROM_LOAD( "lw1voi2.3l",  0x080000, 0x080000, CRC(cd8b86a2) SHA1(54bbc91e995ea0c33874ce6fe5c3f014e173da07) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
@@ -4994,7 +4998,7 @@ ROM_START( luckywldj )
 	ROM_LOAD( "lw1voi1.3m",  0x000000, 0x080000, CRC(b3e57993) SHA1(ff7071fc2e2c00f0cf819860c2a9be353474920a) )
 	ROM_LOAD( "lw1voi2.3l",  0x080000, 0x080000, CRC(cd8b86a2) SHA1(54bbc91e995ea0c33874ce6fe5c3f014e173da07) )
 
-	ROM_REGION( 0x100, "user3", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
