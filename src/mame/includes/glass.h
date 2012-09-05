@@ -11,12 +11,15 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_mainram(*this, "mainram")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_mainram;
 //      UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -33,6 +36,10 @@ public:
 	DECLARE_WRITE16_MEMBER(glass_coin_w);
 	DECLARE_WRITE16_MEMBER(glass_blitter_w);
 	DECLARE_WRITE16_MEMBER(glass_vram_w);
+
+	DECLARE_READ16_MEMBER( glass_mainram_r );
+	DECLARE_WRITE16_MEMBER( glass_mainram_w );
+
 	DECLARE_DRIVER_INIT(glass);
 };
 

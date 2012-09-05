@@ -79,21 +79,21 @@ WRITE16_MEMBER(glass_state::glass_coin_w)
 
 static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_SHARE("videoram")						/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_SHARE("videoram")							/* Video RAM */
 	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")									/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")												/* Video Registers */
 	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)														/* CLR INT Video */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")											/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")												/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_WRITE(glass_blitter_w)													/* serial blitter */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)											/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)					/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)				/* OKI6295 status register */
 	AM_RANGE(0x70000a, 0x70004b) AM_WRITE(glass_coin_w)														/* Coin Counters/Lockout */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM																		/* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("mainram")													/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
 
@@ -310,6 +310,93 @@ static void glass_ROM16_split_gfx( running_machine &machine, const char *src_reg
 	}
 }
 
+/* How does the protection work?
+
+  We know in World Rally it shares the whole of main RAM with the Dallas, with subtle reads and writes / values being checked.. so I guess this will be similar at least
+  and thus very hard to figure out if done properly 
+
+ */
+
+READ16_MEMBER( glass_state::glass_mainram_r )
+{
+	UINT16 ret = m_mainram[offset];
+	int pc = cpu_get_pc(&space.device());
+
+	if (offset == (0xfede96 - 0xfec000)>>1)
+	{
+		// this address seems important, the game will abort with 'power failure' depending on some reads, presumably refering to the power to the battery
+
+		// there are also various code segments like the one below
+		/*
+		start:
+		tst.b   this address
+		bne     end
+		tst.b   $fede1d.l
+		nop << why?
+		bne     start
+		end:
+		*/
+		return 0x0000;
+		//printf("%06x read %06x - %04x %04x\n", pc , (offset*2 + 0xfec000), ret, mem_mask);
+	}
+	else if (offset == (0xfede1c - 0xfec000)>>1)
+	{
+		// related to above, could also be some command ack?
+		logerror("%06x read %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), ret, mem_mask);
+	}
+	else if (offset == (0xfede26 - 0xfec000)>>1)
+	{
+		logerror("%06x read %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), ret, mem_mask);
+	}
+	return ret;
+}
+
+WRITE16_MEMBER( glass_state::glass_mainram_w )
+{
+	int pc = cpu_get_pc(&space.device());
+
+	COMBINE_DATA(&m_mainram[offset]);
+
+	if (offset == (0xfede02 - 0xfec000)>>1)
+	{
+//		printf("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
+		// several checks write here then expect it to appear mirrored, might be some kind of command + command ack
+		if (mem_mask & 0xff00) // sometimes mask 0xff00, but not in cases which poll for change
+		{
+			mem_mask = 0x00ff;
+			data >>=8;
+			COMBINE_DATA(&m_mainram[offset]);
+		}
+		return;
+	}
+	else if (offset == (0xfede1c - 0xfec000)>>1)
+	{
+		// see notes about 0xfede96 in read, this address seems important
+		logerror("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
+		if (mem_mask == 0x00ff)
+		{
+			int realdata = data;
+
+			// don't store the bits written, game checks they get cleared?
+			data &= 0xff00;
+			COMBINE_DATA(&m_mainram[offset]);
+
+			// a command?
+			if (realdata == 0x0002)
+			{
+				// there is a check on address 0xfede26 just after writing 0002 here..
+				offset = (0xfede26 - 0xfec000) >> 1;
+				data = 0xff00;
+				mem_mask = 0xff00;
+				COMBINE_DATA(&m_mainram[offset]);
+			}
+		}
+		return;
+	}
+
+}
+	
+
 DRIVER_INIT_MEMBER(glass_state,glass)
 {
 	/*
@@ -329,8 +416,12 @@ DRIVER_INIT_MEMBER(glass_state,glass)
 
 	/* split ROM H11 */
 	glass_ROM16_split_gfx(machine(), "gfx2", "gfx1", 0x0200000, 0x0200000, 0x0200000, 0x0300000);
+
+	/* install custom handler over RAM for protection */
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfec000, 0xfeffff, read16_delegate(FUNC(glass_state::glass_mainram_r), this), write16_delegate(FUNC(glass_state::glass_mainram_w),this));
+
 }
 
-GAME( 1993, glass,    0,     glass, glass, glass_state, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, glass10,  glass, glass, glass, glass_state, glass, ROT0, "Gaelco", "Glass (Ver 1.0)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, glassbrk, glass, glass, glass, glass_state, glass, ROT0, "Gaelco", "Glass (Ver 1.0, Break Edition)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, glass,    0,     glass, glass, glass_state, glass, ROT0, "OMK / Gaelco", "Glass (Ver 1.1)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, glass10,  glass, glass, glass, glass_state, glass, ROT0, "OMK / Gaelco", "Glass (Ver 1.0)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, glassbrk, glass, glass, glass, glass_state, glass, ROT0, "OMK / Gaelco", "Glass (Ver 1.0, Break Edition)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
