@@ -91,7 +91,7 @@ VIDEO_START( xain )
 	xain_state *state = machine.driver_data<xain_state>();
 	state->m_bgram0_tilemap = tilemap_create(machine, get_bgram0_tile_info,back_scan,    16,16,32,32);
 	state->m_bgram1_tilemap = tilemap_create(machine, get_bgram1_tile_info,back_scan,    16,16,32,32);
-	state->m_char_tilemap = tilemap_create(machine, get_char_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_char_tilemap = tilemap_create(machine, get_char_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_bgram0_tilemap->set_transparent_pen(0);
 	state->m_bgram1_tilemap->set_transparent_pen(0);

@@ -101,13 +101,13 @@ WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
 VIDEO_START(fitfight)
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
-	state->m_fof_bak_tilemap = tilemap_create(machine, get_fof_bak_tile_info, tilemap_scan_cols, 8, 8, 128, 32);
+	state->m_fof_bak_tilemap = tilemap_create(machine, get_fof_bak_tile_info, TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	/* opaque */
 
-	state->m_fof_mid_tilemap = tilemap_create(machine, get_fof_mid_tile_info, tilemap_scan_cols, 8, 8, 128, 32);
+	state->m_fof_mid_tilemap = tilemap_create(machine, get_fof_mid_tile_info, TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	state->m_fof_mid_tilemap->set_transparent_pen(0);
 
-	state->m_fof_txt_tilemap = tilemap_create(machine, get_fof_txt_tile_info, tilemap_scan_cols, 8, 8, 128, 32);
+	state->m_fof_txt_tilemap = tilemap_create(machine, get_fof_txt_tile_info, TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	state->m_fof_txt_tilemap->set_transparent_pen(0);
 }
 

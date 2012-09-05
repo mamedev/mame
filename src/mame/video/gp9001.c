@@ -314,9 +314,9 @@ void gp9001vdp_device::create_tilemaps(int region)
 {
 	tile_region = region;
 
-	top.tmap = tilemap_create_device(this, get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
-	fg.tmap = tilemap_create_device(this, get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
-	bg.tmap = tilemap_create_device(this, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	top.tmap = tilemap_create_device(this, get_top0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	fg.tmap = tilemap_create_device(this, get_fg0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	bg.tmap = tilemap_create_device(this, get_bg0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	top.tmap->set_transparent_pen(0);
 	fg.tmap->set_transparent_pen(0);

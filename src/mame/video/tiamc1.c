@@ -140,10 +140,10 @@ VIDEO_START( tiamc1 )
 
 	state_save_register_global_pointer(machine, video_ram, 0x3040);
 
-	state->m_bg_tilemap1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap1 = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
-	state->m_bg_tilemap2 = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap2 = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_bg_vshift = 0;

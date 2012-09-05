@@ -526,8 +526,8 @@ static VIDEO_START(majorpkr)
 {
 	majorpkr_state *state = machine.driver_data<majorpkr_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->m_generic_paletteram_8.allocate(4 * 0x800);

@@ -253,10 +253,10 @@ SCREEN_UPDATE_IND16( mcatadv )
 VIDEO_START( mcatadv )
 {
 	mcatadv_state *state = machine.driver_data<mcatadv_state>();
-	state->m_tilemap1 = tilemap_create(machine, get_mcatadv_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tilemap1 = tilemap_create(machine, get_mcatadv_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_tilemap1->set_transparent_pen(0);
 
-	state->m_tilemap2 = tilemap_create(machine, get_mcatadv_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tilemap2 = tilemap_create(machine, get_mcatadv_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_tilemap2->set_transparent_pen(0);
 
 	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT16, state->m_spriteram.bytes() / 2);

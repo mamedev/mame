@@ -52,7 +52,7 @@ VIDEO_START( ultratnk )
 	ultratnk_state *state = machine.driver_data<ultratnk_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_playfield = tilemap_create(machine, ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_playfield = tilemap_create(machine, ultratnk_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

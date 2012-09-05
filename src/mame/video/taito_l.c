@@ -65,9 +65,9 @@ VIDEO_START( taitol )
 	taitol_state *state = machine.driver_data<taitol_state>();
 	int i;
 
-	state->m_bg18_tilemap = tilemap_create(machine, get_bg18_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg19_tilemap = tilemap_create(machine, get_bg19_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_ch1a_tilemap = tilemap_create(machine, get_ch1a_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg18_tilemap = tilemap_create(machine, get_bg18_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg19_tilemap = tilemap_create(machine, get_bg19_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_ch1a_tilemap = tilemap_create(machine, get_ch1a_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_bg18_tilemap->set_transparent_pen(0);
 	state->m_ch1a_tilemap->set_transparent_pen(0);

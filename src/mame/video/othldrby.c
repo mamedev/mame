@@ -55,9 +55,9 @@ VIDEO_START( othldrby )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_vram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
 	state->m_buf_spriteram = auto_alloc_array(machine, UINT16, 2 * SPRITERAM_SIZE);

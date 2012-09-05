@@ -223,9 +223,9 @@ VIDEO_START( ssrj )
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
 
-	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_cols, 8, 8, 32, 32);
-	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_cols, 8, 8, 32, 32);
-	state->m_tilemap4 = tilemap_create(machine, get_tile_info4, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_tilemap4 = tilemap_create(machine, get_tile_info4, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_tilemap2->set_transparent_pen(0);
 	state->m_tilemap4->set_transparent_pen(0);
 

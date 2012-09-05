@@ -139,7 +139,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( tagteam )
 {
 	tagteam_state *state = machine.driver_data<tagteam_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS_FLIP_X,
 		 8, 8, 32, 32);
 }
 

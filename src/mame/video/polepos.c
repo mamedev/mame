@@ -196,8 +196,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 VIDEO_START( polepos )
 {
 	polepos_state *state = machine.driver_data<polepos_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_cols,8,8,64,16);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_COLS,8,8,64,16);
+	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0x2f);
 }

@@ -125,7 +125,7 @@ VIDEO_START( hyperspt )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -205,6 +205,6 @@ VIDEO_START( roadf )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, roadf_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, roadf_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_bg_tilemap->set_scroll_rows(32);
 }

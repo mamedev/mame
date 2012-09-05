@@ -144,7 +144,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 static VIDEO_START(cshooter)
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
-	state->m_txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
+	state->m_txtilemap = tilemap_create(machine, get_cstx_tile_info,TILEMAP_SCAN_ROWS, 8,8,32, 32);
 	state->m_txtilemap->set_transparent_pen(3);
 }
 

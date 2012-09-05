@@ -178,13 +178,13 @@ static TILE_GET_INFO( apple10_get_bg_tile_info )
 VIDEO_START( snookr10 )
 {
 	snookr10_state *state = machine.driver_data<snookr10_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 VIDEO_START( apple10 )
 {
 	snookr10_state *state = machine.driver_data<snookr10_state>();
-	state->m_bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
+	state->m_bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 SCREEN_UPDATE_IND16( snookr10 )

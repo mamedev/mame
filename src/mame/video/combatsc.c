@@ -288,9 +288,9 @@ VIDEO_START( combatsc )
 {
 	combatsc_state *state = machine.driver_data<combatsc_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_textlayer =  tilemap_create(machine, get_text_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_textlayer =  tilemap_create(machine, get_text_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
 	state->m_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
@@ -309,9 +309,9 @@ VIDEO_START( combatscb )
 {
 	combatsc_state *state = machine.driver_data<combatsc_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0_bootleg, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1_bootleg, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_textlayer = tilemap_create(machine, get_text_info_bootleg, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0_bootleg, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1_bootleg, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_textlayer = tilemap_create(machine, get_text_info_bootleg, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
 	state->m_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);

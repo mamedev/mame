@@ -150,14 +150,14 @@ static TILE_GET_INFO( s2k_get_bg_tile_info )
 VIDEO_START(ampoker2)
 {
 	ampoker2_state *state = machine.driver_data<ampoker2_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 32);
 }
 
 VIDEO_START(sigma2k)
 {
 	ampoker2_state *state = machine.driver_data<ampoker2_state>();
-	state->m_bg_tilemap = tilemap_create(machine, s2k_get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, s2k_get_bg_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 32);
 }
 

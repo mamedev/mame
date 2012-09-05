@@ -490,7 +490,7 @@ static TILE_GET_INFO( get_tile_info )
 static VIDEO_START( marinedt )
 {
 	marinedt_state *state = machine.driver_data<marinedt_state>();
-	state->m_tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_scrolldx(0, 4*8);

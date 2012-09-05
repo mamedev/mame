@@ -101,7 +101,7 @@ VIDEO_START( ddragon )
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, background_scan, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrolldx(0, 384 - 256);
@@ -115,7 +115,7 @@ VIDEO_START( chinagat )
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_16color_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_16color_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrolldy(-8, -8);

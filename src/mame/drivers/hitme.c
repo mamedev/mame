@@ -57,14 +57,14 @@ WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 static VIDEO_START( hitme )
 {
 	hitme_state *state = machine.driver_data<hitme_state>();
-	state->m_tilemap = tilemap_create(machine, get_hitme_tile_info, tilemap_scan_rows, 8, 10, 40, 19);
+	state->m_tilemap = tilemap_create(machine, get_hitme_tile_info, TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
 }
 
 
 static VIDEO_START( barricad )
 {
 	hitme_state *state = machine.driver_data<hitme_state>();
-	state->m_tilemap = tilemap_create(machine, get_hitme_tile_info, tilemap_scan_rows, 8, 8, 32, 24);
+	state->m_tilemap = tilemap_create(machine, get_hitme_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
 
 

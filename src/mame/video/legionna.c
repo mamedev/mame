@@ -141,10 +141,10 @@ static TILE_GET_INFO( get_text_tile_info )
 VIDEO_START( legionna )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
-	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	state->m_sprite_xoffs = 0;
@@ -162,10 +162,10 @@ VIDEO_START( legionna )
 VIDEO_START( denjinmk )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info_denji,tilemap_scan_rows,16,16,32,32);
-	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info_denji, tilemap_scan_rows,16,16,32,32);
-	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info_denji,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info_denji, TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	state->m_sprite_xoffs = 0;
@@ -183,10 +183,10 @@ VIDEO_START( denjinmk )
 VIDEO_START( cupsoc )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info_cupsoc, tilemap_scan_rows,16,16,32,32);
-	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info_cupsoc, TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	state->m_sprite_xoffs = 0;

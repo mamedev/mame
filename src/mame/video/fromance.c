@@ -94,8 +94,8 @@ VIDEO_START( fromance )
 	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_fromance_bg_tile_info, tilemap_scan_rows, 8, 4, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fromance_fg_tile_info, tilemap_scan_rows, 8, 4, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_fromance_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fromance_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common(machine);
 }
@@ -105,8 +105,8 @@ VIDEO_START( nekkyoku )
 	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_nekkyoku_bg_tile_info, tilemap_scan_rows, 8, 4, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_nekkyoku_fg_tile_info, tilemap_scan_rows, 8, 4, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_nekkyoku_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_nekkyoku_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common(machine);
 }

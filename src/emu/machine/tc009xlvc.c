@@ -258,9 +258,9 @@ void tc0091lvc_device::device_start()
 	m_sprram = m_pcg_ram + 0xb000;
 	m_sprram_buffer = auto_alloc_array_clear(machine(), UINT8, 0x400);
 
-	tx_tilemap = tilemap_create_device(this, get_tx_tile_info,tilemap_scan_rows,8,8,64,32);
-	bg0_tilemap = tilemap_create_device(this, get_bg0_tile_info,tilemap_scan_rows,8,8,64,32);
-	bg1_tilemap = tilemap_create_device(this, get_bg1_tile_info,tilemap_scan_rows,8,8,64,32);
+	tx_tilemap = tilemap_create_device(this, get_tx_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg0_tilemap = tilemap_create_device(this, get_bg0_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg1_tilemap = tilemap_create_device(this, get_bg1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	tx_tilemap->set_transparent_pen(0);
 	bg0_tilemap->set_transparent_pen(0);

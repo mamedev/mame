@@ -55,7 +55,7 @@ WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
 static VIDEO_START( mgolf )
 {
 	mgolf_state *state = machine.driver_data<mgolf_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

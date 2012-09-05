@@ -124,8 +124,8 @@ VIDEO_START( blmbycar )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, DIM_NX, DIM_NY );
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, DIM_NX, DIM_NY );
+	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 
 	state->m_tilemap_0->set_scroll_rows(1);
 	state->m_tilemap_0->set_scroll_cols(1);

@@ -934,19 +934,19 @@ VIDEO_START( wecleman )
 	state->m_sprite_list = auto_alloc_array_clear(machine, struct sprite, NUM_SPRITES);
 
 	state->m_bg_tilemap = tilemap_create(machine, wecleman_get_bg_tile_info,
-								tilemap_scan_rows,
+								TILEMAP_SCAN_ROWS,
 									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
 	state->m_fg_tilemap = tilemap_create(machine, wecleman_get_fg_tile_info,
-								tilemap_scan_rows,
+								TILEMAP_SCAN_ROWS,
 
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
 	state->m_txt_tilemap = tilemap_create(machine, wecleman_get_txt_tile_info,
-								 tilemap_scan_rows,
+								 TILEMAP_SCAN_ROWS,
 
 								 8,8,
 								 PAGE_NX * 1, PAGE_NY * 1);

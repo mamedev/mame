@@ -273,13 +273,13 @@ static TILE_GET_INFO( get_tilemap2_tile_info )
 static VIDEO_START( cybertnk )
 {
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	state->m_tilemap0_tilemap = tilemap_create(machine, get_tilemap0_tile_info,tilemap_scan_rows,8,8,128,32);
+	state->m_tilemap0_tilemap = tilemap_create(machine, get_tilemap0_tile_info,TILEMAP_SCAN_ROWS,8,8,128,32);
 	state->m_tilemap0_tilemap->set_transparent_pen(0);
 
-	state->m_tilemap1_tilemap = tilemap_create(machine, get_tilemap1_tile_info,tilemap_scan_rows,8,8,128,32);
+	state->m_tilemap1_tilemap = tilemap_create(machine, get_tilemap1_tile_info,TILEMAP_SCAN_ROWS,8,8,128,32);
 	state->m_tilemap1_tilemap->set_transparent_pen(0);
 
-	state->m_tilemap2_tilemap = tilemap_create(machine, get_tilemap2_tile_info,tilemap_scan_rows,8,8,128,32);
+	state->m_tilemap2_tilemap = tilemap_create(machine, get_tilemap2_tile_info,TILEMAP_SCAN_ROWS,8,8,128,32);
 	state->m_tilemap2_tilemap->set_transparent_pen(0);
 }
 

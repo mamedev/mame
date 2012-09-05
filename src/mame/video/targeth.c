@@ -74,8 +74,8 @@ WRITE16_MEMBER(targeth_state::targeth_vram_w)
 VIDEO_START( targeth )
 {
 	targeth_state *state = machine.driver_data<targeth_state>();
-	state->m_pant[0] = tilemap_create(machine, get_tile_info_targeth_screen0,tilemap_scan_rows,16,16,64,32);
-	state->m_pant[1] = tilemap_create(machine, get_tile_info_targeth_screen1,tilemap_scan_rows,16,16,64,32);
+	state->m_pant[0] = tilemap_create(machine, get_tile_info_targeth_screen0,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[1] = tilemap_create(machine, get_tile_info_targeth_screen1,TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	state->m_pant[0]->set_transparent_pen(0);
 }

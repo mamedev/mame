@@ -158,9 +158,9 @@ VIDEO_START( paradise )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 0x20, 0x20);
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 0x20, 0x20);
-	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 0x20, 0x20);
+	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
 	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);

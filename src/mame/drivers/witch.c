@@ -705,9 +705,9 @@ GFXDECODE_END
 static VIDEO_START(witch)
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	state->m_gfx0a_tilemap = tilemap_create(machine, get_gfx0a_tile_info,tilemap_scan_rows,8,8,32,32);
-	state->m_gfx0b_tilemap = tilemap_create(machine, get_gfx0b_tile_info,tilemap_scan_rows,8,8,32,32);
-	state->m_gfx1_tilemap = tilemap_create(machine, get_gfx1_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_gfx0a_tilemap = tilemap_create(machine, get_gfx0a_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_gfx0b_tilemap = tilemap_create(machine, get_gfx0b_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_gfx1_tilemap = tilemap_create(machine, get_gfx1_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_gfx0a_tilemap->set_transparent_pen(0);
 	state->m_gfx0b_tilemap->set_transparent_pen(0);

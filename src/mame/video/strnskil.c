@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( strnskil )
 {
 	strnskil_state *state = machine.driver_data<strnskil_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(32);

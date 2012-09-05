@@ -81,7 +81,7 @@ static VIDEO_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
 	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
-	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE_IND16( mogura )

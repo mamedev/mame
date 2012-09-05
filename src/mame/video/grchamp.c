@@ -108,7 +108,7 @@ VIDEO_START( grchamp )
 	state->m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
-	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 	state->m_left_tilemap = tilemap_create(machine, get_left_tile_info, get_memory_offset,  8,8, 64,32);
 	state->m_right_tilemap = tilemap_create(machine, get_right_tile_info, get_memory_offset,  8,8, 64,32);
 	state->m_center_tilemap = tilemap_create(machine, get_center_tile_info, get_memory_offset,  8,8, 64,32);

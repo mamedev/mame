@@ -136,7 +136,7 @@ static PALETTE_INIT( koikoi )
 static VIDEO_START(koikoi)
 {
 	koikoi_state *state = machine.driver_data<koikoi_state>();
-	state->m_tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tmap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16(koikoi)

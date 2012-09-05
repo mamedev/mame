@@ -90,10 +90,10 @@ VIDEO_START( relief )
 	machine.gfx[1]->color_granularity = 16;
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the second playfield */
-	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
 	state->m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */

@@ -75,7 +75,7 @@ VIDEO_START( klax )
 	klax_state *state = machine.driver_data<klax_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,32);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);

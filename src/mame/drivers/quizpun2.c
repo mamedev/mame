@@ -147,8 +147,8 @@ WRITE8_MEMBER(quizpun2_state::fg_ram_w)
 static VIDEO_START(quizpun2)
 {
 	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	state->m_bg_tmap = tilemap_create(	machine, get_bg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
-	state->m_fg_tmap = tilemap_create(	machine, get_fg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
+	state->m_bg_tmap = tilemap_create(	machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,	8,16, 0x20,0x20	);
+	state->m_fg_tmap = tilemap_create(	machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,16, 0x20,0x20	);
 
 	state->m_bg_tmap->set_transparent_pen(0);
 	state->m_fg_tmap->set_transparent_pen(0);

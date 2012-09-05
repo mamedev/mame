@@ -200,8 +200,8 @@ VIDEO_START( pacland )
 	machine.primary_screen->register_screen_bitmap(state->m_fg_bitmap);
 	state->m_fg_bitmap.fill(0xffff);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fg_tilemap->set_scroll_rows(32);
 

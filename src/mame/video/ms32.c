@@ -78,10 +78,10 @@ VIDEO_START( ms32 )
 	state->m_bgram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
 	state->m_txram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
 
-	state->m_tx_tilemap = tilemap_create(machine, get_ms32_tx_tile_info,tilemap_scan_rows,8, 8,64,64);
-	state->m_bg_tilemap = tilemap_create(machine, get_ms32_bg_tile_info,tilemap_scan_rows,16,16,64,64);
-	state->m_bg_tilemap_alt = tilemap_create(machine, get_ms32_bg_tile_info,tilemap_scan_rows,16,16,256,16); // alt layout, controller by register?
-	state->m_roz_tilemap = tilemap_create(machine, get_ms32_roz_tile_info,tilemap_scan_rows,16,16,128,128);
+	state->m_tx_tilemap = tilemap_create(machine, get_ms32_tx_tile_info,TILEMAP_SCAN_ROWS,8, 8,64,64);
+	state->m_bg_tilemap = tilemap_create(machine, get_ms32_bg_tile_info,TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_bg_tilemap_alt = tilemap_create(machine, get_ms32_bg_tile_info,TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
+	state->m_roz_tilemap = tilemap_create(machine, get_ms32_roz_tile_info,TILEMAP_SCAN_ROWS,16,16,128,128);
 
 
 	/* set up tile layers */
@@ -119,7 +119,7 @@ VIDEO_START( f1superb )
 	VIDEO_START_CALL( ms32 );
 
 	state->m_f1superb_extraram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
-	state->m_extra_tilemap = tilemap_create(machine, get_ms32_extra_tile_info,tilemap_scan_rows,2048,1,1,0x400);
+	state->m_extra_tilemap = tilemap_create(machine, get_ms32_extra_tile_info,TILEMAP_SCAN_ROWS,2048,1,1,0x400);
 
 }
 

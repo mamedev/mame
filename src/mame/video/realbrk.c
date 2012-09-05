@@ -149,11 +149,11 @@ VIDEO_START(realbrk)
 {
 	realbrk_state *state = machine.driver_data<realbrk_state>();
 	/* Backgrounds */
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 0x40, 0x20);
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 0x40, 0x20);
+	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
+	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x20);
 
 	/* Text */
-	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows,  8,  8, 0x40, 0x20);
+	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
 
 	state->m_tilemap_0->set_transparent_pen(0);
 	state->m_tilemap_1->set_transparent_pen(0);

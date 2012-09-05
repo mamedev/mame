@@ -92,7 +92,7 @@ static TILE_GET_INFO(aquarius_gettileinfo)
 VIDEO_START( aquarius )
 {
 	aquarius_state *state = machine.driver_data<aquarius_state>();
-	state->m_tilemap = tilemap_create(machine, aquarius_gettileinfo, tilemap_scan_rows, 8, 8, 40, 25);
+	state->m_tilemap = tilemap_create(machine, aquarius_gettileinfo, TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
 SCREEN_UPDATE_IND16( aquarius )

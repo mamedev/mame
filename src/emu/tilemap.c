@@ -541,62 +541,61 @@ void tilemap_t::set_transmask(int group, UINT32 fgmask, UINT32 bgmask)
 //**************************************************************************
 
 //-------------------------------------------------
-//  tilemap_scan_rows
-//  tilemap_scan_rows_flip_x
-//  tilemap_scan_rows_flip_y
-//  tilemap_scan_rows_flip_xy - scan in row-major
+// scan_rows
+// scan_rows_flip_x
+// scan_rows_flip_y
+// scan_rows_flip_xy - scan in row-major
 //  order with optional flipping
 //-------------------------------------------------
 
-TILEMAP_MAPPER( tilemap_scan_rows )
+tilemap_memory_index tilemap_t::scan_rows(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + col;
 }
 
-TILEMAP_MAPPER( tilemap_scan_rows_flip_x )
+tilemap_memory_index tilemap_t::scan_rows_flip_x(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return row * num_cols + (num_cols - 1 - col);
 }
 
-TILEMAP_MAPPER( tilemap_scan_rows_flip_y )
+tilemap_memory_index tilemap_t::scan_rows_flip_y(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + col;
 }
 
-TILEMAP_MAPPER( tilemap_scan_rows_flip_xy )
+tilemap_memory_index tilemap_t::scan_rows_flip_xy(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + (num_cols - 1 - col);
 }
 
 
 //-------------------------------------------------
-//  tilemap_scan_cols
-//  tilemap_scan_cols_flip_x
-//  tilemap_scan_cols_flip_y
-//  tilemap_scan_cols_flip_xy - scan in column-
+//  scan_cols
+//  scan_cols_flip_x
+//  scan_cols_flip_y
+//  scan_cols_flip_xy - scan in column-
 //  major order with optional flipping
 //-------------------------------------------------
 
-TILEMAP_MAPPER( tilemap_scan_cols )
+tilemap_memory_index tilemap_t::scan_cols(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + row;
 }
 
-TILEMAP_MAPPER( tilemap_scan_cols_flip_x )
+tilemap_memory_index tilemap_t::scan_cols_flip_x(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-TILEMAP_MAPPER( tilemap_scan_cols_flip_y )
+tilemap_memory_index tilemap_t::scan_cols_flip_y(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return col * num_rows + (num_rows - 1 - row);
 }
 
-TILEMAP_MAPPER( tilemap_scan_cols_flip_xy )
+tilemap_memory_index tilemap_t::scan_cols_flip_xy(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + (num_rows - 1 - row);
 }
-
 
 
 //-------------------------------------------------
@@ -1485,14 +1484,40 @@ tilemap_manager::tilemap_manager(running_machine &machine)
 //  tilemaps
 //-------------------------------------------------
 
+static const struct
+{
+	tilemap_memory_index (*func)(running_machine &, UINT32, UINT32, UINT32, UINT32);
+	const char *name;
+} s_standard_mappers[TILEMAP_STANDARD_COUNT] =
+{
+	{ FUNC(tilemap_t::scan_rows) },
+	{ FUNC(tilemap_t::scan_rows_flip_x) },
+	{ FUNC(tilemap_t::scan_rows_flip_y) },
+	{ FUNC(tilemap_t::scan_rows_flip_xy) },
+	{ FUNC(tilemap_t::scan_cols) },
+	{ FUNC(tilemap_t::scan_cols_flip_x) },
+	{ FUNC(tilemap_t::scan_cols_flip_y) },
+	{ FUNC(tilemap_t::scan_cols_flip_xy) }
+};
+
 tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tile_get_info, mapper, tilewidth, tileheight, cols, rows)));
 }
 
+tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
+{
+	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, &machine()), tilewidth, tileheight, cols, rows)));
+}
+
 tilemap_t &tilemap_manager::create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tilemap_get_info_delegate(tile_get_info, "", &machine()), tilemap_mapper_delegate(mapper, "", &machine()), tilewidth, tileheight, cols, rows)));
+}
+
+tilemap_t &tilemap_manager::create(tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
+{
+	return m_tilemap_list.append(*auto_alloc(machine(), tilemap_t(*this, tilemap_get_info_delegate(tile_get_info, "", &machine()), tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, &machine()), tilewidth, tileheight, cols, rows)));
 }
 
 

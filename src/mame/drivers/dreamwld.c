@@ -266,8 +266,8 @@ static VIDEO_START( dreamwld )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 64,32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 64,32);
 	state->m_bg2_tilemap->set_transparent_pen(0);
 
 	state->m_bg_tilemap->set_scroll_rows(256);	// line scrolling

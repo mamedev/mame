@@ -401,7 +401,7 @@ VIDEO_START( s2650games )
 	state->m_inv_spr = 0;
 	state->m_xoffsethack = 1;
 
-	state->m_bg_tilemap = tilemap_create( machine, s2650_get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	state->m_bg_tilemap = tilemap_create( machine, s2650_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 }

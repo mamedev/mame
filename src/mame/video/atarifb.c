@@ -94,9 +94,9 @@ VIDEO_START( atarifb )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->m_alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
-	state->m_alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
-	state->m_field_tilemap  = tilemap_create(machine, field_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	state->m_alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	state->m_field_tilemap  = tilemap_create(machine, field_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

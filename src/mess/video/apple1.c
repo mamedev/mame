@@ -193,7 +193,7 @@ static terminal_t *terminal_create(
 	term = (terminal_t *) auto_alloc_array(machine, char, sizeof(terminal_t) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));
 
-	term->tm = tilemap_create(machine, terminal_gettileinfo, tilemap_scan_rows,
+	term->tm = tilemap_create(machine, terminal_gettileinfo, TILEMAP_SCAN_ROWS,
 		char_width, char_height, num_cols, num_rows);
 
 	term->gfx = gfx;

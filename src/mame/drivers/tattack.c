@@ -67,7 +67,7 @@ static SCREEN_UPDATE_IND16( tattack )
 static VIDEO_START( tattack )
 {
 	tattack_state *state = machine.driver_data<tattack_state>();
-		state->m_tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+		state->m_tmap = tilemap_create( machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )

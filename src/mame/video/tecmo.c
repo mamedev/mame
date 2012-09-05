@@ -89,15 +89,15 @@ VIDEO_START( tecmo )
 	tecmo_state *state = machine.driver_data<tecmo_state>();
 	if (state->m_video_type == 2)	/* gemini */
 	{
-		state->m_bg_tilemap = tilemap_create(machine, gemini_get_bg_tile_info,tilemap_scan_rows,16,16,32,16);
-		state->m_fg_tilemap = tilemap_create(machine, gemini_get_fg_tile_info,tilemap_scan_rows,16,16,32,16);
+		state->m_bg_tilemap = tilemap_create(machine, gemini_get_bg_tile_info,TILEMAP_SCAN_ROWS,16,16,32,16);
+		state->m_fg_tilemap = tilemap_create(machine, gemini_get_fg_tile_info,TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
 	else	/* rygar, silkworm */
 	{
-		state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,32,16);
-		state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,16,16,32,16);
+		state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,16,16,32,16);
+		state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

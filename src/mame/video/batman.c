@@ -99,17 +99,17 @@ VIDEO_START( batman )
 	batman_state *state = machine.driver_data<batman_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the second playfield */
-	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
 	state->m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 }
 

@@ -78,8 +78,8 @@ VIDEO_START( dbz )
 {
 	dbz_state *state = machine.driver_data<dbz_state>();
 
-	state->m_bg1_tilemap = tilemap_create(machine, get_dbz_bg1_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_dbz_bg2_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, get_dbz_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_dbz_bg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	state->m_bg1_tilemap->set_transparent_pen(0);
 	state->m_bg2_tilemap->set_transparent_pen(0);

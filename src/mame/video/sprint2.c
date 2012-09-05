@@ -48,7 +48,7 @@ VIDEO_START( sprint2 )
 	sprint2_state *state = machine.driver_data<sprint2_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 

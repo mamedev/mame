@@ -86,8 +86,8 @@ VIDEO_START( lwings )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, lwings_get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, lwings_get_bg1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(3);
 }
@@ -96,8 +96,8 @@ VIDEO_START( trojan )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, trojan_get_bg1_tile_info,tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, trojan_get_bg1_tile_info,TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, get_bg2_memory_offset, 16, 16, 32, 16);
 
 	state->m_fg_tilemap->set_transparent_pen(3);

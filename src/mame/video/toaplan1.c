@@ -214,10 +214,10 @@ static void toaplan1_create_tilemaps(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_pf1_tilemap->set_transparent_pen(0);
 	state->m_pf2_tilemap->set_transparent_pen(0);

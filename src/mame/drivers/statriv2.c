@@ -158,13 +158,13 @@ static PALETTE_INIT( statriv2 )
 static VIDEO_START( horizontal )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_tilemap = tilemap_create(machine, horizontal_tile_info ,tilemap_scan_rows, 8,15, 64,16);
+	state->m_tilemap = tilemap_create(machine, horizontal_tile_info ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
 }
 
 static VIDEO_START( vertical )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_tilemap = tilemap_create(machine, vertical_tile_info, tilemap_scan_rows, 8,8, 32,32);
+	state->m_tilemap = tilemap_create(machine, vertical_tile_info, TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }
 
 

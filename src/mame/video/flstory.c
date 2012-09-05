@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_rumba_tile_info )
 VIDEO_START( flstory )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  state->m_bg_tilemap->set_transparent_pen(15);
 	state->m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -73,7 +73,7 @@ VIDEO_START( flstory )
 VIDEO_START( rumba )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_rumba_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_rumba_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  state->m_bg_tilemap->set_transparent_pen(15);
 	state->m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -86,7 +86,7 @@ VIDEO_START( rumba )
 VIDEO_START( victnine )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = tilemap_create(machine, victnine_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, victnine_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_generic_paletteram_8.allocate(0x200);

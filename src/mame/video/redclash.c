@@ -181,7 +181,7 @@ VIDEO_START( redclash )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

@@ -274,7 +274,7 @@ VIDEO_START( glfgreat )
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 512);
+	state->m_roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	state->m_roz_tilemap->set_transparent_pen(0);
 
 	state->m_glfgreat_roz_rom_bank = 0;
@@ -289,7 +289,7 @@ VIDEO_START( prmrsocr )
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info, tilemap_scan_rows, 16, 16, 512, 256);
+	state->m_roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	state->m_roz_tilemap->set_transparent_pen(0);
 
 	state->m_prmrsocr_sprite_bank = 0;

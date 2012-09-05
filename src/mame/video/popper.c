@@ -181,10 +181,10 @@ static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 VIDEO_START( popper )
 {
 	popper_state *state = machine.driver_data<popper_state>();
-	state->m_p123_tilemap    = tilemap_create(machine, get_popper_p123_tile_info,    tilemap_scan_cols, 8, 8, 33, 32 );
-	state->m_p0_tilemap      = tilemap_create(machine, get_popper_p0_tile_info,      tilemap_scan_cols, 8, 8, 33, 32);
-	state->m_ol_p123_tilemap = tilemap_create(machine, get_popper_ol_p123_tile_info, tilemap_scan_cols, 8, 8, 2, 32);
-	state->m_ol_p0_tilemap   = tilemap_create(machine, get_popper_ol_p0_tile_info,   tilemap_scan_cols, 8, 8, 2, 32);
+	state->m_p123_tilemap    = tilemap_create(machine, get_popper_p123_tile_info,    TILEMAP_SCAN_COLS, 8, 8, 33, 32 );
+	state->m_p0_tilemap      = tilemap_create(machine, get_popper_p0_tile_info,      TILEMAP_SCAN_COLS, 8, 8, 33, 32);
+	state->m_ol_p123_tilemap = tilemap_create(machine, get_popper_ol_p123_tile_info, TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	state->m_ol_p0_tilemap   = tilemap_create(machine, get_popper_ol_p0_tile_info,   TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 
 	state->m_p123_tilemap->set_transmask(0, 0x0f, 0x01);
 	state->m_p123_tilemap->set_transmask(1, 0x01, 0x0f);

@@ -49,7 +49,7 @@ WRITE8_MEMBER(cball_state::cball_vram_w)
 static VIDEO_START( cball )
 {
 	cball_state *state = machine.driver_data<cball_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

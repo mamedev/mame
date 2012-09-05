@@ -32,7 +32,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( orbit )
 {
 	orbit_state *state = machine.driver_data<orbit_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 32, 30);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
 }
 
 

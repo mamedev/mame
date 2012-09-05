@@ -145,21 +145,21 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &mo0desc);
 	atarimo_set_slipram(0, &state->m_current_slip[0]);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  16,8, 64,32);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate the second screen if necessary */
 	if (screens == 2)
 	{
 		/* initialize the playfield */
-		state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_rows,  16,8, 64,64);
+		state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,64);
 		state->m_playfield2_tilemap->set_scrollx(0, 0);
 
 		/* initialize the motion objects */
@@ -167,7 +167,7 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 		atarimo_set_slipram(1, &state->m_current_slip[1]);
 
 		/* initialize the alphanumerics */
-		state->m_alpha2_tilemap = tilemap_create(machine, get_alpha2_tile_info, tilemap_scan_rows,  16,8, 64,32);
+		state->m_alpha2_tilemap = tilemap_create(machine, get_alpha2_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,32);
 		state->m_alpha2_tilemap->set_scrollx(0, 0);
 		state->m_alpha2_tilemap->set_transparent_pen(0);
 	}

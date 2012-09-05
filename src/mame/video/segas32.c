@@ -252,7 +252,7 @@ static void common_start(running_machine &machine, int multi32)
 	{
 		struct cache_entry *entry = auto_alloc(machine, struct cache_entry);
 
-		entry->tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16,16, 32,16);
+		entry->tmap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = state->m_cache_head;

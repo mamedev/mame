@@ -135,9 +135,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 VIDEO_START( goal92 )
 {
 	goal92_state *state = machine.driver_data<goal92_state>();
-	state->m_bg_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_fg_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_tx_layer = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_layer = tilemap_create(machine, get_back_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_layer = tilemap_create(machine, get_fore_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_layer = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, 0x400 * 2);
 	state_save_register_global_pointer(machine, state->m_buffered_spriteram, 0x400 * 2);

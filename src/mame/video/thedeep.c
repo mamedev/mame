@@ -104,7 +104,7 @@ VIDEO_START( thedeep )
 {
 	thedeep_state *state = machine.driver_data<thedeep_state>();
 	state->m_tilemap_0  = tilemap_create(machine, get_tile_info_0,tilemap_scan_rows_back,16,16,0x20,0x20);
-	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows,8,8,0x20,0x20);
+	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_1,TILEMAP_SCAN_ROWS,8,8,0x20,0x20);
 
 	state->m_tilemap_0->set_transparent_pen(0 );
 	state->m_tilemap_1->set_transparent_pen(0 );

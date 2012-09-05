@@ -52,7 +52,7 @@ VIDEO_START( atetris )
 {
 	atetris_state *state = machine.driver_data<atetris_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 }
 
 

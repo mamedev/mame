@@ -343,7 +343,7 @@ VIDEO_START( rallyx )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
@@ -359,7 +359,7 @@ VIDEO_START( jungler )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	state->m_spriteram_base = 0x14;
@@ -373,7 +373,7 @@ VIDEO_START( locomotn )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
@@ -394,7 +394,7 @@ VIDEO_START( commsega )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */

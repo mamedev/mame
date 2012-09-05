@@ -157,7 +157,7 @@ VIDEO_START( sidearms )
 		state->m_bg_tilemap = tilemap_create(machine, get_philko_bg_tile_info, sidearms_tilemap_scan, 32, 32, 128, 128);
 	}
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 64);
 
 	state->m_fg_tilemap->set_transparent_pen(3);

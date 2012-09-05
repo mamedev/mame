@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tile_info )
 static VIDEO_START( mayumi )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
-	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)

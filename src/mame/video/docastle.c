@@ -113,7 +113,7 @@ static TILE_GET_INFO( get_tile_info )
 static void video_start_common( running_machine &machine, UINT32 tile_transmask )
 {
 	docastle_state *state = machine.driver_data<docastle_state>();
-	state->m_do_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_do_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 

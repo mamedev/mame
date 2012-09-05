@@ -166,9 +166,9 @@ VIDEO_START(sslam)
 {
 	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_sslam_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_md_tilemap = tilemap_create(machine, get_sslam_md_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_tx_tilemap = tilemap_create(machine, get_sslam_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_sslam_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_md_tilemap = tilemap_create(machine, get_sslam_md_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, get_sslam_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_md_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_transparent_pen(0);
@@ -181,7 +181,7 @@ VIDEO_START(powerbls)
 {
 	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_powerbls_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_bg_tilemap = tilemap_create(machine, get_powerbls_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_sprites_x_offset = -21;
 	state->save_item(NAME(state->m_sprites_x_offset));

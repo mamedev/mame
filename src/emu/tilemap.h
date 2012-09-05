@@ -487,6 +487,19 @@ public:
 	void draw_roz(bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask = 0xff);
 	void draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly);
 
+	// mappers
+	// scan in row-major order with optional flipping
+	static tilemap_memory_index scan_rows(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	static tilemap_memory_index scan_rows_flip_x(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	static tilemap_memory_index scan_rows_flip_y(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	static tilemap_memory_index scan_rows_flip_xy(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+
+	// scan in column-major order with optional flipping
+	static tilemap_memory_index scan_cols(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	static tilemap_memory_index scan_cols_flip_x(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	static tilemap_memory_index scan_cols_flip_y(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+	static tilemap_memory_index scan_cols_flip_xy(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
+
 private:
 	// internal set of transparency states for rendering
 	enum trans_t
@@ -592,6 +605,21 @@ private:
 };
 
 
+// constants
+enum tilemap_standard_mapper
+{
+	TILEMAP_SCAN_ROWS = 0,
+	TILEMAP_SCAN_ROWS_FLIP_X,
+	TILEMAP_SCAN_ROWS_FLIP_Y,
+	TILEMAP_SCAN_ROWS_FLIP_XY,
+	TILEMAP_SCAN_COLS,
+	TILEMAP_SCAN_COLS_FLIP_X,
+	TILEMAP_SCAN_COLS_FLIP_Y,
+	TILEMAP_SCAN_COLS_FLIP_XY,
+	TILEMAP_STANDARD_COUNT
+};
+
+
 // tilemap manager
 class tilemap_manager
 {
@@ -606,7 +634,9 @@ public:
 
 	// tilemap creation
 	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
+	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows);
 	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows);
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -669,32 +699,21 @@ private:
 inline tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 { return &machine.tilemap().create(tilemap_get_info_delegate(tile_get_info, "", &machine), tilemap_mapper_delegate(mapper, "", &machine), tilewidth, tileheight, cols, rows); }
 
+inline tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
+{ return &machine.tilemap().create(tilemap_get_info_delegate(tile_get_info, "", &machine), mapper, tilewidth, tileheight, cols, rows); }
+
 // create a new tilemap that is owned by a device
 inline tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 { return &device->machine().tilemap().create(tilemap_get_info_delegate(tile_get_info, "", device), tilemap_mapper_delegate(mapper, "", &device->machine()), tilewidth, tileheight, cols, rows); }
 
-
-
-// ----- common logical-to-memory mappers -----
-
-// scan in row-major order with optional flipping
-TILEMAP_MAPPER( tilemap_scan_rows );
-TILEMAP_MAPPER( tilemap_scan_rows_flip_x );
-TILEMAP_MAPPER( tilemap_scan_rows_flip_y );
-TILEMAP_MAPPER( tilemap_scan_rows_flip_xy );
-
-// scan in column-major order with optional flipping
-TILEMAP_MAPPER( tilemap_scan_cols );
-TILEMAP_MAPPER( tilemap_scan_cols_flip_x );
-TILEMAP_MAPPER( tilemap_scan_cols_flip_y );
-TILEMAP_MAPPER( tilemap_scan_cols_flip_xy );
+inline tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
+{ return &device->machine().tilemap().create(tilemap_get_info_delegate(tile_get_info, "", device), mapper, tilewidth, tileheight, cols, rows); }
 
 
 
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
-
 
 inline running_machine &tilemap_t::machine() const
 {

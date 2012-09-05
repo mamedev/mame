@@ -345,15 +345,15 @@ VIDEO_START(tecmosys)
 	state->m_tmp_tilemap_renderbitmap.fill(0x0000);
 
 
-	state->m_txt_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
+	state->m_txt_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
 	state->m_txt_tilemap->set_transparent_pen(0);
 
-	state->m_bg0tilemap = tilemap_create(machine, get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_bg0tilemap = tilemap_create(machine, get_bg0tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
 	state->m_bg0tilemap->set_transparent_pen(0);
 
-	state->m_bg1tilemap = tilemap_create(machine, get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_bg1tilemap = tilemap_create(machine, get_bg1tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
 	state->m_bg1tilemap->set_transparent_pen(0);
 
-	state->m_bg2tilemap = tilemap_create(machine, get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_bg2tilemap = tilemap_create(machine, get_bg2tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
 	state->m_bg2tilemap->set_transparent_pen(0);
 }

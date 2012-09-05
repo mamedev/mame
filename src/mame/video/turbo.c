@@ -178,7 +178,7 @@ VIDEO_START( turbo )
 	turbo_state *state = machine.driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 }
 
 
@@ -187,7 +187,7 @@ VIDEO_START( buckrog )
 	turbo_state *state = machine.driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* allocate the bitmap RAM */
 	state->m_buckrog_bitmap_ram = auto_alloc_array(machine, UINT8, 0xe000);

@@ -134,13 +134,13 @@ WRITE32_MEMBER(unico_state::unico_vram32_w)
 VIDEO_START( unico )
 {
 	unico_state *state = machine.driver_data<unico_state>();
-	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info,tilemap_scan_rows,
+	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info,TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info,tilemap_scan_rows,
+	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info,TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info,tilemap_scan_rows,
+	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info,TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
 	state->m_tilemap[0]->set_user_data(&state->m_vram[0x8000/2]);
@@ -166,13 +166,13 @@ VIDEO_START( unico )
 VIDEO_START( zeropnt2 )
 {
 	unico_state *state = machine.driver_data<unico_state>();
-	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info32,tilemap_scan_rows,
+	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info32,TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info32,tilemap_scan_rows,
+	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info32,TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info32,tilemap_scan_rows,
+	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info32,TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
 	state->m_tilemap[0]->set_user_data(&state->m_vram32[0x8000/4]);

@@ -2399,7 +2399,7 @@ static VIDEO_START( ss23 )
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	gfx_element_set_source(machine.gfx[0], reinterpret_cast<UINT8 *>(state->m_charram.target()));
-	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860

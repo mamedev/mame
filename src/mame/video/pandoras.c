@@ -109,7 +109,7 @@ static TILE_GET_INFO( get_tile_info0 )
 VIDEO_START( pandoras )
 {
 	pandoras_state *state = machine.driver_data<pandoras_state>();
-	state->m_layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_layer0 = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->save_item(NAME(state->m_flipscreen));
 }

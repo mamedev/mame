@@ -240,7 +240,7 @@ VIDEO_START( pangpang )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     tilemap_create(machine, pangpang_get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
+	state->m_pf1_tilemap =     tilemap_create(machine, pangpang_get_fg_tile_info,  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	state->m_pf1_alt_tilemap = tilemap_create(machine, pangpang_get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, pangpang_get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
@@ -255,7 +255,7 @@ VIDEO_START( tumblepb )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
+	state->m_pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
@@ -269,7 +269,7 @@ VIDEO_START( sdfight )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
+	state->m_pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
@@ -283,7 +283,7 @@ VIDEO_START( fncywld )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     tilemap_create(machine, get_fncywld_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
+	state->m_pf1_tilemap =     tilemap_create(machine, get_fncywld_fg_tile_info,  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_fncywld_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_fncywld_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 
@@ -298,7 +298,7 @@ VIDEO_START( suprtrio )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 8,  8, 64, 32);
+	state->m_pf1_tilemap =     tilemap_create(machine, get_fg_tile_info,  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	state->m_pf1_alt_tilemap = tilemap_create(machine, get_bg1_tile_info, tumblep_scan,     16, 16, 64, 32);
 	state->m_pf2_tilemap =     tilemap_create(machine, get_bg2_tile_info, tumblep_scan,     16, 16, 64, 32);
 

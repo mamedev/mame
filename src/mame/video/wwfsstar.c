@@ -211,7 +211,7 @@ VIDEO_START( wwfsstar )
 {
 	wwfsstar_state *state = machine.driver_data<wwfsstar_state>();
 
-	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
 	state->m_fg0_tilemap->set_transparent_pen(0);
 
 	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,bg0_scan, 16, 16,32,32);

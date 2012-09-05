@@ -74,7 +74,7 @@ VIDEO_START(mainsnk)
 	mainsnk_state *state = machine.driver_data<mainsnk_state>();
 
 	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,    8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,    8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);

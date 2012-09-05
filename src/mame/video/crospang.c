@@ -112,8 +112,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( crospang )
 {
 	crospang_state *state = machine.driver_data<crospang_state>();
-	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_fg_layer->set_transparent_pen(0);
 }

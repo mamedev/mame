@@ -73,7 +73,7 @@ VIDEO_START( compgolf )
 {
 	compgolf_state *state = machine.driver_data<compgolf_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_back_info, back_scan, 16, 16, 32, 32);
-	state->m_text_tilemap = tilemap_create(machine, get_text_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_text_tilemap = tilemap_create(machine, get_text_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_text_tilemap->set_transparent_pen(0);
 }

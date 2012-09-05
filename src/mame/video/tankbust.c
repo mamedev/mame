@@ -80,10 +80,10 @@ VIDEO_START( tankbust )
 {
 	tankbust_state *state = machine.driver_data<tankbust_state>();
 	/* not scrollable */
-	state->m_txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_txt_tilemap = tilemap_create(machine, get_txt_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	/* scrollable */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 
 	state->m_txt_tilemap->set_transparent_pen(0);

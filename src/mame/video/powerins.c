@@ -198,7 +198,7 @@ VIDEO_START( powerins )
 								DIM_NX_0, DIM_NY_0 );
 
 	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1,
-								tilemap_scan_cols,
+								TILEMAP_SCAN_COLS,
 
 								8,8,
 								DIM_NX_1, DIM_NY_1 );

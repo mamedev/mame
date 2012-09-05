@@ -148,10 +148,10 @@ VIDEO_START( macrossp )
 	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT32, state->m_spriteram.bytes() / 4);
 	state->m_spriteram_old2 = auto_alloc_array_clear(machine, UINT32, state->m_spriteram.bytes() / 4);
 
-	state->m_text_tilemap = tilemap_create(machine, get_macrossp_text_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_scra_tilemap = tilemap_create(machine, get_macrossp_scra_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_scrb_tilemap = tilemap_create(machine, get_macrossp_scrb_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_scrc_tilemap = tilemap_create(machine, get_macrossp_scrc_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_text_tilemap = tilemap_create(machine, get_macrossp_text_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_scra_tilemap = tilemap_create(machine, get_macrossp_scra_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_scrb_tilemap = tilemap_create(machine, get_macrossp_scrb_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_scrc_tilemap = tilemap_create(machine, get_macrossp_scrc_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	state->m_text_tilemap->set_transparent_pen(0);
 	state->m_scra_tilemap->set_transparent_pen(0);

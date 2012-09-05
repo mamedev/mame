@@ -467,10 +467,10 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
-	state->m_text_layer	= tilemap_create( machine, get_text_tile_info, tilemap_scan_rows,  8,8,64,32 );
-	state->m_back_layer	= tilemap_create( machine, get_back_tile_info, tilemap_scan_cols,  16,16,32,32 );
-	state->m_mid_layer	= tilemap_create( machine, get_mid_tile_info, tilemap_scan_cols,  16,16,32,32 );
-	state->m_fore_layer	= tilemap_create( machine, get_fore_tile_info, tilemap_scan_cols,  16,16,32,32 );
+	state->m_text_layer	= tilemap_create( machine, get_text_tile_info, TILEMAP_SCAN_ROWS,  8,8,64,32 );
+	state->m_back_layer	= tilemap_create( machine, get_back_tile_info, TILEMAP_SCAN_COLS,  16,16,32,32 );
+	state->m_mid_layer	= tilemap_create( machine, get_mid_tile_info, TILEMAP_SCAN_COLS,  16,16,32,32 );
+	state->m_fore_layer	= tilemap_create( machine, get_fore_tile_info, TILEMAP_SCAN_COLS,  16,16,32,32 );
 
 	state->m_text_layer->set_transparent_pen(31);
 	state->m_mid_layer->set_transparent_pen(63);

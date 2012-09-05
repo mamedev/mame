@@ -161,7 +161,7 @@ VIDEO_START( stfight )
 	stfight_state *state = machine.driver_data<stfight_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,bg_scan,     16,16,128,256);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,fg_scan,16,16,128,256);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8,8,32,32);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0x0f);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0xcf);

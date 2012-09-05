@@ -173,10 +173,10 @@ WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
 static VIDEO_START(igs_majhong)
 {
 	igs_m027_state *state = machine.driver_data<igs_m027_state>();
-	state->m_igs_tx_tilemap= tilemap_create(machine, get_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	state->m_igs_tx_tilemap= tilemap_create(machine, get_tx_tilemap_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	state->m_igs_tx_tilemap->set_transparent_pen(15);
-	state->m_igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	//state->m_igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	state->m_igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	//state->m_igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	//state->m_igs_bg_tilemap->set_transparent_pen(15);
 	logerror("Video START OK!\n");
 }

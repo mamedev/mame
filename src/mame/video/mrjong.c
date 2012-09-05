@@ -103,7 +103,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( mrjong )
 {
 	mrjong_state *state = machine.driver_data<mrjong_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_xy, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS_FLIP_XY, 8, 8, 32, 32);
 }
 
 /*

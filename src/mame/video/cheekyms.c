@@ -102,7 +102,7 @@ VIDEO_START( cheekyms )
 	height = machine.primary_screen->height();
 	state->m_bitmap_buffer = auto_bitmap_ind16_alloc(machine, width, height);
 
-	state->m_cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_cm_tilemap->set_transparent_pen(0);
 }
 

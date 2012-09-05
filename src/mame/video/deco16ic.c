@@ -931,8 +931,8 @@ static DEVICE_START( deco16ic )
 		fullwidth = 1;
 
 	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
-//  deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, intf->full_width12 ? 64 : 32, 32);
-	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, 64 , 32); // nitroball
+//  deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, TILEMAP_SCAN_ROWS, 8, 8, intf->full_width12 ? 64 : 32, 32);
+	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
 
 	deco16ic->pf12_8x8_gfx_bank = intf->_8x8_gfxregion;
 	deco16ic->pf12_16x16_gfx_bank = intf->_16x16_gfxregion;
@@ -942,7 +942,7 @@ static DEVICE_START( deco16ic )
 	else
 		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
-	deco16ic->pf2_tilemap_8x8 = tilemap_create_device(device, get_pf2_tile_info_b, tilemap_scan_rows, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+	deco16ic->pf2_tilemap_8x8 = tilemap_create_device(device, get_pf2_tile_info_b, TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
 	deco16ic->pf1_tilemap_8x8->set_transparent_pen(0);
 	deco16ic->pf2_tilemap_8x8->set_transparent_pen(0);

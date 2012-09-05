@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( quizshow )
 {
 	quizshow_state *state = machine.driver_data<quizshow_state>();
-	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 16, 32, 16);
+	state->m_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 }
 
 SCREEN_UPDATE_IND16( quizshow )

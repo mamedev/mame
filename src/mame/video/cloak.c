@@ -166,7 +166,7 @@ VIDEO_START( cloak )
 {
 	cloak_state *state = machine.driver_data<cloak_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bitmap_videoram1 = auto_alloc_array(machine, UINT8, 256*256);
 	state->m_bitmap_videoram2 = auto_alloc_array(machine, UINT8, 256*256);

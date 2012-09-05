@@ -47,8 +47,8 @@ VIDEO_START( f1gp )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0xff);
 
@@ -63,8 +63,8 @@ VIDEO_START( f1gpb )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_roz_tilemap = tilemap_create(machine, f1gp_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0xff);
 
@@ -78,8 +78,8 @@ VIDEO_START( f1gp2 )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, f1gp2_get_roz_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_roz_tilemap = tilemap_create(machine, f1gp2_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0xff);
 	state->m_roz_tilemap->set_transparent_pen(0x0f);

@@ -43,7 +43,7 @@ public:
 
 	virtual void video_start()
 	{
-		m_tilemap = tilemap_create(machine(), get_clcd_tilemap_tile_info, tilemap_scan_rows, 6, 8, 80, 16);
+		m_tilemap = tilemap_create(machine(), get_clcd_tilemap_tile_info, TILEMAP_SCAN_ROWS, 6, 8, 80, 16);
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

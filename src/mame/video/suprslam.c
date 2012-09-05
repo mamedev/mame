@@ -144,8 +144,8 @@ VIDEO_START( suprslam )
 {
 	suprslam_state *state = machine.driver_data<suprslam_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_suprslam_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_screen_tilemap = tilemap_create(machine, get_suprslam_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_suprslam_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_screen_tilemap = tilemap_create(machine, get_suprslam_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_screen_tilemap->set_transparent_pen(15);
 }

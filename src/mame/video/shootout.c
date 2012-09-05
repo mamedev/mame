@@ -85,8 +85,8 @@ VIDEO_START( shootout )
 {
 	shootout_state *state = machine.driver_data<shootout_state>();
 
-	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_background = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_foreground = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_foreground->set_transparent_pen(0 );
 }
 

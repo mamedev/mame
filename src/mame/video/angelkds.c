@@ -250,13 +250,13 @@ VIDEO_START( angelkds )
 {
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bgbot_tilemap = tilemap_create(machine, get_bgbot_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bgbot_tilemap = tilemap_create(machine, get_bgbot_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bgbot_tilemap->set_transparent_pen(15);
 
-	state->m_bgtop_tilemap = tilemap_create(machine, get_bgtop_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bgtop_tilemap = tilemap_create(machine, get_bgtop_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bgtop_tilemap->set_transparent_pen(15);
 }
 

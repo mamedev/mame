@@ -1152,10 +1152,10 @@ VIDEO_START( x68000 )
 	machine.gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
-	state->m_bg0_8 = tilemap_create(machine, x68k_get_bg0_tile,tilemap_scan_rows,8,8,64,64);
-	state->m_bg1_8 = tilemap_create(machine, x68k_get_bg1_tile,tilemap_scan_rows,8,8,64,64);
-	state->m_bg0_16 = tilemap_create(machine, x68k_get_bg0_tile_16,tilemap_scan_rows,16,16,64,64);
-	state->m_bg1_16 = tilemap_create(machine, x68k_get_bg1_tile_16,tilemap_scan_rows,16,16,64,64);
+	state->m_bg0_8 = tilemap_create(machine, x68k_get_bg0_tile,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg1_8 = tilemap_create(machine, x68k_get_bg1_tile,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg0_16 = tilemap_create(machine, x68k_get_bg0_tile_16,TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_bg1_16 = tilemap_create(machine, x68k_get_bg1_tile_16,TILEMAP_SCAN_ROWS,16,16,64,64);
 
 	state->m_bg0_8->set_transparent_pen(0);
 	state->m_bg1_8->set_transparent_pen(0);

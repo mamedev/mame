@@ -132,7 +132,7 @@ VIDEO_START( bioship )
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	state->m_bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
+	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,32,32);
 
 	state->m_bg_tilemap0->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);
@@ -149,7 +149,7 @@ VIDEO_START( strahl )
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	state->m_bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	state->m_fg_tilemap = tilemap_create(machine, strahl_get_fg_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
+	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,32,32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);
@@ -161,7 +161,7 @@ VIDEO_START( macross )
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	state->m_bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
+	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,32,32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 
@@ -172,7 +172,7 @@ VIDEO_START( gunnail )
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
 	state->m_bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
+	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,64,32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_bg_tilemap0->set_scroll_rows(512);
@@ -191,7 +191,7 @@ VIDEO_START( macross2 )
 	state->m_bg_tilemap2 = tilemap_create(machine, macross_get_bg2_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	state->m_bg_tilemap3 = tilemap_create(machine, macross_get_bg3_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
-	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
+	state->m_tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,64,32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 
@@ -210,7 +210,7 @@ VIDEO_START( raphero )
 VIDEO_START( bjtwin )
 {
 	nmk16_state *state = machine.driver_data<nmk16_state>();
-	state->m_bg_tilemap0 = tilemap_create(machine, bjtwin_get_bg_tile_info,tilemap_scan_cols,8,8,64,32);
+	state->m_bg_tilemap0 = tilemap_create(machine, bjtwin_get_bg_tile_info,TILEMAP_SCAN_COLS,8,8,64,32);
 
 	nmk16_video_init(machine);
 	state->m_videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
@@ -907,7 +907,7 @@ VIDEO_START( afega )
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
-	state->m_tx_tilemap = tilemap_create(	machine, macross_get_tx_tile_info, tilemap_scan_cols,
+	state->m_tx_tilemap = tilemap_create(	machine, macross_get_tx_tile_info, TILEMAP_SCAN_COLS,
 
 								8,8,
 								32,32);
@@ -928,7 +928,7 @@ VIDEO_START( grdnstrm )
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
-	state->m_tx_tilemap = tilemap_create(	machine, macross_get_tx_tile_info, tilemap_scan_cols,
+	state->m_tx_tilemap = tilemap_create(	machine, macross_get_tx_tile_info, TILEMAP_SCAN_COLS,
 
 								8,8,
 								32,32);
@@ -949,7 +949,7 @@ VIDEO_START( firehawk )
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
-	state->m_tx_tilemap = tilemap_create(	machine, macross_get_tx_tile_info, tilemap_scan_cols,
+	state->m_tx_tilemap = tilemap_create(	machine, macross_get_tx_tile_info, TILEMAP_SCAN_COLS,
 
 								8,8,
 								32,32);

@@ -61,7 +61,7 @@ VIDEO_START( starshp1 )
 
 	int i;
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 

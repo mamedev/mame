@@ -135,8 +135,8 @@ VIDEO_START( labyrunr )
 {
 	labyrunr_state *state = machine.driver_data<labyrunr_state>();
 
-	state->m_layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_layer1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_layer0 = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_layer1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_layer0->set_transparent_pen(0);
 	state->m_layer1->set_transparent_pen(0);

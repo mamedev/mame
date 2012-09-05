@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 VIDEO_START( perfrman )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_pf1_tilemap = tilemap_create(machine, get_pf_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_pf1_tilemap->set_transparent_pen(0);
 }
@@ -78,8 +78,8 @@ VIDEO_START( perfrman )
 VIDEO_START( slapfight )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows,8,8,64,32);
-	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 }

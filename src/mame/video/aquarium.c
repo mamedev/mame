@@ -147,9 +147,9 @@ WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
 VIDEO_START(aquarium)
 {
 	aquarium_state *state = machine.driver_data<aquarium_state>();
-	state->m_txt_tilemap = tilemap_create(machine, get_aquarium_txt_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_bak_tilemap = tilemap_create(machine, get_aquarium_bak_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_mid_tilemap = tilemap_create(machine, get_aquarium_mid_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_txt_tilemap = tilemap_create(machine, get_aquarium_txt_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bak_tilemap = tilemap_create(machine, get_aquarium_bak_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_mid_tilemap = tilemap_create(machine, get_aquarium_mid_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_txt_tilemap->set_transparent_pen(0);
 	state->m_mid_tilemap->set_transparent_pen(0);

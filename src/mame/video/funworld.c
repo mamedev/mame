@@ -184,13 +184,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START(funworld)
 {
 	funworld_state *state = machine.driver_data<funworld_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 96, 29);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
 VIDEO_START(magicrd2)
 {
 	funworld_state *state = machine.driver_data<funworld_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
 }
 
 

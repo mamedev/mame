@@ -478,7 +478,7 @@ VIDEO_START( galaxold_plain )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -694,7 +694,7 @@ VIDEO_START( rockclim )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	VIDEO_START_CALL(galaxold);
-	state->m_rockclim_tilemap = tilemap_create(machine, rockclim_get_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_rockclim_tilemap = tilemap_create(machine, rockclim_get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_draw_background = rockclim_draw_background;
 	state->m_modify_charcode = mooncrst_modify_charcode;
@@ -723,7 +723,7 @@ VIDEO_START( drivfrcg )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -738,7 +738,7 @@ VIDEO_START( ad2083 )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -776,7 +776,7 @@ VIDEO_START( racknrol )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, racknrol_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, racknrol_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -836,7 +836,7 @@ VIDEO_START( dambustr )
 
 	/* make a copy of the tilemap to emulate background priority */
 	state->m_dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
-	state->m_dambustr_tilemap2 = tilemap_create(machine, dambustr_get_tile_info2,tilemap_scan_rows,8,8,32,32);
+	state->m_dambustr_tilemap2 = tilemap_create(machine, dambustr_get_tile_info2,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_dambustr_tilemap2->set_transparent_pen(0);
 }

@@ -122,9 +122,9 @@ static void set_pens(running_machine &machine)
 VIDEO_START(darkmist)
 {
 	darkmist_state *state = machine.driver_data<darkmist_state>();
-	state->m_bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,512,64 );
-	state->m_fgtilemap = tilemap_create( machine, get_fgtile_info,tilemap_scan_rows,16,16,64,256 );
-	state->m_txtilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
+	state->m_bgtilemap = tilemap_create( machine, get_bgtile_info,TILEMAP_SCAN_ROWS,16,16,512,64 );
+	state->m_fgtilemap = tilemap_create( machine, get_fgtile_info,TILEMAP_SCAN_ROWS,16,16,64,256 );
+	state->m_txtilemap = tilemap_create( machine, get_txttile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
 	state->m_fgtilemap->set_transparent_pen(0);
 	state->m_txtilemap->set_transparent_pen(0);
 }

@@ -52,7 +52,7 @@ static TILE_GET_INFO( sqix_get_bg_tile_info )
 VIDEO_START( pbillian )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_bg_tilemap = tilemap_create(machine, pb_get_bg_tile_info, tilemap_scan_rows,  8, 8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, pb_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8,32,32);
 }
 
 VIDEO_START( superqix )
@@ -60,7 +60,7 @@ VIDEO_START( superqix )
 	superqix_state *state = machine.driver_data<superqix_state>();
 	state->m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine, 256, 256);
 	state->m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine, 256, 256);
-	state->m_bg_tilemap = tilemap_create(machine, sqix_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, sqix_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	state->m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */

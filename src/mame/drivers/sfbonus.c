@@ -900,11 +900,11 @@ static VIDEO_START(sfbonus)
 	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	state->m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine,1024,512);
 
-	state->m_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
-	state->m_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 16);
-	state->m_reel2_tilemap = tilemap_create(machine,get_sfbonus_reel2_tile_info,tilemap_scan_rows,8,32, 64, 16);
-	state->m_reel3_tilemap = tilemap_create(machine,get_sfbonus_reel3_tile_info,tilemap_scan_rows,8,32, 64, 16);
-	state->m_reel4_tilemap = tilemap_create(machine,get_sfbonus_reel4_tile_info,tilemap_scan_rows,8,32, 64, 16);
+	state->m_tilemap = tilemap_create(machine,get_sfbonus_tile_info,TILEMAP_SCAN_ROWS,8,8, 128, 64);
+	state->m_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	state->m_reel2_tilemap = tilemap_create(machine,get_sfbonus_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	state->m_reel3_tilemap = tilemap_create(machine,get_sfbonus_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	state->m_reel4_tilemap = tilemap_create(machine,get_sfbonus_reel4_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 16);
 
 	state->m_tilemap->set_transparent_pen(0);
 	state->m_reel_tilemap->set_transparent_pen(255);

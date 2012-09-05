@@ -286,12 +286,12 @@ VIDEO_START( namcona1 )
 	static const tile_get_info_func get_info[4] = { tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 	int i;
 
-	state->m_roz_tilemap = tilemap_create( machine, roz_get_info, tilemap_scan_rows, 8,8,64,64 );
+	state->m_roz_tilemap = tilemap_create( machine, roz_get_info, TILEMAP_SCAN_ROWS, 8,8,64,64 );
 	state->m_roz_palette = -1;
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
 	{
-		state->m_bg_tilemap[i] = tilemap_create( machine, get_info[i], tilemap_scan_rows, 8,8,64,64 );
+		state->m_bg_tilemap[i] = tilemap_create( machine, get_info[i], TILEMAP_SCAN_ROWS, 8,8,64,64 );
 		state->m_tilemap_palette_bank[i] = -1;
 	}
 

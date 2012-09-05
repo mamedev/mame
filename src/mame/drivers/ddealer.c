@@ -176,7 +176,7 @@ static VIDEO_START( ddealer )
 {
 	ddealer_state *state = machine.driver_data<ddealer_state>();
 	state->m_flipscreen = 0;
-	state->m_back_tilemap = tilemap_create(machine, get_back_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
+	state->m_back_tilemap = tilemap_create(machine, get_back_tile_info, TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 }
 
 static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)

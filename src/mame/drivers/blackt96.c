@@ -156,14 +156,14 @@ static VIDEO_START( blackt96 )
 {
 	blackt96_state *state = machine.driver_data<blackt96_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_bg0_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[3] = tilemap_create(machine, get_bg3_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[4] = tilemap_create(machine, get_bg4_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[5] = tilemap_create(machine, get_bg5_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[6] = tilemap_create(machine, get_bg6_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap[7] = tilemap_create(machine, get_bg7_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_bg0_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[2] = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[3] = tilemap_create(machine, get_bg3_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[4] = tilemap_create(machine, get_bg4_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[5] = tilemap_create(machine, get_bg5_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[6] = tilemap_create(machine, get_bg6_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[7] = tilemap_create(machine, get_bg7_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	state->m_spriteram[0] = state->m_spriteram0;
 	state->m_spriteram[1] = state->m_spriteram1;

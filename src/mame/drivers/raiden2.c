@@ -870,10 +870,10 @@ static TILE_GET_INFO( get_text_tile_info )
 static VIDEO_START( raiden2 )
 {
 	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
-	state->background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
-	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
-	state->foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	state->text_layer       = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	state->background_layer = tilemap_create(machine, get_back_tile_info, TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	state->foreground_layer = tilemap_create(machine, get_fore_tile_info, TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 
 	state->midground_layer->set_transparent_pen(15);
 	state->foreground_layer->set_transparent_pen(15);

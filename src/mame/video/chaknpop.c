@@ -157,7 +157,7 @@ VIDEO_START( chaknpop )
 	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	state->m_tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
 	state->m_vram1 = &RAM[0x10000];
 	state->m_vram2 = &RAM[0x12000];

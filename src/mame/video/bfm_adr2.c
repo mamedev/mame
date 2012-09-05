@@ -208,9 +208,9 @@ VIDEO_START( adder2 )
 	state_save_register_item_array(machine, "Adder", NULL, 0, adder_ram);
 	state_save_register_item_2d_array(machine, "Adder", NULL, 0, adder_screen_ram);
 
-	tilemap0 = tilemap_create(machine, get_tile0_info, tilemap_scan_rows,  8, 8, 50, 35);
+	tilemap0 = tilemap_create(machine, get_tile0_info, TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
-	tilemap1 = tilemap_create(machine, get_tile1_info, tilemap_scan_rows,  8, 8, 50, 35);
+	tilemap1 = tilemap_create(machine, get_tile1_info, TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 }
 
 // video update ///////////////////////////////////////////////////////////

@@ -214,7 +214,7 @@ WRITE16_MEMBER(welltris_state::welltris_charvideoram_w)
 VIDEO_START( welltris )
 {
 	welltris_state *state = machine.driver_data<welltris_state>();
-	state->m_char_tilemap = tilemap_create(machine, get_welltris_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_char_tilemap = tilemap_create(machine, get_welltris_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state->m_char_tilemap->set_transparent_pen(15);
 }

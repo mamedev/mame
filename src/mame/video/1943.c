@@ -205,9 +205,9 @@ static TILE_GET_INFO( c1943_get_fg_tile_info )
 VIDEO_START( 1943 )
 {
 	_1943_state *state = machine.driver_data<_1943_state>();
-	state->m_bg2_tilemap = tilemap_create(machine, c1943_get_bg2_tile_info, tilemap_scan_cols, 32, 32, 2048, 8);
-	state->m_bg_tilemap = tilemap_create(machine, c1943_get_bg_tile_info, tilemap_scan_cols, 32, 32, 2048, 8);
-	state->m_fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, c1943_get_bg2_tile_info, TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	state->m_bg_tilemap = tilemap_create(machine, c1943_get_bg_tile_info, TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	state->m_fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0x0f);
 	state->m_fg_tilemap->set_transparent_pen(0);

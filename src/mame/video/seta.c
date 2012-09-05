@@ -449,18 +449,18 @@ VIDEO_START( seta_2_layers )
        at any given time */
 
 	/* layer 0 */
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 
 	/* layer 1 */
-	state->m_tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
+	state->m_tilemap_2 = tilemap_create(	machine, get_tile_info_2, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
+	state->m_tilemap_3 = tilemap_create(	machine, get_tile_info_3, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 	state->m_tilemaps_flip = 0;
@@ -484,10 +484,10 @@ VIDEO_START( seta_1_layer )
        at any given time */
 
 	/* layer 0 */
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 	state->m_color_mode_shift = 4;
@@ -506,10 +506,10 @@ VIDEO_START( twineagl_1_layer )
        at any given time */
 
 	/* layer 0 */
-	state->m_tilemap_0 = tilemap_create(	machine, twineagl_get_tile_info_0, tilemap_scan_rows,
+	state->m_tilemap_0 = tilemap_create(	machine, twineagl_get_tile_info_0, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, tilemap_scan_rows,
+	state->m_tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 	state->m_tilemap_0->set_transparent_pen(0);

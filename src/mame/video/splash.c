@@ -171,8 +171,8 @@ VIDEO_START( splash )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_splash_tilemap0, tilemap_scan_rows,  8,  8, 64, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_splash_tilemap1, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_splash_tilemap0, TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_splash_tilemap1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_bg_tilemap[0]->set_transparent_pen(0);
 	state->m_bg_tilemap[1]->set_transparent_pen(0);

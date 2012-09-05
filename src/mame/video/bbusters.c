@@ -78,9 +78,9 @@ VIDEO_START( bbuster )
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 
-	state->m_fix_tilemap = tilemap_create(machine, get_bbusters_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
-	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_bbusters_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 
 	state->m_pf1_tilemap->set_transparent_pen(15);
 	state->m_fix_tilemap->set_transparent_pen(15);
@@ -90,9 +90,9 @@ VIDEO_START( mechatt )
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 
-	state->m_fix_tilemap = tilemap_create(machine, get_bbusters_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_cols, 16, 16, 256, 32);
-	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_cols, 16, 16, 256, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_bbusters_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	state->m_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
 	state->m_pf1_tilemap->set_transparent_pen(15);
 	state->m_fix_tilemap->set_transparent_pen(15);

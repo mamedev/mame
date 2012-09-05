@@ -312,7 +312,7 @@ VIDEO_START( taitojc )
 
 	assert(state->m_gfx_index != MAX_GFX_ELEMENTS);
 
-	state->m_tilemap = tilemap_create(machine, taitojc_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_tilemap = tilemap_create(machine, taitojc_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	state->m_tilemap->set_transparent_pen(0);
 

@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static VIDEO_START(d9final)
 {
 	d9final_state *state = machine.driver_data<d9final_state>();
-	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 static SCREEN_UPDATE_IND16(d9final)

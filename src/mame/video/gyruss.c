@@ -115,7 +115,7 @@ static TILE_GET_INFO( gyruss_get_tile_info )
 VIDEO_START( gyruss )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
-	state->m_tilemap = tilemap_create(machine, gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tilemap = tilemap_create(machine, gyruss_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_tilemap->set_transmask(0, 0x00, 0);	/* opaque */
 	state->m_tilemap->set_transmask(1, 0x0f, 0);  /* transparent */
 }

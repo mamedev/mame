@@ -96,7 +96,7 @@ VIDEO_START( playch10 )
 	const UINT8 *bios = state->memregion("maincpu")->base();
 	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 
@@ -106,7 +106,7 @@ VIDEO_START( playch10_hboard )
 	const UINT8 *bios = state->memregion("maincpu")->base();
 	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

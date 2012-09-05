@@ -152,13 +152,13 @@ static TILE_GET_INFO( exctsccr_get_bg_tile_info )
 VIDEO_START( champbas )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_bg_tilemap = tilemap_create(machine, champbas_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, champbas_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 VIDEO_START( exctsccr )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_bg_tilemap = tilemap_create(machine, exctsccr_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, exctsccr_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

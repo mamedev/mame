@@ -269,10 +269,10 @@ static VIDEO_START(multfish)
 	memset(state->m_vid,0x00,sizeof(state->m_vid));
 	state->save_item(NAME(state->m_vid));
 
-	state->m_tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
+	state->m_tilemap = tilemap_create(machine,get_multfish_tile_info,TILEMAP_SCAN_ROWS,16,16, 64, 32);
 	state->m_tilemap->set_transparent_pen(255);
 
-	state->m_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,tilemap_scan_rows,16,16, 64, 64);
+	state->m_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,TILEMAP_SCAN_ROWS,16,16, 64, 64);
 	state->m_reel_tilemap->set_transparent_pen(255);
 	state->m_reel_tilemap->set_scroll_cols(64);
 }

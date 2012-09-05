@@ -354,10 +354,10 @@ VIDEO_START(skns)
 
 	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
 
-	state->m_tilemap_A = tilemap_create(machine, get_tilemap_A_tile_info,tilemap_scan_rows,16,16,64, 64);
+	state->m_tilemap_A = tilemap_create(machine, get_tilemap_A_tile_info,TILEMAP_SCAN_ROWS,16,16,64, 64);
 		state->m_tilemap_A->set_transparent_pen(0);
 
-	state->m_tilemap_B = tilemap_create(machine, get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
+	state->m_tilemap_B = tilemap_create(machine, get_tilemap_B_tile_info,TILEMAP_SCAN_ROWS,16,16,64, 64);
 		state->m_tilemap_B->set_transparent_pen(0);
 
 	state->m_sprite_bitmap.allocate(1024,1024);

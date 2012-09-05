@@ -84,7 +84,7 @@ static VIDEO_START( suprgolf )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
-	state->m_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	state->m_tilemap = tilemap_create( machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
 	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->m_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
 	state->m_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);

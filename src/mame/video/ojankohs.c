@@ -263,7 +263,7 @@ VIDEO_START( ojankohs )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_tilemap = tilemap_create(machine, ojankohs_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
+	state->m_tilemap = tilemap_create(machine, ojankohs_get_tile_info, TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 //  state->m_colorram = auto_alloc_array(machine, UINT8, 0x1000);
 //  state->m_paletteram = auto_alloc_array(machine, UINT8, 0x800);
@@ -273,7 +273,7 @@ VIDEO_START( ojankoy )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_tilemap = tilemap_create(machine, ojankoy_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
+	state->m_tilemap = tilemap_create(machine, ojankoy_get_tile_info, TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  state->m_videoram = auto_alloc_array(machine, UINT8, 0x2000);
 //  state->m_colorram = auto_alloc_array(machine, UINT8, 0x1000);
 }

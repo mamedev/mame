@@ -102,19 +102,19 @@ VIDEO_START( lordgun )
 	int h = machine.primary_screen->height();
 
 	// 0x800 x 200
-	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
 								 8,8, 0x100, 0x40 );
 
 	// 0x800 x 200
-	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
 								 16,16, 0x80,0x20 );
 
 	// 0x800 x 200
-	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
+	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info_2, TILEMAP_SCAN_ROWS,
 								 32,32, 0x40,0x10 );
 
 	// 0x200 x 100
-	state->m_tilemap[3] = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
+	state->m_tilemap[3] = tilemap_create(	machine, get_tile_info_3, TILEMAP_SCAN_ROWS,
 								 8,8, 0x40,0x20 );
 
 	state->m_tilemap[0]->set_scroll_rows(1);

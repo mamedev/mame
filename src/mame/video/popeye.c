@@ -250,7 +250,7 @@ VIDEO_START( skyskipr )
 
 	state->m_bitmap_type = TYPE_SKYSKIPR;
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
     state->m_lastflip = 0;
@@ -268,7 +268,7 @@ VIDEO_START( popeye )
 
 	state->m_bitmap_type = TYPE_POPEYE;
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
     state->m_lastflip = 0;

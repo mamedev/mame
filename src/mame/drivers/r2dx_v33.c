@@ -187,10 +187,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 static VIDEO_START( rdx_v33 )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,16,16,32,32);
-	md_tilemap = tilemap_create(machine, get_md_tile_info, tilemap_scan_rows,16,16,32,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,16,16,32,32);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,8, 8, 64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
+	md_tilemap = tilemap_create(machine, get_md_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS,8, 8, 64,32);
 
 	bg_tilemap->set_transparent_pen(15);
 	md_tilemap->set_transparent_pen(15);

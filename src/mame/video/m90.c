@@ -96,10 +96,10 @@ static TILE_GET_INFO( dynablsb_get_pf2w_tile_info ) { dynablsb_get_tile_info(mac
 VIDEO_START( m90 )
 {
 	m90_state *state = machine.driver_data<m90_state>();
-	state->m_pf1_layer =      tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
-	state->m_pf1_wide_layer = tilemap_create(machine, get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
-	state->m_pf2_layer =      tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
-	state->m_pf2_wide_layer = tilemap_create(machine, get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->m_pf1_layer =      tilemap_create(machine, get_pf1_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pf1_wide_layer = tilemap_create(machine, get_pf1w_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
+	state->m_pf2_layer =      tilemap_create(machine, get_pf2_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pf2_wide_layer = tilemap_create(machine, get_pf2w_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	state->m_pf1_layer->set_transparent_pen(0);
 	state->m_pf1_wide_layer->set_transparent_pen(0);
@@ -112,10 +112,10 @@ VIDEO_START( m90 )
 VIDEO_START( bomblord )
 {
 	m90_state *state = machine.driver_data<m90_state>();
-	state->m_pf1_layer =      tilemap_create(machine, bomblord_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
-	state->m_pf1_wide_layer = tilemap_create(machine, bomblord_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
-	state->m_pf2_layer =      tilemap_create(machine, bomblord_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
-	state->m_pf2_wide_layer = tilemap_create(machine, bomblord_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->m_pf1_layer =      tilemap_create(machine, bomblord_get_pf1_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pf1_wide_layer = tilemap_create(machine, bomblord_get_pf1w_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
+	state->m_pf2_layer =      tilemap_create(machine, bomblord_get_pf2_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pf2_wide_layer = tilemap_create(machine, bomblord_get_pf2w_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	state->m_pf2_layer->set_transparent_pen(0);
 	state->m_pf2_wide_layer->set_transparent_pen(0);
@@ -128,10 +128,10 @@ VIDEO_START( bomblord )
 VIDEO_START( dynablsb )
 {
 	m90_state *state = machine.driver_data<m90_state>();
-	state->m_pf1_layer =      tilemap_create(machine, dynablsb_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
-	state->m_pf1_wide_layer = tilemap_create(machine, dynablsb_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
-	state->m_pf2_layer =      tilemap_create(machine, dynablsb_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
-	state->m_pf2_wide_layer = tilemap_create(machine, dynablsb_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->m_pf1_layer =      tilemap_create(machine, dynablsb_get_pf1_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pf1_wide_layer = tilemap_create(machine, dynablsb_get_pf1w_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
+	state->m_pf2_layer =      tilemap_create(machine, dynablsb_get_pf2_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pf2_wide_layer = tilemap_create(machine, dynablsb_get_pf2w_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	state->m_pf2_layer->set_transparent_pen(0);
 	state->m_pf2_wide_layer->set_transparent_pen(0);

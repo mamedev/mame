@@ -145,7 +145,7 @@ VIDEO_START( m57 )
 {
 	m57_state *state = machine.driver_data<m57_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_rows(256);
 
 	state->save_item(NAME(state->m_flipscreen));

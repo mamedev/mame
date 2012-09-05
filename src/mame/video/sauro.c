@@ -89,10 +89,10 @@ VIDEO_START( sauro )
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_tile_info_fg, tilemap_scan_cols,
+	state->m_fg_tilemap = tilemap_create(machine, get_tile_info_fg, TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -163,7 +163,7 @@ VIDEO_START( trckydoc )
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 }
 

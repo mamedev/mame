@@ -92,7 +92,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( mustache )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS_FLIP_X,
 		 8, 8, 64, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(4);

@@ -80,9 +80,9 @@ static TILE_GET_INFO( get_bg0_tile_info )
 static VIDEO_START( cultures )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows, 8, 8, 64, 128);
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
+	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
 	state->m_bg1_tilemap->set_transparent_pen(0);
 	state->m_bg0_tilemap->set_transparent_pen(0);

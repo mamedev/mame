@@ -102,7 +102,7 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 static VIDEO_START(bestleag)
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_cols,8,8,256, 32);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,256, 32);
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,bsb_bg_scan,16,16,128, 64);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,bsb_bg_scan,16,16,128, 64);
 

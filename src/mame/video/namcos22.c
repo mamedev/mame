@@ -2731,7 +2731,7 @@ static VIDEO_START( common )
 	int code;
 
 	state->m_mix_bitmap = auto_bitmap_ind16_alloc(machine,640,480);
-	state->m_bgtilemap = tilemap_create( machine, TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
+	state->m_bgtilemap = tilemap_create( machine, TextTilemapGetInfo,TILEMAP_SCAN_ROWS,16,16,64,64 );
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
 	state->m_mbDSPisActive = 0;

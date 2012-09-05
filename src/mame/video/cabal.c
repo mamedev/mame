@@ -46,8 +46,8 @@ VIDEO_START( cabal )
 {
 	cabal_state *state = machine.driver_data<cabal_state>();
 
-	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,16,16);
-	state->m_text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,32,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,TILEMAP_SCAN_ROWS,16,16,16,16);
+	state->m_text_layer       = tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,  8,8,32,32);
 
 	state->m_text_layer->set_transparent_pen(3);
 	state->m_background_layer->set_transparent_pen(15);

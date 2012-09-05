@@ -67,9 +67,9 @@ VIDEO_START( fstarfrc )
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);
@@ -91,9 +91,9 @@ VIDEO_START( ginkun )
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);
@@ -113,9 +113,9 @@ VIDEO_START( riot )
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);

@@ -53,7 +53,7 @@ VIDEO_START(xyonix)
 {
 	xyonix_state *state = machine.driver_data<xyonix_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_xyonix_tile_info, tilemap_scan_rows, 4, 8, 80, 32);
+	state->m_tilemap = tilemap_create(machine, get_xyonix_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
 }
 
 SCREEN_UPDATE_IND16(xyonix)

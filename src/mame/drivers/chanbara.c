@@ -154,8 +154,8 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static VIDEO_START(chanbara )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,8, 8, 32, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,16, 16, 16, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,8, 8, 32, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS,16, 16, 16, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
 

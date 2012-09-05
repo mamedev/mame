@@ -585,11 +585,11 @@ VIDEO_START( s16a_bootleg )
 
 
 
-	state->m_text_tilemap = tilemap_create(machine, get_s16a_bootleg_tile_infotxt, tilemap_scan_rows, 8,8, 64,32 );
+	state->m_text_tilemap = tilemap_create(machine, get_s16a_bootleg_tile_infotxt, TILEMAP_SCAN_ROWS, 8,8, 64,32 );
 
 	// the system16a bootlegs have simple tilemaps instead of the paged system
-	state->m_bg_tilemaps[0] = tilemap_create(machine, get_s16a_bootleg_tile_info0, tilemap_scan_rows, 8,8, 64,32 );
-	state->m_bg_tilemaps[1] = tilemap_create(machine, get_s16a_bootleg_tile_info1, tilemap_scan_rows, 8,8, 64,32 );
+	state->m_bg_tilemaps[0] = tilemap_create(machine, get_s16a_bootleg_tile_info0, TILEMAP_SCAN_ROWS, 8,8, 64,32 );
+	state->m_bg_tilemaps[1] = tilemap_create(machine, get_s16a_bootleg_tile_info1, TILEMAP_SCAN_ROWS, 8,8, 64,32 );
 
 	state->m_text_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemaps[0]->set_transparent_pen(0);

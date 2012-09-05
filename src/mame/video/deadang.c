@@ -76,8 +76,8 @@ VIDEO_START( deadang )
 	deadang_state *state = machine.driver_data<deadang_state>();
 	state->m_pf3_layer = tilemap_create(machine, get_pf3_tile_info,bg_scan,               16,16,128,256);
 	state->m_pf2_layer = tilemap_create(machine, get_pf2_tile_info,bg_scan,          16,16,128,256);
-	state->m_pf1_layer = tilemap_create(machine, get_pf1_tile_info,tilemap_scan_cols,16,16, 32, 32);
-	state->m_text_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_pf1_layer = tilemap_create(machine, get_pf1_tile_info,TILEMAP_SCAN_COLS,16,16, 32, 32);
+	state->m_text_layer = tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_pf2_layer->set_transparent_pen(15);
 	state->m_pf1_layer->set_transparent_pen(15);

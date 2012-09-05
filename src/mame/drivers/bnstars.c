@@ -507,18 +507,18 @@ WRITE32_MEMBER(bnstars_state::ms32_spramx_w)
 static VIDEO_START(bnstars)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
-	state->m_ms32_tx_tilemap[0] = tilemap_create(machine, get_ms32_tx0_tile_info,tilemap_scan_rows, 8, 8,64,64);
-	state->m_ms32_tx_tilemap[1] = tilemap_create(machine, get_ms32_tx1_tile_info,tilemap_scan_rows, 8, 8,64,64);
+	state->m_ms32_tx_tilemap[0] = tilemap_create(machine, get_ms32_tx0_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	state->m_ms32_tx_tilemap[1] = tilemap_create(machine, get_ms32_tx1_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,64);
 	state->m_ms32_tx_tilemap[0]->set_transparent_pen(0);
 	state->m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
-	state->m_ms32_bg_tilemap[0] = tilemap_create(machine, get_ms32_bg0_tile_info,tilemap_scan_rows,16,16,64,64);
-	state->m_ms32_bg_tilemap[1] = tilemap_create(machine, get_ms32_bg1_tile_info,tilemap_scan_rows,16,16,64,64);
+	state->m_ms32_bg_tilemap[0] = tilemap_create(machine, get_ms32_bg0_tile_info,TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_ms32_bg_tilemap[1] = tilemap_create(machine, get_ms32_bg1_tile_info,TILEMAP_SCAN_ROWS,16,16,64,64);
 	state->m_ms32_bg_tilemap[0]->set_transparent_pen(0);
 	state->m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
-	state->m_ms32_roz_tilemap[0] = tilemap_create(machine, get_ms32_roz0_tile_info,tilemap_scan_rows,16,16,128,128);
-	state->m_ms32_roz_tilemap[1] = tilemap_create(machine, get_ms32_roz1_tile_info,tilemap_scan_rows,16,16,128,128);
+	state->m_ms32_roz_tilemap[0] = tilemap_create(machine, get_ms32_roz0_tile_info,TILEMAP_SCAN_ROWS,16,16,128,128);
+	state->m_ms32_roz_tilemap[1] = tilemap_create(machine, get_ms32_roz1_tile_info,TILEMAP_SCAN_ROWS,16,16,128,128);
 	state->m_ms32_roz_tilemap[0]->set_transparent_pen(0);
 	state->m_ms32_roz_tilemap[1]->set_transparent_pen(0);
 

@@ -68,13 +68,13 @@ VIDEO_START( shadfrce )
 {
 	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 
-	state->m_fgtilemap = tilemap_create(machine, get_shadfrce_fgtile_info,tilemap_scan_rows,    8,  8,64,32);
+	state->m_fgtilemap = tilemap_create(machine, get_shadfrce_fgtile_info,TILEMAP_SCAN_ROWS,    8,  8,64,32);
 	state->m_fgtilemap->set_transparent_pen(0);
 
-	state->m_bg0tilemap = tilemap_create(machine, get_shadfrce_bg0tile_info,tilemap_scan_rows, 16, 16,32,32);
+	state->m_bg0tilemap = tilemap_create(machine, get_shadfrce_bg0tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
 	state->m_bg0tilemap->set_transparent_pen(0);
 
-	state->m_bg1tilemap = tilemap_create(machine, get_shadfrce_bg1tile_info,tilemap_scan_rows, 16, 16,32,32);
+	state->m_bg1tilemap = tilemap_create(machine, get_shadfrce_bg1tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	state->m_spvideoram_old = auto_alloc_array(machine, UINT16, state->m_spvideoram.bytes()/2);
 }

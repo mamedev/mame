@@ -650,10 +650,10 @@ static TILE_GET_INFO( mirderby_get_info1_1 )
 VIDEO_START( mrokumei )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_bg_tilemap[0][0] = tilemap_create( machine, mrokumei_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32 );
-	state->m_bg_tilemap[0][1] = tilemap_create( machine, mrokumei_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32 );
-	state->m_bg_tilemap[1][0] = tilemap_create( machine, mrokumei_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32 );
-	state->m_bg_tilemap[1][1] = tilemap_create( machine, mrokumei_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->m_bg_tilemap[0][0] = tilemap_create( machine, mrokumei_get_info0_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
+	state->m_bg_tilemap[0][1] = tilemap_create( machine, mrokumei_get_info0_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
+	state->m_bg_tilemap[1][0] = tilemap_create( machine, mrokumei_get_info1_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
+	state->m_bg_tilemap[1][1] = tilemap_create( machine, mrokumei_get_info1_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
 
 	state->m_bg_tilemap[0][1]->set_transparent_pen(0);
 	state->m_bg_tilemap[1][1]->set_transparent_pen(0);
@@ -662,14 +662,14 @@ VIDEO_START( mrokumei )
 VIDEO_START( reikaids )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_bg_tilemap[0][0] = tilemap_create(machine, reikaids_get_info0_0, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[0][1] = tilemap_create(machine, reikaids_get_info0_1, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[0][2] = tilemap_create(machine, reikaids_get_info0_2, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[0][3] = tilemap_create(machine, reikaids_get_info0_3, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[1][0] = tilemap_create(machine, reikaids_get_info1_0, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[1][1] = tilemap_create(machine, reikaids_get_info1_1, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[1][2] = tilemap_create(machine, reikaids_get_info1_2, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_bg_tilemap[1][3] = tilemap_create(machine, reikaids_get_info1_3, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap[0][0] = tilemap_create(machine, reikaids_get_info0_0, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[0][1] = tilemap_create(machine, reikaids_get_info0_1, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[0][2] = tilemap_create(machine, reikaids_get_info0_2, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[0][3] = tilemap_create(machine, reikaids_get_info0_3, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[1][0] = tilemap_create(machine, reikaids_get_info1_0, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[1][1] = tilemap_create(machine, reikaids_get_info1_1, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[1][2] = tilemap_create(machine, reikaids_get_info1_2, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap[1][3] = tilemap_create(machine, reikaids_get_info1_3, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	state->m_bg_tilemap[0][0]->set_transparent_pen(0xff);
 	state->m_bg_tilemap[0][1]->set_transparent_pen(0xff);
@@ -684,10 +684,10 @@ VIDEO_START( reikaids )
 VIDEO_START( pteacher )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_bg_tilemap[0][0] = tilemap_create(machine, pteacher_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg_tilemap[0][1] = tilemap_create(machine, pteacher_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg_tilemap[1][0] = tilemap_create(machine, pteacher_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg_tilemap[1][1] = tilemap_create(machine, pteacher_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap[0][0] = tilemap_create(machine, pteacher_get_info0_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap[0][1] = tilemap_create(machine, pteacher_get_info0_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap[1][0] = tilemap_create(machine, pteacher_get_info1_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap[1][1] = tilemap_create(machine, pteacher_get_info1_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_bg_tilemap[0][1]->set_transparent_pen(0xff);
 	state->m_bg_tilemap[1][1]->set_transparent_pen(0xff);
@@ -696,10 +696,10 @@ VIDEO_START( pteacher )
 VIDEO_START( lemnangl )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_bg_tilemap[0][0] = tilemap_create(machine, lemnangl_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg_tilemap[0][1] = tilemap_create(machine, lemnangl_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg_tilemap[1][0] = tilemap_create(machine, lemnangl_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_bg_tilemap[1][1] = tilemap_create(machine, lemnangl_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap[0][0] = tilemap_create(machine, lemnangl_get_info0_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap[0][1] = tilemap_create(machine, lemnangl_get_info0_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap[1][0] = tilemap_create(machine, lemnangl_get_info1_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap[1][1] = tilemap_create(machine, lemnangl_get_info1_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_bg_tilemap[0][1]->set_transparent_pen(0x0f);
 	state->m_bg_tilemap[1][1]->set_transparent_pen(0x0f);
@@ -708,10 +708,10 @@ VIDEO_START( lemnangl )
 VIDEO_START( mirderby )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->m_bg_tilemap[0][0] = tilemap_create( machine, mirderby_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32 );
-	state->m_bg_tilemap[0][1] = tilemap_create( machine, mirderby_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32 );
-	state->m_bg_tilemap[1][0] = tilemap_create( machine, mirderby_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32 );
-	state->m_bg_tilemap[1][1] = tilemap_create( machine, mirderby_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->m_bg_tilemap[0][0] = tilemap_create( machine, mirderby_get_info0_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
+	state->m_bg_tilemap[0][1] = tilemap_create( machine, mirderby_get_info0_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
+	state->m_bg_tilemap[1][0] = tilemap_create( machine, mirderby_get_info1_0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
+	state->m_bg_tilemap[1][1] = tilemap_create( machine, mirderby_get_info1_1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
 
 	state->m_bg_tilemap[0][1]->set_transparent_pen(0);
 	state->m_bg_tilemap[1][1]->set_transparent_pen(0);

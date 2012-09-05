@@ -207,7 +207,7 @@ WRITE8_MEMBER(firefox_state::tileram_w)
 static VIDEO_START( firefox )
 {
 	firefox_state *state = machine.driver_data<firefox_state>();
-	state->m_bgtiles = tilemap_create(machine, bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
+	state->m_bgtiles = tilemap_create(machine, bgtile_get_info, TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	state->m_bgtiles->set_transparent_pen(0);
 	state->m_bgtiles->set_scrolldy(machine.primary_screen->visible_area().min_y, 0);
 }

@@ -49,8 +49,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( tsamurai )
 {
 	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_background = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_foreground = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_background->set_transparent_pen(0);
 	state->m_foreground->set_transparent_pen(0);
@@ -250,7 +250,7 @@ static TILE_GET_INFO( get_vsgongf_tile_info )
 VIDEO_START( vsgongf )
 {
 	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	state->m_foreground = tilemap_create(machine, get_vsgongf_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_foreground = tilemap_create(machine, get_vsgongf_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
 SCREEN_UPDATE_IND16( vsgongf )

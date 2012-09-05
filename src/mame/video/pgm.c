@@ -625,10 +625,10 @@ VIDEO_START( pgm )
 	state->m_aoffset = 0;
 	state->m_boffset = 0;
 
-	state->m_tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_tx_tilemap->set_transparent_pen(15);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_pgm_bg_tilemap_tile_info, tilemap_scan_rows, 32, 32, 64, 16);
+	state->m_bg_tilemap = tilemap_create(machine, get_pgm_bg_tilemap_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 64, 16);
 	state->m_bg_tilemap->set_transparent_pen(31);
 	state->m_bg_tilemap->set_scroll_rows(16 * 32);
 

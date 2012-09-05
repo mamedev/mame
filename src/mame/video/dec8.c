@@ -297,7 +297,7 @@ static TILE_GET_INFO( get_cobracom_fix_tile_info )
 VIDEO_START( cobracom )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_cobracom_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_cobracom_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 
@@ -335,7 +335,7 @@ static TILE_GET_INFO( get_ghostb_fix_tile_info )
 VIDEO_START( ghostb )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_ghostb_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_ghostb_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fix_tilemap->set_transparent_pen(0);
 
 	state->m_game_uses_priority = 0;
@@ -374,7 +374,7 @@ static TILE_GET_INFO( get_oscar_fix_tile_info )
 VIDEO_START( oscar )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_oscar_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_oscar_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 
@@ -455,7 +455,7 @@ VIDEO_START( lastmisn )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
-	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_game_uses_priority = 0;
@@ -465,7 +465,7 @@ VIDEO_START( shackled )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
-	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transmask(0, 0x000f, 0xfff0); /* Bottom 12 pens */
@@ -527,8 +527,8 @@ static TILE_GET_INFO( get_srdarwin_tile_info )
 VIDEO_START( srdarwin )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_srdarwin_tile_info, tilemap_scan_rows, 16, 16, 32, 16);
-	state->m_fix_tilemap = tilemap_create(machine, get_srdarwin_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_srdarwin_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	state->m_fix_tilemap = tilemap_create(machine, get_srdarwin_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); //* draw as background only
@@ -602,8 +602,8 @@ static TILE_GET_INFO( get_gondo_tile_info )
 VIDEO_START( gondo )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transmask(0, 0x00ff, 0xff00); /* Bottom 8 pens */
@@ -613,8 +613,8 @@ VIDEO_START( gondo )
 VIDEO_START( garyoret )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_game_uses_priority = 1;

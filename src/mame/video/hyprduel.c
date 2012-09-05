@@ -370,9 +370,9 @@ static VIDEO_START( common_14220 )
 	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable.bytes() / 2);
 	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable.bytes() / 4);
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit, TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
 
 	state->m_bg_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
 	state->m_bg_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);

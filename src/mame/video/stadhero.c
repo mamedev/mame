@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_pf1_tile_info )
 VIDEO_START( stadhero )
 {
 	stadhero_state *state = machine.driver_data<stadhero_state>();
-	state->m_pf1_tilemap =     tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_pf1_tilemap =     tilemap_create(machine, get_pf1_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
 	state->m_pf1_tilemap->set_transparent_pen(0);
 }
 

@@ -63,7 +63,7 @@ VIDEO_START( mcr68 )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
@@ -79,10 +79,10 @@ VIDEO_START( zwackery )
 	int code, y, x;
 
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, zwackery_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, zwackery_get_bg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,32);
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = tilemap_create(machine, zwackery_get_fg_tile_info, tilemap_scan_rows,  16,16, 32,32);
+	state->m_fg_tilemap = tilemap_create(machine, zwackery_get_fg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
 	/* allocate memory for the assembled gfx data */

@@ -128,8 +128,8 @@ WRITE16_MEMBER(glass_state::glass_vram_w)
 VIDEO_START( glass )
 {
 	glass_state *state = machine.driver_data<glass_state>();
-	state->m_pant[0] = tilemap_create(machine, get_tile_info_glass_screen0, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_pant[1] = tilemap_create(machine, get_tile_info_glass_screen1, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_pant[0] = tilemap_create(machine, get_tile_info_glass_screen0, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_pant[1] = tilemap_create(machine, get_tile_info_glass_screen1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_screen_bitmap = auto_bitmap_ind16_alloc (machine, 320, 200);
 
 	state->save_item(NAME(*state->m_screen_bitmap));

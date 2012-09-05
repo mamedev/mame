@@ -103,7 +103,7 @@ VIDEO_START( centiped )
 	init_penmask(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, centiped_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, centiped_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -112,7 +112,7 @@ VIDEO_START( warlords )
 	init_common(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, warlords_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, warlords_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -122,7 +122,7 @@ VIDEO_START( milliped )
 	init_penmask(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, milliped_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, milliped_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -132,7 +132,7 @@ VIDEO_START( bullsdrt )
 	init_penmask(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bullsdrt_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, bullsdrt_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

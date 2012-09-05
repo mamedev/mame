@@ -38,9 +38,9 @@ static void wgp_core_vh_start( running_machine &machine, int piv_xoffs, int piv_
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
 
-	state->m_piv_tilemap[0] = tilemap_create(machine, get_piv0_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_piv_tilemap[1] = tilemap_create(machine, get_piv1_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_piv_tilemap[2] = tilemap_create(machine, get_piv2_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_piv_tilemap[0] = tilemap_create(machine, get_piv0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_piv_tilemap[1] = tilemap_create(machine, get_piv1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_piv_tilemap[2] = tilemap_create(machine, get_piv2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	state->m_piv_xoffs = piv_xoffs;
 	state->m_piv_yoffs = piv_yoffs;

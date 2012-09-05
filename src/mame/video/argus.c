@@ -279,9 +279,9 @@ VIDEO_START( argus )
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                     offset             w   h  col  row */
-	state->m_bg0_tilemap = tilemap_create(machine, argus_get_bg0_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, argus_get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_tx_tilemap  = tilemap_create(machine, argus_get_tx_tile_info,  tilemap_scan_cols,  8,  8, 32, 32);
+	state->m_bg0_tilemap = tilemap_create(machine, argus_get_bg0_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, argus_get_bg1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_tx_tilemap  = tilemap_create(machine, argus_get_tx_tile_info,  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	state->m_bg1_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);
@@ -307,8 +307,8 @@ VIDEO_START( valtric )
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                      offset             w   h  col  row */
-	state->m_bg1_tilemap = tilemap_create(machine, valtric_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
-	state->m_tx_tilemap  = tilemap_create(machine, valtric_get_tx_tile_info, tilemap_scan_cols,  8,  8, 32, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, valtric_get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_tx_tilemap  = tilemap_create(machine, valtric_get_tx_tile_info, TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 
@@ -328,9 +328,9 @@ VIDEO_START( butasan )
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                       offset             w   h  col  row */
-	state->m_bg0_tilemap = tilemap_create(machine, butasan_get_bg0_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, butasan_get_bg1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_tx_tilemap  = tilemap_create(machine, butasan_get_tx_tile_info,  tilemap_scan_rows,  8,  8, 32, 32);
+	state->m_bg0_tilemap = tilemap_create(machine, butasan_get_bg0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, butasan_get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap  = tilemap_create(machine, butasan_get_tx_tile_info,  TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
 
 	state->m_bg1_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);

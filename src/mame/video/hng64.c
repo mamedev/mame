@@ -1658,21 +1658,21 @@ VIDEO_START( hng64 )
 	state->m_old_tileflags2 = -1;
 	state->m_old_tileflags3 = -1;
 
-	state->m_tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap0_16x16_alt = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_16x16_alt = tilemap_create(machine, get_hng64_tile0_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->m_tilemap1_8x8       = tilemap_create(machine, get_hng64_tile1_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap1_16x16     = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap1_16x16_alt = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_8x8       = tilemap_create(machine, get_hng64_tile1_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_16x16     = tilemap_create(machine, get_hng64_tile1_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_16x16_alt = tilemap_create(machine, get_hng64_tile1_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->m_tilemap2_8x8       = tilemap_create(machine, get_hng64_tile2_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap2_16x16     = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap2_16x16_alt = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_8x8       = tilemap_create(machine, get_hng64_tile2_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_16x16     = tilemap_create(machine, get_hng64_tile2_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_16x16_alt = tilemap_create(machine, get_hng64_tile2_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->m_tilemap3_8x8       = tilemap_create(machine, get_hng64_tile3_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_8x8       = tilemap_create(machine, get_hng64_tile3_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
 	state->m_tilemap0_8x8->set_transparent_pen(0);
 	state->m_tilemap0_16x16->set_transparent_pen(0);

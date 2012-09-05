@@ -96,19 +96,19 @@ VIDEO_START( senjyo )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	if (state->m_is_senjyo)
 	{
-		state->m_bg1_tilemap = tilemap_create(machine, senjyo_bg1_tile_info, tilemap_scan_rows, 16, 16, 16, 32);
-		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,    tilemap_scan_rows, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
-		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,    tilemap_scan_rows, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
+		state->m_bg1_tilemap = tilemap_create(machine, senjyo_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
+		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
 	}
 	else
 	{
-		state->m_bg1_tilemap = tilemap_create(machine, starforc_bg1_tile_info, tilemap_scan_rows, 16, 16, 16, 32);
-		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
-		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		state->m_bg1_tilemap = tilemap_create(machine, starforc_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
 	}
 
 	state->m_fg_tilemap->set_transparent_pen(0);

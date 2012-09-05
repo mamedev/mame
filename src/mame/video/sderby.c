@@ -96,12 +96,12 @@ VIDEO_START( sderby )
 {
 	sderby_state *state = machine.driver_data<sderby_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_sderby_tile_info,tilemap_scan_rows, 16, 16,32,32);
-	state->m_md_tilemap = tilemap_create(machine, get_sderby_md_tile_info,tilemap_scan_rows, 16, 16,32,32);
+	state->m_tilemap = tilemap_create(machine, get_sderby_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_md_tilemap = tilemap_create(machine, get_sderby_md_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	state->m_md_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_sderby_fg_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_sderby_fg_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

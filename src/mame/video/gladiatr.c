@@ -47,8 +47,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 VIDEO_START( ppking )
 {
 	gladiatr_state *state = machine.driver_data<gladiatr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,8,8,32,64);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,8,8,32,64);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,64);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,64);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 
@@ -60,8 +60,8 @@ VIDEO_START( ppking )
 VIDEO_START( gladiatr )
 {
 	gladiatr_state *state = machine.driver_data<gladiatr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,8,8,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 

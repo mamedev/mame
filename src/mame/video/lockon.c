@@ -900,7 +900,7 @@ VIDEO_START( lockon )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_lockon_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap = tilemap_create(machine, get_lockon_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */

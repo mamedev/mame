@@ -137,8 +137,8 @@ VIDEO_START( sprcros2 )
 {
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 
-	state->m_bgtilemap = tilemap_create(machine, get_sprcros2_bgtile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_fgtilemap = tilemap_create(machine, get_sprcros2_fgtile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bgtilemap = tilemap_create(machine, get_sprcros2_bgtile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fgtilemap = tilemap_create(machine, get_sprcros2_fgtile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fgtilemap, machine.gfx[2], 0);
 }

@@ -157,7 +157,7 @@ VIDEO_START( williams2 )
 	state->m_generic_paletteram_8.allocate(0x400 * 2);
 
 	/* create the tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols,  24,16, 128,16);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS,  24,16, 128,16);
 	state->m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register(machine);

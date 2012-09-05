@@ -190,7 +190,7 @@ static TILE_GET_INFO( get_supershot_text_tile_info )
 static VIDEO_START( supershot )
 {
 	supershot_state *state = machine.driver_data<supershot_state>();
-	state->m_tilemap = tilemap_create(machine, get_supershot_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tilemap = tilemap_create(machine, get_supershot_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( supershot )

@@ -299,8 +299,8 @@ VIDEO_START( nemesis )
 
 	state->m_spriteram_words = state->m_spriteram.bytes() / 2;
 
-	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_background = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_foreground = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state->m_background->set_transparent_pen(0);
 	state->m_foreground->set_transparent_pen(0);

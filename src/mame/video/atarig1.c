@@ -52,13 +52,13 @@ VIDEO_START( atarig1 )
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x10);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	state->m_rle = machine.device("rle");
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset statics */

@@ -162,12 +162,12 @@ static VIDEO_START( skylncr )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
 
-	state->m_tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows, 8, 8, 0x40, 0x20	);
+	state->m_tmap = tilemap_create(	machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20	);
 
-	state->m_reel_1_tilemap = tilemap_create(machine, get_reel_1_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
-	state->m_reel_2_tilemap = tilemap_create(machine, get_reel_2_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
-	state->m_reel_3_tilemap = tilemap_create(machine, get_reel_3_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
-	state->m_reel_4_tilemap = tilemap_create(machine, get_reel_4_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
+	state->m_reel_1_tilemap = tilemap_create(machine, get_reel_1_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_2_tilemap = tilemap_create(machine, get_reel_2_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_3_tilemap = tilemap_create(machine, get_reel_3_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_4_tilemap = tilemap_create(machine, get_reel_4_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
 
 	state->m_reel_2_tilemap->set_scroll_cols(0x40);
 	state->m_reel_3_tilemap->set_scroll_cols(0x40);

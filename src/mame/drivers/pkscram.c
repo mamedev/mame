@@ -233,9 +233,9 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 static VIDEO_START( pkscramble )
 {
 	pkscram_state *state = machine.driver_data<pkscram_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8,32,32);
-	state->m_md_tilemap = tilemap_create(machine, get_md_tile_info, tilemap_scan_rows, 8, 8,32,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_md_tilemap = tilemap_create(machine, get_md_tile_info, TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_md_tilemap->set_transparent_pen(15);
 	state->m_fg_tilemap->set_transparent_pen(15);

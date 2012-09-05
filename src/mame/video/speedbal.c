@@ -39,8 +39,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 VIDEO_START( speedbal )
 {
 	speedbal_state *state = machine.driver_data<speedbal_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols_flip_x,  16, 16, 16, 16);
-	state->m_fg_tilemap = tilemap_create(machine, get_tile_info_fg, tilemap_scan_cols_flip_x,   8,  8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_COLS_FLIP_X,  16, 16, 16, 16);
+	state->m_fg_tilemap = tilemap_create(machine, get_tile_info_fg, TILEMAP_SCAN_COLS_FLIP_X,   8,  8, 32, 32);
 
 	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	state->m_bg_tilemap->set_transmask(1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */

@@ -31,7 +31,7 @@ WRITE8_MEMBER(sbugger_state::sbugger_videoram_attr_w)
 VIDEO_START(sbugger)
 {
 	sbugger_state *state = machine.driver_data<sbugger_state>();
-	state->m_tilemap = tilemap_create(machine, get_sbugger_tile_info, tilemap_scan_rows, 8, 16, 64, 16);
+	state->m_tilemap = tilemap_create(machine, get_sbugger_tile_info, TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
 }
 
 SCREEN_UPDATE_IND16(sbugger)

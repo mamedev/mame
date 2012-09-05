@@ -102,7 +102,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( fastfred )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -351,9 +351,9 @@ WRITE8_HANDLER( imago_charbank_w )
 VIDEO_START( imago )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->m_web_tilemap = tilemap_create(machine, imago_get_tile_info_web,tilemap_scan_rows,     8,8,32,32);
-	state->m_bg_tilemap   = tilemap_create(machine, imago_get_tile_info_bg, tilemap_scan_rows,8,8,32,32);
-	state->m_fg_tilemap   = tilemap_create(machine, imago_get_tile_info_fg, tilemap_scan_rows,8,8,32,32);
+	state->m_web_tilemap = tilemap_create(machine, imago_get_tile_info_web,TILEMAP_SCAN_ROWS,     8,8,32,32);
+	state->m_bg_tilemap   = tilemap_create(machine, imago_get_tile_info_bg, TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_fg_tilemap   = tilemap_create(machine, imago_get_tile_info_fg, TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

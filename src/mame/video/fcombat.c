@@ -102,7 +102,7 @@ PALETTE_INIT( fcombat )
 VIDEO_START( fcombat )
 {
 	fcombat_state *state = machine.driver_data<fcombat_state>();
-	state->m_bgmap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32 * 8 * 2, 32);
+	state->m_bgmap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
 }
 
 

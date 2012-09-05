@@ -49,9 +49,9 @@ static void gcpinbal_core_vh_start( running_machine &machine )
 	int xoffs = 0;
 	int yoffs = 0;
 
-	state->m_tilemap[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_tilemap[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->m_tilemap[2] = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,8,8,64,64);
+	state->m_tilemap[0] = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tilemap[1] = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tilemap[2] = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_tilemap[0]->set_transparent_pen(0);
 	state->m_tilemap[1]->set_transparent_pen(0);

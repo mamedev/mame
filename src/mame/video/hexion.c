@@ -43,8 +43,8 @@ static TILE_GET_INFO( get_tile_info1 )
 VIDEO_START( hexion )
 {
 	hexion_state *state = machine.driver_data<hexion_state>();
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,     8,8,64,32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,     8,8,64,32);
 
 	state->m_bg_tilemap[0]->set_transparent_pen(0);
 	state->m_bg_tilemap[1]->set_scrollx(0,-4);

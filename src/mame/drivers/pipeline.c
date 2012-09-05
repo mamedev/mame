@@ -129,8 +129,8 @@ static VIDEO_START ( pipeline )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
 	state->m_palram=auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_tilemap1 = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
-	state->m_tilemap2 = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,64,32 );
+	state->m_tilemap1 = tilemap_create( machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_tilemap2 = tilemap_create( machine, get_tile_info2,TILEMAP_SCAN_ROWS,8,8,64,32 );
 	state->m_tilemap2->set_transparent_pen(0);
 }
 

@@ -98,7 +98,7 @@ static VIDEO_START( mole )
 {
 	mole_state *state = machine.driver_data<mole_state>();
 	memset(state->m_tileram, 0, sizeof(state->m_tileram));
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	state->save_item(NAME(state->m_tileram));
 }

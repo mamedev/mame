@@ -90,8 +90,8 @@ static TILE_GET_INFO( get_t2_tile_info )
 static VIDEO_START( koftball )
 {
 	koftball_state *state = machine.driver_data<koftball_state>();
-	state->m_tilemap_1 = tilemap_create(machine, get_t1_tile_info,tilemap_scan_rows,8,8,64,32);
-	state->m_tilemap_2 = tilemap_create(machine, get_t2_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_tilemap_1 = tilemap_create(machine, get_t1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_2 = tilemap_create(machine, get_t2_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_tilemap_1->set_transparent_pen(0);
 }

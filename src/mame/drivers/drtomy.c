@@ -123,8 +123,8 @@ static VIDEO_START( drtomy )
 {
 	drtomy_state *state = machine.driver_data<drtomy_state>();
 
-	state->m_tilemap_bg = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_fg, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tilemap_bg = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_fg, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tilemap_fg->set_transparent_pen(0);
 }

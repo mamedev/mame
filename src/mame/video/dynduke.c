@@ -82,9 +82,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( dynduke )
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
-	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,      16,16,32,32);
-	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,32,32);
-	state->m_tx_layer = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_COLS,      16,16,32,32);
+	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_COLS,16,16,32,32);
+	state->m_tx_layer = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_fg_layer->set_transparent_pen(15);
 	state->m_tx_layer->set_transparent_pen(15);

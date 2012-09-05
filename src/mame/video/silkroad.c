@@ -129,9 +129,9 @@ WRITE32_MEMBER(silkroad_state::silkroad_fgram3_w)
 VIDEO_START(silkroad)
 {
 	silkroad_state *state = machine.driver_data<silkroad_state>();
-	state->m_fg_tilemap  = tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_fg3_tilemap = tilemap_create(machine, get_fg3_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_fg_tilemap  = tilemap_create(machine, get_fg_tile_info,  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg3_tilemap = tilemap_create(machine, get_fg3_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg2_tilemap->set_transparent_pen(0);

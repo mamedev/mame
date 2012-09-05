@@ -398,7 +398,7 @@ static void cave_vh_start( running_machine &machine, int num )
 	switch (num)
 	{
 		case 4:
-			state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
+			state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			state->m_tilemap[3]->set_transparent_pen(0);
 			state->m_tilemap[3]->set_scroll_rows(1);
 			state->m_tilemap[3]->set_scroll_cols(1);
@@ -406,7 +406,7 @@ static void cave_vh_start( running_machine &machine, int num )
 			state->save_item(NAME(state->m_old_tiledim[3]));
 
 		case 3:
-			state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
+			state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			state->m_tilemap[2]->set_transparent_pen(0);
 			state->m_tilemap[2]->set_scroll_rows(1);
 			state->m_tilemap[2]->set_scroll_cols(1);
@@ -414,7 +414,7 @@ static void cave_vh_start( running_machine &machine, int num )
 			state->save_item(NAME(state->m_old_tiledim[2]));
 
 		case 2:
-			state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
+			state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			state->m_tilemap[1]->set_transparent_pen(0);
 			state->m_tilemap[1]->set_scroll_rows(1);
 			state->m_tilemap[1]->set_scroll_cols(1);
@@ -422,7 +422,7 @@ static void cave_vh_start( running_machine &machine, int num )
 			state->save_item(NAME(state->m_old_tiledim[1]));
 
 		case 1:
-			state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
+			state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8);
 			state->m_tilemap[0]->set_transparent_pen(0);
 			state->m_tilemap[0]->set_scroll_rows(1);
 			state->m_tilemap[0]->set_scroll_cols(1);
@@ -472,7 +472,7 @@ VIDEO_START( sailormn_3_layers )
 	cave_vh_start(machine, 2);
 
 	/* Layer 2 (8x8) needs to be handled differently */
-	state->m_tilemap[2] = tilemap_create(machine, sailormn_get_tile_info_2, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8 );
+	state->m_tilemap[2] = tilemap_create(machine, sailormn_get_tile_info_2, TILEMAP_SCAN_ROWS, 8, 8, 512 / 8, 512 / 8 );
 
 	state->m_tilemap[2]->set_transparent_pen(0);
 	state->m_tilemap[2]->set_scroll_rows(1);

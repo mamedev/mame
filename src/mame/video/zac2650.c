@@ -123,7 +123,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( tinvader )
 {
 	zac2650_state *state = machine.driver_data<zac2650_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
 		 24, 24, 32, 32);
 
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);

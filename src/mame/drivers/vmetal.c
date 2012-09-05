@@ -445,9 +445,9 @@ static VIDEO_START(varia)
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
 
-	state->m_texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info, tilemap_scan_rows,  8,  8, 256, 256);
-	state->m_mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
-	state->m_mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
+	state->m_texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info, TILEMAP_SCAN_ROWS,  8,  8, 256, 256);
+	state->m_mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
+	state->m_mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
 
 	state->m_texttilemap->set_transparent_pen(15);
 	state->m_mid1tilemap->set_transparent_pen(15);

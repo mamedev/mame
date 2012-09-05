@@ -66,7 +66,7 @@ VIDEO_START( alpha68k )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	state->m_fix_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_fix_tilemap->set_transparent_pen(0);
 }
 

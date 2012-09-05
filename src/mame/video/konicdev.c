@@ -2716,9 +2716,9 @@ static DEVICE_START( k052109 )
 	k052109->gfxnum = intf->gfx_num;
 	k052109->callback = intf->callback;
 
-	k052109->tilemap[0] = tilemap_create_device(device, k052109_get_tile_info0, tilemap_scan_rows, 8, 8, 64, 32);
-	k052109->tilemap[1] = tilemap_create_device(device, k052109_get_tile_info1, tilemap_scan_rows, 8, 8, 64, 32);
-	k052109->tilemap[2] = tilemap_create_device(device, k052109_get_tile_info2, tilemap_scan_rows, 8, 8, 64, 32);
+	k052109->tilemap[0] = tilemap_create_device(device, k052109_get_tile_info0, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	k052109->tilemap[1] = tilemap_create_device(device, k052109_get_tile_info1, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	k052109->tilemap[2] = tilemap_create_device(device, k052109_get_tile_info2, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	k052109->ram = auto_alloc_array_clear(machine, UINT8, 0x6000);
 
@@ -5372,7 +5372,7 @@ static DEVICE_START( k051316 )
 	k051316->bpp = is_tail2nos ? 4 : intf->bpp;	// tail2nos is passed with bpp = -4 to setup the custom charlayout!
 	k051316->callback = intf->callback;
 
-	k051316->tmap = tilemap_create_device(device, k051316_get_tile_info0, tilemap_scan_rows, 16, 16, 32, 32);
+	k051316->tmap = tilemap_create_device(device, k051316_get_tile_info0, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	k051316->ram = auto_alloc_array(machine, UINT8, 0x800);
 
@@ -7935,22 +7935,22 @@ static DEVICE_START( k056832 )
 
 	k056832->videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
 
-	k056832->tilemap[0x0] = tilemap_create_device(device, k056832_get_tile_info0, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x1] = tilemap_create_device(device, k056832_get_tile_info1, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x2] = tilemap_create_device(device, k056832_get_tile_info2, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x3] = tilemap_create_device(device, k056832_get_tile_info3, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x4] = tilemap_create_device(device, k056832_get_tile_info4, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x5] = tilemap_create_device(device, k056832_get_tile_info5, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x6] = tilemap_create_device(device, k056832_get_tile_info6, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x7] = tilemap_create_device(device, k056832_get_tile_info7, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x8] = tilemap_create_device(device, k056832_get_tile_info8, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0x9] = tilemap_create_device(device, k056832_get_tile_info9, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0xa] = tilemap_create_device(device, k056832_get_tile_infoa, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0xb] = tilemap_create_device(device, k056832_get_tile_infob, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0xc] = tilemap_create_device(device, k056832_get_tile_infoc, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0xd] = tilemap_create_device(device, k056832_get_tile_infod, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0xe] = tilemap_create_device(device, k056832_get_tile_infoe, tilemap_scan_rows,  8, 8, 64, 32);
-	k056832->tilemap[0xf] = tilemap_create_device(device, k056832_get_tile_infof, tilemap_scan_rows,  8, 8, 64, 32);
+	k056832->tilemap[0x0] = tilemap_create_device(device, k056832_get_tile_info0, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x1] = tilemap_create_device(device, k056832_get_tile_info1, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x2] = tilemap_create_device(device, k056832_get_tile_info2, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x3] = tilemap_create_device(device, k056832_get_tile_info3, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x4] = tilemap_create_device(device, k056832_get_tile_info4, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x5] = tilemap_create_device(device, k056832_get_tile_info5, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x6] = tilemap_create_device(device, k056832_get_tile_info6, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x7] = tilemap_create_device(device, k056832_get_tile_info7, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x8] = tilemap_create_device(device, k056832_get_tile_info8, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0x9] = tilemap_create_device(device, k056832_get_tile_info9, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0xa] = tilemap_create_device(device, k056832_get_tile_infoa, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0xb] = tilemap_create_device(device, k056832_get_tile_infob, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0xc] = tilemap_create_device(device, k056832_get_tile_infoc, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0xd] = tilemap_create_device(device, k056832_get_tile_infod, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0xe] = tilemap_create_device(device, k056832_get_tile_infoe, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	k056832->tilemap[0xf] = tilemap_create_device(device, k056832_get_tile_infof, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
@@ -10173,8 +10173,8 @@ static DEVICE_START( k037122 )
 	k037122->tile_ram = auto_alloc_array(device->machine(), UINT32, 0x20000 / 4);
 	k037122->reg = auto_alloc_array(device->machine(), UINT32, 0x400 / 4);
 
-	k037122->layer[0] = tilemap_create_device(device, k037122_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
-	k037122->layer[1] = tilemap_create_device(device, k037122_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
+	k037122->layer[0] = tilemap_create_device(device, k037122_tile_info_layer0, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	k037122->layer[1] = tilemap_create_device(device, k037122_tile_info_layer1, TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	k037122->layer[0]->set_transparent_pen(0);
 	k037122->layer[1]->set_transparent_pen(0);

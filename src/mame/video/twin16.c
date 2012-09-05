@@ -495,7 +495,7 @@ static TILE_GET_INFO( get_text_tile_info )
 VIDEO_START( twin16 )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
-	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_text_tilemap->set_transparent_pen(0);
 
 	palette_set_shadow_factor(machine,0.4); // screenshots estimate

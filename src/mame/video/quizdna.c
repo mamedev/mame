@@ -57,8 +57,8 @@ VIDEO_START( quizdna )
 	state->m_bg_ram = auto_alloc_array(machine, UINT8, 0x2000);
 	state->m_fg_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32 );
-	state->m_fg_tilemap = tilemap_create( machine, get_fg_tile_info,tilemap_scan_rows,16,8,32,32 );
+	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_fg_tilemap = tilemap_create( machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,16,8,32,32 );
 
 	state->m_fg_tilemap->set_transparent_pen(0 );
 }

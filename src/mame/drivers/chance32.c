@@ -89,10 +89,10 @@ VIDEO_START( chance32 )
 {
 	chance32_state *state = machine.driver_data<chance32_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 8, 35, 29);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 8, 35, 29);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 
 	state->m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 	state->m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);

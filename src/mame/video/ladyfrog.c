@@ -133,7 +133,7 @@ static VIDEO_START( ladyfrog_common )
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_generic_paletteram_8.allocate(0x200);
 	state->m_generic_paletteram2_8.allocate(0x200);

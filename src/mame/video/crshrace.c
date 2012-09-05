@@ -36,8 +36,8 @@ VIDEO_START( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_tilemap1->set_transparent_pen(0x0f);
 	state->m_tilemap2->set_transparent_pen(0xff);

@@ -81,8 +81,8 @@ static VIDEO_START( pzletime )
 {
 	pzletime_state *state = machine.driver_data<pzletime_state>();
 
-	state->m_mid_tilemap = tilemap_create(machine, get_mid_tile_info, tilemap_scan_cols, 16, 16, 64, 16);
-	state->m_txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_mid_tilemap = tilemap_create(machine, get_mid_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_txt_tilemap = tilemap_create(machine, get_txt_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state->m_mid_tilemap->set_transparent_pen(0);
 	state->m_txt_tilemap->set_transparent_pen(0);

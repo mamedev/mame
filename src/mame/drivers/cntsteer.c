@@ -134,8 +134,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 static VIDEO_START( cntsteer )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 
@@ -145,8 +145,8 @@ static VIDEO_START( cntsteer )
 static VIDEO_START( zerotrgt )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 

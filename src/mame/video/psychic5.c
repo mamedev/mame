@@ -231,8 +231,8 @@ VIDEO_START( psychic5 )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h  col  row */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,  8,  8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 
@@ -255,8 +255,8 @@ VIDEO_START( bombsa )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h   col  row */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,  8,  8,  32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 

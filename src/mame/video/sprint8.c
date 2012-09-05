@@ -119,8 +119,8 @@ VIDEO_START( sprint8 )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
-	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
+	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
 	state->m_tilemap1->set_scrolly(0, +24);
 	state->m_tilemap2->set_scrolly(0, +24);

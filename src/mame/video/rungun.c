@@ -78,7 +78,7 @@ VIDEO_START( rng )
 	rungun_state *state = machine.driver_data<rungun_state>();
 	int gfx_index;
 
-	state->m_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
+	state->m_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 	state->m_936_tilemap->set_transparent_pen(0);
 
 	/* find first empty slot to decode gfx */
@@ -93,7 +93,7 @@ VIDEO_START( rng )
 	state->m_ttl_gfx_index = gfx_index;
 
 	// create the tilemap
-	state->m_ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_ttl_tilemap->set_transparent_pen(0);
 

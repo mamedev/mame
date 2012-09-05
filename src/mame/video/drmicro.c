@@ -110,8 +110,8 @@ VIDEO_START( drmicro)
 	state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->save_pointer(NAME(state->m_videoram), 0x1000);
 
-	state->m_bg1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg2 = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg1 = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg2 = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg2->set_transparent_pen(0);
 }

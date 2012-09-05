@@ -214,10 +214,10 @@ static TILE_GET_INFO( get_sl_tile_info )
 VIDEO_START( dday )
 {
 	dday_state *state = machine.driver_data<dday_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_sl_tilemap = tilemap_create(machine, get_sl_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_sl_tilemap = tilemap_create(machine, get_sl_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	machine.primary_screen->register_screen_bitmap(state->m_main_bitmap);
 

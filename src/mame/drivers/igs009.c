@@ -247,13 +247,13 @@ WRITE8_MEMBER(igs009_state::fg_color_w)
 static VIDEO_START(jingbell)
 {
 	igs009_state *state = machine.driver_data<igs009_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_jingbell_reel1_tile_info,tilemap_scan_rows,8,32, 128, 8);
-	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_jingbell_reel2_tile_info,tilemap_scan_rows,8,32, 128, 8);
-	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_jingbell_reel3_tile_info,tilemap_scan_rows,8,32, 128, 8);
-	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_jingbell_reel4_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_jingbell_reel1_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_jingbell_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_jingbell_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_jingbell_reel4_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	state->m_gp98_reel1_tilemap->set_scroll_cols(128);
 	state->m_gp98_reel2_tilemap->set_scroll_cols(128);
@@ -265,13 +265,13 @@ static VIDEO_START(jingbell)
 static VIDEO_START(gp98)
 {
 	igs009_state *state = machine.driver_data<igs009_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_gp98_reel1_tile_info,tilemap_scan_rows,8,32, 128, 8);
-	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_gp98_reel2_tile_info,tilemap_scan_rows,8,32, 128, 8);
-	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_gp98_reel3_tile_info,tilemap_scan_rows,8,32, 128, 8);
-	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_gp98_reel4_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_gp98_reel1_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_gp98_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_gp98_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_gp98_reel4_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	state->m_gp98_reel1_tilemap->set_scroll_cols(128);
 	state->m_gp98_reel2_tilemap->set_scroll_cols(128);

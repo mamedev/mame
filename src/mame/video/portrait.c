@@ -67,8 +67,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( portrait )
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
-	state->m_background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
-	state->m_foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
+	state->m_background = tilemap_create( machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,       16, 16, 32, 32 );
+	state->m_foreground = tilemap_create( machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 32, 32 );
 
 	state->m_foreground->set_transparent_pen(7 );
 }

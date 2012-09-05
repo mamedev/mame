@@ -230,7 +230,7 @@ VIDEO_START( gdfs )
 	VIDEO_START_CALL(ssv);
 
 
-	state->m_gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
 											 16,16, 0x100,0x100	);
 
 	state->m_gdfs_tmap->set_transparent_pen(0);

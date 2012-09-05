@@ -64,7 +64,7 @@ VIDEO_START( pow )
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_pow_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_pow_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_fg_tile_offset = 0;
 
 	common_video_start(machine);
@@ -74,7 +74,7 @@ VIDEO_START( searchar )
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_searchar_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_searchar_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	common_video_start(machine);
 }

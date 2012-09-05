@@ -28,7 +28,7 @@ VIDEO_START( darius )
 {
 	darius_state *state = machine.driver_data<darius_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

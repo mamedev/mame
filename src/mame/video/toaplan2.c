@@ -60,7 +60,7 @@ static void truxton2_create_tx_tilemap(running_machine &machine)
 {
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tx_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_tx_tilemap->set_scroll_rows(8*32);	/* line scrolling */
 	state->m_tx_tilemap->set_scroll_cols(1);
 	state->m_tx_tilemap->set_transparent_pen(0);

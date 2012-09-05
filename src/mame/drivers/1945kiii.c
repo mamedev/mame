@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_k3_bg_tile_info )
 static VIDEO_START(k3)
 {
 	k3_state *state = machine.driver_data<k3_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 64);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

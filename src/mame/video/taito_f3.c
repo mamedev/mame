@@ -588,10 +588,10 @@ VIDEO_START( f3 )
 	state->m_spriteram =    auto_alloc_array_clear(machine, UINT16, 0x10000/2);
 
 	if (state->m_f3_game_config->extend) {
-		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,32);
-		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,64,32);
-		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,64,32);
-		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,64,32);
+		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,TILEMAP_SCAN_ROWS,16,16,64,32);
 
 		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
 		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x2000/2);
@@ -609,14 +609,14 @@ VIDEO_START( f3 )
 
 
 	} else {
-		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,32,32);
-		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,32,32);
-		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,32,32);
-		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,32,32);
-		state->m_pf5_tilemap = tilemap_create(machine, get_tile_info5,tilemap_scan_rows,16,16,32,32);
-		state->m_pf6_tilemap = tilemap_create(machine, get_tile_info6,tilemap_scan_rows,16,16,32,32);
-		state->m_pf7_tilemap = tilemap_create(machine, get_tile_info7,tilemap_scan_rows,16,16,32,32);
-		state->m_pf8_tilemap = tilemap_create(machine, get_tile_info8,tilemap_scan_rows,16,16,32,32);
+		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf5_tilemap = tilemap_create(machine, get_tile_info5,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf6_tilemap = tilemap_create(machine, get_tile_info6,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf7_tilemap = tilemap_create(machine, get_tile_info7,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf8_tilemap = tilemap_create(machine, get_tile_info8,TILEMAP_SCAN_ROWS,16,16,32,32);
 
 		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
 		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x1000/2);
@@ -644,8 +644,8 @@ VIDEO_START( f3 )
 	state->m_spriteram16_buffered = auto_alloc_array(machine, UINT16, 0x10000/2);
 	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 	state->m_sprite_end = state->m_spritelist;
-	state->m_vram_layer = tilemap_create(machine, get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
-	state->m_pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
+	state->m_vram_layer = tilemap_create(machine, get_tile_info_vram,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pixel_layer = tilemap_create(machine, get_tile_info_pixel,TILEMAP_SCAN_COLS,8,8,64,32);
 	state->m_pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
 	state->m_sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
 	machine.primary_screen->register_screen_bitmap(state->m_pri_alp_bitmap);

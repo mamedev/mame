@@ -101,7 +101,7 @@ VIDEO_START( carjmbre )
 {
 	carjmbre_state *state = machine.driver_data<carjmbre_state>();
 
-	state->m_cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_bgcolor));
 }

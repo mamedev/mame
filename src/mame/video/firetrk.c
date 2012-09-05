@@ -229,8 +229,8 @@ VIDEO_START( firetrk )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
+	state->m_tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -240,8 +240,8 @@ VIDEO_START( superbug )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, superbug_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, superbug_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
+	state->m_tilemap1 = tilemap_create(machine, superbug_get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap2 = tilemap_create(machine, superbug_get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -251,8 +251,8 @@ VIDEO_START( montecar )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, montecar_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, montecar_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
+	state->m_tilemap1 = tilemap_create(machine, montecar_get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap2 = tilemap_create(machine, montecar_get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

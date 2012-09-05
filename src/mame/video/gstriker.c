@@ -61,7 +61,7 @@ static void VS920A_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->m_VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
+		state->m_VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 		state->m_VS920A[i].tmap->set_transparent_pen(0);
 	}

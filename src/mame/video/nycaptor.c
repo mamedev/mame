@@ -77,7 +77,7 @@ VIDEO_START( nycaptor )
 	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32 );
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
 
 	state->m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
 	state->m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1

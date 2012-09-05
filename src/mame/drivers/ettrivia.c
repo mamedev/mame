@@ -253,8 +253,8 @@ static PALETTE_INIT( ettrivia )
 static VIDEO_START( ettrivia )
 {
 	ettrivia_state *state = machine.driver_data<ettrivia_state>();
-	state->m_bg_tilemap = tilemap_create( machine, get_tile_info_bg,tilemap_scan_rows,8,8,64,32 );
-	state->m_fg_tilemap = tilemap_create( machine, get_tile_info_fg,tilemap_scan_rows,8,8,64,32 );
+	state->m_bg_tilemap = tilemap_create( machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_fg_tilemap = tilemap_create( machine, get_tile_info_fg,TILEMAP_SCAN_ROWS,8,8,64,32 );
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

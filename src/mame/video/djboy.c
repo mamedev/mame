@@ -40,7 +40,7 @@ WRITE8_MEMBER(djboy_state::djboy_videoram_w)
 VIDEO_START( djboy )
 {
 	djboy_state *state = machine.driver_data<djboy_state>();
-	state->m_background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
+	state->m_background = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 }
 
 WRITE8_MEMBER(djboy_state::djboy_paletteram_w)

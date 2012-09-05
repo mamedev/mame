@@ -17,7 +17,7 @@ VIDEO_START(speedspn)
 {
 	speedspn_state *state = machine.driver_data<speedspn_state>();
 	state->m_vidram = auto_alloc_array(machine, UINT8, 0x1000 * 2);
-	state->m_tilemap = tilemap_create(machine, get_speedspn_tile_info,tilemap_scan_cols, 8, 8,64,32);
+	state->m_tilemap = tilemap_create(machine, get_speedspn_tile_info,TILEMAP_SCAN_COLS, 8, 8,64,32);
 }
 
 WRITE8_MEMBER(speedspn_state::speedspn_vidram_w)

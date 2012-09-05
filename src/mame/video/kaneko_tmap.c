@@ -142,9 +142,9 @@ void kaneko_view2_tilemap_device::device_start()
 	m_vscroll[1] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
 	m_regs = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x20/2);
 
-	m_tmap[0] = tilemap_create_device(	this, get_tile_info_0, tilemap_scan_rows,
+	m_tmap[0] = tilemap_create_device(	this, get_tile_info_0, TILEMAP_SCAN_ROWS,
 										 16,16, 0x20,0x20	);
-	m_tmap[1] = tilemap_create_device(	this, get_tile_info_1, tilemap_scan_rows,
+	m_tmap[1] = tilemap_create_device(	this, get_tile_info_1, TILEMAP_SCAN_ROWS,
 										 16,16, 0x20,0x20	);
 
 	m_tmap[0]->set_transparent_pen(0);

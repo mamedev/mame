@@ -127,7 +127,7 @@ static VIDEO_START( m14 )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	state->m_m14_tilemap = tilemap_create(machine, m14_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_m14_tilemap = tilemap_create(machine, m14_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( m14 )

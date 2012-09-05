@@ -132,8 +132,8 @@ static void video_start_common(running_machine &machine, tile_get_info_func fg_t
 	memset(state->m_congo_custom, 0, sizeof(state->m_congo_custom));
 
 	/* create a background and foreground tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8,8, 32,512);
-	state->m_fg_tilemap = tilemap_create(machine, fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,512);
+	state->m_fg_tilemap = tilemap_create(machine, fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
 	state->m_fg_tilemap->set_transparent_pen(0);

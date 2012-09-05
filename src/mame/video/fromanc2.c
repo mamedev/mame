@@ -383,14 +383,14 @@ VIDEO_START( fromanc2 )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->m_tilemap[0][0] = tilemap_create(machine, fromanc2_get_v0_l0_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[0][1] = tilemap_create(machine, fromanc2_get_v0_l1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[0][2] = tilemap_create(machine, fromanc2_get_v0_l2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[0][3] = tilemap_create(machine, fromanc2_get_v0_l3_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[1][0] = tilemap_create(machine, fromanc2_get_v1_l0_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[1][1] = tilemap_create(machine, fromanc2_get_v1_l1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[1][2] = tilemap_create(machine, fromanc2_get_v1_l2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[1][3] = tilemap_create(machine, fromanc2_get_v1_l3_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_tilemap[0][0] = tilemap_create(machine, fromanc2_get_v0_l0_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[0][1] = tilemap_create(machine, fromanc2_get_v0_l1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[0][2] = tilemap_create(machine, fromanc2_get_v0_l2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[0][3] = tilemap_create(machine, fromanc2_get_v0_l3_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[1][0] = tilemap_create(machine, fromanc2_get_v1_l0_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[1][1] = tilemap_create(machine, fromanc2_get_v1_l1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[1][2] = tilemap_create(machine, fromanc2_get_v1_l2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[1][3] = tilemap_create(machine, fromanc2_get_v1_l3_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_tilemap[0][1]->set_transparent_pen(0x000);
 	state->m_tilemap[0][2]->set_transparent_pen(0x000);
@@ -433,13 +433,13 @@ VIDEO_START( fromancr )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->m_tilemap[0][0] = tilemap_create(machine, fromancr_get_v0_l0_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[0][1] = tilemap_create(machine, fromancr_get_v0_l1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[0][2] = tilemap_create(machine, fromancr_get_v0_l2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_tilemap[0][0] = tilemap_create(machine, fromancr_get_v0_l0_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[0][1] = tilemap_create(machine, fromancr_get_v0_l1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[0][2] = tilemap_create(machine, fromancr_get_v0_l2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	state->m_tilemap[0][3] = 0;
-	state->m_tilemap[1][0] = tilemap_create(machine, fromancr_get_v1_l0_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[1][1] = tilemap_create(machine, fromancr_get_v1_l1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_tilemap[1][0] = tilemap_create(machine, fromancr_get_v1_l0_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[1][1] = tilemap_create(machine, fromancr_get_v1_l1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	state->m_tilemap[1][3] = 0;
 
 	state->m_tilemap[0][1]->set_transparent_pen(0x0ff);
@@ -478,13 +478,13 @@ VIDEO_START( fromanc4 )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->m_tilemap[0][0] = tilemap_create(machine, fromancr_get_v0_l0_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
-	state->m_tilemap[0][1] = tilemap_create(machine, fromancr_get_v0_l1_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
-	state->m_tilemap[0][2] = tilemap_create(machine, fromancr_get_v0_l2_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
+	state->m_tilemap[0][0] = tilemap_create(machine, fromancr_get_v0_l0_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	state->m_tilemap[0][1] = tilemap_create(machine, fromancr_get_v0_l1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	state->m_tilemap[0][2] = tilemap_create(machine, fromancr_get_v0_l2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	state->m_tilemap[0][3] = 0;
-	state->m_tilemap[1][0] = tilemap_create(machine, fromancr_get_v1_l0_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
-	state->m_tilemap[1][1] = tilemap_create(machine, fromancr_get_v1_l1_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
-	state->m_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, tilemap_scan_rows, 8, 8, 256, 64);
+	state->m_tilemap[1][0] = tilemap_create(machine, fromancr_get_v1_l0_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	state->m_tilemap[1][1] = tilemap_create(machine, fromancr_get_v1_l1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	state->m_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	state->m_tilemap[1][3] = 0;
 
 	state->m_tilemap[0][1]->set_transparent_pen(0x000);

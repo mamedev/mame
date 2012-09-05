@@ -139,10 +139,10 @@ static TILE_GET_INFO( get_tile_info3 )
 VIDEO_START( namcos86 )
 {
 	namcos86_state *state = machine.driver_data<namcos86_state>();
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,8,8,64,32);
-	state->m_bg_tilemap[3] = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,8,8,64,32);
+	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info2,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[3] = tilemap_create(machine, get_tile_info3,TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_bg_tilemap[0]->set_transparent_pen(7);
 	state->m_bg_tilemap[1]->set_transparent_pen(7);

@@ -143,8 +143,8 @@ static TILE_GET_INFO( get_tile_info2 )
 static VIDEO_START(dunhuang)
 {
 	dunhuang_state *state = machine.driver_data<dunhuang_state>();
-	state->m_tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20);
-	state->m_tmap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8,32, 0x40,0x8);
+	state->m_tmap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
+	state->m_tmap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
 
 	state->m_tmap->set_transparent_pen(0);
 	state->m_tmap2->set_transparent_pen(0);

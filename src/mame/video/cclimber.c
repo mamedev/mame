@@ -445,11 +445,11 @@ static TILE_GET_INFO( toproller_get_bg_tile_info )
 VIDEO_START( cclimber )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	state->m_pf_tilemap = tilemap_create(machine, cclimber_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_pf_tilemap = tilemap_create(machine, cclimber_get_pf_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_pf_tilemap->set_transparent_pen(0);
 	state->m_pf_tilemap->set_scroll_cols(32);
 
-	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bs_tilemap->set_scroll_cols(1);
 	state->m_bs_tilemap->set_scroll_rows(1);
 	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
@@ -460,11 +460,11 @@ VIDEO_START( cclimber )
 VIDEO_START( swimmer )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	state->m_pf_tilemap = tilemap_create(machine, swimmer_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_pf_tilemap = tilemap_create(machine, swimmer_get_pf_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_pf_tilemap->set_transparent_pen(0);
 	state->m_pf_tilemap->set_scroll_cols(32);
 
-	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bs_tilemap->set_scroll_cols(1);
 	state->m_bs_tilemap->set_scroll_rows(1);
 	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
@@ -475,13 +475,13 @@ VIDEO_START( swimmer )
 VIDEO_START( toprollr )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	state->m_pf_tilemap = tilemap_create(machine, toprollr_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_pf_tilemap = tilemap_create(machine, toprollr_get_pf_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_pf_tilemap->set_transparent_pen(0);
 
-	state->m_toproller_bg_tilemap = tilemap_create(machine, toproller_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_toproller_bg_tilemap = tilemap_create(machine, toproller_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_toproller_bg_tilemap->set_scroll_rows(1);
 
-	state->m_bs_tilemap = tilemap_create(machine, toprollr_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bs_tilemap = tilemap_create(machine, toprollr_get_bs_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bs_tilemap->set_scroll_cols(1);
 	state->m_bs_tilemap->set_scroll_rows(1);
 	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */

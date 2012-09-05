@@ -192,7 +192,7 @@ static TILE_GET_INFO( get_tile_info_bigfight_1 )
 VIDEO_START( apache3 )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	state->m_tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_tx_layer = tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 	state->m_shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 	state->m_temp_bitmap.allocate(512, 512);
 	state->m_apache3_road_x_ram = auto_alloc_array(machine, UINT8, 512);
@@ -203,7 +203,7 @@ VIDEO_START( apache3 )
 VIDEO_START( roundup5 )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	state->m_tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->m_tx_layer = tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
 	state->m_shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 	state->m_roundup5_vram = auto_alloc_array(machine, UINT16, (0x48000 * 4)/2);
 
@@ -215,11 +215,11 @@ VIDEO_START( roundup5 )
 VIDEO_START( cyclwarr )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	state->m_layer0 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,64,512);
-	//state->m_layer1 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,64,512);
-	state->m_layer1 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
-	state->m_layer2 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
-	state->m_layer3 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
+	state->m_layer0 = tilemap_create(machine, get_tile_info_bigfight_0,TILEMAP_SCAN_ROWS,8,8,64,512);
+	//state->m_layer1 = tilemap_create(machine, get_tile_info_bigfight_0,TILEMAP_SCAN_ROWS,8,8,64,512);
+	state->m_layer1 = tilemap_create(machine, get_tile_info_bigfight_0,TILEMAP_SCAN_ROWS,8,8,128,256);
+	state->m_layer2 = tilemap_create(machine, get_tile_info_bigfight_1,TILEMAP_SCAN_ROWS,8,8,64,512);
+	state->m_layer3 = tilemap_create(machine, get_tile_info_bigfight_1,TILEMAP_SCAN_ROWS,8,8,64,512);
 
 	state->m_shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 }
@@ -227,10 +227,10 @@ VIDEO_START( cyclwarr )
 VIDEO_START( bigfight )
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	state->m_layer0 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
-	state->m_layer1 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
-	state->m_layer2 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
-	state->m_layer3 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
+	state->m_layer0 = tilemap_create(machine, get_tile_info_bigfight_0,TILEMAP_SCAN_ROWS,8,8,128,256);
+	state->m_layer1 = tilemap_create(machine, get_tile_info_bigfight_0,TILEMAP_SCAN_ROWS,8,8,128,256);
+	state->m_layer2 = tilemap_create(machine, get_tile_info_bigfight_1,TILEMAP_SCAN_ROWS,8,8,128,256);
+	state->m_layer3 = tilemap_create(machine, get_tile_info_bigfight_1,TILEMAP_SCAN_ROWS,8,8,128,256);
 
 	state->m_shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 }

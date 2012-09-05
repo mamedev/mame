@@ -176,7 +176,7 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 	}
 
 #if TILEMAPS
-	state->m_bg_tilemap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
+	state->m_bg_tilemap = tilemap_create(	machine, get_tile_info, TILEMAP_SCAN_COLS,
 
 								8, 8, 0x20*((state->m_text_dim > 0)?4:8), 0x20);
 

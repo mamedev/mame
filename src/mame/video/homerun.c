@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_homerun_tile_info )
 VIDEO_START( homerun )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
-	state->m_tilemap = tilemap_create(machine, get_homerun_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_tilemap = tilemap_create(machine, get_homerun_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

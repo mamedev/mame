@@ -165,8 +165,8 @@ PALETTE_INIT (pitnrun)
 VIDEO_START(pitnrun)
 {
 	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_fg = tilemap_create( machine, get_tile_info1,tilemap_scan_rows,8,8,32,32 );
-	state->m_bg = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,32*4,32 );
+	state->m_fg = tilemap_create( machine, get_tile_info1,TILEMAP_SCAN_ROWS,8,8,32,32 );
+	state->m_bg = tilemap_create( machine, get_tile_info2,TILEMAP_SCAN_ROWS,8,8,32*4,32 );
 	state->m_fg->set_transparent_pen(0 );
 	state->m_tmp_bitmap[0] = auto_bitmap_ind16_alloc(machine,128,128);
 	state->m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine,128,128);

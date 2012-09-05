@@ -159,7 +159,7 @@ VIDEO_START( gottlieb )
 	state->m_transparent0 = FALSE;
 
 	/* configure the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
@@ -186,7 +186,7 @@ VIDEO_START( screwloo )
 	state->m_transparent0 = FALSE;
 
 	/* configure the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_screwloo_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_screwloo_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 

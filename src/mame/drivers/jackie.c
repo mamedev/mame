@@ -183,15 +183,15 @@ static TILE_GET_INFO( get_jackie_reel3_tile_info )
 static VIDEO_START(jackie)
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	state->m_reel1_tilemap = tilemap_create(machine,get_jackie_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_jackie_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_jackie_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	state->m_reel1_tilemap = tilemap_create(machine,get_jackie_reel1_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	state->m_reel2_tilemap = tilemap_create(machine,get_jackie_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	state->m_reel3_tilemap = tilemap_create(machine,get_jackie_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);
 	state->m_reel3_tilemap->set_scroll_cols(64);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

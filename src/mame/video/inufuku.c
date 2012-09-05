@@ -214,8 +214,8 @@ VIDEO_START( inufuku )
 {
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_inufuku_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_tx_tilemap = tilemap_create(machine, get_inufuku_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_inufuku_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tx_tilemap = tilemap_create(machine, get_inufuku_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_bg_tilemap->set_transparent_pen(255);
 	state->m_tx_tilemap->set_transparent_pen(255);

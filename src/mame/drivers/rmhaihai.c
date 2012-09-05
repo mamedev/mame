@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( rmhaihai )
 {
 	rmhaihai_state *state = machine.driver_data<rmhaihai_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
 		8, 8, 64, 32);
 }
 

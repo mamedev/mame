@@ -38,7 +38,7 @@ VIDEO_START( foodf )
 	foodf_state *state = machine.driver_data<foodf_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 32,32);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 32,32);
 	state->m_playfield_tilemap->set_transparent_pen(0);
 
 	/* adjust the playfield for the 8 pixel offset */

@@ -135,7 +135,7 @@ static VIDEO_START( madalien )
 		16, 16, 32, 32
 	};
 
-	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_FG, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
+	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_FG, TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	state->m_tilemap_fg->set_transparent_pen(0);
 	state->m_tilemap_fg->set_scrolldx(0, 0x50);
 	state->m_tilemap_fg->set_scrolldy(0, 0x20);

@@ -117,8 +117,8 @@ static void register_savestate(running_machine &machine)
 VIDEO_START( m72 )
 {
 	m72_state *state = machine.driver_data<m72_state>();
-	state->m_bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->m_fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
@@ -157,8 +157,8 @@ VIDEO_START( xmultipl )
 VIDEO_START( rtype2 )
 {
 	m72_state *state = machine.driver_data<m72_state>();
-	state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->m_fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
@@ -205,9 +205,9 @@ VIDEO_START( majtitle )
 	m72_state *state = machine.driver_data<m72_state>();
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
-//  state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,256,64);
+//  state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,256,64);
 	state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
-	state->m_fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
@@ -233,8 +233,8 @@ VIDEO_START( majtitle )
 VIDEO_START( hharry )
 {
 	m72_state *state = machine.driver_data<m72_state>();
-	state->m_bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->m_fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
+	state->m_bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 

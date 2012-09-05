@@ -202,7 +202,7 @@ VIDEO_START( bwing )
 	UINT32 *dwptr;
 	int i;
 
-	state->m_charmap = tilemap_create(machine, get_charinfo, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_charmap = tilemap_create(machine, get_charinfo, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_fgmap = tilemap_create(machine, get_fgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
 	state->m_bgmap = tilemap_create(machine, get_bgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
 

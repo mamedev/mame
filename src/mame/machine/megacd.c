@@ -2304,10 +2304,10 @@ void segacd_init_main_cpu( running_machine& machine )
 	machine.gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine.gfx[15]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 
-	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
-	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
-	segacd_stampmap[2] = tilemap_create(machine, get_stampmap_16x16_16x16_tile_info, tilemap_scan_rows, 16, 16, 256, 256); // 128kb!
-	segacd_stampmap[3] = tilemap_create(machine, get_stampmap_32x32_16x16_tile_info, tilemap_scan_rows, 32, 32, 128, 128); // 32kb!
+	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
+	segacd_stampmap[2] = tilemap_create(machine, get_stampmap_16x16_16x16_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
+	segacd_stampmap[3] = tilemap_create(machine, get_stampmap_32x32_16x16_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
 }
 
 

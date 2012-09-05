@@ -396,7 +396,7 @@ VIDEO_START( galaxian )
 	if (!state->m_sfx_tilemap)
 	{
 		/* normal galaxian hardware is row-based and individually scrolling columns */
-		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, GALAXIAN_XSCALE*8,8, 32,32);
+		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS, GALAXIAN_XSCALE*8,8, 32,32);
 		state->m_bg_tilemap->set_scroll_cols(32);
 		state->m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
 		state->m_bg_tilemap->set_scrolldy(0, 8);
@@ -404,7 +404,7 @@ VIDEO_START( galaxian )
 	else
 	{
 		/* sfx hardware is column-based and individually scrolling rows */
-		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_cols, GALAXIAN_XSCALE*8,8, 32,32);
+		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_COLS, GALAXIAN_XSCALE*8,8, 32,32);
 		state->m_bg_tilemap->set_scroll_rows(32);
 		state->m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
 		state->m_bg_tilemap->set_scrolldy(0, 8);

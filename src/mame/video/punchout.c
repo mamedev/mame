@@ -129,12 +129,12 @@ static TILEMAP_MAPPER( armwrest_bs1_scan_flipx )
 VIDEO_START( punchout )
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_bg_top_tilemap = tilemap_create(machine, top_get_info, tilemap_scan_rows,  8,8, 32,32);
-	state->m_bg_bot_tilemap = tilemap_create(machine, bot_get_info, tilemap_scan_rows,  8,8, 64,32);
+	state->m_bg_top_tilemap = tilemap_create(machine, top_get_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	state->m_bg_bot_tilemap = tilemap_create(machine, bot_get_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 	state->m_bg_bot_tilemap->set_scroll_rows(32);
 
-	state->m_spr1_tilemap = tilemap_create(machine, bs1_get_info, tilemap_scan_rows,  8,8, 16,32);
-	state->m_spr2_tilemap = tilemap_create(machine, bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
+	state->m_spr1_tilemap = tilemap_create(machine, bs1_get_info, TILEMAP_SCAN_ROWS,  8,8, 16,32);
+	state->m_spr2_tilemap = tilemap_create(machine, bs2_get_info, TILEMAP_SCAN_ROWS,  8,8, 16,32);
 
 	state->m_fg_tilemap = NULL;
 
@@ -146,13 +146,13 @@ VIDEO_START( punchout )
 VIDEO_START( armwrest )
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
-	state->m_bg_top_tilemap = tilemap_create(machine, armwrest_top_get_info, tilemap_scan_rows,  8,8, 32,32);
-	state->m_bg_bot_tilemap = tilemap_create(machine, armwrest_bot_get_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_top_tilemap = tilemap_create(machine, armwrest_top_get_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	state->m_bg_bot_tilemap = tilemap_create(machine, armwrest_bot_get_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	state->m_spr1_tilemap =       tilemap_create(machine, bs1_get_info, armwrest_bs1_scan,  8,8, 32,16);
 	state->m_spr1_tilemap_flipx = tilemap_create(machine, bs1_get_info, armwrest_bs1_scan_flipx,  8,8, 32,16);
-	state->m_spr2_tilemap = tilemap_create(machine, bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
-	state->m_fg_tilemap = tilemap_create(machine, armwrest_fg_get_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_spr2_tilemap = tilemap_create(machine, bs2_get_info, TILEMAP_SCAN_ROWS,  8,8, 16,32);
+	state->m_fg_tilemap = tilemap_create(machine, armwrest_fg_get_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	state->m_spr1_tilemap->set_transparent_pen(0x07);
 	state->m_spr1_tilemap_flipx->set_transparent_pen(0x07);

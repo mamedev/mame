@@ -117,8 +117,8 @@ VIDEO_START( bigtwin )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 
@@ -136,9 +136,9 @@ VIDEO_START( bigtwinb )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, bigtwinb_get_tx_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, bigtwinb_get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -159,9 +159,9 @@ VIDEO_START( wbeachvl )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, wbeachvl_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, wbeachvl_get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
-	state->m_bg_tilemap = tilemap_create(machine, wbeachvl_get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
+	state->m_tx_tilemap = tilemap_create(machine, wbeachvl_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, wbeachvl_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, wbeachvl_get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -179,8 +179,8 @@ VIDEO_START( excelsr )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 
@@ -197,9 +197,9 @@ VIDEO_START( hotmind )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -221,9 +221,9 @@ VIDEO_START( hrdtimes )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

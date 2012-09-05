@@ -231,9 +231,9 @@ VIDEO_START( wwfwfest )
     state_save_register_global(machine, state->m_bg1_scrollx);
     state_save_register_global(machine, state->m_bg1_scrolly);
 
-	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows, 16, 16,32,32);
-	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows, 16, 16,32,32);
+	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	state->m_fg0_tilemap->set_transparent_pen(0);
 	state->m_bg1_tilemap->set_transparent_pen(0);

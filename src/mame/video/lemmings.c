@@ -33,7 +33,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( lemmings )
 {
 	lemmings_state *state = machine.driver_data<lemmings_state>();
-	state->m_vram_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
+	state->m_vram_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	state->m_vram_tilemap->set_transparent_pen(0);
 	state->m_bitmap0.fill(0x100);

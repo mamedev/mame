@@ -212,8 +212,8 @@ VIDEO_START( firebatl )
 {
 	clshroad_state *state = machine.driver_data<clshroad_state>();
 	/* These 2 use the graphics and scroll value */
-	state->m_tilemap_0a = tilemap_create(machine, get_tile_info_0a,tilemap_scan_rows,16,16,0x20,0x10);
-	state->m_tilemap_0b = tilemap_create(machine, get_tile_info_0b,tilemap_scan_rows,16,16,0x20,0x10);
+	state->m_tilemap_0a = tilemap_create(machine, get_tile_info_0a,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	state->m_tilemap_0b = tilemap_create(machine, get_tile_info_0b,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
 	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_fb1,tilemap_scan_rows_extra,8,8,0x24,0x20);
 
@@ -236,8 +236,8 @@ VIDEO_START( clshroad )
 {
 	clshroad_state *state = machine.driver_data<clshroad_state>();
 	/* These 2 use the graphics and scroll value */
-	state->m_tilemap_0a = tilemap_create(machine, get_tile_info_0a,tilemap_scan_rows,16,16,0x20,0x10);
-	state->m_tilemap_0b = tilemap_create(machine, get_tile_info_0b,tilemap_scan_rows,16,16,0x20,0x10);
+	state->m_tilemap_0a = tilemap_create(machine, get_tile_info_0a,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	state->m_tilemap_0b = tilemap_create(machine, get_tile_info_0b,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
 	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows_extra,8,8,0x24,0x20);
 

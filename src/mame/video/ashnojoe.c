@@ -200,13 +200,13 @@ VIDEO_START( ashnojoe )
 {
 	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->m_joetilemap = tilemap_create(machine, get_joe_tile_info,  tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_joetilemap2 = tilemap_create(machine, get_joe_tile_info_2, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_joetilemap3 = tilemap_create(machine, get_joe_tile_info_3, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_joetilemap4 = tilemap_create(machine, get_joe_tile_info_4, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_joetilemap5 = tilemap_create(machine, get_joe_tile_info_5, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_joetilemap6 = tilemap_create(machine, get_joe_tile_info_6, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_joetilemap7 = tilemap_create(machine, get_joe_tile_info_7, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_joetilemap = tilemap_create(machine, get_joe_tile_info,  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_joetilemap2 = tilemap_create(machine, get_joe_tile_info_2, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap3 = tilemap_create(machine, get_joe_tile_info_3, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_joetilemap4 = tilemap_create(machine, get_joe_tile_info_4, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_joetilemap5 = tilemap_create(machine, get_joe_tile_info_5, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap6 = tilemap_create(machine, get_joe_tile_info_6, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap7 = tilemap_create(machine, get_joe_tile_info_7, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_joetilemap->set_transparent_pen(15);
 	state->m_joetilemap2->set_transparent_pen(15);

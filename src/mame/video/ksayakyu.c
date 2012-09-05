@@ -117,8 +117,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 VIDEO_START(ksayakyu)
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	state->m_tilemap = tilemap_create(machine, get_ksayakyu_tile_info, tilemap_scan_rows, 8, 8, 32, 32 * 8);
-	state->m_textmap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tilemap = tilemap_create(machine, get_ksayakyu_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
+	state->m_textmap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_textmap->set_transparent_pen(0);
 }
 

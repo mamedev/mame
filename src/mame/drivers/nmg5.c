@@ -850,8 +850,8 @@ static VIDEO_START( nmg5 )
 {
 	nmg5_state *state = machine.driver_data<nmg5_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

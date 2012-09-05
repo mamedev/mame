@@ -53,7 +53,7 @@ VIDEO_START( sprint4 )
 	sprint4_state *state = machine.driver_data<sprint4_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_playfield = tilemap_create(machine, sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_playfield = tilemap_create(machine, sprint4_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

@@ -470,9 +470,9 @@ static TILE_GET_INFO( get_gs3_tile_info )
 static VIDEO_START(gstream)
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	state->m_tilemap1 = tilemap_create(machine, get_gs1_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, get_gs2_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
-	state->m_tilemap3 = tilemap_create(machine, get_gs3_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
+	state->m_tilemap1 = tilemap_create(machine, get_gs1_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	state->m_tilemap2 = tilemap_create(machine, get_gs2_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	state->m_tilemap3 = tilemap_create(machine, get_gs3_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
 
 	state->m_tilemap1->set_transparent_pen(0);
 	state->m_tilemap2->set_transparent_pen(0);

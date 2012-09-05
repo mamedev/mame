@@ -110,7 +110,7 @@ VIDEO_START( fortyl )
 	state->m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine, 256, 256);
 	state->m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine, 256, 256);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_xoffset = 128;	// this never changes
 

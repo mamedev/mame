@@ -95,7 +95,7 @@ static VIDEO_START( midas )
 	midas_state *state = machine.driver_data<midas_state>();
 	state->m_gfxram = auto_alloc_array(machine, UINT16, 0x20000/2);
 
-	state->m_tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
+	state->m_tmap = tilemap_create(	machine, get_tile_info, TILEMAP_SCAN_COLS,
 							8,8, 0x80,0x20	);
 
 	state->m_tmap->set_transparent_pen(0);

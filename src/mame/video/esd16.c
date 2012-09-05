@@ -141,14 +141,14 @@ VIDEO_START( esd16 )
 {
 	esd16_state *state = machine.driver_data<esd16_state>();
 
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 0x80, 0x40);
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 0x80, 0x40);
+	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 
 	/* swatpolc changes tilemap 0 to 16x16 at various times */
-	state->m_tilemap_0_16x16 = tilemap_create(machine, get_tile_info_0_16x16, tilemap_scan_rows, 16,16, 0x40, 0x40);
+	state->m_tilemap_0_16x16 = tilemap_create(machine, get_tile_info_0_16x16, TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
-	state->m_tilemap_1_16x16 = tilemap_create(machine, get_tile_info_1_16x16, tilemap_scan_rows, 16,16, 0x40, 0x40);
+	state->m_tilemap_1_16x16 = tilemap_create(machine, get_tile_info_1_16x16, TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	state->m_tilemap_0->set_scrolldx(-0x60 + 2, -0x60);
 	state->m_tilemap_1->set_scrolldx(-0x60, -0x60 + 2);

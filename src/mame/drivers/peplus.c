@@ -959,7 +959,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( peplus )
 {
 	peplus_state *state = machine.driver_data<peplus_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 	state->m_palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(state->m_palette_ram, 0, 0x3000);
 	state->m_palette_ram2 = auto_alloc_array(machine, UINT8, 0x3000);

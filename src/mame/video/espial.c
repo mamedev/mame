@@ -90,7 +90,7 @@ VIDEO_START( espial )
 {
 	espial_state *state = machine.driver_data<espial_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_item(NAME(state->m_flipscreen));
@@ -101,7 +101,7 @@ VIDEO_START( netwars )
 	espial_state *state = machine.driver_data<espial_state>();
 
 	/* Net Wars has a tile map that's twice as big as Espial's */
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 	state->m_bg_tilemap->set_scrolldy(0, 0x100);

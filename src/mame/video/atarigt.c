@@ -92,7 +92,7 @@ VIDEO_START( atarigt )
 	state->m_rle = machine.device("rle");
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 
 	/* allocate temp bitmaps */
 	width = machine.primary_screen->width();

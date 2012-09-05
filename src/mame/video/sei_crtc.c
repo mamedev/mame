@@ -255,11 +255,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 VIDEO_START( seibu_crtc )
 {
-	sc0_tilemap = tilemap_create(machine, seibucrtc_sc0_tile_info,tilemap_scan_rows,16,16,32,32);
-	sc2_tilemap = tilemap_create(machine, seibucrtc_sc2_tile_info,tilemap_scan_rows,16,16,32,32);
-	sc1_tilemap = tilemap_create(machine, seibucrtc_sc1_tile_info,tilemap_scan_rows,16,16,32,32);
-	sc3_tilemap_0 = tilemap_create(machine, seibucrtc_sc3_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	sc3_tilemap_1 = tilemap_create(machine, seibucrtc_sc3_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	sc0_tilemap = tilemap_create(machine, seibucrtc_sc0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	sc2_tilemap = tilemap_create(machine, seibucrtc_sc2_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	sc1_tilemap = tilemap_create(machine, seibucrtc_sc1_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	sc3_tilemap_0 = tilemap_create(machine, seibucrtc_sc3_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	sc3_tilemap_1 = tilemap_create(machine, seibucrtc_sc3_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	sc2_tilemap->set_transparent_pen(15);
 	sc1_tilemap->set_transparent_pen(15);

@@ -189,9 +189,9 @@ static TILE_GET_INFO( get_layer2_tile_info )
 static VIDEO_START( magic10 )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer0_tilemap = tilemap_create(machine, get_layer0_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->m_layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_layer0_tilemap = tilemap_create(machine, get_layer0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_layer1_tilemap->set_transparent_pen(0);
 	state->m_layer2_tilemap->set_transparent_pen(0);

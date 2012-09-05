@@ -104,19 +104,19 @@ VIDEO_START( mcr )
 	switch (mcr_cpu_board)
 	{
 		case 90009:
-			bg_tilemap = tilemap_create(machine, mcr_90009_get_tile_info, tilemap_scan_rows,  16,16, 32,30);
+			bg_tilemap = tilemap_create(machine, mcr_90009_get_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		case 90010:
-			bg_tilemap = tilemap_create(machine, mcr_90010_get_tile_info, tilemap_scan_rows,  16,16, 32,30);
+			bg_tilemap = tilemap_create(machine, mcr_90010_get_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		case 91475:
-			bg_tilemap = tilemap_create(machine, mcr_90010_get_tile_info, tilemap_scan_rows,  16,16, 32,30);
+			bg_tilemap = tilemap_create(machine, mcr_90010_get_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		case 91490:
-			bg_tilemap = tilemap_create(machine, mcr_91490_get_tile_info, tilemap_scan_rows,  16,16, 32,30);
+			bg_tilemap = tilemap_create(machine, mcr_91490_get_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
 			break;
 
 		default:

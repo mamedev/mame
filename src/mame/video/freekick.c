@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_freek_tile_info )
 VIDEO_START( freekick )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
-	state->m_freek_tilemap = tilemap_create(machine, get_freek_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_freek_tilemap = tilemap_create(machine, get_freek_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

@@ -397,14 +397,14 @@ VIDEO_START( tceptor )
 
 	namco_road_set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,  8, 8, 34, 28);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,  8, 8, 34, 28);
 
 	state->m_tx_tilemap->set_scrollx(0, -2*8);
 	state->m_tx_tilemap->set_scrolly(0, 0);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 7);
 
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state_save_register_global_pointer(machine, state->m_sprite_ram_buffered, 0x200 / 2);
 	state_save_register_global(machine, state->m_bg1_scroll_x);

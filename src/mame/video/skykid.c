@@ -115,7 +115,7 @@ VIDEO_START( skykid )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
 	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,     8,8,64,32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 

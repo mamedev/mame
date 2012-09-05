@@ -93,7 +93,7 @@ VIDEO_START( mcr3 )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 #endif
 
@@ -102,7 +102,7 @@ VIDEO_START( mcrmono )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, mcrmono_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
+	state->m_bg_tilemap = tilemap_create(machine, mcrmono_get_bg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 
 
@@ -113,7 +113,7 @@ VIDEO_START( spyhunt )
 	state->m_bg_tilemap = tilemap_create(machine, spyhunt_get_bg_tile_info, spyhunt_bg_scan,  64,32, 64,32);
 
 	/* initialize the text tilemap */
-	state->m_alpha_tilemap = tilemap_create(machine, spyhunt_get_alpha_tile_info, tilemap_scan_cols,  16,16, 32,32);
+	state->m_alpha_tilemap = tilemap_create(machine, spyhunt_get_alpha_tile_info, TILEMAP_SCAN_COLS,  16,16, 32,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 	state->m_alpha_tilemap->set_scrollx(0, 16);
 

@@ -577,7 +577,7 @@ static VIDEO_START( subsino2 )
 	{
 		layer_t *l = &state->m_layers[i];
 
-		l->tmap = tilemap_create(machine, i ? ss9601_get_tile_info_1 : ss9601_get_tile_info_0, tilemap_scan_rows, 8,8, 0x80,0x40);
+		l->tmap = tilemap_create(machine, i ? ss9601_get_tile_info_1 : ss9601_get_tile_info_0, TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
 
 		l->tmap->set_transparent_pen(0);
 

@@ -95,10 +95,10 @@ PALETTE_INIT( fuuki16 )
 VIDEO_START( fuuki16 )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
-	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);
-	state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_tilemap[0]->set_transparent_pen(0x0f);	// 4 bits
 	state->m_tilemap[1]->set_transparent_pen(0xff);	// 8 bits

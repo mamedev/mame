@@ -137,9 +137,9 @@ WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 static VIDEO_START( warpspeed )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
-	state->m_text_tilemap = tilemap_create(machine, get_warpspeed_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_text_tilemap = tilemap_create(machine, get_warpspeed_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_text_tilemap->set_transparent_pen(0);
-	state->m_starfield_tilemap = tilemap_create(machine, get_warpspeed_starfield_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_starfield_tilemap = tilemap_create(machine, get_warpspeed_starfield_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_starfield_tilemap->mark_all_dirty();
 }
 

@@ -170,7 +170,7 @@ VIDEO_START( lasso )
 	lasso_state *state = machine.driver_data<lasso_state>();
 
 	/* create tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, lasso_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, lasso_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
@@ -180,8 +180,8 @@ VIDEO_START( wwjgtin )
 	lasso_state *state = machine.driver_data<lasso_state>();
 
 	/* create tilemaps */
-	state->m_bg_tilemap =    tilemap_create(machine, lasso_get_bg_tile_info,      tilemap_scan_rows,  8,  8,  32, 32);
-	state->m_track_tilemap = tilemap_create(machine, wwjgtin_get_track_tile_info, tilemap_scan_rows, 16, 16, 128, 64);
+	state->m_bg_tilemap =    tilemap_create(machine, lasso_get_bg_tile_info,      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
+	state->m_track_tilemap = tilemap_create(machine, wwjgtin_get_track_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
@@ -191,7 +191,7 @@ VIDEO_START( pinbo )
 	lasso_state *state = machine.driver_data<lasso_state>();
 
 	/* create tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, pinbo_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, pinbo_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 }

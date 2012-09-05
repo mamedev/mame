@@ -55,9 +55,9 @@ static TILE_GET_INFO( get_bg2_tile_info )
 VIDEO_START( msisaac )
 {
 	msisaac_state *state = machine.driver_data<msisaac_state>();
-	state->m_bg_tilemap  = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_fg_tilemap  = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap  = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap  = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg2_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

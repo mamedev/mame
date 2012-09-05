@@ -73,8 +73,8 @@ VIDEO_START( rpunch )
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	/* allocate tilemaps for the backgrounds */
-	state->m_background[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_cols,8,8,64,64);
-	state->m_background[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_cols,8,8,64,64);
+	state->m_background[0] = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_COLS,8,8,64,64);
+	state->m_background[1] = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_COLS,8,8,64,64);
 
 	/* configure the tilemaps */
 	state->m_background[1]->set_transparent_pen(15);

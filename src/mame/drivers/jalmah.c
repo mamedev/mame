@@ -304,8 +304,8 @@ static VIDEO_START( jalmah )
 	state->m_sc2_tilemap_2 = tilemap_create(machine, get_sc2_tile_info,range2_16x16,16,16,64,128);
 	state->m_sc2_tilemap_3 = tilemap_create(machine, get_sc2_tile_info,range3_16x16,16,16,32,256);
 
-	state->m_sc3_tilemap_0 = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
-	//state->m_sc3_tilemap_1 = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
+	state->m_sc3_tilemap_0 = tilemap_create(machine, get_sc3_tile_info,TILEMAP_SCAN_COLS,8,8,256,32);
+	//state->m_sc3_tilemap_1 = tilemap_create(machine, get_sc3_tile_info,TILEMAP_SCAN_COLS,8,8,256,32);
 	state->m_sc3_tilemap_2 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
 	state->m_sc3_tilemap_3 = tilemap_create(machine, get_sc3_tile_info,range3_8x8,8,8,64,128);
 

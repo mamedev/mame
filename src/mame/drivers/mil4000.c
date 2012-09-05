@@ -179,10 +179,10 @@ static TILE_GET_INFO( get_sc3_tile_info )
 static VIDEO_START(mil4000)
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->m_sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->m_sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->m_sc3_tilemap = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc3_tilemap = tilemap_create(machine, get_sc3_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_sc1_tilemap->set_transparent_pen(0);
 	state->m_sc2_tilemap->set_transparent_pen(0);

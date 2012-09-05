@@ -81,10 +81,10 @@ void segas24_tile::device_start()
 	char_ram = auto_alloc_array(machine(), UINT16, 0x80000/2);
 	tile_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
 
-	tile_layer[0] = tilemap_create_device(this, tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
-	tile_layer[1] = tilemap_create_device(this, tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
-	tile_layer[2] = tilemap_create_device(this, tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
-	tile_layer[3] = tilemap_create_device(this, tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
+	tile_layer[0] = tilemap_create_device(this, tile_info_0s, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[1] = tilemap_create_device(this, tile_info_0w, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[2] = tilemap_create_device(this, tile_info_1s, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[3] = tilemap_create_device(this, tile_info_1w, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 
 	tile_layer[0]->set_transparent_pen(0);
 	tile_layer[1]->set_transparent_pen(0);

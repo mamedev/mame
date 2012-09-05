@@ -107,7 +107,7 @@ VIDEO_START( tank8 )
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 	machine.primary_screen->register_screen_bitmap(state->m_helper3);
 
-	state->m_tilemap = tilemap_create(machine, tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tilemap = tilemap_create(machine, tank8_get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 

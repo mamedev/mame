@@ -84,8 +84,8 @@ VIDEO_START( thoop2 )
 	thoop2_state *state = machine.driver_data<thoop2_state>();
 	int i;
 
-	state->m_pant[0] = tilemap_create(machine, get_tile_info_thoop2_screen0,tilemap_scan_rows,16,16,32,32);
-	state->m_pant[1] = tilemap_create(machine, get_tile_info_thoop2_screen1,tilemap_scan_rows,16,16,32,32);
+	state->m_pant[0] = tilemap_create(machine, get_tile_info_thoop2_screen0,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_pant[1] = tilemap_create(machine, get_tile_info_thoop2_screen1,TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	state->m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	state->m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */

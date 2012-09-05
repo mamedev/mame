@@ -245,15 +245,15 @@ VIDEO_START( tetrisp2 )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	state->m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
+	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,
 
 								16,16,NX_0,NY_0);
 
-	state->m_tilemap_fg = tilemap_create(	machine, get_tile_info_fg,tilemap_scan_rows,
+	state->m_tilemap_fg = tilemap_create(	machine, get_tile_info_fg,TILEMAP_SCAN_ROWS,
 
 								8,8,NX_1,NY_1);
 
-	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,tilemap_scan_rows,
+	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,TILEMAP_SCAN_ROWS,
 
 								16,16,NX_0*2,NY_0*2);
 
@@ -278,15 +278,15 @@ VIDEO_START( rockntread )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	state->m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
+	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,
 
 								16, 16, 256, 16);	// rockn ms(main),1,2,3,4
 
-	state->m_tilemap_fg = tilemap_create(	machine, get_tile_info_fg,tilemap_scan_rows,
+	state->m_tilemap_fg = tilemap_create(	machine, get_tile_info_fg,TILEMAP_SCAN_ROWS,
 
 								8, 8, 64, 64);
 
-	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,tilemap_scan_rows,
+	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,TILEMAP_SCAN_ROWS,
 
 								16, 16, 128, 128);
 
@@ -305,15 +305,15 @@ VIDEO_START( rocknms )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	VIDEO_START_CALL( rockntread );
 
-	state->m_tilemap_sub_bg = tilemap_create(machine, get_tile_info_rocknms_sub_bg,tilemap_scan_rows,
+	state->m_tilemap_sub_bg = tilemap_create(machine, get_tile_info_rocknms_sub_bg,TILEMAP_SCAN_ROWS,
 
 					16, 16, 32, 256);	// rockn ms(sub)
 
-	state->m_tilemap_sub_fg = tilemap_create(machine, get_tile_info_rocknms_sub_fg,tilemap_scan_rows,
+	state->m_tilemap_sub_fg = tilemap_create(machine, get_tile_info_rocknms_sub_fg,TILEMAP_SCAN_ROWS,
 
 					8, 8, 64, 64);
 
-	state->m_tilemap_sub_rot = tilemap_create( machine, get_tile_info_rocknms_sub_rot,tilemap_scan_rows,
+	state->m_tilemap_sub_rot = tilemap_create( machine, get_tile_info_rocknms_sub_rot,TILEMAP_SCAN_ROWS,
 
 					16, 16, 128, 128);
 
@@ -783,14 +783,14 @@ VIDEO_START( stepstag )
 	stepstag_state *state = machine.driver_data<stepstag_state>();
 	state->m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
+	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,
 											16,16,NX_0,NY_0);
 
 	// Temporary hack
-	state->m_tilemap_fg = tilemap_create(	machine, stepstag_get_tile_info_fg,tilemap_scan_rows,
+	state->m_tilemap_fg = tilemap_create(	machine, stepstag_get_tile_info_fg,TILEMAP_SCAN_ROWS,
 											8,8,NX_1,NY_1);
 
-	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,tilemap_scan_rows,
+	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,TILEMAP_SCAN_ROWS,
 											16,16,NX_0*2,NY_0*2);
 
 	state->m_tilemap_bg->set_transparent_pen(0);

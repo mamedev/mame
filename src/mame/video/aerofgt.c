@@ -100,7 +100,7 @@ static void aerofgt_register_state_globals( running_machine &machine )
 VIDEO_START( pspikes )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
 	/* no bg2 in this game */
 
 	state->m_sprite_gfx = 1;
@@ -113,8 +113,8 @@ VIDEO_START( pspikes )
 VIDEO_START( karatblz )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, karatblz_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
-	state->m_bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_bg1_tilemap = tilemap_create(machine, karatblz_bg1_tile_info,TILEMAP_SCAN_ROWS,     8,8,64,64);
+	state->m_bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_bg2_tilemap->set_transparent_pen(15);
 	state->m_spritepalettebank = 0;
@@ -128,8 +128,8 @@ VIDEO_START( spinlbrk )
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 
-	state->m_bg1_tilemap = tilemap_create(machine, spinlbrk_bg1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_bg1_tilemap = tilemap_create(machine, spinlbrk_bg1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_bg2_tilemap->set_transparent_pen(15);
 
@@ -155,8 +155,8 @@ VIDEO_START( spinlbrk )
 VIDEO_START( turbofrc )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_bg2_tilemap->set_transparent_pen(15);
 
@@ -169,7 +169,7 @@ VIDEO_START( turbofrc )
 VIDEO_START( wbbc97 )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	/* no bg2 in this game */
 
 	state->m_bg1_tilemap->set_transparent_pen(15);

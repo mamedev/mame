@@ -156,9 +156,9 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 static VIDEO_START(pturn)
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
-	state->m_fgmap = tilemap_create(machine, get_pturn_tile_info,tilemap_scan_rows,8, 8,32,32);
+	state->m_fgmap = tilemap_create(machine, get_pturn_tile_info,TILEMAP_SCAN_ROWS,8, 8,32,32);
 	state->m_fgmap->set_transparent_pen(0);
-	state->m_bgmap = tilemap_create(machine, get_pturn_bg_tile_info,tilemap_scan_rows,8, 8,32,32*8);
+	state->m_bgmap = tilemap_create(machine, get_pturn_bg_tile_info,TILEMAP_SCAN_ROWS,8, 8,32,32*8);
 	state->m_bgmap->set_transparent_pen(0);
 }
 

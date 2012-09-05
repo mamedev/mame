@@ -185,8 +185,8 @@ VIDEO_START( galivan )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 }
@@ -195,8 +195,8 @@ VIDEO_START( ninjemak )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, ninjemak_get_bg_tile_info, tilemap_scan_cols, 16, 16, 512, 32);
-	state->m_tx_tilemap = tilemap_create(machine, ninjemak_get_tx_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, ninjemak_get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 512, 32);
+	state->m_tx_tilemap = tilemap_create(machine, ninjemak_get_tx_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 }

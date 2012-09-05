@@ -382,7 +382,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 static VIDEO_START( ddayjlc )
 {
 	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( ddayjlc )

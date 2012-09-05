@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( trucocl )
 {
 	trucocl_state *state = machine.driver_data<trucocl_state>();
-	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32 );
+	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32 );
 }
 
 SCREEN_UPDATE_IND16( trucocl )

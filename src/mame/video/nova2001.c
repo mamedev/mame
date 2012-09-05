@@ -162,8 +162,8 @@ static TILE_GET_INFO( raiders5_get_fg_tile_info )
 VIDEO_START( nova2001 )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, nova2001_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, nova2001_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, nova2001_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, nova2001_get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, -7);
 }
@@ -171,15 +171,15 @@ VIDEO_START( nova2001 )
 VIDEO_START( pkunwar )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, pkunwar_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, pkunwar_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START( ninjakun )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, ninjakun_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, ninjakun_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, ninjakun_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, ninjakun_get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(7, 0);
 }
@@ -187,8 +187,8 @@ VIDEO_START( ninjakun )
 VIDEO_START( raiders5 )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, raiders5_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, raiders5_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, raiders5_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, raiders5_get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(7, 0);
 }

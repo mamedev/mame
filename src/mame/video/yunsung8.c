@@ -175,8 +175,8 @@ VIDEO_START( yunsung8 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, DIM_NX_0, DIM_NY_0 );
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, DIM_NX_1, DIM_NY_1 );
+	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
+	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
 
 	state->m_tilemap_1->set_transparent_pen(0);
 }

@@ -72,8 +72,8 @@ static TILE_GET_INFO( get_tile_info_B )
 VIDEO_START( flkatck )
 {
 	flkatck_state *state = machine.driver_data<flkatck_state>();
-	state->m_k007121_tilemap[0] = tilemap_create(machine, get_tile_info_A, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_k007121_tilemap[1] = tilemap_create(machine, get_tile_info_B, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_k007121_tilemap[0] = tilemap_create(machine, get_tile_info_A, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_k007121_tilemap[1] = tilemap_create(machine, get_tile_info_B, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

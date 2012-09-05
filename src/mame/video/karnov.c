@@ -166,7 +166,7 @@ VIDEO_START( karnov )
 
 	/* Allocate bitmap & tilemap */
 	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->m_bitmap_f));
 
@@ -179,7 +179,7 @@ VIDEO_START( wndrplnt )
 
 	/* Allocate bitmap & tilemap */
 	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->m_bitmap_f));
 

@@ -190,8 +190,8 @@ WRITE16_MEMBER(terracre_state::amazon_scrollx_w)
 VIDEO_START( amazon )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
-	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
+	state->m_background = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_COLS,16,16,64,32);
+	state->m_foreground = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_COLS,8,8,64,32);
 	state->m_foreground->set_transparent_pen(0xf);
 
 	/* register for saving */

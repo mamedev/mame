@@ -236,8 +236,8 @@ VIDEO_START( marvins )
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
 	state->m_tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	state->m_fg_tilemap = tilemap_create(machine, marvins_get_fg_tile_info, tilemap_scan_cols,    8, 8, 64, 32);
-	state->m_bg_tilemap = tilemap_create(machine, marvins_get_bg_tile_info, tilemap_scan_cols,    8, 8, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, marvins_get_fg_tile_info, TILEMAP_SCAN_COLS,    8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, marvins_get_bg_tile_info, TILEMAP_SCAN_COLS,    8, 8, 64, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);
@@ -259,7 +259,7 @@ VIDEO_START( jcross )
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
 	state->m_tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	state->m_bg_tilemap = tilemap_create(machine, aso_get_bg_tile_info,     tilemap_scan_cols,    8, 8, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, aso_get_bg_tile_info,     TILEMAP_SCAN_COLS,    8, 8, 64, 64);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);
@@ -280,7 +280,7 @@ VIDEO_START( sgladiat )
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
 	state->m_tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	state->m_bg_tilemap = tilemap_create(machine, aso_get_bg_tile_info,     tilemap_scan_cols,    8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, aso_get_bg_tile_info,     TILEMAP_SCAN_COLS,    8, 8, 64, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);
@@ -326,7 +326,7 @@ VIDEO_START( tnk3 )
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
 	state->m_tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	state->m_bg_tilemap = tilemap_create(machine, tnk3_get_bg_tile_info,    tilemap_scan_cols,    8, 8, 64, 64);
+	state->m_bg_tilemap = tilemap_create(machine, tnk3_get_bg_tile_info,    TILEMAP_SCAN_COLS,    8, 8, 64, 64);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);
@@ -346,7 +346,7 @@ VIDEO_START( ikari )
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
 	state->m_tx_tilemap = tilemap_create(machine, ikari_get_tx_tile_info, marvins_tx_scan_cols,  8,  8, 36, 28);
-	state->m_bg_tilemap = tilemap_create(machine, ikari_get_bg_tile_info, tilemap_scan_cols,    16, 16, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, ikari_get_bg_tile_info, TILEMAP_SCAN_COLS,    16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);
@@ -368,8 +368,8 @@ VIDEO_START( gwar )
 
 	memset(state->m_empty_tile, 0xf, sizeof(state->m_empty_tile));
 
-	state->m_tx_tilemap = tilemap_create(machine, gwar_get_tx_tile_info, tilemap_scan_cols,  8,  8, 50, 32);
-	state->m_bg_tilemap = tilemap_create(machine, gwar_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, gwar_get_tx_tile_info, TILEMAP_SCAN_COLS,  8,  8, 50, 32);
+	state->m_bg_tilemap = tilemap_create(machine, gwar_get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 

@@ -137,9 +137,9 @@ WRITE16_MEMBER(ginganin_state::ginganin_txtram16_w)
 VIDEO_START( ginganin )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, BG_NX, BG_NY);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, FG_NX, FG_NY);
-	state->m_tx_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows, 8, 8, TXT_NX, TXT_NY);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
+	state->m_tx_tilemap = tilemap_create(machine, get_txt_tile_info, TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);

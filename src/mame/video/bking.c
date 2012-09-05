@@ -226,7 +226,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( bking )
 {
 	bking_state *state = machine.driver_data<bking_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap1);
 	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap2);
 

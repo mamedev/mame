@@ -162,12 +162,12 @@ static VIDEO_START(galaxi)
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
 
-	state->m_bg1_tmap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
-	state->m_bg2_tmap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
-	state->m_bg3_tmap = tilemap_create(machine, get_bg3_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
-	state->m_bg4_tmap = tilemap_create(machine, get_bg4_tile_info, tilemap_scan_rows, 16, 16, 0x20, 0x10);
+	state->m_bg1_tmap = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg2_tmap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg3_tmap = tilemap_create(machine, get_bg3_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg4_tmap = tilemap_create(machine, get_bg4_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 
-	state->m_fg_tmap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 0x40, 0x20);
+	state->m_fg_tmap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 
 	state->m_bg1_tmap->set_transparent_pen(0);
 	state->m_bg2_tmap->set_transparent_pen(0);

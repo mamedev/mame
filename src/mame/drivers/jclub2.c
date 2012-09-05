@@ -220,10 +220,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static VIDEO_START( darkhors )
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	state->m_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_tmap			=	tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
 												16,16, 0x40,0x40	);
 
-	state->m_tmap2			=	tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->m_tmap2			=	tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
 												16,16, 0x40,0x40	);
 
 	state->m_tmap->set_transparent_pen(0);

@@ -343,7 +343,7 @@ static TILE_GET_INFO( get_stisub_tile_info )
 static VIDEO_START( subsino )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
+	state->m_tmap = tilemap_create(	machine, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	state->m_tmap->set_transparent_pen(0 );
 	state->m_tiles_offset = 0;
 }
@@ -453,9 +453,9 @@ static VIDEO_START( subsino_reels )
 	subsino_state *state = machine.driver_data<subsino_state>();
 	VIDEO_START_CALL( subsino );
 
-	state->m_reel1_tilemap = tilemap_create(machine,get_subsino_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_subsino_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_subsino_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	state->m_reel1_tilemap = tilemap_create(machine,get_subsino_reel1_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel2_tilemap = tilemap_create(machine,get_subsino_reel2_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel3_tilemap = tilemap_create(machine,get_subsino_reel3_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);
@@ -466,12 +466,12 @@ static VIDEO_START( subsino_reels )
 static VIDEO_START( stisub )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_tmap = tilemap_create(	machine, get_stisub_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
+	state->m_tmap = tilemap_create(	machine, get_stisub_tile_info, TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	state->m_tmap->set_transparent_pen(0 );
 
-	state->m_reel1_tilemap = tilemap_create(machine,get_stisub_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_stisub_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_stisub_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	state->m_reel1_tilemap = tilemap_create(machine,get_stisub_reel1_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel2_tilemap = tilemap_create(machine,get_stisub_reel2_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel3_tilemap = tilemap_create(machine,get_stisub_reel3_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);

@@ -204,8 +204,8 @@ static VIDEO_START( dynadice )
 	dynadice_state *state = machine.driver_data<dynadice_state>();
 
 	/* pacman - style videoram layout */
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->m_top_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 2, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_top_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 	state->m_bg_tilemap->set_scrollx(0, -16);
 }
 

@@ -130,7 +130,7 @@ static void video_start_common(running_machine &machine, int pagecount)
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
-		state->m_tilemap_page[pagenum] = tilemap_create(machine, tile_get_info, tilemap_scan_rows, 8,8, 32,32);
+		state->m_tilemap_page[pagenum] = tilemap_create(machine, tile_get_info, TILEMAP_SCAN_ROWS, 8,8, 32,32);
 		state->m_tilemap_page[pagenum]->set_transparent_pen(0);
 		state->m_tilemap_page[pagenum]->set_user_data(state->m_videoram + 0x800 * pagenum);
 	}

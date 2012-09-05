@@ -358,7 +358,7 @@ VIDEO_START( blzntrnd )
 
 	state->m_has_zoom = 1;
 
-	state->m_k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, tilemap_scan_rows, 8, 8, 256, 512);
+	state->m_k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
 	state->m_bg_tilemap_scrolldx[0] = 8;
 	state->m_bg_tilemap_scrolldx[1] = 8;

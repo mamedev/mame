@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( gat )
 {
 	gatron_state *state = machine.driver_data<gatron_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 16, 48, 16);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 8, 16, 48, 16);
 }
 
 SCREEN_UPDATE_IND16( gat )

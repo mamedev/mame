@@ -499,7 +499,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( avt )
 {
 	avt_state *state = machine.driver_data<avt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 28, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
 }
 
 

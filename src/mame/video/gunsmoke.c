@@ -131,8 +131,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( gunsmoke )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,  32, 32, 2048, 8);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x4f);
 }

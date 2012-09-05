@@ -391,10 +391,10 @@ static VIDEO_START( mwarr )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
 
-	state->m_bg_tilemap    = tilemap_create(machine, get_bg_tile_info,    tilemap_scan_cols, 16, 16, 64, 16);
-	state->m_mlow_tilemap  = tilemap_create(machine, get_mlow_tile_info,  tilemap_scan_cols, 16, 16, 64, 16);
-	state->m_mhigh_tilemap = tilemap_create(machine, get_mhigh_tile_info, tilemap_scan_cols, 16, 16, 64, 16);
-	state->m_tx_tilemap    = tilemap_create(machine, get_tx_tile_info,    tilemap_scan_rows,  8,  8, 64, 32);
+	state->m_bg_tilemap    = tilemap_create(machine, get_bg_tile_info,    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_mlow_tilemap  = tilemap_create(machine, get_mlow_tile_info,  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_mhigh_tilemap = tilemap_create(machine, get_mhigh_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_tx_tilemap    = tilemap_create(machine, get_tx_tile_info,    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	state->m_mlow_tilemap->set_transparent_pen(0);
 	state->m_mhigh_tilemap->set_transparent_pen(0);

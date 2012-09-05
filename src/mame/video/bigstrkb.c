@@ -116,7 +116,7 @@ WRITE16_MEMBER(bigstrkb_state::bsb_videoram3_w)
 VIDEO_START(bigstrkb)
 {
 	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
-	state->m_tilemap = tilemap_create(machine, get_bsb_tile_info,tilemap_scan_cols, 8, 8,64,32);
+	state->m_tilemap = tilemap_create(machine, get_bsb_tile_info,TILEMAP_SCAN_COLS, 8, 8,64,32);
 	state->m_tilemap2 = tilemap_create(machine, get_bsb_tile2_info,bsb_bg_scan, 16, 16,128,64);
 	state->m_tilemap3 = tilemap_create(machine, get_bsb_tile3_info,bsb_bg_scan, 16, 16,128,64);
 

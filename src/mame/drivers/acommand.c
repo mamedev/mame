@@ -182,7 +182,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static VIDEO_START( acommand )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	state->m_tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,tilemap_scan_cols,8,8,512,32);
+	state->m_tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,512,32);
 	state->m_bg_tilemap = tilemap_create(machine, ac_get_bg_tile_info,bg_scan,16,16,256,16);
 
 	state->m_ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);

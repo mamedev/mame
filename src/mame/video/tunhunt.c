@@ -77,7 +77,7 @@ VIDEO_START( tunhunt )
 
 	state->m_tmpbitmap.allocate(256, 64, machine.primary_screen->format());
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrollx(0, 64);
