@@ -10,7 +10,8 @@ TilemapCB( running_machine &machine, UINT16 code, int *tile, int *mask )
 {
 	*mask = code;
 
-	switch( namcos2_gametype )
+	namcos2_shared_state *state = machine.driver_data<namcos2_shared_state>();
+	switch( state->m_gametype )
 	{
 	case NAMCOS2_FINAL_LAP_2:
 	case NAMCOS2_FINAL_LAP_3:
@@ -25,33 +26,31 @@ TilemapCB( running_machine &machine, UINT16 code, int *tile, int *mask )
 } /* TilemapCB */
 
 /**
- * namcos2_gfx_ctrl selects a bank of 128 sprites within spriteram
+ * m_gfx_ctrl selects a bank of 128 sprites within spriteram
  *
- * namcos2_gfx_ctrl also supplies palette and priority information that is applied to the output of the
- *                  Namco System 2 ROZ chip
+ * m_gfx_ctrl also supplies palette and priority information that is applied to the output of the
+ *            Namco System 2 ROZ chip
  *
  * -xxx ---- ---- ---- roz priority
  * ---- xxxx ---- ---- roz palette
  * ---- ---- xxxx ---- always zero?
  * ---- ---- ---- xxxx sprite bank
  */
-static UINT16 namcos2_gfx_ctrl;
-
-READ16_HANDLER( namcos2_gfx_ctrl_r )
+READ16_MEMBER( namcos2_state::gfx_ctrl_r )
 {
-	return namcos2_gfx_ctrl;
+	return m_gfx_ctrl;
 } /* namcos2_gfx_ctrl_r */
 
-WRITE16_HANDLER( namcos2_gfx_ctrl_w )
+WRITE16_MEMBER( namcos2_state::gfx_ctrl_w )
 {
-	COMBINE_DATA(&namcos2_gfx_ctrl);
+	COMBINE_DATA(&m_gfx_ctrl);
 } /* namcos2_gfx_ctrl_w */
 
-static TILE_GET_INFO( get_tile_info_roz )
+TILE_GET_INFO_MEMBER( namcos2_state::roz_tile_info )
 {
-	int tile = machine.driver_data<namcos2_state>()->m_rozram[tile_index];
-	SET_TILE_INFO(3,tile,0/*color*/,0);
-} /* get_tile_info_roz */
+	int tile = m_rozram[tile_index];
+	SET_TILE_INFO_MEMBER(3,tile,0/*color*/,0);
+} /* roz_tile_info */
 
 struct RozParam
 {
@@ -240,7 +239,7 @@ void namcos2_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	const int xoffset = 38,yoffset = 0;
 	struct RozParam rozParam;
 
-	rozParam.color = (namcos2_gfx_ctrl & 0x0f00);
+	rozParam.color = (m_gfx_ctrl & 0x0f00);
 	rozParam.incxx  = (INT16)m_roz_ctrl[0];
 	rozParam.incxy  = (INT16)m_roz_ctrl[1];
 	rozParam.incyx  = (INT16)m_roz_ctrl[2];
@@ -285,21 +284,6 @@ void namcos2_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	DrawRozHelper( bitmap, m_tilemap_roz, cliprect, &rozParam );
 }
 
-READ16_MEMBER(namcos2_state::roz_ctrl_word_r)
-{
-	return m_roz_ctrl[offset];
-}
-
-WRITE16_MEMBER( namcos2_state::roz_ctrl_word_w )
-{
-	COMBINE_DATA(&m_roz_ctrl[offset]);
-}
-
-READ16_MEMBER( namcos2_state::rozram_word_r )
-{
-	return m_rozram[offset];
-}
-
 WRITE16_MEMBER( namcos2_state::rozram_word_w )
 {
 	COMBINE_DATA(&m_rozram[offset]);
@@ -312,7 +296,7 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 
 /**************************************************************************/
 
-inline UINT16 namcos2_state::get_palette_register( int which )
+UINT16 namcos2_state::get_palette_register( int which )
 {
 	const UINT16 *source = &m_paletteram[0x3000/2];
 	return ((source[which*2]&0xff)<<8) | (source[which*2+1]&0xff);
@@ -362,7 +346,7 @@ WRITE16_MEMBER( namcos2_state::paletteram_word_w )
 			/*case 0x180a:*/ case 0x180b:
 				if (data^m_paletteram[offset]) {
 					m_paletteram[offset] = data;
-					namcos2_adjust_posirq_timer(machine(),namcos2_GetPosIrqScanline(machine()));
+					namcos2_adjust_posirq_timer(machine(),get_pos_irq_scanline());
 				}
 				break;
 
@@ -378,12 +362,6 @@ WRITE16_MEMBER( namcos2_state::paletteram_word_w )
 	}
 } /* namcos2_68k_video_palette_w */
 
-
-int
-namcos2_GetPosIrqScanline( running_machine &machine )
-{
-	return (machine.driver_data<namcos2_state>()->get_palette_register(5) - 32) & 0xff;
-} /* namcos2_GetPosIrqScanline */
 
 inline void
 namcos2_state::update_palette()
@@ -407,25 +385,13 @@ namcos2_state::update_palette()
 
 /**************************************************************************/
 
-static void
-DrawSpriteInit( running_machine &machine )
+void namcos2_state::draw_sprite_init()
 {
-	int i;
 	/* set table for sprite color == 0x0f */
-	for( i = 0; i<16*256; i++ )
+	for( int i = 0; i<16*256; i++ )
 	{
-		machine.shadow_table[i] = i+0x2000;
+		machine().shadow_table[i] = i+0x2000;
 	}
-}
-
-WRITE16_MEMBER( namcos2_state::spriteram_word_w )
-{
-	COMBINE_DATA(&m_spriteram[offset]);
-}
-
-READ16_MEMBER( namcos2_state::spriteram_word_r )
-{
-	return m_spriteram[offset];
 }
 
 /**************************************************************************/
@@ -433,9 +399,9 @@ READ16_MEMBER( namcos2_state::spriteram_word_r )
 void namcos2_state::video_start()
 {
 	namco_tilemap_init(machine(), 2, memregion("gfx4")->base(), TilemapCB);
-	m_tilemap_roz = tilemap_create(machine(), get_tile_info_roz,tilemap_scan_rows,8,8,256,256);
+	m_tilemap_roz = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), tilemap_mapper_delegate(FUNC(tilemap_scan_rows), &machine()), 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
-	DrawSpriteInit(machine());
+	draw_sprite_init();
 }
 
 void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
@@ -458,7 +424,7 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	apply_clip( clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
-	m_tilemap_roz->enable((namcos2_gfx_ctrl & 0x7000) ? 1 : 0);
+	m_tilemap_roz->enable((m_gfx_ctrl & 0x7000) ? 1 : 0);
 
 	for( pri=0; pri<16; pri++ )
 	{
@@ -466,11 +432,11 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			namco_tilemap_draw( bitmap, clip, pri/2 );
 
-			if( ((namcos2_gfx_ctrl & 0x7000) >> 12)==pri/2 )
+			if( ((m_gfx_ctrl & 0x7000) >> 12)==pri/2 )
 			{
 				draw_roz(bitmap,clip);
 			}
-			draw_sprites(bitmap, clip, pri/2, namcos2_gfx_ctrl );
+			draw_sprites(bitmap, clip, pri/2, m_gfx_ctrl );
 		}
 	}
 	return 0;
@@ -481,7 +447,7 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 void namcos2_state::video_start_finallap()
 {
 	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
-	DrawSpriteInit(machine());
+	draw_sprite_init();
 	namco_road_init(machine(), 3);
 }
 
@@ -501,7 +467,7 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 			namco_tilemap_draw( bitmap, clip, pri/2 );
 		}
 		namco_road_draw(machine(), bitmap,clip,pri );
-		draw_sprites(bitmap,clip,pri,namcos2_gfx_ctrl );
+		draw_sprites(bitmap,clip,pri,m_gfx_ctrl );
 	}
 	return 0;
 }
@@ -511,12 +477,12 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 void namcos2_state::video_start_luckywld()
 {
 	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
-	namco_obj_init( machine(), 0, 0x0, NULL );
-	if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
+	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
+	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
-		namco_roz_init( machine(), 1, "gfx5" );
+		c169_roz_init(1, "gfx5");
 	}
-	if( namcos2_gametype!=NAMCOS2_STEEL_GUNNER_2 )
+	if( m_gametype!=NAMCOS2_STEEL_GUNNER_2 )
 	{
 		namco_road_init(machine(), 3);
 	}
@@ -538,11 +504,11 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 			namco_tilemap_draw( bitmap, clip, pri/2 );
 		}
 		namco_road_draw(machine(), bitmap,clip,pri );
-		if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
+		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 		{
-			namco_roz_draw( bitmap, clip, pri );
+			c169_roz_draw(bitmap, clip, pri);
 		}
-		namco_obj_draw(machine(), bitmap, clip, pri );
+		c355_obj_draw(bitmap, clip, pri );
 	}
 	return 0;
 }
@@ -552,7 +518,7 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 void namcos2_state::video_start_sgunner()
 {
 	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
-	namco_obj_init( machine(), 0, 0x0, NULL );
+	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 }
 
 UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -567,7 +533,7 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 	for( pri=0; pri<8; pri++ )
 	{
 		namco_tilemap_draw( bitmap, clip, pri );
-		namco_obj_draw(machine(), bitmap, clip, pri );
+		c355_obj_draw(bitmap, clip, pri );
 	}
 	return 0;
 }
@@ -578,7 +544,7 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 void namcos2_state::video_start_metlhawk()
 {
 	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
-	namco_roz_init( machine(), 1, "gfx5" );
+	c169_roz_init(1, "gfx5");
 }
 
 UINT32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -596,7 +562,7 @@ UINT32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16
 		{
 			namco_tilemap_draw( bitmap, clip, pri/2 );
 		}
-		namco_roz_draw( bitmap, clip, pri );
+		c169_roz_draw(bitmap, clip, pri);
 		draw_sprites_metalhawk(bitmap,clip,pri );
 	}
 	return 0;

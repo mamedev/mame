@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "includes/namconb1.h"
 #include "includes/namcoic.h"
-#include "includes/namcos2.h"
 
 
 /* nth_word32 is a general-purpose utility function, which allows us to
@@ -52,7 +51,7 @@ NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int mangle;
 
-	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
+	if( state->m_gametype == NAMCONB2_MACH_BREAKERS )
 	{
 		/*  00010203 04050607 00010203 04050607 (normal) */
 		/*  00010718 191a1b07 00010708 090a0b07 (alt bank) */
@@ -105,6 +104,7 @@ static void namconb1_install_palette(running_machine &machine)
 static void
 video_update_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
 {
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int pri;
 	namconb1_install_palette(machine);
 
@@ -112,12 +112,12 @@ video_update_common(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 	{
 		for( pri=0; pri<16; pri++ )
 		{
-			namco_roz_draw( bitmap,cliprect,pri );
+			state->c169_roz_draw(bitmap, cliprect, pri);
 			if( (pri&1)==0 )
 			{
 				namco_tilemap_draw( bitmap, cliprect, pri/2 );
 			}
-			namco_obj_draw(machine, bitmap, cliprect, pri );
+			state->c355_obj_draw(bitmap, cliprect, pri );
 		}
 	}
 	else
@@ -125,7 +125,7 @@ video_update_common(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 		for( pri=0; pri<8; pri++ )
 		{
 			namco_tilemap_draw( bitmap, cliprect, pri );
-			namco_obj_draw(machine, bitmap, cliprect, pri );
+			state->c355_obj_draw(bitmap, cliprect, pri );
 		}
 	}
 } /* video_update_common */
@@ -164,8 +164,9 @@ NB1objcode2tile( running_machine &machine, int code )
 
 VIDEO_START( namconb1 )
 {
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	namco_tilemap_init( machine, NAMCONB1_TILEGFX, machine.root_device().memregion(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
-	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,NB1objcode2tile);
+	state->c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(NB1objcode2tile), &machine));
 } /* namconb1 */
 
 /****************************************************************************************************/
@@ -202,7 +203,7 @@ NB2objcode2tile( running_machine &machine, int code )
 	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int bank = nth_byte32( state->m_spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;
-	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
+	if( state->m_gametype == NAMCONB2_MACH_BREAKERS )
 	{
 		if( bank&0x01 ) code |= 0x01*0x800;
 		if( bank&0x02 ) code |= 0x02*0x800;
@@ -225,7 +226,8 @@ NB2objcode2tile( running_machine &machine, int code )
 
 VIDEO_START( namconb2 )
 {
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	namco_tilemap_init(machine, NAMCONB1_TILEGFX, machine.root_device().memregion(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
-	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,NB2objcode2tile);
-	namco_roz_init(machine, NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
+	state->c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(NB2objcode2tile), &machine));
+	state->c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namconb2_vh_start */

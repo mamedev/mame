@@ -156,7 +156,6 @@ OSC3: 48.384MHz
 */
 
 #include "emu.h"
-#include "includes/namcos2.h"
 #include "includes/namcoic.h"
 #include "cpu/i960/i960.h"
 #include "cpu/m37710/m37710.h"
@@ -236,9 +235,9 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
-	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE_LEGACY(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)
-	AM_RANGE(0x30d00000, 0x30d0001f) AM_READWRITE_LEGACY(namco_rozcontrol32_le_r,namco_rozcontrol32_le_w)
-	AM_RANGE(0x30e00000, 0x30e1ffff) AM_READWRITE_LEGACY(namco_obj32_le_r, namco_obj32_le_w)
+	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
+	AM_RANGE(0x30d00000, 0x30d0001f) AM_READWRITE16(c169_roz_control_r,c169_roz_control_w,0xffffffff)
+	AM_RANGE(0x30e00000, 0x30e1ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
 	AM_RANGE(0x30f00000, 0x30f0000f) AM_RAM /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
 	AM_RANGE(0x40000000, 0x4000005f) AM_READWRITE(namcofl_sysreg_r, namcofl_sysreg_w )
 	AM_RANGE(0xfffffffc, 0xffffffff) AM_READ(fl_unk1_r )
@@ -818,13 +817,13 @@ static void namcofl_common_init(running_machine &machine)
 DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
 {
 	namcofl_common_init(machine());
-	namcos2_gametype = NAMCOFL_SPEED_RACER;
+	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
 DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 {
 	namcofl_common_init(machine());
-	namcos2_gametype = NAMCOFL_FINAL_LAP_R;
+	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
 GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

@@ -2,7 +2,6 @@
 
 #include "emu.h"
 #include "includes/namcoic.h"
-#include "includes/namcos2.h"
 #include "includes/namcofl.h"
 
 
@@ -83,6 +82,7 @@ static void TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mas
 
 SCREEN_UPDATE_IND16( namcofl )
 {
+	namcofl_state *state = screen.machine().driver_data<namcofl_state>();
 	int pri;
 
 	namcofl_install_palette(screen.machine());
@@ -91,10 +91,10 @@ SCREEN_UPDATE_IND16( namcofl )
 
 	for( pri=0; pri<16; pri++ )
 	{
-		namco_roz_draw( bitmap,cliprect,pri );
+		state->c169_roz_draw(bitmap, cliprect, pri);
 		if((pri&1)==0)
 			namco_tilemap_draw( bitmap, cliprect, pri>>1 );
-		namco_obj_draw(screen.machine(), bitmap, cliprect, pri );
+		state->c355_obj_draw(bitmap, cliprect, pri );
 	}
 
 	return 0;
@@ -119,7 +119,8 @@ static int FLobjcode2tile( running_machine &machine, int code )
 
 VIDEO_START( namcofl )
 {
+	namcofl_state *state = machine.driver_data<namcofl_state>();
 	namco_tilemap_init( machine, NAMCOFL_TILEGFX, machine.root_device().memregion(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
-	namco_obj_init(machine,NAMCOFL_SPRITEGFX,0x0,FLobjcode2tile);
-	namco_roz_init(machine,NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
+	state->c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(FLobjcode2tile), &machine));
+	state->c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

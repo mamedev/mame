@@ -7,7 +7,6 @@ Namco System 21 Video Hardware
 */
 
 #include "emu.h"
-#include "includes/namcos2.h"
 #include "includes/namcoic.h"
 #include "includes/namcos21.h"
 
@@ -117,15 +116,15 @@ CopyVisiblePolyFrameBuffer( running_machine &machine, bitmap_ind16 &bitmap, cons
 VIDEO_START( namcos21 )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	if( namcos2_gametype == NAMCOS21_WINRUN91 )
+	if( state->m_gametype == NAMCOS21_WINRUN91 )
 	{
 		state->m_videoram = auto_alloc_array(machine, UINT8, 0x80000);
 	}
 	AllocatePolyFrameBuffer(machine);
-	namco_obj_init(machine,
+	state->c355_obj_init(
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
-		NULL );
+		namcos2_shared_state::c355_obj_code2tile_delegate() );
 } /* VIDEO_START( namcos21 ) */
 
 static void
@@ -176,30 +175,30 @@ SCREEN_UPDATE_IND16( namcos21 )
 	update_palette(screen.machine());
 	bitmap.fill(0xff, cliprect );
 
-	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	if( state->m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		namco_obj_draw(screen.machine(), bitmap, cliprect, 2 );
-		namco_obj_draw(screen.machine(), bitmap, cliprect, 14 );	//driver's eyes
+		state->c355_obj_draw(bitmap, cliprect, 2 );
+		state->c355_obj_draw(bitmap, cliprect, 14 );	//driver's eyes
 	}
 
 	CopyVisiblePolyFrameBuffer( screen.machine(), bitmap, cliprect, 0x7fc0, 0x7ffe );
 
-	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	if( state->m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		namco_obj_draw(screen.machine(), bitmap, cliprect, 0 );
-		namco_obj_draw(screen.machine(), bitmap, cliprect, 1 );
+		state->c355_obj_draw(bitmap, cliprect, 0 );
+		state->c355_obj_draw(bitmap, cliprect, 1 );
 	}
 
 	CopyVisiblePolyFrameBuffer( screen.machine(), bitmap, cliprect, 0, 0x7fbf );
 
 
-	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	if( state->m_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw high priority 2d sprites */
 		for( pri=pivot; pri<8; pri++ )
 		{
-			namco_obj_draw(screen.machine(), bitmap, cliprect, pri );
+			state->c355_obj_draw(bitmap, cliprect, pri );
 		}
-			namco_obj_draw(screen.machine(), bitmap, cliprect, 15 );	//driver's eyes
+			state->c355_obj_draw(bitmap, cliprect, 15 );	//driver's eyes
 	}
 	else
 	{ /* winrun bitmap layer */
@@ -288,12 +287,12 @@ renderscanline_flat( namcos21_state *state, const edge *e1, const edge *e2, int 
 					if( depthcueenable && zz>0 )
 					{
 						int depth = 0;
-						if( namcos2_gametype == NAMCOS21_WINRUN91 )
+						if( state->m_gametype == NAMCOS21_WINRUN91 )
 						{
 							depth = (zz>>10)*0x100;
 							pen += depth;
 						}
-						else if( namcos2_gametype == NAMCOS21_DRIVERS_EYES )
+						else if( state->m_gametype == NAMCOS21_DRIVERS_EYES )
 						{
 							depth = (zz>>10)*0x100;
 							pen -= depth;
@@ -445,11 +444,11 @@ namcos21_DrawQuad( running_machine &machine, int sx[4], int sy[4], int zcode[4],
         0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
         0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
     */
-	if( namcos2_gametype == NAMCOS21_WINRUN91 )
+	if( state->m_gametype == NAMCOS21_WINRUN91 )
 	{
 		color = 0x4000|(color&0xff);
 	}
-	else if ( namcos2_gametype == NAMCOS21_DRIVERS_EYES )
+	else if ( state->m_gametype == NAMCOS21_DRIVERS_EYES )
 	{
 		color = 0x3f00|(color&0xff);
 	}

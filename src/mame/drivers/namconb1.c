@@ -272,7 +272,6 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/namconb1.h"
-#include "includes/namcos2.h"
 #include "includes/namcoic.h"
 #include "sound/c352.h"
 #include "cpu/m37710/m37710.h"
@@ -590,7 +589,7 @@ static NVRAM_HANDLER( namconb1 )
 		else
 		{
 			memset( state->m_nvmem32, 0x00, NB1_NVMEM_SIZE );
-			if( namcos2_gametype == NAMCONB1_GUNBULET )
+			if( state->m_gametype == NAMCONB1_GUNBULET )
 			{
 				state->m_nvmem32[0] = 0x0f260f26; /* default gun calibration */
 			}
@@ -612,52 +611,52 @@ DRIVER_INIT_MEMBER(namconb1_state,nebulray)
 	size_t numBytes = (0xfe7-0xe6f)*8;
 	memset( &pMem[0xe6f*8], 0, numBytes );
 
-	namcos2_gametype = NAMCONB1_NEBULRAY;
+	m_gametype = NAMCONB1_NEBULRAY;
 } /* nebulray */
 
 DRIVER_INIT_MEMBER(namconb1_state,gslgr94u)
 {
-	namcos2_gametype = NAMCONB1_GSLGR94U;
+	m_gametype = NAMCONB1_GSLGR94U;
 } /* gslgr94u */
 
 DRIVER_INIT_MEMBER(namconb1_state,gslgr94j)
 {
-	namcos2_gametype = NAMCONB1_GSLGR94J;
+	m_gametype = NAMCONB1_GSLGR94J;
 } /* gslgr94j */
 
 DRIVER_INIT_MEMBER(namconb1_state,sws95)
 {
-	namcos2_gametype = NAMCONB1_SWS95;
+	m_gametype = NAMCONB1_SWS95;
 } /* sws95 */
 
 DRIVER_INIT_MEMBER(namconb1_state,sws96)
 {
-	namcos2_gametype = NAMCONB1_SWS96;
+	m_gametype = NAMCONB1_SWS96;
 } /* sws96 */
 
 DRIVER_INIT_MEMBER(namconb1_state,sws97)
 {
-	namcos2_gametype = NAMCONB1_SWS97;
+	m_gametype = NAMCONB1_SWS97;
 } /* sws97 */
 
 DRIVER_INIT_MEMBER(namconb1_state,gunbulet)
 {
-	namcos2_gametype = NAMCONB1_GUNBULET;
+	m_gametype = NAMCONB1_GUNBULET;
 } /* gunbulet */
 
 DRIVER_INIT_MEMBER(namconb1_state,vshoot)
 {
-	namcos2_gametype = NAMCONB1_VSHOOT;
+	m_gametype = NAMCONB1_VSHOOT;
 } /* vshoot */
 
 DRIVER_INIT_MEMBER(namconb1_state,machbrkr)
 {
-	namcos2_gametype = NAMCONB2_MACH_BREAKERS;
+	m_gametype = NAMCONB2_MACH_BREAKERS;
 }
 
 DRIVER_INIT_MEMBER(namconb1_state,outfxies)
 {
-	namcos2_gametype = NAMCONB2_OUTFOXIES;
+	m_gametype = NAMCONB2_OUTFOXIES;
 }
 
 READ32_MEMBER(namconb1_state::custom_key_r)
@@ -669,7 +668,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		m_count = machine().rand();
 	} while( m_count==old_count );
 
-	switch( namcos2_gametype )
+	switch( m_gametype )
 	{
 	case NAMCONB1_GUNBULET:
 		return 0; /* no protection */
@@ -856,8 +855,8 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_SHARE("nvmem32")
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
+	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
+	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
 	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
 	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_SHARE("spritebank32")
@@ -872,17 +871,17 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
+	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
+	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
 	AM_RANGE(0x640000, 0x64000f) AM_RAM /* unknown xy offset */
 	AM_RANGE(0x680000, 0x68ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_r, namco_tilemapvideoram32_w )
 	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_r, namco_tilemapcontrol32_w )
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE_LEGACY(namco_rozvideoram32_r,namco_rozvideoram32_w)
-	AM_RANGE(0x740000, 0x74001f) AM_READWRITE_LEGACY(namco_rozcontrol32_r,namco_rozcontrol32_w)
+	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
+	AM_RANGE(0x740000, 0x74001f) AM_READWRITE16(c169_roz_control_r,c169_roz_control_w,0xffffffff)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_SHARE("spritebank32")
 	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_SHARE("tilebank32")
-	AM_RANGE(0x980000, 0x98000f) AM_READ_LEGACY(namco_rozbank32_r) AM_WRITE_LEGACY(namco_rozbank32_w)
+	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
 	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_SHARE("nvmem32")
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)

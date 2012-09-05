@@ -538,7 +538,7 @@ WRITE16_MEMBER(namcos2_state::dpram_word_w)
 	{
 		m_dpram[offset] = data&0xff;
 
-		if( namcos2_gametype==NAMCOS2_GOLLY_GHOST )
+		if( m_gametype==NAMCOS2_GOLLY_GHOST )
 		{
 			switch( offset )
 			{
@@ -601,10 +601,10 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_default_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(spriteram_word_r, spriteram_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE_LEGACY(namcos2_gfx_ctrl_r,namcos2_gfx_ctrl_w)
-	AM_RANGE(0xc80000, 0xc9ffff) AM_READWRITE(rozram_word_r,rozram_word_w) AM_SHARE("rozram")
-	AM_RANGE(0xcc0000, 0xcc000f) AM_READWRITE(roz_ctrl_word_r, roz_ctrl_word_w)
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w)
+	AM_RANGE(0xc80000, 0xc9ffff) AM_RAM_WRITE(rozram_word_w) AM_SHARE("rozram")
+	AM_RANGE(0xcc0000, 0xcc000f) AM_RAM AM_SHARE("rozctrl")
 	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE_LEGACY(namcos2_68k_key_r,namcos2_68k_key_w)
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
@@ -629,8 +629,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_finallap_am, AS_PROGRAM, 16, namcos2_state )
 	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(namcos2_flap_prot_r)
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(spriteram_word_r, spriteram_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x840000, 0x840001) AM_READ_LEGACY(namcos2_gfx_ctrl_r) AM_WRITE_LEGACY(namcos2_gfx_ctrl_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x840000, 0x840001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w)
 	AM_RANGE(0x880000, 0x89ffff) AM_READ_LEGACY(namco_road16_r) AM_WRITE_LEGACY(namco_road16_w)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
@@ -654,7 +654,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_sgunner_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w)
+	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) AM_SHARE("objram")
 	AM_RANGE(0x818000, 0x818001) AM_WRITENOP
 	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE_LEGACY(namcos2_68k_key_r,namcos2_68k_key_w)
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
@@ -678,10 +678,10 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_metlhawk_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(spriteram_word_r, spriteram_word_w) AM_SHARE("spriteram") \
-	AM_RANGE(0xc40000, 0xc4ffff) AM_READWRITE_LEGACY(namco_rozvideoram16_r,namco_rozvideoram16_w) \
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(namco_rozcontrol16_r,namco_rozcontrol16_w) \
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE_LEGACY(namcos2_gfx_ctrl_r,namcos2_gfx_ctrl_w) /* ??? */ \
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("spriteram") \
+	AM_RANGE(0xc40000, 0xc4ffff) AM_READWRITE(c169_roz_videoram_r,c169_roz_videoram_w) AM_SHARE("rozvideoram") \
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(c169_roz_control_r,c169_roz_control_w) \
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w) /* ??? */ \
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
 
@@ -703,14 +703,14 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_luckywld_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w)
+	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) AM_SHARE("objram")
 	AM_RANGE(0x818000, 0x818001) AM_NOP /* enable? */
 	AM_RANGE(0x81a000, 0x81a001) AM_WRITENOP /* enable? */
 	AM_RANGE(0x840000, 0x840001) AM_READNOP
-	AM_RANGE(0x900000, 0x900007) AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w)
+	AM_RANGE(0x900000, 0x900007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_READWRITE_LEGACY(namco_road16_r,namco_road16_w)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE_LEGACY(namco_rozvideoram16_r,namco_rozvideoram16_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(namco_rozcontrol16_r,namco_rozcontrol16_w)
+	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(c169_roz_videoram_r,c169_roz_videoram_w) AM_SHARE("rozvideoram")
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(c169_roz_control_r,c169_roz_control_w)
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE_LEGACY(namcos2_68k_key_r,namcos2_68k_key_w)
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
@@ -5004,17 +5004,17 @@ ROM_END
 
 DRIVER_INIT_MEMBER(namcos2_state,assault)
 {
-	namcos2_gametype=NAMCOS2_ASSAULT;
+	m_gametype=NAMCOS2_ASSAULT;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,assaultj)
 {
-	namcos2_gametype=NAMCOS2_ASSAULT_JP;
+	m_gametype=NAMCOS2_ASSAULT_JP;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,assaultp)
 {
-	namcos2_gametype=NAMCOS2_ASSAULT_PLUS;
+	m_gametype=NAMCOS2_ASSAULT_PLUS;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,assaultp_hack)
@@ -5033,67 +5033,67 @@ DRIVER_INIT_MEMBER(namcos2_state,assaultp_hack)
 
 DRIVER_INIT_MEMBER(namcos2_state,burnforc)
 {
-	namcos2_gametype=NAMCOS2_BURNING_FORCE;
+	m_gametype=NAMCOS2_BURNING_FORCE;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,cosmogng)
 {
-	namcos2_gametype=NAMCOS2_COSMO_GANG;
+	m_gametype=NAMCOS2_COSMO_GANG;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,dsaber)
 {
-	namcos2_gametype=NAMCOS2_DRAGON_SABER;
+	m_gametype=NAMCOS2_DRAGON_SABER;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,dsaberj)
 {
-	namcos2_gametype=NAMCOS2_DRAGON_SABER;
+	m_gametype=NAMCOS2_DRAGON_SABER;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,dirtfoxj)
 {
-	namcos2_gametype=NAMCOS2_DIRT_FOX_JP;
+	m_gametype=NAMCOS2_DIRT_FOX_JP;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,finallap)
 {
-	namcos2_gametype=NAMCOS2_FINAL_LAP;
+	m_gametype=NAMCOS2_FINAL_LAP;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,finalap2)
 {
-	namcos2_gametype=NAMCOS2_FINAL_LAP_2;
+	m_gametype=NAMCOS2_FINAL_LAP_2;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,finalap3)
 {
-	namcos2_gametype=NAMCOS2_FINAL_LAP_3;
+	m_gametype=NAMCOS2_FINAL_LAP_3;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,finehour)
 {
-	namcos2_gametype=NAMCOS2_FINEST_HOUR;
+	m_gametype=NAMCOS2_FINEST_HOUR;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,fourtrax)
 {
-	namcos2_gametype=NAMCOS2_FOUR_TRAX;
+	m_gametype=NAMCOS2_FOUR_TRAX;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,kyukaidk)
 {
-	namcos2_gametype=NAMCOS2_KYUUKAI_DOUCHUUKI;
+	m_gametype=NAMCOS2_KYUUKAI_DOUCHUUKI;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,marvlanj)
 {
-	namcos2_gametype=NAMCOS2_MARVEL_LAND;
+	m_gametype=NAMCOS2_MARVEL_LAND;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,marvland)
 {
-	namcos2_gametype=NAMCOS2_MARVEL_LAND;
+	m_gametype=NAMCOS2_MARVEL_LAND;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
@@ -5151,82 +5151,82 @@ DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
 			} /* next k */
 		} /* next j */
 	} /* next i */
-	namcos2_gametype=NAMCOS2_METAL_HAWK;
+	m_gametype=NAMCOS2_METAL_HAWK;
 } /* metlhawk */
 
 DRIVER_INIT_MEMBER(namcos2_state,mirninja)
 {
-	namcos2_gametype=NAMCOS2_MIRAI_NINJA;
+	m_gametype=NAMCOS2_MIRAI_NINJA;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,ordyne)
 {
-	namcos2_gametype=NAMCOS2_ORDYNE;
+	m_gametype=NAMCOS2_ORDYNE;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,phelios)
 {
-	namcos2_gametype=NAMCOS2_PHELIOS;
+	m_gametype=NAMCOS2_PHELIOS;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,rthun2)
 {
-	namcos2_gametype=NAMCOS2_ROLLING_THUNDER_2;
+	m_gametype=NAMCOS2_ROLLING_THUNDER_2;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,rthun2j)
 {
-	namcos2_gametype=NAMCOS2_ROLLING_THUNDER_2;
+	m_gametype=NAMCOS2_ROLLING_THUNDER_2;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,sgunner2)
 {
-	namcos2_gametype=NAMCOS2_STEEL_GUNNER_2;
+	m_gametype=NAMCOS2_STEEL_GUNNER_2;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,sws)
 {
-	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM;
+	m_gametype=NAMCOS2_SUPER_WSTADIUM;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,sws92)
 {
-	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM_92;
+	m_gametype=NAMCOS2_SUPER_WSTADIUM_92;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,sws92g)
 {
-	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM_92T;
+	m_gametype=NAMCOS2_SUPER_WSTADIUM_92T;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,sws93)
 {
-	namcos2_gametype=NAMCOS2_SUPER_WSTADIUM_93;
+	m_gametype=NAMCOS2_SUPER_WSTADIUM_93;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,suzuka8h)
 {
-    namcos2_gametype=NAMCOS2_SUZUKA_8_HOURS;
+    m_gametype=NAMCOS2_SUZUKA_8_HOURS;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,suzuk8h2)
 {
-	namcos2_gametype=NAMCOS2_SUZUKA_8_HOURS_2;
+	m_gametype=NAMCOS2_SUZUKA_8_HOURS_2;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,valkyrie)
 {
-	namcos2_gametype=NAMCOS2_VALKYRIE;
+	m_gametype=NAMCOS2_VALKYRIE;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,gollygho)
 {
-	namcos2_gametype=NAMCOS2_GOLLY_GHOST;
+	m_gametype=NAMCOS2_GOLLY_GHOST;
 }
 
 DRIVER_INIT_MEMBER(namcos2_state,bubbletr)
 {
-	namcos2_gametype=NAMCOS2_BUBBLE_TROUBLE;
+	m_gametype=NAMCOS2_BUBBLE_TROUBLE;
 }
 
 
@@ -5249,7 +5249,7 @@ DRIVER_INIT_MEMBER(namcos2_state,luckywld)
 		if( code&0x80 ) out |= 0x01;
 		pData[i] = out;
 	}
-	namcos2_gametype=NAMCOS2_LUCKY_AND_WILD;
+	m_gametype=NAMCOS2_LUCKY_AND_WILD;
 }
 
 /* Based on the dumped BIOS versions it looks like Namco changed the BIOS rom */

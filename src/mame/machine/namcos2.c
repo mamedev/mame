@@ -21,7 +21,6 @@ static void InitC148(void);
 static emu_timer *namcos2_posirq_timer;
 
 void (*namcos2_kickstart)(running_machine &machine, int internal);
-int namcos2_gametype;
 
 static unsigned mFinalLapProtCount;
 static int namcos2_mcu_analog_ctrl;
@@ -31,6 +30,7 @@ static UINT8 *namcos2_eeprom;
 static int sendval;
 
 
+// not shared
 READ16_HANDLER( namcos2_flap_prot_r )
 {
 	static const UINT16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
@@ -86,7 +86,7 @@ ResetAllSubCPUs( running_machine &machine, int state )
 {
 	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, state);
 	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, state);
-	switch( namcos2_gametype )
+	switch( machine.driver_data<namcos2_shared_state>()->m_gametype )
 	{
 	case NAMCOS21_SOLVALOU:
 	case NAMCOS21_STARBLADE:
@@ -232,7 +232,7 @@ sws93       1993    334         $014e
 
 READ16_HANDLER( namcos2_68k_key_r )
 {
-	switch (namcos2_gametype)
+	switch (space->machine().driver_data<namcos2_shared_state>()->m_gametype)
 	{
 	case NAMCOS2_ORDYNE:
 		switch(offset)
@@ -406,19 +406,20 @@ READ16_HANDLER( namcos2_68k_key_r )
 
 WRITE16_HANDLER( namcos2_68k_key_w )
 {
-	if( namcos2_gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
+	int gametype = space->machine().driver_data<namcos2_shared_state>()->m_gametype;
+	if( gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
 	{
 		if (data == 0x615E) sendval = 1;
 	}
-	if( namcos2_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
+	if( gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4 )
 	{
 		if (data == 0x13EC) sendval = 1;
 	}
-	if( namcos2_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
+	if( gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7 )
 	{
 		if (data == 0x13EC) sendval = 1;
 	}
-	if( namcos2_gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
+	if( gametype == NAMCOS2_MARVEL_LAND && offset == 6 )
 	{
 		if (data == 0x1001) sendval = 0;
 	}
@@ -437,19 +438,19 @@ static UINT16  namcos2_68k_slave_C148[0x20];
 static UINT16  namcos2_68k_gpu_C148[0x20];
 
 
-static int IsSystem21( void )
+bool namcos2_shared_state::is_system21()
 {
-	switch( namcos2_gametype )
+	switch (m_gametype)
 	{
-	case NAMCOS21_AIRCOMBAT:
-	case NAMCOS21_STARBLADE:
-	case NAMCOS21_CYBERSLED:
-	case NAMCOS21_SOLVALOU:
-	case NAMCOS21_WINRUN91:
-	case NAMCOS21_DRIVERS_EYES:
-		return 1;
-	default:
-		return 0;
+		case NAMCOS21_AIRCOMBAT:
+		case NAMCOS21_STARBLADE:
+		case NAMCOS21_CYBERSLED:
+		case NAMCOS21_SOLVALOU:
+		case NAMCOS21_WINRUN91:
+		case NAMCOS21_DRIVERS_EYES:
+			return 1;
+		default:
+			return 0;
 	}
 }
 
@@ -654,13 +655,15 @@ READ16_HANDLER( namcos2_68k_gpu_C148_r )
 
 static int GetPosIRQScanline( running_machine &machine )
 {
-	if (IsSystem21()) return 0;
-	return namcos2_GetPosIrqScanline(machine);
+	namcos2_shared_state *state = machine.driver_data<namcos2_shared_state>();
+	if (state->is_system21()) return 0;
+	return downcast<namcos2_state *>(state)->get_pos_irq_scanline();
 }
 
 static TIMER_CALLBACK( namcos2_posirq_tick )
 {
-	if (IsSystem21()) {
+	namcos2_shared_state *state = machine.driver_data<namcos2_shared_state>();
+	if (state->is_system21()) {
 		if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
 			machine.primary_screen->update_partial(param);
 			cputag_set_input_line(machine, "gpu", namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
@@ -682,13 +685,15 @@ void namcos2_adjust_posirq_timer( running_machine &machine, int scanline )
 
 INTERRUPT_GEN( namcos2_68k_master_vblank )
 {
-	if (!IsSystem21()) namcos2_adjust_posirq_timer(device->machine(), GetPosIRQScanline(device->machine()));
+	namcos2_shared_state *state = device->machine().driver_data<namcos2_shared_state>();
+	if (!state->is_system21()) namcos2_adjust_posirq_timer(device->machine(), GetPosIRQScanline(device->machine()));
 	device_set_input_line(device, namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
 INTERRUPT_GEN( namcos2_68k_slave_vblank )
 {
-	if (!IsSystem21()) namcos2_adjust_posirq_timer(device->machine(), GetPosIRQScanline(device->machine()));
+	namcos2_shared_state *state = device->machine().driver_data<namcos2_shared_state>();
+	if (!state->is_system21()) namcos2_adjust_posirq_timer(device->machine(), GetPosIRQScanline(device->machine()));
 	device_set_input_line(device, namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
@@ -765,8 +770,8 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 #if 0
 		/* Perform the offset handling on the input port */
 		/* this converts it to a twos complement number */
-		if( namcos2_gametype == NAMCOS2_DIRT_FOX ||
-			namcos2_gametype == NAMCOS2_DIRT_FOX_JP )
+		if( m_gametype == NAMCOS2_DIRT_FOX ||
+			m_gametype == NAMCOS2_DIRT_FOX_JP )
 		{
 			namcos2_mcu_analog_data ^= 0x80;
 		}

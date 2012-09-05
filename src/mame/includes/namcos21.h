@@ -2,6 +2,8 @@
  * @file namcos21.h
  */
 
+#include "namcos2.h"
+
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
 
@@ -23,11 +25,11 @@ struct dsp_state
 	int slaveActive;
 };
 
-class namcos21_state : public driver_device
+class namcos21_state : public namcos2_shared_state
 {
 public:
 	namcos21_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: namcos2_shared_state(mconfig, type, tag),
 		m_winrun_dspbios(*this,"winrun_dspbios"),
 		m_winrun_polydata(*this,"winrun_polydata"),
 		m_winrun_gpucomram(*this,"winrun_comram"),

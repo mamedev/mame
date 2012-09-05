@@ -1,3 +1,5 @@
+#include "namcos2.h"
+
 #define NAMCONB1_HTOTAL		(288)	/* wrong */
 #define NAMCONB1_HBSTART	(288)
 #define NAMCONB1_VTOTAL		(262)	/* needs to be checked */
@@ -13,11 +15,11 @@
 #define NAMCONB1_SPRITEGFX		1
 #define NAMCONB1_ROTGFX			2
 
-class namconb1_state : public driver_device
+class namconb1_state : public namcos2_shared_state
 {
 public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: namcos2_shared_state(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"mcu"),
 		m_nvmem32(*this, "nvmem32"),

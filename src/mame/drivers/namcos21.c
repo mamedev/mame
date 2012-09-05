@@ -296,7 +296,6 @@ CPU68 PCB:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
 #include "includes/namcoic.h"
@@ -341,7 +340,7 @@ WRITE16_MEMBER(namcos21_state::dspcuskey_w)
 READ16_MEMBER(namcos21_state::dspcuskey_r)
 {
 	UINT16 result = 0;
-	if( namcos2_gametype == NAMCOS21_SOLVALOU )
+	if( m_gametype == NAMCOS21_SOLVALOU )
 	{
 		switch( cpu_get_pc(&space.device()) )
 		{
@@ -354,7 +353,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 			break;
 		}
 	}
-	else if( namcos2_gametype == NAMCOS21_CYBERSLED )
+	else if( m_gametype == NAMCOS21_CYBERSLED )
 	{
 		switch( cpu_get_pc(&space.device()) )
 		{
@@ -365,7 +364,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 			break;
 		}
 	}
-	else if( namcos2_gametype == NAMCOS21_AIRCOMBAT )
+	else if( m_gametype == NAMCOS21_AIRCOMBAT )
 	{
 		switch( cpu_get_pc(&space.device()) )
 		{
@@ -497,7 +496,7 @@ namcos21_kickstart( running_machine &machine, int internal )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
 	/* patch dsp watchdog */
-	switch( namcos2_gametype )
+	switch( state->m_gametype )
 	{
 	case NAMCOS21_AIRCOMBAT:
 		state->m_master_dsp_code[0x008e] = 0x808f;
@@ -567,7 +566,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 {
 	COMBINE_DATA( &m_dspram16[offset] );
 
-	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	if( m_gametype != NAMCOS21_WINRUN91 )
 	{
 		if( m_mpDspState->masterSourceAddr &&
 			offset == 1+(m_mpDspState->masterSourceAddr&0x7fff) )
@@ -575,7 +574,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 			if (ENABLE_LOGGING) logerror( "IDC-CONTINUE\n" );
 			TransferDspData(machine());
 		}
-		else if (namcos2_gametype == NAMCOS21_SOLVALOU &&
+		else if (m_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
 					&space.device() == machine().device("maincpu"))
 		{ /* hack; synchronization for solvalou */
@@ -1075,8 +1074,8 @@ READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_r){ return 0; }
 	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w) \
 	AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (?) Air Combat */ \
 	AM_RANGE(0x480000, 0x4807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w) /* Air Combat */ \
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w) \
-	AM_RANGE(0x720000, 0x720007) AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w) \
+	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) AM_SHARE("objram") \
+	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w) \
 	AM_RANGE(0x740000, 0x75ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram") \
 	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) \
 	AM_RANGE(0x800000, 0x8fffff) AM_READ(datarom_r) \
@@ -1415,8 +1414,8 @@ ADDRESS_MAP_END
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DRIVEYES_68K_COMMON \
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w) \
-	AM_RANGE(0x720000, 0x720007) AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w) \
+	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) AM_SHARE("objram") \
+	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w) \
 	AM_RANGE(0x740000, 0x75ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram") \
 	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) \
 	AM_RANGE(0x800000, 0x8fffff) AM_READ(datarom_r) \
@@ -2217,7 +2216,7 @@ ROM_END
 static void namcos21_init( running_machine &machine, int game_type )
 {
 	namcos21_state *state = machine.driver_data<namcos21_state>();
-	namcos2_gametype = game_type;
+	state->m_gametype = game_type;
 	state->m_pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	state->m_mpDataROM = (UINT16 *)state->memregion( "user1" )->base();
 	InitDSP(machine);
@@ -2237,7 +2236,7 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 
 	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
 
-	namcos2_gametype = NAMCOS21_WINRUN91;
+	m_gametype = NAMCOS21_WINRUN91;
 	m_mpDataROM = (UINT16 *)memregion( "user1" )->base();
 	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
 	m_pointram_idx = 0;
@@ -2278,7 +2277,7 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 	m_winrun_dspcomram = auto_alloc_array(machine(), UINT16, 0x1000*2);
-	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
+	m_gametype = NAMCOS21_DRIVERS_EYES;
 	m_mpDataROM = (UINT16 *)memregion( "user1" )->base();
 	m_pointram = auto_alloc_array(machine(), UINT8, PTRAM_SIZE);
 	m_pointram_idx = 0;
