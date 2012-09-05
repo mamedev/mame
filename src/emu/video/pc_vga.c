@@ -213,9 +213,9 @@ static struct
 	INT16 prev_y;
 	UINT16 src_x;
 	UINT16 src_y;
-	UINT16 line_axial_step;
-	UINT16 line_diagonal_step;
-	UINT16 line_errorterm;
+	INT16 line_axial_step;
+	INT16 line_diagonal_step;
+	INT16 line_errorterm;
 	UINT16 rect_width;
 	UINT16 rect_height;
 	UINT32 fgcolour;
@@ -2519,8 +2519,14 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 	{
 		switch(index)
 		{
+//			case 0x2e:
+//				res = 0x11;  // Trio64
+//				break;
+//			case 0x2f:
+//				res = 0x00;
+//				break;
 			case 0x30: // CR30 Chip ID/REV register
-				res = 0xc0; // TODO: hardcoded to Vision 86c864
+				res = 0xc0; // BIOS is from a card with the 764 chipset (Trio64)
 				break;
 			case 0x31:
 				res = s3.memory_config;
@@ -2978,7 +2984,7 @@ READ16_HANDLER(s3_line_error_r)
 
 WRITE16_HANDLER(s3_line_error_w)
 {
-	s3.line_errorterm = data & 0x3fff;
+	s3.line_errorterm = data;
 	logerror("S3: Line Parameter/Error Term write %04x\n",data);
 }
 
@@ -3122,7 +3128,46 @@ WRITE16_HANDLER(s3_cmd_w)
 		case 0x2000:  // Line
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - Line\n",s3.current_cmd);
+			if(data & 0x0008)
+			{
+				// TODO
+				logerror("S3: Command (%04x) - Line (Vector) - %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
+			}
+			else
+			{
+				// Not perfect, but will do for now.
+				INT16 dx = s3.rect_width;
+				INT16 dy = s3.line_axial_step >> 1;
+				INT16 err = s3.line_errorterm;
+				int sx = (data & 0x0020) ? 1 : -1;
+				int sy = (data & 0x0080) ? 1 : -1;
+				int count = 0;
+				INT16 temp;
+
+				logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
+					s3.curr_x,s3.curr_y,s3.line_axial_step,s3.line_diagonal_step,s3.line_errorterm,s3.rect_width,s3.rect_height);
+
+				if((data & 0x0040))
+				{
+					temp = dx; dx = dy; dy = temp;
+				}
+				for(;;)
+				{
+					s3_write(s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH),s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH));
+					if (count > s3.rect_width) break;
+					count++;
+					if((err*2) > -dy)
+					{
+						err -= dy;
+						s3.curr_x += sx;
+					}
+					if((err*2) < dx)
+					{
+						err += dx;
+						s3.curr_y += sy;
+					}
+				}
+			}
 			break;
 		case 0x4000:  // Rectangle Fill
 			if(data & 0x0100)  // WAIT (for read/write of PIXEL TRANSFER (E2E8))
@@ -3134,6 +3179,8 @@ WRITE16_HANDLER(s3_cmd_w)
 						s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 				break;
 			}
+			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			offset = 0;
 			offset += (VGA_LINE_LENGTH * s3.curr_y);
 			offset += s3.curr_x;
@@ -3179,10 +3226,10 @@ WRITE16_HANDLER(s3_cmd_w)
 			}
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
-					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
 			break;
 		case 0xc000:  // BitBLT
+			logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
+					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			offset = 0;
 			offset += (VGA_LINE_LENGTH * s3.dest_y);
 			offset += s3.dest_x;
@@ -3237,10 +3284,10 @@ WRITE16_HANDLER(s3_cmd_w)
 			}
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
-					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		case 0xe000:  // Pattern Fill
+			logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
+					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			offset = 0;
 			offset += (VGA_LINE_LENGTH * s3.dest_y);
 			offset += s3.dest_x;
@@ -3306,8 +3353,6 @@ WRITE16_HANDLER(s3_cmd_w)
 			}
 			s3.state = S3_IDLE;
 			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
-					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
 			break;
 		default:
 			s3.state = S3_IDLE;
@@ -3338,7 +3383,7 @@ READ16_HANDLER( s3_8ae8_r )
 
 WRITE16_HANDLER( s3_8ae8_w )
 {
-	s3.line_axial_step = data & 0x3fff;
+	s3.line_axial_step = data;
 	s3.dest_y = data;
 	logerror("S3: Line Axial Step / Destination Y write %04x\n",data);
 }
@@ -3363,7 +3408,7 @@ READ16_HANDLER( s3_8ee8_r )
 
 WRITE16_HANDLER( s3_8ee8_w )
 {
-	s3.line_diagonal_step = data & 0x3fff;
+	s3.line_diagonal_step = data;
 	s3.dest_x = data;
 	logerror("S3: Line Diagonal Step / Destination X write %04x\n",data);
 }
