@@ -8,7 +8,7 @@
 **********************************************************************/
 
 #include "d9060.h"
-#include "machine/scsihd.h"
+#include "machine/d9060hd.h"
 
 
 
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_4MHz/4, via_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", D9060HD, SCSI_ID_0)
 MACHINE_CONFIG_END
 
 

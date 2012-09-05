@@ -13,53 +13,28 @@
 #define __S1410__
 
 #include "emu.h"
+#include "machine/scsihd.h"
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_S1410_ADD( _tag) \
-    MCFG_DEVICE_ADD(_tag, S1410, 0)
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> s1410_interface
-
-struct s1410_interface
-{
-};
-
-// ======================> s1410_device
-
-class s1410_device :  public device_t,
-                      public s1410_interface
+class s1410_device  : public scsihd_device
 {
 public:
-    // construction/destruction
-    s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-protected:
-    // device-level overrides
-    virtual void device_start();
-    virtual void device_reset();
-    virtual void device_config_complete();
+	virtual void ExecCommand( int *transferLength );
+	virtual void WriteData( UINT8 *data, int dataLength );
 
-private:
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
 };
 
 
 // device type definition
 extern const device_type S1410;
-
-
 
 #endif

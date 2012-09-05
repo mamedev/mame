@@ -18,6 +18,11 @@ scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	scsidev_device(mconfig, type, name, tag, owner, clock)
+{
+}
+
 void scsihd_device::device_start()
 {
 	save_item( NAME( lba ) );

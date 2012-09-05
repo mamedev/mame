@@ -16,6 +16,8 @@
 #include "includes/rmnimbus.h"
 #include "machine/er59256.h"
 #include "machine/scsihd.h"
+#include "machine/s1410.h"
+#include "machine/acb4070.h"
 #include "machine/6522via.h"
 #include "machine/ctronics.h"
 #include "sound/ay8910.h"
@@ -320,8 +322,8 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", ACB4070, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", S1410, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", SCSIHD, SCSI_ID_2)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", SCSIHD, SCSI_ID_3)
 

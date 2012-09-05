@@ -321,76 +321,6 @@ void scsibus_device::scsibus_exec_command()
 			dataout_timer->adjust(attotime::from_seconds(FORMAT_UNIT_TIMEOUT));
 			break;
 
-		// Check track format Xebec
-		case SCSI_CMD_CHECK_TRACK_FORMAT:
-			LOG(1,"SCSIBUS: check track format\n");
-			command_local=1;
-			xfer_count=0;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
-			break;
-
-		// Setup drive parameters Xebec
-		case SCSI_CMD_INIT_DRIVE_PARAMS:
-			LOG(1,"SCSIBUS: init_drive_params: Xebec S1410\n");
-			command_local=1;
-			xfer_count=XEBEC_PARAMS_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
-			break;
-
-		// Format bad track Xebec
-		case SCSI_CMD_FORMAT_ALT_TRACK:
-			LOG(1,"SCSIBUS: format_alt_track: Xebec S1410\n");
-			command_local=1;
-			xfer_count=XEBEC_ALT_TRACK_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
-			break;
-
-		// Write buffer Xebec S1410 specific
-		case SCSI_CMD_WRITE_SEC_BUFFER:
-			LOG(1,"SCSIBUS: write_sector_buffer: Xebec S1410\n");
-			command_local=1;
-			xfer_count=XEBEC_SECTOR_BUFFER_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
-			break;
-
-		// Read buffer Xebec S1410 specific
-		case SCSI_CMD_READ_SEC_BUFFER:
-			LOG(1,"SCSIBUS: read_sector_buffer: Xebec S1410\n");
-			command_local=1;
-			xfer_count=XEBEC_SECTOR_BUFFER_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAIN);
-			break;
-
-		// Write buffer, Adaptec ACB40x0 specific
-		case SCSI_CMD_WRITE_DATA_BUFFER:
-			LOG(1,"SCSIBUS: write_buffer: Adaptec ACB40x0\n");
-			command_local=1;
-			xfer_count=ADAPTEC_DATA_BUFFER_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAOUT);
-			break;
-
-		// Read buffer, Adaptec ACB40x0 specific
-		case SCSI_CMD_READ_DATA_BUFFER:
-			LOG(1,"SCSIBUS: read_data_buffer: Adaptec ACB40x0\n");
-			command_local=1;
-			xfer_count=ADAPTEC_DATA_BUFFER_SIZE;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_DATAIN);
-			break;
-
 		// Send diagnostic info
 		case SCSI_CMD_SEND_DIAGNOSTIC:
 			LOG(1,"SCSIBUS: send_diagnostic\n");
@@ -402,7 +332,7 @@ void scsibus_device::scsibus_exec_command()
 			break;
 
 		case SCSI_CMD_SEARCH_DATA_EQUAL:
-			LOG(1,"SCSIBUS: Search_data_equal ACB40x0\n");
+			LOG(1,"SCSIBUS: Search_data_equaln");
 			command_local=1;
 			xfer_count=0;
 			data_last=xfer_count;
@@ -443,28 +373,6 @@ void scsibus_device::scsibus_exec_command()
 			data_last=xfer_count;
 			bytes_left=0;
 			devices[last_id]->SetPhase(SCSI_PHASE_DATAIN);
-			break;
-
-		// Xebec S1410
-		case SCSI_CMD_RAM_DIAGS:
-		case SCSI_CMD_DRIVE_DIAGS:
-		case SCSI_CMD_CONTROLER_DIAGS:
-			LOG(1,"SCSIBUS: Xebec RAM, disk or Controler diags [%02X]\n",command[0]);
-			command_local=1;
-			xfer_count=0;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
-			break;
-
-		// Commodore D9060/9090
-		case SCSI_CMD_PHYSICAL_DEVICE_ID:
-			LOG(1,"SCSIBUS: physical device ID\n");
-			command_local=1;
-			xfer_count=0;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
 			break;
 	}
 
@@ -527,14 +435,6 @@ void scsibus_device::check_process_dataout()
 
 	switch (command[0])
 	{
-		case SCSI_CMD_INIT_DRIVE_PARAMS:
-			tracks=((buffer[0]<<8)+buffer[1]);
-			capacity=(tracks * buffer[2]) * 17;
-			LOG(1,"Tracks=%d, Heads=%d\n",tracks,buffer[2]);
-			LOG(1,"Setting disk capacity to %d blocks\n",capacity);
-			//debugger_break(device->machine());
-			break;
-
 		case SCSI_CMD_MODE_SELECT:
 			sense=(adaptec_sense_t *)buffer;
 			tracks=(sense->cylinder_count[0]<<8)+sense->cylinder_count[1];
@@ -757,8 +657,6 @@ void scsibus_device::scsi_change_phase(UINT8 newphase)
 			scsi_out_line_change(SCSI_LINE_REQ,1);
 			scsi_out_line_change(SCSI_LINE_BSY,1);
 			LOG(1,"SCSIBUS: done\n\n");
-			//if (IS_COMMAND(SCSI_CMD_READ_CAPACITY))
-			//  debugger_break(device->machine());
 			break;
 
 		case SCSI_PHASE_COMMAND:

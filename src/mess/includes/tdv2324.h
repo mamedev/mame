@@ -13,7 +13,6 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "machine/s1410.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
 #include "video/tms9927.h"

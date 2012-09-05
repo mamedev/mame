@@ -894,6 +894,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c2040.o		\
 	$(MESS_MACHINE)/c8280.o		\
 	$(MESS_MACHINE)/d9060.o		\
+	$(MESS_MACHINE)/d9060hd.o	\
 	$(MESS_MACHINE)/softbox.o	\
 	$(MESS_MACHINE)/serialbox.o	\
 	$(MESS_MACHINE)/cmdhd.o	\
@@ -1518,6 +1519,7 @@ $(MESSOBJ)/rm.a:				\
 	$(MESS_DRIVERS)/rmnimbus.o	\
 	$(MESS_MACHINE)/rmnimbus.o  \
 	$(MESS_VIDEO)/rmnimbus.o    \
+	$(MESS_MACHINE)/acb4070.o	\
 
 $(MESSOBJ)/robotron.a:			\
 	$(MESS_DRIVERS)/a5105.o		\

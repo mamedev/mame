@@ -193,8 +193,6 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( s1410 );
 }
 
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -204,24 +202,84 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, S1410, "Xebec S1410", tag, owner, clock)
+    : scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock)
 {
 }
 
+#define S1410_CMD_CHECK_TRACK_FORMAT ( 0x05 )
+#define S1410_CMD_INIT_DRIVE_PARAMS ( 0x0c )
+#define S1410_CMD_FORMAT_ALT_TRACK ( 0x0E )
+#define S1410_CMD_WRITE_SEC_BUFFER ( 0x0F )
+#define S1410_CMD_READ_SEC_BUFFER ( 0x10 )
+#define S1410_CMD_RAM_DIAGS ( 0xe0 )
+#define S1410_CMD_DRIVE_DIAGS ( 0xe3 )
+#define S1410_CMD_CONTROLER_DIAGS ( 0xe4 )
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+#define TRANSFERLENGTH_INIT_DRIVE_PARAMS ( 0x08 )
+#define TRANSFERLENGTH_FORMAT_ALT_TRACK ( 0x03 )
+#define TRANSFERLENGTH_SECTOR_BUFFER ( 0x0200 )
 
-void s1410_device::device_start()
+void s1410_device::ExecCommand( int *transferLength )
 {
+	UINT8 *command;
+	int commandLength;
+	GetCommand( &command, &commandLength );
+
+	switch( command[ 0 ] )
+	{
+	case S1410_CMD_INIT_DRIVE_PARAMS:
+		SetPhase(SCSI_PHASE_DATAOUT);
+		*transferLength = TRANSFERLENGTH_INIT_DRIVE_PARAMS;
+		break;
+
+	case S1410_CMD_FORMAT_ALT_TRACK:
+		SetPhase(SCSI_PHASE_DATAOUT);
+		*transferLength = TRANSFERLENGTH_FORMAT_ALT_TRACK;
+		break;
+
+	case S1410_CMD_WRITE_SEC_BUFFER:
+		SetPhase(SCSI_PHASE_DATAOUT);
+		*transferLength = TRANSFERLENGTH_SECTOR_BUFFER;
+		break;
+
+	case S1410_CMD_READ_SEC_BUFFER:
+		SetPhase(SCSI_PHASE_DATAIN);
+		*transferLength = TRANSFERLENGTH_SECTOR_BUFFER;
+		break;
+
+	case S1410_CMD_CHECK_TRACK_FORMAT:
+	case S1410_CMD_RAM_DIAGS:
+	case S1410_CMD_DRIVE_DIAGS:
+	case S1410_CMD_CONTROLER_DIAGS:
+		SetPhase(SCSI_PHASE_STATUS);
+		*transferLength = 0;
+		break;
+
+	default:
+		scsihd_device::ExecCommand( transferLength );
+		break;
+	}
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void s1410_device::device_reset()
+void s1410_device::WriteData( UINT8 *data, int dataLength )
 {
+	UINT8 *command;
+	int commandLength;
+	GetCommand( &command, &commandLength );
+
+	switch( command[ 0 ] )
+	{
+	case S1410_CMD_INIT_DRIVE_PARAMS:
+		{
+			UINT16 tracks=((data[0]<<8)+data[1]);
+			UINT8 heads = data[2];
+			UINT32 capacity=(tracks * heads) * 17;
+			logerror("S1410_CMD_INIT_DRIVE_PARAMS Tracks=%d, Heads=%d, Capacity=%d\n",tracks,heads,capacity);
+		}
+		break;
+
+	default:
+		scsihd_device::WriteData( data, dataLength );
+		break;
+	}
 }
