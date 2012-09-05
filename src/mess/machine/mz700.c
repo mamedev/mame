@@ -436,23 +436,17 @@ static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 )
 static READ8_DEVICE_HANDLER( pio_port_b_r )
 {
 	int key_line = dynamic_cast<ttl74145_device *>(device)->read();
+	const char *const keynames[10] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
+	int i;
+	UINT8 res = 0;
 
-	switch (key_line)
+	for(i=0;i<10;i++)
 	{
-	case 1 << 0: return device->machine().root_device().ioport("ROW0")->read();
-	case 1 << 1: return device->machine().root_device().ioport("ROW1")->read();
-	case 1 << 2: return device->machine().root_device().ioport("ROW2")->read();
-	case 1 << 3: return device->machine().root_device().ioport("ROW3")->read();
-	case 1 << 4: return device->machine().root_device().ioport("ROW4")->read();
-	case 1 << 5: return device->machine().root_device().ioport("ROW5")->read();
-	case 1 << 6: return device->machine().root_device().ioport("ROW6")->read();
-	case 1 << 7: return device->machine().root_device().ioport("ROW7")->read();
-	case 1 << 8: return device->machine().root_device().ioport("ROW8")->read();
-	case 1 << 9: return device->machine().root_device().ioport("ROW9")->read();
+		if(key_line & (1 << i))
+			res |= device->machine().root_device().ioport(keynames[i])->read();
 	}
 
-	/* should never reach this */
-    return 0xff;
+    return res;
 }
 
 /*
