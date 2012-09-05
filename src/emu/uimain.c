@@ -367,7 +367,8 @@ void ui_menu_keyboard_mode::handle()
 -------------------------------------------------*/
 int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 {
-	const char *current = machine().options().value(slot->device().tag()+1);
+	astring temp;
+	const char *current = machine().options().main_value(temp,slot->device().tag()+1);
 	const slot_interface* intf = slot->get_slot_interfaces();
 	int val = -1;
 	for (int i = 0; intf[i].name != NULL; i++) {
@@ -421,7 +422,8 @@ const char *ui_menu_slot_devices::slot_get_prev(device_slot_interface *slot)
 -------------------------------------------------*/
 const char *ui_menu_slot_devices::get_slot_device(device_slot_interface *slot)
 {
-	return machine().options().value(slot->device().tag()+1);
+	astring temp;
+	return machine().options().main_value(temp,slot->device().tag()+1);
 }
 
 
@@ -550,6 +552,13 @@ void ui_menu_bios_selection::handle()
 			if (strcmp(dev->tag(),":")==0) {
 				astring error;
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
+				assert(!error);
+			} else {
+				astring error;
+				astring value;
+				astring temp;
+				value.printf("%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
+				machine().options().set_value(dev->owner()->tag()+1, value.cstr(), OPTION_PRIORITY_CMDLINE, error);
 				assert(!error);
 			}
 			reset(UI_MENU_RESET_REMEMBER_REF);

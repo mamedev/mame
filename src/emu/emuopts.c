@@ -565,3 +565,31 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 
 	return result;
 }
+
+
+const char *emu_options::main_value(astring &buffer, const char *name) const
+{	
+	buffer = value(name);
+	int pos = buffer.chr(0,',');
+	if (pos!=-1) {
+		buffer = buffer.substr(0,pos);
+	}
+	return buffer.cstr();
+}
+
+const char *emu_options::sub_value(astring &buffer, const char *name, const char *subname) const
+{	
+	astring tmp = ",";
+	tmp.cat(subname);
+	tmp.cat("=");
+	buffer = value(name);
+	int pos = buffer.find(0,tmp);
+	if (pos!=-1) {
+		int endpos = buffer.chr(pos+1,',');
+		if(endpos==-1) endpos = buffer.len();
+		buffer = buffer.substr(pos+tmp.len(),endpos-pos-tmp.len());
+	} else {
+		buffer ="";
+	}
+	return buffer.cstr();
+}

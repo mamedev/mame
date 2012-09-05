@@ -283,24 +283,22 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
     from SystemBios structure and OPTION_BIOS
 -------------------------------------------------*/
 
-static void determine_bios_rom(rom_load_data *romdata)
+static void determine_bios_rom(rom_load_data *romdata, device_t *device,const char *specbios)
 {
-	const char *specbios = romdata->machine().options().bios();
 	const char *defaultname = NULL;
 	const rom_entry *rom;
 	int default_no = 1;
 	int bios_count = 0;
 
 
-	device_t &rootdevice = romdata->machine().config().root_device();
-	rootdevice.set_system_bios(0);
+	device->set_system_bios(0);
 	/* first determine the default BIOS name */
-	for (rom = rootdevice.rom_region(); !ROMENTRY_ISEND(rom); rom++)
+	for (rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			defaultname = ROM_GETNAME(rom);
 
 	/* look for a BIOS with a matching name */
-	for (rom = rootdevice.rom_region(); !ROMENTRY_ISEND(rom); rom++)
+	for (rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
 			const char *biosname = ROM_GETNAME(rom);
@@ -310,14 +308,14 @@ static void determine_bios_rom(rom_load_data *romdata)
 			/* Allow '-bios n' to still be used */
 			sprintf(bios_number, "%d", bios_flags - 1);
 			if (mame_stricmp(bios_number, specbios) == 0 || mame_stricmp(biosname, specbios) == 0)
-				rootdevice.set_system_bios(bios_flags);
+				device->set_system_bios(bios_flags);
 			if (defaultname != NULL && mame_stricmp(biosname, defaultname) == 0)
 				default_no = bios_flags;
 			bios_count++;
 		}
 
 	/* if none found, use the default */
-	if (rootdevice.system_bios() == 0 && bios_count > 0)
+	if (device->system_bios() == 0 && bios_count > 0)
 	{
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
@@ -327,10 +325,10 @@ static void determine_bios_rom(rom_load_data *romdata)
 		}
 
 		/* set to default */
-		rootdevice.set_system_bios(default_no);
+		device->set_system_bios(default_no);
 	}
-	rootdevice.set_default_bios(default_no);
-	LOG(("Using System BIOS: %d\n", rootdevice.system_bios()));
+	device->set_default_bios(default_no);
+	LOG(("For \"%s\" using System BIOS: %d\n", device->tag(), device->system_bios()));
 }
 
 
@@ -352,7 +350,7 @@ static void count_roms(rom_load_data *romdata)
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		for (region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
-				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == romdata->machine().config().root_device().system_bios())
+				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == device->system_bios())
 				{
 					romdata->romstotal++;
 					romdata->romstotalsize += rom_file_size(rom);
@@ -848,7 +846,7 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
     for a region
 -------------------------------------------------*/
 
-static void process_rom_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp)
+static void process_rom_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device)
 {
 	UINT32 lastflags = 0;
 
@@ -878,7 +876,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
 		/* handle files */
 		else if (ROMENTRY_ISFILE(romp))
 		{
-			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != romdata->machine().config().root_device().system_bios());
+			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != device->system_bios());
 			const rom_entry *baserom = romp;
 			int explength = 0;
 
@@ -1357,7 +1355,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(romdata, locationtag, region, region + 1);
+			process_rom_entries(romdata, locationtag, region, region + 1, device);
 		else if (ROMREGION_ISDISKDATA(region))
 			process_disk_entries(romdata, core_strdup(regiontag.cstr()), region, region + 1, locationtag);
 	}
@@ -1421,7 +1419,7 @@ static void process_region_list(rom_load_data *romdata)
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(romdata, device->shortname(), region, region + 1);
+				process_rom_entries(romdata, device->shortname(), region, region + 1, device);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(romdata, regiontag, region, region + 1, NULL);
@@ -1456,7 +1454,19 @@ void rom_init(running_machine &machine)
 	romdata->m_machine = &machine;
 
 	/* figure out which BIOS we are using */
-	determine_bios_rom(romdata);
+	device_iterator deviter(romdata->machine().config().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) {	
+		if (device->rom_region()) {
+			const char *specbios;
+			astring temp;
+			if (strcmp(device->tag(),":")==0) {
+				specbios = romdata->machine().options().bios();
+			} else {
+				specbios = romdata->machine().options().sub_value(temp,device->owner()->tag()+1,"bios");				
+			}
+			determine_bios_rom(romdata, device, specbios);
+		}
+	}
 
 	/* count the total number of ROMs */
 	count_roms(romdata);

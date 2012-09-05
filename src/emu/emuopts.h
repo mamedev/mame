@@ -357,6 +357,9 @@ public:
 	const char *device_option(device_image_interface &image);
 
 	void remove_device_options();
+
+	const char *main_value(astring &buffer, const char *option) const;
+	const char *sub_value(astring &buffer, const char *name, const char *subname) const;
 private:
 	// device-specific option handling
 	void add_device_options(bool isfirst);
