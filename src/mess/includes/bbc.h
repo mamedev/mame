@@ -17,6 +17,7 @@
 #include "machine/wd17xx.h"
 #include "machine/upd7002.h"
 #include "video/mc6845.h"
+#include "sound/sn76496.h"
 
 class bbc_state : public driver_device
 {
@@ -24,6 +25,7 @@ public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
+		  m_sn(*this, "sn76489"),
 		  m_ACCCON_IRR(CLEAR_LINE),
 		  m_via_system_irq(CLEAR_LINE),
 		  m_via_user_irq(CLEAR_LINE),
@@ -31,6 +33,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<sn76489_new_device> m_sn;
 
 	void check_interrupts();
 

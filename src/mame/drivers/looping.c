@@ -546,8 +546,8 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_w)
 	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE_LEGACY("tms", tms5220_data_w)
-	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD_LEGACY("tms", tms5220_status_r) AM_WRITENOP
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("tms", tms5220n_device, write)
+	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220n_device, read) AM_WRITENOP
 	AM_RANGE(0x3e03, 0x3e03) AM_MIRROR(0x00f6) AM_NOP
 ADDRESS_MAP_END
 
@@ -606,7 +606,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const tms5220_interface tms5220_config =
+static const tms52xx_config tms5220interface =
 {
 	DEVCB_DRIVER_LINE_MEMBER(looping_state,looping_spcint),		// IRQ
 	DEVCB_NULL						// READYQ
@@ -673,8 +673,8 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("tms", TMS5220, TMS_CLOCK)
-	MCFG_SOUND_CONFIG(tms5220_config)
+	MCFG_SOUND_ADD("tms", TMS5220N, TMS_CLOCK)
+	MCFG_SOUND_CONFIG(tms5220interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac")

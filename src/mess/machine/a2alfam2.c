@@ -24,14 +24,26 @@ const device_type A2BUS_ALFAM2 = &device_creator<a2bus_alfam2_device>;
 #define SN2_TAG         "sn76489_2" // center
 #define SN3_TAG         "sn76489_3" // right
 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
 MACHINE_CONFIG_FRAGMENT( a2alfam2 )
     MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
-    MCFG_SOUND_ADD(SN1_TAG, SN76489, XTAL_3_579545MHz)
+    MCFG_SOUND_ADD(SN1_TAG, SN76489_NEW, XTAL_3_579545MHz)
+	MCFG_SOUND_CONFIG(psg_intf)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
-    MCFG_SOUND_ADD(SN2_TAG, SN76489, XTAL_3_579545MHz)
+    MCFG_SOUND_ADD(SN2_TAG, SN76489_NEW, XTAL_3_579545MHz)
+	MCFG_SOUND_CONFIG(psg_intf)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
-    MCFG_SOUND_ADD(SN3_TAG, SN76489, XTAL_3_579545MHz)
+    MCFG_SOUND_ADD(SN3_TAG, SN76489_NEW, XTAL_3_579545MHz)
+	MCFG_SOUND_CONFIG(psg_intf)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
@@ -92,15 +104,15 @@ void a2bus_alfam2_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
     switch (offset)
     {
         case 0:
-            sn76496_w(m_sn1, 0, data);
+            m_sn1->write(space, 0, data);
             break;
 
         case 1:
-            sn76496_w(m_sn2, 0, data);
+            m_sn2->write(space, 0, data);
             break;
 
         case 2:
-            sn76496_w(m_sn3, 0, data);
+            m_sn3->write(space, 0, data);
             break;
     }
 }

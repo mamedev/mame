@@ -87,7 +87,7 @@ public:
 	required_device<device_t> m_wave;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_audio;
+	required_device<sn76489_new_device> m_audio;
 	required_device<msm5832_device> m_rtc;
 	DECLARE_READ8_MEMBER( mycom_upper_r );
 	DECLARE_WRITE8_MEMBER( mycom_upper_w );
@@ -418,7 +418,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 
 	// if WE & CE are low, pass sound command to audio chip
 	if ((data & 0x30)==0)
-		sn76496_w(m_audio, 0, m_sn_we);
+		m_audio->write(space, 0, m_sn_we);
 }
 
 static WRITE8_DEVICE_HANDLER( mycom_rtc_w )
@@ -549,6 +549,23 @@ static const wd17xx_interface wd1771_intf =
 };
 
 
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 MACHINE_START_MEMBER(mycom_state)
 {
 	m_p_ram = memregion("maincpu")->base();
@@ -595,8 +612,9 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL_10MHz / 4)
+	MCFG_SOUND_ADD("sn1", SN76489_NEW, XTAL_10MHz / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* Devices */
 	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)

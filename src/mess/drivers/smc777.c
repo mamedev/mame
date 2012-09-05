@@ -32,8 +32,11 @@ class smc777_state : public driver_device
 {
 public:
 	smc777_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+	m_sn(*this, "sn1")
+	{ }
+		
+	optional_device<sn76489a_new_device> m_sn;
 	UINT16 m_cursor_addr;
 	UINT16 m_cursor_raster;
 	UINT8 m_keyb_press;
@@ -686,7 +689,7 @@ WRITE8_MEMBER(smc777_state::smc777_io_w)
 	else if(low_offs >= 0x48 && low_offs <= 0x4f) { logerror("HDD (Winchester) write %02x %02x\n",low_offs & 1,data); } //might be 0x48 - 0x50
 	else if(low_offs == 0x51)					  { smc777_color_mode_w(space,0,data); }
 	else if(low_offs == 0x52)					  { smc777_ramdac_w(space,offset & 0xff00,data); }
-	else if(low_offs == 0x53)					  { sn76496_w(machine().device("sn1"),0,data); }
+	else if(low_offs == 0x53)					  { m_sn->write(space,0,data); }
 	else if(low_offs >= 0x54 && low_offs <= 0x59) { logerror("VTR Controller write [%02x] %02x\n",low_offs & 7,data); }
 	else if(low_offs == 0x5a || low_offs == 0x5b) { logerror("RAM Banking write [%02x] %02x\n",low_offs & 1,data); }
 	else if(low_offs == 0x70)					  { logerror("Auto-start ROM write %02x\n",data); }
@@ -1049,6 +1052,24 @@ static INTERRUPT_GEN( smc777_vblank_irq )
 		device_set_input_line(device,0,HOLD_LINE);
 }
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 #define MASTER_CLOCK XTAL_4_028MHz
 
 static MACHINE_CONFIG_START( smc777, smc777_state )
@@ -1083,8 +1104,9 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
+	MCFG_SOUND_ADD("sn1", SN76489A_NEW, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

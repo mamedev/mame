@@ -49,8 +49,8 @@ public:
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_sn1;
-	required_device<device_t> m_sn2;
+	required_device<sn76489a_new_device> m_sn1;
+	required_device<sn76489a_new_device> m_sn2;
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(pasopia7_memory_ctrl_w);
@@ -736,10 +736,10 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		m_pio->write_alt(space, io_port & 3, data);
 	else
 	if(io_port == 0x3a)
-		sn76496_w(m_sn1, 0, data);
+		m_sn1->write(space, 0, data);
 	else
 	if(io_port == 0x3b)
-		sn76496_w(m_sn2, 0, data);
+		m_sn2->write(space, 0, data);
 	else
 	if(io_port == 0x3c)
 		pasopia7_memory_ctrl_w(space,0, data);
@@ -1043,6 +1043,24 @@ static const floppy_interface pasopia7_floppy_interface =
 	NULL
 };
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+ 
+ 
+//-------------------------------------------------
+//  sn76496_config psg_intf
+//-------------------------------------------------
+
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -1054,10 +1072,12 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MCFG_SOUND_ADD("sn1", SN76489A_NEW, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
+	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SOUND_ADD("sn2", SN76489A_NEW, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_4MHz, z80ctc_intf )

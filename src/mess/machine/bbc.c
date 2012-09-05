@@ -918,7 +918,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 	if (state->m_b0_sound == 0)
 	{
 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
-		sn76496_w(device->machine().device("sn76489"), 0,state->m_via_system_porta);
+		state->m_sn->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0,state->m_via_system_porta);
 	}
 	if (state->m_b3_keyboard == 0)
 	{
@@ -1030,7 +1030,7 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_portb )
 			if (state->m_b0_sound == 1)
 			{
 				state->m_b0_sound = 0;
-				sn76496_w(space->machine().device("sn76489"), 0, state->m_via_system_porta);
+				state->m_sn->write(*device->machine().device<legacy_cpu_device>("maincpu")->space(), 0, state->m_via_system_porta);
 			}
 			break;
 		case 1:
