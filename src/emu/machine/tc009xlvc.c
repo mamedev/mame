@@ -181,47 +181,44 @@ void tc0091lvc_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
 {
-	tc0091lvc_device *vdp = (tc0091lvc_device*)device;
-	int attr = vdp->m_vram0[2 * tile_index + 1];
-	int code = vdp->m_vram0[2 * tile_index]
+	int attr = m_vram0[2 * tile_index + 1];
+	int code = m_vram0[2 * tile_index]
 			| ((attr & 0x03) << 8)
-			| ((vdp->m_vregs[(attr & 0xc) >> 2]) << 10);
+			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
 //          | (state->m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
 
-static TILE_GET_INFO_DEVICE( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
 {
-	tc0091lvc_device *vdp = (tc0091lvc_device*)device;
-	int attr = vdp->m_vram1[2 * tile_index + 1];
-	int code = vdp->m_vram1[2 * tile_index]
+	int attr = m_vram1[2 * tile_index + 1];
+	int code = m_vram1[2 * tile_index]
 			| ((attr & 0x03) << 8)
-			| ((vdp->m_vregs[(attr & 0xc) >> 2]) << 10);
+			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
 //          | (state->m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
 
-static TILE_GET_INFO_DEVICE( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 {
-	tc0091lvc_device *vdp = (tc0091lvc_device*)device;
-	int attr = vdp->m_tvram[2 * tile_index + 1];
-	UINT16 code = vdp->m_tvram[2 * tile_index]
+	int attr = m_tvram[2 * tile_index + 1];
+	UINT16 code = m_tvram[2 * tile_index]
 			| ((attr & 0x07) << 8);
 
-	SET_TILE_INFO_DEVICE(
-			vdp->m_gfx_index,
+	SET_TILE_INFO_MEMBER(
+			m_gfx_index,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
@@ -258,9 +255,9 @@ void tc0091lvc_device::device_start()
 	m_sprram = m_pcg_ram + 0xb000;
 	m_sprram_buffer = auto_alloc_array_clear(machine(), UINT8, 0x400);
 
-	tx_tilemap = tilemap_create_device(this, get_tx_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg0_tilemap = tilemap_create_device(this, get_bg0_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg1_tilemap = tilemap_create_device(this, get_bg1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	tx_tilemap->set_transparent_pen(0);
 	bg0_tilemap->set_transparent_pen(0);

@@ -40,6 +40,10 @@ public:
 	DECLARE_WRITE8_MEMBER( tc0091lvc_bg0_scroll_w );
 	DECLARE_WRITE8_MEMBER( tc0091lvc_bg1_scroll_w );
 
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+
 	UINT8 *m_palette_ram;
 	UINT8 *m_vregs;
 	UINT8 *m_bitmap_ram;
