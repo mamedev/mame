@@ -139,24 +139,8 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 	*keyport = F5;
 	*kernal = F6;
 
-	// the following logic is actually inside the TED
-
-	*cs0 = 1;
-	*cs1 = 1;
-
-	if (m_rom_en)
-	{
-		if (offset >= 0x8000 && offset < 0xc000)
-		{
-			*cs0 = 0;
-			*cs1 = 1;
-		}
-		else if ((offset >= 0xc000 && offset < 0xfd00) || (offset >= 0xff20))
-		{
-			*cs0 = 1;
-			*cs1 = 0;
-		}
-	}
+	*cs0 = m_ted->cs0_r(offset);
+	*cs1 = m_ted->cs1_r(offset);
 }
 
 
@@ -169,7 +153,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 	UINT8 data = m_ted->bus_r();
 	int c1l = 1, c1h = 1, c2l = 1, c2h = 1;
 
-	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u m_rom_en %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1,m_rom_en);
+	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
 	if (!scs && m_t6721)
 	{
@@ -298,7 +282,7 @@ WRITE8_MEMBER( plus4_state::write )
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
 
-	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u m_rom_en %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1,m_rom_en);
+	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
 	if (!scs && m_t6721)
 	{
@@ -326,15 +310,11 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (offset == 0xff3e)
 	{
-		m_rom_en = 1;
-
-		m_ted->rom_switch_w(m_rom_en);
+		m_ted->rom_switch_w(1);
 	}
 	else if (offset == 0xff3f)
 	{
-		m_rom_en = 0;
-
-		m_ted->rom_switch_w(m_rom_en);
+		m_ted->rom_switch_w(0);
 	}
 	else if (offset < 0xfd00 || offset >= 0xff20)
 	{
@@ -342,6 +322,21 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 
 	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+}
+
+
+//-------------------------------------------------
+//  ted_videoram_r -
+//-------------------------------------------------
+
+READ8_MEMBER( plus4_state::ted_videoram_r )
+{
+	int phi0 = 1, mux = 0, ras = 1, ba = 0;
+	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
+
+	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+
+	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
 }
 
 
@@ -356,6 +351,15 @@ WRITE8_MEMBER( plus4_state::write )
 
 static ADDRESS_MAP_START( plus4_mem, AS_PROGRAM, 8, plus4_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( ted_videoram_map )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( ted_videoram_map, AS_0, 8, plus4_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(ted_videoram_r)
 ADDRESS_MAP_END
 
 
@@ -637,26 +641,6 @@ WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
 	check_interrupts();
 }
 
-READ8_MEMBER( plus4_state::ted_ram_r )
-{
-	int phi0 = 1, mux = 0, ras = 1, ba = 0;
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
-
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
-
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, 1, 1);
-}
-
-READ8_MEMBER( plus4_state::ted_rom_r )
-{
-	int phi0 = 1, mux = 0, ras = 1, ba = 0;
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
-
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
-
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
-}
-
 READ8_MEMBER( plus4_state::ted_k_r )
 {
 	UINT8 value = 0xff;
@@ -685,8 +669,6 @@ static MOS7360_INTERFACE( ted_intf )
 	SCREEN_TAG,
 	MOS7501_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(plus4_state, ted_irq_w),
-	DEVCB_DRIVER_MEMBER(plus4_state, ted_ram_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, ted_rom_r),
 	DEVCB_DRIVER_MEMBER(plus4_state, ted_k_r)
 };
 
@@ -872,7 +854,6 @@ void plus4_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_addr));
-	save_item(NAME(m_rom_en));
 	save_item(NAME(m_ted_irq));
 	save_item(NAME(m_acia_irq));
 	save_item(NAME(m_exp_irq));
@@ -902,7 +883,6 @@ void plus4_state::machine_reset()
 	}
 
 	m_addr = 0;
-	m_rom_en = 1;
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -931,7 +911,7 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 
 	// video and sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_14_31818MHz/4, ted_intf)
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_14_31818MHz/4, ted_intf, ted_videoram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -970,7 +950,7 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 
 	// video and sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_17_73447MHz/5, ted_intf)
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_17_73447MHz/5, ted_intf, ted_videoram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices

@@ -174,6 +174,27 @@ static const UINT8 PALETTE[] =
 const device_type MOS7360 = &device_creator<mos7360_device>;
 
 
+// default address maps
+static ADDRESS_MAP_START( mos7360_videoram_map, AS_0, 8, mos7360_device )
+	AM_RANGE(0x0000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *mos7360_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch (spacenum)
+	{
+		case AS_0: return &m_videoram_space_config;
+		default: return NULL;
+	}
+}
+
+
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -211,6 +232,30 @@ inline int mos7360_device::rastercolumn()
 	return (int) ((machine().time().as_double() - m_rastertime) * TED7360_VRETRACERATE * m_lines * 57 * 8 + 0.5);
 }
 
+inline UINT8 mos7360_device::read_ram(offs_t offset)
+{
+	int rom = m_rom;
+	m_rom = 0;
+
+	m_last_data = space(AS_0)->read_byte(offset);
+
+	m_rom = rom;
+	
+	return m_last_data;
+}
+
+inline UINT8 mos7360_device::read_rom(offs_t offset)
+{
+	int rom = m_rom;
+	m_rom = 1;
+
+	m_last_data = space(AS_0)->read_byte(offset);
+
+	m_rom = rom;
+	
+	return m_last_data;
+}
+
 
 
 //**************************************************************************
@@ -223,7 +268,9 @@ inline int mos7360_device::rastercolumn()
 
 mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS7360, "MOS7360", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
 	  device_sound_interface(mconfig, *this),
+	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos7360_videoram_map)),
 	  m_stream(NULL)
 {
 }
@@ -246,8 +293,6 @@ void mos7360_device::device_config_complete()
 	else
 	{
 		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_in_ram_cb, 0, sizeof(m_in_ram_cb));
-		memset(&m_in_rom_cb, 0, sizeof(m_in_rom_cb));
 		memset(&m_in_k_cb, 0, sizeof(m_in_k_cb));
 	}
 }
@@ -269,8 +314,6 @@ void mos7360_device::device_start()
 
 	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_in_ram_func.resolve(m_in_ram_cb, *this);
-	m_in_rom_func.resolve(m_in_rom_cb, *this);
 	m_in_k_func.resolve(m_in_k_cb, *this);
 
 	// allocate timers
@@ -479,11 +522,9 @@ void mos7360_device::draw_character(int ybegin, int yend, int ch, int yoff, int 
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = m_in_rom_func(m_chargenaddr + ch * 8 + y);
+			code = read_rom(m_chargenaddr + ch * 8 + y);
 		else
-			code = m_in_ram_func(m_chargenaddr + ch * 8 + y);
-
-		m_last_data = code;
+			code = read_ram(m_chargenaddr + ch * 8 + y);
 
 		m_bitmap.pix16(y + yoff, 0 + xoff) = color[code >> 7];
 		m_bitmap.pix16(y + yoff, 1 + xoff) = color[(code >> 6) & 1];
@@ -503,11 +544,9 @@ void mos7360_device::draw_character_multi(int ybegin, int yend, int ch, int yoff
 	for (y = ybegin; y <= yend; y++)
 	{
 		if (INROM)
-			code = m_in_rom_func(m_chargenaddr + ch * 8 + y);
+			code = read_rom(m_chargenaddr + ch * 8 + y);
 		else
-			code = m_in_ram_func(m_chargenaddr + ch * 8 + y);
-
-		m_last_data = code;
+			code = read_ram(m_chargenaddr + ch * 8 + y);
 
 		m_bitmap.pix16(y + yoff, 0 + xoff) =
 			m_bitmap.pix16(y + yoff, 1 + xoff) = m_multi[code >> 6];
@@ -526,10 +565,8 @@ void mos7360_device::draw_bitmap(int ybegin, int yend, int ch, int yoff, int xof
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = m_in_ram_func(m_bitmapaddr + ch * 8 + y);
+		code = read_ram(m_bitmapaddr + ch * 8 + y);
 		
-		m_last_data = code;
-
 		m_bitmap.pix16(y + yoff, 0 + xoff) = m_c16_bitmap[code >> 7];
 		m_bitmap.pix16(y + yoff, 1 + xoff) = m_c16_bitmap[(code >> 6) & 1];
 		m_bitmap.pix16(y + yoff, 2 + xoff) = m_c16_bitmap[(code >> 5) & 1];
@@ -547,10 +584,8 @@ void mos7360_device::draw_bitmap_multi(int ybegin, int yend, int ch, int yoff, i
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = m_in_ram_func(m_bitmapaddr + ch * 8 + y);
+		code = read_ram(m_bitmapaddr + ch * 8 + y);
 		
-		m_last_data = code;
-
 		m_bitmap.pix16(y + yoff, 0 + xoff) =
 			m_bitmap.pix16(y + yoff, 1 + xoff) = m_bitmapmulti[code >> 6];
 		m_bitmap.pix16(y + yoff, 2 + xoff) =
@@ -643,8 +678,8 @@ void mos7360_device::drawlines(int first, int last)
 		{
 			if (HIRESON)
 			{
-				ch = m_in_ram_func((m_videoaddr | 0x400) + offs);
-				attr = m_in_ram_func(m_videoaddr + offs);
+				ch = read_ram((m_videoaddr | 0x400) + offs);
+				attr = read_ram(m_videoaddr + offs);
 				c1 = ((ch >> 4) & 0xf) | (attr << 4);
 				c2 = (ch & 0xf) | (attr & 0x70);
 				m_bitmapmulti[1] = m_c16_bitmap[1] = c1 & 0x7f;
@@ -660,8 +695,8 @@ void mos7360_device::drawlines(int first, int last)
 			}
 			else
 			{
-				ch = m_in_ram_func((m_videoaddr | 0x400) + offs);
-				attr = m_in_ram_func(m_videoaddr + offs);
+				ch = read_ram((m_videoaddr | 0x400) + offs);
+				attr = read_ram(m_videoaddr + offs);
 				// levente harsfalvi's docu says cursor off in ecm and multicolor
 				if (ECMON)
 				{
@@ -1159,4 +1194,34 @@ void mos7360_device::raster_interrupt_gen()
 UINT8 mos7360_device::bus_r()
 {
 	return m_last_data;
+}
+
+
+//-------------------------------------------------
+//  cs0_r - chip select 0 read
+//-------------------------------------------------
+
+int mos7360_device::cs0_r(offs_t offset)
+{
+	if (m_rom && offset >= 0x8000 && offset < 0xc000)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  cs0_r - chip select 1 read
+//-------------------------------------------------
+
+int mos7360_device::cs1_r(offs_t offset)
+{
+	if (m_rom && ((offset >= 0xc000 && offset < 0xfd00) || (offset >= 0xff20)))
+	{
+		return 0;
+	}
+
+	return 1;
 }

@@ -43,7 +43,7 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_MOS7360_ADD(_tag, _screen_tag, _clock, _config) \
+#define MCFG_MOS7360_ADD(_tag, _screen_tag, _clock, _config, _videoram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -52,7 +52,8 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos7360_device, screen_update) \
 	MCFG_PALETTE_LENGTH(128) \
 	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map)
 
 
 #define MOS7360_INTERFACE(_name) \
@@ -98,8 +99,6 @@ struct mos7360_interface
 
 	devcb_write_line	m_out_irq_cb;
 
-	devcb_read8			m_in_ram_cb;
-	devcb_read8			m_in_rom_cb;
 	devcb_read8			m_in_k_cb;
 };
 
@@ -107,6 +106,7 @@ struct mos7360_interface
 // ======================> mos7360_device
 
 class mos7360_device :  public device_t,
+					    public device_memory_interface,
 					    public device_sound_interface,
 					    public mos7360_interface
 {
@@ -115,8 +115,13 @@ public:
 	//mos7360_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	int cs0_r(offs_t offset);
+	int cs1_r(offs_t offset);
 
 	UINT8 bus_r();
 
@@ -153,6 +158,8 @@ protected:
 	inline void set_interrupt(int mask);
 	inline void clear_interrupt(int mask);
 	inline int rastercolumn();
+	inline UINT8 read_ram(offs_t offset);
+	inline UINT8 read_rom(offs_t offset);
 
 	void initialize_palette();
 	void draw_character(int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color);
@@ -163,9 +170,9 @@ protected:
 	void drawlines(int first, int last);
 	void soundport_w(int offset, int data);
 
+	const address_space_config		m_videoram_space_config;
+
 	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_read8		m_in_ram_func;
-	devcb_resolved_read8		m_in_rom_func;
 	devcb_resolved_read8		m_in_k_func;
 
 	screen_device *m_screen;			// screen which sets bitmap properties

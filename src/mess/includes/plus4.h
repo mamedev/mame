@@ -47,7 +47,6 @@ public:
 		  m_function(NULL),
 		  m_c2(NULL),
 		  m_addr(0),
-		  m_rom_en(1),
 		  m_ted_irq(CLEAR_LINE),
 		  m_acia_irq(CLEAR_LINE),
 		  m_exp_irq(CLEAR_LINE)
@@ -76,6 +75,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( ted_videoram_r );
 
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_READ8_MEMBER( c16_cpu_r );
@@ -98,7 +98,6 @@ public:
 	const UINT8 *m_function;
 	const UINT8 *m_c2;
 	UINT8 m_addr;
-	int m_rom_en;
 
 	// interrupt state
 	int m_ted_irq;
