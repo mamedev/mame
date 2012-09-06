@@ -51,9 +51,13 @@ void vic1111_device::device_start()
 
 UINT8 vic1111_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (!blk1 || !blk2)
+	if (!blk1)
 	{
-		data = m_ram[offset & 0x3fff];
+		data = m_ram[offset];
+	}
+	else if (!blk2)
+	{
+		data = m_ram[0x2000 + offset];
 	}
 
 	return data;
@@ -66,8 +70,12 @@ UINT8 vic1111_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data
 
 void vic1111_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (!blk1 || !blk2)
+	if (!blk1)
 	{
-		m_ram[offset & 0x3fff] = data;
+		m_ram[offset] = data;
+	}
+	else if (!blk2)
+	{
+		m_ram[0x2000 + offset] = data;
 	}
 }
