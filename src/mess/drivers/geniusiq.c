@@ -95,7 +95,7 @@ PCB - German Version:
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
-#define KEYBOARD_QUEUE_SIZE 	8
+#define KEYBOARD_QUEUE_SIZE 	0x80
 
 class geniusiq_state : public driver_device
 {
@@ -120,10 +120,12 @@ public:
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mouse_pos_w);
 	DECLARE_INPUT_CHANGED_MEMBER(send_input);
+	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
 	DECLARE_WRITE16_MEMBER(gfx_base_w);
 	DECLARE_WRITE16_MEMBER(gfx_dest_w);
 	DECLARE_WRITE16_MEMBER(gfx_color_w);
 	DECLARE_WRITE16_MEMBER(gfx_idx_w);
+	void queue_input(UINT16 data);
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
@@ -133,8 +135,10 @@ private:
 	UINT16		m_gfx_x;
 	UINT32		m_gfx_base;
 	UINT8		m_gfx_color[2];
-	UINT16		m_mouse_posx;
-	UINT16		m_mouse_posy;
+	UINT8		m_mouse_posx;
+	UINT8		m_mouse_posy;
+	UINT16		m_mouse_gfx_posx;
+	UINT16		m_mouse_gfx_posy;
 	struct
 	{
 		UINT16	buffer[KEYBOARD_QUEUE_SIZE];
@@ -196,8 +200,8 @@ UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				UINT8 pen = (data>>12) & 0x0f;
 
 				// I assume color 0 is transparent
-				if(pen != 0 && screen.visible_area().contains(m_mouse_posx + x*2 + b, m_mouse_posy + y))
-					bitmap.pix16(m_mouse_posy + y, m_mouse_posx + x*2 + b) = pen;
+				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*2 + b, m_mouse_gfx_posy + y))
+					bitmap.pix16(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*2 + b) = pen;
 				data <<= 4;
 			}
 		}
@@ -217,11 +221,10 @@ WRITE8_MEMBER(geniusiq_state::flash_w)
 
 WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
 {
-	switch (offset)
-	{
-		case 0:		m_mouse_posx = data;	break;
-		case 1:		m_mouse_posy = data;	break;
-	}
+	if (offset)
+		m_mouse_gfx_posy = data;
+	else
+		m_mouse_gfx_posx = data;
 }
 
 WRITE16_MEMBER(geniusiq_state::gfx_color_w)
@@ -293,18 +296,41 @@ READ16_MEMBER( geniusiq_state::input_r )
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
+void geniusiq_state::queue_input(UINT16 data)
 {
-	m_keyboard.buffer[m_keyboard.tail] = (UINT8)(FPTR)param;
-
-	// set bit 7 if the key is released
-	if (!newval)
-		m_keyboard.buffer[m_keyboard.tail] |= 0x80;
+	m_keyboard.buffer[m_keyboard.tail] = data;
 
 	m_keyboard.tail = (m_keyboard.tail+1) % KEYBOARD_QUEUE_SIZE;
 
-	// new input from keyboard
+	// new data in queue
 	m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
+{
+	UINT8 new_mouse_x = ioport("MOUSEX")->read();
+	UINT8 new_mouse_y = ioport("MOUSEY")->read();
+	UINT8 mouse_buttons = ioport("MOUSE")->read();
+
+	UINT8 delta_x = (UINT8)(new_mouse_x - m_mouse_posx);
+	UINT8 delta_y = (UINT8)(new_mouse_y - m_mouse_posy);
+	m_mouse_posx = new_mouse_x;
+	m_mouse_posy = new_mouse_y;
+
+	queue_input(0x1000 | 0x40 | mouse_buttons | ((delta_y>>4) & 0x0c) | ((delta_x>>6) & 0x03));
+	queue_input(0x1000 | (delta_x & 0x3f));
+	queue_input(0x1000 | (delta_y & 0x3f));
+}
+
+INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
+{
+	UINT16 data = (UINT16)(FPTR)param;
+
+	// set bit 7 if the key is released
+	if (!newval)
+		data |= 0x80;
+
+	queue_input(data);
 }
 
 
@@ -335,7 +361,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_irq )
 {
-	cputag_set_input_line(field.machine(), "maincpu", (int)(FPTR)param, newval ? HOLD_LINE : CLEAR_LINE);
+	//cputag_set_input_line(field.machine(), "maincpu", (int)(FPTR)param, newval ? HOLD_LINE : CLEAR_LINE);
 }
 
 /* Input ports */
@@ -378,7 +404,7 @@ static INPUT_PORTS_START( geniusiq )
 
 	PORT_START( "IN2" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x20 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 )		PORT_NAME("Enter") PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x21 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ENTER )		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x21 )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x22 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x23 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x24 )
@@ -392,7 +418,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COLON )		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x2c )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_K )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x2d )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_I )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x2e )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Button 1")	PORT_CODE( KEYCODE_ENTER )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x2f )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Button 1 (keyboard)")	PORT_CODE( KEYCODE_F2 )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x2f )
 
 	PORT_START( "IN3" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8 )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x30 )
@@ -428,7 +454,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_V )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x4c )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x4d )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_R )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x4e )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Up")			PORT_CODE( KEYCODE_UP )		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x4f )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Up Button")	PORT_CODE( KEYCODE_UP )		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x4f )
 
 	PORT_START( "IN5" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4 )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x50 )
@@ -438,7 +464,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3 )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x54 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x55 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x56 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Down")		PORT_CODE( KEYCODE_DOWN )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x57 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Down Button")	PORT_CODE( KEYCODE_DOWN )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x57 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_INSERT )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x58 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_X )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x59 )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_S )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x5a )
@@ -446,7 +472,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x5c )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x5d )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x5e )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Left")		PORT_CODE( KEYCODE_LEFT )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x5f )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Left Button")	PORT_CODE( KEYCODE_LEFT )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x5f )
 
 	PORT_START( "IN6" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Help")				PORT_CODE( KEYCODE_F1 )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x60 )
@@ -456,7 +482,7 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x64 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x65 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 )			PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x66 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Right")		PORT_CODE( KEYCODE_RIGHT )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x67 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mouse Right Button") PORT_CODE( KEYCODE_RIGHT )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x67 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x68 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0_PAD )		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x69 )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_DEL_PAD )	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x6a )
@@ -484,6 +510,16 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x7e )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )		//  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x7f )
 
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0)		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0)		PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
+
+	PORT_START("MOUSE")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 )	PORT_NAME("Mouse Button 2")		PORT_CODE(MOUSECODE_BUTTON2)	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 )	PORT_NAME("Mouse Button 1")		PORT_CODE(MOUSECODE_BUTTON1)	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
+
 	PORT_START( "DEBUG" )	// for debug purposes, to be removed in the end
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 ) PORT_NAME( "IRQ 1" ) PORT_CHANGED( trigger_irq, 1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 ) PORT_NAME( "IRQ 2" ) PORT_CHANGED( trigger_irq, 2 )
@@ -505,6 +541,8 @@ MACHINE_RESET_MEMBER( geniusiq_state )
 	m_gfx_color[0] = m_gfx_color[1] = 0;
 	m_mouse_posx = 0;
 	m_mouse_posy = 0;
+	m_mouse_gfx_posx = 0;
+	m_mouse_gfx_posy = 0;
 }
 
 static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
