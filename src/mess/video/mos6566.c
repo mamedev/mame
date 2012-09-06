@@ -535,10 +535,10 @@ mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, d
 	  device_memory_interface(mconfig, *this),
 	  device_execute_interface(mconfig, *this),
 	  m_icount(0),
+	  m_variant(TYPE_6566),
 	  m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
 	  m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map))
 {
-	m_variant = TYPE_6566;
 }
 
 mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
@@ -586,6 +586,7 @@ void mos6566_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
+		// TODO
     }
 }
 

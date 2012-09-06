@@ -65,7 +65,7 @@ void vcs_joystick_device::device_start()
 
 
 //-------------------------------------------------
-//  c64_pb_r - port B read
+//  vcs_joy_r - joystick read
 //-------------------------------------------------
 
 UINT8 vcs_joystick_device::vcs_joy_r()

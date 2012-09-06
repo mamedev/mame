@@ -80,16 +80,16 @@
 
 #pragma once
 
-#ifndef __MOS656X__
-#define __MOS656X__
+#ifndef __MOS6566__
+#define __MOS6566__
 
 #include "emu.h"
 
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+//***************************************************************************
+// DEVICE CONFIGURATION MACROS
+//***************************************************************************
 
 #define MCFG_MOS6566_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS6566, _clock) \
@@ -254,9 +254,9 @@
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//***************************************************************************
+//  TYPE DEFINITIONS
+//***************************************************************************
 
 // ======================> mos6566_interface
 
@@ -479,7 +479,7 @@ public:
 };
 
 
-// device type definition
+// device type definitions
 extern const device_type MOS6566;
 extern const device_type MOS6567;
 extern const device_type MOS8562;

@@ -1,47 +1,96 @@
-/*****************************************************************************
- *
- * audio/vic6560.h
- *
- ****************************************************************************/
-
-#ifndef __MOS6560_H__
-#define __MOS6560_H__
-
-#include "devlegcy.h"
-#include "devcb.h"
-
-
 /***************************************************************************
-    TYPE DEFINITIONS
+
+    MOS 6560/6561 Video Interface Chip (VIC) emulation
+
+    Copyright the MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+****************************************************************************
+                            _____   _____
+                   N/C   1 |*    \_/     | 40  Vdd
+                CHROMA   2 |             | 39  phi1
+             LUMA/SYNC   3 |             | 38  phi2
+                   R/W   4 |             | 37  OPTION
+                   D11   5 |             | 36  Pphi2
+                   D10   6 |             | 35  Pphi1
+                    D9   7 |             | 34  A13
+                    D8   8 |             | 33  A12
+                    D7   9 |             | 32  A11
+                    D6  10 |   MOS6560   | 31  A10
+                    D5  11 |   MOS6561   | 30  A9
+                    D4  12 |             | 29  A8
+                    D3  13 |             | 28  A7
+                    D2  14 |             | 27  A6
+                    D1  15 |             | 26  A5
+                    D0  16 |             | 25  A4
+                 POT X  17 |             | 24  A3
+                 POT Y  18 |             | 23  A2
+                 AUDIO  19 |             | 22  A1
+                   Vss  20 |_____________| 21  A0
+
 ***************************************************************************/
 
-typedef enum
-{
-	MOS6560_ATTACKUFO,        // this is a 6560VIC derivative, missing some of the features
-	MOS6560,                  // this is the NTSC version
-	MOS6561                   // this is the PAL version
-} mos6560_type;
+#pragma once
 
-typedef struct _mos6560_interface mos6560_interface;
-struct _mos6560_interface
-{
-	const char		*screen;
+#ifndef __MOS6560__
+#define __MOS6560__
 
-	mos6560_type	type;
+#include "emu.h"
 
-	devcb_read8		x_cb;
-	devcb_read8		y_cb;
-	devcb_read8		button_cb;
 
-	devcb_read8		paddle0_cb, paddle1_cb;
 
-	devcb_read8		dma_read;
-	devcb_read8		dma_read_color;
-};
+//***************************************************************************
+// DEVICE CONFIGURATION MACROS
+//***************************************************************************
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
+	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16) \
+	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+
+#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+	MCFG_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE) \
+	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16) \
+	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+
+#define MCFG_MOS656X_ATTACK_UFO_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
+	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16) \
+	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+
+
+#define MOS6560_INTERFACE(_name) \
+	const mos6560_interface (_name) =
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
 #define MOS6560_VRETRACERATE 60
 #define MOS6561_VRETRACERATE 50
@@ -75,25 +124,53 @@ struct _mos6560_interface
 #define MOS6561_CLOCK	(4433618/4)
 
 
-/***************************************************************************
-    INFO PROTOTYPES
-***************************************************************************/
+
+//***************************************************************************
+//  TYPE DEFINITIONS
+//***************************************************************************
+
+// ======================> mos6560_interface
+
+struct mos6560_interface
+{
+	const char		*m_screen_tag;
+
+	devcb_read8		m_potx_cb;
+	devcb_read8 	m_poty_cb;
+};
+
+
+// ======================> mos6560_device
 
 class mos6560_device : public device_t,
-                                  public device_sound_interface
+				       public device_memory_interface,
+                       public device_sound_interface,
+                       public mos6560_interface
 {
 public:
+	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mos6560_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	UINT8 bus_r();
 
+	DECLARE_WRITE_LINE_MEMBER( lp_w );
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void raster_interrupt_gen();
 
 protected:
+	enum
+	{
+		TYPE_6560,			// NTSC-M
+		TYPE_6561,			// PAL-B
+		TYPE_ATTACK_UFO		// NTSC-M, less features
+	};
+
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -101,56 +178,89 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-private:
-	// internal state
-	void *m_token;
+
+	inline void initialize_palette();
+	inline UINT8 read_videoram(offs_t offset);
+	inline UINT8 read_colorram(offs_t offset);
+
+	void draw_character( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color );
+	void draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color );
+	void drawlines( int first, int last );
+	void soundport_w( int offset, int data );
+	void sound_start();
+
+	int  m_variant;
+
+	const address_space_config		m_videoram_space_config;
+	const address_space_config		m_colorram_space_config;
+
+	screen_device *m_screen;
+
+	UINT8 m_reg[16];
+
+	bitmap_ind16 m_bitmap;
+
+	int m_rasterline, m_lastline;
+	double m_lightpenreadtime;
+
+	int m_charheight, m_matrix8x16, m_inverted;
+	int m_chars_x, m_chars_y;
+	int m_xsize, m_ysize, m_xpos, m_ypos;
+	int m_chargenaddr, m_videoaddr;
+
+	/* values in videoformat */
+	UINT16 m_backgroundcolor, m_framecolor, m_helpercolor;
+
+	/* arrays for bit to color conversion without condition checking */
+	UINT16 m_mono[2], m_monoinverted[2], m_multi[4], m_multiinverted[4];
+
+	/* video chip settings */
+	int m_total_xsize, m_total_ysize, m_total_lines, m_total_vretracerate;
+
+	/* DMA */
+	UINT8 m_last_data;
+
+	/* paddles */
+	devcb_resolved_read8	m_paddle_cb[2];
+
+	/* sound part */
+	int m_tone1pos, m_tone2pos, m_tone3pos,
+	m_tonesize, m_tone1samples, m_tone2samples, m_tone3samples,
+	m_noisesize,		  /* number of samples */
+	m_noisepos,         /* pos of tone */
+	m_noisesamples;	  /* count of samples to give out per tone */
+
+	sound_stream *m_channel;
+	INT16 *m_tone;
+	INT8 *m_noise;
 };
 
-extern const device_type MOS656X;
+
+// ======================> mos6561_device
+
+class mos6561_device :  public mos6560_device
+{
+public:
+    // construction/destruction
+    mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+// ======================> mos656x_attack_ufo_device
 
-#define MCFG_MOS656X_ADD(_tag, _interface) \
-	MCFG_SOUND_ADD(_tag, MOS656X, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+class mos656x_attack_ufo_device :  public mos6560_device
+{
+public:
+    // construction/destruction
+    mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
-#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _config) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
-	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
-	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16) \
-	MCFG_PALETTE_INIT(mos6560) \
-	MCFG_SOUND_ADD(_tag, MOS656X, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _config) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE) \
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
-	MCFG_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE) \
-	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16) \
-	MCFG_PALETTE_INIT(mos6560) \
-	MCFG_SOUND_ADD(_tag, MOS656X, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+// device type definitions
+extern const device_type MOS6560;
+extern const device_type MOS6561;
+extern const device_type MOS656X_ATTACK_UFO;
 
-/***************************************************************************
-    I/O PROTOTYPES
-***************************************************************************/
 
-WRITE8_DEVICE_HANDLER( mos6560_port_w );
-READ8_DEVICE_HANDLER( mos6560_port_r );
 
-void mos6560_raster_interrupt_gen( device_t *device );
-UINT32 mos6560_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );
-
-extern PALETTE_INIT( mos6560 );
-
-#endif /* __MOS6560_H__ */
+#endif

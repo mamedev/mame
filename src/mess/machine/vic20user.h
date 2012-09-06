@@ -62,6 +62,7 @@
 
 struct vic20_user_port_interface
 {
+	devcb_write_line	m_out_light_pen_cb;
 	devcb_write_line	m_out_cb1_cb;
 	devcb_write_line	m_out_cb2_cb;
     devcb_write_line	m_out_reset_cb;
@@ -95,6 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
 
 	// cartridge interface
+	DECLARE_WRITE_LINE_MEMBER( light_pen_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb1_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
@@ -105,6 +107,7 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
+	devcb_resolved_write_line	m_out_light_pen_func;
 	devcb_resolved_write_line	m_out_cb1_func;
 	devcb_resolved_write_line	m_out_cb2_func;
     devcb_resolved_write_line	m_out_reset_func;

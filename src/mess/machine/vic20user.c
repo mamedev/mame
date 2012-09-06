@@ -102,6 +102,7 @@ void vic20_user_port_device::device_start()
 	m_cart = dynamic_cast<device_vic20_user_port_interface *>(get_card_device());
 
 	// resolve callbacks
+	m_out_light_pen_func.resolve(m_out_light_pen_cb, *this);
 	m_out_cb1_func.resolve(m_out_cb1_cb, *this);
 	m_out_cb2_func.resolve(m_out_cb2_cb, *this);
 	m_out_reset_func.resolve(m_out_reset_cb, *this);
@@ -131,6 +132,7 @@ WRITE_LINE_MEMBER( vic20_user_port_device::cb2_w ) { if (m_cart != NULL) m_cart-
 WRITE_LINE_MEMBER( vic20_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->vic20_atn_w(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::port_reset_w ) { if (m_cart != NULL) m_cart->vic20_reset_w(state); }
 
+WRITE_LINE_MEMBER( vic20_user_port_device::light_pen_w ) { m_out_light_pen_func(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::via_cb1_w ) { m_out_cb1_func(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::via_cb2_w ) { m_out_cb2_func(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::reset_w ) { m_out_reset_func(state); }

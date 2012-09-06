@@ -46,6 +46,7 @@ public:
 	virtual ~vcs_control_port_device();
 
 	// computer interface
+	UINT8 joy_r();
 	DECLARE_READ8_MEMBER( joy_r );
 	UINT8 pot_x_r();
 	DECLARE_READ8_MEMBER( pot_x_r );
@@ -82,6 +83,13 @@ protected:
 // device type definition
 extern const device_type VCS_CONTROL_PORT;
 
+
+// slot devices
+#include "machine/vcs_joy.h"
+#include "machine/vcs_lightpen.h"
+#include "machine/vcs_paddles.h"
+
+SLOT_INTERFACE_EXTERN( vcs_control_port_devices );
 
 
 #endif

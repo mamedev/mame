@@ -553,6 +553,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/null_modem.o	\
 	$(MESS_MACHINE)/vcsctrl.o	\
 	$(MESS_MACHINE)/vcs_joy.o	\
+	$(MESS_MACHINE)/vcs_lightpen.o	\
+	$(MESS_MACHINE)/vcs_paddles.o	\
 
 
 
