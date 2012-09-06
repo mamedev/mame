@@ -813,10 +813,6 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct NCR5380interface macplus_5380intf =
 {
 	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
@@ -931,7 +927,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -990,7 +986,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1036,7 +1032,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1088,7 +1084,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_NUBUS_SLOT_ADD("nubus","nbd", mac_nubus_cards, NULL, NULL)
 	MCFG_NUBUS_SLOT_ADD("nubus","nbe", mac_nubus_cards, NULL, NULL)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1286,7 +1282,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1337,7 +1333,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1408,7 +1404,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1579,7 +1575,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_NVRAM_HANDLER(mac)
 
 	/* devices */
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
@@ -1639,7 +1635,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_NCR539X_ADD(MAC_539X_1_TAG, C7M, mac_539x_intf)

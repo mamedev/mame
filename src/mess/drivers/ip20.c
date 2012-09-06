@@ -483,10 +483,6 @@ static void scsi_irq(running_machine &machine, int state)
 {
 }
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct WD33C93interface wd33c93_intf =
 {
 	&scsi_irq,		/* command completion IRQ */
@@ -610,7 +606,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)
 	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
 

@@ -1204,10 +1204,6 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (Lost World needs this, very similar to wbeachvl in playmark.c) */
 };
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct LSI53C810interface lsi53c810_intf =
 {
 	&scsi_irq_callback,
@@ -5336,7 +5332,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 MACHINE_CONFIG_END
 
@@ -5378,7 +5374,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 MACHINE_CONFIG_END
 

@@ -1496,10 +1496,6 @@ static void scsi_irq(running_machine &machine, int state)
 	}
 }
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct WD33C93interface wd33c93_intf =
 {
 	&scsi_irq,		/* command completion IRQ */
@@ -1671,7 +1667,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
 	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)

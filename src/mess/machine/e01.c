@@ -54,6 +54,7 @@
 */
 
 #include "e01.h"
+#include "machine/scsicb.h"
 #include "machine/scsihd.h"
 
 
@@ -259,7 +260,7 @@ static const wd17xx_interface fdc_intf =
 
 
 //-------------------------------------------------
-//  SCSIBus_interface scsi_intf
+//  SCSICB_interface scsi_intf
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( e01_device::scsi_bsy_w )
@@ -281,15 +282,15 @@ WRITE_LINE_MEMBER( e01_device::scsi_req_w )
 	update_interrupts();
 }
 
-static const SCSIBus_interface scsi_intf =
+static const SCSICB_interface scsi_intf =
 {
 	NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, scsi_bsy_w),
+	DEVCB_DEVICE_LINE_MEMBER("^^", e01_device, scsi_bsy_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, scsi_req_w),
+	DEVCB_DEVICE_LINE_MEMBER("^^", e01_device, scsi_req_w),
 	DEVCB_NULL
 };
 
@@ -347,8 +348,9 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(e01_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)
 
-	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsi_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -1,43 +1,23 @@
 /*
     SCSIBus.h
 
-    Implementation of a raw SCSI/SASI bus for machines that don't use a SCSI
-    controler chip such as the RM Nimbus, which implements it as a bunch of
-    74LS series chips.
-
 */
+
+#pragma once
 
 #ifndef _SCSIBUS_H_
 #define _SCSIBUS_H_
 
+#include "machine/scsicb.h"
 #include "machine/scsidev.h"
 
-
-/***************************************************************************
-    INTERFACE
-***************************************************************************/
-
-typedef struct _SCSIBus_interface SCSIBus_interface;
-struct _SCSIBus_interface
-{
-    void (*line_change_cb)(device_t *, UINT8 line, UINT8 state);
-
-	devcb_write_line _out_bsy_func;
-	devcb_write_line _out_sel_func;
-	devcb_write_line _out_cd_func;
-	devcb_write_line _out_io_func;
-	devcb_write_line _out_msg_func;
-	devcb_write_line _out_req_func;
-	devcb_write_line _out_rst_func;
-};
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-#define MCFG_SCSIBUS_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, SCSIBUS, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_SCSIBUS_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SCSIBUS, 0)
 
 
 /***************************************************************************
@@ -144,8 +124,7 @@ typedef struct
 	UINT8		sectors_per_track;
 } adaptec_sense_t;
 
-class scsibus_device : public device_t,
-					   public SCSIBus_interface
+class scsibus_device : public device_t
 {
 public:
 	// construction/destruction
@@ -185,7 +164,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -210,14 +188,7 @@ private:
 	void dump_bytes(UINT8 *buff, int count);
 
 	scsidev_device          *devices[8];
-
-	devcb_resolved_write_line out_bsy_func;
-	devcb_resolved_write_line out_sel_func;
-	devcb_resolved_write_line out_cd_func;
-	devcb_resolved_write_line out_io_func;
-	devcb_resolved_write_line out_msg_func;
-	devcb_resolved_write_line out_req_func;
-	devcb_resolved_write_line out_rst_func;
+	scsicb_device *m_scsicb;
 
 	UINT8       linestate;
 	UINT8       last_id;

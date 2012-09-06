@@ -296,10 +296,6 @@ static void scsi_irq(running_machine &machine)
 	psx_irq_set(machine, 0x400);
 }
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct AM53CF96interface am53cf96_intf =
 {
 	&scsi_irq,		/* command completion IRQ */
@@ -352,7 +348,7 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
 	MCFG_AM53CF96_ADD("scsi:am53cf96", am53cf96_intf)
 

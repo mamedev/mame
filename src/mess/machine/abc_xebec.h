@@ -17,8 +17,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/abcbus.h"
-#include "machine/scsibus.h"
-#include "machine/scsihd.h"
 
 
 

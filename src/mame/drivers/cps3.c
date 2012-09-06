@@ -2262,10 +2262,6 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 //static sh2_cpu_core sh2cp_conf_slave  = { 1, NULL };
 
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct WD33C93interface wd33c93_intf =
 {
 	NULL			/* command completion IRQ */
@@ -2505,7 +2501,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
 	MCFG_CPU_CONFIG(sh2_conf_cps3)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_1)
 	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
 

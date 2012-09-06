@@ -36,17 +36,13 @@ const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_5380_TAG    "scsi:ncr5380"
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct NCR5380interface a2scsi_5380_intf =
 {
 	NULL        // IRQ handler (unconnected according to schematic)
 };
 
 MACHINE_CONFIG_FRAGMENT( scsi )
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_NCR5380_ADD(SCSI_5380_TAG, (XTAL_28_63636MHz/4), a2scsi_5380_intf)
 MACHINE_CONFIG_END
 

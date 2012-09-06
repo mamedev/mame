@@ -2626,10 +2626,6 @@ static const rf5c68_interface rf5c68_intf =
 	towns_pcm_irq
 };
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const FMSCSIinterface towns_scsi_config =
 {
 	DEVCB_LINE(towns_scsi_irq),
@@ -2713,7 +2709,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)

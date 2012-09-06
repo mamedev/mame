@@ -2528,10 +2528,6 @@ static const floppy_interface x68k_floppy_interface =
 	NULL
 };
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const mb89352_interface x68k_scsi_intf =
 {
 	DEVCB_LINE(x68k_scsi_irq),
@@ -2821,7 +2817,7 @@ static MACHINE_CONFIG_START( x68ksupr, x68k_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
@@ -2842,7 +2838,7 @@ static MACHINE_CONFIG_START( x68kxvi, x68k_state )
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
@@ -2864,7 +2860,7 @@ static MACHINE_CONFIG_START( x68030, x68k_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram32")
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)

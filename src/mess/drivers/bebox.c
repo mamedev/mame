@@ -117,10 +117,6 @@ static void scsi53c810_dma_callback(running_machine &machine, UINT32 src, UINT32
 }
 
 
-static const SCSIBus_interface scsibus_intf =
-{
-};
-
 static const struct LSI53C810interface lsi53c810_intf =
 {
 	&scsi53c810_irq_callback,
@@ -197,7 +193,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MCFG_SCSIBUS_ADD("scsi", scsibus_intf)
+	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)

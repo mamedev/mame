@@ -15,6 +15,7 @@
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
 #include "machine/er59256.h"
+#include "machine/scsicb.h"
 #include "machine/scsihd.h"
 #include "machine/s1410.h"
 #include "machine/acb4070.h"
@@ -78,7 +79,11 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static const SCSIBus_interface scsibus_config =
+//-------------------------------------------------
+//  SCSICB_interface sasi_intf
+//-------------------------------------------------
+
+static const SCSICB_interface scsibus_config =
 {
 	&nimbus_scsi_linechange
 };
@@ -321,11 +326,12 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
-	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsibus_config)
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", ACB4070, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", S1410, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", SCSIHD, SCSI_ID_2)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", SCSIHD, SCSI_ID_3)
+	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsibus_config)
 
     MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1536K")

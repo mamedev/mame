@@ -594,18 +594,21 @@ void scsibus_device::scsi_out_line_change_now(UINT8 line, UINT8 state)
 
 	LOG(3,"scsi_out_line_change(%s,%d)\n",linenames[line],state);
 
-	if(line_change_cb!=NULL)
-		line_change_cb(this, line,state);
-
-	switch (line)
+	if(m_scsicb != NULL)
 	{
-	case SCSI_LINE_BSY: out_bsy_func(state); break;
-	case SCSI_LINE_SEL: out_sel_func(state); break;
-	case SCSI_LINE_CD: out_cd_func(state); break;
-	case SCSI_LINE_IO: out_io_func(state); break;
-	case SCSI_LINE_MSG: out_msg_func(state); break;
-	case SCSI_LINE_REQ: out_req_func(state); break;
-	case SCSI_LINE_RESET: out_rst_func(state); break;
+		if(m_scsicb->line_change_cb!=NULL)
+			m_scsicb->line_change_cb(this, line,state);
+
+		switch (line)
+		{
+		case SCSI_LINE_BSY: m_scsicb->out_bsy_func(state); break;
+		case SCSI_LINE_SEL: m_scsicb->out_sel_func(state); break;
+		case SCSI_LINE_CD: m_scsicb->out_cd_func(state); break;
+		case SCSI_LINE_IO: m_scsicb->out_io_func(state); break;
+		case SCSI_LINE_MSG: m_scsicb->out_msg_func(state); break;
+		case SCSI_LINE_REQ: m_scsicb->out_req_func(state); break;
+		case SCSI_LINE_RESET: m_scsicb->out_rst_func(state); break;
+		}
 	}
 }
 
@@ -746,27 +749,9 @@ scsibus_device::scsibus_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void scsibus_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const SCSIBus_interface *intf = reinterpret_cast<const SCSIBus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<SCSIBus_interface *>(this) = *intf;
-	}
-}
-
 void scsibus_device::device_start()
 {
 	memset(devices, 0, sizeof(devices));
-
-	out_bsy_func.resolve(_out_bsy_func, *this);
-	out_sel_func.resolve(_out_sel_func, *this);
-	out_cd_func.resolve(_out_cd_func, *this);
-	out_io_func.resolve(_out_io_func, *this);
-	out_msg_func.resolve(_out_msg_func, *this);
-	out_req_func.resolve(_out_req_func, *this);
-	out_rst_func.resolve(_out_rst_func, *this);
 
 	// All lines start high - inactive
 	linestate=0xFF;
@@ -786,6 +771,11 @@ void scsibus_device::device_start()
 		if( scsidev != NULL )
 		{
 			devices[scsidev->GetDeviceID()] = scsidev;
+		}
+		else
+		{
+			scsicb_device *scsicb = dynamic_cast<scsicb_device *>(device);
+			m_scsicb = scsicb;
 		}
 	}
 }

@@ -58,6 +58,7 @@ Notes:
 */
 
 #include "includes/bullet.h"
+#include "machine/scsicb.h"
 #include "machine/scsihd.h"
 
 
@@ -1021,7 +1022,7 @@ static const wd17xx_interface bulletf_fdc_intf =
 
 
 //-------------------------------------------------
-//  SCSIBus_interface scsi_intf
+//  SCSICB_interface scsi_intf
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( bulletf_state::req_w )
@@ -1037,7 +1038,7 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 	update_dma_rdy();
 }
 
-static const SCSIBus_interface scsi_intf =
+static const SCSICB_interface scsi_intf =
 {
 	NULL,
 	DEVCB_NULL,
@@ -1206,8 +1207,9 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
-	MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
+	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host", scsi_intf)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
