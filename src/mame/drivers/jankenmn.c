@@ -250,9 +250,9 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jankenmn )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Guu (Rock)")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Choki (Scissors)")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Paa (Paper)")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Guu (Rock)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Choki (Scissors)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state,jankenmn_hopper_status_r, NULL)
@@ -381,5 +381,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                   FLAGS...  LAYOUT */
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT                 ROT    COMPANY    FULLNAME                   FLAGS...  LAYOUT */
 GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", 0,        layout_jankenmn )
