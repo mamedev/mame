@@ -4,13 +4,14 @@
 
         12/05/2009 Skeleton driver.
         28/07/2009 added Guru-readme(TM)
+        08/01/2012 Fleshed out driver.
 
         Todo:
               * fix vector generator hardware enough to pass the startup self test
                 the tests are described on page 6-5 thru 6-8 of the tech reference
               * hook up the direction and sync prom to the sync counter
               * figure out the correct meaning of systat b register - needed for communications selftest
-              * hook up smc_5016t baud generator to i8251 rx and tx clocks - begun
+              * hook up smc com5016t baud generator to i8251 rx and tx clocks - begun
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
@@ -154,6 +155,7 @@ public:
 	UINT8* m_trans;
 	UINT8* m_pattern;
 	UINT8* m_dir;
+	UINT8 m_vsync; // vsync pin of crtc
 	UINT16 m_vgX;
 	UINT16 m_vgY;
 	UINT16 m_vgERR; // error register can cause carries which need to be caught
@@ -163,10 +165,11 @@ public:
 	UINT8 m_vgPMUL; // reload value for PMUL_Count
 	UINT8 m_vgPMUL_Count;
 	UINT8 m_vgDownCount; // down counter = number of pixels, loaded from vgDU on execute
-	UINT8 m_vgDU;
-	UINT8 m_vgDVM;
-	UINT8 m_vgDIR;
-	UINT8 m_vgWOPS;
+#define VG_DU m_regfile[0]
+#define VG_DVM m_regfile[1]
+#define VG_DIR m_regfile[2]
+#define VG_WOPS m_regfile[3]
+	UINT8 m_regfile[4];
 	UINT8 m_VG_MODE; // 2 bits, latched on EXEC
 	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
 	UINT8 m_ACTS;
@@ -243,7 +246,7 @@ static void vram_write(running_machine &machine, UINT8 data)
 	block |= data<<(nybbleNum*4); // write the new part
 	// NOTE: this next part may have to be made conditional on VG_MODE
 	// check if the attribute nybble is supposed to be modified, and if so do so
-	if (state->m_vgWOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->m_vgWOPS&0xF0)<<8);
+	if (state->VG_WOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->VG_WOPS&0xF0)<<8);
 	state->m_vram[(EA<<1)+1] = block&0xFF; // write block back to vram
 	state->m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
@@ -253,7 +256,7 @@ static TIMER_CALLBACK( execute_vg )
 	vk100_state *state = machine.driver_data<vk100_state>();
 	UINT8 thisNyb = vram_read(machine); // read in the nybble
 	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-	UINT8 newNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
+	UINT8 newNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->VG_WOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
 	switch (state->m_VG_MODE)
 	{
@@ -305,7 +308,7 @@ static TIMER_CALLBACK( execute_vg )
      */
 	//UINT8 direction_rom = state->m_dir[];
 	// HACK: we need the proper direction rom dump for this!
-	switch(state->m_vgDIR&0x7)
+	switch(state->VG_DIR&0x7)
 	{
 		case 0:
 			state->m_vgX++;
@@ -423,27 +426,27 @@ WRITE8_MEMBER(vk100_state::vgPMUL)
 /* port 0x60: "DU" load vg vector major register */
 WRITE8_MEMBER(vk100_state::vgDU)
 {
-	m_vgDU = data;
+	VG_DU = data;
 #ifdef VG60_VERBOSE
-	logerror("VG: 0x60: DU Reg loaded with %02X\n", m_vgDU);
+	logerror("VG: 0x60: DU Reg loaded with %02X\n", VG_DU);
 #endif
 }
 
 /* port 0x61: "DVM" load vg vector minor register */
 WRITE8_MEMBER(vk100_state::vgDVM)
 {
-	m_vgDVM = data;
+	VG_DVM = data;
 #ifdef VG60_VERBOSE
-	logerror("VG: 0x61: DVM Reg loaded with %02X\n", m_vgDVM);
+	logerror("VG: 0x61: DVM Reg loaded with %02X\n", VG_DVM);
 #endif
 }
 
 /* port 0x62: "DIR" load vg Direction register */
 WRITE8_MEMBER(vk100_state::vgDIR)
 {
-	m_vgDIR = data;
+	VG_DIR = data;
 #ifdef VG60_VERBOSE
-	logerror("VG: 0x62: DIR Reg loaded with %02X\n", m_vgDIR);
+	logerror("VG: 0x62: DIR Reg loaded with %02X\n", VG_DIR);
 #endif
 }
 
@@ -455,10 +458,10 @@ WRITE8_MEMBER(vk100_state::vgDIR)
  */
 WRITE8_MEMBER(vk100_state::vgWOPS)
 {
-	m_vgWOPS = data;
+	VG_WOPS = data;
 #ifdef VG60_VERBOSE
 	static const char *const functions[] = { "Overlay", "Replace", "Complement", "Erase" };
-	logerror("VG: 0x64: WOPS Reg loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (m_vgWOPS>>7)&1, (m_vgWOPS>>6)&1, (m_vgWOPS>>5)&1, (m_vgWOPS>>4)&1, (m_vgWOPS>>3)&1, functions[(m_vgWOPS>>1)&3], m_vgWOPS&1);
+	logerror("VG: 0x64: WOPS Reg loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (VG_WOPS>>7)&1, (VG_WOPS>>6)&1, (VG_WOPS>>5)&1, (VG_WOPS>>4)&1, (VG_WOPS>>3)&1, functions[(VG_WOPS>>1)&3], VG_WOPS&1);
 #endif
 }
 
@@ -475,7 +478,7 @@ WRITE8_MEMBER(vk100_state::vgEX)
 #endif
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x80;
-	m_vgDownCount = m_vgDU; // set down counter to length of major vector
+	m_vgDownCount = VG_DU; // set down counter to length of major vector
 	m_VG_MODE = offset&3;
 	m_vgGO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg));
@@ -501,9 +504,32 @@ WRITE8_MEMBER(vk100_state::KBDW)
 #endif
 }
 
-/* port 0x6C: "BAUD" controls the smc5016t dual baud generator which
+/* port 0x6C: "BAUD" controls the smc com5016t dual baud generator which
  * controls the divisors for the rx and tx clocks on the 8251 from the
- * 5.0688Mhz cpu xtal :
+    5.0688Mhz cpu xtal.
+   It has 5v,12v on pins 2 and 9, pin 10 is NC.
+ * A later part that replaced this on the market is SMC COM8116(T)/8136(T), which
+    was a 5v-only part (pin 9 and 10 are NC, 10 is a clock out on the 8136.
+ *  Note that even on the SMC COM5016T version, SMC would allow the user
+     to mask their own dividers on custom ordered chips if desired.
+ *  The COM8116(T)/8136(T) came it at least 4 mask rom types meant for different
+     input clocks:
+     -000 or no mark for 5.0688Mhz (which exactly matches the table below)
+     -003 is for 6.01835MHz
+     -005 is for 4.915200Mhz
+     -006 is for 5.0688Mhz but omits the 2000 baud entry, instead has 200,
+      and output frequencies are 2x as fast (meant for a 32X clock uart)
+     -013 is for 2.76480MHz
+     -013A is for 5.52960MHz
+     (several other unknown refclock masks appear on partscalper sites)
+    GI also made a clone of the 8116 5v chip called the AY-5-8116(T)/8136(T)
+     which had at least two masks: -000/no mark and -005, matching speeds above
+    WD made the WD1943 which is similarly 5v compatible, with -00, -05, -06 masks
+    The COM8046(T) has 5 bits for selection instead of 4, but still expects
+     a 5.0688MHz reference clock, and the second half of the table matches the
+     values below; the first half of the table is the values below /2, rounded
+     down (for uarts which need a clock rate of 32x baud instead of 16x).
+    WD's BR1941 is also functionally compatible but uses 5v,12v,-5v on pins 2,9,10
  * The baud divisor lookup table has 16 entries, but only entries 2,5,6,7,A,C,E,F are documented/used in the vk100 tech manual
  * The others are based on page 13 of http://www.hartetechnologies.com/manuals/Tarbell/Tarbell%20Z80%20CPU%20Board%20Model%203033.pdf
  * D C B A   Divisor                                Expected Baud
@@ -537,19 +563,18 @@ WRITE8_MEMBER(vk100_state::BAUD)
 }
 
 /* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
- * /GO    BIT3   BIT2   BIT1   BIT0   Dip       ?      ?
- *                                    Switch
- * d7     d6     d5     d4     d3     d2        d1     d0
- * bit3, 2, 1, 0 are the last 4 bits read by the vector generator from VRAM
- * note: if the vector generator is not running, reading SYSTAT A will
- * supposedly FORCE the vector generator to read one nybble from the
- * current x,y! (how does this work schematicwise??? it may just read
- * the last nybble read by the constantly running sync counter, in
- * which case the hack here sort of works as well)
- * this appears to be the only way the vram can be READ by the cpu
- d2 is where the dipswitch values are read from, based on the offset
- d1 is unknown
- d0 is unknown
+ * /GO    BIT3   BIT2   BIT1   BIT0   Dip     RST7.5 GND
+ *                                    Switch  VSYNC
+ * d7     d6     d5     d4     d3     d2      d1     d0
+  bit3, 2, 1, 0 are the 4 bits output from the VRAM 12->4 multiplexer
+   which are also inputs to the pattern rom; they are constantly updated
+   by the sync rom and related circuitry.
+  This is the only way the vram can be read by the cpu.
+  d7 is from the /Q output of the GO latch
+  d6,5,4,3 are from the 74ls298 at ic4 (right edge of pcb)
+  d2 is where the dipswitch values are read from, based on the offset
+  d1 is connected to 8085 rst7.5 (pin 7) and crtc pin 40 (VSYNC) [verified via tracing]
+  d0 is tied to GND [verified via tracing]
 
  31D reads and checks d7 in a loop
  205 reads, xors with 0x55 (from reg D), ANDS result with 0x78 and branches if it is not zero (checking for bit pattern 1010?)
@@ -562,7 +587,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 #ifdef SYSTAT_A_VERBOSE
 	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	return ((m_vgGO?0:1)<<7)|(vram_read(machine())<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|0x3;
+	return ((m_vgGO?0:1)<<7)|(vram_read(machine())<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|(m_vsync?0x2:0);
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
@@ -853,6 +878,7 @@ static MACHINE_RESET( vk100 )
 	output_set_value("hardcopy_led", 1);
 	output_set_value("l1_led", 1);
 	output_set_value("l2_led", 1);
+	state->m_vsync = 0;
 	state->m_vgX = 0;
 	state->m_vgY = 0;
 	state->m_vgERR = 0;
@@ -862,10 +888,10 @@ static MACHINE_RESET( vk100 )
 	state->m_vgPMUL = 0;
 	state->m_vgPMUL_Count = 0;
 	state->m_vgDownCount = 0;
-	state->m_vgDU = 0;
-	state->m_vgDVM = 0;
-	state->m_vgDIR = 0;
-	state->m_vgWOPS = 0;
+	state->VG_DU = 0;
+	state->VG_DVM = 0;
+	state->VG_DIR = 0;
+	state->VG_WOPS = 0;
 	state->m_VG_MODE = 0;
 	state->m_vgGO = 0;
 	state->m_ACTS = 1;
@@ -873,11 +899,11 @@ static MACHINE_RESET( vk100 )
 	state->m_TXDivisor = 6336;
 }
 
-static INTERRUPT_GEN( vk100_vertical_interrupt )
+static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 {
-	vk100_state *state = device->machine().driver_data<vk100_state>();
-	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, ASSERT_LINE);
-	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, CLEAR_LINE);
+	vk100_state *m_state = device->machine().driver_data<vk100_state>();
+	device_set_input_line(m_state->m_maincpu, I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
+	m_state->m_vsync = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER(i8251_rxrdy_int)
@@ -958,7 +984,7 @@ static const mc6845_interface mc6845_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE(crtc_vsync),
 	NULL
 };
 
@@ -982,7 +1008,6 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
 	MCFG_CPU_IO_MAP(vk100_io)
-	MCFG_CPU_VBLANK_INT("screen", vk100_vertical_interrupt)
 
 	MCFG_MACHINE_RESET(vk100)
 
