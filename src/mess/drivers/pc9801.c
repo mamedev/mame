@@ -16,10 +16,8 @@
     - clean-up duplicating code;
 
     TODO (PC-9821):
-    - "set the software dip-switch" warning;
-    - asserts with i386: Invalid REP/opcode 40 combination, this is because POR bit mustn't be
-      setted to off
     - fix CPU for some clones;
+	- PARITY ERROR, presumably it needs a far better emulation of the i8251 ports
 
     TODO: (PC-486MU)
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
@@ -255,6 +253,7 @@ class pc9801_state : public driver_device
 public:
 	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_sio(*this, UPD8251_TAG),
 		  m_hgdc1(*this, "upd7220_chr"),
@@ -263,6 +262,7 @@ public:
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
@@ -719,7 +719,7 @@ READ8_MEMBER(pc9801_state::pc9801_40_r)
 			printf("Read to undefined port [%02x]\n",offset+0x40);
 		else
 		{
-			//printf("Read to 8251 kbd port [%02x]\n",offset+0x40);
+			//printf("Read to 8251 kbd port [%02x] %08x\n",offset+0x40,cpu_get_pc(m_maincpu));
 			if(offset == 1)
 			{
 				UINT8 res;
@@ -729,7 +729,7 @@ READ8_MEMBER(pc9801_state::pc9801_40_r)
 				return res;
 			}
 
-			return 1;
+			return 1 | 4 | 2;
 		}
 	}
 
@@ -746,8 +746,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_40_w)
 	{
 		if(offset & 4)
 			printf("Write to undefined port [%02x] <- %02x\n",offset+0x40,data);
-		//else
-			//printf("Write to 8251 kbd port [%02x] <- %02x\n",offset+0x40,data);
+		else
+			printf("Write to 8251 kbd port [%02x] <- %02x\n",offset+0x40,data);
 	}
 }
 
@@ -2112,6 +2112,15 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pc9821 )
+	PORT_INCLUDE( pc9801rs )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "S-Dip SW Init" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static const gfx_layout charset_8x8 =
 {
 	8,8,
@@ -3176,11 +3185,11 @@ COMP( 1989, pc9801rs,  0,       0,     pc9801rs, pc9801rs, driver_device, 0, "Ni
 COMP( 1985, pc9801vm,  pc9801rs,0,     pc9801rs, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801VM", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1987, pc9801ux,  pc9801rs,0,     pc9801ux, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801UX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1988, pc9801rx,  pc9801rs,0,     pc9801ux, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801RX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821,    0,       0,     pc9821,   pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821ce2, pc9821,  0,     pc9821,   pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MULTi Ce2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821ne,  pc9821,  0,     pc9821,   pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc486mu,   pc9821,  0,     pc9821,   pc9801rs, driver_device, 0, "Epson",                       "PC-486MU",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1998, pc9821v13, pc9821,  0,     pc9821,   pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 13)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1998, pc9821v20, pc9821,  0,     pc9821v20,pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 20)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821,    0,       0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821ce2, pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MULTi Ce2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821ne,  pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc486mu,   pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Epson",                       "PC-486MU",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, pc9821v13, pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 13)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1998, pc9821v20, pc9821,  0,     pc9821v20,pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 20)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
