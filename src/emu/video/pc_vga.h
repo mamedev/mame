@@ -11,6 +11,7 @@
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_vga_isa );
+MACHINE_CONFIG_EXTERN( pcvideo_s3_isa );
 
 VIDEO_START( vga );
 
@@ -31,6 +32,7 @@ void pc_vga_reset(running_machine &machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
 void pc_video_start(running_machine &machine);
+void s3_video_start(running_machine &machine);
 
 READ8_HANDLER(vga_port_03b0_r);
 READ8_HANDLER(vga_port_03c0_r);

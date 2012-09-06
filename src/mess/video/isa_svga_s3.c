@@ -28,7 +28,7 @@ const device_type ISA16_SVGA_S3 = &device_creator<isa16_svga_s3_device>;
 
 machine_config_constructor isa16_svga_s3_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( pcvideo_vga_isa );
+	return MACHINE_CONFIG_NAME( pcvideo_s3_isa );
 }
 
 //-------------------------------------------------
@@ -71,7 +71,7 @@ void isa16_svga_s3_device::device_start()
 	int i;
 	for (i = 0; i < 0x100; i++)
 		palette_set_color_rgb(machine(), i, 0, 0, 0);
-	pc_video_start(machine());
+	s3_video_start(machine());
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "s3_764");
 

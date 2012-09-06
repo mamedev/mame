@@ -236,6 +236,19 @@ static struct
 	UINT16 mmio_9ae8;
 	UINT16 mmio_bee8;
 
+	// hardware graphics cursor
+	UINT8 cursor_mode;
+	UINT16 cursor_x;
+	UINT16 cursor_y;
+	UINT16 cursor_start_addr;
+	UINT8 cursor_pattern_x;  // cursor pattern origin
+	UINT8 cursor_pattern_y;
+	UINT8 cursor_fg[4];
+	UINT8 cursor_bg[4];
+	UINT8 cursor_fg_ptr;
+	UINT8 cursor_bg_ptr;
+	UINT8 extended_dac_ctrl;
+
 	bool gpbusy;
 	int state;
 }s3;
@@ -294,6 +307,19 @@ void pc_video_start(running_machine &machine)
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
+}
+
+void s3_video_start(running_machine &machine)
+{
+	int x;
+	// Avoid an infinite loop when displaying.  0 is not possible anyway.
+	vga.crtc.maximum_scan_line = 1;
+	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
+	for(x=0;x<4;x++)
+	{
+		s3.cursor_fg[x] = 0xff;
+		s3.cursor_bg[x] = 0x00;
+	}
 }
 
 static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -909,6 +935,84 @@ SCREEN_UPDATE_RGB32( pc_video )
 
 	return 0;
 }
+
+SCREEN_UPDATE_RGB32( pc_video_s3 )
+{
+	UINT8 cur_mode = 0;
+
+	SCREEN_UPDATE32_CALL( pc_video );
+
+	cur_mode = pc_vga_choosevideomode(screen.machine());
+
+	// draw hardware graphics cursor
+	// TODO: support 16 bit and greater video modes
+	if(s3.cursor_mode & 0x01)  // if cursor is enabled
+	{
+		UINT32 src;
+		UINT32* dst;
+		UINT8 val;
+		int x,y;
+		UINT16 cx = s3.cursor_x & 0x07ff;
+		UINT16 cy = s3.cursor_y & 0x07ff;
+
+		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
+			return 0;  // cursor only works in VGA or SVGA modes
+
+		src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
+//		for(x=0;x<64;x++)
+//			printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
+		for(y=0;y<64;y++)
+		{
+			dst = &bitmap.pix32(cy + y, cx);
+			for(x=0;x<64;x++)
+			{
+				UINT16 bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+				UINT16 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+				val = ((bita & 0x01) << 1) | (bitb & 0x01);
+				if(s3.extended_dac_ctrl & 0x10)
+				{  // X11 mode
+					switch(val)
+					{
+					case 0x00:
+						// no change
+						break;
+					case 0x01:
+						// no change
+						break;
+					case 0x02:
+						dst[x] = screen.machine().pens[s3.cursor_bg[0]];
+						break;
+					case 0x03:
+						dst[x] = screen.machine().pens[s3.cursor_fg[0]];
+						break;
+					}
+				}
+				else
+				{  // Windows mode
+					switch(val)
+					{
+					case 0x00:
+						dst[x] = screen.machine().pens[s3.cursor_bg[0]];
+						break;
+					case 0x01:
+						dst[x] = screen.machine().pens[s3.cursor_fg[0]];
+						break;
+					case 0x02:  // screen data
+						// no change
+						break;
+					case 0x03:  // inverted screen data
+						dst[x] = ~(dst[x]);
+						break;
+					}
+				}
+				if(x % 16 == 15)
+					src+=4;
+			}
+		}
+	}
+	return 0;
+}
+
 /***************************************************************************/
 
 INLINE UINT8 rotate_right(UINT8 val)
@@ -1985,6 +2089,14 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga_isa )
 	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_FRAGMENT( pcvideo_s3_isa )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_STATIC(pc_video_s3)
+
+	MCFG_PALETTE_LENGTH(0x100)
+MACHINE_CONFIG_END
+
 /******************************************
 
 Tseng ET4000k implementation
@@ -2526,7 +2638,7 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 //				res = 0x00;
 //				break;
 			case 0x30: // CR30 Chip ID/REV register
-				res = 0xc0; // BIOS is from a card with the 764 chipset (Trio64)
+				res = 0xc0; // BIOS is from a card with the 764 chipset (Trio64), should be 0xe0 or 0xe1, but the Vision 330 driver in win95 doesn't like that
 				break;
 			case 0x31:
 				res = s3.memory_config;
@@ -2542,6 +2654,44 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 				break;
 			case 0x42: // CR42 Mode Control
 				res = 0x0d; // hardcode to non-interlace
+				break;
+			case 0x45:
+				res = s3.cursor_mode;
+				break;
+			case 0x46:
+				res = (s3.cursor_x & 0xff00) >> 8;
+				break;
+			case 0x47:
+				res = s3.cursor_x & 0x00ff;
+				break;
+			case 0x48:
+				res = (s3.cursor_y & 0xff00) >> 8;
+				break;
+			case 0x49:
+				res = s3.cursor_y & 0x00ff;
+				break;
+			case 0x4a:
+				res = s3.cursor_fg[s3.cursor_fg_ptr];
+				s3.cursor_fg_ptr = 0;
+				break;
+			case 0x4b:
+				res = s3.cursor_bg[s3.cursor_bg_ptr];
+				s3.cursor_bg_ptr = 0;
+				break;
+			case 0x4c:
+				res = (s3.cursor_start_addr & 0xff00) >> 8;
+				break;
+			case 0x4d:
+				res = s3.cursor_start_addr & 0x00ff;
+				break;
+			case 0x4e:
+				res = s3.cursor_pattern_x;
+				break;
+			case 0x4f:
+				res = s3.cursor_pattern_y;
+				break;
+			case 0x55:
+				res = s3.extended_dac_ctrl;
 				break;
 			case 0x67:
 				res = s3.ext_misc_ctrl_2;
@@ -2623,12 +2773,159 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 					s3.write_count = 0;
 				}
 				break;
+/*
+3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode
+bit    0  HWGC ENB. Hardware Graphics Cursor Enable. Set to enable the
+          HardWare Cursor in VGA and enhanced modes.
+       1  (911/24) Delay Timing for Pattern Data Fetch
+       2  (801/5,928) Hardware Cursor Horizontal Stretch 2. If set the cursor
+           pixels are stretched horizontally to two bytes and items 0 and 1 of
+           the fore/background stacks in 3d4h index 4Ah/4Bh are used.
+       3  (801/5,928) Hardware Cursor Horizontal Stretch 3. If set the cursor
+           pixels are stretched horizontally to three bytes and items 0,1 and
+           2 of the fore/background stacks in 3d4h index 4Ah/4Bh are used.
+     2-3  (805i,864/964) HWC-CSEL. Hardware Cursor Color Select.
+            0: 4/8bit, 1: 15/16bt, 2: 24bit, 3: 32bit
+          Note: So far I've had better luck with: 0: 8/15/16bit, 1: 32bit??
+       4  (80x +) Hardware Cursor Right Storage. If set the cursor data is
+           stored in the last 256 bytes of 4 1Kyte lines (4bits/pixel) or the
+           last 512 bytes of 2 2Kbyte lines (8bits/pixel). Intended for
+           1280x1024 modes where there are no free lines at the bottom.
+       5  (928) Cursor Control Enable for Brooktree Bt485 DAC. If set and 3d4h
+           index 55h bit 5 is set the HC1 output becomes the ODF and the HC0
+           output becomes the CDE
+          (964) BT485 ODF Selection for Bt485A RAMDAC. If set pin 185 (RS3
+           /ODF) is the ODF output to a Bt485A compatible RamDAC (low for even
+           fields and high for odd fields), if clear pin185 is the RS3 output.
+ */
+			case 0x45:
+				s3.cursor_mode = data;
+				break;
+/*
+3d4h index 46h M(R/W):  CR46/7 Hardware Graphics Cursor Origin-X
+bit 0-10  The HardWare Cursor X position. For 64k modes this value should be
+          twice the actual X co-ordinate.
+ */
+			case 0x46:
+				s3.cursor_x = (s3.cursor_x & 0x00ff) | (data << 8);
+				break;
+			case 0x47:
+				s3.cursor_x = (s3.cursor_x & 0xff00) | data;
+				break;
+/*
+3d4h index 48h M(R/W):  CR48/9 Hardware Graphics Cursor Origin-Y
+bit  0-9  (911/24) The HardWare Cursor Y position.
+    0-10  (80x +) The HardWare Cursor Y position.
+Note: The position is activated when the high byte of the Y coordinate (index
+      48h) is written, so this byte should be written last (not 911/924 ?)
+ */
+			case 0x48:
+				s3.cursor_y = (s3.cursor_y & 0x00ff) | (data << 8);
+				break;
+			case 0x49:
+				s3.cursor_y = (s3.cursor_y & 0xff00) | data;
+				break;
+
+/*
+3d4h index 4Ah (R/W):  Hardware Graphics Cursor Foreground Stack       (80x +)
+bit  0-7  The Foreground Cursor color. Three bytes (4 for the 864/964) are
+          stacked here. When the Cursor Mode register (3d4h index 45h) is read
+          the stackpointer is reset. When a byte is written the byte is
+          written into the current top of stack and the stackpointer is
+          increased. The first byte written (item 0) is allways used, the
+          other two(3) only when Hardware Cursor Horizontal Stretch (3d4h
+          index 45h bit 2-3) is enabled.
+ */
+			case 0x4a:
+				s3.cursor_fg[s3.cursor_fg_ptr++] = data;
+				s3.cursor_fg_ptr %= 4;
+				break;
+/*
+3d4h index 4Bh (R/W):  Hardware Graphics Cursor Background Stack       (80x +)
+bit  0-7  The Background Cursor color. Three bytes (4 for the 864/964) are
+          stacked here. When the Cursor Mode register (3d4h index 45h) is read
+          the stackpointer is reset. When a byte is written the byte is
+          written into the current top of stack and the stackpointer is
+          increased. The first byte written (item 0) is allways used, the
+          other two(3) only when Hardware Cursor Horizontal Stretch (3d4h
+          index 45h bit 2-3) is enabled.
+ */
+			case 0x4b:
+				s3.cursor_bg[s3.cursor_bg_ptr++] = data;
+				s3.cursor_bg_ptr %= 4;
+				break;
+/*
+3d4h index 4Ch M(R/W):  CR4C/D Hardware Graphics Cursor Storage Start Address
+bit  0-9  (911,924) HCS_STADR. Hardware Graphics Cursor Storage Start Address
+    0-11  (80x,928) HWGC_STA. Hardware Graphics Cursor Storage Start Address
+    0-12  (864,964) HWGC_STA. Hardware Graphics Cursor Storage Start Address
+          Address of the HardWare Cursor Map in units of 1024 bytes (256 bytes
+          for planar modes). The cursor map is a 64x64 bitmap with 2 bits (A
+          and B) per pixel. The map is stored as one word (16 bits) of bit A,
+          followed by one word with the corresponding 16 B bits.
+          The bits are interpreted as:
+             A    B    MS-Windows:         X-11:
+             0    0    Background          Screen data
+             0    1    Foreground          Screen data
+             1    0    Screen data         Background
+             1    1    Inverted screen     Foreground
+          The Windows/X11 switch is only available for the 80x +.
+          (911/24) For 64k color modes the cursor is stored as one byte (8
+            bits) of A bits, followed by the 8 B-bits, and each bit in the
+            cursor should be doubled to provide a consistent cursor image.
+          (801/5,928) For Hi/True color modes use the Horizontal Stretch bits
+            (3d4h index 45h bits 2 and 3).
+ */
+			case 0x4c:
+				s3.cursor_start_addr = (s3.cursor_start_addr & 0x00ff) | (data << 8);
+				break;
+			case 0x4d:
+				s3.cursor_start_addr = (s3.cursor_start_addr & 0xff00) | data;
+				break;
+/*
+3d4h index 4Eh (R/W):  CR4E HGC Pattern Disp Start X-Pixel Position
+bit  0-5  Pattern Display Start X-Pixel Position.
+ */
+			case 0x4e:
+				s3.cursor_pattern_x = data;
+				break;
+/*
+3d4h index 4Fh (R/W):  CR4F HGC Pattern Disp Start Y-Pixel Position
+bit  0-5  Pattern Display Start Y-Pixel Position.
+ */
+			case 0x4f:
+				s3.cursor_pattern_y = data;
+				break;
 			case 0x51:
 				vga.crtc.start_addr &= ~0xc0000;
 				vga.crtc.start_addr |= ((data & 0x3) << 18);
 				break;
 			case 0x53:
 				s3.cr53 = data;
+				break;
+/*
+3d4h index 55h (R/W):  Extended Video DAC Control Register             (80x +)
+bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
+         RAMDAC, allowing access to all 8 or 16 registers on advanced RAMDACs.
+         If this field is 0, 3d4h index 43h bit 1 is active.
+      2  Enable General Input Port Read. If set DAC reads are disabled and the
+         STRD strobe for reading the General Input Port is enabled for reading
+         while DACRD is active, if clear DAC reads are enabled.
+      3  (928) Enable External SID Operation if set. If set video data is
+           passed directly from the VRAMs to the DAC rather than through the
+           VGA chip
+      4  Hardware Cursor MS/X11 Mode. If set the Hardware Cursor is in X11
+         mode, if clear in MS-Windows mode
+      5  (80x,928) Hardware Cursor External Operation Mode. If set the two
+          bits of cursor data ,is output on the HC[0-1] pins for the video DAC
+          The SENS pin becomes HC1 and the MID2 pin becomes HC0.
+      6  ??
+      7  (80x,928) Disable PA Output. If set PA[0-7] and VCLK are tristated.
+         (864/964) TOFF VCLK. Tri-State Off VCLK Output. VCLK output tri
+          -stated if set
+ */
+			case 0x55:
+				s3.extended_dac_ctrl = data;
 				break;
 			case 0x67:
 				s3.ext_misc_ctrl_2 = data;
@@ -3966,8 +4263,8 @@ WRITE8_HANDLER( s3_mem_w )
 		case 0xbae8:
 			s3.fgmix = (s3.fgmix & 0xff00) | data;
 			break;
-		case 0xbae9:
 		case 0x8137:
+		case 0xbae9:
 			s3.fgmix = (s3.fgmix & 0x00ff) | (data << 8);
 			break;
 		case 0x8138:
@@ -4014,6 +4311,26 @@ WRITE8_HANDLER( s3_mem_w )
 			break;
 		case 0x814b:
 			s3.rect_width = (s3.rect_width & 0x00ff) | (data << 8);
+			break;
+		case 0x8150:
+			s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
+			if(s3.state == S3_DRAWING_RECT)
+				s3_wait_draw();
+			break;
+		case 0x8151:
+			s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
+			if(s3.state == S3_DRAWING_RECT)
+				s3_wait_draw();
+			break;
+		case 0x8152:
+			s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
+			if(s3.state == S3_DRAWING_RECT)
+				s3_wait_draw();
+			break;
+		case 0x8153:
+			s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
+			if(s3.state == S3_DRAWING_RECT)
+				s3_wait_draw();
 			break;
 		case 0xbee8:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0xff00) | data;
