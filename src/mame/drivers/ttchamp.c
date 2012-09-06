@@ -49,10 +49,12 @@ class ttchamp_state : public driver_device
 {
 public:
 	ttchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_peno_vram(*this, "peno_vram"){ }
+		: driver_device(mconfig, type, tag)
+	{ }
 
-	required_shared_ptr<UINT16> m_peno_vram;
+	UINT16* m_peno_vram;
+	UINT16* m_peno_mainram;
+
 	UINT16 m_paloff;
 	DECLARE_WRITE16_MEMBER(paloff_w);
 	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
@@ -60,11 +62,39 @@ public:
 	DECLARE_READ16_MEMBER(peno_rand);
 	DECLARE_READ16_MEMBER(peno_rand2);
 	DECLARE_DRIVER_INIT(ttchamp);
+
+	DECLARE_WRITE16_MEMBER( penocup_vid_w )
+	{
+		offset &=0x7fff;
+		COMBINE_DATA(&m_peno_vram[offset]);
+	}
+
+	DECLARE_READ16_MEMBER( penocup_mainram_r )
+	{
+		return m_peno_mainram[offset];
+	}
+	
+	DECLARE_WRITE16_MEMBER( penocup_mainram_w )
+	{
+		offset &=0x7fff;
+		COMBINE_DATA(&m_peno_mainram[offset]);
+//		COMBINE_DATA(&m_peno_vram[offset]);
+	}
+
+
+
 };
+
 
 
 static VIDEO_START(ttchamp)
 {
+	ttchamp_state *state = machine.driver_data<ttchamp_state>();
+	state->m_peno_vram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x10000/2);
+	state->m_peno_mainram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x10000/2);
+
+	
+
 }
 
 static SCREEN_UPDATE_IND16(ttchamp)
@@ -88,7 +118,7 @@ static SCREEN_UPDATE_IND16(ttchamp)
 //  }
 
 	count=0;
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_peno_vram.target());
+	UINT8 *videoram = (UINT8*)state->m_peno_vram;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -138,9 +168,16 @@ READ16_MEMBER(ttchamp_state::peno_rand2)
 #endif
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
-    AM_RANGE(0x00000, 0x0ffff) AM_RAM
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("peno_vram")
-    AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
+    AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_READWRITE(penocup_mainram_r, penocup_mainram_w)
+
+ /* 0x10000 - 0x1ffff is where it writes most image stuff, but other address get written to 0 where the left edge of 'sprites' would be? why? bad code execution, or some kind of write address based blitter?
+   see for example the lines written down the side of where the (not displayed) CREDIT text would go, as well as beside the actual credit number.. also ingame if you can get it to start
+ */
+	
+	AM_RANGE(0x10000, 0xfffff) AM_WRITE(penocup_vid_w)
+
+	// how are these banked? what are the bank sizes? data needed for startup is at 0x20000-0x2ffff (strings) and 0x30000-0x3ffff (code) the rest seems to be graphics..
+	AM_RANGE(0x00000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END
 
@@ -170,9 +207,7 @@ static INPUT_PORTS_START(ttchamp)
     PORT_START("SYSTEM")
     PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
     PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
     PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -229,7 +264,7 @@ static INPUT_PORTS_START(ttchamp)
     PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
     PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
     PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 INPUT_PORTS_END
 
@@ -339,7 +374,7 @@ ROM_END
 DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 {
 	UINT8 *ROM1 = machine().root_device().memregion("user1")->base();
-	machine().root_device().membank("bank1")->set_base(&ROM1[0x120000]);
+	machine().root_device().membank("bank1")->set_base(&ROM1[0x100000]);
 	machine().root_device().membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
