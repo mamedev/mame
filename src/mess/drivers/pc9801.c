@@ -8,13 +8,10 @@
     - floppy interface doesn't seem to work at all with either floppy inserted or not, missing DMA irq?
     - proper 8251 uart hook-up on keyboard
     - boot is too slow right now, might be due of the floppy / HDD devices
-
-    TODO (PC-9801UX):
-    - POR mechanism makes this to die very soon (hack is unsuited for what this needs);
+	- investigate on POR bit
 
     TODO (PC-9801RS):
     - floppy disk hook-up;
-    - POR mechanism isn't fully understood;
     - extra features;
     - clean-up duplicating code;
 
@@ -302,7 +299,7 @@ public:
 
 	/* PC9801RS specific */
 	UINT8 m_gate_a20; //A20 line
-	UINT8 m_por;		//Power-On Reset
+	UINT8 m_access_ctrl; // DMA related
 	UINT8 m_rom_bank;
 	UINT8 m_fdc_ctrl;
 	UINT32 m_ram_size;
@@ -375,6 +372,8 @@ public:
 	DECLARE_READ8_MEMBER(ide_status_r);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_READ8_MEMBER(pc9801rs_access_ctrl_r);
+	DECLARE_WRITE8_MEMBER(pc9801rs_access_ctrl_w);
 };
 
 
@@ -1285,10 +1284,12 @@ READ8_MEMBER(pc9801_state::pc9801rs_f0_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_f0_w)
 {
-
 	if(offset == 0x00)
 	{
-		m_por = 0x00;
+		UINT8 por;
+		/* reset POR bit, TODO: is there any other way? */
+		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
+		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
 		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 
@@ -1306,10 +1307,6 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_f0_w)
 
 READ8_MEMBER(pc9801_state::pc9801rs_30_r)
 {
-
-	if(offset == 5)
-		return (pc9801_30_r(space,offset) & ~0xa0) | m_por; //ppi bug?
-
 	return pc9801_30_r(space,offset);
 }
 
@@ -1490,6 +1487,20 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 	pc9801_a0_w(space,offset,data);
 }
 
+READ8_MEMBER( pc9801_state::pc9801rs_access_ctrl_r )
+{
+	if(offset == 1)
+		return m_access_ctrl;
+
+	return 0xff;
+}
+
+WRITE8_MEMBER( pc9801_state::pc9801rs_access_ctrl_w )
+{
+	if(offset == 1)
+		m_access_ctrl = data;
+}
+
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
@@ -1508,6 +1519,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
+	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 
 ADDRESS_MAP_END
@@ -1567,6 +1579,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffff)
+	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
 
 ADDRESS_MAP_END
@@ -1667,7 +1680,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 //  AM_RANGE(0x0430, 0x0430) IDE bank register
 //  AM_RANGE(0x0432, 0x0432) IDE bank register (mirror)
-//  AM_RANGE(0x0439, 0x0439) ROM/RAM bank (NEC)
+	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 //  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
 //  AM_RANGE(0x04a0, 0x04af) EGC
@@ -2465,9 +2478,9 @@ static MACHINE_RESET(pc9801rs)
 	MACHINE_RESET_CALL(pc9801);
 
 	state->m_gate_a20 = 0;
-	state->m_por = 0xa0;
 	state->m_rom_bank = 0;
 	state->m_fdc_ctrl = 3;
+	state->m_access_ctrl = 0;
 
 	state->m_ram_size = machine.device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
