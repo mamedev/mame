@@ -100,6 +100,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "corestr.h"
 #include "jedparse.h"
 
 
@@ -876,7 +877,7 @@ static pal_data* find_pal_data(const char *name)
     for (index = 0; index < sizeof(paldata) / sizeof(paldata[0]);
          ++index)
     {
-        if (!strcmpi(name, paldata[index].name))
+        if (!core_stricmp(name, paldata[index].name))
         {
             return &paldata[index];
         }
