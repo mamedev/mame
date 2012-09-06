@@ -377,7 +377,7 @@ static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap
 
 
 INLINE void zdrawgfxzoom32GP(
-		bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx,
+		bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -416,7 +416,7 @@ INLINE void zdrawgfxzoom32GP(
 	if (!scalex || !scaley) return;
 
 	// find shadow pens and cull invisible shadows
-	granularity = shdpen = gfx->color_granularity;
+	granularity = shdpen = gfx->granularity();
 	shdpen--;
 
 	if (zcode >= 0)
@@ -440,9 +440,9 @@ INLINE void zdrawgfxzoom32GP(
 	src_pitch = 16;
 	src_fw    = 16;
 	src_fh    = 16;
-	src_base  = gfx_element_get_data(gfx, code % gfx->total_elements);
+	src_base  = gfx->get_data(code % gfx->elements());
 
-	pal_base  = gfx->machine().pens + gfx->color_base + (color % gfx->total_colors) * granularity;
+	pal_base  = gfx->machine().pens + gfx->colorbase() + (color % gfx->colors()) * granularity;
 	shd_base  = gfx->machine().shadow_table;
 
 	dst_ptr   = &bitmap.pix32(0);

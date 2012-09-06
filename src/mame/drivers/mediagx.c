@@ -236,14 +236,14 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
 	const pen_t *pens = gfx->machine().pens;
 
-	dp = gfx_element_get_data(gfx, ch);
+	dp = gfx->get_data(ch);
 
 	for (j=y; j < y+8; j++)
 	{
@@ -252,11 +252,11 @@ static void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-				p[i] = pens[gfx->color_base + (att & 0xf)];
+				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else
 			{
 				if (((att >> 4) & 7) > 0)
-					p[i] = pens[gfx->color_base + ((att >> 4) & 0x7)];
+					p[i] = pens[gfx->colorbase() + ((att >> 4) & 0x7)];
 			}
 		}
 	}
@@ -357,7 +357,7 @@ static void draw_cga(running_machine &machine, bitmap_rgb32 &bitmap, const recta
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	UINT32 *cga = state->m_cga_ram;
 	int index = 0;
 

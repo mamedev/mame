@@ -28,7 +28,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	const UINT16 *source = state->m_spriteram;
 	const UINT16 *finish = source + 0x2000;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 
 	while (source < finish)
 	{

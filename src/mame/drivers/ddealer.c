@@ -181,7 +181,7 @@ static VIDEO_START( ddealer )
 
 static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
 {
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 
 	INT16 sx, sy;
 	int x,y, count;

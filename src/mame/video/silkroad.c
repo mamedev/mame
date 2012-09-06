@@ -10,7 +10,7 @@
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	silkroad_state *state = machine.driver_data<silkroad_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	UINT32 *source = state->m_sprram;
 	UINT32 *finish = source + 0x1000/4;
 

@@ -200,7 +200,7 @@ GFXDECODE_END
 SCREEN_UPDATE_IND16( bmcpokr )
 {
 	bmcpokr_state *state = screen.machine().driver_data<bmcpokr_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	int count = 0;
 	for (int y=0;y<32;y++)

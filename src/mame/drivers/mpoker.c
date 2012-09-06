@@ -208,7 +208,7 @@ static SCREEN_UPDATE_IND16(mpoker)
 	mpoker_state *state = screen.machine().driver_data<mpoker_state>();
 	int y,x;
 	int count;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 	for (y=0;y<32;y++)

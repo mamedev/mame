@@ -1439,7 +1439,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 
 	if (offset < 0x1000 / 2)
 	{
-		gfx_element_mark_dirty(device->machine().gfx[tc0080vco->tx_gfx], offset / 8);
+		device->machine().gfx[tc0080vco->tx_gfx]->mark_dirty(offset / 8);
 #if 0
 		if (!tc0080vco->has_tx)
 		{
@@ -1470,7 +1470,7 @@ WRITE16_DEVICE_HANDLER( tc0080vco_word_w )
 
 	else if (offset < 0x11000 / 2)
 	{
-		gfx_element_mark_dirty(device->machine().gfx[tc0080vco->tx_gfx], (offset - 0x10000 / 2) / 8);
+		device->machine().gfx[tc0080vco->tx_gfx]->mark_dirty((offset - 0x10000 / 2) / 8);
 #if 0
 		if (!tc0080vco->has_tx)
 		{
@@ -1902,7 +1902,7 @@ static DEVICE_START( tc0080vco )
 	tc0080vco->scroll_ram    = tc0080vco->ram + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine().gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine(), &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
+	device->machine().gfx[tc0080vco->tx_gfx] = auto_alloc(device->machine(), gfx_element(device->machine(), tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0));
 
 	device->save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_postload), tc0080vco));
@@ -2173,7 +2173,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 		else if (offset < 0x3000)
 			tc0100scn->tilemap[2][0]->mark_tile_dirty((offset & 0x0fff));
 		else if (offset < 0x3800)
-			gfx_element_mark_dirty(device->machine().gfx[tc0100scn->tx_gfx], (offset - 0x3000) / 8);
+			device->machine().gfx[tc0100scn->tx_gfx]->mark_dirty((offset - 0x3000) / 8);
 		else if (offset >= 0x4000 && offset < 0x6000)
 			tc0100scn->tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
 	}
@@ -2184,7 +2184,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_word_w )
 		else if (offset >= 0x4000 && offset < 0x8000)
 			tc0100scn->tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
 		else if (offset >= 0x8800 && offset < 0x9000)
-			gfx_element_mark_dirty(device->machine().gfx[tc0100scn->tx_gfx], (offset - 0x8800) / 8);
+			device->machine().gfx[tc0100scn->tx_gfx]->mark_dirty((offset - 0x8800) / 8);
 		else if (offset >= 0x9000)
 			tc0100scn->tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
 	}
@@ -2246,7 +2246,7 @@ WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w )
 				tc0100scn_dirty_tilemaps(device);
 
 				/* reset the pointer to the text characters (and dirty them all) */
-				gfx_element_set_source(device->machine().gfx[tc0100scn->tx_gfx], (UINT8 *)tc0100scn->char_ram);
+				device->machine().gfx[tc0100scn->tx_gfx]->set_source((UINT8 *)tc0100scn->char_ram);
 			}
 
 			break;
@@ -2491,13 +2491,13 @@ static DEVICE_START( tc0100scn )
 	tc0100scn->bg_col_mult = 1;	/* multiplier for when bg gfx != 4bpp */
 	tc0100scn->tx_col_mult = 1;	/* multiplier needed when bg gfx is 6bpp */
 
-	if (device->machine().gfx[intf->gfxnum]->color_granularity == 2)	/* Yuyugogo, Yesnoj */
+	if (device->machine().gfx[intf->gfxnum]->granularity() == 2)	/* Yuyugogo, Yesnoj */
 		tc0100scn->bg_col_mult = 8;
 
-	if (device->machine().gfx[intf->gfxnum]->color_granularity == 0x40)	/* Undrfire */
+	if (device->machine().gfx[intf->gfxnum]->granularity() == 0x40)	/* Undrfire */
 		tc0100scn->tx_col_mult = 4;
 
-//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", device->machine().gfx[intf->gfxnum]->color_granularity, tc0100scn->tx_col_mult);
+//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", device->machine().gfx[intf->gfxnum]->granularity(), tc0100scn->tx_col_mult);
 
 	tc0100scn->ram = auto_alloc_array_clear(device->machine(), UINT16, TC0100SCN_RAM_SIZE / 2);
 
@@ -2507,7 +2507,7 @@ static DEVICE_START( tc0100scn )
 									/* we call this here, so that they can be modified at VIDEO_START*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine().gfx[tc0100scn->tx_gfx] = gfx_element_alloc(device->machine(), &tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0);
+	device->machine().gfx[tc0100scn->tx_gfx] = auto_alloc(device->machine(), gfx_element(device->machine(), tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0));
 
 	device->save_pointer(NAME(tc0100scn->ram), TC0100SCN_RAM_SIZE / 2);
 	device->save_item(NAME(tc0100scn->ctrl));
@@ -2976,7 +2976,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_word_w )
 		}
 		else if (offset <= 0x7fff)
 		{
-			gfx_element_mark_dirty(device->machine().gfx[tc0480scp->tx_gfx], (offset - 0x7000) / 16);
+			device->machine().gfx[tc0480scp->tx_gfx]->mark_dirty((offset - 0x7000) / 16);
 		}
 	}
 	else
@@ -2994,7 +2994,7 @@ WRITE16_DEVICE_HANDLER( tc0480scp_word_w )
 		}
 		else if (offset <= 0x7fff)
 		{
-			gfx_element_mark_dirty(device->machine().gfx[tc0480scp->tx_gfx], (offset - 0x7000) / 16);
+			device->machine().gfx[tc0480scp->tx_gfx]->mark_dirty((offset - 0x7000) / 16);
 		}
 	}
 }
@@ -3717,7 +3717,7 @@ static DEVICE_START( tc0480scp )
 	tc0480scp_set_layer_ptrs(tc0480scp);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine().gfx[tc0480scp->tx_gfx] = gfx_element_alloc(device->machine(), &tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0);
+	device->machine().gfx[tc0480scp->tx_gfx] = auto_alloc(device->machine(), gfx_element(device->machine(), tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0));
 
 	device->save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
 	device->save_item(NAME(tc0480scp->ctrl));

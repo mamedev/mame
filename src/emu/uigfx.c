@@ -84,7 +84,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 
 /* graphics set handling */
 static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, int xcells, int ycells);
-static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate);
+static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate);
 static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
 static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state);
 
@@ -473,8 +473,8 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	cellboxheight = (cellboxbounds.y1 - cellboxbounds.y0) * (float)targheight;
 
 	/* compute the number of source pixels in a cell */
-	cellxpix = 1 + ((state->gfxset.rotate[state->gfxset.set] & ORIENTATION_SWAP_XY) ? gfx->height : gfx->width);
-	cellypix = 1 + ((state->gfxset.rotate[state->gfxset.set] & ORIENTATION_SWAP_XY) ? gfx->width : gfx->height);
+	cellxpix = 1 + ((state->gfxset.rotate[state->gfxset.set] & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width());
+	cellypix = 1 + ((state->gfxset.rotate[state->gfxset.set] & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height());
 
 	/* compute the largest pixel scale factor that still fits */
 	xcells = state->gfxset.count[set];
@@ -513,7 +513,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 
 	/* figure out the title and expand the outer box to fit */
 	for (x = 0; x < MAX_GFX_ELEMENTS && machine.gfx[x] != NULL; x++) ;
-	sprintf(title, "GFX %d/%d %dx%d COLOR %X", state->gfxset.set, x - 1, gfx->width, gfx->height, state->gfxset.color[set]);
+	sprintf(title, "GFX %d/%d %dx%d COLOR %X", state->gfxset.set, x - 1, gfx->width(), gfx->height(), state->gfxset.color[set]);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
@@ -550,7 +550,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	for (y = 0; y < ycells; y += 1 + skip)
 
 		/* only display if there is data to show */
-		if (state->gfxset.offset[set] + y * xcells < gfx->total_elements)
+		if (state->gfxset.offset[set] + y * xcells < gfx->elements())
 		{
 			char buffer[10];
 
@@ -645,11 +645,11 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, in
 	if (ui_input_pressed_repeat(machine, IPT_UI_HOME, 4))
 		state->gfxset.offset[set] = 0;
 	if (ui_input_pressed_repeat(machine, IPT_UI_END, 4))
-		state->gfxset.offset[set] = gfx->total_elements;
+		state->gfxset.offset[set] = gfx->elements();
 
 	/* clamp within range */
-	if (state->gfxset.offset[set] + xcells * ycells > ((gfx->total_elements + xcells - 1) / xcells) * xcells)
-		state->gfxset.offset[set] = ((gfx->total_elements + xcells - 1) / xcells) * xcells - xcells * ycells;
+	if (state->gfxset.offset[set] + xcells * ycells > ((gfx->elements() + xcells - 1) / xcells) * xcells)
+		state->gfxset.offset[set] = ((gfx->elements() + xcells - 1) / xcells) * xcells - xcells * ycells;
 	if (state->gfxset.offset[set] < 0)
 		state->gfxset.offset[set] = 0;
 
@@ -660,8 +660,8 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, in
 		state->gfxset.color[set] += 1;
 
 	/* clamp within range */
-	if (state->gfxset.color[set] >= (int)gfx->total_colors)
-		state->gfxset.color[set] = gfx->total_colors - 1;
+	if (state->gfxset.color[set] >= (int)gfx->colors())
+		state->gfxset.color[set] = gfx->colors() - 1;
 	if (state->gfxset.color[set] < 0)
 		state->gfxset.color[set] = 0;
 
@@ -689,8 +689,8 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 	int x, y;
 
 	/* compute the number of source pixels in a cell */
-	cellxpix = 1 + ((state->gfxset.rotate[set] & ORIENTATION_SWAP_XY) ? gfx->height : gfx->width);
-	cellypix = 1 + ((state->gfxset.rotate[set] & ORIENTATION_SWAP_XY) ? gfx->width : gfx->height);
+	cellxpix = 1 + ((state->gfxset.rotate[set] & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width());
+	cellypix = 1 + ((state->gfxset.rotate[set] & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height());
 
 	/* realloc the bitmap if it is too small */
 	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->bpp() != 32 || state->bitmap->width() != cellxpix * xcells || state->bitmap->height() != cellypix * ycells)
@@ -720,7 +720,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 			cellbounds.set(0, state->bitmap->width() - 1, y * cellypix, (y + 1) * cellypix - 1);
 
 			/* only display if there is data to show */
-			if (state->gfxset.offset[set] + y * xcells < gfx->total_elements)
+			if (state->gfxset.offset[set] + y * xcells < gfx->elements())
 			{
 				/* draw the individual cells */
 				for (x = 0; x < xcells; x++)
@@ -732,7 +732,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 					cellbounds.max_x = (x + 1) * cellxpix - 1;
 
 					/* only render if there is data */
-					if (index < gfx->total_elements)
+					if (index < gfx->elements())
 						gfxset_draw_item(machine, gfx, index, *state->bitmap, cellbounds.min_x, cellbounds.min_y, state->gfxset.color[set], state->gfxset.rotate[set]);
 
 					/* otherwise, fill with transparency */
@@ -758,21 +758,21 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
     the view
 -------------------------------------------------*/
 
-static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
+static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
 {
 	static const pen_t default_palette[] =
 	{
 		MAKE_RGB(0,0,0), MAKE_RGB(0,0,255), MAKE_RGB(0,255,0), MAKE_RGB(0,255,255),
 		MAKE_RGB(255,0,0), MAKE_RGB(255,0,255), MAKE_RGB(255,255,0), MAKE_RGB(255,255,255)
 	};
-	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height : gfx->width;
-	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width : gfx->height;
+	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
+	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();
 	const rgb_t *palette = (machine.total_colors() != 0) ? palette_entry_list_raw(machine.palette) : NULL;
 	UINT32 palette_mask = ~0;
 	int x, y;
 
 	if (palette != NULL)
-		palette += gfx->color_base + color * gfx->color_granularity;
+		palette += gfx->colorbase() + color * gfx->granularity();
 	else
 	{
 		palette = default_palette;
@@ -783,7 +783,7 @@ static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, i
 	for (y = 0; y < height; y++)
 	{
 		UINT32 *dest = &bitmap.pix32(dsty + y, dstx);
-		const UINT8 *src = gfx_element_get_data(gfx, index);
+		const UINT8 *src = gfx->get_data(index);
 
 		/* loop over columns in the cell */
 		for (x = 0; x < width; x++)
@@ -795,22 +795,22 @@ static void gfxset_draw_item(running_machine &machine, const gfx_element *gfx, i
 			if (!(rotate & ORIENTATION_SWAP_XY))
 			{
 				if (rotate & ORIENTATION_FLIP_X)
-					effx = gfx->width - 1 - effx;
+					effx = gfx->width() - 1 - effx;
 				if (rotate & ORIENTATION_FLIP_Y)
-					effy = gfx->height - 1 - effy;
+					effy = gfx->height() - 1 - effy;
 			}
 			else
 			{
 				int temp;
 				if (rotate & ORIENTATION_FLIP_X)
-					effx = gfx->height - 1 - effx;
+					effx = gfx->height() - 1 - effx;
 				if (rotate & ORIENTATION_FLIP_Y)
-					effy = gfx->width - 1 - effy;
+					effy = gfx->width() - 1 - effy;
 				temp = effx; effx = effy; effy = temp;
 			}
 
 			/* get a pointer to the start of this source row */
-			s = src + effy * gfx->line_modulo;
+			s = src + effy * gfx->rowbytes();
 
 			/* extract the pixel */
 			*dest++ = 0xff000000 | palette[s[effx] & palette_mask];

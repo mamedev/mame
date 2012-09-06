@@ -212,7 +212,7 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 		{
 			if (state->m_tileduty[i] == 1)
 			{
-				gfx_element_decode(screen.machine().gfx[0], i);
+				screen.machine().gfx[0]->decode(i);
 				state->m_tileduty[i] = 0;
 			}
 		}

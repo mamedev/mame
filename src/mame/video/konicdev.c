@@ -1239,7 +1239,7 @@ static void decode_gfx(running_machine &machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine.total_colors() >> bpp, 0);
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, gl, data, machine.total_colors() >> bpp, 0));
 }
 
 
@@ -1426,7 +1426,7 @@ void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
-//  const gfx_element *gfx = gfxs[chip];
+//  gfx_element *gfx = gfxs[chip];
 	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
 	int flipscreen = k007121->flipscreen;
 	int i, num, inc, offs[5];
@@ -3092,7 +3092,7 @@ void k051960_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 			flipy = !flipy;
 		}
 
-		drawmode_table[k051960->gfx->color_granularity - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[k051960->gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
@@ -3678,7 +3678,7 @@ void k053245_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectang
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[k053245->gfx->color_granularity - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[k053245->gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -3928,7 +3928,7 @@ void k053245_sprites_draw_lethal( device_t *device, bitmap_ind16 &bitmap, const 
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[machine.gfx[0]->color_granularity - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[machine.gfx[0]->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -4739,7 +4739,7 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[k053246->gfx->color_granularity - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[k053246->gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -7034,7 +7034,7 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 			int count, src_pitch, src_modulo;
 			int dst_pitch;
 			int line;
-			const gfx_element *src_gfx;
+			gfx_element *src_gfx;
 			int offs, mask;
 
 			#define LINE_WIDTH 512
@@ -7048,7 +7048,7 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 			pixmap  = k056832->pixmap[page];
 			pal_ptr = machine.pens;
 			src_gfx = machine.gfx[k056832->gfxnum];
-			src_pitch  = src_gfx->line_modulo;
+			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
 
@@ -7887,7 +7887,7 @@ static DEVICE_START( k056832 )
 			fatalerror("Unsupported bpp");
 	}
 
-	machine.gfx[intf->gfx_num]->color_granularity = 16; /* override */
+	machine.gfx[intf->gfx_num]->set_granularity(16); /* override */
 
 	/* deinterleave the graphics, if needed */
 	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
@@ -9861,8 +9861,8 @@ WRITE32_DEVICE_HANDLER( k001604_char_w )
 
 	COMBINE_DATA(k001604->char_ram + addr);
 
-	gfx_element_mark_dirty(device->machine().gfx[k001604->gfx_index[0]], addr / 32);
-	gfx_element_mark_dirty(device->machine().gfx[k001604->gfx_index[1]], addr / 128);
+	device->machine().gfx[k001604->gfx_index[0]]->mark_dirty(addr / 32);
+	device->machine().gfx[k001604->gfx_index[1]]->mark_dirty(addr / 128);
 }
 
 WRITE32_DEVICE_HANDLER( k001604_reg_w )
@@ -9937,8 +9937,8 @@ static DEVICE_START( k001604 )
 	k001604->layer_8x8[0]->set_transparent_pen(0);
 	k001604->layer_8x8[1]->set_transparent_pen(0);
 
-	device->machine().gfx[k001604->gfx_index[0]] = gfx_element_alloc(device->machine(), &k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine().total_colors() / 16, 0);
-	device->machine().gfx[k001604->gfx_index[1]] = gfx_element_alloc(device->machine(), &k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine().total_colors() / 16, 0);
+	device->machine().gfx[k001604->gfx_index[0]] = auto_alloc(device->machine(), gfx_element(device->machine(), k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine().total_colors() / 16, 0));
+	device->machine().gfx[k001604->gfx_index[1]] = auto_alloc(device->machine(), gfx_element(device->machine(), k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine().total_colors() / 16, 0));
 
 	device->save_pointer(NAME(k001604->reg), 0x400 / 4);
 	device->save_pointer(NAME(k001604->char_ram), 0x200000 / 4);
@@ -10133,7 +10133,7 @@ WRITE32_DEVICE_HANDLER( k037122_char_w )
 	UINT32 addr = offset + (bank * (0x40000/4));
 
 	COMBINE_DATA(k037122->char_ram + addr);
-	gfx_element_mark_dirty(device->machine().gfx[k037122->gfx_index], addr / 32);
+	device->machine().gfx[k037122->gfx_index]->mark_dirty(addr / 32);
 }
 
 READ32_DEVICE_HANDLER( k037122_reg_r )
@@ -10179,7 +10179,7 @@ static DEVICE_START( k037122 )
 	k037122->layer[0]->set_transparent_pen(0);
 	k037122->layer[1]->set_transparent_pen(0);
 
-	device->machine().gfx[k037122->gfx_index] = gfx_element_alloc(device->machine(), &k037122_char_layout, (UINT8*)k037122->char_ram, device->machine().total_colors() / 16, 0);
+	device->machine().gfx[k037122->gfx_index] = auto_alloc(device->machine(), gfx_element(device->machine(), k037122_char_layout, (UINT8*)k037122->char_ram, device->machine().total_colors() / 16, 0));
 
 	device->save_pointer(NAME(k037122->reg), 0x400 / 4);
 	device->save_pointer(NAME(k037122->char_ram), 0x200000 / 4);

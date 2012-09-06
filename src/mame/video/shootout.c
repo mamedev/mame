@@ -94,7 +94,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	shootout_state *state = machine.driver_data<shootout_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	const UINT8 *source = spriteram+127*4;
 	int count;
 

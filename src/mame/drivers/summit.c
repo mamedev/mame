@@ -40,7 +40,7 @@ static VIDEO_START(summit)
 static SCREEN_UPDATE_IND16(summit)
 {
 	summit_state *state = screen.machine().driver_data<summit_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x0000;
 
 	int y,x;

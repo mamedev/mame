@@ -83,7 +83,7 @@ READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_r)
 WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_w)
 {
 	m_pcg1_ram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], (offset+0x4000) / 32);
+	machine().gfx[m_gfx_index]->mark_dirty((offset+0x4000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
@@ -95,7 +95,7 @@ READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
 WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_w)
 {
 	m_pcg2_ram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], (offset+0xc000) / 32);
+	machine().gfx[m_gfx_index]->mark_dirty((offset+0xc000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_w)
 {
 	m_vram0[offset] = data;
 	bg0_tilemap->mark_tile_dirty(offset/2);
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], (offset+0x8000) / 32);
+	machine().gfx[m_gfx_index]->mark_dirty((offset+0x8000) / 32);
 	tx_tilemap->mark_all_dirty();
 
 }
@@ -122,7 +122,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_w)
 {
 	m_vram1[offset] = data;
 	bg1_tilemap->mark_tile_dirty(offset/2);
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], (offset+0x9000) / 32);
+	machine().gfx[m_gfx_index]->mark_dirty((offset+0x9000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
@@ -135,7 +135,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_w)
 {
 	m_tvram[offset] = data;
 	tx_tilemap->mark_tile_dirty(offset/2);
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], (offset+0xa000) / 32);
+	machine().gfx[m_gfx_index]->mark_dirty((offset+0xa000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
@@ -147,7 +147,7 @@ READ8_MEMBER(tc0091lvc_device::tc0091lvc_spr_r)
 WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
 {
 	m_sprram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], (offset+0xb000) / 32);
+	machine().gfx[m_gfx_index]->mark_dirty((offset+0xb000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
@@ -276,7 +276,7 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	machine().gfx[m_gfx_index] = gfx_element_alloc(machine(), &char_layout, (UINT8 *)m_pcg_ram, machine().total_colors() / 16, 0);
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)m_pcg_ram, machine().total_colors() / 16, 0));
 }
 
 void tc0091lvc_device::device_reset()
@@ -292,7 +292,7 @@ const address_space_config *tc0091lvc_device::memory_space_config(address_spacen
 
 void tc0091lvc_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip )
 {
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	int count;
 
 	for(count=0;count<0x3e7;count+=8)

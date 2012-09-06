@@ -35,12 +35,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
 	const UINT8 *spritepalettebank = state->memregion("user1")->base();
-	const gfx_element *pGfx = machine.gfx[2];
+	gfx_element *pGfx = machine.gfx[2];
 	const UINT16 *pSource = state->m_spriteram;
 	int i;
 	int transparent_pen;
 
-	if( pGfx->total_elements > 0x200 )
+	if( pGfx->elements() > 0x200 )
 	{ /* HORE HORE Kid */
 		transparent_pen = 0xf;
 	}

@@ -416,7 +416,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_ind16 &bitm
 			if (vdc8563->dirty[i])
 			{
 				drawgfx_opaque(bitmap,rect,machine.gfx[0], vdc8563->ram[i], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
-						machine.gfx[0]->width * x + 8, height * y + height);
+						machine.gfx[0]->width() * x + 8, height * y + height);
 
 				if ((vdc8563->cursor_on) && (i == (CRTC6845_CURSOR_POS & vdc8563->mask)))
 				{
@@ -425,7 +425,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_ind16 &bitm
 						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
 					if (k > 0)
-						bitmap.plot_box(machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width, k, FRAMECOLOR);
+						bitmap.plot_box(machine.gfx[0]->width() * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width(), k, FRAMECOLOR);
 				}
 
 				vdc8563->dirty[i] = 0;
@@ -485,7 +485,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_ind16 &bitmap, 
 						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
 					if (k > 0)
-						bitmap.plot_box(machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width,
+						bitmap.plot_box(machine.gfx[0]->width() * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width(),
 								k, 0x10 | (vdc8563->ram[j] & 0x0f));
 				}
 
@@ -524,7 +524,7 @@ static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_ind16 &bitma
 				if (vdc8563->dirty[k])
 				{
 					drawgfx_opaque(bitmap, rect, machine.gfx[1], vdc8563->ram[k], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
-							machine.gfx[0]->width * x + 8, height * y + height + j);
+							machine.gfx[0]->width() * x + 8, height * y + height + j);
 					vdc8563->dirty[k] = 0;
 				}
 			}
@@ -556,7 +556,7 @@ UINT32 vdc8563_video_update( device_t *device, bitmap_ind16 &bitmap, const recta
 		{
 			if (full_refresh || vdc8563->fontdirty[i])
 			{
-				gfx_element_mark_dirty(device->machine().gfx[0],i);
+				device->machine().gfx[0]->mark_dirty(i);
 				vdc8563->fontdirty[i] = 0;
 			}
 		}
@@ -572,13 +572,13 @@ UINT32 vdc8563_video_update( device_t *device, bitmap_ind16 &bitmap, const recta
 		int h = CRTC6845_CHAR_LINES;
 		int height = CRTC6845_CHAR_HEIGHT;
 
-		bitmap.plot_box(0, 0, device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
+		bitmap.plot_box(0, 0, device->machine().gfx[0]->width() * (w + 2), height, FRAMECOLOR);
 
-		bitmap.plot_box(0, height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
+		bitmap.plot_box(0, height, device->machine().gfx[0]->width(), height * h, FRAMECOLOR);
 
-		bitmap.plot_box(device->machine().gfx[0]->width * (w + 1), height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
+		bitmap.plot_box(device->machine().gfx[0]->width() * (w + 1), height, device->machine().gfx[0]->width(), height * h, FRAMECOLOR);
 
-		bitmap.plot_box(0, height * (h + 1), device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
+		bitmap.plot_box(0, height * (h + 1), device->machine().gfx[0]->width() * (w + 2), height, FRAMECOLOR);
 	}
 
 	vdc8563->changed = 0;

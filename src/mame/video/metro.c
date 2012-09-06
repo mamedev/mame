@@ -163,14 +163,14 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 	}
 	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->m_support_8bpp)) /* draw tile as 8bpp */
 	{
-		const gfx_element *gfx1 = machine.gfx[big?3:1];
+		gfx_element *gfx1 = machine.gfx[big?3:1];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
 			                 ((tile & 0xfffff) + 2*(code & 0xf));
 		const UINT8* data;
 		UINT8 flipxy = (code & 0x6000) >> 13;
 
-		if (tile2 < gfx1->total_elements)
-			data = gfx_element_get_data(gfx1, tile2);
+		if (tile2 < gfx1->elements())
+			data = gfx1->get_data(tile2);
 		else
 		{
 			*pix |= 0;
@@ -196,14 +196,14 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 	}
 	else
 	{
-		const gfx_element *gfx1 = machine.gfx[big?2:0];
+		gfx_element *gfx1 = machine.gfx[big?2:0];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
 			                 ((tile & 0xfffff) +   (code & 0xf));
 		const UINT8* data;
 		UINT8 flipxy = (code & 0x6000) >> 13;
 
-		if (tile2 < gfx1->total_elements)
-			data = gfx_element_get_data(gfx1, tile2);
+		if (tile2 < gfx1->elements())
+			data = gfx1->get_data(tile2);
 		else
 		{
 			*pix |= 0;
@@ -468,8 +468,6 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	for (i = 0; i < 0x20; i++)
 	{
-		gfx_element gfx(machine);
-
 		if (!(state->m_videoregs[0x02/2] & 0x8000))
 		{
 			src = state->m_spriteram + (sprites - 1) * (8 / 2);
@@ -541,7 +539,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, base_gfx8 + gfxstart, width, height, width, 0, 256, 0);
+				gfx_element gfx(machine, base_gfx8 + gfxstart, width, height, width, 0, 256);
 
 				pdrawgfxzoom_transpen(	bitmap,cliprect, &gfx,
 								0,
@@ -557,7 +555,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16, 0);
+				gfx_element gfx(machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16);
 
 				pdrawgfxzoom_transpen(	bitmap,cliprect, &gfx,
 								0,

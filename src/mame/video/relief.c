@@ -87,7 +87,7 @@ VIDEO_START( relief )
 	relief_state *state = machine.driver_data<relief_state>();
 
 	/* MOs are 5bpp but with a 4-bit color granularity */
-	machine.gfx[1]->color_granularity = 16;
+	machine.gfx[1]->set_granularity(16);
 
 	/* initialize the playfield */
 	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);

@@ -29,7 +29,7 @@ PALETTE_INIT( flower )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	flower_state *state = machine.driver_data<flower_state>();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	UINT8 *source = state->m_spriteram + 0x200;
 	UINT8 *finish = source - 0x200;
 

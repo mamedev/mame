@@ -547,7 +547,7 @@ static void toprollr_draw_bigsprite(running_machine &machine, bitmap_ind16 &bitm
 }
 
 
-static void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx)
+static void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
 {
 	cclimber_state *state = gfx->machine().driver_data<cclimber_state>();
 	int offs;
@@ -588,7 +588,7 @@ static void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-static void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx)
+static void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
 {
 	cclimber_state *state = gfx->machine().driver_data<cclimber_state>();
 	int offs;
@@ -626,7 +626,7 @@ static void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-static void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx)
+static void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
 {
 	cclimber_state *state = gfx->machine().driver_data<cclimber_state>();
 	int offs;

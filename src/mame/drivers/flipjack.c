@@ -191,7 +191,7 @@ static SCREEN_UPDATE_RGB32( flipjack )
 	{
 		for (x=0;x<32;x++)
 		{
-			const gfx_element *gfx = screen.machine().gfx[0];
+			gfx_element *gfx = screen.machine().gfx[0];
 			int tile = state->m_bank << 8 | state->m_vram[x+y*0x100];
 			int color = state->m_cram[x+y*0x100] & 0x3f;
 

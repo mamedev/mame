@@ -57,7 +57,7 @@ static SCREEN_UPDATE_IND16(kongambl)
 {
 	#if CUSTOM_DRAW
 	kongambl_state *state = screen.machine().driver_data<kongambl_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	UINT32 count;
 
 	count = 0;

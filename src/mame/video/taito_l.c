@@ -149,42 +149,42 @@ READ8_MEMBER(taitol_state::taitol_control_r)
 
 void taitol_chardef14_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 0);
+	machine.gfx[2]->mark_dirty(offset / 32 + 0);
 }
 
 void taitol_chardef15_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 128);
+	machine.gfx[2]->mark_dirty(offset / 32 + 128);
 }
 
 void taitol_chardef16_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 256);
+	machine.gfx[2]->mark_dirty(offset / 32 + 256);
 }
 
 void taitol_chardef17_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 384);
+	machine.gfx[2]->mark_dirty(offset / 32 + 384);
 }
 
 void taitol_chardef1c_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 512);
+	machine.gfx[2]->mark_dirty(offset / 32 + 512);
 }
 
 void taitol_chardef1d_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 640);
+	machine.gfx[2]->mark_dirty(offset / 32 + 640);
 }
 
 void taitol_chardef1e_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 768);
+	machine.gfx[2]->mark_dirty(offset / 32 + 768);
 }
 
 void taitol_chardef1f_m( running_machine &machine, int offset )
 {
-	gfx_element_mark_dirty(machine.gfx[2], offset / 32 + 896);
+	machine.gfx[2]->mark_dirty(offset / 32 + 896);
 }
 
 void taitol_bg18_m( running_machine &machine, int offset )

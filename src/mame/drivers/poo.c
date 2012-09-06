@@ -78,7 +78,7 @@ static SCREEN_UPDATE_IND16(unclepoo)
 	poo_state *state = screen.machine().driver_data<poo_state>();
 	int y,x;
 	int count;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 

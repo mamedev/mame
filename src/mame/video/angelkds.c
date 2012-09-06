@@ -136,7 +136,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 	const UINT8 *source = state->m_spriteram + 0x100 - 4;
 	const UINT8 *finish = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = machine.gfx[3];
 
 	while (source >= finish)
 	{

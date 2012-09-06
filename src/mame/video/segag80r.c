@@ -194,7 +194,7 @@ VIDEO_START( segag80r )
 			3,	rg_resistances, state->m_gweights, 220, 0,
 			2,	b_resistances,  state->m_bweights, 220, 0);
 
-	gfx_element_set_source(machine.gfx[0], &videoram[0x800]);
+	machine.gfx[0]->set_source(&videoram[0x800]);
 
 	/* allocate paletteram */
 	state->m_generic_paletteram_8.allocate(0x80);
@@ -270,7 +270,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
-		gfx_element_mark_dirty(machine().gfx[0], (offset & 0x7ff) / 8);
+		machine().gfx[0]->mark_dirty((offset & 0x7ff) / 8);
 }
 
 

@@ -114,9 +114,9 @@ inline bool tilemap_t::gfx_elements_changed()
 	// iterate over all used gfx types and set the dirty flag if any of them have changed
 	for (int gfxnum = 0; usedmask != 0; usedmask >>= 1, gfxnum++)
 		if ((usedmask & 1) != 0)
-			if (m_gfx_dirtyseq[gfxnum] != machine().gfx[gfxnum]->dirtyseq)
+			if (m_gfx_dirtyseq[gfxnum] != machine().gfx[gfxnum]->dirtyseq())
 			{
-				m_gfx_dirtyseq[gfxnum] = machine().gfx[gfxnum]->dirtyseq;
+				m_gfx_dirtyseq[gfxnum] = machine().gfx[gfxnum]->dirtyseq();
 				isdirty = true;
 			}
 
@@ -756,7 +756,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 	if (m_tileinfo.gfxnum != 0xff && (m_gfx_used & (1 << m_tileinfo.gfxnum)) == 0)
 	{
 		m_gfx_used |= 1 << m_tileinfo.gfxnum;
-		m_gfx_dirtyseq[m_tileinfo.gfxnum] = machine().gfx[m_tileinfo.gfxnum]->dirtyseq;
+		m_gfx_dirtyseq[m_tileinfo.gfxnum] = machine().gfx[m_tileinfo.gfxnum]->dirtyseq();
 	}
 
 g_profiler.stop();

@@ -410,7 +410,7 @@ SCREEN_UPDATE_IND16( goldstar )
 	{
 		if (screen.machine().root_device().memregion("user1")->base())
 		{
-			const gfx_element *gfx = screen.machine().gfx[2];
+			gfx_element *gfx = screen.machine().gfx[2];
 			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
 
@@ -453,7 +453,7 @@ SCREEN_UPDATE_IND16( bingowng )
 	{
 		if (screen.machine().root_device().memregion("user1")->base())
 		{
-			const gfx_element *gfx = screen.machine().gfx[2];
+			gfx_element *gfx = screen.machine().gfx[2];
 			int girlyscroll = (INT8)((state->m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((state->m_cm_girl_scroll & 0x0f)<<4);
 

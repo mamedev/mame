@@ -267,7 +267,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			gfx_element_mark_dirty(machine().gfx[sprite_data[i].char_type], offset * 4 / (w * h));
+			machine().gfx[sprite_data[i].char_type]->mark_dirty(offset * 4 / (w * h));
 		}
 	}
 }
@@ -284,7 +284,7 @@ static void nemesis_postload(running_machine &machine)
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			gfx_element_mark_dirty(machine.gfx[sprite_data[i].char_type], offs * 4 / (w * h));
+			machine.gfx[sprite_data[i].char_type]->mark_dirty(offs * 4 / (w * h));
 		}
 	}
 	state->m_background->mark_all_dirty();
@@ -310,14 +310,14 @@ VIDEO_START( nemesis )
 	memset(state->m_charram, 0, state->m_charram.bytes());
 	memset(state->m_blank_tile, 0, ARRAY_LENGTH(state->m_blank_tile));
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[4], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[5], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[6], (UINT8 *)state->m_charram.target());
-	gfx_element_set_source(machine.gfx[7], (UINT8 *)state->m_charram.target());
+	machine.gfx[0]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[1]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[2]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[3]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[4]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[5]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[6]->set_source((UINT8 *)state->m_charram.target());
+	machine.gfx[7]->set_source((UINT8 *)state->m_charram.target());
 
 	/* Set up save state */
 	machine.save().register_postload(save_prepost_delegate(FUNC(nemesis_postload), &machine));

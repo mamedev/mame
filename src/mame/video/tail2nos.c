@@ -50,7 +50,7 @@ static void tail2nos_postload(running_machine &machine)
 
 	for (i = 0; i < 0x20000; i += 64)
 	{
-		gfx_element_mark_dirty(machine.gfx[2], i / 64);
+		machine.gfx[2]->mark_dirty(i / 64);
 	}
 }
 
@@ -94,7 +94,7 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 
 	COMBINE_DATA(&m_zoomdata[offset]);
 	if (oldword != m_zoomdata[offset])
-		gfx_element_mark_dirty(machine().gfx[2], offset / 64);
+		machine().gfx[2]->mark_dirty(offset / 64);
 }
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)

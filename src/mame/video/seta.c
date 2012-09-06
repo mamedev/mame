@@ -678,8 +678,8 @@ PALETTE_INIT( inttoote )
 
 PALETTE_INIT( setaroul )
 {
-	machine.gfx[0]->color_granularity=16;
-	machine.gfx[1]->color_granularity=16;
+	machine.gfx[0]->set_granularity(16);
+	machine.gfx[1]->set_granularity(16);
 
 	PALETTE_INIT_CALL(inttoote);
 }
@@ -773,11 +773,11 @@ static void usclssic_set_pens(running_machine &machine)
 static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
 {
 	int y;
-	const gfx_element *gfx_tilemap = machine.gfx[gfxnum];
+	gfx_element *gfx_tilemap = machine.gfx[gfxnum];
 	const bitmap_ind16 &src_bitmap = tilemap->pixmap();
 	int width_mask, height_mask;
-	int opaque_mask = gfx_tilemap->color_granularity - 1;
-	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
+	int opaque_mask = gfx_tilemap->granularity() - 1;
+	int pixel_effect_mask = gfx_tilemap->colorbase() + (gfx_tilemap->colors() - 1) * gfx_tilemap->granularity();
 	int p;
 
 	width_mask = src_bitmap.width() - 1;

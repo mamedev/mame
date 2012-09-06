@@ -147,7 +147,7 @@ WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 {
 
 	m_char_rom[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
+	machine().gfx[0]->mark_dirty(offset >> 4);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)

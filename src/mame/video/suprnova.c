@@ -368,8 +368,8 @@ VIDEO_START(skns)
 	state->m_tilemap_bitmap_higher.allocate(320,240);
 	state->m_tilemap_bitmapflags_higher.allocate(320,240);
 
-	machine.gfx[2]->color_granularity=256;
-	machine.gfx[3]->color_granularity=256;
+	machine.gfx[2]->set_granularity(256);
+	machine.gfx[3]->set_granularity(256);
 }
 
 VIDEO_RESET( skns )

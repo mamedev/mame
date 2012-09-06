@@ -342,7 +342,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	bitmap.fill(machine.gfx[image]->color_base + 3, rect);
+	bitmap.fill(machine.gfx[image]->colorbase() + 3, rect);
 }
 
 

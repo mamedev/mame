@@ -165,7 +165,7 @@ public:
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	UINT32 *source = state->m_spritebuf1;
 	UINT32 *finish = state->m_spritebuf1 + 0x1000 / 4;
 	UINT16 *redirect = (UINT16 *)state->memregion("spritelut")->base();

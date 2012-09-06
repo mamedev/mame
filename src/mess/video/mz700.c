@@ -79,7 +79,7 @@ SCREEN_UPDATE_IND16( mz700 )
 VIDEO_START( mz800 )
 {
 	mz_state *mz = machine.driver_data<mz_state>();
-	gfx_element_set_source(machine.gfx[0], mz->m_cgram);
+	machine.gfx[0]->set_source(mz->m_cgram);
 }
 
 SCREEN_UPDATE_IND16( mz800 )
@@ -131,5 +131,5 @@ WRITE8_MEMBER(mz_state::mz800_cgram_w)
 {
 	m_cgram[offset] = data;
 
-	gfx_element_mark_dirty(machine().gfx[0], offset/8);
+	machine().gfx[0]->mark_dirty(offset/8);
 }

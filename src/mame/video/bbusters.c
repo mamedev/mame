@@ -150,14 +150,14 @@ INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int 
 		break;
 	}
 
-	return gfx_element_get_data(gfx, (sprite+code) % gfx->total_elements) + ((dy%16) * gfx->line_modulo);
+	return gfx->get_data((sprite+code) % gfx->elements()) + ((dy%16) * gfx->rowbytes());
 }
 
 static void bbusters_draw_block(running_machine &machine, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
 	bbusters_state *state = machine.driver_data<bbusters_state>();
 	gfx_element *gfx = machine.gfx[bank];
-	pen_t pen_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
+	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	UINT32 xinc=(state->m_scale_line_count * 0x10000 ) / size;
 	UINT8 pixel;
 	int x_index;

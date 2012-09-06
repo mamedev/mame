@@ -112,7 +112,7 @@ READ8_MEMBER(st0016_state::st0016_character_ram_r)
 WRITE8_MEMBER(st0016_state::st0016_character_ram_w)
 {
 	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	gfx_element_mark_dirty(machine().gfx[st0016_ramgfx], st0016_char_bank);
+	machine().gfx[st0016_ramgfx]->mark_dirty(st0016_char_bank);
 }
 
 READ8_MEMBER(st0016_state::st0016_vregs_r)
@@ -360,7 +360,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 							tileno = (code+i0++)&ST0016_CHAR_BANK_MASK ;
 
 							gfxoffs = 0;
-							srcgfx= gfx_element_get_data(gfx, tileno);
+							srcgfx= gfx->get_data(tileno);
 
 							for (yloop=0; yloop<8; yloop++)
 							{
@@ -450,7 +450,7 @@ VIDEO_START( st0016 )
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, (UINT8 *) st0016_charram, 0x40, 0);
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, charlayout, (UINT8 *) st0016_charram, 0x40, 0));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -526,7 +526,7 @@ static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rect
 							ypos = y*8+spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
 							xpos = x*8+spr_dx;
 							gfxoffs = 0;
-							srcgfx= gfx_element_get_data(gfx, code);
+							srcgfx= gfx->get_data(code);
 
 							for (yloop=0; yloop<8; yloop++)
 							{

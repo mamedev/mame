@@ -82,7 +82,7 @@ VIDEO_START( xxmissio )
 }
 
 
-static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx)
+static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
 {
 	xxmissio_state *state = gfx->machine().driver_data<xxmissio_state>();
 	int offs;

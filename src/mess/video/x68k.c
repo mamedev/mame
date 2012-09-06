@@ -1144,12 +1144,12 @@ VIDEO_START( x68000 )
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_8, machine.root_device().memregion("user1")->base(), 32, 0);
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, x68k_pcg_8, machine.root_device().memregion("user1")->base(), 32, 0));
 
 	gfx_index++;
 
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &x68k_pcg_16, state->memregion("user1")->base(), 32, 0);
-	machine.gfx[gfx_index]->total_colors = 32;
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, x68k_pcg_16, state->memregion("user1")->base(), 32, 0));
+	machine.gfx[gfx_index]->set_colors(32);
 
 	/* Tilemaps */
 	state->m_bg0_8 = tilemap_create(machine, x68k_get_bg0_tile,TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -1211,12 +1211,12 @@ SCREEN_UPDATE_IND16( x68000 )
 	{
 		if(state->m_video.tile16_dirty[x] != 0)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[1], x);
+			screen.machine().gfx[1]->mark_dirty(x);
 			state->m_video.tile16_dirty[x] = 0;
 		}
 		if(state->m_video.tile8_dirty[x] != 0)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[0], x);
+			screen.machine().gfx[0]->mark_dirty(x);
 			state->m_video.tile8_dirty[x] = 0;
 		}
 	}

@@ -162,13 +162,13 @@ SCREEN_UPDATE_IND16( fcombat )
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (state->m_sprite_palette * 16);
-				const gfx_element *gfx = screen.machine().gfx[1];
+				gfx_element *gfx = screen.machine().gfx[1];
 
 		if (state->m_cocktail_flip)
 		{
-			x = 64 * 8 - gfx->width - x;
-			y = 32 * 8 - gfx->height - y;
-			if (wide) y -= gfx->height;
+			x = 64 * 8 - gfx->width() - x;
+			y = 32 * 8 - gfx->height() - y;
+			if (wide) y -= gfx->height();
 			xflip = !xflip;
 			yflip = !yflip;
 		}
@@ -180,14 +180,14 @@ SCREEN_UPDATE_IND16( fcombat )
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			drawgfx_transpen(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height(), 0);
 		}
 
 		if(flags&0x10)
 		{
-			drawgfx_transpen(bitmap, cliprect, gfx, code2 + 16, color, xflip, yflip, x, y + gfx->height, 0);
-			drawgfx_transpen(bitmap, cliprect, gfx, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height, 0);
-			drawgfx_transpen(bitmap, cliprect, gfx, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height, 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
+			drawgfx_transpen(bitmap, cliprect, gfx, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height(), 0);
 
 		}
 

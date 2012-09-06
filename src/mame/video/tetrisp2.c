@@ -418,7 +418,7 @@ static void tetrisp2_draw_sprites(	running_machine &machine, _BitmapClass &bitma
 		if (ysize > 0x100 - ty)
 			ysize = 0x100 - ty;
 
-		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
+		gfx->set_source_clip(tx, xsize, ty, ysize);
 
 		{
 			primask = 0;

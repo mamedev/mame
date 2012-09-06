@@ -73,7 +73,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 {
 	neoprint_state *state = machine.driver_data<neoprint_state>();
 	int i, y, x;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	INT16 scrollx, scrolly;
 
 	i = (state->m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;

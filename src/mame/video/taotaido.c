@@ -41,7 +41,7 @@ static void draw_sprite(running_machine &machine, UINT16 spriteno, bitmap_ind16 
 	int x,y;
 
 	UINT16 *source = &state->m_spriteram_older[spriteno*4];
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 
 
 	int yzoom = (source[0] & 0xf000) >> 12;

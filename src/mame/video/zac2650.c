@@ -31,8 +31,8 @@ READ8_MEMBER(zac2650_state::zac_s2636_r)
 WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 {
 	m_s2636_0_ram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[1], offset/8);
-	gfx_element_mark_dirty(machine().gfx[2], offset/8);
+	machine().gfx[1]->mark_dirty(offset/8);
+	machine().gfx[2]->mark_dirty(offset/8);
 	if (offset == 0xc7)
 	{
 		s2636_soundport_w(machine().device("s2636snd"), 0, data);
@@ -71,9 +71,9 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 
         /* Get fingerprint */
 
-	    for (x = fx; x < fx + machine.gfx[expand]->width; x++)
+	    for (x = fx; x < fx + machine.gfx[expand]->width(); x++)
 	    {
-		    for (y = fy; y < fy + machine.gfx[expand]->height; y++)
+		    for (y = fy; y < fy + machine.gfx[expand]->height(); y++)
             {
 			    if (visarea.contains(x, y))
 	        	    Checksum += state->m_spritebitmap.pix16(y, x);
@@ -90,9 +90,9 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 
         /* Remove fingerprint */
 
-	    for (x = fx; x < fx + machine.gfx[expand]->width; x++)
+	    for (x = fx; x < fx + machine.gfx[expand]->width(); x++)
 	    {
-		    for (y = fy; y < fy + machine.gfx[expand]->height; y++)
+		    for (y = fy; y < fy + machine.gfx[expand]->height(); y++)
             {
 			    if (visarea.contains(x, y))
 	        	    Checksum -= state->m_spritebitmap.pix16(y, x);
@@ -129,8 +129,8 @@ VIDEO_START( tinvader )
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 	machine.primary_screen->register_screen_bitmap(state->m_spritebitmap);
 
-	gfx_element_set_source(machine.gfx[1], state->m_s2636_0_ram);
-	gfx_element_set_source(machine.gfx[2], state->m_s2636_0_ram);
+	machine.gfx[1]->set_source(state->m_s2636_0_ram);
+	machine.gfx[2]->set_source(state->m_s2636_0_ram);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -172,9 +172,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				    0,0,
 				    bx,by, 0);
 
-	        for (x = bx; x < bx + machine.gfx[expand]->width; x++)
+	        for (x = bx; x < bx + machine.gfx[expand]->width(); x++)
 	        {
-		        for (y = by; y < by + machine.gfx[expand]->height; y++)
+		        for (y = by; y < by + machine.gfx[expand]->height(); y++)
                 {
 			        if (visarea.contains(x, y))
 	        	        if (bitmap.pix16(y, x) != state->m_bitmap.pix16(y, x))

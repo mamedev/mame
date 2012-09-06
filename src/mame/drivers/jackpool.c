@@ -46,7 +46,7 @@ static VIDEO_START(jackpool)
 static SCREEN_UPDATE_IND16(jackpool)
 {
 	jackpool_state *state = screen.machine().driver_data<jackpool_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int count;// = 0x00000/2;
 
 	int y,x;

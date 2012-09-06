@@ -10,7 +10,7 @@
 #include "includes/snk6502.h"
 
 
-#define TOTAL_COLORS(m,gfxn) ((m).gfx[gfxn]->total_colors * (m).gfx[gfxn]->color_granularity)
+#define TOTAL_COLORS(m,gfxn) ((m).gfx[gfxn]->colors() * (m).gfx[gfxn]->granularity())
 #define COLOR(m,gfxn,offs) ((m).config().m_gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
@@ -103,7 +103,7 @@ WRITE8_MEMBER(snk6502_state::snk6502_charram_w)
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[0], (offset/8) % 256);
+		machine().gfx[0]->mark_dirty((offset/8) % 256);
 	}
 }
 
@@ -183,7 +183,7 @@ VIDEO_START( snk6502 )
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 }
 
 VIDEO_START( pballoon )
@@ -320,5 +320,5 @@ VIDEO_START( satansat )
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 }

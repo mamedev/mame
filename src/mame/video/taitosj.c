@@ -187,10 +187,10 @@ VIDEO_START( taitosj )
 	state->m_sprite_sprite_collbitmap1.allocate(32,32);
 	state->m_sprite_sprite_collbitmap2.allocate(32,32);
 
-	gfx_element_set_source(machine.gfx[0], state->m_characterram);
-	gfx_element_set_source(machine.gfx[1], state->m_characterram);
-	gfx_element_set_source(machine.gfx[2], state->m_characterram + 0x1800);
-	gfx_element_set_source(machine.gfx[3], state->m_characterram + 0x1800);
+	machine.gfx[0]->set_source(state->m_characterram);
+	machine.gfx[1]->set_source(state->m_characterram);
+	machine.gfx[2]->set_source(state->m_characterram + 0x1800);
+	machine.gfx[3]->set_source(state->m_characterram + 0x1800);
 
 	compute_draw_order(machine);
 }
@@ -224,13 +224,13 @@ WRITE8_MEMBER(taitosj_state::taitosj_characterram_w)
 	{
 		if (offset < 0x1800)
 		{
-			gfx_element_mark_dirty(machine().gfx[0], (offset / 8) & 0xff);
-			gfx_element_mark_dirty(machine().gfx[1], (offset / 32) & 0x3f);
+			machine().gfx[0]->mark_dirty((offset / 8) & 0xff);
+			machine().gfx[1]->mark_dirty((offset / 32) & 0x3f);
 		}
 		else
 		{
-			gfx_element_mark_dirty(machine().gfx[2], (offset / 8) & 0xff);
-			gfx_element_mark_dirty(machine().gfx[3], (offset / 32) & 0x3f);
+			machine().gfx[2]->mark_dirty((offset / 8) & 0xff);
+			machine().gfx[3]->mark_dirty((offset / 32) & 0x3f);
 		}
 
 		m_characterram[offset] = data;
@@ -263,7 +263,7 @@ INLINE int get_sprite_xy(taitosj_state *state, UINT8 which, UINT8* sx, UINT8* sy
 }
 
 
-INLINE const gfx_element *get_sprite_gfx_element(running_machine &machine, UINT8 which)
+INLINE gfx_element *get_sprite_gfx_element(running_machine &machine, UINT8 which)
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
 	offs_t offs = which * 4;

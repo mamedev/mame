@@ -2939,12 +2939,12 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 
 		for (x=0;x<0x200;x++)
 		{
-			gfx_element_mark_dirty(machine.gfx[0], x);
+			machine.gfx[0]->mark_dirty(x);
 		}
 
 		for (x=0;x<0x80;x++)
 		{
-			gfx_element_mark_dirty(machine.gfx[1], x);
+			machine.gfx[1]->mark_dirty(x);
 		}
 	}
 

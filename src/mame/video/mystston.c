@@ -178,7 +178,7 @@ static TILE_GET_INFO( get_fg_tile_info )
  *
  *************************************/
 
-static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip)
+static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip)
 {
 	mystston_state *state = gfx->machine().driver_data<mystston_state>();
 	int offs;

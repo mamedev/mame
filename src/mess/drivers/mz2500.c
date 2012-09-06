@@ -901,9 +901,9 @@ void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 				UINT8 *pcg_ram = memregion("pcg")->base();
 				pcg_ram[offset] = data;
 				if((offset & 0x1800) == 0x0000)
-					gfx_element_mark_dirty(machine().gfx[3], (offset) >> 3);
+					machine().gfx[3]->mark_dirty((offset) >> 3);
 				else
-					gfx_element_mark_dirty(machine().gfx[4], (offset & 0x7ff) >> 3);
+					machine().gfx[4]->mark_dirty((offset & 0x7ff) >> 3);
 			}
 			break;
 		}

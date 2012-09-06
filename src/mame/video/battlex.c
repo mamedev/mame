@@ -63,7 +63,7 @@ VIDEO_START( battlex )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	battlex_state *state = machine.driver_data<battlex_state>();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	UINT8 *source = state->m_spriteram;
 	UINT8 *finish = state->m_spriteram + 0x200;
 

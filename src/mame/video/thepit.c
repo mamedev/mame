@@ -109,7 +109,7 @@ static TILE_GET_INFO( solid_get_tile_info )
 static TILE_GET_INFO( get_tile_info )
 {
 	thepit_state *state = machine.driver_data<thepit_state>();
-	UINT8 fore_color = state->m_colorram[tile_index] % machine.gfx[0]->total_colors;
+	UINT8 fore_color = state->m_colorram[tile_index] % machine.gfx[0]->colors();
 	UINT8 code = state->m_videoram[tile_index];
 	SET_TILE_INFO(2 * state->m_graphics_bank, code, fore_color, 0);
 }

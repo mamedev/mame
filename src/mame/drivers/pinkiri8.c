@@ -204,7 +204,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 {
 	pinkiri8_state *state = screen.machine().driver_data<pinkiri8_state>();
 	int col_bank;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	/* update palette */
 	for (int pen = 0; pen < 0x800 ; pen++)

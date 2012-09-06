@@ -25,7 +25,7 @@ WRITE16_MEMBER(sslam_state::sslam_paletteram_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	sslam_state *state = machine.driver_data<sslam_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	UINT16 *source = state->m_spriteram;
 	UINT16 *finish = source + 0x1000/2;
 

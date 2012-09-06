@@ -285,7 +285,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int sprite_xoffs = state->m_spriteram[0x07f5] + ((state->m_spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = state->m_spriteram[0x07f7];
 
-	int bank_sprites = machine.gfx[2]->total_elements / 8;
+	int bank_sprites = machine.gfx[2]->elements() / 8;
 
 	while (source >= finish)
 	{
@@ -323,7 +323,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		sy++;	/* sprites are buffered and delayed by one scanline */
 
-		gfx_element_set_source_clip(gfx, tx, sizex, ty, sizey);
+		gfx->set_source_clip(tx, sizex, ty, sizey);
 		pdrawgfx_transpen( bitmap, cliprect,gfx,
 				sprite,
 				color,
@@ -371,7 +371,7 @@ SCREEN_UPDATE_IND16( namcos86 )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	bitmap.fill(screen.machine().gfx[0]->color_base + 8*state->m_backcolor+7, cliprect);
+	bitmap.fill(screen.machine().gfx[0]->colorbase() + 8*state->m_backcolor+7, cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{

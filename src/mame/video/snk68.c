@@ -202,7 +202,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	// pow has 0x4000 tiles and independent x/y flipping
 	// the other games have > 0x4000 tiles and flipping in only one direction
 	// (globally selected)
-	int const is_pow = (machine.gfx[1]->total_elements <= 0x4000);
+	int const is_pow = (machine.gfx[1]->elements() <= 0x4000);
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 0x40)

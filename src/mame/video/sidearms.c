@@ -172,7 +172,7 @@ static void draw_sprites_region(running_machine &machine, bitmap_ind16 &bitmap, 
 {
 	sidearms_state *state = machine.driver_data<sidearms_state>();
 	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 	int offs, attr, color, code, x, y, flipx, flipy;
 
 	flipy = flipx = state->m_flipon;

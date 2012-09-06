@@ -484,7 +484,7 @@ public:
 static VIDEO_START(mastboy)
 {
 	mastboy_state *state = machine.driver_data<mastboy_state>();
-	gfx_element_set_source(machine.gfx[0], state->m_vram);
+	machine.gfx[0]->set_source(state->m_vram);
 }
 
 static SCREEN_UPDATE_IND16(mastboy)
@@ -589,7 +589,7 @@ WRITE8_MEMBER(mastboy_state::banked_ram_w)
 			m_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
-			gfx_element_mark_dirty(machine().gfx[0], offs/32);
+			machine().gfx[0]->mark_dirty(offs/32);
 		}
 	}
 	else

@@ -483,7 +483,7 @@ VIDEO_START( galaxold_plain )
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	state->m_color_mask = (machine.gfx[0]->color_granularity == 4) ? 7 : 3;
+	state->m_color_mask = (machine.gfx[0]->granularity() == 4) ? 7 : 3;
 }
 
 VIDEO_START( galaxold )

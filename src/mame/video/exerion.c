@@ -372,13 +372,13 @@ SCREEN_UPDATE_IND16( exerion )
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (state->m_sprite_palette * 16);
-		const gfx_element *gfx = doubled ? screen.machine().gfx[2] : screen.machine().gfx[1];
+		gfx_element *gfx = doubled ? screen.machine().gfx[2] : screen.machine().gfx[1];
 
 		if (state->m_cocktail_flip)
 		{
-			x = 64*8 - gfx->width - x;
-			y = 32*8 - gfx->height - y;
-			if (wide) y -= gfx->height;
+			x = 64*8 - gfx->width() - x;
+			y = 32*8 - gfx->height() - y;
+			if (wide) y -= gfx->height();
 			xflip = !xflip;
 			yflip = !yflip;
 		}
@@ -390,7 +390,7 @@ SCREEN_UPDATE_IND16( exerion )
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			drawgfx_transmask(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height,
+			drawgfx_transmask(bitmap, cliprect, gfx, code2, color, xflip, yflip, x, y + gfx->height(),
 			        colortable_get_transpen_mask(screen.machine().colortable, gfx, color, 0x10));
 		}
 

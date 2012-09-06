@@ -338,7 +338,7 @@ while (0)																			\
 
         bitmap_t &dest - the bitmap to render to
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-        const gfx_element *gfx - pointer to the gfx_element to render
+        gfx_element *gfx - pointer to the gfx_element to render
         UINT32 code - index of the entry within gfx_element
         UINT32 color - index of the color within gfx_element
         int flipx - non-zero means render right-to-left instead of left-to-right
@@ -363,14 +363,14 @@ do {																					\
 		assert(gfx != NULL);															\
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());						\
 		assert(dest.cliprect().contains(cliprect));										\
-		assert(code < gfx->total_elements);												\
+		assert(code < gfx->elements());												\
 																						\
 		/* ignore empty/invalid cliprects */											\
 		if (cliprect.empty())															\
 			break;																		\
 																						\
 		/* compute final pixel in X and exit if we are entirely clipped */				\
-		destendx = destx + gfx->width - 1;												\
+		destendx = destx + gfx->width() - 1;												\
 		if (destx > cliprect.max_x || destendx < cliprect.min_x)						\
 			break;																		\
 																						\
@@ -387,7 +387,7 @@ do {																					\
 			destendx = cliprect.max_x;													\
 																						\
 		/* compute final pixel in Y and exit if we are entirely clipped */				\
-		destendy = desty + gfx->height - 1;												\
+		destendy = desty + gfx->height() - 1;												\
 		if (desty > cliprect.max_y || destendy < cliprect.min_y)						\
 			break;																		\
 																						\
@@ -405,25 +405,25 @@ do {																					\
 																						\
 		/* apply X flipping */															\
 		if (flipx)																		\
-			srcx = gfx->width - 1 - srcx;												\
+			srcx = gfx->width() - 1 - srcx;												\
 																						\
 		/* apply Y flipping */															\
-		dy = gfx->line_modulo;															\
+		dy = gfx->rowbytes();															\
 		if (flipy)																		\
 		{																				\
-			srcy = gfx->height - 1 - srcy;												\
+			srcy = gfx->height() - 1 - srcy;												\
 			dy = -dy;																	\
 		}																				\
 																						\
 		/* fetch the source data */														\
-		srcdata = gfx_element_get_data(gfx, code);										\
+		srcdata = gfx->get_data(code);										\
 																						\
 		/* compute how many blocks of 4 pixels we have */							\
 		UINT32 numblocks = (destendx + 1 - destx) / 4;								\
 		UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;					\
 																					\
 		/* adjust srcdata to point to the first source pixel of the row */			\
-		srcdata += srcy * gfx->line_modulo + srcx;									\
+		srcdata += srcy * gfx->rowbytes() + srcx;									\
 																					\
 		/* non-flipped 8bpp case */													\
 		if (!flipx)																	\
@@ -509,7 +509,7 @@ do {																					\
 
         bitmap_t &dest - the bitmap to render to
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-        const gfx_element *gfx - pointer to the gfx_element to render
+        gfx_element *gfx - pointer to the gfx_element to render
         UINT32 code - index of the entry within gfx_element
         UINT32 color - index of the color within gfx_element
         int flipx - non-zero means render right-to-left instead of left-to-right
@@ -543,14 +543,14 @@ do {																					\
 			break;																		\
 																						\
 		/* compute scaled size */														\
-		dstwidth = (scalex * gfx->width + 0x8000) >> 16;								\
-		dstheight = (scaley * gfx->height + 0x8000) >> 16;								\
+		dstwidth = (scalex * gfx->width() + 0x8000) >> 16;								\
+		dstheight = (scaley * gfx->height() + 0x8000) >> 16;								\
 		if (dstwidth < 1 || dstheight < 1)												\
 			break;																		\
 																						\
 		/* compute 16.16 source steps in dx and dy */									\
-		dx = (gfx->width << 16) / dstwidth;												\
-		dy = (gfx->height << 16) / dstheight;											\
+		dx = (gfx->width() << 16) / dstwidth;												\
+		dy = (gfx->height() << 16) / dstheight;											\
 																						\
 		/* compute final pixel in X and exit if we are entirely clipped */				\
 		destendx = destx + dstwidth - 1;												\
@@ -604,7 +604,7 @@ do {																					\
 		}																				\
 																						\
 		/* fetch the source data */														\
-		srcdata = gfx_element_get_data(gfx, code);										\
+		srcdata = gfx->get_data(code);										\
 																						\
 		/* compute how many blocks of 4 pixels we have */							\
 		UINT32 numblocks = (destendx + 1 - destx) / 4;								\
@@ -615,7 +615,7 @@ do {																					\
 		{																			\
 			PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 			PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);				\
-			const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->line_modulo;		\
+			const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();		\
 			INT32 cursrcx = srcx;													\
 			srcy += dy;																\
 																					\

@@ -42,7 +42,7 @@ static SCREEN_UPDATE_IND16(royalgum)
 {
 	rgum_state *state = screen.machine().driver_data<rgum_state>();
 	int x,y,count;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 

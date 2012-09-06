@@ -442,7 +442,7 @@ static void cave_vh_start( running_machine &machine, int num )
 
 	state->m_background_color = machine.config().m_gfxdecodeinfo[0].color_codes_start +
 					(machine.config().m_gfxdecodeinfo[0].total_color_codes - 1) *
-						machine.gfx[0]->color_granularity;
+						machine.gfx[0]->granularity();
 
 	switch (state->m_kludge)
 	{

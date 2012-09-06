@@ -38,7 +38,7 @@ VIDEO_START( lemmings )
 	state->m_vram_tilemap->set_transparent_pen(0);
 	state->m_bitmap0.fill(0x100);
 
-	gfx_element_set_source(machine.gfx[2], state->m_vram_buffer);
+	machine.gfx[2]->set_source(state->m_vram_buffer);
 
 	machine.device<decospr_device>("spritegen")->alloc_sprite_bitmap();
 	machine.device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
@@ -97,7 +97,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
 
 	/* Copy pixel to buffer for easier decoding later */
 	tile = ((sx / 8) * 32) + (sy / 8);
-	gfx_element_mark_dirty(machine().gfx[2], tile);
+	machine().gfx[2]->mark_dirty(tile);
 	m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 8) & 0xf;
 
 	sx += 1; /* Update both pixels in the word */

@@ -255,7 +255,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_
 		}
 
 
-		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
+		gfx->set_source_clip(tx, xsize, ty, ysize);
 
 		{
 			// passes the priority as the upper bits of the colour

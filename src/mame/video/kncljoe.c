@@ -183,7 +183,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 	UINT8 *spriteram = state->m_spriteram;
 	rectangle clip = cliprect;
-	const gfx_element *gfx = machine.gfx[1 + state->m_sprite_bank];
+	gfx_element *gfx = machine.gfx[1 + state->m_sprite_bank];
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
 	const rectangle &visarea = machine.primary_screen->visible_area();

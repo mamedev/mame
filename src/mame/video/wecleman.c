@@ -610,14 +610,14 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 			if ((road>>8) != 0x04) continue;
 			road &= YMASK;
 
-			src_ptr = gfx_element_get_data(machine.gfx[1], (road << 3));
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 1);
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 2);
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 3);
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 4);
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 5);
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 6);
-			gfx_element_get_data(machine.gfx[1], (road << 3) + 7);
+			src_ptr = machine.gfx[1]->get_data((road << 3));
+			machine.gfx[1]->get_data((road << 3) + 1);
+			machine.gfx[1]->get_data((road << 3) + 2);
+			machine.gfx[1]->get_data((road << 3) + 3);
+			machine.gfx[1]->get_data((road << 3) + 4);
+			machine.gfx[1]->get_data((road << 3) + 5);
+			machine.gfx[1]->get_data((road << 3) + 6);
+			machine.gfx[1]->get_data((road << 3) + 7);
 			mdy = ((road * MIDCURB_DY) >> 8) * bitmap.rowpixels();
 			tdy = ((road * TOPCURB_DY) >> 8) * bitmap.rowpixels();
 
@@ -656,7 +656,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 
 // blends two 8x8x16bpp direct RGB tilemaps
 static void draw_cloud(bitmap_rgb32 &bitmap,
-				 const gfx_element *gfx,
+				 gfx_element *gfx,
 				 UINT16 *tm_base,
 				 int x0, int y0,				// target coordinate
 				 int xcount, int ycount,		// number of tiles to draw in x and y
@@ -677,8 +677,8 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 
 	if (alpha > 0x1f) return;
 
-	tilew = gfx->width;
-	tileh = gfx->height;
+	tilew = gfx->width();
+	tileh = gfx->height();
 
 	tmmaskx = (1<<tmw_l2) - 1;
 	tmmasky = (1<<tmh_l2) - 1;
@@ -693,7 +693,7 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 
 	dst_base = &bitmap.pix32(y0+dy, x0+dx);
 
-	pal_base = gfx->machine().pens + pal_offset * gfx->color_granularity;
+	pal_base = gfx->machine().pens + pal_offset * gfx->granularity();
 
 	alpha <<= 6;
 
@@ -713,8 +713,8 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 			// Wec Le Mans specific: decodes tile color in EAX
 			UINT16 tile_color = ((tiledata >> 5) & 0x78) + (tiledata >> 12);
 
-			src_ptr = gfx_element_get_data(gfx, tile_index);
-			pal_ptr = pal_base + tile_color * gfx->color_granularity;
+			src_ptr = gfx->get_data(tile_index);
+			pal_ptr = pal_base + tile_color * gfx->granularity();
 			dst_ptr = dst_base + j * tilew;
 
 			/* alpha case */
@@ -967,7 +967,7 @@ VIDEO_START( wecleman )
 	state->m_txt_tilemap->set_scrolly(0, -BMP_PAD );
 
 	// patches out a mysterious pixel floating in the sky (tile decoding bug?)
-	*(machine.gfx[0]->gfxdata + (machine.gfx[0]->char_modulo*0xaca+7)) = 0;
+	*const_cast<UINT8 *>(machine.gfx[0]->get_data(0xaca)+7) = 0;
 }
 
 //  Callbacks for the K051316

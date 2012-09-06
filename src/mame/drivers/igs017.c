@@ -314,13 +314,12 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	// prepare GfxElement on the fly
-	gfx_element gfx(machine);
 
 	// Bounds checking
 	if ( addr + dimx * dimy >= state->m_sprites_gfx_size )
 		return;
 
-	gfx_element_build_temporary(&gfx, machine, state->m_sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32, 0);
+	gfx_element gfx(machine, state->m_sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32);
 
 	drawgfx_transpen(	bitmap,cliprect, &gfx,
 				0, color,

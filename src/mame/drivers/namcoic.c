@@ -273,7 +273,7 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 /**************************************************************************************/
 
 void namcos2_shared_state::zdrawgfxzoom(
-		bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int scalex, int scaley, int zpos )
 {
@@ -283,15 +283,15 @@ void namcos2_shared_state::zdrawgfxzoom(
 		if( gfx )
 		{
 			int shadow_offset = (gfx->machine().config().m_video_attributes&VIDEO_HAS_SHADOWS)?gfx->machine().total_colors():0;
-			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-			const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const UINT8 *source_base = gfx->get_data(code % gfx->elements());
+			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
+			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
+				int dx = (gfx->width()<<16)/sprite_screen_width;
+				int dy = (gfx->height()<<16)/sprite_screen_height;
 
 				int ex = sx+sprite_screen_width;
 				int ey = sy+sprite_screen_height;
@@ -350,7 +350,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 					{
 						for( y=sy; y<ey; y++ )
 						{
-							const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+							const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 							UINT16 *dest = &dest_bmp.pix16(y);
 							UINT8 *pri = &priority_bitmap.pix8(y);
 							int x, x_index = x_index_base;
@@ -415,7 +415,7 @@ void namcos2_shared_state::zdrawgfxzoom(
 } /* zdrawgfxzoom */
 
 void namcos2_shared_state::zdrawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int scalex, int scaley, int zpos )
 {
@@ -482,9 +482,9 @@ namcos2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 					gfx_element *gfx = machine().gfx[rgn];
 
 					if( (word0&0x0200)==0 )
-						gfx_element_set_source_clip(gfx, (word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
+						gfx->set_source_clip((word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
 					else
-						gfx_element_set_source_clip(gfx, 0, 32, 0, 32);
+						gfx->set_source_clip(0, 32, 0, 32);
 
 					zdrawgfxzoom(
 						bitmap,
@@ -1344,7 +1344,7 @@ WRITE16_MEMBER( namco_c45_road_device::write )
 	else
 	{
 		offset -= 0x10000/2;
-		gfx_element_mark_dirty(m_gfx, offset / WORDS_PER_ROAD_TILE);
+		m_gfx->mark_dirty(offset / WORDS_PER_ROAD_TILE);
 	}
 }
 
@@ -1445,7 +1445,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 void namco_c45_road_device::device_start()
 {
 	// create a gfx_element describing the road graphics
-	m_gfx = gfx_element_alloc(machine(), &s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00);
+	m_gfx = auto_alloc(machine(), gfx_element(machine(), s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00));
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
@@ -1459,7 +1459,7 @@ void namco_c45_road_device::device_start()
 
 void namco_c45_road_device::device_stop()
 {
-	gfx_element_free(m_gfx);
+	auto_free(machine(), m_gfx);
 }
 
 

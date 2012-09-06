@@ -95,7 +95,7 @@ static void kickgoal_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 {
 	kickgoal_state *state = machine.driver_data<kickgoal_state>();
 	UINT16 *spriteram = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	int offs;
 
 	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)

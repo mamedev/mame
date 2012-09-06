@@ -102,7 +102,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
 	rectangle clip = cliprect;
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	const rectangle &visarea = machine.primary_screen->visible_area();
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;

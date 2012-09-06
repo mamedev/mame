@@ -410,7 +410,7 @@ Notes:
 
 static void copy_from_nvram(running_machine &machine);
 
-INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask)
@@ -447,19 +447,19 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 	{
 		if( gfx )
 		{
-//          const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)];
-			UINT32 palbase = (gfx->color_granularity * color) & 0x1ffff;
+//          const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
+			UINT32 palbase = (gfx->granularity() * color) & 0x1ffff;
 			const pen_t *pal = &state->m_mame_colours[palbase];
-			const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+			const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
-			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
+			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
+				int dx = (gfx->width()<<16)/sprite_screen_width;
+				int dy = (gfx->height()<<16)/sprite_screen_height;
 
 				int ex = sx+sprite_screen_width;
 				int ey = sy+sprite_screen_height;
@@ -520,7 +520,7 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -539,7 +539,7 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -559,7 +559,7 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -579,7 +579,7 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -589,7 +589,7 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 									if( c != transparent_color )
 									{
 										/* blending isn't 100% understood */
-										if (gfx->color_granularity == 64)
+										if (gfx->granularity() == 64)
 										{
 											// OK for sfiii2 spotlight
 											if (c&0x01) dest[x] |= 0x2000;
@@ -827,13 +827,13 @@ static VIDEO_START(cps3)
 	state_save_register_global_pointer(machine, state->m_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = gfx_element_alloc(machine, &cps3_tiles8x8_layout, (UINT8 *)state->m_ss_ram, machine.total_colors() / 16, 0);
+	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, cps3_tiles8x8_layout, (UINT8 *)state->m_ss_ram, machine.total_colors() / 16, 0));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[1] = gfx_element_alloc(machine, &cps3_tiles16x16_layout, (UINT8 *)state->m_char_ram, machine.total_colors() / 64, 0);
-	machine.gfx[1]->color_granularity = 64;
+	machine.gfx[1] = auto_alloc(machine, gfx_element(machine, cps3_tiles16x16_layout, (UINT8 *)state->m_char_ram, machine.total_colors() / 64, 0));
+	machine.gfx[1]->set_granularity(64);
 
 	//decode_charram();
 
@@ -926,8 +926,8 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 			yflip  = (dat & 0x00000800)>>11;
 			xflip  = (dat & 0x00001000)>>12;
 
-			if (!bpp) machine.gfx[1]->color_granularity=256;
-			else machine.gfx[1]->color_granularity=64;
+			if (!bpp) machine.gfx[1]->set_granularity(256);
+			else machine.gfx[1]->set_granularity(64);
 
 			cps3_drawgfxzoom(bitmap,clip,machine.gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
 		}
@@ -1157,13 +1157,13 @@ static SCREEN_UPDATE_RGB32(cps3)
 								/* use the bpp value from the main list or the sublists? */
 								if (whichbpp)
 								{
-									if (!global_bpp) screen.machine().gfx[1]->color_granularity=256;
-									else screen.machine().gfx[1]->color_granularity=64;
+									if (!global_bpp) screen.machine().gfx[1]->set_granularity(256);
+									else screen.machine().gfx[1]->set_granularity(64);
 								}
 								else
 								{
-									if (!bpp) screen.machine().gfx[1]->color_granularity=256;
-									else screen.machine().gfx[1]->color_granularity=64;
+									if (!bpp) screen.machine().gfx[1]->set_granularity(256);
+									else screen.machine().gfx[1]->set_granularity(64);
 								}
 
 								{
@@ -1264,7 +1264,7 @@ WRITE32_MEMBER(cps3_state::cps3_ssram_w)
 		// we only want to endian-flip the character data, the tilemap info is fine
 		data = LITTLE_ENDIANIZE_INT32(data);
 		mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
-		gfx_element_mark_dirty(machine().gfx[0], offset/16);
+		machine().gfx[0]->mark_dirty(offset/16);
 	}
 
 	COMBINE_DATA(&m_ss_ram[offset]);
@@ -1356,7 +1356,7 @@ WRITE32_MEMBER(cps3_state::cram_data_w)
 	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
 	data = LITTLE_ENDIANIZE_INT32(data);
 	COMBINE_DATA(&m_char_ram[fulloffset]);
-	gfx_element_mark_dirty(machine().gfx[1], fulloffset/0x40);
+	machine().gfx[1]->mark_dirty(fulloffset/0x40);
 }
 
 /* FLASH ROM ACCESS */
@@ -1822,7 +1822,7 @@ static UINT32 process_byte( running_machine &machine, UINT8 real_byte, UINT32 de
 		while (state->m_rle_length)
 		{
 			dest[((destination+tranfercount)&0x7fffff)^3] = (state->m_last_normal_byte&0x3f);
-			gfx_element_mark_dirty(machine.gfx[1], ((destination+tranfercount)&0x7fffff)/0x100);
+			machine.gfx[1]->mark_dirty(((destination+tranfercount)&0x7fffff)/0x100);
 			//printf("RLE WRite Byte %08x, %02x\n", destination+tranfercount, real_byte);
 
 			tranfercount++;
@@ -1841,7 +1841,7 @@ static UINT32 process_byte( running_machine &machine, UINT8 real_byte, UINT32 de
 		//printf("Write Normal Data\n");
 		dest[(destination&0x7fffff)^3] = real_byte;
 		state->m_last_normal_byte = real_byte;
-		gfx_element_mark_dirty(machine.gfx[1], (destination&0x7fffff)/0x100);
+		machine.gfx[1]->mark_dirty((destination&0x7fffff)/0x100);
 		return 1;
 	}
 }
@@ -1912,7 +1912,7 @@ static UINT32 ProcessByte8(running_machine &machine,UINT8 b,UINT32 dst_offset)
 		for(i=0;i<rle;++i)
 		{
 			destRAM[(dst_offset&0x7fffff)^3] = state->m_lastb;
-			gfx_element_mark_dirty(machine.gfx[1], (dst_offset&0x7fffff)/0x100);
+			machine.gfx[1]->mark_dirty((dst_offset&0x7fffff)/0x100);
 
 			dst_offset++;
 			++l;
@@ -1926,7 +1926,7 @@ static UINT32 ProcessByte8(running_machine &machine,UINT8 b,UINT32 dst_offset)
 		state->m_lastb2=state->m_lastb;
 		state->m_lastb=b;
 		destRAM[(dst_offset&0x7fffff)^3] = b;
-		gfx_element_mark_dirty(machine.gfx[1], (dst_offset&0x7fffff)/0x100);
+		machine.gfx[1]->mark_dirty((dst_offset&0x7fffff)/0x100);
 		return 1;
 	}
 }

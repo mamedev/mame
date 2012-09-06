@@ -48,9 +48,9 @@ VIDEO_START( cbm700 )
 //      if( i < 176 || i > 223 )
 		{
 			int y;
-			for( y = 0; y < machine.gfx[0]->height; y++ ) {
-				machine.gfx[0]->gfxdata[(i * machine.gfx[0]->height + y) * machine.gfx[0]->width + 8] = 0;
-				machine.gfx[1]->gfxdata[(i * machine.gfx[1]->height + y) * machine.gfx[1]->width + 8] = 0;
+			for( y = 0; y < machine.gfx[0]->height(); y++ ) {
+				*const_cast<UINT8 *>(machine.gfx[0]->get_data(i) + y * machine.gfx[0]->rowbytes() + 8) = 0;
+				*const_cast<UINT8 *>(machine.gfx[1]->get_data(i) + y * machine.gfx[1]->rowbytes() + 8) = 0;
 			}
 		}
 	}
@@ -71,9 +71,9 @@ MC6845_UPDATE_ROW( cbm600_update_row )
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			bitmap.plot_box( device->machine().gfx[state->m_font]->width * i, y, device->machine().gfx[state->m_font]->width, 1, palette[1] );
+			bitmap.plot_box( device->machine().gfx[state->m_font]->width() * i, y, device->machine().gfx[state->m_font]->width(), 1, palette[1] );
 		} else {
-			drawgfx_opaque( bitmap, cliprect, device->machine().gfx[state->m_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, device->machine().gfx[state->m_font]->width * i, y-ra );
+			drawgfx_opaque( bitmap, cliprect, device->machine().gfx[state->m_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, device->machine().gfx[state->m_font]->width() * i, y-ra );
 		}
 	}
 }
@@ -87,9 +87,9 @@ MC6845_UPDATE_ROW( cbm700_update_row )
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			bitmap.plot_box( device->machine().gfx[state->m_font]->width * i, y, device->machine().gfx[state->m_font]->width, 1, palette[1] );
+			bitmap.plot_box( device->machine().gfx[state->m_font]->width() * i, y, device->machine().gfx[state->m_font]->width(), 1, palette[1] );
 		} else {
-			drawgfx_opaque( bitmap, cliprect, device->machine().gfx[state->m_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, device->machine().gfx[state->m_font]->width * i, y-ra );
+			drawgfx_opaque( bitmap, cliprect, device->machine().gfx[state->m_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, device->machine().gfx[state->m_font]->width() * i, y-ra );
 		}
 	}
 }

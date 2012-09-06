@@ -74,7 +74,7 @@ WRITE16_MEMBER(pirates_state::pirates_bg_tileram_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pirates_state *state = machine.driver_data<pirates_state>();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	UINT16 *source = state->m_spriteram + 4;
 	UINT16 *finish = source + 0x800/2-4;
 

@@ -187,8 +187,8 @@ static terminal_t *terminal_create(
 	terminal_t *term;
 	int char_width, char_height;
 
-	char_width = machine.gfx[gfx]->width;
-	char_height = machine.gfx[gfx]->height;
+	char_width = machine.gfx[gfx]->width();
+	char_height = machine.gfx[gfx]->height();
 
 	term = (terminal_t *) auto_alloc_array(machine, char, sizeof(terminal_t) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));

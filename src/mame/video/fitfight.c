@@ -7,7 +7,7 @@
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
-	const gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = machine.gfx[3];
 	UINT16 *source = state->m_spriteram;
 	UINT16 *finish = source + 0x800 / 2;
 

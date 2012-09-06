@@ -135,7 +135,7 @@ WRITE8_MEMBER(tryout_state::tryout_vram_w)
 		break;
 	}
 
-	gfx_element_mark_dirty(machine().gfx[2], (offset-0x400/64)&0x7f);
+	machine().gfx[2]->mark_dirty((offset-0x400/64)&0x7f);
 }
 
 WRITE8_MEMBER(tryout_state::tryout_vram_bankswitch_w)
@@ -174,7 +174,7 @@ VIDEO_START( tryout )
 	state->m_vram=auto_alloc_array(machine, UINT8, 8 * 0x800);
 	state->m_vram_gfx=auto_alloc_array(machine, UINT8, 0x6000);
 
-	gfx_element_set_source(machine.gfx[2], state->m_vram_gfx);
+	machine.gfx[2]->set_source(state->m_vram_gfx);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

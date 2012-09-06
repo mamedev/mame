@@ -76,7 +76,7 @@ static void register_state_save(running_machine &machine)
 static void truxton2_postload(running_machine &machine)
 {
 	for (int i = 0; i < 1024; i++)
-		gfx_element_mark_dirty(machine.gfx[2], i);
+		machine.gfx[2]->mark_dirty(i);
 }
 
 VIDEO_START( toaplan2 )
@@ -112,7 +112,7 @@ VIDEO_START( truxton2 )
 	VIDEO_START_CALL( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	gfx_element_set_source(machine.gfx[2], reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
+	machine.gfx[2]->set_source(reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
 	machine.save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine));
 
 	truxton2_create_tx_tilemap(machine);
@@ -177,7 +177,7 @@ VIDEO_START( batrider )
 
 	/* Create the Text tilemap for this game */
 	state->m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
-	gfx_element_set_source(machine.gfx[2], reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
+	machine.gfx[2]->set_source(reinterpret_cast<UINT8 *>(state->m_tx_gfxram16.target()));
 	machine.save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine));
 
 	truxton2_create_tx_tilemap(machine);
@@ -246,7 +246,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 	{
 		int code = offset/32;
 		COMBINE_DATA(&m_tx_gfxram16[offset]);
-		gfx_element_mark_dirty(machine().gfx[2], code);
+		machine().gfx[2]->mark_dirty(code);
 	}
 }
 
@@ -268,7 +268,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	memcpy(dest, m_mainram16, m_mainram16.bytes());
 
 	for (int i = 0; i < 1024; i++)
-		gfx_element_mark_dirty(machine().gfx[2], i);
+		machine().gfx[2]->mark_dirty(i);
 }
 
 WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)

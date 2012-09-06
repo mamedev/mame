@@ -393,7 +393,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	playmark_state *state = machine.driver_data<playmark_state>();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs;
-	int height = machine.gfx[0]->height;
+	int height = machine.gfx[0]->height();
 
 	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{

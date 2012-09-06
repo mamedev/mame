@@ -434,7 +434,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 	int flip = state->flip_screen();
 	int flipmask = flip ? 0xff : 0x00;
 	int offs;

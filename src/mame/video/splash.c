@@ -213,7 +213,7 @@ static void splash_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int i;
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 
 	for (i = 0; i < 0x400; i += 4){
 		int sx = state->m_spriteram[i+2] & 0xff;
@@ -234,7 +234,7 @@ static void funystrp_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 {
 	splash_state *state = machine.driver_data<splash_state>();
 	int i;
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 
 	for (i = 0; i < 0x400; i += 4){
 		int sx = state->m_spriteram[i+2] & 0xff;

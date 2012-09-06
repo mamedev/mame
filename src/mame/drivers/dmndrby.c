@@ -349,9 +349,9 @@ static SCREEN_UPDATE_IND16(dderby)
 	dmndrby_state *state = screen.machine().driver_data<dmndrby_state>();
 	int x,y,count;
 	int off,scrolly;
-	const gfx_element *gfx = screen.machine().gfx[0];
-	const gfx_element *sprites = screen.machine().gfx[1];
-	const gfx_element *track = screen.machine().gfx[2];
+	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *sprites = screen.machine().gfx[1];
+	gfx_element *track = screen.machine().gfx[2];
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 

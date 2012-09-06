@@ -101,7 +101,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 	const UINT16 *source = state->m_sprites;
 	const UINT16 *finish = source + (0x1000 / 2);
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 
 	int xpos, ypos;
 

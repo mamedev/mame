@@ -393,8 +393,8 @@ SCREEN_VBLANK( starshp1 )
 
 		rect.min_x = get_sprite_hpos(state, 13);
 		rect.min_y = get_sprite_vpos(state, 13);
-		rect.max_x = rect.min_x + screen.machine().gfx[1]->width - 1;
-		rect.max_y = rect.min_y + screen.machine().gfx[1]->height - 1;
+		rect.max_x = rect.min_x + screen.machine().gfx[1]->width() - 1;
+		rect.max_y = rect.min_y + screen.machine().gfx[1]->height() - 1;
 
 		rect &= state->m_helper.cliprect();
 

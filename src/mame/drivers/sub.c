@@ -140,8 +140,8 @@ static VIDEO_START(sub)
 static SCREEN_UPDATE_IND16(sub)
 {
 	sub_state *state = screen.machine().driver_data<sub_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
-	const gfx_element *gfx_1 = screen.machine().gfx[1];
+	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx_1 = screen.machine().gfx[1];
 	int y,x;
 	int count = 0;
 

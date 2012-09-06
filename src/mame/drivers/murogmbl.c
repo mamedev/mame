@@ -95,7 +95,7 @@ static VIDEO_START(murogmbl)
 static SCREEN_UPDATE_IND16(murogmbl)
 {
 	murogmbl_state *state = screen.machine().driver_data<murogmbl_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0;
 
 	int y, x;

@@ -863,7 +863,7 @@ SCREEN_UPDATE_IND16( spikes91 )
 	int i, scrolly;
 	int y, x;
 	int count;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	state->m_bg1_tilemap->set_scroll_rows(256);
 	scrolly = state->m_bg1scrolly;

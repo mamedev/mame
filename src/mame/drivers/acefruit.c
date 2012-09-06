@@ -118,17 +118,17 @@ static SCREEN_UPDATE_IND16( acefruit )
 				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
-				const gfx_element *gfx = screen.machine().gfx[ 0 ];
+				gfx_element *gfx = screen.machine().gfx[ 0 ];
 
 				for( x = 0; x < 16; x++ )
 				{
 					int sprite = ( state->m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
-					const UINT8 *gfxdata = gfx_element_get_data(gfx, sprite);
+					const UINT8 *gfxdata = gfx->get_data(sprite);
 
 					for( y = 0; y < 8; y++ )
 					{
 						UINT16 *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
-						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->line_modulo ) + ( ( spriteindex % 64 ) >> 1 ) );
+						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
 					spriteindex += spritesize;

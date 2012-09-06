@@ -343,7 +343,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
 	int j, x, y, ex, ey, px, py;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	/* get sprite ram start and end offsets */
 	int start_offset = (state->m_vregs[1] & 0x10)*0x100;
@@ -392,27 +392,27 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					} else { /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
-						const UINT8 *gfx_src = gfx_element_get_data(gfx, number % gfx->total_elements);
+						const UINT8 *gfx_src = gfx->get_data(number % gfx->elements());
 
-						for (py = 0; py < gfx->height; py++){
+						for (py = 0; py < gfx->height(); py++){
 							/* get a pointer to the current line in the screen bitmap */
 							int ypos = ((sy + ey*16 + py) & 0x1ff);
 							UINT16 *srcy = &bitmap.pix16(ypos);
 
-							int gfx_py = yflip ? (gfx->height - 1 - py) : py;
+							int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
 
 							if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
 
-							for (px = 0; px < gfx->width; px++){
+							for (px = 0; px < gfx->width(); px++){
 								/* get current pixel */
 								int xpos = (((sx + ex*16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
 								UINT16 *pixel = srcy + xpos;
 								int src_color = *pixel;
 
-								int gfx_px = xflip ? (gfx->width - 1 - px) : px;
+								int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
 
 								/* get asociated pen for the current sprite pixel */
-								int gfx_pen = gfx_src[gfx->line_modulo*gfx_py + gfx_px];
+								int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
 
 								if ((gfx_pen == 0) || (gfx_pen >= 16)) continue;
 

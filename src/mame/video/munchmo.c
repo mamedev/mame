@@ -50,7 +50,7 @@ VIDEO_START( mnchmobl )
 static void draw_status( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	munchmo_state *state = machine.driver_data<munchmo_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	int row;
 
 	for (row = 0; row < 4; row++)
@@ -83,7 +83,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 */
 	munchmo_state *state = machine.driver_data<munchmo_state>();
 	UINT8 *rom = state->memregion("gfx2")->base();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs++)
@@ -121,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int flags = state->m_vreg[7];							/*   XB?????? */
 	int xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
 	int bank = (flags & 0x40) ? 1 : 0;
-	const gfx_element *gfx = machine.gfx[2 + bank];
+	gfx_element *gfx = machine.gfx[2 + bank];
 	int color_base = state->m_palette_bank * 4 + 3;
 	int i, j;
 	int firstsprite = state->m_vreg[4] & 0x3f;

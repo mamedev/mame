@@ -768,19 +768,19 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 static void
 poly3d_DrawSprite(
-	bitmap_rgb32 &dest_bmp, const gfx_element *gfx, UINT32 code,
+	bitmap_rgb32 &dest_bmp, gfx_element *gfx, UINT32 code,
 	UINT32 color, int flipx, int flipy, int sx, int sy,
 	int scalex, int scaley, int cz_factor, int prioverchar, int alpha )
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
-	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-	int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+	int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
+	int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
 	if (sprite_screen_width && sprite_screen_height)
 	{
 		float fsx = sx;
 		float fsy = sy;
-		float fwidth = gfx->width;
-		float fheight = gfx->height;
+		float fwidth = gfx->width();
+		float fheight = gfx->height();
 		float fsw = sprite_screen_width;
 		float fsh = sprite_screen_height;
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
@@ -793,12 +793,12 @@ poly3d_DrawSprite(
 		extra->machine = &gfx->machine();
 		extra->alpha = alpha;
 		extra->prioverchar = 2 | prioverchar;
-		extra->line_modulo = gfx->line_modulo;
+		extra->line_modulo = gfx->rowbytes();
 		extra->flipx = flipx;
 		extra->flipy = flipy;
-		extra->pens = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color&0x7f)];
+		extra->pens = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color&0x7f)];
 		extra->priority_bitmap = &gfx->machine().priority_bitmap;
-		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
+		extra->source = gfx->get_data(code % gfx->elements());
 
 		vert[0].x = fsx;
 		vert[0].y = fsy;
@@ -1466,7 +1466,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 } /* namcos22_draw_direct_poly */
 
 static void
-Prepare3dTexture( running_machine &machine, void *pTilemapROM, void *pTextureROM )
+Prepare3dTexture( running_machine &machine, void *pTilemapROM, const void *pTextureROM )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int i;
@@ -2699,7 +2699,7 @@ READ32_MEMBER(namcos22_state::namcos22_cgram_r)
 WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
 {
 	COMBINE_DATA( &m_cgram[offset] );
-	gfx_element_mark_dirty(machine().gfx[GFX_CHAR],offset/32);
+	machine().gfx[GFX_CHAR]->mark_dirty(offset/32);
 }
 
 READ32_MEMBER(namcos22_state::namcos22_paletteram_r)
@@ -2737,10 +2737,10 @@ static VIDEO_START( common )
 	state->m_mbDSPisActive = 0;
 	memset( state->m_polygonram, 0xcc, 0x20000 );
 
-	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->total_elements; code++)
-		gfx_element_decode(machine.gfx[GFX_TEXTURE_TILE], code);
+	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->elements(); code++)
+		machine.gfx[GFX_TEXTURE_TILE]->decode(code);
 
-	Prepare3dTexture(machine, state->memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
+	Prepare3dTexture(machine, state->memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->get_data(0) );
 	state->m_dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
 	state->m_mPtRomSize = state->memregion("pointrom")->bytes()/3;
 	state->m_mpPolyL = state->memregion("pointrom")->base();
@@ -2751,7 +2751,7 @@ static VIDEO_START( common )
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine));
 
-	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)state->m_cgram.target());
+	machine.gfx[GFX_CHAR]->set_source((UINT8 *)state->m_cgram.target());
 }
 
 VIDEO_START( namcos22 )

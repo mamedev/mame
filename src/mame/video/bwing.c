@@ -96,9 +96,9 @@ WRITE8_MEMBER(bwing_state::bwing_scrollram_w)
 	{
 		offs = offset;
 		if (offset < 0x1000)
-			gfx_element_mark_dirty(machine().gfx[2], offset / 32);
+			machine().gfx[2]->mark_dirty(offset / 32);
 		else
-			gfx_element_mark_dirty(machine().gfx[3], offset / 32);
+			machine().gfx[3]->mark_dirty(offset / 32);
 	}
 
 	(m_srbase[m_srbank])[offs] = data;
@@ -173,15 +173,15 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 static TILE_GET_INFO( get_fgtileinfo )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	tileinfo.pen_data = gfx_element_get_data(machine.gfx[2], state->m_fgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo.palette_base = machine.gfx[2]->color_base + ((state->m_fgdata[tile_index] >> 7) << 3);
+	tileinfo.pen_data = machine.gfx[2]->get_data(state->m_fgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo.palette_base = machine.gfx[2]->colorbase() + ((state->m_fgdata[tile_index] >> 7) << 3);
 }
 
 static TILE_GET_INFO( get_bgtileinfo )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	tileinfo.pen_data = gfx_element_get_data(machine.gfx[3], state->m_bgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo.palette_base = machine.gfx[3]->color_base + ((state->m_bgdata[tile_index] >> 7) << 3);
+	tileinfo.pen_data = machine.gfx[3]->get_data(state->m_bgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo.palette_base = machine.gfx[3]->colorbase() + ((state->m_bgdata[tile_index] >> 7) << 3);
 }
 
 static TILE_GET_INFO( get_charinfo )
@@ -199,7 +199,7 @@ static TILEMAP_MAPPER( bwing_scan_cols )
 VIDEO_START( bwing )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	UINT32 *dwptr;
+//	UINT32 *dwptr;
 	int i;
 
 	state->m_charmap = tilemap_create(machine, get_charinfo, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
@@ -224,18 +224,21 @@ VIDEO_START( bwing )
 		state->m_sreg[i] = 0;
 
 //  state->m_fgfx = machine.gfx[2];
-	gfx_element_set_source(machine.gfx[2], state->m_srbase[1]);
+	machine.gfx[2]->set_source(state->m_srbase[1]);
 
 //  state->m_bgfx = machine.gfx[3];
-	gfx_element_set_source(machine.gfx[3], state->m_srbase[1] + 0x1000);
-
-	dwptr = machine.gfx[2]->pen_usage;
+	machine.gfx[3]->set_source(state->m_srbase[1] + 0x1000);
+/*
+	WTF??
+	
+	dwptr = machine.gfx[2]->pen_usage();
 	if (dwptr)
 	{
 		dwptr[0] = 0;
 		for(i = 1; i < BW_NTILES; i++)
 			dwptr[i] = -1;
 	}
+*/
 }
 
 //****************************************************************************

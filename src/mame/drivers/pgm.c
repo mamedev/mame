@@ -3602,7 +3602,7 @@ static void expand_32x32x5bpp(running_machine &machine)
 
 	glcopy.total = (gfx2_size_needed / glcopy.charincrement)*8;
 
-	machine.gfx[1] = gfx_element_alloc(machine, &glcopy, (UINT8 *)dst, 32, 0x400);
+	machine.gfx[1] = auto_alloc(machine, gfx_element(machine, glcopy, (UINT8 *)dst, 32, 0x400));
 
 
 }

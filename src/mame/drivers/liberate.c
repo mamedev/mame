@@ -157,8 +157,8 @@ WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 	offset &= 0x7ff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
-//  gfx_element_mark_dirty(machine().gfx[0], (offset | 0x1800) >> 3);
+	machine().gfx[0]->mark_dirty(offset >> 3);
+//  machine().gfx[0]->mark_dirty((offset | 0x1800) >> 3);
 }
 
 WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
@@ -223,8 +223,8 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
 	offset &= 0x7ff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(machine().gfx[3], (offset + 0x800) >> 3);
-	gfx_element_mark_dirty(machine().gfx[3 + 4], (offset + 0x800) >> 5);
+	machine().gfx[3]->mark_dirty((offset + 0x800) >> 3);
+	machine().gfx[3 + 4]->mark_dirty((offset + 0x800) >> 5);
 }
 
 

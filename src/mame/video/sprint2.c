@@ -164,8 +164,8 @@ SCREEN_VBLANK( sprint2 )
 
 			rect.min_x = get_sprite_x(video_ram, i);
 			rect.min_y = get_sprite_y(video_ram, i);
-			rect.max_x = get_sprite_x(video_ram, i) + screen.machine().gfx[1]->width - 1;
-			rect.max_y = get_sprite_y(video_ram, i) + screen.machine().gfx[1]->height - 1;
+			rect.max_x = get_sprite_x(video_ram, i) + screen.machine().gfx[1]->width() - 1;
+			rect.max_y = get_sprite_y(video_ram, i) + screen.machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 

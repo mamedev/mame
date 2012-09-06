@@ -118,10 +118,10 @@ VIDEO_START( btime )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 
-	if (machine.gfx[0]->srcdata == NULL)
-		gfx_element_set_source(machine.gfx[0], state->m_deco_charram);
-	if (machine.gfx[1]->srcdata == NULL)
-		gfx_element_set_source(machine.gfx[1], state->m_deco_charram);
+	if (machine.gfx[0]->srcdata() == NULL)
+		machine.gfx[0]->set_source(state->m_deco_charram);
+	if (machine.gfx[1]->srcdata() == NULL)
+		machine.gfx[1]->set_source(state->m_deco_charram);
 }
 
 
@@ -221,10 +221,10 @@ WRITE8_MEMBER(btime_state::deco_charram_w)
 	offset &= 0x1fff;
 
 	/* dirty sprite */
-	gfx_element_mark_dirty(machine().gfx[1], offset >> 5);
+	machine().gfx[1]->mark_dirty(offset >> 5);
 
 	/* diry char */
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
+	machine().gfx[0]->mark_dirty(offset >> 3);
 }
 
 WRITE8_MEMBER(btime_state::bnj_background_w)

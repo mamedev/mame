@@ -312,7 +312,7 @@ WRITE8_MEMBER(smc777_state::smc777_pcg_w)
 
 	pcg[vram_index] = data;
 
-    gfx_element_mark_dirty(machine().gfx[0], vram_index >> 3);
+    machine().gfx[0]->mark_dirty(vram_index >> 3);
 }
 
 READ8_MEMBER(smc777_state::smc777_fbuf_r)

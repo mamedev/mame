@@ -108,7 +108,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	targeth_state *state = machine.driver_data<targeth_state>();
 	int i;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
 		int sx = state->m_spriteram[i+2] & 0x03ff;

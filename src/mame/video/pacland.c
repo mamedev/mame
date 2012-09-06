@@ -103,15 +103,15 @@ PALETTE_INIT( pacland )
 	/* color_prom now points to the beginning of the lookup table */
 
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i, *color_prom++);
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i, *color_prom++);
 
 	/* Background */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i, *color_prom++);
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i, *color_prom++);
 
 	/* Sprites */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[2]->color_base + i, *color_prom++);
+		colortable_entry_set_value(machine.colortable, machine.gfx[2]->colorbase() + i, *color_prom++);
 
 	state->m_palette_bank = 0;
 	switch_palette(machine);
@@ -207,8 +207,8 @@ VIDEO_START( pacland )
 
 	/* create one group per color code; for each group, set the transparency mask
        to correspond to the pens that are 0x7f or 0xff */
-	assert(machine.gfx[0]->total_colors <= TILEMAP_NUM_GROUPS);
-	for (color = 0; color < machine.gfx[0]->total_colors; color++)
+	assert(machine.gfx[0]->colors() <= TILEMAP_NUM_GROUPS);
+	for (color = 0; color < machine.gfx[0]->colors(); color++)
 	{
 		UINT32 mask = colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0x7f);
 		mask |= colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0xff);

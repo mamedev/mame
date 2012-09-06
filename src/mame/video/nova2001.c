@@ -269,7 +269,7 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 32)
@@ -307,7 +307,7 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 32)

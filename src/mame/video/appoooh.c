@@ -203,7 +203,7 @@ WRITE8_MEMBER(appoooh_state::appoooh_out_w)
 	/* bit 7 unknown (used) */
 }
 
-static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
+static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
 {
 	appoooh_state *state = gfx->machine().driver_data<appoooh_state>();
 	int offs;
@@ -235,7 +235,7 @@ static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &clipr
 	}
 }
 
-static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
+static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite )
 {
 	appoooh_state *state = gfx->machine().driver_data<appoooh_state>();
 	int offs;

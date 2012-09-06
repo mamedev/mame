@@ -87,7 +87,7 @@ VIDEO_START(mainsnk)
 WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
 {
 	int bank;
-	int total_elements = machine().gfx[0]->total_elements;
+	int total_elements = machine().gfx[0]->elements();
 
 	flip_screen_set(~data & 0x80);
 
@@ -126,7 +126,7 @@ WRITE8_MEMBER(mainsnk_state::mainsnk_bgram_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
 {
 	mainsnk_state *state = machine.driver_data<mainsnk_state>();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	const UINT8 *source, *finish;
 	source =  state->m_spriteram;
 	finish =  source + 25*4;

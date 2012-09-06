@@ -218,21 +218,21 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machi
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-void kaneko16_sprite_device::kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void kaneko16_sprite_device::kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
-	pen_t pen_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
-	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
-	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
+	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
+	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
 
 	if (sprite_screen_width && sprite_screen_height)
 	{
 		/* compute sprite increment per screen pixel */
-		int dx = (gfx->width<<16)/sprite_screen_width;
-		int dy = (gfx->height<<16)/sprite_screen_height;
+		int dx = (gfx->width()<<16)/sprite_screen_width;
+		int dy = (gfx->height()<<16)/sprite_screen_height;
 
 		int ex = sx+sprite_screen_width;
 		int ey = sy+sprite_screen_height;
@@ -290,7 +290,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(bitmap_ind16 &dest_bmp
 
 			for( y=sy; y<ey; y++ )
 			{
-				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 				UINT16 *dest = &dest_bmp.pix16(y);
 				UINT8 *pri = &priority_bitmap.pix8(y);
 

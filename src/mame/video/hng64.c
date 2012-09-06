@@ -92,7 +92,7 @@ do																					\
 while (0)																			\
 
 
-static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
 {
@@ -103,14 +103,14 @@ static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &clip
 	assert(gfx != NULL);
 
 	/* get final code and color, and grab lookup tables */
-	code %= gfx->total_elements;
-	color %= gfx->total_colors;
-	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
+	code %= gfx->elements();
+	color %= gfx->colors();
+	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
 
 	/* use pen usage to optimize */
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	if (gfx->has_pen_usage())
 	{
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 
 		/* fully transparent; do nothing */
 		if ((usage & ~(1 << transpen)) == 0)
@@ -125,7 +125,7 @@ static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &clip
 }
 
 
-static void pdrawgfxzoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void pdrawgfxzoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen)
@@ -145,14 +145,14 @@ static void pdrawgfxzoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &
 	assert(gfx != NULL);
 
 	/* get final code and color, and grab lookup tables */
-	code %= gfx->total_elements;
-	color %= gfx->total_colors;
-	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
+	code %= gfx->elements();
+	color %= gfx->colors();
+	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
 
 	/* use pen usage to optimize */
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	if (gfx->has_pen_usage())
 	{
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 
 		/* fully transparent; do nothing */
 		if ((usage & ~(1 << transpen)) == 0)
@@ -210,7 +210,7 @@ static void pdrawgfxzoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
-	const gfx_element *gfx;
+	gfx_element *gfx;
 	UINT32 *source = state->m_spriteram;
 	UINT32 *finish = state->m_spriteram + 0xc000/4;
 

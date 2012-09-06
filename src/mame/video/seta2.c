@@ -160,7 +160,7 @@ WRITE16_MEMBER(seta2_state::seta2_vregs_w)
 
 ***************************************************************************/
 
-static void seta_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx,
+static void seta_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 							int shadow_depth )
 {
@@ -170,14 +170,14 @@ static void seta_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, const
 	int sx, x1, dx;
 	int sy, y1, dy;
 
-	addr	=	gfx_element_get_data(gfx, code  % gfx->total_elements);
-	color	=	gfx->color_granularity * (color % gfx->total_colors);
+	addr	=	gfx->get_data(code  % gfx->elements());
+	color	=	gfx->granularity() * (color % gfx->colors());
 
-	if ( flipx )	{	x1 = x0-1;				x0 += gfx->width-1;		dx = -1;	}
-	else			{	x1 = x0 + gfx->width;							dx =  1;	}
+	if ( flipx )	{	x1 = x0-1;				x0 += gfx->width()-1;		dx = -1;	}
+	else			{	x1 = x0 + gfx->width();							dx =  1;	}
 
-	if ( flipy )	{	y1 = y0-1;				y0 += gfx->height-1;	dy = -1;	}
-	else			{	y1 = y0 + gfx->height;							dy =  1;	}
+	if ( flipy )	{	y1 = y0-1;				y0 += gfx->height()-1;	dy = -1;	}
+	else			{	y1 = y0 + gfx->height();							dy =  1;	}
 
 #define SETA_DRAWGFX(SETPIXELCOLOR)												\
 	for ( sy = y0; sy != y1; sy += dy )											\
@@ -196,7 +196,7 @@ static void seta_drawgfx(	bitmap_ind16 &bitmap, const rectangle &cliprect, const
 			}																	\
 		}																		\
 																				\
-		addr	+=	gfx->line_modulo;											\
+		addr	+=	gfx->rowbytes();											\
 	}
 
 	if (shadow_depth)
@@ -224,7 +224,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 //  for ( ; s1 < end; s1+=4 )
 	for ( ; s1 < buffered_spriteram16 + 0x4000/2; s1+=4 )	// more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
-		const gfx_element *gfx;
+		gfx_element *gfx;
 		int num		= s1[0];
 		int xoffs	= s1[1];
 		int yoffs	= s1[2];
@@ -446,10 +446,10 @@ VIDEO_START( seta2 )
 {
 	seta2_state *state = machine.driver_data<seta2_state>();
 
-	machine.gfx[2]->color_granularity = 16;
-	machine.gfx[3]->color_granularity = 16;
-	machine.gfx[4]->color_granularity = 16;
-	machine.gfx[5]->color_granularity = 16;
+	machine.gfx[2]->set_granularity(16);
+	machine.gfx[3]->set_granularity(16);
+	machine.gfx[4]->set_granularity(16);
+	machine.gfx[5]->set_granularity(16);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 

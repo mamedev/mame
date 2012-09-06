@@ -156,7 +156,7 @@ static VIDEO_START( cyclemb )
 static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int x,y,count;
 	UINT8 flip_screen = state->flip_screen();
 
@@ -257,7 +257,7 @@ static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int x,y;
 	//UINT8 flip_screen = state->flip_screen();
 

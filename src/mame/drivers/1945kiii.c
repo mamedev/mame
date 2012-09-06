@@ -99,7 +99,7 @@ static VIDEO_START(k3)
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	k3_state *state = machine.driver_data<k3_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	UINT16 *source = state->m_spriteram_1;
 	UINT16 *source2 = state->m_spriteram_2;
 	UINT16 *finish = source + 0x1000 / 2;

@@ -183,7 +183,7 @@ static void draw_scanline32_transpen(bitmap_rgb32 &bitmap, INT32 destx, INT32 de
     a single transparent pen, storing the alpha value
     in alpha field of ARGB32, negative alpha implies alphatable
 -------------------------------------------------*/
-static void drawgfx_alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void drawgfx_alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
@@ -205,12 +205,12 @@ static void drawgfx_alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, co
 	}
 
 	/* get final code and color, and grab lookup tables */
-	code %= gfx->total_elements;
-	color %= gfx->total_colors;
-	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
+	code %= gfx->elements();
+	color %= gfx->colors();
+	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
 
 	/* early out if completely transparent */
-	if (gfx->pen_usage != NULL && (gfx->pen_usage[code] & ~(1 << 0)) == 0)
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << 0)) == 0)
 		return;
 
 	if (fixedalpha >= 0)
@@ -229,7 +229,7 @@ static void drawgfx_alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, co
     a fixed alpha value, or if alpha==-1 then uses
     the per-pen alphatable[] array
  -------------------------------------------------*/
-static void drawgfx_alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+static void drawgfx_alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
@@ -251,12 +251,12 @@ static void drawgfx_alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, co
 	assert(alphatable != NULL);
 
 	/* get final code and color, and grab lookup tables */
-	code %= gfx->total_elements;
-	color %= gfx->total_colors;
-	paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
+	code %= gfx->elements();
+	color %= gfx->colors();
+	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
 
 	/* early out if completely transparent */
-	if (gfx->pen_usage != NULL && (gfx->pen_usage[code] & ~(1 << 0)) == 0)
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << 0)) == 0)
 		return;
 
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHATABLE32, NO_PRIORITY);
@@ -515,7 +515,7 @@ static void draw_background( running_machine &machine, bitmap_rgb32 &bitmap, con
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
 static void psikyosh_drawgfxzoom( running_machine &machine,
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
@@ -554,24 +554,24 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 			{
 				for (xtile = xstart; xtile != xend; xtile += xinc)
 				{
-					const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-					const UINT8 *code_base = gfx_element_get_data(gfx, (code + code_offset++) % gfx->total_elements);
+					const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+					const UINT8 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
 
 					int x_index_base, y_index, sx, sy, ex, ey;
 
-					if (flipx)	{ x_index_base = gfx->width - 1; }
+					if (flipx)	{ x_index_base = gfx->width() - 1; }
 					else		{ x_index_base = 0; }
 
-					if (flipy)	{ y_index = gfx->height-1; }
+					if (flipy)	{ y_index = gfx->height()-1; }
 					else		{ y_index = 0; }
 
 					/* start coordinates */
-					sx = offsx + xtile * gfx->width;
-					sy = offsy + ytile * gfx->height;
+					sx = offsx + xtile * gfx->width();
+					sy = offsy + ytile * gfx->height();
 
 					/* end coordinates */
-					ex = sx + gfx->width;
-					ey = sy + gfx->height;
+					ex = sx + gfx->width();
+					ey = sy + gfx->height();
 
 					if (sx < myclip.min_x)
 					{ /* clip left */
@@ -606,10 +606,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							if (z > 0)
 							{
-								const UINT8 *source = code_base + (y_index) * gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + (y_index) * gfx->rowbytes() + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								UINT16 *pri = &state->m_z_bitmap.pix16(sy, sx);
-								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
+								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
@@ -637,9 +637,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							}
 							else
 							{
-								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
-								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
+								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
@@ -665,10 +665,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							if (z > 0)
 							{
-								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								UINT16 *pri = &state->m_z_bitmap.pix16(sy, sx);
-								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
+								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
@@ -696,9 +696,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							}
 							else
 							{
-								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
-								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
+								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
@@ -725,10 +725,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 						{
 							if (z > 0)
 							{
-								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
 								UINT16 *pri = &state->m_z_bitmap.pix16(sy, sx);
-								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
+								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
@@ -760,9 +760,9 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 							}
 							else
 							{
-								const UINT8 *source = code_base + y_index * gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								UINT32 *dest = &dest_bmp.pix32(sy, sx);
-								int src_modulo = yinc * gfx->line_modulo - xinc * (ex - sx);
+								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
 
 								for (y = sy; y < ey; y++)
@@ -800,15 +800,15 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 		{
 			for (xtile = 0; xtile < wide; xtile++)
 			{
-				const UINT8 *code_base = gfx_element_get_data(gfx, (code + code_offset++) % gfx->total_elements);
-				for (ypixel = 0; ypixel < gfx->height; ypixel++)
+				const UINT8 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
+				for (ypixel = 0; ypixel < gfx->height(); ypixel++)
 				{
-					const UINT8 *source = code_base + ypixel * gfx->line_modulo;
-					UINT8 *dest = &state->m_zoom_bitmap.pix8(ypixel + ytile*gfx->height);
+					const UINT8 *source = code_base + ypixel * gfx->rowbytes();
+					UINT8 *dest = &state->m_zoom_bitmap.pix8(ypixel + ytile*gfx->height());
 
-					for (xpixel = 0; xpixel < gfx->width; xpixel++)
+					for (xpixel = 0; xpixel < gfx->width(); xpixel++)
 					{
-						dest[xpixel + xtile*gfx->width] = source[xpixel];
+						dest[xpixel + xtile*gfx->width()] = source[xpixel];
 					}
 				}
 			}
@@ -817,10 +817,10 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 		/* Start drawing */
 		if (gfx)
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 
-			int sprite_screen_height = ((high * gfx->height * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
-			int sprite_screen_width = ((wide * gfx->width * (0x400 * 0x400)) / zoomx + 0x200) >> 10;
+			int sprite_screen_height = ((high * gfx->height() * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
+			int sprite_screen_width = ((wide * gfx->width() * (0x400 * 0x400)) / zoomx + 0x200) >> 10;
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
@@ -1084,7 +1084,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
-	const gfx_element *gfx;
+	gfx_element *gfx;
 	UINT32 *src = state->m_spriteram->buffer(); /* Use buffered spriteram */
 	UINT16 *list = (UINT16 *)src + 0x3800 / 2;
 	UINT16 listlen = 0x800/2;
@@ -1229,7 +1229,7 @@ VIDEO_START( psikyosh )
 	state->m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
 	state->m_bg_zoom = auto_alloc_array(machine, UINT16, 256);
 
-	machine.gfx[1]->color_granularity = 16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
+	machine.gfx[1]->set_granularity(16); /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
 	/* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 	int i;

@@ -344,7 +344,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		sy++;	/* sprites are buffered and delayed by one scanline */
 
-		gfx_element_set_source_clip(gfx, tx, sizex, ty, sizey);
+		gfx->set_source_clip(tx, sizex, ty, sizey);
 		if (color != 0x7f)
 			pdrawgfx_transpen( bitmap, cliprect, gfx,
 					sprite,

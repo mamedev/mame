@@ -108,7 +108,7 @@ SCREEN_UPDATE_IND16( jumping )
 	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram[offs];
-		if (tile < screen.machine().gfx[1]->total_elements)
+		if (tile < screen.machine().gfx[1]->elements())
 		{
 			int sx,sy,color,data1;
 

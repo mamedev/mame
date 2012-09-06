@@ -283,15 +283,15 @@ WRITE16_MEMBER(taitof2_state::koshien_spritebank_w)
 	m_spritebank_buffered[7] = m_spritebank_buffered[6] + 0x400;
 }
 
-static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16 &dest_bmp, const rectangle &clip, const gfx_element *gfx,
+static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	bitmap_ind8 &priority_bitmap = gfx->machine().priority_bitmap;
-	int sprite_screen_height = (scaley * gfx->height + 0x8000) >> 16;
-	int sprite_screen_width = (scalex * gfx->width + 0x8000) >> 16;
+	int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
+	int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
 
 	if (!scalex || !scaley)
 		return;
@@ -299,8 +299,8 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16
 	if (sprite_screen_width && sprite_screen_height)
 	{
 		/* compute sprite increment per screen pixel */
-		int dx = (gfx->width << 16) / sprite_screen_width;
-		int dy = (gfx->height << 16) / sprite_screen_height;
+		int dx = (gfx->width() << 16) / sprite_screen_width;
+		int dy = (gfx->height() << 16) / sprite_screen_height;
 
 		int ex = sx + sprite_screen_width;
 		int ey = sy + sprite_screen_height;
@@ -359,7 +359,7 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16
 
 			for (y = sy; y < ey; y++)
 			{
-				const UINT8 *source = source_base + (y_index >> 16) * gfx->line_modulo;
+				const UINT8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
 				UINT16 *dest = &dest_bmp.pix16(y);
 				UINT8 *pri = &priority_bitmap.pix8(y);
 
@@ -759,7 +759,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (machine.gfx[0]->color_granularity == 64)	/* Final Blow is 6-bit deep */
+			if (machine.gfx[0]->granularity() == 64)	/* Final Blow is 6-bit deep */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;

@@ -57,7 +57,7 @@ WRITE8_MEMBER(speedspn_state::speedspn_global_display_w)
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	speedspn_state *state = machine.driver_data<speedspn_state>();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	UINT8 *source = state->m_vidram+ 0x1000;
 	UINT8 *finish = source + 0x1000;
 

@@ -76,7 +76,7 @@ static SCREEN_UPDATE_IND16( cmmb )
 {
 	cmmb_state *state = screen.machine().driver_data<cmmb_state>();
 	UINT8 *videoram = state->m_videoram;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int count = 0x00000;
 
 	int y,x;
@@ -113,8 +113,8 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 	offset&=0xfff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
-    gfx_element_mark_dirty(machine().gfx[1], offset >> 5);
+	machine().gfx[0]->mark_dirty(offset >> 4);
+    machine().gfx[1]->mark_dirty(offset >> 5);
 }
 
 

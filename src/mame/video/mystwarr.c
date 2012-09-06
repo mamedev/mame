@@ -22,7 +22,7 @@ static void mystwarr_decode_tiles(running_machine &machine)
 	int gfxnum;
 
 	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(machine.gfx); gfxnum++)
-		if (machine.gfx[gfxnum] != NULL && machine.gfx[gfxnum]->srcdata == s)
+		if (machine.gfx[gfxnum] != NULL && machine.gfx[gfxnum]->srcdata() == s)
 			break;
 	assert(gfxnum != ARRAY_LENGTH(machine.gfx));
 
@@ -55,7 +55,7 @@ static void mystwarr_decode_tiles(running_machine &machine)
 		d += 5;
 	}
 
-	gfx_element_set_source(machine.gfx[gfxnum], decoded);
+	machine.gfx[gfxnum]->set_source(decoded);
 }
 
 

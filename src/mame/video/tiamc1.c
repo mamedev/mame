@@ -23,7 +23,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
 		m_charram[offset + 0x1800] = data;
 
 	if ((m_layers_ctrl & (16|8|4|2)) != (16|8|4|2))
-		gfx_element_mark_dirty(machine().gfx[0], (offset / 8) & 0xff);
+		machine().gfx[0]->mark_dirty((offset / 8) & 0xff);
 
 	if(!(m_layers_ctrl & 1)) {
 		m_tileram[offset] = data;
@@ -153,7 +153,7 @@ VIDEO_START( tiamc1 )
 	state_save_register_global(machine, state->m_bg_vshift);
 	state_save_register_global(machine, state->m_bg_hshift);
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

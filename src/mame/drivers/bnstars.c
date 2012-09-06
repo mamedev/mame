@@ -486,7 +486,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		else
 			pri_mask = 0xfe;
 
-		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
+		gfx->set_source_clip(tx, xsize, ty, ysize);
 		pdrawgfxzoom_transpen(bitmap, cliprect, gfx,
 				code,
 				color,
@@ -1488,7 +1488,7 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx7");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx6");
 
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank1")->set_base(memregion("maincpu")->base());
 }
 
 GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

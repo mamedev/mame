@@ -629,7 +629,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 {
 	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 
 //  static int ytlim = 1;
 //  static int xtlim = 1;

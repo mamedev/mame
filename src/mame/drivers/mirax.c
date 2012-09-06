@@ -163,7 +163,7 @@ static PALETTE_INIT( mirax )
 static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag)
 {
 	mirax_state *state = machine.driver_data<mirax_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	int y,x;
 	int res_x,res_y,wrapy;
 

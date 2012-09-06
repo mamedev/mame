@@ -266,29 +266,29 @@ WRITE16_MEMBER(armedf_state::armedf_bg_scrolly_w)
 ***************************************************************************/
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
-void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
-	const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
 	xinc = flipx ? -1 : 1;
 	yinc = flipy ? -1 : 1;
 
-	x_index_base = flipx ? gfx->width-1 : 0;
-	y_index = flipy ? gfx->height-1 : 0;
+	x_index_base = flipx ? gfx->width()-1 : 0;
+	y_index = flipy ? gfx->height()-1 : 0;
 
 	/* start coordinates */
 	sx = offsx;
 	sy = offsy;
 
 	/* end coordinates */
-	ex = sx + gfx->width;
-	ey = sy + gfx->height;
+	ex = sx + gfx->width();
+	ey = sy + gfx->height();
 
 	if (sx < clip.min_x)
 	{ /* clip left */
@@ -319,7 +319,7 @@ void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const recta
 		{
 			for (y = sy; y < ey; y++)
 			{
-				const UINT8 *source = source_base + y_index*gfx->line_modulo;
+				const UINT8 *source = source_base + y_index*gfx->rowbytes();
 				UINT16 *dest = &dest_bmp.pix16(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)

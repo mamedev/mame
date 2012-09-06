@@ -289,7 +289,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
 	int i;
-	const gfx_element *gfx = screen.machine().gfx[3];
+	gfx_element *gfx = screen.machine().gfx[3];
 
 
 	for (i=0;i<0x1000/4;i+=4)

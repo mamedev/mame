@@ -91,7 +91,7 @@ static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const re
 
 					drawgfx_transpen_raw(bitmap, cliprect, machine.gfx[2],
 						code + layout[row][col],
-						machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+						machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 						flipx, flipy,
 						x, y,
 						0);
@@ -134,7 +134,7 @@ SCREEN_UPDATE_RGB32( spbactn )
 
 		drawgfx_transpen_raw(state->m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
 					code,
-					screen.machine().gfx[1]->color_base + color * screen.machine().gfx[1]->color_granularity,
+					screen.machine().gfx[1]->colorbase() + color * screen.machine().gfx[1]->granularity(),
 					0, 0,
 					16 * sx, 8 * sy,
 					(UINT32)-1);
@@ -161,7 +161,7 @@ SCREEN_UPDATE_RGB32( spbactn )
 
 			drawgfx_transpen_raw(state->m_tile_bitmap_bg, cliprect, screen.machine().gfx[1],
 					code,
-					screen.machine().gfx[1]->color_base + color * screen.machine().gfx[1]->color_granularity,
+					screen.machine().gfx[1]->colorbase() + color * screen.machine().gfx[1]->granularity(),
 					0, 0,
 					16 * sx, 8 * sy,
 					0);
@@ -195,7 +195,7 @@ SCREEN_UPDATE_RGB32( spbactn )
 
 		drawgfx_transpen_raw(state->m_tile_bitmap_fg, cliprect, screen.machine().gfx[0],
 					code,
-					screen.machine().gfx[0]->color_base + color * screen.machine().gfx[0]->color_granularity,
+					screen.machine().gfx[0]->colorbase() + color * screen.machine().gfx[0]->granularity(),
 					0, 0,
 					16 * sx, 8 * sy,
 					0);

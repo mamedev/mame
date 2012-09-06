@@ -1165,7 +1165,7 @@ static void decode_gfx(running_machine &machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine.total_colors() >> bpp, 0);
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, gl, data, machine.total_colors() >> bpp, 0));
 }
 
 /***************************************************************************/
@@ -2114,7 +2114,7 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 			fatalerror("Unsupported bpp");
 	}
 
-	machine.gfx[gfx_index]->color_granularity = 16; /* override */
+	machine.gfx[gfx_index]->set_granularity(16); /* override */
 
 	K056832_memory_region = gfx_memory_region;
 	K056832_gfxnum = gfx_index;
@@ -2621,7 +2621,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 			int count, src_pitch, src_modulo;
 			int	dst_pitch;
 			int line;
-			const gfx_element *src_gfx;
+			gfx_element *src_gfx;
 			int offs, mask;
 
 			#define LINE_WIDTH 512
@@ -2635,7 +2635,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 			pixmap  = K056832_pixmap[page];
 			pal_ptr    = machine.pens;
 			src_gfx    = machine.gfx[K056832_gfxnum];
-			src_pitch  = src_gfx->line_modulo;
+			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
 

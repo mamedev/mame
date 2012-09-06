@@ -73,7 +73,7 @@ WRITE8_MEMBER(m10_state::m10_chargen_w)
 	if (m_chargen[offset] != data)
 	{
 		m_chargen[offset] = data;
-		gfx_element_mark_dirty(m_back_gfx, offset >> (3 + 5));
+		m_back_gfx->mark_dirty(offset >> (3 + 5));
 	}
 }
 
@@ -84,7 +84,7 @@ WRITE8_MEMBER(m10_state::m15_chargen_w)
 	if (m_chargen[offset] != data)
 	{
 		m_chargen[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
+		machine().gfx[0]->mark_dirty(offset >> 3);
 	}
 }
 
@@ -109,7 +109,7 @@ VIDEO_START( m10 )
 	state->m_tx_tilemap->set_scrolldx(0, 62);
 	state->m_tx_tilemap->set_scrolldy(0, 0);
 
-	state->m_back_gfx = gfx_element_alloc(machine, &backlayout, state->m_chargen, 8, 0);
+	state->m_back_gfx = auto_alloc(machine, gfx_element(machine, backlayout, state->m_chargen, 8, 0));
 
 	machine.gfx[1] = state->m_back_gfx;
 	return ;
@@ -119,7 +119,7 @@ VIDEO_START( m15 )
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
-	machine.gfx[0] = gfx_element_alloc(machine, &charlayout, state->m_chargen, 8, 0);
+	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, charlayout, state->m_chargen, 8, 0));
 
 	state->m_tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan, 8, 8, 32, 32);
 	state->m_tx_tilemap->set_scrolldx(0, 116);

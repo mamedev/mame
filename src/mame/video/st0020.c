@@ -56,9 +56,9 @@ void st0020_device::device_start()
 		if (machine().gfx[m_gfx_index] == 0)
 			break;
 
-	machine().gfx[m_gfx_index] = gfx_element_alloc(machine(), &layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, machine().total_colors() / 64, 0);
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, machine().total_colors() / 64, 0));
 
-	machine().gfx[m_gfx_index]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine().gfx[m_gfx_index]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	save_pointer(NAME(m_st0020_gfxram), 4 * 0x100000/2);
 	save_pointer(NAME(m_st0020_spriteram), 0x80000/2);
@@ -89,7 +89,7 @@ WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 
 	offset += m_st0020_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&m_st0020_gfxram[offset]);
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], offset / (16*8/2));
+	machine().gfx[m_gfx_index]->mark_dirty(offset / (16*8/2));
 }
 
 READ16_MEMBER(st0020_device::st0020_sprram_r)
@@ -178,7 +178,7 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 				dst /= 16*8;
 				while (len--)
 				{
-					gfx_element_mark_dirty(machine().gfx[m_gfx_index], dst);
+					machine().gfx[m_gfx_index]->mark_dirty(dst);
 					dst++;
 				}
 			}

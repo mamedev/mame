@@ -20,7 +20,7 @@ VIDEO_START( buggychl )
 	state->save_item(NAME(state->m_tmp_bitmap1));
 	state->save_item(NAME(state->m_tmp_bitmap2));
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 }
 
 
@@ -30,7 +30,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_chargen_w)
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[0], (offset / 8) & 0xff);
+		machine().gfx[0]->mark_dirty((offset / 8) & 0xff);
 	}
 }
 
@@ -205,7 +205,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
 					realflipy = (lookup[pos + 1] & 0x80) ? !flipy : flipy;
 					code += (realflipy ? (charline ^ 7) : charline);
-					pendata = gfx_element_get_data(machine.gfx[1], code);
+					pendata = machine.gfx[1]->get_data(code);
 
 					for (x = 0; x < 16; x++)
 					{

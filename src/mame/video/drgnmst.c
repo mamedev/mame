@@ -60,7 +60,7 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	drgnmst_state *state = machine.driver_data<drgnmst_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	UINT16 *source = state->m_spriteram;
 	UINT16 *finish = source + 0x800 / 2;
 

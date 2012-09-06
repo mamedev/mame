@@ -166,7 +166,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 	{
 		offset |= (0 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[1], (offset / 8) % 256);
+		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
 		s2636_work_ram_w(m_s2636_0, offset, data);
@@ -189,7 +189,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 	{
 		offset |= (1 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[1], (offset / 8) % 256);
+		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
 		s2636_work_ram_w(m_s2636_1, offset, data);
@@ -212,7 +212,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 	{
 		offset |= (2 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[1], (offset / 8) % 256);
+		machine().gfx[1]->mark_dirty((offset / 8) % 256);
 	}
 	else
 		s2636_work_ram_w(m_s2636_2, offset, data);
@@ -994,7 +994,7 @@ MACHINE_START( cvs )
 
 	/* allocate memory */
 	if (machine.gfx[1] != NULL)
-		gfx_element_set_source(machine.gfx[1], state->m_character_ram);
+		machine.gfx[1]->set_source(state->m_character_ram);
 
 	start_393hz_timer(machine);
 

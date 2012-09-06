@@ -138,7 +138,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	{
 		int sx, sy, flipx, flipy, code, color;
 
-		if (machine.gfx[1]->total_elements > 256)
+		if (machine.gfx[1]->elements() > 256)
 		{
 			/* spriteram
 

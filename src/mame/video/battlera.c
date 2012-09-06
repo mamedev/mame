@@ -31,9 +31,9 @@ VIDEO_START( battlera )
 	state->m_current_scanline=0;
 	state->m_irq_enable=state->m_rcr_enable=state->m_sb_enable=state->m_bb_enable=0;
 
-	gfx_element_set_source(machine.gfx[0], state->m_HuC6270_vram);
-	gfx_element_set_source(machine.gfx[1], state->m_HuC6270_vram);
-	gfx_element_set_source(machine.gfx[2], state->m_blank_tile);
+	machine.gfx[0]->set_source(state->m_HuC6270_vram);
+	machine.gfx[1]->set_source(state->m_HuC6270_vram);
+	machine.gfx[2]->set_source(state->m_blank_tile);
 }
 
 /******************************************************************************/
@@ -125,8 +125,8 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			case 2: /* VRAM */
 				if (m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|1]!=data) {
 					m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|1]=data;
-					gfx_element_mark_dirty(machine().gfx[0], m_HuC6270_registers[0]>>4);
-					gfx_element_mark_dirty(machine().gfx[1], m_HuC6270_registers[0]>>6);
+					machine().gfx[0]->mark_dirty(m_HuC6270_registers[0]>>4);
+					machine().gfx[1]->mark_dirty(m_HuC6270_registers[0]>>6);
 				}
 				if (m_HuC6270_registers[0]<0x1000) m_vram_dirty[m_HuC6270_registers[0]]=1;
 				return;
@@ -185,8 +185,8 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			case 2: /* VWR - VRAM */
 				if (m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|0]!=data) {
 					m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|0]=data;
-					gfx_element_mark_dirty(machine().gfx[0], m_HuC6270_registers[0]>>4);
-					gfx_element_mark_dirty(machine().gfx[1], m_HuC6270_registers[0]>>6);
+					machine().gfx[0]->mark_dirty(m_HuC6270_registers[0]>>4);
+					machine().gfx[1]->mark_dirty(m_HuC6270_registers[0]>>6);
 					if (m_HuC6270_registers[0]<0x1000) m_vram_dirty[m_HuC6270_registers[0]]=1;
 				}
 				m_HuC6270_registers[0]+=m_inc_value;
@@ -306,9 +306,9 @@ SCREEN_UPDATE_IND16( battlera )
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* if any tiles changed, redraw the VRAM */
-	if (screen.machine().gfx[0]->dirtyseq != state->m_tile_dirtyseq)
+	if (screen.machine().gfx[0]->dirtyseq() != state->m_tile_dirtyseq)
 	{
-		state->m_tile_dirtyseq = screen.machine().gfx[0]->dirtyseq;
+		state->m_tile_dirtyseq = screen.machine().gfx[0]->dirtyseq();
 		memset(state->m_vram_dirty, 1, 0x1000);
 	}
 

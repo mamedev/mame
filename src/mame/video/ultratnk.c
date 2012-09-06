@@ -119,8 +119,8 @@ SCREEN_VBLANK( ultratnk )
 
 			rect.min_x = horz - 15;
 			rect.min_y = vert - 15;
-			rect.max_x = horz - 15 + screen.machine().gfx[1]->width - 1;
-			rect.max_y = vert - 15 + screen.machine().gfx[1]->height - 1;
+			rect.max_x = horz - 15 + screen.machine().gfx[1]->width() - 1;
+			rect.max_y = vert - 15 + screen.machine().gfx[1]->height() - 1;
 
 			rect &= screen.machine().primary_screen->visible_area();
 

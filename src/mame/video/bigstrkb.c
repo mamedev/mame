@@ -17,7 +17,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
     **- End of Comments -*/
 
 	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 	UINT16 *source = state->m_spriteram;
 	UINT16 *finish = source + 0x800/2;
 

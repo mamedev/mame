@@ -334,7 +334,7 @@ static SCREEN_UPDATE_RGB32(coolridr)
 {
 	coolridr_state *state = screen.machine().driver_data<coolridr_state>();
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	const gfx_element *gfx = screen.machine().gfx[2];
+	gfx_element *gfx = screen.machine().gfx[2];
 	UINT32 count;
 	int y,x;
 
@@ -691,7 +691,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_char_w)
 		gfx[offset*4+2] = (m_h1_charram[offset] & 0x0000ff00) >> 8;
 		gfx[offset*4+3] = (m_h1_charram[offset] & 0x000000ff) >> 0;
 
-		gfx_element_mark_dirty(machine().gfx[2], offset/64); //*4/256
+		machine().gfx[2]->mark_dirty(offset/64); //*4/256
 	}
 }
 

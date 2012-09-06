@@ -412,7 +412,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	mwarr_state *state = machine.driver_data<mwarr_state>();
 	const UINT16 *source = state->m_sprites_buffer + 0x800 - 4;
 	const UINT16 *finish = state->m_sprites_buffer;
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
 	while (source >= finish)

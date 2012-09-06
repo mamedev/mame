@@ -98,8 +98,8 @@ SCREEN_UPDATE_IND16( finalizr )
 
 	/* Draw the sprites. */
 	{
-		const gfx_element *gfx1 = screen.machine().gfx[1];
-		const gfx_element *gfx2 = screen.machine().gfx[2];
+		gfx_element *gfx1 = screen.machine().gfx[1];
+		gfx_element *gfx2 = screen.machine().gfx[2];
 
 		UINT8 *sr = state->m_spriterambank ? state->m_spriteram_2 : state->m_spriteram;
 

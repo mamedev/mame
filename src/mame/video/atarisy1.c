@@ -664,15 +664,15 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		machine.gfx[gfx_index] = gfx_element_alloc(machine, &objlayout_4bpp, srcdata, 0x40, 256);
+		machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, objlayout_4bpp, srcdata, 0x40, 256));
 		break;
 
 	case 5:
-		machine.gfx[gfx_index] = gfx_element_alloc(machine, &objlayout_5bpp, srcdata, 0x40, 256);
+		machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, objlayout_5bpp, srcdata, 0x40, 256));
 		break;
 
 	case 6:
-		machine.gfx[gfx_index] = gfx_element_alloc(machine, &objlayout_6bpp, srcdata, 0x40, 256);
+		machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, objlayout_6bpp, srcdata, 0x40, 256));
 		break;
 
 	default:
@@ -680,7 +680,7 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 	}
 
 	/* set the color information */
-	machine.gfx[gfx_index]->color_granularity = 8;
+	machine.gfx[gfx_index]->set_granularity(8);
 	state->m_bank_color_shift[gfx_index] = bpp - 3;
 
 	/* set the entry and return it */

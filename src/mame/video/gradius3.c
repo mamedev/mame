@@ -64,7 +64,7 @@ static void gradius3_postload(running_machine &machine)
 
 	for (i = 0; i < 0x20000; i += 16)
 	{
-		gfx_element_mark_dirty(machine.gfx[0], i / 16);
+		machine.gfx[0]->mark_dirty(i / 16);
 	}
 }
 
@@ -84,9 +84,9 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0; i < TOTAL_SPRITES; i++)
-		gfx_element_mark_dirty(machine.gfx[1], i);
+		machine.gfx[1]->mark_dirty(i);
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_gfxram.target());
+	machine.gfx[0]->set_source((UINT8 *)state->m_gfxram.target());
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(gradius3_postload), &machine));
 }
@@ -113,7 +113,7 @@ WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 	COMBINE_DATA(&m_gfxram[offset]);
 
 	if (oldword != m_gfxram[offset])
-		gfx_element_mark_dirty(machine().gfx[0], offset / 16);
+		machine().gfx[0]->mark_dirty(offset / 16);
 }
 
 /***************************************************************************

@@ -117,7 +117,7 @@ WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 	UINT8 *gfxram = memregion( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
-	gfx_element_mark_dirty(machine().gfx[1], offset/32);
+	machine().gfx[1]->mark_dirty(offset/32);
 }
 
 

@@ -461,7 +461,7 @@ static VIDEO_START( amaticmg )
 static SCREEN_UPDATE_IND16( amaticmg )
 {
 	amaticmg_state *state = screen.machine().driver_data<amaticmg_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int y,x;
 	int count = 0;
 
@@ -487,7 +487,7 @@ static SCREEN_UPDATE_IND16( amaticmg )
 static SCREEN_UPDATE_IND16( amaticmg2 )
 {
 	amaticmg_state *state = screen.machine().driver_data<amaticmg_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int y,x;
 	int count = 16;
 

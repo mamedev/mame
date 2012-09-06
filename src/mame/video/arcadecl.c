@@ -67,7 +67,7 @@ VIDEO_START( arcadecl )
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -12);
 	atarimo_set_yscroll(0, 0x110);
-	state->m_has_mo = (machine.gfx[0]->total_elements > 10);
+	state->m_has_mo = (machine.gfx[0]->elements() > 10);
 }
 
 

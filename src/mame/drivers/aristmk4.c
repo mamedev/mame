@@ -324,9 +324,9 @@ static const UINT8 cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0
 static VIDEO_START(aristmk4)
 {
 	int tile;
-	for (tile = 0; tile < machine.gfx[0]->total_elements; tile++)
+	for (tile = 0; tile < machine.gfx[0]->elements(); tile++)
 	{
-		gfx_element_decode(machine.gfx[0], tile);
+		machine.gfx[0]->decode(tile);
 	}
 }
 
@@ -368,7 +368,7 @@ INLINE void uBackgroundColour(running_machine &machine)
 static SCREEN_UPDATE_IND16(aristmk4)
 {
 	aristmk4_state *state = screen.machine().driver_data<aristmk4_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	int x,y;
 	int count = 0;
 	int color;
@@ -385,7 +385,7 @@ static SCREEN_UPDATE_IND16(aristmk4)
 			tile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0x3ff;
 			bgtile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
 			uBackgroundColour(screen.machine());	// read sw7
-			gfx_element_decode(gfx, bgtile);	// force the machine to update only the first 256 tiles.
+			gfx->decode(bgtile);	// force the machine to update only the first 256 tiles.
 								// as we only update the background, not the entire display.
 			flipx = ((state->m_mkiv_vram[count]) & 0x04);
 			flipy = ((state->m_mkiv_vram[count]) & 0x08);

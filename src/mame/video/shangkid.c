@@ -62,7 +62,7 @@ WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)
 static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
-	const gfx_element *gfx;
+	gfx_element *gfx;
 	int transparent_pen;
 	int bank_index;
 	int c,r;

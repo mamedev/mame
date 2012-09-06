@@ -494,8 +494,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 0; i < 0x20; i++)
 	{
-		gfx_element gfx(machine);
-
 		if (!(state->m_videoregs[0x02 / 2] & 0x8000))
 		{
 			src = state->m_spriteram + (sprites - 1) * (8 / 2);
@@ -569,7 +567,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, base_gfx8 + gfxstart, width, height, width, 0, 256, 0);
+				gfx_element gfx(machine, base_gfx8 + gfxstart, width, height, width, 0, 256);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect, &gfx,
 								0,
@@ -585,7 +583,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element_build_temporary(&gfx, machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16, 0);
+				gfx_element gfx(machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect, &gfx,
 								0,

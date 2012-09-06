@@ -261,7 +261,7 @@ WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 			old_word = m_shaperam[offset];
 			COMBINE_DATA( &m_shaperam[offset] );
 			if( m_shaperam[offset]!=old_word )
-				gfx_element_mark_dirty(machine().gfx[2], offset/4);
+				machine().gfx[2]->mark_dirty(offset/4);
 		}
 	}
 	else if( type == 0x02 )
@@ -270,8 +270,8 @@ WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 		COMBINE_DATA( &m_cgram[offset] );
 		if( m_cgram[offset]!=old_word )
 		{
-			gfx_element_mark_dirty(machine().gfx[0], offset/0x20);
-			gfx_element_mark_dirty(machine().gfx[1], offset/0x20);
+			machine().gfx[0]->mark_dirty(offset/0x20);
+			machine().gfx[1]->mark_dirty(offset/0x20);
 		}
 	}
 } /* namcona1_gfxram_w */
@@ -298,9 +298,9 @@ VIDEO_START( namcona1 )
 	state->m_shaperam		     = auto_alloc_array(machine, UINT16, 0x2000*4/2 );
 	state->m_cgram			     = auto_alloc_array(machine, UINT16, 0x1000*0x40/2 );
 
-	machine.gfx[0] = gfx_element_alloc( machine, &cg_layout_8bpp, (UINT8 *)state->m_cgram, machine.total_colors()/256, 0 );
-	machine.gfx[1] = gfx_element_alloc( machine, &cg_layout_4bpp, (UINT8 *)state->m_cgram, machine.total_colors()/16, 0 );
-	machine.gfx[2] = gfx_element_alloc( machine, &shape_layout, (UINT8 *)state->m_shaperam, machine.total_colors()/2, 0 );
+	machine.gfx[0] = auto_alloc( machine, gfx_element( machine, cg_layout_8bpp, (UINT8 *)state->m_cgram, machine.total_colors()/256, 0 ));
+	machine.gfx[1] = auto_alloc( machine, gfx_element( machine, cg_layout_4bpp, (UINT8 *)state->m_cgram, machine.total_colors()/16, 0 ));
+	machine.gfx[2] = auto_alloc( machine, gfx_element( machine, shape_layout, (UINT8 *)state->m_shaperam, machine.total_colors()/2, 0 ));
 
 } /* namcona1_vh_start */
 
@@ -318,21 +318,21 @@ static void pdraw_tile(running_machine &machine,
 		int bOpaque,
 		int gfx_region )
 {
-	const gfx_element *gfx = machine.gfx[gfx_region];
-	const gfx_element *mask = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[gfx_region];
+	gfx_element *mask = machine.gfx[2];
 
-	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-	const UINT8 *source_base = gfx_element_get_data(gfx, (code % gfx->total_elements));
-	const UINT8 *mask_base = gfx_element_get_data(mask, (code % mask->total_elements));
+	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const UINT8 *source_base = gfx->get_data((code % gfx->elements()));
+	const UINT8 *mask_base = mask->get_data((code % mask->elements()));
 
-	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
-	int sprite_screen_width  = ((1<<16)*gfx->width+0x8000)>>16;
+	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
+	int sprite_screen_width  = ((1<<16)*gfx->width()+0x8000)>>16;
 
 	if (sprite_screen_width && sprite_screen_height)
 	{
 		/* compute sprite increment per screen pixel */
-		int dx = (gfx->width<<16)/sprite_screen_width;
-		int dy = (gfx->height<<16)/sprite_screen_height;
+		int dx = (gfx->width()<<16)/sprite_screen_width;
+		int dy = (gfx->height()<<16)/sprite_screen_height;
 
 		int ex = sx+sprite_screen_width;
 		int ey = sy+sprite_screen_height;
@@ -390,8 +390,8 @@ static void pdraw_tile(running_machine &machine,
 
 			for( y=sy; y<ey; y++ )
 			{
-				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
+				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
+				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->rowbytes();
 				UINT16 *dest = &dest_bmp.pix16(y);
 				UINT8 *pri = &machine.priority_bitmap.pix8(y);
 
@@ -566,7 +566,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	gfx_element *pGfx;
 
 	pGfx = machine.gfx[0];
-	paldata = &machine.pens[pGfx->color_base + pGfx->color_granularity * state->m_tilemap_palette_bank[which]];
+	paldata = &machine.pens[pGfx->colorbase() + pGfx->granularity() * state->m_tilemap_palette_bank[which]];
 
 	/* draw one scanline at a time */
 	clip.min_x = cliprect.min_x;

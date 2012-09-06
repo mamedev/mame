@@ -85,7 +85,7 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 }
 
 template<class _BitmapClass>
-void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
@@ -98,25 +98,25 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,const
 	/* Start drawing */
 	if (gfx)
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
-		const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const UINT8 *alpha = &jal_blend_table[gfx->granularity() * (color % gfx->colors())];
+		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 		int x_index_base, y_index, sx, sy, ex, ey;
 		int xinc, yinc;
 
 		xinc = flipx ? -1 : 1;
 		yinc = flipy ? -1 : 1;
 
-		x_index_base = flipx ? gfx->width-1 : 0;
-		y_index = flipy ? gfx->height-1 : 0;
+		x_index_base = flipx ? gfx->width()-1 : 0;
+		y_index = flipy ? gfx->height()-1 : 0;
 
 		/* start coordinates */
 		sx = offsx;
 		sy = offsy;
 
 		/* end coordinates */
-		ex = sx + gfx->width;
-		ey = sy + gfx->height;
+		ex = sx + gfx->width();
+		ey = sy + gfx->height();
 
 		if (sx < clip.min_x)
 		{ /* clip left */
@@ -147,7 +147,7 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,const
 			/* taken from case 7: TRANSPARENCY_ALPHARANGE */
 			for (y = sy; y < ey; y++)
 			{
-				const UINT8 *source = source_base + y_index*gfx->line_modulo;
+				const UINT8 *source = source_base + y_index*gfx->rowbytes();
 				typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
@@ -174,11 +174,11 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,const
 	}
 }
 
-void jal_blend_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void jal_blend_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 { jal_blend_drawgfx_common(dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
-void jal_blend_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+void jal_blend_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 { jal_blend_drawgfx_common(dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }

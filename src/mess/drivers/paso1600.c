@@ -170,7 +170,7 @@ READ8_MEMBER( paso1600_state::paso1600_pcg_r )
 WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
 {
 	m_p_pcg[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
+	machine().gfx[0]->mark_dirty(offset >> 3);
 }
 
 WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )

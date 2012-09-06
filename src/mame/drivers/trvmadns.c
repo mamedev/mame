@@ -161,7 +161,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
 {
 	m_gfxram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[0], offset/16);
+	machine().gfx[0]->mark_dirty(offset/16);
 }
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
@@ -287,14 +287,14 @@ static VIDEO_START( trvmadns )
 
 //  fg_tilemap->set_transparent_pen(1);
 
-	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
+	machine.gfx[0]->set_source(state->m_gfxram);
 }
 
 static SCREEN_UPDATE_IND16( trvmadns )
 {
 	trvmadns_state *state = screen.machine().driver_data<trvmadns_state>();
 	int x,y,count;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	bitmap.fill(0xd, cliprect);
 

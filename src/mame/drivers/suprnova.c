@@ -669,8 +669,8 @@ WRITE32_MEMBER(skns_state::skns_v3t_w)
 
 	COMBINE_DATA(&m_v3t_ram[offset]);
 
-	gfx_element_mark_dirty(machine().gfx[1], offset/0x40);
-	gfx_element_mark_dirty(machine().gfx[3], offset/0x20);
+	machine().gfx[1]->mark_dirty(offset/0x40);
+	machine().gfx[3]->mark_dirty(offset/0x20);
 
 	data = m_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?

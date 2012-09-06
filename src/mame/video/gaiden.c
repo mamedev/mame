@@ -361,7 +361,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_
 	};
 
 	gaiden_state *state = machine.driver_data<gaiden_state>();
-	const gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = machine.gfx[3];
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + state->m_spriteram;
 	int count = NUM_SPRITES;
 
@@ -435,7 +435,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_
 
 						pdrawgfx_transpen_raw(bitmap_sp, cliprect, gfx,
 							number + layout[row][col],
-							gfx->color_base + color * gfx->color_granularity,
+							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
 							sx, sy,
 							machine.priority_bitmap, priority_mask, 0);
@@ -455,7 +455,7 @@ static void gaiden_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_
 
 						pdrawgfx_transpen_raw(bitmap, cliprect, gfx,
 							number + layout[row][col],
-							gfx->color_base + color * gfx->color_granularity,
+							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
 							sx, sy,
 							machine.priority_bitmap, priority_mask, 0);
@@ -483,7 +483,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_b
 	};
 
 	gaiden_state *state = machine.driver_data<gaiden_state>();
-	const gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = machine.gfx[3];
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + state->m_spriteram;
 	int count = NUM_SPRITES;
 
@@ -556,7 +556,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_b
 
 						pdrawgfx_transpen_raw(bitmap_sp, cliprect, gfx,
 							number + layout[row][col],
-							gfx->color_base + color * gfx->color_granularity,
+							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
 							sx, sy,
 							machine.priority_bitmap, priority_mask, 0);
@@ -576,7 +576,7 @@ static void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_b
 
 						pdrawgfx_transpen_raw(bitmap, cliprect, gfx,
 							number + layout[row][col],
-							gfx->color_base + color * gfx->color_granularity,
+							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
 							sx, sy,
 							machine.priority_bitmap, priority_mask, 0);
@@ -635,14 +635,14 @@ static void drgnbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 		pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[3],
 				code,
-				machine.gfx[3]->color_base + color * machine.gfx[3]->color_granularity,
+				machine.gfx[3]->colorbase() + color * machine.gfx[3]->granularity(),
 				flipx,flipy,x,y,
 				machine.priority_bitmap, priority_mask,15);
 
 		/* wrap x*/
 		pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[3],
 				code,
-				machine.gfx[3]->color_base + color * machine.gfx[3]->color_granularity,
+				machine.gfx[3]->colorbase() + color * machine.gfx[3]->granularity(),
 				flipx,flipy,x-512,y,
 				machine.priority_bitmap, priority_mask,15);
 

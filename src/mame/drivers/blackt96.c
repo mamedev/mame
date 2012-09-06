@@ -179,8 +179,8 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 {
 	blackt96_state *state = machine.driver_data<blackt96_state>();
 	/* the very first 'page' in the spriteram contains the x/y positions for each tile strip */
-	const gfx_element *gfxbg = machine.gfx[0];
-	const gfx_element *gfxspr = machine.gfx[1];
+	gfx_element *gfxbg = machine.gfx[0];
+	gfx_element *gfxspr = machine.gfx[1];
 
 	int base = column * (0x80/2);
 	base += page * 2;
@@ -225,7 +225,7 @@ static SCREEN_UPDATE_IND16( blackt96 )
 	blackt96_state *state = screen.machine().driver_data<blackt96_state>();
 	int count;
 	int x,y;
-	const gfx_element *gfx = screen.machine().gfx[2];
+	gfx_element *gfx = screen.machine().gfx[2];
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 

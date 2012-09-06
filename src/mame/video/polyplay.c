@@ -33,7 +33,7 @@ WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
 {
 	if (m_characterram[offset] != data)
 	{
-		gfx_element_mark_dirty(machine().gfx[1], (offset >> 3) & 0x7f);
+		machine().gfx[1]->mark_dirty((offset >> 3) & 0x7f);
 
 		m_characterram[offset] = data;
 	}
@@ -42,7 +42,7 @@ WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
 VIDEO_START( polyplay )
 {
 	polyplay_state *state = machine.driver_data<polyplay_state>();
-	gfx_element_set_source(machine.gfx[1], state->m_characterram);
+	machine.gfx[1]->set_source(state->m_characterram);
 }
 
 

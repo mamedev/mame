@@ -28,7 +28,7 @@ PALETTE_INIT( xevious )
 {
 	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine.gfx[gfxn]->total_colors * machine.gfx[gfxn]->color_granularity)
+	#define TOTAL_COLORS(gfxn) (machine.gfx[gfxn]->colors() * machine.gfx[gfxn]->granularity())
 
 	machine.colortable = colortable_alloc(machine, 128+1);
 
@@ -69,7 +69,7 @@ PALETTE_INIT( xevious )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
@@ -81,7 +81,7 @@ PALETTE_INIT( xevious )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine.colortable, machine.gfx[2]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[2]->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -91,7 +91,7 @@ PALETTE_INIT( xevious )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -142,7 +142,7 @@ PALETTE_INIT( battles )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
 
 		color_prom++;
@@ -154,7 +154,7 @@ PALETTE_INIT( battles )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine.colortable, machine.gfx[2]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[2]->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -163,7 +163,7 @@ PALETTE_INIT( battles )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i,
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }

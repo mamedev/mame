@@ -2443,7 +2443,7 @@ INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
 }
 
 static void stv_vdp2_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,int scalex, int scaley,
 		int sprite_screen_width, int sprite_screen_height, int alpha)
@@ -2452,16 +2452,16 @@ static void stv_vdp2_drawgfxzoom(
 
 	if (!scalex || !scaley) return;
 
-	if (gfx->pen_usage && transparency == STV_TRANSPARENCY_PEN)
+	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
 	{
 		int transmask = 0;
 
 		transmask = 1 << (transparent_color & 0xff);
 
-		if ((gfx->pen_usage[code] & ~transmask) == 0)
+		if ((gfx->pen_usage(code) & ~transmask) == 0)
 			/* character is totally transparent, no need to draw */
 			return;
-		else if ((gfx->pen_usage[code] & transmask) == 0)
+		else if ((gfx->pen_usage(code) & transmask) == 0)
 			/* character is totally opaque, can disable transparency */
 			transparency = STV_TRANSPARENCY_NONE;
 	}
@@ -2480,17 +2480,17 @@ static void stv_vdp2_drawgfxzoom(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
-		//int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
-		//int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
+		//int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
+		//int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
 
 		if (sprite_screen_width && sprite_screen_height)
 		{
 			/* compute sprite increment per screen pixel */
-			//int dx = (gfx->width<<16)/sprite_screen_width;
-			//int dy = (gfx->height<<16)/sprite_screen_height;
+			//int dx = (gfx->width()<<16)/sprite_screen_width;
+			//int dy = (gfx->height()<<16)/sprite_screen_height;
 			int dx = stv2_current_tilemap.incx;
 			int dy = stv2_current_tilemap.incy;
 
@@ -2553,7 +2553,7 @@ static void stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 						UINT32 *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -2572,7 +2572,7 @@ static void stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 						UINT32 *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -2592,7 +2592,7 @@ static void stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 						UINT32 *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -2612,7 +2612,7 @@ static void stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 						UINT32 *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -5373,16 +5373,16 @@ WRITE32_HANDLER ( saturn_vdp2_vram_w )
 	gfxdata[offset*4+2] = (data & 0x0000ff00) >> 8;
 	gfxdata[offset*4+3] = (data & 0x000000ff) >> 0;
 
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
-	gfx_element_mark_dirty(space->machine().gfx[1], offset/8);
-	gfx_element_mark_dirty(space->machine().gfx[2], offset/8);
-	gfx_element_mark_dirty(space->machine().gfx[3], offset/8);
+	space->machine().gfx[0]->mark_dirty(offset/8);
+	space->machine().gfx[1]->mark_dirty(offset/8);
+	space->machine().gfx[2]->mark_dirty(offset/8);
+	space->machine().gfx[3]->mark_dirty(offset/8);
 
 	/* 8-bit tiles overlap, so this affects the previous one as well */
 	if (offset/8 != 0)
 	{
-		gfx_element_mark_dirty(space->machine().gfx[2], offset/8 - 1);
-		gfx_element_mark_dirty(space->machine().gfx[3], offset/8 - 1);
+		space->machine().gfx[2]->mark_dirty(offset/8 - 1);
+		space->machine().gfx[3]->mark_dirty(offset/8 - 1);
 	}
 
 	if ( stv_rbg_cache_data.watch_vdp2_vram_writes )
@@ -5761,16 +5761,16 @@ static void stv_vdp2_state_save_postload(running_machine &machine)
 		gfxdata[offset*4+2] = (data & 0x0000ff00) >> 8;
 		gfxdata[offset*4+3] = (data & 0x000000ff) >> 0;
 
-		gfx_element_mark_dirty(machine.gfx[0], offset/8);
-		gfx_element_mark_dirty(machine.gfx[1], offset/8);
-		gfx_element_mark_dirty(machine.gfx[2], offset/8);
-		gfx_element_mark_dirty(machine.gfx[3], offset/8);
+		machine.gfx[0]->mark_dirty(offset/8);
+		machine.gfx[1]->mark_dirty(offset/8);
+		machine.gfx[2]->mark_dirty(offset/8);
+		machine.gfx[3]->mark_dirty(offset/8);
 
 		/* 8-bit tiles overlap, so this affects the previous one as well */
 		if (offset/8 != 0)
 		{
-			gfx_element_mark_dirty(machine.gfx[2], offset/8 - 1);
-			gfx_element_mark_dirty(machine.gfx[3], offset/8 - 1);
+			machine.gfx[2]->mark_dirty(offset/8 - 1);
+			machine.gfx[3]->mark_dirty(offset/8 - 1);
 		}
 
 	}
@@ -5799,8 +5799,8 @@ static int stv_vdp2_start (running_machine &machine)
 	state->m_vdp2_cram = auto_alloc_array_clear(machine, UINT32, 0x080000/4 );
 	state->m_vdp2.gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
 
-//  machine.gfx[0]->color_granularity=4;
-//  machine.gfx[1]->color_granularity=4;
+//  machine.gfx[0]->granularity()=4;
+//  machine.gfx[1]->granularity()=4;
 
 	memset( &stv_rbg_cache_data, 0, sizeof(stv_rbg_cache_data));
 	stv_rbg_cache_data.is_cache_dirty = 3;
@@ -5824,14 +5824,14 @@ VIDEO_START( stv_vdp2 )
 	debug.l_en = 0xff;
 	debug.error = 0xffffffff;
 	debug.roz = 0;
-	gfx_element_set_source(machine.gfx[0], state->m_vdp2.gfx_decode);
-	gfx_element_set_source(machine.gfx[1], state->m_vdp2.gfx_decode);
-	gfx_element_set_source(machine.gfx[2], state->m_vdp2.gfx_decode);
-	gfx_element_set_source(machine.gfx[3], state->m_vdp2.gfx_decode);
-	gfx_element_set_source(machine.gfx[4], state->m_vdp1.gfx_decode);
-	gfx_element_set_source(machine.gfx[5], state->m_vdp1.gfx_decode);
-	gfx_element_set_source(machine.gfx[6], state->m_vdp1.gfx_decode);
-	gfx_element_set_source(machine.gfx[7], state->m_vdp1.gfx_decode);
+	machine.gfx[0]->set_source(state->m_vdp2.gfx_decode);
+	machine.gfx[1]->set_source(state->m_vdp2.gfx_decode);
+	machine.gfx[2]->set_source(state->m_vdp2.gfx_decode);
+	machine.gfx[3]->set_source(state->m_vdp2.gfx_decode);
+	machine.gfx[4]->set_source(state->m_vdp1.gfx_decode);
+	machine.gfx[5]->set_source(state->m_vdp1.gfx_decode);
+	machine.gfx[6]->set_source(state->m_vdp1.gfx_decode);
+	machine.gfx[7]->set_source(state->m_vdp1.gfx_decode);
 }
 
 void stv_vdp2_dynamic_res_change(running_machine &machine)
@@ -6711,41 +6711,41 @@ SCREEN_UPDATE_RGB32( stv_vdp2 )
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[0], tilecode);
+			screen.machine().gfx[0]->mark_dirty(tilecode);
 		}
 
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[1], tilecode);
+			screen.machine().gfx[1]->mark_dirty(tilecode);
 		}
 
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[2], tilecode);
+			screen.machine().gfx[2]->mark_dirty(tilecode);
 		}
 
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[3], tilecode);
+			screen.machine().gfx[3]->mark_dirty(tilecode);
 		}
 
 		/* vdp 1 ... doesn't have to be tile based */
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[4], tilecode);
+			screen.machine().gfx[4]->mark_dirty(tilecode);
 		}
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[5], tilecode);
+			screen.machine().gfx[5]->mark_dirty(tilecode);
 		}
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[6], tilecode);
+			screen.machine().gfx[6]->mark_dirty(tilecode);
 		}
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			gfx_element_mark_dirty(screen.machine().gfx[7], tilecode);
+			screen.machine().gfx[7]->mark_dirty(tilecode);
 		}
 	}
 

@@ -162,8 +162,8 @@ static VIDEO_START(srmp6)
 	state->m_sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)state->m_tileram, machine.total_colors() / 256, 0);
-	machine.gfx[0]->color_granularity=256;
+	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, tiles8x8_layout, (UINT8*)state->m_tileram, machine.total_colors() / 256, 0));
+	machine.gfx[0]->set_granularity(256);
 
 	state->m_brightness = 0x60;
 }
@@ -391,7 +391,7 @@ static UINT32 process(running_machine &machine,UINT8 b,UINT32 dst_offset)
 		for(i=0;i<rle;++i)
 		{
 			tram[dst_offset + state->m_destl] = state->m_lastb;
-			gfx_element_mark_dirty(machine.gfx[0], (dst_offset + state->m_destl)/0x40);
+			machine.gfx[0]->mark_dirty((dst_offset + state->m_destl)/0x40);
 
 			dst_offset++;
 			++l;
@@ -405,7 +405,7 @@ static UINT32 process(running_machine &machine,UINT8 b,UINT32 dst_offset)
 		state->m_lastb2 = state->m_lastb;
 		state->m_lastb = b;
 		tram[dst_offset + state->m_destl] = b;
-		gfx_element_mark_dirty(machine.gfx[0], (dst_offset + state->m_destl)/0x40);
+		machine.gfx[0]->mark_dirty((dst_offset + state->m_destl)/0x40);
 
 		return 1;
 	}

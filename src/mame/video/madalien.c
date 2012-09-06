@@ -153,7 +153,7 @@ static VIDEO_START( madalien )
 
 	state->m_headlight_bitmap = auto_bitmap_ind16_alloc(machine, 128, 128);
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 
 	drawgfx_opaque(*state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 0, 0x00, 0x00);
 	drawgfx_opaque(*state->m_headlight_bitmap, state->m_headlight_bitmap->cliprect(), machine.gfx[2], 0, 0, 0, 1, 0x00, 0x40);
@@ -246,7 +246,7 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 WRITE8_MEMBER(madalien_state::madalien_charram_w)
 {
 	m_charram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[0], (offset/8) & 0xff);
+	machine().gfx[0]->mark_dirty((offset/8) & 0xff);
 }
 
 

@@ -63,8 +63,8 @@ static void draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, int x1, 
 static void draw_sprite_collision( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	circus_state *state = machine.driver_data<circus_state>();
-	const gfx_element *sprite_gfx = machine.gfx[1];
-	const UINT8 *sprite_data = gfx_element_get_data(sprite_gfx, state->m_clown_z);
+	gfx_element *sprite_gfx = machine.gfx[1];
+	const UINT8 *sprite_data = sprite_gfx->get_data(state->m_clown_z);
 	int sx, sy, dx, dy;
 	int pixel, collision = 0;
 
@@ -79,7 +79,7 @@ static void draw_sprite_collision( running_machine &machine, bitmap_ind16 &bitma
 				dx = state->m_clown_y + sx;
 				if (dx>=0 && dx<bitmap.width())
 				{
-					pixel = sprite_data[sy * sprite_gfx->line_modulo + sx];
+					pixel = sprite_data[sy * sprite_gfx->rowbytes() + sx];
 					if (pixel)
 					{
 						collision |= bitmap.pix16(dy, dx);

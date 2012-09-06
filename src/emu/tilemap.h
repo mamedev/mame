@@ -408,19 +408,19 @@ struct tile_data
 
 	void set(running_machine &machine, int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
-		const gfx_element *gfx = machine.gfx[_gfxnum];
-		int code = rawcode % gfx->total_elements;
-		pen_data = gfx_element_get_data(gfx, code);
-		palette_base = gfx->color_base + gfx->color_granularity * rawcolor;
+		gfx_element *gfx = machine.gfx[_gfxnum];
+		int code = rawcode % gfx->elements();
+		pen_data = gfx->get_data(code);
+		palette_base = gfx->colorbase() + gfx->granularity() * rawcolor;
 		flags = _flags;
 		gfxnum = _gfxnum;
 	}
 
-	void set(running_machine &machine, const gfx_element &gfx, int rawcode, int rawcolor, int _flags)
+	void set(running_machine &machine, gfx_element &gfx, int rawcode, int rawcolor, int _flags)
 	{
-		int code = rawcode % gfx.total_elements;
-		pen_data = gfx_element_get_data(&gfx, code);
-		palette_base = gfx.color_base + gfx.color_granularity * rawcolor;
+		int code = rawcode % gfx.elements();
+		pen_data = gfx.get_data(code);
+		palette_base = gfx.colorbase() + gfx.granularity() * rawcolor;
 		flags = _flags;
 	}
 };

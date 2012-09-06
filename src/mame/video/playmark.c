@@ -390,8 +390,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	int offs, start_offset = state->m_spriteram.bytes() / 2 - 4;
-	int height = machine.gfx[0]->height;
-	int colordiv = machine.gfx[0]->color_granularity / 16;
+	int height = machine.gfx[0]->height();
+	int colordiv = machine.gfx[0]->granularity() / 16;
 	UINT16 *spriteram = state->m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
@@ -434,7 +434,7 @@ static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 	int offs, start_offset = state->m_spriteram.bytes() / 2 - 4;
-	int height = machine.gfx[0]->height;
+	int height = machine.gfx[0]->height();
 	UINT16 *spriteram = state->m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order

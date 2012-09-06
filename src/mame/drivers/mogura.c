@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_mogura_tile_info )
 static VIDEO_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
+	machine.gfx[0]->set_source(state->m_gfxram);
 	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 {
 	m_gfxram[offset] = data ;
 
-	gfx_element_mark_dirty(machine().gfx[0], offset / 16);
+	machine().gfx[0]->mark_dirty(offset / 16);
 }
 
 

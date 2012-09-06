@@ -25,14 +25,6 @@ bitmap_ind8 drawgfx_dummy_priority_bitmap;
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
-
-
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
@@ -208,251 +200,250 @@ void gfx_init(running_machine &machine)
 		glcopy.total = total;
 
 		// allocate the graphics
-		machine.gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
+		machine.gfx[curgfx] = auto_alloc(machine, gfx_element(machine, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start));
 	}
 }
 
 
 
-/*-------------------------------------------------
-    gfx_element_alloc - allocate a gfx_element structure
-    based on a given layout
--------------------------------------------------*/
+//-------------------------------------------------
+//  gfx_element - constructor
+//-------------------------------------------------
 
-gfx_element *gfx_element_alloc(running_machine &machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
+gfx_element::gfx_element(running_machine &machine)
+	: m_width(0),
+	  m_height(0),
+	  m_startx(0),
+	  m_starty(0),
+	  m_origwidth(0),
+	  m_origheight(0),
+	  m_total_elements(0),
+	  m_color_base(0),
+	  m_color_depth(0),
+	  m_color_granularity(0),
+	  m_total_colors(0),
+	  m_line_modulo(0),
+	  m_char_modulo(0),
+	  m_srcdata(NULL),
+	  m_dirtyseq(1),
+	  m_gfxdata(NULL),
+	  m_layout_is_raw(false),
+	  m_layout_planes(0),
+	  m_layout_charincrement(0),
+	  m_machine(machine)
 {
-	int israw = (gl->planeoffset[0] == GFX_RAW);
-	int planes = gl->planes;
-	UINT16 width = gl->width;
-	UINT16 height = gl->height;
-	UINT32 total = gl->total;
-	gfx_element *gfx;
+}
 
-	// allocate memory for the gfx_element structure
-	gfx = auto_alloc_clear(machine, gfx_element(machine));
+gfx_element::gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity)
+	: m_width(width),
+	  m_height(height),
+	  m_startx(0),
+	  m_starty(0),
+	  m_origwidth(width),
+	  m_origheight(height),
+	  m_total_elements(1),
+	  m_color_base(color_base),
+	  m_color_depth(color_granularity),
+	  m_color_granularity(color_granularity),
+	  m_total_colors((machine.total_colors() - color_base) / color_granularity),
+	  m_line_modulo(rowbytes),
+	  m_char_modulo(0),
+	  m_srcdata(base),
+	  m_dirtyseq(1),
+	  m_gfxdata(NULL),
+	  m_layout_is_raw(false),
+	  m_layout_planes(0),
+	  m_layout_charincrement(0),
+	  m_machine(machine)
+{
+}
 
-	// fill in the data
-	gfx->width = width;
-	gfx->height = height;
+gfx_element::gfx_element(running_machine &machine, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
+	: m_width(0),
+	  m_height(0),
+	  m_startx(0),
+	  m_starty(0),
+	  m_origwidth(0),
+	  m_origheight(0),
+	  m_total_elements(0),
+	  m_color_base(color_base),
+	  m_color_depth(0),
+	  m_color_granularity(0),
+	  m_total_colors(total_colors),
+	  m_line_modulo(0),
+	  m_char_modulo(0),
+	  m_srcdata(NULL),
+	  m_dirtyseq(1),
+	  m_gfxdata(NULL),
+	  m_layout_is_raw(false),
+	  m_layout_planes(0),
+	  m_layout_charincrement(0),
+	  m_machine(machine)
+{
+	// set the layout
+	set_layout(gl, srcdata);
+}
 
-	gfx->origwidth = width;
-	gfx->origheight = height;
-	gfx->total_elements = total;
 
-	gfx->color_base = color_base;
-	gfx->color_depth = 1 << planes;
-	gfx->color_granularity = 1 << planes;
-	gfx->total_colors = total_colors;
+//-------------------------------------------------
+//  set_layout - set the layout for a gfx_element
+//-------------------------------------------------
 
-	gfx->srcdata = srcdata;
+void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
+{
+	// configure ourselves
+	m_width = m_origwidth = gl.width;
+	m_height = m_origheight = gl.height;
+	m_startx = m_starty = 0;
+	m_total_elements = gl.total;
+	m_color_depth = m_color_granularity = 1 << gl.planes;
 
-	// copy the layout
-	gfx->layout = *gl;
-	if (gfx->layout.extxoffs != NULL)
-	{
-		if (gfx->layout.width < ARRAY_LENGTH(gfx->layout.xoffset))
-		{
-			memcpy(gfx->layout.xoffset, gfx->layout.extxoffs, sizeof(gfx->layout.xoffset[0]) * gfx->layout.width);
-			gfx->layout.extxoffs = NULL;
-		}
-		else
-		{
-			UINT32 *buffer = auto_alloc_array(machine, UINT32, gfx->layout.width);
-			memcpy(buffer, gfx->layout.extxoffs, sizeof(gfx->layout.extxoffs[0]) * gfx->layout.width);
-			gfx->layout.extxoffs = buffer;
-		}
-	}
-
-	if (gfx->layout.extyoffs != NULL)
-	{
-		if (gfx->layout.height < ARRAY_LENGTH(gfx->layout.yoffset))
-		{
-			memcpy(gfx->layout.yoffset, gfx->layout.extyoffs, sizeof(gfx->layout.yoffset[0]) * gfx->layout.height);
-			gfx->layout.extyoffs = NULL;
-		}
-		else
-		{
-			UINT32 *buffer = auto_alloc_array(machine, UINT32, gfx->layout.height);
-			memcpy(buffer, gfx->layout.extyoffs, sizeof(gfx->layout.extyoffs[0]) * gfx->layout.height);
-			gfx->layout.extyoffs = buffer;
-		}
-	}
-
-	// allocate a pen usage array for entries with 32 pens or less
-	if (gfx->color_depth <= 32)
-		gfx->pen_usage = auto_alloc_array(machine, UINT32, gfx->total_elements);
-
-	// allocate a dirty array
-	gfx->dirty = auto_alloc_array(machine, UINT8, gfx->total_elements);
-	memset(gfx->dirty, 1, gfx->total_elements * sizeof(*gfx->dirty));
+	// copy data from the layout
+	m_layout_is_raw = (gl.planeoffset[0] == GFX_RAW);
+	m_layout_planes = gl.planes;
+	m_layout_charincrement = gl.charincrement;
+	m_layout_planeoffset.resize(m_layout_planes);
+	m_layout_xoffset.resize(m_width);
+	m_layout_yoffset.resize(m_height);
 
 	// raw graphics case
-	if (israw)
+	if (m_layout_is_raw)
 	{
 		// modulos are determined for us by the layout
-		gfx->line_modulo = (gl->extyoffs ? gl->extyoffs[0] : gl->yoffset[0]) / 8;
-		gfx->char_modulo = gl->charincrement / 8;
-
-		// don't free the data because we will get a pointer at decode time
-		gfx->flags |= GFX_ELEMENT_DONT_FREE;
+		m_line_modulo = ((gl.extyoffs != NULL) ? gl.extyoffs[0] : gl.yoffset[0]) / 8;
+		m_char_modulo = gl.charincrement / 8;
 
 		// RAW graphics must have a pointer up front
-		gfx->gfxdata = (UINT8 *)gfx->srcdata;
+		assert(srcdata != NULL);
+		m_gfxdata_allocated.reset();
+		m_gfxdata = const_cast<UINT8 *>(m_srcdata);
 	}
 
 	// decoded graphics case
 	else
 	{
+		// copy offsets
+		for (int p = 0; p < m_layout_planes; p++)
+			m_layout_planeoffset[p] = gl.planeoffset[p];
+		for (int y = 0; y < m_height; y++)
+			m_layout_yoffset[y] = gl.yoffs(y);
+		for (int x = 0; x < m_width; x++)
+			m_layout_xoffset[x] = gl.xoffs(x);
+
 		// we get to pick our own modulos
-		gfx->line_modulo = gfx->origwidth;
-		gfx->char_modulo = gfx->line_modulo * gfx->origheight;
+		m_line_modulo = m_origwidth;
+		m_char_modulo = m_line_modulo * m_origheight;
 
 		// allocate memory for the data
-		gfx->gfxdata = auto_alloc_array(machine, UINT8, gfx->total_elements * gfx->char_modulo);
+		m_gfxdata_allocated.resize(m_total_elements * m_char_modulo);
+		m_gfxdata = &m_gfxdata_allocated[0];
 	}
 
-	return gfx;
+	// mark everything dirty
+	m_dirty.resize(m_total_elements);
+	memset(m_dirty, 1, m_total_elements);
+
+	// allocate a pen usage array for entries with 32 pens or less
+	if (m_color_depth <= 32)
+		m_pen_usage.resize(m_total_elements);
+	else
+		m_pen_usage.reset();
+	
+	// set the source
+	set_source(srcdata);
 }
 
 
-/*-------------------------------------------------
-    gfx_element_decode - update a single code in
-    a gfx_element
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_raw_layout - set the layout for a gfx_element
+//-------------------------------------------------
 
-void gfx_element_decode(const gfx_element *gfx, UINT32 code)
+void gfx_element::set_raw_layout(const UINT8 *srcdata, UINT32 width, UINT32 height, UINT32 total, UINT32 linemod, UINT32 charmod)
 {
-	decodechar(gfx, code, gfx->srcdata);
+	gfx_layout layout = { 0 };
+	layout.width = width;
+	layout.height = height;
+	layout.total = total;
+	layout.planes = 8;
+	layout.planeoffset[0] = GFX_RAW;
+	layout.yoffset[0] = linemod;
+	layout.charincrement = charmod;
+	set_layout(layout, srcdata);
 }
 
 
-/*-------------------------------------------------
-    gfx_element_free - free a gfx_element
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_source_clip - set a source clipping rect
+//-------------------------------------------------
 
-void gfx_element_free(gfx_element *gfx)
+void gfx_element::set_source_clip(UINT32 xoffs, UINT32 width, UINT32 yoffs, UINT32 height)
 {
-	// ignore NULL frees
-	if (gfx == NULL)
-		return;
+	assert(xoffs < m_origwidth);
+	assert(yoffs < m_origheight);
+	assert(xoffs + width <= m_origwidth);
+	assert(yoffs + height <= m_origheight);
 
-	// free our data
-	auto_free(gfx->machine(), gfx->layout.extyoffs);
-	auto_free(gfx->machine(), gfx->layout.extxoffs);
-	auto_free(gfx->machine(), gfx->pen_usage);
-	auto_free(gfx->machine(), gfx->dirty);
-	auto_free(gfx->machine(), gfx->gfxdata);
-	auto_free(gfx->machine(), gfx);
+	m_width = width;
+	m_height = height;
+	m_startx = xoffs;
+	m_starty = yoffs;
 }
 
 
-/*-------------------------------------------------
-    gfx_element_build_temporary - create a
-    temporary one-off gfx_element
--------------------------------------------------*/
+//-------------------------------------------------
+//  decode - decode a single character
+//-------------------------------------------------
 
-void gfx_element_build_temporary(gfx_element *gfx, running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags)
+void gfx_element::decode(UINT32 code)
 {
-	static UINT8 not_dirty = 0;
-
-	gfx->width = width;
-	gfx->height = height;
-	gfx->startx = 0;
-	gfx->starty = 0;
-
-	gfx->origwidth = width;
-	gfx->origheight = height;
-	gfx->flags = flags;
-	gfx->total_elements = 1;
-
-	gfx->color_base = color_base;
-	gfx->color_depth = color_granularity;
-	gfx->color_granularity = color_granularity;
-	gfx->total_colors = (machine.total_colors() - color_base) / color_granularity;
-
-	gfx->pen_usage = NULL;
-
-	gfx->gfxdata = base;
-	gfx->line_modulo = rowbytes;
-	gfx->char_modulo = 0;
-	gfx->srcdata = base;
-	gfx->dirty = &not_dirty;
-	gfx->dirtyseq = 0;
-}
-
-
-/*-------------------------------------------------
-    calc_penusage - calculate the pen usage for
-    a given graphics tile
--------------------------------------------------*/
-
-static void calc_penusage(const gfx_element *gfx, UINT32 code)
-{
-	const UINT8 *dp = gfx->gfxdata + code * gfx->char_modulo;
-	UINT32 usage = 0;
-	int x, y;
-
-	// if nothing allocated, don't do it
-	if (gfx->pen_usage == NULL)
-		return;
-
-	for (y = 0; y < gfx->origheight; y++)
-	{
-		for (x = 0; x < gfx->origwidth; x++)
-			usage |= 1 << dp[x];
-
-		dp += gfx->line_modulo;
-	}
-
-	// store the final result
-	gfx->pen_usage[code] = usage;
-}
-
-
-/*-------------------------------------------------
-    decodechar - decode a single character based
-    on a specified layout
--------------------------------------------------*/
-
-static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
-{
-	const gfx_layout *gl = &gfx->layout;
-	int israw = (gl->planeoffset[0] == GFX_RAW);
-	int planes = gl->planes;
-	UINT32 charincrement = gl->charincrement;
-	const UINT32 *poffset = gl->planeoffset;
-	const UINT32 *xoffset = gl->extxoffs ? gl->extxoffs : gl->xoffset;
-	const UINT32 *yoffset = gl->extyoffs ? gl->extyoffs : gl->yoffset;
-	UINT8 *dp = gfx->gfxdata + code * gfx->char_modulo;
-	int plane, x, y;
-
-	if (!israw)
+	// don't decode GFX_RAW
+	if (!m_layout_is_raw)
 	{
 		// zap the data to 0
-		memset(dp, 0, gfx->char_modulo);
-		for (plane = 0; plane < planes; plane++)
+		UINT8 *decode_base = m_gfxdata + code * m_char_modulo;
+		memset(decode_base, 0, m_char_modulo);
+		
+		// iterate over planes
+		for (int plane = 0; plane < m_layout_planes; plane++)
 		{
-			int planebit = 1 << (planes - 1 - plane);
-			int planeoffs = code * charincrement + poffset[plane];
+			int planebit = 1 << (m_layout_planes - 1 - plane);
+			int planeoffs = code * m_layout_charincrement + m_layout_planeoffset[plane];
 
-			for (y = 0; y < gfx->origheight; y++)
+			// iterate over rows
+			for (int y = 0; y < m_origheight; y++)
 			{
-				int yoffs = planeoffs + yoffset[y];
-
-				dp = gfx->gfxdata + code * gfx->char_modulo + y * gfx->line_modulo;
-				for (x = 0; x < gfx->origwidth; x++)
-					if (readbit(src, yoffs + xoffset[x]))
+				int yoffs = planeoffs + m_layout_yoffset[y];
+				UINT8 *dp = decode_base + y * rowbytes();
+				
+				// iterate over columns
+				for (int x = 0; x < m_origwidth; x++)
+					if (readbit(m_srcdata, yoffs + m_layout_xoffset[x]))
 						dp[x] |= planebit;
 			}
 		}
 	}
 
-	// compute pen usage
-	calc_penusage(gfx, code);
+	// (re)compute pen usage
+	if (code < m_pen_usage.count())
+	{
+		// iterate over data, creating a bitmask of live pens
+		const UINT8 *dp = m_gfxdata + code * m_char_modulo;
+		UINT32 usage = 0;
+		for (int y = 0; y < m_origheight; y++)
+		{
+			for (int x = 0; x < m_origwidth; x++)
+				usage |= 1 << dp[x];
+			dp += m_line_modulo;
+		}
+
+		// store the final result
+		m_pen_usage[code] = usage;
+	}
 
 	// no longer dirty
-	gfx->dirty[code] = 0;
+	m_dirty[code] = 0;
 }
+
 
 
 /***************************************************************************
@@ -464,20 +455,20 @@ static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
     no transparency
 -------------------------------------------------*/
 
-void drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
 {
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 }
 
-void drawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
 {
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 }
@@ -488,7 +479,7 @@ void drawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_ele
     a single transparent pen
 -------------------------------------------------*/
 
-void drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
@@ -497,11 +488,11 @@ void drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_e
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -511,12 +502,12 @@ void drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_e
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
 }
 
-void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
@@ -525,11 +516,11 @@ void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_e
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -539,7 +530,7 @@ void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_e
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
 }
@@ -551,13 +542,13 @@ void drawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_e
     lookups
 -------------------------------------------------*/
 
-void drawgfx_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// render
@@ -565,13 +556,13 @@ void drawgfx_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, const g
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
 }
 
-void drawgfx_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// render
@@ -586,7 +577,7 @@ void drawgfx_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, const g
     a mask
 -------------------------------------------------*/
 
-void drawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transmask)
 {
@@ -595,11 +586,11 @@ void drawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -609,12 +600,12 @@ void drawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
 }
 
-void drawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transmask)
 {
@@ -623,11 +614,11 @@ void drawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -637,7 +628,7 @@ void drawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
 }
@@ -649,28 +640,28 @@ void drawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
     transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void drawgfx_transtable(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transtable(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable, const pen_t *shadowtable)
 {
 	assert(pentable != NULL);
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16, NO_PRIORITY);
 }
 
-void drawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable, const pen_t *shadowtable)
 {
 	assert(pentable != NULL);
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSTABLE32, NO_PRIORITY);
 }
@@ -682,7 +673,7 @@ void drawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
     remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void drawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen, UINT8 alpha)
 {
@@ -691,12 +682,12 @@ void drawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_elem
 		return drawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// get final code and color, and grab lookup tables
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32, NO_PRIORITY);
 }
@@ -712,7 +703,7 @@ void drawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_elem
     element with no transparency
 -------------------------------------------------*/
 
-void drawgfxzoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley)
 {
@@ -721,13 +712,13 @@ void drawgfxzoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gfx
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 }
 
-void drawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley)
 {
@@ -736,8 +727,8 @@ void drawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
 		return drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 }
@@ -748,7 +739,7 @@ void drawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
     element with a single transparent pen
 -------------------------------------------------*/
 
-void drawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -761,11 +752,11 @@ void drawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const g
 		return drawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -775,12 +766,12 @@ void drawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const g
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
 }
 
-void drawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -793,11 +784,11 @@ void drawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const g
 		return drawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -807,7 +798,7 @@ void drawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const g
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
 }
@@ -819,7 +810,7 @@ void drawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const g
     color lookups
 -------------------------------------------------*/
 
-void drawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -828,8 +819,8 @@ void drawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, con
 		return drawgfx_transpen_raw(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// render
@@ -837,7 +828,7 @@ void drawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, con
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
 }
 
-void drawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -846,8 +837,8 @@ void drawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, con
 		return drawgfx_transpen_raw(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// render
@@ -862,7 +853,7 @@ void drawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, con
     provided as a mask
 -------------------------------------------------*/
 
-void drawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transmask)
 {
@@ -875,11 +866,11 @@ void drawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const 
 		return drawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -889,12 +880,12 @@ void drawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const 
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
 }
 
-void drawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transmask)
 {
@@ -907,11 +898,11 @@ void drawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const 
 		return drawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -921,7 +912,7 @@ void drawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const 
 	}
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
 }
@@ -933,7 +924,7 @@ void drawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const 
     are transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void drawgfxzoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -944,13 +935,13 @@ void drawgfxzoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, const
 		return drawgfx_transtable(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, pentable, shadowtable);
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16, NO_PRIORITY);
 }
 
-void drawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -961,8 +952,8 @@ void drawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const
 		return drawgfx_transtable(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, pentable, shadowtable);
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSTABLE32, NO_PRIORITY);
 }
@@ -974,7 +965,7 @@ void drawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const
     the remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void drawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void drawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen, UINT8 alpha)
 {
@@ -987,12 +978,12 @@ void drawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
 		return drawgfxzoom_transpen(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DECLARE_NO_PRIORITY;
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32, NO_PRIORITY);
 }
@@ -1009,7 +1000,7 @@ void drawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask)
 {
@@ -1017,12 +1008,12 @@ void pdrawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_el
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
 }
 
-void pdrawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask)
 {
@@ -1030,8 +1021,8 @@ void pdrawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_el
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
 }
 
@@ -1042,7 +1033,7 @@ void pdrawgfx_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_el
     priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
 {
@@ -1051,11 +1042,11 @@ void pdrawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_
 		return pdrawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -1068,11 +1059,11 @@ void pdrawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
 }
 
-void pdrawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
 {
@@ -1081,11 +1072,11 @@ void pdrawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
 		return pdrawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -1098,7 +1089,7 @@ void pdrawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
 }
 
@@ -1109,13 +1100,13 @@ void pdrawgfx_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_
     lookups, checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
 {
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// high bit of the mask is implicitly on
@@ -1125,13 +1116,13 @@ void pdrawgfx_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, const 
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, UINT8);
 }
 
-void pdrawgfx_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
 {
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// high bit of the mask is implicitly on
@@ -1148,7 +1139,7 @@ void pdrawgfx_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, const 
     a mask, checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transmask)
 {
@@ -1157,11 +1148,11 @@ void pdrawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx
 		return pdrawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -1174,11 +1165,11 @@ void pdrawgfx_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
 }
 
-void pdrawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transmask)
 {
@@ -1187,11 +1178,11 @@ void pdrawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
 		return pdrawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -1204,7 +1195,7 @@ void pdrawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
 }
 
@@ -1216,7 +1207,7 @@ void pdrawgfx_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
     against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transtable(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transtable(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -1226,12 +1217,12 @@ void pdrawgfx_transtable(bitmap_ind16 &dest, const rectangle &cliprect, const gf
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY, UINT8);
 }
 
-void pdrawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -1241,8 +1232,8 @@ void pdrawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gf
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY, UINT8);
 }
 
@@ -1254,7 +1245,7 @@ void pdrawgfx_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gf
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen, UINT8 alpha)
 {
@@ -1263,15 +1254,15 @@ void pdrawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_ele
 		return pdrawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY, UINT8);
 }
 
@@ -1287,7 +1278,7 @@ void pdrawgfx_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_ele
     the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask)
 {
@@ -1299,12 +1290,12 @@ void pdrawgfxzoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, const gf
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
 }
 
-void pdrawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask)
 {
@@ -1316,8 +1307,8 @@ void pdrawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gf
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
 }
 
@@ -1328,7 +1319,7 @@ void pdrawgfxzoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, const gf
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1342,11 +1333,11 @@ void pdrawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const 
 		return pdrawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -1359,11 +1350,11 @@ void pdrawgfxzoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, const 
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
 }
 
-void pdrawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1377,11 +1368,11 @@ void pdrawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const 
 		return pdrawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
 
@@ -1394,7 +1385,7 @@ void pdrawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const 
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
 }
 
@@ -1406,7 +1397,7 @@ void pdrawgfxzoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, const 
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1416,8 +1407,8 @@ void pdrawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, co
 		return pdrawgfx_transpen_raw(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// high bit of the mask is implicitly on
@@ -1427,7 +1418,7 @@ void pdrawgfxzoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, co
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, UINT8);
 }
 
-void pdrawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1437,8 +1428,8 @@ void pdrawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, co
 		return pdrawgfx_transpen_raw(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// high bit of the mask is implicitly on
@@ -1456,7 +1447,7 @@ void pdrawgfxzoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, co
     priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transmask)
@@ -1470,11 +1461,11 @@ void pdrawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const
 		return pdrawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -1487,11 +1478,11 @@ void pdrawgfxzoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, const
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
 }
 
-void pdrawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transmask)
@@ -1505,11 +1496,11 @@ void pdrawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const
 		return pdrawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		UINT32 usage = gfx->pen_usage[code];
+		UINT32 usage = gfx->pen_usage(code);
 		if ((usage & ~transmask) == 0)
 			return;
 
@@ -1522,7 +1513,7 @@ void pdrawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
 }
 
@@ -1534,7 +1525,7 @@ void pdrawgfxzoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, const
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		const UINT8 *pentable, const pen_t *shadowtable)
@@ -1549,12 +1540,12 @@ void pdrawgfxzoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, cons
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY, UINT8);
 }
 
-void pdrawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		const UINT8 *pentable, const pen_t *shadowtable)
@@ -1569,8 +1560,8 @@ void pdrawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, cons
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	code %= gfx->total_elements;
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY, UINT8);
 }
 
@@ -1583,7 +1574,7 @@ void pdrawgfxzoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, cons
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx_element *gfx,
+void pdrawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		UINT32 transpen, UINT8 alpha)
@@ -1597,15 +1588,15 @@ void pdrawgfxzoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, const gfx
 		return pdrawgfxzoom_transpen(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask, transpen);
 
 	// early out if completely transparent
-	code %= gfx->total_elements;
-	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
+	code %= gfx->elements();
+	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << transpen)) == 0)
 		return;
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY, UINT8);
 }
 

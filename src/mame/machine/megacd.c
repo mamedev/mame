@@ -1911,23 +1911,23 @@ _32x32_END
 
 static void segacd_mark_tiles_dirty(running_machine& machine, int offset)
 {
-	gfx_element_mark_dirty(machine.gfx[0], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[1], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[2], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[3], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[4], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[5], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[6], (offset*2)/(SEGACD_BYTES_PER_TILE16));
-	gfx_element_mark_dirty(machine.gfx[7], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[0]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[1]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[2]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[3]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[4]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[5]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[6]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	machine.gfx[7]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
 
-	gfx_element_mark_dirty(machine.gfx[8], (offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[9], (offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[10],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[11],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[12],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[13],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[14],(offset*2)/(SEGACD_BYTES_PER_TILE32));
-	gfx_element_mark_dirty(machine.gfx[15],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[8]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[9]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[10]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[11]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[12]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[13]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[14]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	machine.gfx[15]->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
 }
 
 
@@ -2072,12 +2072,12 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, in
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine.gfx[tile_region];
-	tileno %= gfx->total_elements;
+	gfx_element *gfx = machine.gfx[tile_region];
+	tileno %= gfx->elements();
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	const UINT8* srcdata = gfx->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -2111,12 +2111,12 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, in
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine.gfx[tile_region];
-	tileno %= gfx->total_elements;
+	gfx_element *gfx = machine.gfx[tile_region];
+	tileno %= gfx->elements();
 
 	if (tileno==0) return 0x00; // does this apply in this mode?
 
-	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	const UINT8* srcdata = gfx->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -2150,12 +2150,12 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, 
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine.gfx[tile_region];
-	tileno %= gfx->total_elements;
+	gfx_element *gfx = machine.gfx[tile_region];
+	tileno %= gfx->elements();
 
 	if (tileno==0) return 0x00; // does this apply in this mode
 
-	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	const UINT8* srcdata = gfx->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -2189,12 +2189,12 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, 
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
 
-	const gfx_element *gfx = machine.gfx[tile_region];
-	tileno %= gfx->total_elements;
+	gfx_element *gfx = machine.gfx[tile_region];
+	tileno %= gfx->elements();
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	const UINT8* srcdata = gfx->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -2286,23 +2286,23 @@ void segacd_init_main_cpu( running_machine& machine )
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = gfx_element_alloc(machine, &sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[1] = gfx_element_alloc(machine, &sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[2] = gfx_element_alloc(machine, &sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[3] = gfx_element_alloc(machine, &sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[4] = gfx_element_alloc(machine, &sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[5] = gfx_element_alloc(machine, &sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[6] = gfx_element_alloc(machine, &sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[7] = gfx_element_alloc(machine, &sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[1] = auto_alloc(machine, gfx_element(machine, sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[2] = auto_alloc(machine, gfx_element(machine, sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[3] = auto_alloc(machine, gfx_element(machine, sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[4] = auto_alloc(machine, gfx_element(machine, sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[5] = auto_alloc(machine, gfx_element(machine, sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[6] = auto_alloc(machine, gfx_element(machine, sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[7] = auto_alloc(machine, gfx_element(machine, sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
 
-	machine.gfx[8] = gfx_element_alloc(machine, &sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[9] = gfx_element_alloc(machine, &sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[10]= gfx_element_alloc(machine, &sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[11]= gfx_element_alloc(machine, &sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[12]= gfx_element_alloc(machine, &sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[13]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine.gfx[15]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine.gfx[8] = auto_alloc(machine, gfx_element(machine, sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[9] = auto_alloc(machine, gfx_element(machine, sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[10]= auto_alloc(machine, gfx_element(machine, sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[11]= auto_alloc(machine, gfx_element(machine, sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[12]= auto_alloc(machine, gfx_element(machine, sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[13]= auto_alloc(machine, gfx_element(machine, sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[14]= auto_alloc(machine, gfx_element(machine, sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
+	machine.gfx[15]= auto_alloc(machine, gfx_element(machine, sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0));
 
 	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 8, 8);

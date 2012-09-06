@@ -183,7 +183,7 @@ static TILE_GET_INFO( gwar_get_bg_tile_info )
 	// bermudat, tdfever use FFFF to blank the background.
 	// (still call SET_TILE_INFO, otherwise problems might occur on boot when
 	// the tile data hasn't been initialised)
-	if (code >= machine.gfx[1]->total_elements)
+	if (code >= machine.gfx[1]->elements())
 		tileinfo.pen_data = state->m_empty_tile;
 }
 
@@ -718,7 +718,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		const int scrollx, const int scrolly, const int from, const int to)
 {
 	snk_state *state = machine.driver_data<snk_state>();
-	const gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = machine.gfx[3];
 	const UINT8 *source, *finish;
 
 	source = state->m_spriteram + from*4;
@@ -763,8 +763,8 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 {
 	snk_state *state = machine.driver_data<snk_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	const gfx_element *gfx = machine.gfx[2];
-	const int size = gfx->width;
+	gfx_element *gfx = machine.gfx[2];
+	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
 	int xflip,yflip;
 	int offs;
@@ -787,12 +787,12 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 		xflip = 0;
 		yflip = 0;
 
-		if (gfx->total_elements > 256)	// all except jcross
+		if (gfx->elements() > 256)	// all except jcross
 		{
 			tile_number |= (attributes & 0x40) << 2;
 		}
 
-		if (gfx->total_elements > 512)	// athena
+		if (gfx->elements() > 512)	// athena
 		{
 			tile_number |= (attributes & 0x20) << 4;
 		}
@@ -828,8 +828,8 @@ static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 		const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
 {
 	snk_state *state = machine.driver_data<snk_state>();
-	const gfx_element *gfx = machine.gfx[gfxnum];
-	const int size = gfx->width;
+	gfx_element *gfx = machine.gfx[gfxnum];
+	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
 	int which, finish;
 
@@ -900,8 +900,8 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to )
 {
 	snk_state *state = machine.driver_data<snk_state>();
-	const gfx_element *gfx = machine.gfx[gfxnum];
-	const int size = gfx->width;
+	gfx_element *gfx = machine.gfx[gfxnum];
+	const int size = gfx->width();
 	int tile_number, attributes, sx, sy, color;
 	int which;
 	int flipx, flipy;

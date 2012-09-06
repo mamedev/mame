@@ -206,7 +206,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	bionicc_state *state = machine.driver_data<bionicc_state>();
 	UINT16 *buffered_spriteram = state->m_spriteram->buffer();
 	int offs;
-	const gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = machine.gfx[3];
 
 	for (offs = (state->m_spriteram->bytes() - 8) / 2; offs >= 0; offs -= 4)
 	{

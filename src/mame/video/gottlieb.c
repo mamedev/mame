@@ -109,7 +109,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
-		gfx_element_mark_dirty(machine().gfx[0], offset / 32);
+		machine().gfx[0]->mark_dirty(offset / 32);
 	}
 }
 
@@ -163,7 +163,7 @@ VIDEO_START( gottlieb )
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 
 	/* save some state */
 	state_save_register_global(machine, state->m_background_priority);
@@ -190,7 +190,7 @@ VIDEO_START( screwloo )
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 
 	/* save some state */
 	state_save_register_global(machine, state->m_background_priority);

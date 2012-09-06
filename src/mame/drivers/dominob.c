@@ -88,7 +88,7 @@ public:
 
 static VIDEO_START( dominob )
 {
-	machine.gfx[0]->color_granularity = 8;
+	machine.gfx[0]->set_granularity(8);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

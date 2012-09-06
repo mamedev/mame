@@ -170,8 +170,8 @@ protected:
 
 public:
 	// general
-	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	void zdrawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 };
 
 class namcos2_state : public namcos2_shared_state

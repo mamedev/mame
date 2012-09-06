@@ -329,7 +329,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	equites_state *state = machine.driver_data<equites_state>();
 	const UINT8 * const xrom = state->memregion("user2")->base();
 	const UINT8 * const yrom = xrom + 0x100;
-	const gfx_element* const gfx = machine.gfx[2];
+	gfx_element* gfx = machine.gfx[2];
 	int offs;
 
 	// note that sprites are actually 30x30, contained in 32x32 squares. The outer edge is not used.
@@ -350,8 +350,8 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 //      const UINT8 * const xromline = xrom + (scalex << 4);
 		const UINT8 * const yromline = yrom + (scaley << 4) + (15 - scaley);
-		const UINT8* const srcgfx = gfx_element_get_data(gfx, tile);
-		const pen_t *paldata = &machine.pens[gfx->color_base + gfx->color_granularity * color];
+		const UINT8* const srcgfx = gfx->get_data(tile);
+		const pen_t *paldata = &machine.pens[gfx->colorbase() + gfx->granularity() * color];
 		int x,yy;
 
 		sy += 16;
@@ -385,7 +385,7 @@ static void splndrbt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
 						{
 							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;	// FIXME This is wrong. Should use the PROM.
-							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line) ) * gfx->line_modulo;
+							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line) ) * gfx->rowbytes();
 
 							int pen = srcgfx[offset];
 

@@ -67,8 +67,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	sderby_state *state = machine.driver_data<sderby_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
-	int height = machine.gfx[0]->height;
-	int colordiv = machine.gfx[0]->color_granularity / 16;
+	int height = machine.gfx[0]->height();
+	int colordiv = machine.gfx[0]->granularity() / 16;
 
 	for (offs = 4;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{

@@ -69,14 +69,14 @@ PALETTE_INIT( bankp )
 	/* color_prom now points to the beginning of the lookup table */
 
 	/* charset #1 lookup table */
-	for (i = 0; i < machine.gfx[0]->total_colors * machine.gfx[0]->color_granularity; i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[0]->color_base + i, *color_prom++ & 0x0f);
+	for (i = 0; i < machine.gfx[0]->colors() * machine.gfx[0]->granularity(); i++)
+		colortable_entry_set_value(machine.colortable, machine.gfx[0]->colorbase() + i, *color_prom++ & 0x0f);
 
 	color_prom += 128;	/* skip the bottom half of the PROM - seems to be not used */
 
 	/* charset #2 lookup table */
-	for (i = 0; i < machine.gfx[1]->total_colors * machine.gfx[1]->color_granularity; i++)
-		colortable_entry_set_value(machine.colortable, machine.gfx[1]->color_base + i, *color_prom++ & 0x0f);
+	for (i = 0; i < machine.gfx[1]->colors() * machine.gfx[1]->granularity(); i++)
+		colortable_entry_set_value(machine.colortable, machine.gfx[1]->colorbase() + i, *color_prom++ & 0x0f);
 
 	/* the bottom half of the PROM seems to be not used */
 }

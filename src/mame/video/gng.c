@@ -108,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	gng_state *state = machine.driver_data<gng_state>();
 	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 	int offs;
 
 

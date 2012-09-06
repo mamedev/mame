@@ -504,7 +504,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sprite_xflip = (supracan_vram[i+1] & 0x0800) >> 11;
 		int sprite_yflip = (supracan_vram[i+1] & 0x0400) >> 10;
 		//int xscale = (supracan_vram[i+2] & 0xf000) >> 12;
-		const gfx_element *gfx = machine.gfx[region];
+		gfx_element *gfx = machine.gfx[region];
 
 
 
@@ -1096,11 +1096,11 @@ WRITE16_MEMBER( supracan_state::supracan_vram_w )
 	write_swapped_byte(offset*2, (data & 0x00ff));
 
 	// mark tiles of each depth as dirty
-	gfx_element_mark_dirty(machine().gfx[0], (offset*2)/(64));
-	gfx_element_mark_dirty(machine().gfx[1], (offset*2)/(32));
-	gfx_element_mark_dirty(machine().gfx[2], (offset*2)/(16));
-	gfx_element_mark_dirty(machine().gfx[3], (offset*2)/(512));
-	gfx_element_mark_dirty(machine().gfx[4], (offset*2)/(8));
+	machine().gfx[0]->mark_dirty((offset*2)/(64));
+	machine().gfx[1]->mark_dirty((offset*2)/(32));
+	machine().gfx[2]->mark_dirty((offset*2)/(16));
+	machine().gfx[3]->mark_dirty((offset*2)/(512));
+	machine().gfx[4]->mark_dirty((offset*2)/(8));
 
 }
 

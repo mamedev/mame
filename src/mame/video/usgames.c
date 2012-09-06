@@ -46,7 +46,7 @@ VIDEO_START(usgames)
 {
 	usgames_state *state = machine.driver_data<usgames_state>();
 	state->m_tilemap = tilemap_create(machine, get_usgames_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	machine.gfx[0]->set_source(state->m_charram);
 }
 
 
@@ -59,7 +59,7 @@ WRITE8_MEMBER(usgames_state::usgames_videoram_w)
 WRITE8_MEMBER(usgames_state::usgames_charram_w)
 {
 	m_charram[offset] = data;
-	gfx_element_mark_dirty(machine().gfx[0], offset/8);
+	machine().gfx[0]->mark_dirty(offset/8);
 }
 
 

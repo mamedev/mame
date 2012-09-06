@@ -175,7 +175,7 @@ static void machine_reset(running_machine &machine)
 	state->m_cur_rombank = state->m_cur_rombank2 = 0;
 	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 
-	gfx_element_set_source(machine.gfx[2], state->m_rambanks);
+	machine.gfx[2]->set_source(state->m_rambanks);
 
 	state->m_adpcm_pos = 0;
 	state->m_adpcm_data = -1;

@@ -62,7 +62,7 @@ WRITE32_MEMBER(taitojc_state::taitojc_tile_w)
 WRITE32_MEMBER(taitojc_state::taitojc_char_w)
 {
 	COMBINE_DATA(m_char_ram + offset);
-	gfx_element_mark_dirty(machine().gfx[m_gfx_index], offset/32);
+	machine().gfx[m_gfx_index]->mark_dirty(offset/32);
 }
 
 // Object data format:
@@ -320,7 +320,7 @@ VIDEO_START( taitojc )
 	state->m_tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)state->m_char_ram, machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index] = auto_alloc(machine, gfx_element(machine, taitojc_char_layout, (UINT8 *)state->m_char_ram, machine.total_colors() / 16, 0));
 
 	state->m_texture = auto_alloc_array(machine, UINT8, 0x400000);
 

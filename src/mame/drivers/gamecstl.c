@@ -137,12 +137,12 @@ static VIDEO_START(gamecstl)
 		palette_set_color(machine, i, cga_palette[i]);
 }
 
-static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
-	dp = gfx_element_get_data(gfx, ch);
+	dp = gfx->get_data(ch);
 
 	for (j=y; j < y+8; j++)
 	{
@@ -152,9 +152,9 @@ static void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-				p[i] = gfx->color_base + (att & 0xf);
+				p[i] = gfx->colorbase() + (att & 0xf);
 			else
-				p[i] = gfx->color_base  + ((att >> 4) & 0x7);
+				p[i] = gfx->colorbase()  + ((att >> 4) & 0x7);
 		}
 	}
 }
@@ -163,7 +163,7 @@ static SCREEN_UPDATE_IND16(gamecstl)
 {
 	gamecstl_state *state = screen.machine().driver_data<gamecstl_state>();
 	int i, j;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	UINT32 *cga = state->m_cga_ram;
 	int index = 0;
 

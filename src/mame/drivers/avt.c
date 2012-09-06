@@ -508,7 +508,7 @@ static SCREEN_UPDATE_IND16( avt )
 	avt_state *state = screen.machine().driver_data<avt_state>();
 	int x,y;
 	int count;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 
 	count = 0;
 

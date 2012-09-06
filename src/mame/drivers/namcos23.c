@@ -1463,7 +1463,7 @@ WRITE32_MEMBER(namcos23_state::namcos23_textram_w)
 WRITE32_MEMBER(namcos23_state::s23_txtchar_w)
 {
 	COMBINE_DATA(&m_charram[offset]);
-	gfx_element_mark_dirty(machine().gfx[0], offset/32);
+	machine().gfx[0]->mark_dirty(offset/32);
 }
 
 static UINT8 nthbyte( const UINT32 *pSource, int offs )
@@ -2398,7 +2398,7 @@ static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 static VIDEO_START( ss23 )
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	gfx_element_set_source(machine.gfx[0], reinterpret_cast<UINT8 *>(state->m_charram.target()));
+	machine.gfx[0]->set_source(reinterpret_cast<UINT8 *>(state->m_charram.target()));
 	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
@@ -2424,7 +2424,7 @@ static SCREEN_UPDATE_RGB32( ss23 )
 	render_run( screen.machine(), bitmap );
 
 	gfx_element *gfx = screen.machine().gfx[0];
-	memset(gfx->dirty, 1, gfx->total_elements);
+	gfx->mark_all_dirty();
 
 	state->m_bgtilemap->draw(bitmap, cliprect, 0/*flags*/, 0/*priority*/ ); /* opaque */
 	return 0;

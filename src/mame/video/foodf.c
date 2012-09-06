@@ -117,7 +117,7 @@ SCREEN_UPDATE_IND16( foodf )
 {
 	foodf_state *state = screen.machine().driver_data<foodf_state>();
 	int offs;
-	const gfx_element *gfx = screen.machine().gfx[1];
+	gfx_element *gfx = screen.machine().gfx[1];
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	UINT16 *spriteram16 = state->m_spriteram;
 

@@ -188,9 +188,9 @@ WRITE8_HANDLER( decocass_charram_w )
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->m_charram[offset] = data;
 	/* dirty sprite */
-	gfx_element_mark_dirty(space->machine().gfx[1], (offset >> 5) & 255);
+	space->machine().gfx[1]->mark_dirty((offset >> 5) & 255);
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine().gfx[0], (offset >> 3) & 1023);
+	space->machine().gfx[0]->mark_dirty((offset >> 3) & 1023);
 }
 
 
@@ -222,7 +222,7 @@ WRITE8_HANDLER( decocass_tileram_w )
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->m_tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
-	gfx_element_mark_dirty(space->machine().gfx[2], (offset / 64) & 15);
+	space->machine().gfx[2]->mark_dirty((offset / 64) & 15);
 	/* first 1KB of tile RAM is shared with tilemap RAM */
 	if (offset < state->m_bgvideoram_size)
 		mark_bg_tile_dirty(space->machine(), offset);
@@ -233,8 +233,8 @@ WRITE8_HANDLER( decocass_objectram_w )
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->m_objectram[offset] = data;
 	/* dirty the object */
-	gfx_element_mark_dirty(space->machine().gfx[3], 0);
-	gfx_element_mark_dirty(space->machine().gfx[3], 1);
+	space->machine().gfx[3]->mark_dirty(0);
+	space->machine().gfx[3]->mark_dirty(1);
 }
 
 WRITE8_HANDLER( decocass_bgvideoram_w )
@@ -510,14 +510,14 @@ VIDEO_START( decocass )
 	state->m_bgvideoram = state->m_tileram;
 	state->m_bgvideoram_size = 0x0400;	/* d000-d3ff */
 
-	gfx_element_set_source(machine.gfx[0], state->m_charram);
-	gfx_element_set_source(machine.gfx[1], state->m_charram);
-	gfx_element_set_source(machine.gfx[2], state->m_tileram);
-	gfx_element_set_source(machine.gfx[3], state->m_objectram);
+	machine.gfx[0]->set_source(state->m_charram);
+	machine.gfx[1]->set_source(state->m_charram);
+	machine.gfx[2]->set_source(state->m_tileram);
+	machine.gfx[3]->set_source(state->m_objectram);
 
 	/* This should ensure that the fake 17th tile is left blank
      * now that dirty-tile tracking is handled by the core */
-	gfx_element_decode(machine.gfx[2], 16);
+	machine.gfx[2]->decode(16);
 }
 
 SCREEN_UPDATE_IND16( decocass )

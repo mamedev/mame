@@ -1516,44 +1516,36 @@ void atarigen_blend_gfx(running_machine &machine, int gfx0, int gfx1, int mask0,
 	int c, x, y;
 
 	/* allocate memory for the assembled data */
-	srcdata = auto_alloc_array(machine, UINT8, gx0->total_elements * gx0->width * gx0->height);
+	srcdata = auto_alloc_array(machine, UINT8, gx0->elements() * gx0->width() * gx0->height());
 
 	/* loop over elements */
 	dest = srcdata;
-	for (c = 0; c < gx0->total_elements; c++)
+	for (c = 0; c < gx0->elements(); c++)
 	{
-		const UINT8 *c0base = gfx_element_get_data(gx0, c);
-		const UINT8 *c1base = gfx_element_get_data(gx1, c);
+		const UINT8 *c0base = gx0->get_data(c);
+		const UINT8 *c1base = gx1->get_data(c);
 
 		/* loop over height */
-		for (y = 0; y < gx0->height; y++)
+		for (y = 0; y < gx0->height(); y++)
 		{
 			const UINT8 *c0 = c0base;
 			const UINT8 *c1 = c1base;
 
-			for (x = 0; x < gx0->width; x++)
+			for (x = 0; x < gx0->width(); x++)
 				*dest++ = (*c0++ & mask0) | (*c1++ & mask1);
-			c0base += gx0->line_modulo;
-			c1base += gx1->line_modulo;
+			c0base += gx0->rowbytes();
+			c1base += gx1->rowbytes();
 		}
 	}
+	
+//	int newdepth = gx0->depth() * gx1->depth();
+	int granularity = gx0->granularity();
+	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_granularity(granularity);
 
 	/* free the second graphics element */
-	gfx_element_free(gx1);
 	machine.gfx[gfx1] = NULL;
-
-	/* create a simple target layout */
-	gx0->layout.planes = 8;
-	for (x = 0; x < 8; x++)
-		gx0->layout.planeoffset[x] = x;
-	for (x = 0; x < gx0->width; x++)
-		gx0->layout.xoffset[x] = 8 * x;
-	for (y = 0; y < gx0->height; y++)
-		gx0->layout.yoffset[y] = 8 * y * gx0->width;
-	gx0->layout.charincrement = 8 * gx0->width * gx0->height;
-
-	/* make the assembled data our new source data */
-	gfx_element_set_source(gx0, srcdata);
+	auto_free(machine, gx1);
 }
 
 

@@ -147,7 +147,7 @@ WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 
 
 INLINE void dragngun_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,
 		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height, UINT8 alpha )
@@ -170,14 +170,14 @@ INLINE void dragngun_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-			const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
+				int dx = (gfx->width()<<16)/sprite_screen_width;
+				int dy = (gfx->height()<<16)/sprite_screen_height;
 
 				int ex = sx+sprite_screen_width;
 				int ey = sy+sprite_screen_height;
@@ -240,7 +240,7 @@ INLINE void dragngun_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 								UINT8 *pri = &pri_buffer->pix8(y);
 
@@ -264,7 +264,7 @@ INLINE void dragngun_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -287,7 +287,7 @@ INLINE void dragngun_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 								UINT8 *pri = &pri_buffer->pix8(y);
 
@@ -311,7 +311,7 @@ INLINE void dragngun_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -697,14 +697,14 @@ SCREEN_UPDATE_RGB32( fghthist )
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
 */
-static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
+static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
 	deco32_state *state = gfx0->machine().driver_data<deco32_state>();
 	running_machine &machine = gfx0->machine();
 	const pen_t *pens = machine.pens;
-	const pen_t *pal0 = &pens[gfx0->color_base];
-	const pen_t *pal1 = &pens[gfx1->color_base];
-	const pen_t *pal2 = &pens[machine.gfx[(state->m_pri&1) ? 1 : 2]->color_base];
+	const pen_t *pal0 = &pens[gfx0->colorbase()];
+	const pen_t *pal1 = &pens[gfx1->colorbase()];
+	const pen_t *pal2 = &pens[machine.gfx[(state->m_pri&1) ? 1 : 2]->colorbase()];
 	int x,y;
 	bitmap_ind16& sprite0_mix_bitmap = machine.device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
 	bitmap_ind16& sprite1_mix_bitmap = machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
@@ -723,8 +723,8 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			UINT16 priColAlphaPal1=sprite1[x];
 			UINT16 pri0=(priColAlphaPal0&0x6000)>>13;
 			UINT16 pri1=(priColAlphaPal1&0x6000)>>13;
-			UINT16 col0=((priColAlphaPal0&0x1f00)>>8) % gfx0->total_colors;
-			UINT16 col1=((priColAlphaPal1&0x0f00)>>8) % gfx1->total_colors;
+			UINT16 col0=((priColAlphaPal0&0x1f00)>>8) % gfx0->colors();
+			UINT16 col1=((priColAlphaPal1&0x0f00)>>8) % gfx1->colors();
 			UINT16 alpha1=priColAlphaPal1&0x8000;
 
 			// Apply sprite bitmap 0 according to priority rules
@@ -740,17 +740,17 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
                 */
 				if ((pri0&0x3)==0 || (pri0&0x3)==1 || ((pri0&0x3)==2 && mixAlphaTilemap)) // Spri0 on top of everything, or under alpha playfield
 				{
-					destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->color_granularity * col0)];
+					destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
 				}
 				else if ((pri0&0x3)==2) // Spri0 under top playfield
 				{
 					if (tilemapPri[x]<4)
-						destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->color_granularity * col0)];
+						destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
 				}
 				else // Spri0 under top & middle playfields
 				{
 					if (tilemapPri[x]<2)
-						destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->color_granularity * col0)];
+						destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
 				}
 			}
 
@@ -780,14 +780,14 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					if (pri1==0 && (((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2))))
 					{
 						if ((state->m_pri&1)==0 || ((state->m_pri&1)==1 && tilemapPri[x]<4) || ((state->m_pri&1)==1 && mixAlphaTilemap))
-							destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
+							destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
 					}
 					else if (pri1==1 && ((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2)))
-						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
+						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
 					else if (pri1==2)// TOdo
-						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
+						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
 					else if (pri1==3)// TOdo
-						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
+						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
 				}
 				else
 				{
@@ -797,13 +797,13 @@ static void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
                         Pri 0 - Under sprite 0 pri 0, over all tilemaps
                     */
 					if (pri1==0 && ((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0)))
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)];
+						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
 					else if (pri1==1) // todo
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)];
+						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
 					else if (pri1==2) // todo
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)];
+						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
 					else if (pri1==3) // todo
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)];
+						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
 				}
 			}
 

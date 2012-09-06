@@ -261,13 +261,13 @@ static void decode_bg(running_machine &machine, const char * region)
 	auto_free(machine, buffer);
 
 	/* decode the graphics */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine.root_device().memregion(region)->base(), 64, 2048);
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, bg_layout, machine.root_device().memregion(region)->base(), 64, 2048));
 }
 
 static void decode_sprite(running_machine &machine, int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, layout, (const UINT8 *)data, 64, 1024);
+	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, *layout, (const UINT8 *)data, 64, 1024));
 }
 
 // fix sprite order

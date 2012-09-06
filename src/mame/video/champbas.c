@@ -196,7 +196,7 @@ static void champbas_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
 	int offs;
-	const gfx_element* const gfx = machine.gfx[1];
+	gfx_element* const gfx = machine.gfx[1];
 
 	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{

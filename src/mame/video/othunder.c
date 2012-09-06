@@ -67,7 +67,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
 	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
-	UINT16 tile_mask = (machine.gfx[0]->total_elements) - 1;
+	UINT16 tile_mask = (machine.gfx[0]->elements()) - 1;
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;

@@ -43,7 +43,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
 
 	offset=offset%0xc000;
 
-	gfx_element_mark_dirty(machine().gfx[1],offset/0x10);
+	machine().gfx[1]->mark_dirty(offset/0x10);
 }
 
 
@@ -209,7 +209,7 @@ VIDEO_START( roundup5 )
 
 	state->m_tx_layer->set_transparent_pen(0);
 
-	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_roundup5_vram);
+	machine.gfx[1]->set_source((UINT8 *)state->m_roundup5_vram);
 }
 
 VIDEO_START( cyclwarr )
@@ -239,7 +239,7 @@ VIDEO_START( bigfight )
 
 template<class _BitmapClass>
 INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
-		_BitmapClass &dest_bmp, const rectangle &clip, const gfx_element *gfx,
+		_BitmapClass &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -261,9 +261,9 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-			const UINT8 *shadow_pens = state->m_shadow_pen_array + (gfx->color_granularity * (color % gfx->total_colors));
-			const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const UINT8 *shadow_pens = state->m_shadow_pen_array + (gfx->granularity() * (color % gfx->colors()));
+			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 			int block_size = 8 * scalex;
 			int sprite_screen_height = ((ssy&0xffff)+block_size)>>16;
@@ -272,8 +272,8 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
+				int dx = (gfx->width()<<16)/sprite_screen_width;
+				int dy = (gfx->height()<<16)/sprite_screen_height;
 
 				int sx;//=ssx>>16;
 				int sy;//=ssy>>16;
@@ -384,7 +384,7 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
-									const UINT8 *source = code_base + (cy>>16) * gfx->line_modulo;
+									const UINT8 *source = code_base + (cy>>16) * gfx->rowbytes();
 									int c = source[(cx >> 16)];
 									if( c != transparent_color )
 									{
@@ -407,7 +407,7 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->rowbytes();
 								typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 
 								int x, x_index = x_index_base;

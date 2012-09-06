@@ -158,10 +158,10 @@ VIDEO_START( macrossp )
 	state->m_scrb_tilemap->set_transparent_pen(0);
 	state->m_scrc_tilemap->set_transparent_pen(0);
 
-	machine.gfx[0]->color_granularity = 64;
-	machine.gfx[1]->color_granularity = 64;
-	machine.gfx[2]->color_granularity = 64;
-	machine.gfx[3]->color_granularity = 64;
+	machine.gfx[0]->set_granularity(64);
+	machine.gfx[1]->set_granularity(64);
+	machine.gfx[2]->set_granularity(64);
+	machine.gfx[3]->set_granularity(64);
 
 	state->save_pointer(NAME(state->m_spriteram_old), state->m_spriteram.bytes() / 4);
 	state->save_pointer(NAME(state->m_spriteram_old2), state->m_spriteram.bytes() / 4);
@@ -172,7 +172,7 @@ VIDEO_START( macrossp )
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority )
 {
 	macrossp_state *state = machine.driver_data<macrossp_state>();
-	const gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine.gfx[0];
 	//  UINT32 *source = state->m_spriteram;
 	UINT32 *source = state->m_spriteram_old2; /* buffers by two frames */
 	UINT32 *finish = source + state->m_spriteram.bytes() / 4;

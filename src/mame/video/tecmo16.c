@@ -400,7 +400,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 						}
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+								machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 								flipx,flipy,
 								sx,sy,
 								machine.priority_bitmap, priority_mask,0);
@@ -408,7 +408,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+								machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 								flipx,flipy,
 								sx-512,sy,
 								machine.priority_bitmap, priority_mask,0);
@@ -416,7 +416,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+								machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 								flipx,flipy,
 								sx+512,sy,
 								machine.priority_bitmap, priority_mask,0);
@@ -443,7 +443,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 						}
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+								machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 								flipx,flipy,
 								sx,sy,
 								machine.priority_bitmap, priority_mask,0);
@@ -451,7 +451,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+								machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 								flipx,flipy,
 								sx-512,sy,
 								machine.priority_bitmap, priority_mask,0);
@@ -459,7 +459,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 						/* wrap around x */
 						pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[2],
 								code + layout[y][x],
-								machine.gfx[2]->color_base + color * machine.gfx[2]->color_granularity,
+								machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
 								flipx,flipy,
 								sx+512,sy,
 								machine.priority_bitmap, priority_mask,0);

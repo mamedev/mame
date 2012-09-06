@@ -100,7 +100,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	stlforce_state *state = machine.driver_data<stlforce_state>();
 	const UINT16 *source = state->m_spriteram+0x0;
 	const UINT16 *finish = state->m_spriteram+0x800;
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 	int ypos, xpos, attr, num;
 
 	while (source<finish)

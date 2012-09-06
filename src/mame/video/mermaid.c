@@ -307,8 +307,8 @@ SCREEN_VBLANK( mermaid )
 
 			rect.min_x = sx;
 			rect.min_y = sy;
-			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
-			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+			rect.max_x = sx + screen.machine().gfx[1]->width() - 1;
+			rect.max_y = sy + screen.machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 
@@ -410,8 +410,8 @@ SCREEN_VBLANK( mermaid )
 
 			rect.min_x = sx;
 			rect.min_y = sy;
-			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
-			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+			rect.max_x = sx + screen.machine().gfx[1]->width() - 1;
+			rect.max_y = sy + screen.machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 
@@ -491,8 +491,8 @@ SCREEN_VBLANK( mermaid )
 
 			rect.min_x = sx;
 			rect.min_y = sy;
-			rect.max_x = sx + screen.machine().gfx[1]->width - 1;
-			rect.max_y = sy + screen.machine().gfx[1]->height - 1;
+			rect.max_x = sx + screen.machine().gfx[1]->width() - 1;
+			rect.max_y = sy + screen.machine().gfx[1]->height() - 1;
 
 			rect &= visarea;
 

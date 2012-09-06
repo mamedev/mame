@@ -588,7 +588,7 @@ Offset+3
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
@@ -674,7 +674,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;

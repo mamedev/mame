@@ -532,10 +532,10 @@ static WRITE16_HANDLER( mpu4_vid_vidram_w )
 	mpu4vid_state *state = space->machine().driver_data<mpu4vid_state>();
 	COMBINE_DATA(&state->m_vid_vidram[offset]);
 	offset <<= 1;
-	gfx_element_mark_dirty(space->machine().gfx[state->m_gfx_index+0], offset/0x20);
-	gfx_element_mark_dirty(space->machine().gfx[state->m_gfx_index+1], offset/0x20);
-	gfx_element_mark_dirty(space->machine().gfx[state->m_gfx_index+2], offset/0x20);
-	gfx_element_mark_dirty(space->machine().gfx[state->m_gfx_index+3], offset/0x20);
+	space->machine().gfx[state->m_gfx_index+0]->mark_dirty(offset/0x20);
+	space->machine().gfx[state->m_gfx_index+1]->mark_dirty(offset/0x20);
+	space->machine().gfx[state->m_gfx_index+2]->mark_dirty(offset/0x20);
+	space->machine().gfx[state->m_gfx_index+3]->mark_dirty(offset/0x20);
 }
 
 
@@ -557,10 +557,10 @@ static VIDEO_START( mpu4_vid )
 	assert(state->m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+0] = auto_alloc(machine, gfx_element(machine, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0));
+	machine.gfx[state->m_gfx_index+1] = auto_alloc(machine, gfx_element(machine, mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0));
+	machine.gfx[state->m_gfx_index+2] = auto_alloc(machine, gfx_element(machine, mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0));
+	machine.gfx[state->m_gfx_index+3] = auto_alloc(machine, gfx_element(machine, mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0));
 
 	state->m_scn2674->init_stuff();
 

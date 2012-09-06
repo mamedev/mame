@@ -107,7 +107,7 @@ VIDEO_START( cheekyms )
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const gfx_element *gfx, int flip )
+static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip )
 {
 	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	offs_t offs;

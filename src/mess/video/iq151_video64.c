@@ -63,7 +63,7 @@ void iq151_video64_device::device_start()
 	m_videoram = (UINT8*)memregion("videoram")->base();
 	m_chargen = (UINT8*)memregion("chargen")->base();
 
-	machine().gfx[0] = gfx_element_alloc(machine(), &iq151_video64_charlayout, m_chargen, 1, 0);
+	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), iq151_video64_charlayout, m_chargen, 1, 0));
 }
 
 //-------------------------------------------------

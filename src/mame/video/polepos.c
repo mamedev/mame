@@ -425,11 +425,11 @@ static void zoom_sprite(running_machine &machine, bitmap_ind16 &bitmap,int big,
 		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
-	const gfx_element *gfx = machine.gfx[big ? 3 : 2];
-	const UINT8 *gfxdata = gfx_element_get_data(gfx, code % gfx->total_elements);
+	gfx_element *gfx = machine.gfx[big ? 3 : 2];
+	const UINT8 *gfxdata = gfx->get_data(code % gfx->elements());
 	UINT8 *scaling_rom = machine.root_device().memregion("gfx6")->base();
 	UINT32 transmask = colortable_get_transpen_mask(machine.colortable, gfx, color, 0x1f);
-	int coloroffs = gfx->color_base + color * gfx->color_granularity;
+	int coloroffs = gfx->colorbase() + color * gfx->granularity();
 	int x,y;
 
 	if (flipx) flipx = big ? 0x1f : 0x0f;
@@ -448,7 +448,7 @@ static void zoom_sprite(running_machine &machine, bitmap_ind16 &bitmap,int big,
 			const UINT8 *src;
 
 			if (!big) dy >>= 1;
-			src = gfxdata + dy * gfx->line_modulo;
+			src = gfxdata + dy * gfx->rowbytes();
 
 			for (x = (big ? 0x40 : 0x20);x > 0;x--)
 			{

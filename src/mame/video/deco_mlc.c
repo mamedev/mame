@@ -20,9 +20,9 @@
 VIDEO_START( mlc )
 {
 	deco_mlc_state *state = machine.driver_data<deco_mlc_state>();
-	if (machine.gfx[0]->color_granularity==16)
+	if (machine.gfx[0]->granularity()==16)
 		state->m_colour_mask=0x7f;
-	else if (machine.gfx[0]->color_granularity==32)
+	else if (machine.gfx[0]->granularity()==32)
 		state->m_colour_mask=0x3f;
 	else
 		state->m_colour_mask=0x1f;
@@ -62,7 +62,7 @@ static void blitRaster(running_machine &machine, bitmap_rgb32 &bitmap, int raste
 #endif
 
 static void mlc_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,const gfx_element *gfx,
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,int use8bpp,
 		int scalex, int scaley,int alpha)
@@ -85,12 +85,12 @@ static void mlc_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-			const UINT8 *code_base1 = gfx_element_get_data(gfx, code1 % gfx->total_elements);
-			const UINT8 *code_base2 = gfx_element_get_data(gfx, code2 % gfx->total_elements);
+			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
+			const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
 
-			int sprite_screen_height = (scaley*gfx->height+(sy&0xffff))>>16;
-			int sprite_screen_width = (scalex*gfx->width+(sx&0xffff))>>16;
+			int sprite_screen_height = (scaley*gfx->height()+(sy&0xffff))>>16;
+			int sprite_screen_width = (scalex*gfx->width()+(sx&0xffff))>>16;
 
 			sx>>=16;
 			sy>>=16;
@@ -98,8 +98,8 @@ static void mlc_drawgfxzoom(
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width<<16)/sprite_screen_width;
-				int dy = (gfx->height<<16)/sprite_screen_height;
+				int dx = (gfx->width()<<16)/sprite_screen_width;
+				int dy = (gfx->height()<<16)/sprite_screen_height;
 
 				int ex = sx+sprite_screen_width;
 				int ey = sy+sprite_screen_height;
@@ -161,8 +161,8 @@ static void mlc_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source1 = code_base1 + (y_index>>16) * gfx->line_modulo;
-								const UINT8 *source2 = code_base2 + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source1 = code_base1 + (y_index>>16) * gfx->rowbytes();
+								const UINT8 *source2 = code_base2 + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;
@@ -189,7 +189,7 @@ static void mlc_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const UINT8 *source = code_base1 + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = code_base1 + (y_index>>16) * gfx->rowbytes();
 								UINT32 *dest = &dest_bmp.pix32(y);
 
 								int x, x_index = x_index_base;

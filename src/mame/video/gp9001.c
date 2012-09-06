@@ -758,7 +758,7 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w )
 
 void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap )
 {
-	const gfx_element *gfx = machine.gfx[tile_region+1];
+	gfx_element *gfx = machine.gfx[tile_region+1];
 
 	int offs, old_x, old_y;
 
@@ -866,13 +866,13 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
                         flipx,flipy,
                         sx,sy,0);
                     */
-					sprite %= gfx->total_elements;
-					color %= gfx->total_colors;
+					sprite %= gfx->elements();
+					color %= gfx->colors();
 
 					{
 						int yy, xx;
-						const pen_t *paldata = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * color];
-						const UINT8* srcdata = gfx_element_get_data(gfx, sprite);
+						const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
+						const UINT8* srcdata = gfx->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
 						int xstart, xend, xinc;

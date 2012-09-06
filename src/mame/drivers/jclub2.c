@@ -229,7 +229,7 @@ static VIDEO_START( darkhors )
 	state->m_tmap->set_transparent_pen(0);
 	state->m_tmap2->set_transparent_pen(0);
 
-	machine.gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine.gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
 static SCREEN_UPDATE_IND16( darkhors )

@@ -124,7 +124,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
     */
 
 	shadfrce_state *state = machine.driver_data<shadfrce_state>();
-	const gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine.gfx[1];
 	UINT16 *finish = state->m_spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
 	int hcount;

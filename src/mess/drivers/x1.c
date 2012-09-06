@@ -1171,7 +1171,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-			gfx_element_mark_dirty(machine().gfx[1], pcg_offset >> 3);
+			machine().gfx[1]->mark_dirty(pcg_offset >> 3);
 		}
 		else // Compatible Mode
 		{
@@ -1188,7 +1188,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-			gfx_element_mark_dirty(machine().gfx[1], pcg_offset >> 3);
+			machine().gfx[1]->mark_dirty(pcg_offset >> 3);
 		}
 	}
 }
@@ -2476,7 +2476,7 @@ MACHINE_RESET( x1 )
 	for(i=0;i<0x1800;i++)
 	{
 		PCG_RAM[i] = 0;
-		gfx_element_mark_dirty(machine.gfx[1], i >> 3);
+		machine.gfx[1]->mark_dirty(i >> 3);
 	}
 
 	state->m_is_turbo = 0;

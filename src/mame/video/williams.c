@@ -378,7 +378,7 @@ READ8_MEMBER(williams_state::williams2_video_counter_r)
 static TILE_GET_INFO( get_tile_info )
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	int mask = machine.gfx[0]->total_elements - 1;
+	int mask = machine.gfx[0]->elements() - 1;
 	int data = state->m_williams2_tileram[tile_index];
 	int y = (tile_index >> 1) & 7;
 	int color = 0;

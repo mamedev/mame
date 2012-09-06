@@ -982,9 +982,9 @@ void vboy_state::m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask)
 	if(mem_mask & 0xff00)
 		pcg_ram[(offset<<1)+0] = (data & 0xff00) >> 8;
 
-	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
+	machine().gfx[0]->mark_dirty(offset >> 4);
 	for(i=0;i<0x800;i++)
-		gfx_element_mark_dirty(machine().gfx[0], i);
+		machine().gfx[0]->mark_dirty(i);
 
 }
 

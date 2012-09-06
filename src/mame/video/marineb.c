@@ -214,7 +214,7 @@ SCREEN_UPDATE_IND16( marineb )
 
 		if (!state->m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[gfx]->width - sy;
+			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -257,7 +257,7 @@ SCREEN_UPDATE_IND16( changes )
 
 		if (!state->m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[1]->width - sy;
+			sy = 256 - screen.machine().gfx[1]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -284,7 +284,7 @@ SCREEN_UPDATE_IND16( changes )
 
 	if (!state->m_flipscreen_y)
 	{
-		sy = 256 - screen.machine().gfx[2]->width - sy;
+		sy = 256 - screen.machine().gfx[2]->width() - sy;
 		flipy = !flipy;
 	}
 
@@ -353,7 +353,7 @@ SCREEN_UPDATE_IND16( springer )
 
 		if (!state->m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[gfx]->width - sy;
+			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 
@@ -396,13 +396,13 @@ SCREEN_UPDATE_IND16( hoccer )
 
 		if (!state->m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[1]->width - sy;
+			sy = 256 - screen.machine().gfx[1]->width() - sy;
 			flipy = !flipy;
 		}
 
 		if (state->m_flipscreen_x)
 		{
-			sx = 256 - screen.machine().gfx[1]->width - sx;
+			sx = 256 - screen.machine().gfx[1]->width() - sx;
 			flipx = !flipx;
 		}
 
@@ -456,7 +456,7 @@ SCREEN_UPDATE_IND16( hopprobo )
 
 		if (!state->m_flipscreen_y)
 		{
-			sy = 256 - screen.machine().gfx[gfx]->width - sy;
+			sy = 256 - screen.machine().gfx[gfx]->width() - sy;
 			flipy = !flipy;
 		}
 

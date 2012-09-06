@@ -110,8 +110,8 @@ VIDEO_START( fuuki32 )
 	state->m_tilemap[2]->set_transparent_pen(0x0f);	// 4 bits
 	state->m_tilemap[3]->set_transparent_pen(0x0f);	// 4 bits
 
-	//machine.gfx[1]->color_granularity = 16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
-	//machine.gfx[2]->color_granularity = 16;
+	//machine.gfx[1]->set_granularity(16); /* 256 colour tiles with palette selectable on 16 colour boundaries */
+	//machine.gfx[2]->set_granularity(16);
 }
 
 
@@ -147,7 +147,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 {
 	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	int offs;
-	const gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = screen.machine().gfx[0];
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	const rectangle &visarea = screen.visible_area();
 	int max_x =	visarea.max_x + 1;

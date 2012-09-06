@@ -209,10 +209,10 @@ WRITE32_MEMBER(seibuspi_state::video_dma_address_w)
 	COMBINE_DATA( &m_video_dma_address );
 }
 
-static void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
+static void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
 	seibuspi_state *state = gfx->machine().driver_data<seibuspi_state>();
-	const pen_t *pens = &gfx->machine().pens[gfx->color_base];
+	const pen_t *pens = &gfx->machine().pens[gfx->colorbase()];
 	const UINT8 *dp;
 	int i, j;
 	int x1, x2;
@@ -220,8 +220,8 @@ static void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, const
 	int px, py;
 	int xd = 1, yd = 1;
 
-	int width = gfx->width;
-	int height = gfx->height;
+	int width = gfx->width();
+	int height = gfx->height();
 
 	x1 = sx;
 	x2 = sx + width - 1;
@@ -287,12 +287,12 @@ static void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, const
 		y2 = cliprect.max_y;
 	}
 
-	if (gfx->total_elements <= 0x10000)
+	if (gfx->elements() <= 0x10000)
 	{
 		code &= 0xffff;
 	}
 
-	dp = gfx_element_get_data(gfx, code);
+	dp = gfx->get_data(code);
 
 	// draw
 	for (j=y1; j <= y2; j++)
@@ -344,7 +344,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int a;
 	int priority;
 	int x,y, x1, y1;
-	const gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = machine.gfx[2];
 
 	if( state->m_layer_enable & 0x10 )
 		return;

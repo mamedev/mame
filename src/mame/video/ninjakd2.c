@@ -347,7 +347,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
 static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	const gfx_element* const gfx = machine.gfx[1];
+	gfx_element* const gfx = machine.gfx[1];
 	int const big_xshift = state->m_robokid_sprites ? 1 : 0;
 	int const big_yshift = state->m_robokid_sprites ? 0 : 1;
 

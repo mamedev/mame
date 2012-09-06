@@ -144,7 +144,7 @@ WRITE8_MEMBER( a5105_state::pcg_val_w )
 {
 	m_char_rom[m_pcg_addr | m_pcg_internal_addr] = data;
 
-	gfx_element_mark_dirty(machine().gfx[0], m_pcg_addr >> 3);
+	machine().gfx[0]->mark_dirty(m_pcg_addr >> 3);
 
 	m_pcg_internal_addr++;
 	m_pcg_internal_addr&=7;
