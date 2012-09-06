@@ -86,13 +86,13 @@ PALETTE_INIT( bosco )
 ***************************************************************************/
 
 /* the video RAM has space for 32x32 tiles and is only partially used for the radar */
-static TILEMAP_MAPPER( fg_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(bosco_state::fg_tilemap_scan )
 {
 	return col + (row << 5);
 }
 
 
-INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int ram_offs)
+INLINE void get_tile_info_bosco(running_machine &machine,tile_data &tileinfo,int tile_index,int ram_offs)
 {
 	bosco_state *state =  machine.driver_data<bosco_state>();
 
@@ -106,14 +106,14 @@ INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_
 			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX);
 }
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(bosco_state::bg_get_tile_info )
 {
-	get_tile_info(machine,tileinfo,tile_index,0x400);
+	get_tile_info_bosco(machine(),tileinfo,tile_index,0x400);
 }
 
-static TILE_GET_INFO( fg_get_tile_info )
+TILE_GET_INFO_MEMBER(bosco_state::fg_get_tile_info )
 {
-	get_tile_info(machine,tileinfo,tile_index,0x000);
+	get_tile_info_bosco(machine(),tileinfo,tile_index,0x000);
 }
 
 
@@ -128,8 +128,8 @@ VIDEO_START( bosco )
 {
 	bosco_state *state =  machine.driver_data<bosco_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),state),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),state),  8,8, 8,32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 0x1f);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x1f);

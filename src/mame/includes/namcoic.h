@@ -158,9 +158,6 @@ extern const device_type NAMCO_C45_ROAD;
 
 /*----------- defined in drivers/namcoic.c -----------*/
 
-void namco_tilemap_init(
-		running_machine &machine, int gfxbank, void *pMaskROM,
-		void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask) );
 void namco_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 void namco_tilemap_invalidate( void );
 WRITE16_HANDLER( namco_tilemapvideoram16_w );

@@ -376,16 +376,15 @@ static INPUT_PORTS_START( hotminda )
 	PORT_DIPSETTING(    0xe0, "Easy 9" )
 INPUT_PORTS_END
 
-static TILE_GET_INFO( powerbal_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::powerbal_get_bg_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int code = (state->m_videoram1[tile_index] & 0x07ff) + state->m_tilebank * 0x800;
-	int colr = state->m_videoram1[tile_index] & 0xf000;
+	int code = (m_videoram1[tile_index] & 0x07ff) + m_tilebank * 0x800;
+	int colr = m_videoram1[tile_index] & 0xf000;
 
-	if (state->m_videoram1[tile_index] & 0x800)
+	if (m_videoram1[tile_index] & 0x800)
 		code |= 0x8000;
 
-	SET_TILE_INFO(1, code, colr >> 12, 0);
+	SET_TILE_INFO_MEMBER(1, code, colr >> 12, 0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -421,7 +420,7 @@ static VIDEO_START( powerbal )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, powerbal_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::powerbal_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_xoffset = -20;
 

@@ -44,6 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(apple1_cassette_r);
 	DECLARE_WRITE8_MEMBER(apple1_cassette_w);
 	DECLARE_DRIVER_INIT(apple1);
+	TILE_GET_INFO_MEMBER(terminal_gettileinfo);
 };
 
 

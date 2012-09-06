@@ -398,7 +398,7 @@ void namcos2_state::draw_sprite_init()
 
 void namcos2_state::video_start()
 {
-	namco_tilemap_init(machine(), 2, memregion("gfx4")->base(), TilemapCB);
+	namco_tilemap_init(2, memregion("gfx4")->base(), TilemapCB);
 	m_tilemap_roz = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 	draw_sprite_init();
@@ -446,7 +446,7 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void namcos2_state::video_start_finallap()
 {
-	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
 	draw_sprite_init();
 }
 
@@ -475,7 +475,7 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 
 void namcos2_state::video_start_luckywld()
 {
-	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
@@ -512,7 +512,7 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 
 void namcos2_state::video_start_sgunner()
 {
-	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 }
 
@@ -538,7 +538,7 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 
 void namcos2_state::video_start_metlhawk()
 {
-	namco_tilemap_init(machine(),2,memregion("gfx4")->base(),TilemapCB);
+	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
 	c169_roz_init(1, "gfx5");
 }
 

@@ -168,20 +168,19 @@ WRITE8_HANDLER( redclash_star_reset_w )
 	redclash_set_stars_enable(space->machine(), 1);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(ladybug_state::get_fg_tile_info)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	int code = state->m_videoram[tile_index];
-	int color = (state->m_videoram[tile_index] & 0x70) >> 4; // ??
+	int code = m_videoram[tile_index];
+	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( redclash )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

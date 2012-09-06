@@ -1098,40 +1098,36 @@ static GFXDECODEINFO_START( x68k )
 GFXDECODEINFO_END
 #endif
 
-static TILE_GET_INFO(x68k_get_bg0_tile)
+TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	int code = state->m_spriteram[0x3000+tile_index] & 0x00ff;
-	int colour = (state->m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
-	int flags = (state->m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(0,code,colour+16,flags);
+	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
+	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
+	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
+	SET_TILE_INFO_MEMBER(0,code,colour+16,flags);
 }
 
-static TILE_GET_INFO(x68k_get_bg1_tile)
+TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	int code = state->m_spriteram[0x2000+tile_index] & 0x00ff;
-	int colour = (state->m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
-	int flags = (state->m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(0,code,colour+16,flags);
+	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
+	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
+	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
+	SET_TILE_INFO_MEMBER(0,code,colour+16,flags);
 }
 
-static TILE_GET_INFO(x68k_get_bg0_tile_16)
+TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	int code = state->m_spriteram[0x3000+tile_index] & 0x00ff;
-	int colour = (state->m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
-	int flags = (state->m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,code,colour+16,flags);
+	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
+	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
+	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
+	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
 }
 
-static TILE_GET_INFO(x68k_get_bg1_tile_16)
+TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	int code = state->m_spriteram[0x2000+tile_index] & 0x00ff;
-	int colour = (state->m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
-	int flags = (state->m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,code,colour+16,flags);
+	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
+	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
+	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
+	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
 }
 
 VIDEO_START( x68000 )
@@ -1152,10 +1148,10 @@ VIDEO_START( x68000 )
 	machine.gfx[gfx_index]->set_colors(32);
 
 	/* Tilemaps */
-	state->m_bg0_8 = tilemap_create(machine, x68k_get_bg0_tile,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg1_8 = tilemap_create(machine, x68k_get_bg1_tile,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg0_16 = tilemap_create(machine, x68k_get_bg0_tile_16,TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_bg1_16 = tilemap_create(machine, x68k_get_bg1_tile_16,TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_bg0_8 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg1_8 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg1_tile),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg0_16 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile_16),state),TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_bg1_16 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg1_tile_16),state),TILEMAP_SCAN_ROWS,16,16,64,64);
 
 	state->m_bg0_8->set_transparent_pen(0);
 	state->m_bg1_8->set_transparent_pen(0);

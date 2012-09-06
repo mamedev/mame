@@ -176,11 +176,9 @@ PALETTE_INIT( battles )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 {
-	xevious_state *state =  machine.driver_data<xevious_state>();
-
-	UINT8 attr = state->m_xevious_fg_colorram[tile_index];
+	UINT8 attr = m_xevious_fg_colorram[tile_index];
 
 	/* the hardware has two character sets, one normal and one x-flipped. When
        screen is flipped, character y flip is done by the hardware inverting the
@@ -188,21 +186,19 @@ static TILE_GET_INFO( get_fg_tile_info )
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
 	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_xevious_fg_videoram[tile_index] | (state->flip_screen() ? 0x100 : 0),
+			m_xevious_fg_videoram[tile_index] | (flip_screen() ? 0x100 : 0),
 			color,
-			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (state->flip_screen() ? TILE_FLIPX : 0));
+			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen() ? TILE_FLIPX : 0));
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 {
-	xevious_state *state =  machine.driver_data<xevious_state>();
-
-	UINT8 code = state->m_xevious_bg_videoram[tile_index];
-	UINT8 attr = state->m_xevious_bg_colorram[tile_index];
+	UINT8 code = m_xevious_bg_videoram[tile_index];
+	UINT8 attr = m_xevious_bg_colorram[tile_index];
 	UINT8 color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code + ((attr & 0x01) << 8),
 			color,
@@ -221,8 +217,8 @@ VIDEO_START( xevious )
 {
 	xevious_state *state =  machine.driver_data<xevious_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,     8,8,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_bg_tilemap->set_scrolldx(-20,288+27);
 	state->m_bg_tilemap->set_scrolldy(-16,-16);

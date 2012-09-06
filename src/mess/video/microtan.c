@@ -29,20 +29,19 @@ WRITE8_MEMBER(microtan_state::microtan_videoram_w)
 	}
 }
 
-static TILE_GET_INFO(get_bg_tile_info)
+TILE_GET_INFO_MEMBER(microtan_state::get_bg_tile_info)
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
-	UINT8 *videoram = state->m_videoram;
-	int gfxn = state->m_chunky_buffer[tile_index];
+	UINT8 *videoram = m_videoram;
+	int gfxn = m_chunky_buffer[tile_index];
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(gfxn, code, 0, 0);
+	SET_TILE_INFO_MEMBER(gfxn, code, 0, 0);
 }
 
 VIDEO_START( microtan )
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		8, 16, 32, 16);
 
 	state->m_chunky_buffer = auto_alloc_array(machine, UINT8, 0x200);

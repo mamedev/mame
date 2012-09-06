@@ -117,7 +117,13 @@ public:
 	DECLARE_WRITE16_MEMBER( c169_roz_bank_w );
 	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
 	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
-
+	TILE_GET_INFO_MEMBER( get_tile_info0 );
+	TILE_GET_INFO_MEMBER( get_tile_info1 );
+	TILE_GET_INFO_MEMBER( get_tile_info2 );
+	TILE_GET_INFO_MEMBER( get_tile_info3 );
+	TILE_GET_INFO_MEMBER( get_tile_info4 );
+	TILE_GET_INFO_MEMBER( get_tile_info5 );
+	void namco_tilemap_init(int gfxbank, void *pMaskROM, void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask) );
 protected:
 	struct roz_parameters
 	{

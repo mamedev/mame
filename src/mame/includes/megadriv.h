@@ -107,6 +107,11 @@ public:
 	DECLARE_DRIVER_INIT(megadriv);
 	DECLARE_DRIVER_INIT(megadrij);
 	DECLARE_DRIVER_INIT(mpnew);
+	
+	TILE_GET_INFO_MEMBER( get_stampmap_16x16_1x1_tile_info );
+	TILE_GET_INFO_MEMBER( get_stampmap_32x32_1x1_tile_info );
+	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
+	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
 };
 
 class md_boot_state : public md_base_state

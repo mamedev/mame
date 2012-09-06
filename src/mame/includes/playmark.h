@@ -87,6 +87,7 @@ public:
 	TILE_GET_INFO_MEMBER(bigtwinb_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(hrdtimes_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(hrdtimes_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
 };
 
 /*----------- defined in video/playmark.c -----------*/

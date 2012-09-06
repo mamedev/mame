@@ -42,17 +42,15 @@ static const gfx_layout charlayout =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
 {
 	return (31 - col) * 32 + row;
 }
 
 
-static void get_tile_info( running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, void *param )
+TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 {
-	m10_state *state = machine.driver_data<m10_state>();
-
-	SET_TILE_INFO(0, state->m_videoram[tile_index], state->m_colorram[tile_index] & 0x07, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 
@@ -104,7 +102,7 @@ VIDEO_START( m10 )
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan, 8, 8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),state), 8, 8, 32, 32);
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_scrolldx(0, 62);
 	state->m_tx_tilemap->set_scrolldy(0, 0);
@@ -121,7 +119,7 @@ VIDEO_START( m15 )
 
 	machine.gfx[0] = auto_alloc(machine, gfx_element(machine, charlayout, state->m_chargen, 8, 0));
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan, 8, 8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),state),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),state), 8, 8, 32, 32);
 	state->m_tx_tilemap->set_scrolldx(0, 116);
 	state->m_tx_tilemap->set_scrolldy(0, 0);
 

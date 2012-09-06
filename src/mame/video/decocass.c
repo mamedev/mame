@@ -68,49 +68,46 @@ void decocass_video_state_save_init( running_machine &machine )
     tilemap callbacks
  ********************************************/
 
-static TILEMAP_MAPPER( fgvideoram_scan_cols )
+TILEMAP_MAPPER_MEMBER(decocass_state::fgvideoram_scan_cols )
 {
 	/* logical (col,row) -> memory offset */
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-static TILEMAP_MAPPER( bgvideoram_scan_cols )
+TILEMAP_MAPPER_MEMBER(decocass_state::bgvideoram_scan_cols )
 {
 	/* logical (col,row) -> memory offset */
 	return tile_offset[col * num_rows + row];
 }
 
-static TILE_GET_INFO( get_bg_l_tile_info )
+TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	int color = (state->m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO(
+	int color = (m_color_center_bot >> 7) & 1;
+	SET_TILE_INFO_MEMBER(
 			2,
-			(0x80 == (tile_index & 0x80)) ? 16 : state->m_bgvideoram[tile_index] >> 4,
+			(0x80 == (tile_index & 0x80)) ? 16 : m_bgvideoram[tile_index] >> 4,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_r_tile_info )
+TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	int color = (state->m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO(
+	int color = (m_color_center_bot >> 7) & 1;
+	SET_TILE_INFO_MEMBER(
 			2,
-			(0x00 == (tile_index & 0x80)) ? 16 : state->m_bgvideoram[tile_index] >> 4,
+			(0x00 == (tile_index & 0x80)) ? 16 : m_bgvideoram[tile_index] >> 4,
 			color,
 			TILE_FLIPY);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
 {
-	decocass_state *state = machine.driver_data<decocass_state>();
-	UINT8 code = state->m_fgvideoram[tile_index];
-	UINT8 attr = state->m_colorram[tile_index];
-	SET_TILE_INFO(
+	UINT8 code = m_fgvideoram[tile_index];
+	UINT8 attr = m_colorram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			256 * (attr & 3) + code,
-			state->m_color_center_bot & 1,
+			m_color_center_bot & 1,
 			0);
 }
 
@@ -492,9 +489,9 @@ static void draw_missiles(running_machine &machine,bitmap_ind16 &bitmap, const r
 VIDEO_START( decocass )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	state->m_bg_tilemap_l = tilemap_create(machine, get_bg_l_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
-	state->m_bg_tilemap_r = tilemap_create(machine, get_bg_r_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, fgvideoram_scan_cols, 8, 8, 32, 32);
+	state->m_bg_tilemap_l = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_bg_l_tile_info),state), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),state), 16, 16, 32, 32);
+	state->m_bg_tilemap_r = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_bg_r_tile_info),state), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),state), 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(decocass_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(decocass_state::fgvideoram_scan_cols),state), 8, 8, 32, 32);
 
 	state->m_bg_tilemap_l->set_transparent_pen(0);
 	state->m_bg_tilemap_r->set_transparent_pen(0);

@@ -79,6 +79,8 @@ public:
 	DECLARE_DRIVER_INIT(xevious);
 	DECLARE_DRIVER_INIT(xevios);
 	DECLARE_DRIVER_INIT(battles);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -103,6 +105,9 @@ public:
 	UINT8 *m_spriteram2;
 	UINT32 m_spriteram_size;
 	DECLARE_WRITE8_MEMBER(bosco_flip_screen_w);
+	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 };
 
 class digdug_state : public galaga_state
@@ -123,6 +128,9 @@ public:
 	UINT8 m_bg_disable;
 	UINT8 m_bg_color_bank;
 	DECLARE_CUSTOM_INPUT_MEMBER(shifted_port_r);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 };
 
 

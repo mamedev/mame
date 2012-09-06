@@ -33,6 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(floppy_r);
 	DECLARE_WRITE8_MEMBER(floppy_w);
 	DECLARE_DRIVER_INIT(aquarius);
+	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
 };
 
 

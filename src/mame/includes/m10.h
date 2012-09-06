@@ -79,6 +79,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(andromed);
 	DECLARE_DRIVER_INIT(ipminva1);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
