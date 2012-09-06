@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE8_MEMBER(suprloco_control_w);
 	DECLARE_READ8_MEMBER(suprloco_control_r);
 	DECLARE_DRIVER_INIT(suprloco);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

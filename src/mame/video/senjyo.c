@@ -17,67 +17,62 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 attr = state->m_fgcolorram[tile_index];
+	UINT8 attr = m_fgcolorram[tile_index];
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	if (state->m_is_senjyo && (tile_index & 0x1f) >= 32-8)
+	if (m_is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
+			m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
 			flags);
 }
 
-static TILE_GET_INFO( senjyo_bg1_tile_info )
+TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->m_bg1videoram[tile_index];
+	UINT8 code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			(code & 0x70) >> 4,
 			0);
 }
 
-static TILE_GET_INFO( starforc_bg1_tile_info )
+TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 {
 	/* Star Force has more tiles in bg1, so to get a uniform color code spread */
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
 	static const UINT8 colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
-	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->m_bg1videoram[tile_index];
+	UINT8 code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			colormap[(code & 0xe0) >> 5],
 			0);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->m_bg2videoram[tile_index];
+	UINT8 code = m_bg2videoram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			(code & 0xe0) >> 5,
 			0);
 }
 
-static TILE_GET_INFO( get_bg3_tile_info )
+TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->m_bg3videoram[tile_index];
+	UINT8 code = m_bg3videoram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			code,
 			(code & 0xe0) >> 5,
@@ -96,19 +91,19 @@ VIDEO_START( senjyo )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	if (state->m_is_senjyo)
 	{
-		state->m_bg1_tilemap = tilemap_create(machine, senjyo_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
-		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
+		state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),state),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
+		state->m_bg3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),state),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
 	}
 	else
 	{
-		state->m_bg1_tilemap = tilemap_create(machine, starforc_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
-		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),state),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		state->m_bg3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),state),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
 	}
 
 	state->m_fg_tilemap->set_transparent_pen(0);

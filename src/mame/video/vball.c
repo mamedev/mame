@@ -19,20 +19,19 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( background_scan )
+TILEMAP_MAPPER_MEMBER(vball_state::background_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) <<6);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
-	vball_state *state = machine.driver_data<vball_state>();
-	UINT8 code = state->m_vb_videoram[tile_index];
-	UINT8 attr = state->m_vb_attribram[tile_index];
-	SET_TILE_INFO(
+	UINT8 code = m_vb_videoram[tile_index];
+	UINT8 attr = m_vb_attribram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			code + ((attr & 0x1f) << 8) + (state->m_gfxset<<8),
+			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
 			0);
 }
@@ -41,7 +40,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( vb )
 {
 	vball_state *state = machine.driver_data<vball_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 8, 8,64,64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vball_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(vball_state::background_scan),state), 8, 8,64,64);
 
 	state->m_bg_tilemap->set_scroll_rows(32);
 	state->m_gfxset=0;

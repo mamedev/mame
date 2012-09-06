@@ -104,16 +104,15 @@ INLINE int get_tile_addr(int tile_index)
 	return TX_TILE_OFFSET_CENTER + (x - 1) + y * 32;
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tceptor_state::get_tx_tile_info)
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int offset = get_tile_addr(tile_index);
-	int code = state->m_tile_ram[offset];
-	int color = state->m_tile_attr[offset];
+	int code = m_tile_ram[offset];
+	int color = m_tile_attr[offset];
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void tceptor_state::tile_mark_dirty(int offset)
@@ -164,24 +163,22 @@ WRITE8_MEMBER(tceptor_state::tceptor_tile_attr_w)
 
 /*******************************************************************/
 
-static TILE_GET_INFO( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(tceptor_state::get_bg1_tile_info)
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
-	UINT16 data = state->m_bg_ram[tile_index * 2] | (state->m_bg_ram[tile_index * 2 + 1] << 8);
+	UINT16 data = m_bg_ram[tile_index * 2] | (m_bg_ram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | 0x000;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO(state->m_bg, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 {
-	tceptor_state *state = machine.driver_data<tceptor_state>();
-	UINT16 data = state->m_bg_ram[tile_index * 2 + 0x1000] | (state->m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
+	UINT16 data = m_bg_ram[tile_index * 2 + 0x1000] | (m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
 	int code = (data & 0x3ff) | 0x400;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO(state->m_bg, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
@@ -395,14 +392,14 @@ VIDEO_START( tceptor )
 
 	state->m_c45_road->set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,  8, 8, 34, 28);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
 
 	state->m_tx_tilemap->set_scrollx(0, -2*8);
 	state->m_tx_tilemap->set_scrolly(0, 0);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 7);
 
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state_save_register_global_pointer(machine, state->m_sprite_ram_buffered, 0x200 / 2);
 	state_save_register_global(machine, state->m_bg1_scroll_x);

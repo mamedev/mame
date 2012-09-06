@@ -42,19 +42,18 @@ WRITE8_MEMBER(kchamp_state::kchamp_flipscreen_w)
 	flip_screen_set(data & 0x01);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
 {
-	kchamp_state *state = machine.driver_data<kchamp_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 7) << 8);
-	int color = (state->m_colorram[tile_index] >> 3) & 0x1f;
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 7) << 8);
+	int color = (m_colorram[tile_index] >> 3) & 0x1f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( kchamp )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kchamp_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 /*

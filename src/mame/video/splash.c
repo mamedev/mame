@@ -38,28 +38,26 @@
       0  | xxxx---- -------- | color
 */
 
-static TILE_GET_INFO( get_tile_info_splash_tilemap0 )
+TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap0)
 {
-	splash_state *state = machine.driver_data<splash_state>();
-	int data = state->m_videoram[tile_index];
+	int data = m_videoram[tile_index];
 	int attr = data >> 8;
 	int code = data & 0xff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code + ((0x20 + (attr & 0x0f)) << 8),
 			(attr & 0xf0) >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_splash_tilemap1 )
+TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap1)
 {
-	splash_state *state = machine.driver_data<splash_state>();
-	int data = state->m_videoram[(0x1000/2) + tile_index];
+	int data = m_videoram[(0x1000/2) + tile_index];
 	int attr = data >> 8;
 	int code = data & 0xff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			(code >> 2) + ((0x30 + (attr & 0x0f)) << 6),
 			(attr & 0xf0) >> 4,
@@ -171,8 +169,8 @@ VIDEO_START( splash )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_splash_tilemap0, TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_splash_tilemap1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap0),state), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_bg_tilemap[0]->set_transparent_pen(0);
 	state->m_bg_tilemap[1]->set_transparent_pen(0);

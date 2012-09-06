@@ -62,6 +62,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 	DECLARE_DRIVER_INIT(dorodon);
 	DECLARE_DRIVER_INIT(redclash);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_grid_tile_info);
 };
 
 

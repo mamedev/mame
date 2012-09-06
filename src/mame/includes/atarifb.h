@@ -72,6 +72,9 @@ public:
 	DECLARE_WRITE8_MEMBER(atarifb_alpha1_videoram_w);
 	DECLARE_WRITE8_MEMBER(atarifb_alpha2_videoram_w);
 	DECLARE_WRITE8_MEMBER(atarifb_field_videoram_w);
+	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
+	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
+	TILE_GET_INFO_MEMBER(field_get_tile_info);
 };
 
 

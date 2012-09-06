@@ -40,6 +40,9 @@ public:
 	DECLARE_WRITE8_MEMBER(c1943_d806_w);
 	DECLARE_DRIVER_INIT(1943b);
 	DECLARE_DRIVER_INIT(1943);
+	TILE_GET_INFO_MEMBER(c1943_get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(c1943_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(c1943_get_fg_tile_info);
 };
 
 

@@ -45,12 +45,11 @@ PALETTE_INIT( starshp1 )
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(starshp1_state::get_tile_info)
 {
-	starshp1_state *state = machine.driver_data<starshp1_state>();
-	UINT8 code = state->m_playfield_ram[tile_index];
+	UINT8 code = m_playfield_ram[tile_index];
 
-	SET_TILE_INFO(0, code & 0x3f, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x3f, 0, 0);
 }
 
 
@@ -61,7 +60,7 @@ VIDEO_START( starshp1 )
 
 	int i;
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(starshp1_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 

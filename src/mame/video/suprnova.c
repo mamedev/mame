@@ -272,19 +272,18 @@ static void palette_update(running_machine &machine)
 
 
 
-static TILE_GET_INFO( get_tilemap_A_tile_info )
+TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	int code = ((state->m_tilemapA_ram[tile_index] & 0x001fffff) >> 0 );
-	int colr = ((state->m_tilemapA_ram[tile_index] & 0x3f000000) >> 24 );
-	int pri  = ((state->m_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
-	int depth = (state->m_v3_regs[0x0c/4] & 0x0001) << 1;
+	int code = ((m_tilemapA_ram[tile_index] & 0x001fffff) >> 0 );
+	int colr = ((m_tilemapA_ram[tile_index] & 0x3f000000) >> 24 );
+	int pri  = ((m_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
+	int depth = (m_v3_regs[0x0c/4] & 0x0001) << 1;
 	int flags = 0;
 
-	if(state->m_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
-	if(state->m_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
+	if(m_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
+	if(m_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0+depth,
 			code,
 			0x40+colr,
@@ -300,19 +299,18 @@ WRITE32_MEMBER(skns_state::skns_tilemapA_w)
 	m_tilemap_A->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_tilemap_B_tile_info )
+TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 {
-	skns_state *state = machine.driver_data<skns_state>();
-	int code = ((state->m_tilemapB_ram[tile_index] & 0x001fffff) >> 0 );
-	int colr = ((state->m_tilemapB_ram[tile_index] & 0x3f000000) >> 24 );
-	int pri  = ((state->m_tilemapB_ram[tile_index] & 0x00e00000) >> 21 );
-	int depth = (state->m_v3_regs[0x0c/4] & 0x0100) >> 7;
+	int code = ((m_tilemapB_ram[tile_index] & 0x001fffff) >> 0 );
+	int colr = ((m_tilemapB_ram[tile_index] & 0x3f000000) >> 24 );
+	int pri  = ((m_tilemapB_ram[tile_index] & 0x00e00000) >> 21 );
+	int depth = (m_v3_regs[0x0c/4] & 0x0100) >> 7;
 	int flags = 0;
 
-	if(state->m_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
-	if(state->m_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
+	if(m_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
+	if(m_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1+depth,
 			code,
 			0x40+colr,
@@ -354,10 +352,10 @@ VIDEO_START(skns)
 
 	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
 
-	state->m_tilemap_A = tilemap_create(machine, get_tilemap_A_tile_info,TILEMAP_SCAN_ROWS,16,16,64, 64);
+	state->m_tilemap_A = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_A_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64, 64);
 		state->m_tilemap_A->set_transparent_pen(0);
 
-	state->m_tilemap_B = tilemap_create(machine, get_tilemap_B_tile_info,TILEMAP_SCAN_ROWS,16,16,64, 64);
+	state->m_tilemap_B = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skns_state::get_tilemap_B_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64, 64);
 		state->m_tilemap_B->set_transparent_pen(0);
 
 	state->m_sprite_bitmap.allocate(1024,1024);

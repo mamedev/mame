@@ -89,20 +89,19 @@ WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 {
-	bagman_state *state = machine.driver_data<bagman_state>();
-	int gfxbank = (machine.gfx[2] && (state->m_colorram[tile_index] & 0x10)) ? 2 : 0;
-	int code = state->m_videoram[tile_index] + 8 * (state->m_colorram[tile_index] & 0x20);
-	int color = state->m_colorram[tile_index] & 0x0f;
+	int gfxbank = (machine().gfx[2] && (m_colorram[tile_index] & 0x10)) ? 2 : 0;
+	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
+	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(gfxbank, code, color, 0);
+	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
 }
 
 VIDEO_START( bagman )
 {
 	bagman_state *state = machine.driver_data<bagman_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bagman_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scrolldy(-1, -1);

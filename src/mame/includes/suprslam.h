@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);
 	DECLARE_WRITE16_MEMBER(suprslam_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(suprslam_bank_w);
+	TILE_GET_INFO_MEMBER(get_suprslam_tile_info);
+	TILE_GET_INFO_MEMBER(get_suprslam_bg_tile_info);
 };
 
 

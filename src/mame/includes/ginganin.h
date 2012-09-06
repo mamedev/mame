@@ -39,6 +39,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);
 	DECLARE_WRITE8_MEMBER(ptm_irq);
 	DECLARE_DRIVER_INIT(ginganin);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_txt_tile_info);
 };
 
 

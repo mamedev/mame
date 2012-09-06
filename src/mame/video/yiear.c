@@ -86,22 +86,21 @@ WRITE8_MEMBER(yiear_state::yiear_control_w)
 	coin_counter_w(machine(), 1, data & 0x10);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
 {
-	yiear_state *state = machine.driver_data<yiear_state>();
 	int offs = tile_index * 2;
-	int attr = state->m_videoram[offs];
-	int code = state->m_videoram[offs + 1] | ((attr & 0x10) << 4);
+	int attr = m_videoram[offs];
+	int code = m_videoram[offs + 1] | ((attr & 0x10) << 4);
 //  int color = (attr & 0xf0) >> 4;
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, 0, flags);
+	SET_TILE_INFO_MEMBER(0, code, 0, flags);
 }
 
 VIDEO_START( yiear )
 {
 	yiear_state *state = machine.driver_data<yiear_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(yiear_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

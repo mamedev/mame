@@ -18,6 +18,8 @@ public:
 	DECLARE_WRITE8_MEMBER(runaway_video_ram_w);
 	DECLARE_WRITE8_MEMBER(runaway_tile_bank_w);
 	DECLARE_READ8_MEMBER(runaway_pot_r);
+	TILE_GET_INFO_MEMBER(runaway_get_tile_info);
+	TILE_GET_INFO_MEMBER(qwak_get_tile_info);
 };
 
 

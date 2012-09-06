@@ -57,7 +57,7 @@ PALETTE_INIT( skykid )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static TILEMAP_MAPPER( tx_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(skykid_state::tx_tilemap_scan)
 {
 	int offs;
 
@@ -71,32 +71,30 @@ static TILEMAP_MAPPER( tx_tilemap_scan )
 	return offs;
 }
 
-static TILE_GET_INFO( tx_get_tile_info )
+TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
 {
-	skykid_state *state = machine.driver_data<skykid_state>();
-	int code = state->m_textram[tile_index];
-	int attr = state->m_textram[tile_index + 0x400];
+	int code = m_textram[tile_index];
+	int attr = m_textram[tile_index + 0x400];
 	tileinfo.category = code >> 4 & 0xf;
 
 	/* the hardware has two character sets, one normal and one flipped. When
        screen is flipped, character flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			code | (state->flip_screen() ? 0x100 : 0),
+			code | (flip_screen() ? 0x100 : 0),
 			attr & 0x3f,
-			state->flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
+			flip_screen() ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(skykid_state::bg_get_tile_info)
 {
-	skykid_state *state = machine.driver_data<skykid_state>();
-	int code = state->m_videoram[tile_index];
-	int attr = state->m_videoram[tile_index+0x800];
+	int code = m_videoram[tile_index];
+	int attr = m_videoram[tile_index+0x800];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code + ((attr & 0x01) << 8),
 			((attr & 0x7e) >> 1) | ((attr & 0x01) << 6),
@@ -114,8 +112,8 @@ static TILE_GET_INFO( bg_get_tile_info )
 VIDEO_START( skykid )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,     8,8,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skykid_state::tx_get_tile_info),state),tilemap_mapper_delegate(FUNC(skykid_state::tx_tilemap_scan),state),  8,8,36,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skykid_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,     8,8,64,32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 

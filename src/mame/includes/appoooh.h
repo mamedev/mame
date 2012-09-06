@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(appoooh_out_w);
 	DECLARE_DRIVER_INIT(robowres);
 	DECLARE_DRIVER_INIT(robowresb);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

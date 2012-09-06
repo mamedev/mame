@@ -2,25 +2,24 @@
 #include "video/konicdev.h"
 #include "includes/tmnt.h"
 
-static TILE_GET_INFO( glfgreat_get_roz_tile_info )
+TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 {
-	tmnt_state *state = machine.driver_data<tmnt_state>();
-	UINT8 *rom = state->memregion("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 	int code;
 
-	tile_index += 0x40000 * state->m_glfgreat_roz_rom_bank;
+	tile_index += 0x40000 * m_glfgreat_roz_rom_bank;
 
 	code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
 
-	SET_TILE_INFO(0, code & 0x3fff, code >> 14, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x3fff, code >> 14, 0);
 }
 
-static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
+TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
 {
-	UINT8 *rom = machine.root_device().memregion("user1")->base();
+	UINT8 *rom = machine().root_device().memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
 
-	SET_TILE_INFO(0, code & 0x1fff, code >> 13, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x1fff, code >> 13, 0);
 }
 
 
@@ -274,7 +273,7 @@ VIDEO_START( glfgreat )
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
+	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	state->m_roz_tilemap->set_transparent_pen(0);
 
 	state->m_glfgreat_roz_rom_bank = 0;
@@ -289,7 +288,7 @@ VIDEO_START( prmrsocr )
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
+	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	state->m_roz_tilemap->set_transparent_pen(0);
 
 	state->m_prmrsocr_sprite_bank = 0;

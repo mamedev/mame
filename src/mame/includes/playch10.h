@@ -107,6 +107,7 @@ public:
 	DECLARE_DRIVER_INIT(pceboard);
 	DECLARE_DRIVER_INIT(pciboard);
 	DECLARE_DRIVER_INIT(pcaboard);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

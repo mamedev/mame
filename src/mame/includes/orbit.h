@@ -39,6 +39,7 @@ public:
 	device_t *m_discrete;
 	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

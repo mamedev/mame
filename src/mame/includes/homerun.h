@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE8_MEMBER(pc_w);
+	TILE_GET_INFO_MEMBER(get_homerun_tile_info);
 };
 
 

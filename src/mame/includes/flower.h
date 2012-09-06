@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER(flower_bg1ram_w);
 	DECLARE_WRITE8_MEMBER(flower_flipscreen_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

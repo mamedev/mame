@@ -52,6 +52,12 @@ public:
 	DECLARE_DRIVER_INIT(cclimberj);
 	DECLARE_DRIVER_INIT(cannonb2);
 	DECLARE_DRIVER_INIT(cannonb);
+	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
+	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
+	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
 };
 
 

@@ -21,35 +21,33 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 {
-	rpunch_state *state = machine.driver_data<rpunch_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code;
-	if (state->m_videoflags & 0x0400)	code = (data & 0x0fff) | 0x2000;
+	if (m_videoflags & 0x0400)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
-			((state->m_videoflags & 0x0010) >> 1) | ((data >> 13) & 7),
+			((m_videoflags & 0x0010) >> 1) | ((data >> 13) & 7),
 			0);
 }
 
-static TILE_GET_INFO( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
 {
-	rpunch_state *state = machine.driver_data<rpunch_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int data = videoram[0x2000 / 2 + tile_index];
 	int code;
-	if (state->m_videoflags & 0x0800)	code = (data & 0x0fff) | 0x2000;
+	if (m_videoflags & 0x0800)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
-			((state->m_videoflags & 0x0020) >> 2) | ((data >> 13) & 7),
+			((m_videoflags & 0x0020) >> 2) | ((data >> 13) & 7),
 			0);
 }
 
@@ -73,8 +71,8 @@ VIDEO_START( rpunch )
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	/* allocate tilemaps for the backgrounds */
-	state->m_background[0] = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_COLS,8,8,64,64);
-	state->m_background[1] = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_COLS,8,8,64,64);
+	state->m_background[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rpunch_state::get_bg0_tile_info),state),TILEMAP_SCAN_COLS,8,8,64,64);
+	state->m_background[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rpunch_state::get_bg1_tile_info),state),TILEMAP_SCAN_COLS,8,8,64,64);
 
 	/* configure the tilemaps */
 	state->m_background[1]->set_transparent_pen(15);

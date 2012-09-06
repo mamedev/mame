@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(aeroboto_3000_w);
 	DECLARE_WRITE8_MEMBER(aeroboto_videoram_w);
 	DECLARE_WRITE8_MEMBER(aeroboto_tilecolor_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

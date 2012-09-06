@@ -89,6 +89,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
+	TILE_GET_INFO_MEMBER(firetrk_get_tile_info1);
+	TILE_GET_INFO_MEMBER(superbug_get_tile_info1);
+	TILE_GET_INFO_MEMBER(montecar_get_tile_info1);
+	TILE_GET_INFO_MEMBER(firetrk_get_tile_info2);
+	TILE_GET_INFO_MEMBER(superbug_get_tile_info2);
+	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
 };
 
 

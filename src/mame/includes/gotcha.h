@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
 	DECLARE_WRITE16_MEMBER(gotcha_oki_bank_w);
+	TILEMAP_MAPPER_MEMBER(gotcha_tilemap_scan);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 };
 
 

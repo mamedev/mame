@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(holeland_pal_offs_w);
 	DECLARE_WRITE8_MEMBER(holeland_scroll_w);
 	DECLARE_WRITE8_MEMBER(holeland_flipscreen_w);
+	TILE_GET_INFO_MEMBER(holeland_get_tile_info);
+	TILE_GET_INFO_MEMBER(crzrally_get_tile_info);
 };
 
 

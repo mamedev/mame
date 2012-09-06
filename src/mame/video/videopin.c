@@ -11,25 +11,24 @@
 
 
 
-static TILEMAP_MAPPER( get_memory_offset )
+TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
 {
 	return num_rows * ((col + 16) % 48) + row;
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
 {
-	videopin_state *state = machine.driver_data<videopin_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
 }
 
 
 VIDEO_START( videopin )
 {
 	videopin_state *state = machine.driver_data<videopin_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, get_memory_offset,  8, 8, 48, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(videopin_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(videopin_state::get_memory_offset),state),  8, 8, 48, 32);
 }
 
 

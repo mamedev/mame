@@ -120,24 +120,23 @@ PALETTE_INIT( galivan )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 {
-	UINT8 *BGROM = machine.root_device().memregion("gfx4")->base();
+	UINT8 *BGROM = machine().root_device().memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			(attr & 0x78) >> 3,		/* seems correct */
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
-	int attr = state->m_videoram[tile_index + 0x400];
-	int code = state->m_videoram[tile_index] | ((attr & 0x01) << 8);
-	SET_TILE_INFO(
+	int attr = m_videoram[tile_index + 0x400];
+	int code = m_videoram[tile_index] | ((attr & 0x01) << 8);
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0xe0) >> 5,		/* not sure */
@@ -145,28 +144,27 @@ static TILE_GET_INFO( get_tx_tile_info )
 	tileinfo.category = attr & 8 ? 0 : 1;	/* seems correct */
 }
 
-static TILE_GET_INFO( ninjemak_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 {
-	UINT8 *BGROM = machine.root_device().memregion("gfx4")->base();
+	UINT8 *BGROM = machine().root_device().memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),	/* seems correct */
 			0);
 }
 
-static TILE_GET_INFO( ninjemak_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
-	int attr = state->m_videoram[tile_index + 0x400];
-	int code = state->m_videoram[tile_index] | ((attr & 0x03) << 8);
+	int attr = m_videoram[tile_index + 0x400];
+	int code = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
 	if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
 		code = attr = 0x01;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0x1c) >> 2,		/* seems correct ? */
@@ -185,8 +183,8 @@ VIDEO_START( galivan )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 }
@@ -195,8 +193,8 @@ VIDEO_START( ninjemak )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, ninjemak_get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 512, 32);
-	state->m_tx_tilemap = tilemap_create(machine, ninjemak_get_tx_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 512, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_tx_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 }

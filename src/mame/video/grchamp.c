@@ -71,31 +71,27 @@ WRITE8_MEMBER(grchamp_state::grchamp_right_w)
 	m_right_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(grchamp_state::get_text_tile_info)
 {
-	grchamp_state *state = machine.driver_data<grchamp_state>();
-	SET_TILE_INFO(0, state->m_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-static TILE_GET_INFO( get_left_tile_info )
+TILE_GET_INFO_MEMBER(grchamp_state::get_left_tile_info)
 {
-	grchamp_state *state = machine.driver_data<grchamp_state>();
-	SET_TILE_INFO(1, state->m_leftram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(1, m_leftram[tile_index], 0, 0);
 }
 
-static TILE_GET_INFO( get_right_tile_info )
+TILE_GET_INFO_MEMBER(grchamp_state::get_right_tile_info)
 {
-	grchamp_state *state = machine.driver_data<grchamp_state>();
-	SET_TILE_INFO(2, state->m_rightram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(2, m_rightram[tile_index], 0, 0);
 }
 
-static TILE_GET_INFO( get_center_tile_info )
+TILE_GET_INFO_MEMBER(grchamp_state::get_center_tile_info)
 {
-	grchamp_state *state = machine.driver_data<grchamp_state>();
-	SET_TILE_INFO(3, state->m_centerram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(3, m_centerram[tile_index], 0, 0);
 }
 
-static TILEMAP_MAPPER( get_memory_offset )
+TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 {
 	return (col % 32) + row * 32 + (col / 32) * 32*32;
 }
@@ -108,10 +104,10 @@ VIDEO_START( grchamp )
 	state->m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
-	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	state->m_left_tilemap = tilemap_create(machine, get_left_tile_info, get_memory_offset,  8,8, 64,32);
-	state->m_right_tilemap = tilemap_create(machine, get_right_tile_info, get_memory_offset,  8,8, 64,32);
-	state->m_center_tilemap = tilemap_create(machine, get_center_tile_info, get_memory_offset,  8,8, 64,32);
+	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	state->m_left_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_left_tile_info),state), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),state),  8,8, 64,32);
+	state->m_right_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_right_tile_info),state), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),state),  8,8, 64,32);
+	state->m_center_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(grchamp_state::get_center_tile_info),state), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),state),  8,8, 64,32);
 }
 
 #if 0

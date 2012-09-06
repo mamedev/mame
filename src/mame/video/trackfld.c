@@ -158,24 +158,23 @@ WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
 {
-	trackfld_state *state = machine.driver_data<trackfld_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + 4 * (attr & 0xc0);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 4 * (attr & 0xc0);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	if (state->m_bg_bank)
+	if (m_bg_bank)
 		code |= 0x400;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 VIDEO_START( trackfld )
 {
 	trackfld_state *state = machine.driver_data<trackfld_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(trackfld_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_bg_tilemap->set_scroll_rows(32);
 	state->m_sprites_gfx_banked = 0;
 }

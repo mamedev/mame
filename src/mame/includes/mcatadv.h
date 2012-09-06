@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcatadv_sound_bw_w);
 	DECLARE_WRITE16_MEMBER(mcatadv_videoram1_w);
 	DECLARE_WRITE16_MEMBER(mcatadv_videoram2_w);
+	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info1);
+	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info2);
 };
 
 /*----------- defined in video/mcatadv.c -----------*/

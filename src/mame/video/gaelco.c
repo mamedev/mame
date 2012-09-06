@@ -31,29 +31,27 @@
       1  | xxxxxxxx -------- | not used
 */
 
-static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
+TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen0)
 {
-	gaelco_state *state = machine.driver_data<gaelco_state>();
-	int data = state->m_videoram[tile_index << 1];
-	int data2 = state->m_videoram[(tile_index << 1) + 1];
+	int data = m_videoram[tile_index << 1];
+	int data2 = m_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
+	SET_TILE_INFO_MEMBER(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
 
 
-static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
+TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen1)
 {
-	gaelco_state *state = machine.driver_data<gaelco_state>();
-	int data = state->m_videoram[(0x1000 / 2) + (tile_index << 1)];
-	int data2 = state->m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];
+	int data = m_videoram[(0x1000 / 2) + (tile_index << 1)];
+	int data2 = m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
+	SET_TILE_INFO_MEMBER(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
 
 /***************************************************************************
@@ -77,8 +75,8 @@ WRITE16_MEMBER(gaelco_state::gaelco_vram_w)
 VIDEO_START( bigkarnk )
 {
 	gaelco_state *state = machine.driver_data<gaelco_state>();
-	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tilemap[0]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	state->m_tilemap[1]->set_transmask(0, 0xff01, 0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
@@ -87,8 +85,8 @@ VIDEO_START( bigkarnk )
 VIDEO_START( maniacsq )
 {
 	gaelco_state *state = machine.driver_data<gaelco_state>();
-	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_gaelco_screen0, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_gaelco_screen1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco_state::get_tile_info_gaelco_screen1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tilemap[0]->set_transparent_pen(0);
 	state->m_tilemap[1]->set_transparent_pen(0);

@@ -5,12 +5,11 @@
 
 
 /* bg tilemap */
-static TILE_GET_INFO( get_oneshot_bg_tile_info )
+TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_bg_tile_info)
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
-	int tileno = state->m_bg_videoram[tile_index * 2 + 1];
+	int tileno = m_bg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
@@ -20,12 +19,11 @@ WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
 }
 
 /* mid tilemap */
-static TILE_GET_INFO( get_oneshot_mid_tile_info )
+TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_mid_tile_info)
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
-	int tileno = state->m_mid_videoram[tile_index * 2 + 1];
+	int tileno = m_mid_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO(0, tileno, 2, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 2, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
@@ -36,12 +34,11 @@ WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
 
 
 /* fg tilemap */
-static TILE_GET_INFO( get_oneshot_fg_tile_info )
+TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_fg_tile_info)
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
-	int tileno = state->m_fg_videoram[tile_index * 2 + 1];
+	int tileno = m_fg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO(0, tileno, 3, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 3, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
@@ -54,9 +51,9 @@ VIDEO_START( oneshot )
 {
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 
-	state->m_bg_tilemap =  tilemap_create(machine, get_oneshot_bg_tile_info,  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_mid_tilemap = tilemap_create(machine, get_oneshot_mid_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap =  tilemap_create(machine, get_oneshot_fg_tile_info,  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_bg_tile_info),state),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_mid_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_fg_tile_info),state),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_mid_tilemap->set_transparent_pen(0);

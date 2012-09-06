@@ -37,6 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tankbust_yscroll_w);
 	DECLARE_READ8_MEMBER(tankbust_soundlatch_r);
 	DECLARE_READ8_MEMBER(tankbust_soundtimer_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_txt_tile_info);
 };
 
 

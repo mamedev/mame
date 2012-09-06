@@ -88,13 +88,12 @@ PALETTE_INIT( pandoras )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info0 )
+TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 {
-	pandoras_state *state = machine.driver_data<pandoras_state>();
-	UINT8 attr = state->m_colorram[tile_index];
-	SET_TILE_INFO(
+	UINT8 attr = m_colorram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_videoram[tile_index] + ((attr & 0x10) << 4),
+			m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
 	tileinfo.category = (attr & 0x20) >> 5;
@@ -109,7 +108,7 @@ static TILE_GET_INFO( get_tile_info0 )
 VIDEO_START( pandoras )
 {
 	pandoras_state *state = machine.driver_data<pandoras_state>();
-	state->m_layer0 = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_layer0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pandoras_state::get_tile_info0),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->save_item(NAME(state->m_flipscreen));
 }

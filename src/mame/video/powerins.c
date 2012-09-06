@@ -118,13 +118,12 @@ Offset:
 #define DIM_NY_0			(0x20)
 
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
 {
-	powerins_state *state = machine.driver_data<powerins_state>();
-	UINT16 code = state->m_vram_0[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_vram_0[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			(code & 0x07ff) + (state->m_tile_bank*0x800),
+			(code & 0x07ff) + (m_tile_bank*0x800),
 			((code & 0xf000) >> (16-4)) + ((code & 0x0800) >> (11-4)),
 			0);
 }
@@ -135,7 +134,7 @@ WRITE16_MEMBER(powerins_state::powerins_vram_0_w)
 	m_tilemap_0->mark_tile_dirty(offset);
 }
 
-static TILEMAP_MAPPER( powerins_get_memory_offset_0 )
+TILEMAP_MAPPER_MEMBER(powerins_state::powerins_get_memory_offset_0)
 {
 	return	(col * TILES_PER_PAGE_Y) +
 
@@ -159,11 +158,10 @@ Offset:
 #define DIM_NX_1	(0x40)
 #define DIM_NY_1	(0x20)
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 {
-	powerins_state *state = machine.driver_data<powerins_state>();
-	UINT16 code = state->m_vram_1[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_vram_1[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0x0fff,
 			(code & 0xf000) >> (16-4),
@@ -191,24 +189,15 @@ WRITE16_MEMBER(powerins_state::powerins_vram_1_w)
 VIDEO_START( powerins )
 {
 	powerins_state *state = machine.driver_data<powerins_state>();
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0,
-								powerins_get_memory_offset_0,
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),state),tilemap_mapper_delegate(FUNC(powerins_state::powerins_get_memory_offset_0),state),16,16,DIM_NX_0, DIM_NY_0 );
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),state),TILEMAP_SCAN_COLS,8,8,DIM_NX_1, DIM_NY_1 );
 
-								16,16,
-								DIM_NX_0, DIM_NY_0 );
+	state->m_tilemap_0->set_scroll_rows(1);
+	state->m_tilemap_0->set_scroll_cols(1);
 
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1,
-								TILEMAP_SCAN_COLS,
-
-								8,8,
-								DIM_NX_1, DIM_NY_1 );
-
-		state->m_tilemap_0->set_scroll_rows(1);
-		state->m_tilemap_0->set_scroll_cols(1);
-
-		state->m_tilemap_1->set_scroll_rows(1);
-		state->m_tilemap_1->set_scroll_cols(1);
-		state->m_tilemap_1->set_transparent_pen(15);
+	state->m_tilemap_1->set_scroll_rows(1);
+	state->m_tilemap_1->set_scroll_cols(1);
+	state->m_tilemap_1->set_transparent_pen(15);
 }
 
 

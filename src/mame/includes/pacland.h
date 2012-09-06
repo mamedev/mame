@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pacland_scroll0_w);
 	DECLARE_WRITE8_MEMBER(pacland_scroll1_w);
 	DECLARE_WRITE8_MEMBER(pacland_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

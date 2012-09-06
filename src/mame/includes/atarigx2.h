@@ -40,6 +40,9 @@ public:
 	DECLARE_DRIVER_INIT(spclords);
 	DECLARE_DRIVER_INIT(rrreveng);
 	DECLARE_DRIVER_INIT(motofren);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
 };
 
 

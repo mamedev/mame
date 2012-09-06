@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(upd_data_w);
 	DECLARE_DRIVER_INIT(rabiolep);
 	DECLARE_DRIVER_INIT(svolley);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 };
 
 

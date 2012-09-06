@@ -22,6 +22,8 @@ public:
 	DECLARE_WRITE8_MEMBER(funkybee_gfx_bank_w);
 	DECLARE_WRITE8_MEMBER(funkybee_scroll_w);
 	DECLARE_WRITE8_MEMBER(funkybee_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(funkybee_tilemap_scan);
 };
 
 

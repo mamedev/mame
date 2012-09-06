@@ -60,22 +60,20 @@ PALETTE_INIT( astrowar )
 	palette_set_color_rgb(machine, BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
-static TILE_GET_INFO( get_galaxia_bg_tile_info )
+TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)
 {
-	galaxia_state *state = machine.driver_data<galaxia_state>();
-	UINT8 code = state->m_video_ram[tile_index] & 0x7f; // d7 unused
-	UINT8 color = state->m_color_ram[tile_index] & 3; // highest bits unused
+	UINT8 code = m_video_ram[tile_index] & 0x7f; // d7 unused
+	UINT8 color = m_color_ram[tile_index] & 3; // highest bits unused
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_astrowar_bg_tile_info )
+TILE_GET_INFO_MEMBER(galaxia_state::get_astrowar_bg_tile_info)
 {
-	galaxia_state *state = machine.driver_data<galaxia_state>();
-	UINT8 code = state->m_video_ram[tile_index];
-	UINT8 color = state->m_color_ram[tile_index] & 7; // highest bits unused
+	UINT8 code = m_video_ram[tile_index];
+	UINT8 color = m_color_ram[tile_index] & 7; // highest bits unused
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 static void init_common( running_machine &machine )
@@ -89,7 +87,7 @@ VIDEO_START( galaxia )
 	galaxia_state *state = machine.driver_data<galaxia_state>();
 	init_common(machine);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_galaxia_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_galaxia_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(8);
 
@@ -100,7 +98,7 @@ VIDEO_START( astrowar )
 	galaxia_state *state = machine.driver_data<galaxia_state>();
 	init_common(machine);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_astrowar_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_astrowar_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(8);
 	state->m_bg_tilemap->set_scrolldx(8, 8);

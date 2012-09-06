@@ -28,6 +28,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
 	DECLARE_DRIVER_INIT(condor);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

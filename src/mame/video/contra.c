@@ -76,14 +76,13 @@ static void set_pens( running_machine &machine )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 {
-	contra_state *state = machine.driver_data<contra_state>();
-	UINT8 ctrl_3 = k007121_ctrlram_r(state->m_k007121_1, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(state->m_k007121_1, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(state->m_k007121_1, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(state->m_k007121_1, 6);
-	int attr = state->m_fg_cram[tile_index];
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121_1, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121_1, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121_1, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_1, 6);
+	int attr = m_fg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -98,21 +97,20 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fg_vram[tile_index] + bank * 256,
+			m_fg_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 {
-	contra_state *state = machine.driver_data<contra_state>();
-	UINT8 ctrl_3 = k007121_ctrlram_r(state->m_k007121_2, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(state->m_k007121_2, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(state->m_k007121_2, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(state->m_k007121_2, 6);
-	int attr = state->m_bg_cram[tile_index];
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121_2, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121_2, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121_2, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_2, 6);
+	int attr = m_bg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -128,19 +126,18 @@ static TILE_GET_INFO( get_bg_tile_info )
 	// 2009-12 FP: TO BE VERIFIED - old code used ctrl4 from chip 0?!?
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_bg_vram[tile_index] + bank * 256,
+			m_bg_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 {
-	contra_state *state = machine.driver_data<contra_state>();
-	UINT8 ctrl_5 = k007121_ctrlram_r(state->m_k007121_1, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(state->m_k007121_1, 6);
-	int attr = state->m_tx_cram[tile_index];
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121_1, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_1, 6);
+	int attr = m_tx_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -151,9 +148,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 			((attr >> (bit2    )) & 0x08) |
 			((attr >> (bit3 - 1)) & 0x10);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_tx_vram[tile_index] + bank * 256,
+			m_tx_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
@@ -169,9 +166,9 @@ VIDEO_START( contra )
 {
 	contra_state *state = machine.driver_data<contra_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT8, 0x800);
 	state->m_buffered_spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);

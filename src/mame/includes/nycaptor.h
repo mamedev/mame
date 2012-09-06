@@ -98,6 +98,7 @@ public:
 	DECLARE_DRIVER_INIT(colt);
 	DECLARE_DRIVER_INIT(bronx);
 	DECLARE_DRIVER_INIT(nycaptor);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

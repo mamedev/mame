@@ -96,15 +96,14 @@ PALETTE_INIT( pooyan )
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(pooyan_state::get_bg_tile_info)
 {
-	pooyan_state *state = machine.driver_data<pooyan_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
@@ -118,7 +117,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( pooyan )
 {
 	pooyan_state *state = machine.driver_data<pooyan_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pooyan_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

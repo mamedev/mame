@@ -86,14 +86,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 /* TXT Layer */
-static TILE_GET_INFO( get_aquarium_txt_tile_info )
+TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_txt_tile_info)
 {
-	aquarium_state *state = machine.driver_data<aquarium_state>();
 	int tileno, colour;
 
-	tileno = (state->m_txt_videoram[tile_index] & 0x0fff);
-	colour = (state->m_txt_videoram[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO(2, tileno, colour, 0);
+	tileno = (m_txt_videoram[tile_index] & 0x0fff);
+	colour = (m_txt_videoram[tile_index] & 0xf000) >> 12;
+	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
 WRITE16_MEMBER(aquarium_state::aquarium_txt_videoram_w)
@@ -103,18 +102,17 @@ WRITE16_MEMBER(aquarium_state::aquarium_txt_videoram_w)
 }
 
 /* MID Layer */
-static TILE_GET_INFO( get_aquarium_mid_tile_info )
+TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_mid_tile_info)
 {
-	aquarium_state *state = machine.driver_data<aquarium_state>();
 	int tileno, colour, flag;
 
-	tileno = (state->m_mid_videoram[tile_index * 2] & 0x0fff);
-	colour = (state->m_mid_videoram[tile_index * 2 + 1] & 0x001f);
-	flag = TILE_FLIPYX((state->m_mid_videoram[tile_index * 2 + 1] & 0x300) >> 8);
+	tileno = (m_mid_videoram[tile_index * 2] & 0x0fff);
+	colour = (m_mid_videoram[tile_index * 2 + 1] & 0x001f);
+	flag = TILE_FLIPYX((m_mid_videoram[tile_index * 2 + 1] & 0x300) >> 8);
 
-	SET_TILE_INFO(1, tileno, colour, flag);
+	SET_TILE_INFO_MEMBER(1, tileno, colour, flag);
 
-	tileinfo.category = (state->m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
+	tileinfo.category = (m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
 WRITE16_MEMBER(aquarium_state::aquarium_mid_videoram_w)
@@ -124,18 +122,17 @@ WRITE16_MEMBER(aquarium_state::aquarium_mid_videoram_w)
 }
 
 /* BAK Layer */
-static TILE_GET_INFO( get_aquarium_bak_tile_info )
+TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_bak_tile_info)
 {
-	aquarium_state *state = machine.driver_data<aquarium_state>();
 	int tileno, colour, flag;
 
-	tileno = (state->m_bak_videoram[tile_index * 2] & 0x0fff);
-	colour = (state->m_bak_videoram[tile_index * 2 + 1] & 0x001f);
-	flag = TILE_FLIPYX((state->m_bak_videoram[tile_index * 2 + 1] & 0x300) >> 8);
+	tileno = (m_bak_videoram[tile_index * 2] & 0x0fff);
+	colour = (m_bak_videoram[tile_index * 2 + 1] & 0x001f);
+	flag = TILE_FLIPYX((m_bak_videoram[tile_index * 2 + 1] & 0x300) >> 8);
 
-	SET_TILE_INFO(3, tileno, colour, flag);
+	SET_TILE_INFO_MEMBER(3, tileno, colour, flag);
 
-	tileinfo.category = (state->m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
+	tileinfo.category = (m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
 WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
@@ -147,9 +144,9 @@ WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
 VIDEO_START(aquarium)
 {
 	aquarium_state *state = machine.driver_data<aquarium_state>();
-	state->m_txt_tilemap = tilemap_create(machine, get_aquarium_txt_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_bak_tilemap = tilemap_create(machine, get_aquarium_bak_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_mid_tilemap = tilemap_create(machine, get_aquarium_mid_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_txt_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bak_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_bak_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aquarium_state::get_aquarium_mid_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_txt_tilemap->set_transparent_pen(0);
 	state->m_mid_tilemap->set_transparent_pen(0);

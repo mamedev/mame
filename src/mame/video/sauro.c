@@ -45,24 +45,22 @@ WRITE8_MEMBER(sauro_state::tecfri_scroll_bg_w)
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-static TILE_GET_INFO( get_tile_info_bg )
+TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
 {
-	sauro_state *state = machine.driver_data<sauro_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x07) << 8);
-	int color = ((state->m_colorram[tile_index] >> 4) & 0x0f) | state->m_palette_bank;
-	int flags = state->m_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x07) << 8);
+	int color = ((m_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
+	int flags = m_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-static TILE_GET_INFO( get_tile_info_fg )
+TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 {
-	sauro_state *state = machine.driver_data<sauro_state>();
-	int code = state->m_videoram2[tile_index] + ((state->m_colorram2[tile_index] & 0x07) << 8);
-	int color = ((state->m_colorram2[tile_index] >> 4) & 0x0f) | state->m_palette_bank;
-	int flags = state->m_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
+	int code = m_videoram2[tile_index] + ((m_colorram2[tile_index] & 0x07) << 8);
+	int color = ((m_colorram2[tile_index] >> 4) & 0x0f) | m_palette_bank;
+	int flags = m_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 /* Sauro */
@@ -89,10 +87,10 @@ VIDEO_START( sauro )
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),state), TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_tile_info_fg, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_fg),state), TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -163,7 +161,7 @@ VIDEO_START( trckydoc )
 {
 	sauro_state *state = machine.driver_data<sauro_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),state), TILEMAP_SCAN_COLS,
 		 8, 8, 32, 32);
 }
 

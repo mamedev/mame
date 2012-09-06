@@ -8,12 +8,11 @@ Atari Triple Hunt video emulation
 #include "includes/triplhnt.h"
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
-	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	int code = state->m_playfield_ram[tile_index] & 0x3f;
+	int code = m_playfield_ram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(2, code, code == 0x3f ? 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(2, code, code == 0x3f ? 1 : 0, 0);
 }
 
 
@@ -22,7 +21,7 @@ VIDEO_START( triplhnt )
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

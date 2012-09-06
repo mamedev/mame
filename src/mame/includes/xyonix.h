@@ -16,6 +16,7 @@ public:
 	DECLARE_READ8_MEMBER(xyonix_io_r);
 	DECLARE_WRITE8_MEMBER(xyonix_io_w);
 	DECLARE_WRITE8_MEMBER(xyonix_vidram_w);
+	TILE_GET_INFO_MEMBER(get_xyonix_tile_info);
 };
 
 

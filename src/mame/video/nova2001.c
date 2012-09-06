@@ -77,78 +77,71 @@ WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
  *
  *************************************/
 
-static TILE_GET_INFO( nova2001_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int code = state->m_bg_videoram[tile_index];
-	int color = state->m_bg_videoram[tile_index + 0x400] & 0x0f;
+	int code = m_bg_videoram[tile_index];
+	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-static TILE_GET_INFO( nova2001_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->m_fg_videoram[tile_index + 0x400];
-	int code = state->m_fg_videoram[tile_index];
+	int attr = m_fg_videoram[tile_index + 0x400];
+	int code = m_fg_videoram[tile_index];
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 
 	tileinfo.category = (attr & 0x10) >> 4;
 }
 
-static TILE_GET_INFO( ninjakun_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr  = state->m_bg_videoram[tile_index+0x400];
-	int code = state->m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
+	int attr  = m_bg_videoram[tile_index+0x400];
+	int code = m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-static TILE_GET_INFO( ninjakun_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->m_fg_videoram[tile_index+0x400];
-	int code = state->m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
+	int attr = m_fg_videoram[tile_index+0x400];
+	int code = m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 
 	tileinfo.category = (attr & 0x10) >> 4;
 }
 
-static TILE_GET_INFO( pkunwar_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->m_bg_videoram[tile_index + 0x400];
-	int code = state->m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
+	int attr = m_bg_videoram[tile_index + 0x400];
+	int code = m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 
 	tileinfo.category = (attr & 0x08) >> 3;
 }
 
-static TILE_GET_INFO( raiders5_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->m_bg_videoram[tile_index+0x400];
-	int code = state->m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
+	int attr = m_bg_videoram[tile_index+0x400];
+	int code = m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
 	int color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-static TILE_GET_INFO( raiders5_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int code = state->m_fg_videoram[tile_index];
-	int color = (state->m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
+	int code = m_fg_videoram[tile_index];
+	int color = (m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -162,8 +155,8 @@ static TILE_GET_INFO( raiders5_get_fg_tile_info )
 VIDEO_START( nova2001 )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, nova2001_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, nova2001_get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, -7);
 }
@@ -171,15 +164,15 @@ VIDEO_START( nova2001 )
 VIDEO_START( pkunwar )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, pkunwar_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::pkunwar_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START( ninjakun )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, ninjakun_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, ninjakun_get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(7, 0);
 }
@@ -187,8 +180,8 @@ VIDEO_START( ninjakun )
 VIDEO_START( raiders5 )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->m_bg_tilemap = tilemap_create(machine, raiders5_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, raiders5_get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(7, 0);
 }

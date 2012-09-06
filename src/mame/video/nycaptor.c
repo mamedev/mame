@@ -37,36 +37,35 @@ READ8_MEMBER(nycaptor_state::nycaptor_spriteram_r)
 	return m_spriteram[offset];
 }
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 {
-	nycaptor_state *state = machine.driver_data<nycaptor_state>();
-	int pal = state->m_videoram[tile_index * 2 + 1] & 0x0f;
-	tileinfo.category = (state->m_videoram[tile_index * 2 + 1] & 0x30) >> 4;
+	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
+	tileinfo.category = (m_videoram[tile_index * 2 + 1] & 0x30) >> 4;
 
 	tileinfo.group = 0;
 
-	if ((!nycaptor_spot(machine)) && (pal == 6))
+	if ((!nycaptor_spot(machine())) && (pal == 6))
 		tileinfo.group = 1;
 
-	if (((nycaptor_spot(machine) == 3) && (pal == 8)) || ((nycaptor_spot(machine) == 1) && (pal == 0xc)))
+	if (((nycaptor_spot(machine()) == 3) && (pal == 8)) || ((nycaptor_spot(machine()) == 1) && (pal == 0xc)))
 		tileinfo.group = 2;
 
-	if ((nycaptor_spot(machine) == 1) && (tileinfo.category == 2))
+	if ((nycaptor_spot(machine()) == 1) && (tileinfo.category == 2))
 		tileinfo.group = 3;
 
 #if NYCAPTOR_DEBUG
-	if (state->m_mask & (1 << tileinfo.category))
+	if (m_mask & (1 << tileinfo.category))
 	{
-		if (nycaptor_spot(machine))
+		if (nycaptor_spot(machine()))
 			pal = 0xe;
 		else
 			pal = 4;
 	}
 #endif
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index * 2] + ((state->m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * state->m_char_bank,
+			m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * m_char_bank,
 			pal, 0
 			);
 }
@@ -77,7 +76,7 @@ VIDEO_START( nycaptor )
 	nycaptor_state *state = machine.driver_data<nycaptor_state>();
 
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
 
 	state->m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
 	state->m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1

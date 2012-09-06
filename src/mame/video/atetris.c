@@ -14,14 +14,13 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
 {
-	atetris_state *state = machine.driver_data<atetris_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index * 2] | ((videoram[tile_index * 2 + 1] & 7) << 8);
 	int color = (videoram[tile_index * 2 + 1] & 0xf0) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -52,7 +51,7 @@ VIDEO_START( atetris )
 {
 	atetris_state *state = machine.driver_data<atetris_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atetris_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 }
 
 

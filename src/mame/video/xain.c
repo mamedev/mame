@@ -40,41 +40,38 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( back_scan )
+TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static TILE_GET_INFO( get_bgram0_tile_info )
+TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 {
-	xain_state *state = machine.driver_data<xain_state>();
-	int attr = state->m_bgram0[tile_index | 0x400];
-	SET_TILE_INFO(
+	int attr = m_bgram0[tile_index | 0x400];
+	SET_TILE_INFO_MEMBER(
 			2,
-			state->m_bgram0[tile_index] | ((attr & 7) << 8),
+			m_bgram0[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
 			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( get_bgram1_tile_info )
+TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 {
-	xain_state *state = machine.driver_data<xain_state>();
-	int attr = state->m_bgram1[tile_index | 0x400];
-	SET_TILE_INFO(
+	int attr = m_bgram1[tile_index | 0x400];
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_bgram1[tile_index] | ((attr & 7) << 8),
+			m_bgram1[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
 			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( get_char_tile_info )
+TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 {
-	xain_state *state = machine.driver_data<xain_state>();
-	int attr = state->m_charram[tile_index | 0x400];
-	SET_TILE_INFO(
+	int attr = m_charram[tile_index | 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_charram[tile_index] | ((attr & 3) << 8),
+			m_charram[tile_index] | ((attr & 3) << 8),
 			(attr & 0xe0) >> 5,
 			0);
 }
@@ -89,9 +86,9 @@ static TILE_GET_INFO( get_char_tile_info )
 VIDEO_START( xain )
 {
 	xain_state *state = machine.driver_data<xain_state>();
-	state->m_bgram0_tilemap = tilemap_create(machine, get_bgram0_tile_info,back_scan,    16,16,32,32);
-	state->m_bgram1_tilemap = tilemap_create(machine, get_bgram1_tile_info,back_scan,    16,16,32,32);
-	state->m_char_tilemap = tilemap_create(machine, get_char_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_bgram0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xain_state::get_bgram0_tile_info),state),tilemap_mapper_delegate(FUNC(xain_state::back_scan),state),16,16,32,32);
+	state->m_bgram1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xain_state::get_bgram1_tile_info),state),tilemap_mapper_delegate(FUNC(xain_state::back_scan),state),16,16,32,32);
+	state->m_char_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xain_state::get_char_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_bgram0_tilemap->set_transparent_pen(0);
 	state->m_bgram1_tilemap->set_transparent_pen(0);

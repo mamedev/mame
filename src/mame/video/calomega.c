@@ -29,17 +29,16 @@ WRITE8_MEMBER(calomega_state::calomega_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
 {
-	calomega_state *state = machine.driver_data<calomega_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color.
     ---- --x-   tiles bank.
     xx-- ---x   seems unused. */
 
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color */
 
@@ -52,13 +51,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (attr == 0x32)	/* Is the palette wrong? */
 		color = 0x39;	/* 0x39 is the best match */
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 VIDEO_START( calomega )
 {
 	calomega_state *state = machine.driver_data<calomega_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(calomega_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
 }
 
 SCREEN_UPDATE_IND16( calomega )

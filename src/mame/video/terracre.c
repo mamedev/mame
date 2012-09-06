@@ -10,25 +10,21 @@
 #include "includes/terracre.h"
 
 
-static
-TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
 	/* xxxx.----.----.----
      * ----.xx--.----.----
      * ----.--xx.xxxx.xxxx */
-	unsigned data = state->m_amazon_videoram[tile_index];
+	unsigned data = m_amazon_videoram[tile_index];
 	unsigned color = data>>11;
-	SET_TILE_INFO( 1,data&0x3ff,color,0 );
+	SET_TILE_INFO_MEMBER( 1,data&0x3ff,color,0 );
 }
 
-static
-TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
-	SET_TILE_INFO( 0,data&0xff,0,0 );
+	SET_TILE_INFO_MEMBER( 0,data&0xff,0,0 );
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -190,8 +186,8 @@ WRITE16_MEMBER(terracre_state::amazon_scrollx_w)
 VIDEO_START( amazon )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
-	state->m_background = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_COLS,16,16,64,32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_COLS,8,8,64,32);
+	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(terracre_state::get_bg_tile_info),state),TILEMAP_SCAN_COLS,16,16,64,32);
+	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(terracre_state::get_fg_tile_info),state),TILEMAP_SCAN_COLS,8,8,64,32);
 	state->m_foreground->set_transparent_pen(0xf);
 
 	/* register for saving */

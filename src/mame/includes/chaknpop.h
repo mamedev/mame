@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(chaknpop_attrram_w);
 	DECLARE_WRITE8_MEMBER(unknown_port_1_w);
 	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
+	TILE_GET_INFO_MEMBER(chaknpop_get_tx_tile_info);
 };
 
 

@@ -132,22 +132,21 @@ WRITE8_MEMBER(ironhors_state::ironhors_flipscreen_w)
 	/* other bits are used too, but unknown */
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
 {
-	ironhors_state *state = machine.driver_data<ironhors_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x40) << 2) +
-		((state->m_colorram[tile_index] & 0x20) << 4) + (state->m_charbank << 10);
-	int color = (state->m_colorram[tile_index] & 0x0f) + 16 * state->m_palettebank;
-	int flags = ((state->m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
-		((state->m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
+		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
+	int color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
+	int flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
+		((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( ironhors )
 {
 	ironhors_state *state = machine.driver_data<ironhors_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ironhors_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(32);
 }
@@ -249,21 +248,20 @@ SCREEN_UPDATE_IND16( ironhors )
 	return 0;
 }
 
-static TILE_GET_INFO( farwest_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
 {
-	ironhors_state *state = machine.driver_data<ironhors_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x40) << 2) +
-		((state->m_colorram[tile_index] & 0x20) << 4) + (state->m_charbank << 10);
-	int color = (state->m_colorram[tile_index] & 0x0f) + 16 * state->m_palettebank;
-	int flags = 0;//((state->m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((state->m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
+		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
+	int color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
+	int flags = 0;//((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( farwest )
 {
 	ironhors_state *state = machine.driver_data<ironhors_state>();
-	state->m_bg_tilemap = tilemap_create(machine, farwest_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ironhors_state::farwest_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(32);
 }

@@ -125,22 +125,21 @@ WRITE8_MEMBER(mario_state::mario_flip_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
 {
-	mario_state	*state = machine.driver_data<mario_state>();
-	int code = state->m_videoram[tile_index] + 256 * state->m_gfx_bank;
+	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
 	int color;
 
-	color =  ((state->m_videoram[tile_index] >> 2) & 0x38) | 0x40 | (state->m_palette_bank<<7) | (state->m_monitor<<8);
+	color =  ((m_videoram[tile_index] >> 2) & 0x38) | 0x40 | (m_palette_bank<<7) | (m_monitor<<8);
 	color = color >> 2;
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( mario )
 {
 	mario_state	*state = machine.driver_data<mario_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mario_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_gfx_bank = 0;

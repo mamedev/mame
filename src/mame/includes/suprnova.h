@@ -124,6 +124,8 @@ public:
 	DECLARE_DRIVER_INIT(senknow);
 	DECLARE_DRIVER_INIT(galpani4);
 	DECLARE_DRIVER_INIT(ryouran);
+	TILE_GET_INFO_MEMBER(get_tilemap_A_tile_info);
+	TILE_GET_INFO_MEMBER(get_tilemap_B_tile_info);
 };
 
 

@@ -153,44 +153,40 @@ PALETTE_INIT( dday )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(dday_state::get_bg_tile_info)
 {
-	dday_state *state = machine.driver_data<dday_state>();
 	int code;
 
-	code = state->m_bgvideoram[tile_index];
-	SET_TILE_INFO(0, code, code >> 5, 0);
+	code = m_bgvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, code >> 5, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
 {
-	dday_state *state = machine.driver_data<dday_state>();
 	int code, flipx;
 
-	flipx = state->m_colorram[tile_index & 0x03e0] & 0x01;
-	code = state->m_fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
-	SET_TILE_INFO(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
+	flipx = m_colorram[tile_index & 0x03e0] & 0x01;
+	code = m_fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
+	SET_TILE_INFO_MEMBER(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
 {
-	dday_state *state = machine.driver_data<dday_state>();
 	int code;
 
-	code = state->m_textvideoram[tile_index];
-	SET_TILE_INFO(1, code, code >> 5, 0);
+	code = m_textvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(1, code, code >> 5, 0);
 }
 
-static TILE_GET_INFO( get_sl_tile_info )
+TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 {
-	dday_state *state = machine.driver_data<dday_state>();
 	int code, sl_flipx, flipx;
 	UINT8* sl_map;
 
-	sl_map = &state->memregion("user1")->base()[(state->m_sl_image & 0x07) * 0x0200];
+	sl_map = &memregion("user1")->base()[(m_sl_image & 0x07) * 0x0200];
 
 	flipx = (tile_index >> 4) & 0x01;
-	sl_flipx = (state->m_sl_image >> 3) & 0x01;
+	sl_flipx = (m_sl_image >> 3) & 0x01;
 
 	/* bit 4 is really a flip indicator.  Need to shift bits 5-9 to the right by 1 */
 	tile_index = ((tile_index & 0x03e0) >> 1) | (tile_index & 0x0f);
@@ -201,7 +197,7 @@ static TILE_GET_INFO( get_sl_tile_info )
 		/* no mirroring, draw dark spot */
 		code = 1;
 
-	SET_TILE_INFO(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
 }
 
 
@@ -214,10 +210,10 @@ static TILE_GET_INFO( get_sl_tile_info )
 VIDEO_START( dday )
 {
 	dday_state *state = machine.driver_data<dday_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_sl_tilemap = tilemap_create(machine, get_sl_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_sl_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dday_state::get_sl_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	machine.primary_screen->register_screen_bitmap(state->m_main_bitmap);
 

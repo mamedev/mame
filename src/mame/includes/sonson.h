@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sonson_colorram_w);
 	DECLARE_WRITE8_MEMBER(sonson_scrollx_w);
 	DECLARE_WRITE8_MEMBER(sonson_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

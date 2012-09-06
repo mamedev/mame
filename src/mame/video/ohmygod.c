@@ -7,12 +7,11 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(ohmygod_state::get_tile_info)
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	UINT16 code = state->m_videoram[2 * tile_index + 1];
-	UINT16 attr = state->m_videoram[2 * tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_videoram[2 * tile_index + 1];
+	UINT16 attr = m_videoram[2 * tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0x0f00) >> 8,
@@ -30,7 +29,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( ohmygod )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ohmygod_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 

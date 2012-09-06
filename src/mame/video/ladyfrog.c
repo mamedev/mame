@@ -19,14 +19,13 @@ READ8_MEMBER(ladyfrog_state::ladyfrog_spriteram_r)
 	return m_spriteram[offset];
 }
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(ladyfrog_state::get_tile_info)
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
-	int pal = state->m_videoram[tile_index * 2 + 1] & 0x0f;
-	int tile = state->m_videoram[tile_index * 2] + ((state->m_videoram[tile_index * 2 + 1] & 0xc0) << 2)+ ((state->m_videoram[tile_index * 2 + 1] & 0x30) << 6);
-	SET_TILE_INFO(
+	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
+	int tile = m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2)+ ((m_videoram[tile_index * 2 + 1] & 0x30) << 6);
+	SET_TILE_INFO_MEMBER(
 			0,
-			tile + 0x1000 * state->m_tilebank,
+			tile + 0x1000 * m_tilebank,
 			pal,TILE_FLIPY
 			);
 }
@@ -133,7 +132,7 @@ static VIDEO_START( ladyfrog_common )
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_generic_paletteram_8.allocate(0x200);
 	state->m_generic_paletteram2_8.allocate(0x200);

@@ -44,6 +44,8 @@ public:
 	DECLARE_DRIVER_INIT(pitfightj);
 	DECLARE_DRIVER_INIT(pitfight);
 	DECLARE_DRIVER_INIT(pitfightb);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

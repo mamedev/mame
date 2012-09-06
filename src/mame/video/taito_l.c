@@ -7,45 +7,42 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg18_tile_info )
+TILE_GET_INFO_MEMBER(taitol_state::get_bg18_tile_info)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	int attr = state->m_rambanks[2 * tile_index + 0x8000 + 1];
-	int code = state->m_rambanks[2 * tile_index + 0x8000]
+	int attr = m_rambanks[2 * tile_index + 0x8000 + 1];
+	int code = m_rambanks[2 * tile_index + 0x8000]
 			| ((attr & 0x03) << 8)
-			| ((state->m_bankc[(attr & 0xc) >> 2]) << 10)
-			| (state->m_horshoes_gfxbank << 12);
+			| ((m_bankc[(attr & 0xc) >> 2]) << 10)
+			| (m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_bg19_tile_info )
+TILE_GET_INFO_MEMBER(taitol_state::get_bg19_tile_info)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	int attr = state->m_rambanks[2 * tile_index + 0x9000 + 1];
-	int code = state->m_rambanks[2 * tile_index + 0x9000]
+	int attr = m_rambanks[2 * tile_index + 0x9000 + 1];
+	int code = m_rambanks[2 * tile_index + 0x9000]
 			| ((attr & 0x03) << 8)
-			| ((state->m_bankc[(attr & 0xc) >> 2]) << 10)
-			| (state->m_horshoes_gfxbank << 12);
+			| ((m_bankc[(attr & 0xc) >> 2]) << 10)
+			| (m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_ch1a_tile_info )
+TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	int attr = state->m_rambanks[2 * tile_index + 0xa000 + 1];
-	int code = state->m_rambanks[2 * tile_index + 0xa000] | ((attr & 0x01) << 8) | ((attr & 0x04) << 7);
+	int attr = m_rambanks[2 * tile_index + 0xa000 + 1];
+	int code = m_rambanks[2 * tile_index + 0xa000] | ((attr & 0x01) << 8) | ((attr & 0x04) << 7);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			(attr & 0xf0) >> 4,
@@ -65,9 +62,9 @@ VIDEO_START( taitol )
 	taitol_state *state = machine.driver_data<taitol_state>();
 	int i;
 
-	state->m_bg18_tilemap = tilemap_create(machine, get_bg18_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_bg19_tilemap = tilemap_create(machine, get_bg19_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_ch1a_tilemap = tilemap_create(machine, get_ch1a_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg18_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg19_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_ch1a_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_bg18_tilemap->set_transparent_pen(0);
 	state->m_ch1a_tilemap->set_transparent_pen(0);

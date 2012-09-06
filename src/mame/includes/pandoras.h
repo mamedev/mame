@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pandoras_flipscreen_w);
 	DECLARE_READ8_MEMBER(pandoras_portA_r);
 	DECLARE_READ8_MEMBER(pandoras_portB_r);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
 };
 
 

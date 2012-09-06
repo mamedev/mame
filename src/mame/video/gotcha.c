@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( gotcha_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(gotcha_state::gotcha_tilemap_scan)
 {
 	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
 }
@@ -22,16 +22,14 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	SET_TILE_INFO(0, code, (data >> 12) + color_offs, 0);
 }
 
-static TILE_GET_INFO( fg_get_tile_info )
+TILE_GET_INFO_MEMBER(gotcha_state::fg_get_tile_info)
 {
-	gotcha_state *state = machine.driver_data<gotcha_state>();
-	get_tile_info(machine, tileinfo, tile_index, state->m_fgvideoram, 0);
+	get_tile_info(machine(), tileinfo, tile_index, m_fgvideoram, 0);
 }
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(gotcha_state::bg_get_tile_info)
 {
-	gotcha_state *state = machine.driver_data<gotcha_state>();
-	get_tile_info(machine, tileinfo, tile_index, state->m_bgvideoram, 16);
+	get_tile_info(machine(), tileinfo, tile_index, m_bgvideoram, 16);
 }
 
 
@@ -45,8 +43,8 @@ static TILE_GET_INFO( bg_get_tile_info )
 VIDEO_START( gotcha )
 {
 	gotcha_state *state = machine.driver_data<gotcha_state>();
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, gotcha_tilemap_scan, 16, 16, 64, 32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, gotcha_tilemap_scan, 16, 16, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),state), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),state), 16, 16, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),state), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),state), 16, 16, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 

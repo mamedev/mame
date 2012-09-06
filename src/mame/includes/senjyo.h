@@ -74,6 +74,11 @@ public:
 	DECLARE_DRIVER_INIT(senjyo);
 	DECLARE_DRIVER_INIT(starfore);
 	DECLARE_DRIVER_INIT(starforc);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 };
 
 

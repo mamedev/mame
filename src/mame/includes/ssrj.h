@@ -23,6 +23,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ssrj_vram1_w);
 	DECLARE_WRITE8_MEMBER(ssrj_vram2_w);
 	DECLARE_WRITE8_MEMBER(ssrj_vram4_w);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_GET_INFO_MEMBER(get_tile_info4);
 };
 
 

@@ -159,23 +159,22 @@ WRITE16_MEMBER(taotaido_state::taotaido_bgvideoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( taotaido_bg_tile_info )
+TILE_GET_INFO_MEMBER(taotaido_state::taotaido_bg_tile_info)
 {
-	taotaido_state *state = machine.driver_data<taotaido_state>();
-	int code = state->m_bgram[tile_index]&0x01ff;
-	int bank = (state->m_bgram[tile_index]&0x0e00)>>9;
-	int col  = (state->m_bgram[tile_index]&0xf000)>>12;
+	int code = m_bgram[tile_index]&0x01ff;
+	int bank = (m_bgram[tile_index]&0x0e00)>>9;
+	int col  = (m_bgram[tile_index]&0xf000)>>12;
 
-	code |= state->m_video_bank_select[bank]*0x200;
+	code |= m_video_bank_select[bank]*0x200;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			col,
 			0);
 }
 
-static TILEMAP_MAPPER( taotaido_tilemap_scan_rows )
+TILEMAP_MAPPER_MEMBER(taotaido_state::taotaido_tilemap_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return row*0x40 + (col&0x3f) + ((col&0x40)<<6);
@@ -184,7 +183,7 @@ static TILEMAP_MAPPER( taotaido_tilemap_scan_rows )
 VIDEO_START(taotaido)
 {
 	taotaido_state *state = machine.driver_data<taotaido_state>();
-	state->m_bg_tilemap = tilemap_create(machine, taotaido_bg_tile_info,taotaido_tilemap_scan_rows,     16,16,128,64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taotaido_state::taotaido_bg_tile_info),state),tilemap_mapper_delegate(FUNC(taotaido_state::taotaido_tilemap_scan_rows),state),16,16,128,64);
 
 	state->m_spriteram_old = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state->m_spriteram_older = auto_alloc_array(machine, UINT16, 0x2000/2);

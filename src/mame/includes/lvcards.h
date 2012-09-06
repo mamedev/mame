@@ -17,6 +17,7 @@ public:
 	DECLARE_READ8_MEMBER(payout_r);
 	DECLARE_WRITE8_MEMBER(lvcards_videoram_w);
 	DECLARE_WRITE8_MEMBER(lvcards_colorram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

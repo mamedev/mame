@@ -89,23 +89,22 @@ WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 {
-	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
-	int offset = (tile_index + (state->flip_screen() ? 1 : -1)) & 0x3ff;
-	int attr = state->m_colorram[offset];
+	int offset = (tile_index + (flip_screen() ? 1 : -1)) & 0x3ff;
+	int attr = m_colorram[offset];
 	int gfxbank = (attr & 0x40) >> 6;
-	int code = state->m_videoram[tile_index] + ((attr & 0x20) << 3);
-	int color = state->m_colorram[tile_index] & 0x1f;
+	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);
+	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO(gfxbank, code, color, 0);
+	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
 }
 
 VIDEO_START( hanaawas )
 {
 	hanaawas_state *state = machine.driver_data<hanaawas_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hanaawas_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE_IND16( hanaawas )

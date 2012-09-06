@@ -61,6 +61,11 @@ public:
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrolly_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
+	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

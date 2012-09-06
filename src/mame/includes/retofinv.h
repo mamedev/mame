@@ -56,6 +56,9 @@ public:
 	DECLARE_WRITE8_MEMBER(retofinv_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(retofinv_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(retofinv_gfx_ctrl_w);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 };
 
 

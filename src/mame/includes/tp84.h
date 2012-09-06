@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sub_irq_mask_w);
 	DECLARE_WRITE8_MEMBER(tp84_spriteram_w);
 	DECLARE_READ8_MEMBER(tp84_scanline_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

@@ -187,24 +187,23 @@ WRITE8_MEMBER(ladybug_state::sraider_io_w)
 	redclash_set_stars_speed(machine(), (data & 0x07) - 1);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	int code = state->m_videoram[tile_index] + 32 * (state->m_colorram[tile_index] & 0x08);
-	int color = state->m_colorram[tile_index] & 0x07;
+	int code = m_videoram[tile_index] + 32 * (m_colorram[tile_index] & 0x08);
+	int color = m_colorram[tile_index] & 0x07;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_grid_tile_info )
+TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
-		SET_TILE_INFO(3, tile_index, 0, 0);
+		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
 	else
 	{
 		int temp = tile_index / 32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO(4, tile_index, 0, 0);
+		SET_TILE_INFO_MEMBER(4, tile_index, 0, 0);
 	}
 }
 
@@ -212,7 +211,7 @@ VIDEO_START( ladybug )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_rows(32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
@@ -221,11 +220,11 @@ VIDEO_START( sraider )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_grid_tilemap = tilemap_create(machine, get_grid_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_grid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_grid_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_grid_tilemap->set_scroll_rows(32);
 	state->m_grid_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_rows(32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }

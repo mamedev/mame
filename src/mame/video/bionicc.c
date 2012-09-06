@@ -33,23 +33,21 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
 {
-	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	int attr = state->m_bgvideoram[2 * tile_index + 1];
-	SET_TILE_INFO(
+	int attr = m_bgvideoram[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			1,
-			(state->m_bgvideoram[2 * tile_index] & 0xff) + ((attr & 0x07) << 8),
+			(m_bgvideoram[2 * tile_index] & 0xff) + ((attr & 0x07) << 8),
 			(attr & 0x18) >> 3,
 			TILE_FLIPXY((attr & 0xc0) >> 6));
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
 {
-	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	int attr = state->m_fgvideoram[2 * tile_index + 1];
+	int attr = m_fgvideoram[2 * tile_index + 1];
 	int flags;
 
 	if ((attr & 0xc0) == 0xc0)
@@ -65,21 +63,20 @@ static TILE_GET_INFO( get_fg_tile_info )
 		flags = TILE_FLIPXY((attr & 0xc0) >> 6);
 	}
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
-			(state->m_fgvideoram[2 * tile_index] & 0xff) + ((attr & 0x07) << 8),
+			(m_fgvideoram[2 * tile_index] & 0xff) + ((attr & 0x07) << 8),
 			(attr & 0x18) >> 3,
 			flags);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
 {
-	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	int attr = state->m_txvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	int attr = m_txvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
-			(state->m_txvideoram[tile_index] & 0xff) + ((attr & 0x00c0) << 2),
+			(m_txvideoram[tile_index] & 0xff) + ((attr & 0x00c0) << 2),
 			attr & 0x3f,
 			0);
 }
@@ -96,9 +93,9 @@ VIDEO_START( bionicc )
 {
 	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 
 	state->m_tx_tilemap->set_transparent_pen(3);
 	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */

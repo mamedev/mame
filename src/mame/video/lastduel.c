@@ -16,23 +16,21 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( ld_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	int tile = state->m_scroll2[2 * tile_index] & 0x1fff;
-	int color = state->m_scroll2[2 * tile_index + 1];
-	SET_TILE_INFO(
+	int tile = m_scroll2[2 * tile_index] & 0x1fff;
+	int color = m_scroll2[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
-static TILE_GET_INFO( ld_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	int tile = state->m_scroll1[2 * tile_index] & 0x1fff;
-	int color = state->m_scroll1[2 * tile_index + 1];
-	SET_TILE_INFO(
+	int tile = m_scroll1[2 * tile_index] & 0x1fff;
+	int color = m_scroll1[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			3,
 			tile,
 			color & 0xf,
@@ -40,24 +38,22 @@ static TILE_GET_INFO( ld_get_fg_tile_info )
 	tileinfo.group = (color & 0x80) >> 7;
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	int tile = state->m_scroll2[tile_index] & 0x1fff;
-	int color = state->m_scroll2[tile_index + 0x0800];
-	SET_TILE_INFO(
+	int tile = m_scroll2[tile_index] & 0x1fff;
+	int color = m_scroll2[tile_index + 0x0800];
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	int tile = state->m_scroll1[tile_index] & 0x1fff;
-	int color = state->m_scroll1[tile_index + 0x0800];
-	SET_TILE_INFO(
+	int tile = m_scroll1[tile_index] & 0x1fff;
+	int color = m_scroll1[tile_index + 0x0800];
+	SET_TILE_INFO_MEMBER(
 			3,
 			tile,
 			color & 0xf,
@@ -65,11 +61,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 	tileinfo.group = (color & 0x10) >> 4;
 }
 
-static TILE_GET_INFO( get_fix_info )
+TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
-	int tile = state->m_vram[tile_index];
-	SET_TILE_INFO(
+	int tile = m_vram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile & 0x7ff,
 			tile>>12,
@@ -87,9 +82,9 @@ static TILE_GET_INFO( get_fix_info )
 VIDEO_START( lastduel )
 {
 	lastduel_state *state = machine.driver_data<lastduel_state>();
-	state->m_bg_tilemap = tilemap_create(machine, ld_get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, ld_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_tx_tilemap = tilemap_create(machine, get_fix_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x0001);
 	state->m_fg_tilemap->set_transmask(1, 0xf07f, 0x0f81);
@@ -103,9 +98,9 @@ VIDEO_START( lastduel )
 VIDEO_START( madgear )
 {
 	lastduel_state *state = machine.driver_data<lastduel_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_COLS,16,16,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_COLS,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, get_fix_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),state),TILEMAP_SCAN_COLS,16,16,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),state),TILEMAP_SCAN_COLS,16,16,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fg_tilemap->set_transmask(0, 0xffff, 0x8000);
 	state->m_fg_tilemap->set_transmask(1, 0x80ff, 0xff00);

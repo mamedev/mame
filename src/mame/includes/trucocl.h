@@ -18,6 +18,7 @@ public:
 	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
 	DECLARE_WRITE8_MEMBER(audio_dac_w);
 	DECLARE_DRIVER_INIT(trucocl);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

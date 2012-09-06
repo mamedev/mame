@@ -131,12 +131,11 @@ WRITE8_MEMBER(yunsung8_state::yunsung8_flipscreen_w)
 #define DIM_NX_0			(0x40)
 #define DIM_NY_0			(0x20)
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
 {
-	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	int code  =  state->m_videoram_0[0x1000 + tile_index * 2 + 0] + state->m_videoram_0[0x1000 + tile_index * 2 + 1] * 256;
-	int color =  state->m_videoram_0[0x0800 + tile_index] & 0x07;
-	SET_TILE_INFO(
+	int code  =  m_videoram_0[0x1000 + tile_index * 2 + 0] + m_videoram_0[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  m_videoram_0[0x0800 + tile_index] & 0x07;
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
@@ -148,12 +147,11 @@ static TILE_GET_INFO( get_tile_info_0 )
 #define DIM_NX_1			(0x40)
 #define DIM_NY_1			(0x20)
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
 {
-	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	int code  =  state->m_videoram_1[0x1000 + tile_index * 2 + 0] + state->m_videoram_1[0x1000 + tile_index * 2 + 1] * 256;
-	int color =  state->m_videoram_1[0x0800 + tile_index] & 0x3f;
-	SET_TILE_INFO(
+	int code  =  m_videoram_1[0x1000 + tile_index * 2 + 0] + m_videoram_1[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  m_videoram_1[0x0800 + tile_index] & 0x3f;
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			color,
@@ -175,8 +173,8 @@ VIDEO_START( yunsung8 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(yunsung8_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(yunsung8_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
 
 	state->m_tilemap_1->set_transparent_pen(0);
 }

@@ -8,15 +8,15 @@
 #include "includes/fcombat.h"
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 {
 	int tileno, palno;	//32*16 x 32
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 
-	tileno = machine.root_device().memregion("user1")->base()[tile_index];
-	palno = 0x18; //machine.root_device().memregion("user2")->base()[tile_index] >> 3;
-	SET_TILE_INFO(2, tileno, palno, 0);
+	tileno = machine().root_device().memregion("user1")->base()[tile_index];
+	palno = 0x18; //machine().root_device().memregion("user2")->base()[tile_index] >> 3;
+	SET_TILE_INFO_MEMBER(2, tileno, palno, 0);
 }
 
 
@@ -102,7 +102,7 @@ PALETTE_INIT( fcombat )
 VIDEO_START( fcombat )
 {
 	fcombat_state *state = machine.driver_data<fcombat_state>();
-	state->m_bgmap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
+	state->m_bgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
 }
 
 

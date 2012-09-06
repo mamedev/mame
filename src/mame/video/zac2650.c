@@ -111,19 +111,18 @@ static int SpriteCollision(running_machine &machine, int first,int second)
 	return Checksum;
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 {
-	zac2650_state *state = machine.driver_data<zac2650_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 VIDEO_START( tinvader )
 {
 	zac2650_state *state = machine.driver_data<zac2650_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(zac2650_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 24, 24, 32, 32);
 
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);

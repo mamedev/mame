@@ -42,10 +42,9 @@ WRITE8_MEMBER(exprraid_state::exprraid_scrolly_w)
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 {
-	exprraid_state *state = machine.driver_data<exprraid_state>();
-	UINT8 *tilerom = state->memregion("gfx4")->base();
+	UINT8 *tilerom = memregion("gfx4")->base();
 
 	int data, attr, bank, code, color, flags;
 	int quadrant = 0, offs;
@@ -56,7 +55,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (sx >= 16) quadrant++;
 	if (sy >= 16) quadrant += 2;
 
-	offs = (sy % 16) * 16 + (sx % 16) + (state->m_bg_index[quadrant] & 0x3f) * 0x100;
+	offs = (sy % 16) * 16 + (sx % 16) + (m_bg_index[quadrant] & 0x3f) * 0x100;
 
 	data = tilerom[offs];
 	attr = tilerom[offs + 0x4000];
@@ -67,25 +66,24 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	tileinfo.category = ((attr & 0x80) ? 1 : 0);
 
-	SET_TILE_INFO(bank, code, color, flags);
+	SET_TILE_INFO_MEMBER(bank, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
 {
-	exprraid_state *state = machine.driver_data<exprraid_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x07) << 8);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0x10) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( exprraid )
 {
 	exprraid_state *state = machine.driver_data<exprraid_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(exprraid_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(exprraid_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(2);
 	state->m_fg_tilemap->set_transparent_pen(0);

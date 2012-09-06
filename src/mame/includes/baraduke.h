@@ -32,6 +32,10 @@ public:
 	DECLARE_READ8_MEMBER(baraduke_spriteram_r);
 	DECLARE_WRITE8_MEMBER(baraduke_spriteram_w);
 	DECLARE_DRIVER_INIT(baraduke);
+	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
+	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
 };
 
 

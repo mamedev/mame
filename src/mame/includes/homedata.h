@@ -81,6 +81,30 @@ public:
 	DECLARE_DRIVER_INIT(jogakuen);
 	DECLARE_DRIVER_INIT(battlcry);
 	DECLARE_DRIVER_INIT(mirderby);
+	TILE_GET_INFO_MEMBER(mrokumei_get_info0_0);
+	TILE_GET_INFO_MEMBER(mrokumei_get_info1_0);
+	TILE_GET_INFO_MEMBER(mrokumei_get_info0_1);
+	TILE_GET_INFO_MEMBER(mrokumei_get_info1_1);
+	TILE_GET_INFO_MEMBER(reikaids_get_info0_0);
+	TILE_GET_INFO_MEMBER(reikaids_get_info1_0);
+	TILE_GET_INFO_MEMBER(reikaids_get_info0_1);
+	TILE_GET_INFO_MEMBER(reikaids_get_info1_1);
+	TILE_GET_INFO_MEMBER(reikaids_get_info0_2);
+	TILE_GET_INFO_MEMBER(reikaids_get_info1_2);
+	TILE_GET_INFO_MEMBER(reikaids_get_info0_3);
+	TILE_GET_INFO_MEMBER(reikaids_get_info1_3);
+	TILE_GET_INFO_MEMBER(pteacher_get_info0_0);
+	TILE_GET_INFO_MEMBER(pteacher_get_info1_0);
+	TILE_GET_INFO_MEMBER(pteacher_get_info0_1);
+	TILE_GET_INFO_MEMBER(pteacher_get_info1_1);
+	TILE_GET_INFO_MEMBER(lemnangl_get_info0_0);
+	TILE_GET_INFO_MEMBER(lemnangl_get_info1_0);
+	TILE_GET_INFO_MEMBER(lemnangl_get_info0_1);
+	TILE_GET_INFO_MEMBER(lemnangl_get_info1_1);
+	TILE_GET_INFO_MEMBER(mirderby_get_info0_0);
+	TILE_GET_INFO_MEMBER(mirderby_get_info1_0);
+	TILE_GET_INFO_MEMBER(mirderby_get_info0_1);
+	TILE_GET_INFO_MEMBER(mirderby_get_info1_1);
 };
 
 

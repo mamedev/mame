@@ -54,6 +54,9 @@ public:
 	DECLARE_WRITE8_MEMBER(contra_text_cram_w);
 	DECLARE_WRITE8_MEMBER(contra_K007121_ctrl_0_w);
 	DECLARE_WRITE8_MEMBER(contra_K007121_ctrl_1_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 

@@ -16,24 +16,22 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 {
-	gng_state *state = machine.driver_data<gng_state>();
-	UINT8 attr = state->m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	UINT8 attr = m_fgvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
+			m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 {
-	gng_state *state = machine.driver_data<gng_state>();
-	UINT8 attr = state->m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	UINT8 attr = m_bgvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
+			m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
 			TILE_FLIPYX((attr & 0x30) >> 4));
 	tileinfo.group = (attr & 0x08) >> 3;
@@ -50,8 +48,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( gng )
 {
 	gng_state *state = machine.driver_data<gng_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(3);
 	state->m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */

@@ -15,13 +15,12 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(foodf_state::get_playfield_tile_info)
 {
-	foodf_state *state = machine.driver_data<foodf_state>();
-	UINT16 data = state->m_playfield[tile_index];
+	UINT16 data = m_playfield[tile_index];
 	int code = (data & 0xff) | ((data >> 7) & 0x100);
 	int color = (data >> 8) & 0x3f;
-	SET_TILE_INFO(0, code, color, state->m_playfield_flip ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(0, code, color, m_playfield_flip ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -38,7 +37,7 @@ VIDEO_START( foodf )
 	foodf_state *state = machine.driver_data<foodf_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 32,32);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(foodf_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 32,32);
 	state->m_playfield_tilemap->set_transparent_pen(0);
 
 	/* adjust the playfield for the 8 pixel offset */

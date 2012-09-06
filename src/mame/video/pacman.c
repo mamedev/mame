@@ -119,7 +119,7 @@ PALETTE_INIT( pacman )
 	}
 }
 
-static TILEMAP_MAPPER( pacman_scan_rows )
+TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
 {
 	int offs;
 
@@ -133,13 +133,12 @@ static TILEMAP_MAPPER( pacman_scan_rows )
 	return offs;
 }
 
-static TILE_GET_INFO( pacman_get_tile_info )
+TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	int code = state->m_videoram[tile_index] | (state->m_charbank << 8);
-	int attr = (state->m_colorram[tile_index] & 0x1f) | (state->m_colortablebank << 5) | (state->m_palettebank << 6 );
+	int code = m_videoram[tile_index] | (m_charbank << 8);
+	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-	SET_TILE_INFO(0,code,attr,0);
+	SET_TILE_INFO_MEMBER(0,code,attr,0);
 }
 
 /***************************************************************************
@@ -177,7 +176,7 @@ VIDEO_START( pacman )
 	/* one pixel to the left to get a more correct placement */
 	state->m_xoffsethack = 1;
 
-	state->m_bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),state), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),state),  8, 8, 36, 28 );
 
 	state->m_bg_tilemap->set_scrolldx(0, 384 - 288 );
 	state->m_bg_tilemap->set_scrolldy(0, 264 - 224 );
@@ -333,7 +332,7 @@ VIDEO_START( pengo )
 	state->m_inv_spr = 0;
 	state->m_xoffsethack = 0;
 
-	state->m_bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),state), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),state),  8, 8, 36, 28 );
 
 	state->m_bg_tilemap->set_scrolldx(0, 384 - 288 );
 	state->m_bg_tilemap->set_scrolldy(0, 264 - 224 );
@@ -374,17 +373,16 @@ S2650 Games
 
 **************************************************************************/
 
-static TILE_GET_INFO( s2650_get_tile_info )
+TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
 	int colbank, code, attr;
 
-	colbank = state->m_s2650games_tileram[tile_index & 0x1f] & 0x3;
+	colbank = m_s2650games_tileram[tile_index & 0x1f] & 0x3;
 
-	code = state->m_videoram[tile_index] + (colbank << 8);
-	attr = state->m_colorram[tile_index & 0x1f];
+	code = m_videoram[tile_index] + (colbank << 8);
+	attr = m_colorram[tile_index & 0x1f];
 
-	SET_TILE_INFO(0,code,attr & 0x1f,0);
+	SET_TILE_INFO_MEMBER(0,code,attr & 0x1f,0);
 }
 
 VIDEO_START( s2650games )
@@ -401,7 +399,7 @@ VIDEO_START( s2650games )
 	state->m_inv_spr = 0;
 	state->m_xoffsethack = 1;
 
-	state->m_bg_tilemap = tilemap_create( machine, s2650_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::s2650_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 }
@@ -501,7 +499,7 @@ Jr. Pac-Man
 2018 - 2045 = column 1 attr (28 rows)
 */
 
-static TILEMAP_MAPPER( jrpacman_scan_rows )
+TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
 {
 	int offs;
 
@@ -516,9 +514,8 @@ static TILEMAP_MAPPER( jrpacman_scan_rows )
 	return offs;
 }
 
-static TILE_GET_INFO( jrpacman_get_tile_info )
+TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
 	int color_index, code, attr;
 	if( tile_index < 1792 )
 	{
@@ -529,10 +526,10 @@ static TILE_GET_INFO( jrpacman_get_tile_info )
 		color_index = tile_index + 0x80;
 	}
 
-	code = state->m_videoram[tile_index] | (state->m_charbank << 8);
-	attr = (state->m_videoram[color_index] & 0x1f) | (state->m_colortablebank << 5) | (state->m_palettebank << 6 );
+	code = m_videoram[tile_index] | (m_charbank << 8);
+	attr = (m_videoram[color_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-	SET_TILE_INFO(0,code,attr,0);
+	SET_TILE_INFO_MEMBER(0,code,attr,0);
 }
 
 static void jrpacman_mark_tile_dirty( running_machine &machine, int offset )
@@ -573,7 +570,7 @@ VIDEO_START( jrpacman )
 	state->m_inv_spr = 0;
 	state->m_xoffsethack = 1;
 
-	state->m_bg_tilemap = tilemap_create( machine, jrpacman_get_tile_info,jrpacman_scan_rows,8,8,36,54 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::jrpacman_get_tile_info),state),tilemap_mapper_delegate(FUNC(pacman_state::jrpacman_scan_rows),state),8,8,36,54 );
 
 	state->m_bg_tilemap->set_transparent_pen(0 );
 	state->m_bg_tilemap->set_scroll_cols(36 );

@@ -105,28 +105,24 @@ INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info0 )
+TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info0)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
-	get_tile_info(machine,tileinfo,tile_index,0,&state->m_rthunder_videoram1[0x0000]);
+	get_tile_info(machine(),tileinfo,tile_index,0,&m_rthunder_videoram1[0x0000]);
 }
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info1)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
-	get_tile_info(machine,tileinfo,tile_index,1,&state->m_rthunder_videoram1[0x1000]);
+	get_tile_info(machine(),tileinfo,tile_index,1,&m_rthunder_videoram1[0x1000]);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info2)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
-	get_tile_info(machine,tileinfo,tile_index,2,&state->m_rthunder_videoram2[0x0000]);
+	get_tile_info(machine(),tileinfo,tile_index,2,&m_rthunder_videoram2[0x0000]);
 }
 
-static TILE_GET_INFO( get_tile_info3 )
+TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info3)
 {
-	namcos86_state *state = machine.driver_data<namcos86_state>();
-	get_tile_info(machine,tileinfo,tile_index,3,&state->m_rthunder_videoram2[0x1000]);
+	get_tile_info(machine(),tileinfo,tile_index,3,&m_rthunder_videoram2[0x1000]);
 }
 
 
@@ -139,10 +135,10 @@ static TILE_GET_INFO( get_tile_info3 )
 VIDEO_START( namcos86 )
 {
 	namcos86_state *state = machine.driver_data<namcos86_state>();
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info2,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[3] = tilemap_create(machine, get_tile_info3,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info2),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info3),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_bg_tilemap[0]->set_transparent_pen(7);
 	state->m_bg_tilemap[1]->set_transparent_pen(7);

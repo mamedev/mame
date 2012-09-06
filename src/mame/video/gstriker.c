@@ -25,18 +25,17 @@ t=tile, p=palette
 */
 
 
-static TILE_GET_INFO( VS920A_get_tile_info )
+TILE_GET_INFO_MEMBER(gstriker_state::VS920A_get_tile_info)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int data;
 	int tileno, pal;
 
-	data = state->m_VS920A_cur_chip->vram[tile_index];
+	data = m_VS920A_cur_chip->vram[tile_index];
 
 	tileno = data & 0xFFF;
 	pal =   (data >> 12) & 0xF;
 
-	SET_TILE_INFO(state->m_VS920A_cur_chip->gfx_region, tileno, state->m_VS920A_cur_chip->pal_base + pal, 0);
+	SET_TILE_INFO_MEMBER(m_VS920A_cur_chip->gfx_region, tileno, m_VS920A_cur_chip->pal_base + pal, 0);
 }
 
 WRITE16_MEMBER(gstriker_state::VS920A_0_vram_w)
@@ -61,7 +60,7 @@ static void VS920A_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->m_VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+		state->m_VS920A[i].tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstriker_state::VS920A_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 		state->m_VS920A[i].tmap->set_transparent_pen(0);
 	}
@@ -139,19 +138,18 @@ index is in the MSB. gstriker uses 5 bits for banking, but the chips could be ab
 
 
 
-static TILE_GET_INFO( MB60553_get_tile_info )
+TILE_GET_INFO_MEMBER(gstriker_state::MB60553_get_tile_info)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int data, bankno;
 	int tileno, pal;
 
-	data = state->m_MB60553_cur_chip->vram[tile_index];
+	data = m_MB60553_cur_chip->vram[tile_index];
 
 	tileno = data & 0x1FF;
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO(state->m_MB60553->gfx_region, tileno + state->m_MB60553_cur_chip->bank[bankno] * 0x200, pal + state->m_MB60553->pal_base, 0);
+	SET_TILE_INFO_MEMBER(m_MB60553->gfx_region, tileno + m_MB60553_cur_chip->bank[bankno] * 0x200, pal + m_MB60553->pal_base, 0);
 }
 
 void gstriker_state::MB60553_reg_written(int numchip, int num_reg)
@@ -203,7 +201,7 @@ void gstriker_state::MB60553_reg_written(int numchip, int num_reg)
 }
 
 /* twc94 has the tilemap made of 2 pages .. it needs this */
-static TILEMAP_MAPPER( twc94_scan )
+TILEMAP_MAPPER_MEMBER(gstriker_state::twc94_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row*64) + (col&63) + ((col&64)<<6);
@@ -219,7 +217,7 @@ static void MB60553_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->m_MB60553[i].tmap = tilemap_create(machine, MB60553_get_tile_info,twc94_scan, 16,16,128,64);
+		state->m_MB60553[i].tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstriker_state::MB60553_get_tile_info),state),tilemap_mapper_delegate(FUNC(gstriker_state::twc94_scan),state), 16,16,128,64);
 
 		state->m_MB60553[i].tmap->set_transparent_pen(0);
 	}

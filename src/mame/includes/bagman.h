@@ -43,6 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(dial_input_p1_r);
 	DECLARE_READ8_MEMBER(dial_input_p2_r);
 	DECLARE_DRIVER_INIT(bagman);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

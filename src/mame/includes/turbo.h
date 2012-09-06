@@ -121,6 +121,7 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
 	DECLARE_DRIVER_INIT(buckrog_enc);
 	DECLARE_DRIVER_INIT(turbo_enc);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

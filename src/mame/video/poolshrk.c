@@ -10,17 +10,16 @@ Atari Poolshark video emulation
 
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(poolshrk_state::get_tile_info)
 {
-	poolshrk_state *state = machine.driver_data<poolshrk_state>();
-	SET_TILE_INFO(1, state->m_playfield_ram[tile_index] & 0x3f, 0, 0);
+	SET_TILE_INFO_MEMBER(1, m_playfield_ram[tile_index] & 0x3f, 0, 0);
 }
 
 
 VIDEO_START( poolshrk )
 {
 	poolshrk_state *state = machine.driver_data<poolshrk_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(poolshrk_state::get_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);

@@ -22,26 +22,24 @@ Notes:
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_pow_tile_info )
+TILE_GET_INFO_MEMBER(snk68_state::get_pow_tile_info)
 {
-	snk68_state *state = machine.driver_data<snk68_state>();
-	int tile = state->m_fg_tile_offset + (state->m_pow_fg_videoram[2*tile_index] & 0xff);
-	int color = state->m_pow_fg_videoram[2*tile_index+1] & 0x07;
+	int tile = m_fg_tile_offset + (m_pow_fg_videoram[2*tile_index] & 0xff);
+	int color = m_pow_fg_videoram[2*tile_index+1] & 0x07;
 
-	SET_TILE_INFO(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_searchar_tile_info )
+TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
 {
-	snk68_state *state = machine.driver_data<snk68_state>();
-	int data = state->m_pow_fg_videoram[2*tile_index];
+	int data = m_pow_fg_videoram[2*tile_index];
 	int tile = data & 0x7ff;
 	int color = (data & 0x7000) >> 12;
 
 	// used in the ikari3 intro
 	int flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO(0, tile, color, flags);
+	SET_TILE_INFO_MEMBER(0, tile, color, flags);
 }
 
 /***************************************************************************
@@ -64,7 +62,7 @@ VIDEO_START( pow )
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_pow_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_pow_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_fg_tile_offset = 0;
 
 	common_video_start(machine);
@@ -74,7 +72,7 @@ VIDEO_START( searchar )
 {
 	snk68_state *state = machine.driver_data<snk68_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_searchar_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_searchar_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	common_video_start(machine);
 }

@@ -53,6 +53,10 @@ public:
 	DECLARE_DRIVER_INIT(boggy84);
 	DECLARE_DRIVER_INIT(jumpcoas);
 	DECLARE_DRIVER_INIT(boggy84b);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(imago_get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
+	TILE_GET_INFO_MEMBER(imago_get_tile_info_web);
 };
 
 

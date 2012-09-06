@@ -10,12 +10,11 @@ WRITE8_MEMBER(ssrj_state::ssrj_vram1_w)
 	m_tilemap1->mark_tile_dirty(offset>>1);
 }
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
 {
-	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int code;
-	code = state->m_vram1[tile_index<<1] + (state->m_vram1[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO(
+	code = m_vram1[tile_index<<1] + (m_vram1[(tile_index<<1)+1]<<8);
+	SET_TILE_INFO_MEMBER(
 		0,
 		code&0x3ff,
 		(code>>12)&0x3,
@@ -31,12 +30,11 @@ WRITE8_MEMBER(ssrj_state::ssrj_vram2_w)
 	m_tilemap2->mark_tile_dirty(offset>>1);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
 {
-	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int code;
-	code = state->m_vram2[tile_index<<1] + (state->m_vram2[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO(
+	code = m_vram2[tile_index<<1] + (m_vram2[(tile_index<<1)+1]<<8);
+	SET_TILE_INFO_MEMBER(
 		0,
 		code&0x3ff,
 		((code>>12)&0x3)+4,
@@ -52,12 +50,11 @@ WRITE8_MEMBER(ssrj_state::ssrj_vram4_w)
 	m_tilemap4->mark_tile_dirty(offset>>1);
 }
 
-static TILE_GET_INFO( get_tile_info4 )
+TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
 {
-	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int code;
-	code = state->m_vram4[tile_index<<1] + (state->m_vram4[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO(
+	code = m_vram4[tile_index<<1] + (m_vram4[(tile_index<<1)+1]<<8);
+	SET_TILE_INFO_MEMBER(
 		0,
 		code&0x3ff,
 		((code>>12)&0x3)+12,
@@ -223,9 +220,9 @@ VIDEO_START( ssrj )
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
 
-	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_tilemap4 = tilemap_create(machine, get_tile_info4, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info1),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info2),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_tilemap4 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info4),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_tilemap2->set_transparent_pen(0);
 	state->m_tilemap4->set_transparent_pen(0);
 

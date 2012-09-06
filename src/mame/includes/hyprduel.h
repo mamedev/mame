@@ -80,6 +80,9 @@ public:
 	void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask );
 	DECLARE_DRIVER_INIT(magerror);
 	DECLARE_DRIVER_INIT(hyprduel);
+	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
+	TILE_GET_INFO_MEMBER(get_tile_info_1_8bit);
+	TILE_GET_INFO_MEMBER(get_tile_info_2_8bit);
 };
 
 

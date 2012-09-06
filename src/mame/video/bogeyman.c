@@ -70,33 +70,31 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_paletteram_w)
 	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
 {
-	bogeyman_state *state = machine.driver_data<bogeyman_state>();
-	int attr = state->m_colorram[tile_index];
-	int gfxbank = ((((attr & 0x01) << 8) + state->m_videoram[tile_index]) / 0x80) + 3;
-	int code = state->m_videoram[tile_index] & 0x7f;
+	int attr = m_colorram[tile_index];
+	int gfxbank = ((((attr & 0x01) << 8) + m_videoram[tile_index]) / 0x80) + 3;
+	int code = m_videoram[tile_index] & 0x7f;
 	int color = (attr >> 1) & 0x07;
 
-	SET_TILE_INFO(gfxbank, code, color, 0);
+	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
 {
-	bogeyman_state *state = machine.driver_data<bogeyman_state>();
-	int attr = state->m_colorram2[tile_index];
-	int tile = state->m_videoram2[tile_index] | ((attr & 0x03) << 8);
+	int attr = m_colorram2[tile_index];
+	int tile = m_videoram2[tile_index] | ((attr & 0x03) << 8);
 	int gfxbank = tile / 0x200;
 	int code = tile & 0x1ff;
 
-	SET_TILE_INFO(gfxbank, code, state->m_colbank, 0);
+	SET_TILE_INFO_MEMBER(gfxbank, code, m_colbank, 0);
 }
 
 VIDEO_START( bogeyman )
 {
 	bogeyman_state *state = machine.driver_data<bogeyman_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bogeyman_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bogeyman_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

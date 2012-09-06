@@ -62,7 +62,7 @@ PALETTE_INIT( retofinv )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(retofinv_state::tilemap_scan)
 {
 	row += 2;
 	col -= 2;
@@ -72,26 +72,24 @@ static TILEMAP_MAPPER( tilemap_scan )
 		return (row << 5) + col;
 }
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(retofinv_state::bg_get_tile_info)
 {
-	retofinv_state *state = machine.driver_data<retofinv_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
-			state->m_bg_videoram[tile_index] + 256 * state->m_bg_bank,
-			state->m_bg_videoram[0x400 + tile_index] & 0x3f,
+			m_bg_videoram[tile_index] + 256 * m_bg_bank,
+			m_bg_videoram[0x400 + tile_index] & 0x3f,
 			0);
 }
 
-static TILE_GET_INFO( fg_get_tile_info )
+TILE_GET_INFO_MEMBER(retofinv_state::fg_get_tile_info)
 {
-	retofinv_state *state = machine.driver_data<retofinv_state>();
-	int color = state->m_fg_videoram[0x400 + tile_index];
+	int color = m_fg_videoram[0x400 + tile_index];
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fg_videoram[tile_index] + 256 * state->m_fg_bank,
+			m_fg_videoram[tile_index] + 256 * m_fg_bank,
 			color,
 			0);
 }
@@ -107,8 +105,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 VIDEO_START( retofinv )
 {
 	retofinv_state *state = machine.driver_data<retofinv_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,8,8,36,28);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::bg_get_tile_info),state),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),state),8,8,36,28);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),state),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),state),8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0);
 }

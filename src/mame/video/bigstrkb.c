@@ -48,7 +48,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 /* Tilemaps */
 
-static TILEMAP_MAPPER( bsb_bg_scan )
+TILEMAP_MAPPER_MEMBER(bigstrkb_state::bsb_bg_scan)
 {
 	int offset;
 
@@ -59,15 +59,14 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 	return offset;
 }
 
-static TILE_GET_INFO( get_bsb_tile_info )
+TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile_info)
 {
-	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	int tileno,col;
 
-	tileno = state->m_videoram[tile_index] & 0x0fff;
-	col=	state->m_videoram[tile_index] & 0xf000;
+	tileno = m_videoram[tile_index] & 0x0fff;
+	col=	m_videoram[tile_index] & 0xf000;
 
-	SET_TILE_INFO(0,tileno,col>>12,0);
+	SET_TILE_INFO_MEMBER(0,tileno,col>>12,0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::bsb_videoram_w)
@@ -76,15 +75,14 @@ WRITE16_MEMBER(bigstrkb_state::bsb_videoram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bsb_tile2_info )
+TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile2_info)
 {
-	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	int tileno,col;
 
-	tileno = state->m_videoram2[tile_index] & 0x0fff;
-	col=	state->m_videoram2[tile_index] & 0xf000;
+	tileno = m_videoram2[tile_index] & 0x0fff;
+	col=	m_videoram2[tile_index] & 0xf000;
 
-	SET_TILE_INFO(1,tileno,col>>12,0);
+	SET_TILE_INFO_MEMBER(1,tileno,col>>12,0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::bsb_videoram2_w)
@@ -94,15 +92,14 @@ WRITE16_MEMBER(bigstrkb_state::bsb_videoram2_w)
 }
 
 
-static TILE_GET_INFO( get_bsb_tile3_info )
+TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile3_info)
 {
-	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
 	int tileno,col;
 
-	tileno = state->m_videoram3[tile_index] & 0x0fff;
-	col=	state->m_videoram3[tile_index] & 0xf000;
+	tileno = m_videoram3[tile_index] & 0x0fff;
+	col=	m_videoram3[tile_index] & 0xf000;
 
-	SET_TILE_INFO(1,tileno+0x2000,(col>>12)+(0x100/16),0);
+	SET_TILE_INFO_MEMBER(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::bsb_videoram3_w)
@@ -116,9 +113,9 @@ WRITE16_MEMBER(bigstrkb_state::bsb_videoram3_w)
 VIDEO_START(bigstrkb)
 {
 	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
-	state->m_tilemap = tilemap_create(machine, get_bsb_tile_info,TILEMAP_SCAN_COLS, 8, 8,64,32);
-	state->m_tilemap2 = tilemap_create(machine, get_bsb_tile2_info,bsb_bg_scan, 16, 16,128,64);
-	state->m_tilemap3 = tilemap_create(machine, get_bsb_tile3_info,bsb_bg_scan, 16, 16,128,64);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile_info),state),TILEMAP_SCAN_COLS, 8, 8,64,32);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile2_info),state),tilemap_mapper_delegate(FUNC(bigstrkb_state::bsb_bg_scan),state), 16, 16,128,64);
+	state->m_tilemap3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bigstrkb_state::get_bsb_tile3_info),state),tilemap_mapper_delegate(FUNC(bigstrkb_state::bsb_bg_scan),state), 16, 16,128,64);
 
 	state->m_tilemap->set_transparent_pen(15);
 	//state->m_tilemap2->set_transparent_pen(15);

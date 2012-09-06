@@ -233,13 +233,12 @@ WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
 	popeye_bitmap_w(space,offset,data);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index] & 0x0f;
+	int code = m_videoram[tile_index];
+	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( skyskipr )
@@ -250,7 +249,7 @@ VIDEO_START( skyskipr )
 
 	state->m_bitmap_type = TYPE_SKYSKIPR;
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
     state->m_lastflip = 0;
@@ -268,7 +267,7 @@ VIDEO_START( popeye )
 
 	state->m_bitmap_type = TYPE_POPEYE;
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
     state->m_lastflip = 0;

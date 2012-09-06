@@ -136,30 +136,28 @@ PALETTE_INIT( pleiads )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
 {
-	phoenix_state *state = machine.driver_data<phoenix_state>();
 	int code, col;
 
-	code = state->m_videoram_pg[state->m_videoram_pg_index][tile_index];
+	code = m_videoram_pg[m_videoram_pg_index][tile_index];
 	col = (code >> 5);
-	col = col | 0x08 | (state->m_palette_bank << 4);
-	SET_TILE_INFO(
+	col = col | 0x08 | (m_palette_bank << 4);
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			col,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 {
-	phoenix_state *state = machine.driver_data<phoenix_state>();
 	int code, col;
 
-	code = state->m_videoram_pg[state->m_videoram_pg_index][tile_index + 0x800];
+	code = m_videoram_pg[m_videoram_pg_index][tile_index + 0x800];
 	col = (code >> 5);
-	col = col | 0x00 | (state->m_palette_bank << 4);
-	SET_TILE_INFO(
+	col = col | 0x00 | (m_palette_bank << 4);
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			col,
@@ -186,8 +184,8 @@ VIDEO_START( phoenix )
 	state->m_palette_bank = 0;
 	state->m_cocktail_mode = 0;
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(phoenix_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(phoenix_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 

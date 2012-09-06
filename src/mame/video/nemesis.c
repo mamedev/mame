@@ -21,13 +21,12 @@ sprite_data[8] =
 };
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
 {
-	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int code, color, flags, mask, layer;
 
-	code = state->m_videoram2[tile_index];
-	color = state->m_colorram2[tile_index];
+	code = m_videoram2[tile_index];
+	color = m_colorram2[tile_index];
 	flags = 0;
 
 	if (color & 0x80)
@@ -41,12 +40,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	if (code & 0xf800)
 	{
-		SET_TILE_INFO( 0, code & 0x7ff, color & 0x7f, flags );
+		SET_TILE_INFO_MEMBER( 0, code & 0x7ff, color & 0x7f, flags );
 	}
 	else
 	{
-		SET_TILE_INFO( 0, 0, 0x00, 0 );
-		tileinfo.pen_data = state->m_blank_tile;
+		SET_TILE_INFO_MEMBER( 0, 0, 0x00, 0 );
+		tileinfo.pen_data = m_blank_tile;
 	}
 
 	mask = (code & 0x1000) >> 12;
@@ -57,13 +56,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	tileinfo.category = mask | (layer << 1);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
 {
-	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int code, color, flags, mask, layer;
 
-	code = state->m_videoram1[tile_index];
-	color = state->m_colorram1[tile_index];
+	code = m_videoram1[tile_index];
+	color = m_colorram1[tile_index];
 	flags = 0;
 
 	if (color & 0x80)
@@ -77,12 +75,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	if (code & 0xf800)
 	{
-		SET_TILE_INFO( 0, code & 0x7ff, color & 0x7f, flags );
+		SET_TILE_INFO_MEMBER( 0, code & 0x7ff, color & 0x7f, flags );
 	}
 	else
 	{
-		SET_TILE_INFO( 0, 0, 0x00, 0 );
-		tileinfo.pen_data = state->m_blank_tile;
+		SET_TILE_INFO_MEMBER( 0, 0, 0x00, 0 );
+		tileinfo.pen_data = m_blank_tile;
 	}
 
 	mask = (code & 0x1000) >> 12;
@@ -299,8 +297,8 @@ VIDEO_START( nemesis )
 
 	state->m_spriteram_words = state->m_spriteram.bytes() / 2;
 
-	state->m_background = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nemesis_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nemesis_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state->m_background->set_transparent_pen(0);
 	state->m_foreground->set_transparent_pen(0);

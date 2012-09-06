@@ -80,6 +80,10 @@ public:
 	DECLARE_DRIVER_INIT(bnstars);
 	DECLARE_DRIVER_INIT(f1superb);
 	DECLARE_DRIVER_INIT(ss92046_01);
+	TILE_GET_INFO_MEMBER(get_ms32_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 };
 
 

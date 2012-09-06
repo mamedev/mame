@@ -88,6 +88,7 @@ public:
 	DECLARE_DRIVER_INIT(timesold);
 	DECLARE_DRIVER_INIT(kyros);
 	DECLARE_DRIVER_INIT(sstingry);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 /* game_id - used to deal with a few game specific situations */

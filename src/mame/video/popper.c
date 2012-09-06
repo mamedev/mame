@@ -114,14 +114,13 @@ WRITE8_MEMBER(popper_state::popper_gfx_bank_w)
 	}
 }
 
-static TILE_GET_INFO( get_popper_p123_tile_info )
+TILE_GET_INFO_MEMBER(popper_state::get_popper_p123_tile_info)
 {
-	popper_state *state = machine.driver_data<popper_state>();
-	UINT32 tile_number = state->m_videoram[tile_index];
-	UINT8 attr = state->m_attribram[tile_index];
-	tile_number += state->m_gfx_bank << 8;
+	UINT32 tile_number = m_videoram[tile_index];
+	UINT8 attr = m_attribram[tile_index];
+	tile_number += m_gfx_bank << 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			(attr & 0xf),
@@ -129,31 +128,29 @@ static TILE_GET_INFO( get_popper_p123_tile_info )
 	tileinfo.group = (attr & 0x80) >> 7;
 }
 
-static TILE_GET_INFO( get_popper_p0_tile_info )
+TILE_GET_INFO_MEMBER(popper_state::get_popper_p0_tile_info)
 {
-	popper_state *state = machine.driver_data<popper_state>();
-	UINT32 tile_number = state->m_videoram[tile_index];
-	UINT8 attr = state->m_attribram[tile_index];
-	tile_number += state->m_gfx_bank << 8;
+	UINT32 tile_number = m_videoram[tile_index];
+	UINT8 attr = m_attribram[tile_index];
+	tile_number += m_gfx_bank << 8;
 
 	//pen 0 only in front if colour set as well
 	tileinfo.group = (attr & 0x70) ? ((attr & 0x80) >> 7) : 0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			((attr & 0x70) >> 4) + 8,
 			0);
 }
 
-static TILE_GET_INFO( get_popper_ol_p123_tile_info )
+TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p123_tile_info)
 {
-	popper_state *state = machine.driver_data<popper_state>();
-	UINT32 tile_number = state->m_ol_videoram[tile_index];
-	UINT8 attr  = state->m_ol_attribram[tile_index];
-	tile_number += state->m_gfx_bank << 8;
+	UINT32 tile_number = m_ol_videoram[tile_index];
+	UINT8 attr  = m_ol_attribram[tile_index];
+	tile_number += m_gfx_bank << 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			(attr & 0xf),
@@ -161,17 +158,16 @@ static TILE_GET_INFO( get_popper_ol_p123_tile_info )
 	tileinfo.group = (attr & 0x80) >> 7;
 }
 
-static TILE_GET_INFO( get_popper_ol_p0_tile_info )
+TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p0_tile_info)
 {
-	popper_state *state = machine.driver_data<popper_state>();
-	UINT32 tile_number = state->m_ol_videoram[tile_index];
-	UINT8 attr = state->m_ol_attribram[tile_index];
-	tile_number += state->m_gfx_bank << 8;
+	UINT32 tile_number = m_ol_videoram[tile_index];
+	UINT8 attr = m_ol_attribram[tile_index];
+	tile_number += m_gfx_bank << 8;
 
 	//pen 0 only in front if colour set as well
 	tileinfo.group = (attr & 0x70) ? ((attr & 0x80) >> 7) : 0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			((attr & 0x70) >> 4) + 8,
@@ -181,10 +177,10 @@ static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 VIDEO_START( popper )
 {
 	popper_state *state = machine.driver_data<popper_state>();
-	state->m_p123_tilemap    = tilemap_create(machine, get_popper_p123_tile_info,    TILEMAP_SCAN_COLS, 8, 8, 33, 32 );
-	state->m_p0_tilemap      = tilemap_create(machine, get_popper_p0_tile_info,      TILEMAP_SCAN_COLS, 8, 8, 33, 32);
-	state->m_ol_p123_tilemap = tilemap_create(machine, get_popper_ol_p123_tile_info, TILEMAP_SCAN_COLS, 8, 8, 2, 32);
-	state->m_ol_p0_tilemap   = tilemap_create(machine, get_popper_ol_p0_tile_info,   TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	state->m_p123_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_p123_tile_info),state),    TILEMAP_SCAN_COLS, 8, 8, 33, 32 );
+	state->m_p0_tilemap      = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_p0_tile_info),state),      TILEMAP_SCAN_COLS, 8, 8, 33, 32);
+	state->m_ol_p123_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_ol_p123_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	state->m_ol_p0_tilemap   = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_ol_p0_tile_info),state),   TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 
 	state->m_p123_tilemap->set_transmask(0, 0x0f, 0x01);
 	state->m_p123_tilemap->set_transmask(1, 0x01, 0x0f);

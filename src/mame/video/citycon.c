@@ -16,31 +16,29 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( citycon_scan )
+TILEMAP_MAPPER_MEMBER(citycon_state::citycon_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index],
+			m_videoram[tile_index],
 			(tile_index & 0x03e0) >> 5,	/* color depends on scanline only */
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(citycon_state::get_bg_tile_info)
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
-	UINT8 *rom = state->memregion("gfx4")->base();
-	int code = rom[0x1000 * state->m_bg_image + tile_index];
-	SET_TILE_INFO(
-			3 + state->m_bg_image,
+	UINT8 *rom = memregion("gfx4")->base();
+	int code = rom[0x1000 * m_bg_image + tile_index];
+	SET_TILE_INFO_MEMBER(
+			3 + m_bg_image,
 			code,
-			rom[0xc000 + 0x100 * state->m_bg_image + code],
+			rom[0xc000 + 0x100 * m_bg_image + code],
 			0);
 }
 
@@ -55,8 +53,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( citycon )
 {
 	citycon_state *state = machine.driver_data<citycon_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, citycon_scan, 8, 8, 128, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, citycon_scan, 8, 8, 128, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(citycon_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(citycon_state::citycon_scan),state), 8, 8, 128, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(citycon_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(citycon_state::citycon_scan),state), 8, 8, 128, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scroll_rows(32);

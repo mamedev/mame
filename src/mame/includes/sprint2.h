@@ -61,6 +61,7 @@ public:
 	DECLARE_DRIVER_INIT(sprint1);
 	DECLARE_DRIVER_INIT(sprint2);
 	DECLARE_DRIVER_INIT(dominos);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

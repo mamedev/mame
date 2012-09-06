@@ -46,6 +46,10 @@ public:
 	DECLARE_DRIVER_INIT(sidearms);
 	DECLARE_DRIVER_INIT(whizz);
 	DECLARE_DRIVER_INIT(turtship);
+	TILE_GET_INFO_MEMBER(get_sidearms_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(sidearms_tilemap_scan);
 };
 
 /*----------- defined in video/sidearms.c -----------*/

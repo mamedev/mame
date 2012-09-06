@@ -27,6 +27,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
 	DECLARE_DRIVER_INIT(raiders5);
 	DECLARE_DRIVER_INIT(pkunwar);
+	TILE_GET_INFO_MEMBER(nova2001_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(nova2001_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(ninjakun_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(ninjakun_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(pkunwar_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(raiders5_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(raiders5_get_fg_tile_info);
 };
 
 

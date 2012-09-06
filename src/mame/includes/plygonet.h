@@ -66,6 +66,10 @@ public:
 	DIRECT_UPDATE_MEMBER(plygonet_dsp56k_direct_handler);
 	DECLARE_READ32_MEMBER(polygonet_eeprom_r);
 	DECLARE_DRIVER_INIT(polygonet);
+	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
+	TILE_GET_INFO_MEMBER(roz_get_tile_info);
+	TILEMAP_MAPPER_MEMBER(plygonet_scan);
+	TILEMAP_MAPPER_MEMBER(plygonet_scan_cols);
 };
 
 /*----------- defined in video/plygonet.c -----------*/

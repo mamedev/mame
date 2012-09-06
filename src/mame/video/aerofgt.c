@@ -7,72 +7,66 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_pspikes_tile_info )
+TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	UINT16 code = state->m_bg1videoram[tile_index];
+	UINT16 code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			(code & 0x0fff) + (state->m_gfxbank[bank] << 12),
-			((code & 0xe000) >> 13) + 8 * state->m_charpalettebank,
+			(code & 0x0fff) + (m_gfxbank[bank] << 12),
+			((code & 0xe000) >> 13) + 8 * m_charpalettebank,
 			0);
 }
 
-static TILE_GET_INFO( karatblz_bg1_tile_info )
+TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	UINT16 code = state->m_bg1videoram[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_bg1videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			(code & 0x1fff) + (state->m_gfxbank[0] << 13),
+			(code & 0x1fff) + (m_gfxbank[0] << 13),
 			(code & 0xe000) >> 13,
 			0);
 }
 
 /* also spinlbrk */
-static TILE_GET_INFO( karatblz_bg2_tile_info )
+TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	UINT16 code = state->m_bg2videoram[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_bg2videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
-			(code & 0x1fff) + (state->m_gfxbank[1] << 13),
+			(code & 0x1fff) + (m_gfxbank[1] << 13),
 			(code & 0xe000) >> 13,
 			0);
 }
 
-static TILE_GET_INFO( spinlbrk_bg1_tile_info )
+TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_bg1_tile_info)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	UINT16 code = state->m_bg1videoram[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_bg1videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			(code & 0x0fff) + (state->m_gfxbank[0] << 12),
+			(code & 0x0fff) + (m_gfxbank[0] << 12),
 			(code & 0xf000) >> 12,
 			0);
 }
 
-static TILE_GET_INFO( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(aerofgt_state::get_bg1_tile_info)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	UINT16 code = state->m_bg1videoram[tile_index];
+	UINT16 code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1800) >> 11;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			(code & 0x07ff) + (state->m_gfxbank[bank] << 11),
+			(code & 0x07ff) + (m_gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
 			0);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(aerofgt_state::get_bg2_tile_info)
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	UINT16 code = state->m_bg2videoram[tile_index];
+	UINT16 code = m_bg2videoram[tile_index];
 	int bank = 4 + ((code & 0x1800) >> 11);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			(code & 0x07ff) + (state->m_gfxbank[bank] << 11),
+			(code & 0x07ff) + (m_gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
 			0);
 }
@@ -100,7 +94,7 @@ static void aerofgt_register_state_globals( running_machine &machine )
 VIDEO_START( pspikes )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 	/* no bg2 in this game */
 
 	state->m_sprite_gfx = 1;
@@ -113,8 +107,8 @@ VIDEO_START( pspikes )
 VIDEO_START( karatblz )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, karatblz_bg1_tile_info,TILEMAP_SCAN_ROWS,     8,8,64,64);
-	state->m_bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg1_tile_info),state),TILEMAP_SCAN_ROWS,     8,8,64,64);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_bg2_tilemap->set_transparent_pen(15);
 	state->m_spritepalettebank = 0;
@@ -128,8 +122,8 @@ VIDEO_START( spinlbrk )
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 
-	state->m_bg1_tilemap = tilemap_create(machine, spinlbrk_bg1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_bg2_tilemap->set_transparent_pen(15);
 
@@ -155,8 +149,8 @@ VIDEO_START( spinlbrk )
 VIDEO_START( turbofrc )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_bg2_tilemap->set_transparent_pen(15);
 
@@ -169,7 +163,7 @@ VIDEO_START( turbofrc )
 VIDEO_START( wbbc97 )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->m_bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	/* no bg2 in this game */
 
 	state->m_bg1_tilemap->set_transparent_pen(15);

@@ -51,6 +51,11 @@ public:
 	DECLARE_DRIVER_INIT(yellowcb);
 	DECLARE_DRIVER_INIT(liberate);
 	DECLARE_DRIVER_INIT(prosport);
+	TILEMAP_MAPPER_MEMBER(back_scan);
+	TILEMAP_MAPPER_MEMBER(fix_scan);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	TILE_GET_INFO_MEMBER(prosport_get_back_tile_info);
 };
 
 

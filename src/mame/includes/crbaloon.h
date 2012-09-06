@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(crbaloon_videoram_w);
 	DECLARE_WRITE8_MEMBER(crbaloon_colorram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

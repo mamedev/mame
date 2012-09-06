@@ -48,6 +48,11 @@ public:
 	DECLARE_WRITE8_MEMBER(rallyx_scrollx_w);
 	DECLARE_WRITE8_MEMBER(rallyx_scrolly_w);
 	DECLARE_WRITE8_MEMBER(tactcian_starson_w);
+	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
+	TILE_GET_INFO_MEMBER(rallyx_bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(rallyx_fg_get_tile_info);
+	TILE_GET_INFO_MEMBER(locomotn_bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(locomotn_fg_get_tile_info);
 };
 
 

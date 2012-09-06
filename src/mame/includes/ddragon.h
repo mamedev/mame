@@ -89,6 +89,10 @@ public:
 	DECLARE_DRIVER_INIT(ddragon);
 	DECLARE_DRIVER_INIT(ddragon6809);
 	DECLARE_DRIVER_INIT(chinagat);
+	TILEMAP_MAPPER_MEMBER(background_scan);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_16color_tile_info);
 };
 
 

@@ -25,6 +25,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 	DECLARE_DRIVER_INIT(pirates);
 	DECLARE_DRIVER_INIT(genix);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

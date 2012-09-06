@@ -71,20 +71,19 @@ PALETTE_INIT( brkthru )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
 {
-	brkthru_state *state = machine.driver_data<brkthru_state>();
 	/* BG RAM format
         0         1
         ---- -c-- ---- ---- = Color
         ---- --xx xxxx xxxx = Code
     */
 
-	int code = (state->m_videoram[tile_index * 2] | ((state->m_videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
+	int code = (m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
 	int region = 1 + (code >> 7);
-	int colour = state->m_bgbasecolor + ((state->m_videoram[tile_index * 2 + 1] & 0x04) >> 2);
+	int colour = m_bgbasecolor + ((m_videoram[tile_index * 2 + 1] & 0x04) >> 2);
 
-	SET_TILE_INFO(region, code & 0x7f, colour,0);
+	SET_TILE_INFO_MEMBER(region, code & 0x7f, colour,0);
 }
 
 WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
@@ -95,11 +94,10 @@ WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
 }
 
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(brkthru_state::get_fg_tile_info)
 {
-	brkthru_state *state = machine.driver_data<brkthru_state>();
-	UINT8 code = state->m_fg_videoram[tile_index];
-	SET_TILE_INFO(0, code, 0, 0);
+	UINT8 code = m_fg_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 WRITE8_MEMBER(brkthru_state::brkthru_fgram_w)
@@ -113,8 +111,8 @@ VIDEO_START( brkthru )
 {
 	brkthru_state *state = machine.driver_data<brkthru_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(brkthru_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(brkthru_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);

@@ -24,6 +24,18 @@ public:
 	DECLARE_WRITE16_MEMBER(m90_video_w);
 	DECLARE_DRIVER_INIT(bomblord);
 	DECLARE_DRIVER_INIT(quizf1);
+	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf1w_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf2w_tile_info);
+	TILE_GET_INFO_MEMBER(bomblord_get_pf1_tile_info);
+	TILE_GET_INFO_MEMBER(bomblord_get_pf1w_tile_info);
+	TILE_GET_INFO_MEMBER(bomblord_get_pf2_tile_info);
+	TILE_GET_INFO_MEMBER(bomblord_get_pf2w_tile_info);
+	TILE_GET_INFO_MEMBER(dynablsb_get_pf1_tile_info);
+	TILE_GET_INFO_MEMBER(dynablsb_get_pf1w_tile_info);
+	TILE_GET_INFO_MEMBER(dynablsb_get_pf2_tile_info);
+	TILE_GET_INFO_MEMBER(dynablsb_get_pf2w_tile_info);
 };
 
 

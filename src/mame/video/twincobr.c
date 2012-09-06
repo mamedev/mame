@@ -40,45 +40,42 @@ const mc6845_interface twincobr_mc6845_intf =
     Callbacks for the TileMap code
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 {
-	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
-	code = state->m_bgvideoram16[tile_index+state->m_bg_ram_bank];
+	code = m_bgvideoram16[tile_index+m_bg_ram_bank];
 	tile_number = code & 0x0fff;
 	color = (code & 0xf000) >> 12;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile_number,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 {
-	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
-	code = state->m_fgvideoram16[tile_index];
-	tile_number = (code & 0x0fff) | state->m_fg_rom_bank;
+	code = m_fgvideoram16[tile_index];
+	tile_number = (code & 0x0fff) | m_fg_rom_bank;
 	color = (code & 0xf000) >> 12;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile_number,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
 {
-	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
-	code = state->m_txvideoram16[tile_index];
+	code = m_txvideoram16[tile_index];
 	tile_number = code & 0x07ff;
 	color = (code & 0xf800) >> 11;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			color,
@@ -93,9 +90,9 @@ static void twincobr_create_tilemaps(running_machine &machine)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(twincobr_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(twincobr_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(twincobr_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_transparent_pen(0);

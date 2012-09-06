@@ -89,11 +89,10 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrolly_w)
 	m_bgtilemap->set_scrolly(0, data);
 }
 
-static TILE_GET_INFO( get_sprcros2_bgtile_info )
+TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_bgtile_info)
 {
-	sprcros2_state *state = machine.driver_data<sprcros2_state>();
-	UINT32 tile_number = state->m_bgvideoram[tile_index];
-	UINT8 attr = state->m_bgvideoram[tile_index + 0x400];
+	UINT32 tile_number = m_bgvideoram[tile_index];
+	UINT8 attr = m_bgvideoram[tile_index + 0x400];
 
 	//attr
 	//76543210
@@ -103,18 +102,17 @@ static TILE_GET_INFO( get_sprcros2_bgtile_info )
 
 	tile_number += (attr&0x07)<<8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			(attr&0xf0)>>4,
 			(attr&0x08)?TILE_FLIPX:0);
 }
 
-static TILE_GET_INFO( get_sprcros2_fgtile_info )
+TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_fgtile_info)
 {
-	sprcros2_state *state = machine.driver_data<sprcros2_state>();
-	UINT32 tile_number = state->m_fgvideoram[tile_index];
-	UINT8 attr = state->m_fgvideoram[tile_index + 0x400];
+	UINT32 tile_number = m_fgvideoram[tile_index];
+	UINT8 attr = m_fgvideoram[tile_index + 0x400];
 	int color = (attr&0xfc)>>2;
 
 	tileinfo.group = color;
@@ -126,7 +124,7 @@ static TILE_GET_INFO( get_sprcros2_fgtile_info )
 
 	tile_number += (attr&0x03)<<8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile_number,
 			color,
@@ -137,8 +135,8 @@ VIDEO_START( sprcros2 )
 {
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 
-	state->m_bgtilemap = tilemap_create(machine, get_sprcros2_bgtile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fgtilemap = tilemap_create(machine, get_sprcros2_fgtile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_bgtile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_fgtile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fgtilemap, machine.gfx[2], 0);
 }

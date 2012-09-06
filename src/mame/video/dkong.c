@@ -452,23 +452,21 @@ PALETTE_INIT( dkong3 )
 	state->m_color_codes = color_prom;	/* we'll need it later */
 }
 
-static TILE_GET_INFO( dkong_bg_tile_info )
+TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
 {
-	dkong_state *state = machine.driver_data<dkong_state>();
-	int code = state->m_video_ram[tile_index] + 256 * state->m_gfx_bank;
-	int color = (state->m_color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * state->m_palette_bank;
+	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
+	int color = (m_color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * m_palette_bank;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( radarscp1_bg_tile_info )
+TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
 {
-	dkong_state *state = machine.driver_data<dkong_state>();
-	int code = state->m_video_ram[tile_index] + 256 * state->m_gfx_bank;
-	int color = (state->m_color_codes[tile_index % 32] & 0x0f);
-	color = color | (state->m_palette_bank<<4);
+	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
+	int color = (m_color_codes[tile_index % 32] & 0x0f);
+	color = color | (m_palette_bank<<4);
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 /***************************************************************************
@@ -942,11 +940,11 @@ VIDEO_START( dkong )
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
-			state->m_bg_tilemap = tilemap_create(machine, dkong_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::dkong_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 			state->m_bg_tilemap->set_scrolldx(0, 128);
 			break;
 		case HARDWARE_TRS01:
-			state->m_bg_tilemap = tilemap_create(machine, radarscp1_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::radarscp1_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 			state->m_bg_tilemap->set_scrolldx(0, 128);
 
 			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);

@@ -99,30 +99,28 @@ PALETTE_INIT( zodiack )
 	colortable_entry_set_value(machine.colortable, 0x31, 0x30);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(zodiack_state::get_bg_tile_info)
 {
-	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	int code = state->m_videoram_2[tile_index];
-	int color = (state->m_attributeram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
+	int code = m_videoram_2[tile_index];
+	int color = (m_attributeram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(zodiack_state::get_fg_tile_info)
 {
-	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	int code = state->m_videoram[tile_index];
-	int color = state->m_attributeram[2 * (tile_index % 32) + 1] & 0x07;
+	int code = m_videoram[tile_index];
+	int color = m_attributeram[2 * (tile_index % 32) + 1] & 0x07;
 
-	SET_TILE_INFO(3, code, color, 0);
+	SET_TILE_INFO_MEMBER(3, code, color, 0);
 }
 
 void zodiack_state::video_start()
 {
-	m_bg_tilemap = tilemap_create(machine(), get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = tilemap_create(machine(), get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(zodiack_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(zodiack_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(32);

@@ -76,25 +76,24 @@
     For Debug: there's no tilemap, just sprites.
 ***************************************************************************/
 #if TILEMAPS
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
 {
-	suna8_state *state = machine.driver_data<suna8_state>();
 	UINT8 code, attr;
 
-	if (machine.input().code_pressed(KEYCODE_X))
+	if (machine().input().code_pressed(KEYCODE_X))
 	{
-		UINT8 *rom = state->memregion("maincpu")->base() + 0x10000 + 0x4000 * state->m_trombank;
+		UINT8 *rom = memregion("maincpu")->base() + 0x10000 + 0x4000 * m_trombank;
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];
 	}
 	else
 	{
-		code = state->m_spriteram[ 2 * tile_index + 0 ];
-		attr = state->m_spriteram[ 2 * tile_index + 1 ];
+		code = m_spriteram[ 2 * tile_index + 0 ];
+		attr = m_spriteram[ 2 * tile_index + 1 ];
 	}
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			( (attr & 0x03) << 8 ) + code + state->m_tiles*0x400,
+			( (attr & 0x03) << 8 ) + code + m_tiles*0x400,
 			(attr >> 2) & 0xf,
 			TILE_FLIPYX( (attr >> 6) & 3 ));
 }

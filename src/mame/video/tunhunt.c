@@ -55,15 +55,14 @@ WRITE8_MEMBER(tunhunt_state::tunhunt_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 {
-	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	int attr = state->m_videoram[tile_index];
+	int attr = m_videoram[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( tunhunt )
@@ -77,7 +76,7 @@ VIDEO_START( tunhunt )
 
 	state->m_tmpbitmap.allocate(256, 64, machine.primary_screen->format());
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tunhunt_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrollx(0, 64);

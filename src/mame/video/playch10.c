@@ -79,15 +79,14 @@ const ppu2c0x_interface playch10_ppu_interface =
 	ppu_irq				/* irq */
 };
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
 {
-	playch10_state *state = machine.driver_data<playch10_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offs = tile_index * 2;
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);
 	int color = (videoram[offs + 1] >> 3) & 0x1f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( playch10 )
@@ -96,7 +95,7 @@ VIDEO_START( playch10 )
 	const UINT8 *bios = state->memregion("maincpu")->base();
 	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 
@@ -106,7 +105,7 @@ VIDEO_START( playch10_hboard )
 	const UINT8 *bios = state->memregion("maincpu")->base();
 	state->m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playch10_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

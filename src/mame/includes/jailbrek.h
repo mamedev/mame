@@ -37,6 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(jailbrek_speech_r);
 	DECLARE_WRITE8_MEMBER(jailbrek_speech_w);
 	DECLARE_DRIVER_INIT(jailbrek);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

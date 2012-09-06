@@ -45,6 +45,9 @@ public:
 	DECLARE_WRITE16_MEMBER(goal92_background_w);
 	DECLARE_WRITE16_MEMBER(goal92_foreground_w);
 	DECLARE_WRITE8_MEMBER(adpcm_control_w);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 };
 
 

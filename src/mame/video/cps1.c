@@ -1973,39 +1973,38 @@ static int gfxrom_bank_mapper( running_machine &machine, int type, int code )
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( tilemap0_scan )
+TILEMAP_MAPPER_MEMBER(cps_state::tilemap0_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((col & 0x3f) << 5) + ((row & 0x20) << 6);
 }
 
-static TILEMAP_MAPPER( tilemap1_scan )
+TILEMAP_MAPPER_MEMBER(cps_state::tilemap1_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x30) << 6);
 }
 
-static TILEMAP_MAPPER( tilemap2_scan )
+TILEMAP_MAPPER_MEMBER(cps_state::tilemap2_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x07) + ((col & 0x3f) << 3) + ((row & 0x38) << 6);
 }
 
-static TILE_GET_INFO( get_tile0_info )
+TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 {
-	cps_state *state = machine.driver_data<cps_state>();
-	int code = state->m_scroll1[2 * tile_index];
-	int attr = state->m_scroll1[2 * tile_index + 1];
+	int code = m_scroll1[2 * tile_index];
+	int attr = m_scroll1[2 * tile_index + 1];
 	int gfxset;
 
-	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL1, code);
+	code = gfxrom_bank_mapper(machine(), GFXTYPE_SCROLL1, code);
 
 	/* allows us to reproduce a problem seen with a ffight board where USA and Japanese
          roms have been mixed to be reproduced (ffightub) -- it looks like each column
          should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			gfxset,
 			code,
 			(attr & 0x1f) + 0x20,
@@ -2013,20 +2012,19 @@ static TILE_GET_INFO( get_tile0_info )
 	tileinfo.group = (attr & 0x0180) >> 7;
 
 	// for out of range tiles, switch to fully transparent data
-	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
+	// (but still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo.pen_data = state->m_empty_tile;
+		tileinfo.pen_data = m_empty_tile;
 }
 
-static TILE_GET_INFO( get_tile1_info )
+TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 {
-	cps_state *state = machine.driver_data<cps_state>();
-	int code = state->m_scroll2[2 * tile_index];
-	int attr = state->m_scroll2[2 * tile_index + 1];
+	int code = m_scroll2[2 * tile_index];
+	int attr = m_scroll2[2 * tile_index + 1];
 
-	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL2, code);
+	code = gfxrom_bank_mapper(machine(), GFXTYPE_SCROLL2, code);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			(attr & 0x1f) + 0x40,
@@ -2035,18 +2033,17 @@ static TILE_GET_INFO( get_tile1_info )
 
 	// for out of range tiles, switch to fully transparent data
 	if (code == -1)
-		tileinfo.pen_data = state->m_empty_tile;
+		tileinfo.pen_data = m_empty_tile;
 }
 
-static TILE_GET_INFO( get_tile2_info )
+TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 {
-	cps_state *state = machine.driver_data<cps_state>();
-	int code = state->m_scroll3[2 * tile_index] & 0x3fff;
-	int attr = state->m_scroll3[2 * tile_index + 1];
+	int code = m_scroll3[2 * tile_index] & 0x3fff;
+	int attr = m_scroll3[2 * tile_index + 1];
 
-	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL3, code);
+	code = gfxrom_bank_mapper(machine(), GFXTYPE_SCROLL3, code);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			code,
 			(attr & 0x1f) + 0x60,
@@ -2054,9 +2051,9 @@ static TILE_GET_INFO( get_tile2_info )
 	tileinfo.group = (attr & 0x0180) >> 7;
 
 	// for out of range tiles, switch to fully transparent data
-	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
+	// (but still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo.pen_data = state->m_empty_tile;
+		tileinfo.pen_data = m_empty_tile;
 }
 
 
@@ -2099,9 +2096,9 @@ static VIDEO_START( cps )
 	state->m_stars_rom_size = 0x2000;	/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
 
 	/* create tilemaps */
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile0_info, tilemap0_scan,  8,  8, 64, 64);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile1_info, tilemap1_scan, 16, 16, 64, 64);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile2_info, tilemap2_scan, 32, 32, 64, 64);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile0_info),state), tilemap_mapper_delegate(FUNC(cps_state::tilemap0_scan),state),  8,  8, 64, 64);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile1_info),state), tilemap_mapper_delegate(FUNC(cps_state::tilemap1_scan),state), 16, 16, 64, 64);
+	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cps_state::get_tile2_info),state), tilemap_mapper_delegate(FUNC(cps_state::tilemap2_scan),state), 32, 32, 64, 64);
 
 	/* create empty tiles */
 	memset(state->m_empty_tile, 0x0f, sizeof(state->m_empty_tile));

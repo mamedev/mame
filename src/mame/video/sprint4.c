@@ -35,16 +35,15 @@ PALETTE_INIT( sprint4 )
 }
 
 
-static TILE_GET_INFO( sprint4_tile_info )
+TILE_GET_INFO_MEMBER(sprint4_state::sprint4_tile_info)
 {
-	sprint4_state *state = machine.driver_data<sprint4_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	UINT8 code = videoram[tile_index];
 
 	if ((code & 0x30) == 0x30)
-		SET_TILE_INFO(0, code & ~0x40, (code >> 6) ^ 3, 0);
+		SET_TILE_INFO_MEMBER(0, code & ~0x40, (code >> 6) ^ 3, 0);
 	else
-		SET_TILE_INFO(0, code, 4, 0);
+		SET_TILE_INFO_MEMBER(0, code, 4, 0);
 }
 
 
@@ -53,7 +52,7 @@ VIDEO_START( sprint4 )
 	sprint4_state *state = machine.driver_data<sprint4_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_playfield = tilemap_create(machine, sprint4_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_playfield = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sprint4_state::sprint4_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

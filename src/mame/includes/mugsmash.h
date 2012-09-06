@@ -26,6 +26,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram2_w);
 	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
+	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
+	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
 };
 
 

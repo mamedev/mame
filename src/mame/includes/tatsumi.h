@@ -112,6 +112,9 @@ public:
 	DECLARE_DRIVER_INIT(roundup5);
 	DECLARE_DRIVER_INIT(apache3);
 	DECLARE_DRIVER_INIT(cyclwarr);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);
 };
 
 

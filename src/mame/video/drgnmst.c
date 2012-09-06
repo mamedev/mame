@@ -6,15 +6,14 @@
 #include "includes/drgnmst.h"
 
 
-static TILE_GET_INFO( get_drgnmst_fg_tile_info )
+TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_fg_tile_info)
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 	int tileno, colour, flipyx;
-	tileno = state->m_fg_videoram[tile_index * 2] & 0xfff;
-	colour = state->m_fg_videoram[tile_index * 2 + 1] & 0x1f;
-	flipyx = (state->m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
+	tileno = m_fg_videoram[tile_index * 2] & 0xfff;
+	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
+	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
 
-	SET_TILE_INFO(1, tileno, colour, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_fg_videoram_w)
@@ -23,15 +22,14 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_fg_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_drgnmst_bg_tile_info )
+TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_bg_tile_info)
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 	int tileno, colour, flipyx;
-	tileno = (state->m_bg_videoram[tile_index * 2]& 0x1fff) + 0x800;
-	colour = state->m_bg_videoram[tile_index * 2 + 1] & 0x1f;
-	flipyx = (state->m_bg_videoram[tile_index * 2 + 1] & 0x60) >> 5;
+	tileno = (m_bg_videoram[tile_index * 2]& 0x1fff) + 0x800;
+	colour = m_bg_videoram[tile_index * 2 + 1] & 0x1f;
+	flipyx = (m_bg_videoram[tile_index * 2 + 1] & 0x60) >> 5;
 
-	SET_TILE_INFO(3, tileno, colour, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(3, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_bg_videoram_w)
@@ -40,15 +38,14 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_bg_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_drgnmst_md_tile_info )
+TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_md_tile_info)
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
 	int tileno, colour, flipyx;
-	tileno = (state->m_md_videoram[tile_index * 2] & 0x7fff) - 0x2000;
-	colour = state->m_md_videoram[tile_index * 2 + 1] & 0x1f;
-	flipyx = (state->m_md_videoram[tile_index * 2 + 1] & 0x60) >> 5;
+	tileno = (m_md_videoram[tile_index * 2] & 0x7fff) - 0x2000;
+	colour = m_md_videoram[tile_index * 2 + 1] & 0x1f;
+	flipyx = (m_md_videoram[tile_index * 2 + 1] & 0x60) >> 5;
 
-	SET_TILE_INFO(2, tileno, colour, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(2, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
@@ -105,17 +102,17 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 }
 
 
-static TILEMAP_MAPPER( drgnmst_fg_tilemap_scan_cols )
+TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_fg_tilemap_scan_cols)
 {
 	return (col * 32) + (row & 0x1f) + ((row & 0xe0) >> 5) * 2048;
 }
 
-static TILEMAP_MAPPER( drgnmst_md_tilemap_scan_cols )
+TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_md_tilemap_scan_cols)
 {
 	return (col * 16) + (row & 0x0f) + ((row & 0xf0) >> 4) * 1024;
 }
 
-static TILEMAP_MAPPER( drgnmst_bg_tilemap_scan_cols )
+TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_bg_tilemap_scan_cols)
 {
 	return (col * 8) + (row & 0x07) + ((row & 0xf8) >> 3) * 512;
 }
@@ -123,13 +120,13 @@ static TILEMAP_MAPPER( drgnmst_bg_tilemap_scan_cols )
 VIDEO_START(drgnmst)
 {
 	drgnmst_state *state = machine.driver_data<drgnmst_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_drgnmst_fg_tile_info, drgnmst_fg_tilemap_scan_cols, 8, 8, 64,64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_fg_tile_info),state), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_fg_tilemap_scan_cols),state), 8, 8, 64,64);
 	state->m_fg_tilemap->set_transparent_pen(15);
 
-	state->m_md_tilemap = tilemap_create(machine, get_drgnmst_md_tile_info, drgnmst_md_tilemap_scan_cols, 16, 16, 64,64);
+	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_md_tile_info),state), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_md_tilemap_scan_cols),state), 16, 16, 64,64);
 	state->m_md_tilemap->set_transparent_pen(15);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_drgnmst_bg_tile_info, drgnmst_bg_tilemap_scan_cols, 32, 32, 64,64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drgnmst_state::get_drgnmst_bg_tile_info),state), tilemap_mapper_delegate(FUNC(drgnmst_state::drgnmst_bg_tilemap_scan_cols),state), 32, 32, 64,64);
 	state->m_bg_tilemap->set_transparent_pen(15);
 
 	// do the other tilemaps have rowscroll too? probably not ..

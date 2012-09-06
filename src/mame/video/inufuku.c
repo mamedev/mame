@@ -161,23 +161,21 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 ******************************************************************************/
 
-static TILE_GET_INFO( get_inufuku_bg_tile_info )
+TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_bg_tile_info)
 {
-	inufuku_state *state = machine.driver_data<inufuku_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_bg_videoram[tile_index],
-			state->m_bg_palettebank,
+			m_bg_videoram[tile_index],
+			m_bg_palettebank,
 			0);
 }
 
-static TILE_GET_INFO( get_inufuku_tx_tile_info )
+TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_tx_tile_info)
 {
-	inufuku_state *state = machine.driver_data<inufuku_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_tx_videoram[tile_index],
-			state->m_tx_palettebank,
+			m_tx_videoram[tile_index],
+			m_tx_palettebank,
 			0);
 }
 
@@ -214,8 +212,8 @@ VIDEO_START( inufuku )
 {
 	inufuku_state *state = machine.driver_data<inufuku_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_inufuku_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_tx_tilemap = tilemap_create(machine, get_inufuku_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(inufuku_state::get_inufuku_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(inufuku_state::get_inufuku_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_bg_tilemap->set_transparent_pen(255);
 	state->m_tx_tilemap->set_transparent_pen(255);

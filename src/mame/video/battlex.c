@@ -45,19 +45,18 @@ WRITE8_MEMBER(battlex_state::battlex_flipscreen_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(battlex_state::get_bg_tile_info)
 {
-	battlex_state *state = machine.driver_data<battlex_state>();
-	int tile = state->m_videoram[tile_index * 2] | (((state->m_videoram[tile_index * 2 + 1] & 0x01)) << 8);
-	int color = (state->m_videoram[tile_index * 2 + 1] & 0x0e) >> 1; // high bits unused
+	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x01)) << 8);
+	int color = (m_videoram[tile_index * 2 + 1] & 0x0e) >> 1; // high bits unused
 
-	SET_TILE_INFO(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 VIDEO_START( battlex )
 {
 	battlex_state *state = machine.driver_data<battlex_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(battlex_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

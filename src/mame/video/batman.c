@@ -16,37 +16,34 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_alpha_tile_info )
+TILE_GET_INFO_MEMBER(batman_state::get_alpha_tile_info)
 {
-	batman_state *state = machine.driver_data<batman_state>();
-	UINT16 data = state->m_alpha[tile_index];
-	int code = ((data & 0x400) ? (state->m_alpha_tile_bank * 0x400) : 0) + (data & 0x3ff);
+	UINT16 data = m_alpha[tile_index];
+	int code = ((data & 0x400) ? (m_alpha_tile_bank * 0x400) : 0) + (data & 0x3ff);
 	int color = (data >> 11) & 0x0f;
 	int opaque = data & 0x8000;
-	SET_TILE_INFO(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	SET_TILE_INFO_MEMBER(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(batman_state::get_playfield_tile_info)
 {
-	batman_state *state = machine.driver_data<batman_state>();
-	UINT16 data1 = state->m_playfield[tile_index];
-	UINT16 data2 = state->m_playfield_upper[tile_index] & 0xff;
+	UINT16 data1 = m_playfield[tile_index];
+	UINT16 data2 = m_playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
-	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 	tileinfo.category = (data2 >> 4) & 3;
 }
 
 
-static TILE_GET_INFO( get_playfield2_tile_info )
+TILE_GET_INFO_MEMBER(batman_state::get_playfield2_tile_info)
 {
-	batman_state *state = machine.driver_data<batman_state>();
-	UINT16 data1 = state->m_playfield2[tile_index];
-	UINT16 data2 = state->m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = m_playfield2[tile_index];
+	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
-	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 	tileinfo.category = (data2 >> 4) & 3;
 }
 
@@ -99,17 +96,17 @@ VIDEO_START( batman )
 	batman_state *state = machine.driver_data<batman_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the second playfield */
-	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
+	state->m_playfield2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_playfield2_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
 	state->m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(batman_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 }
 

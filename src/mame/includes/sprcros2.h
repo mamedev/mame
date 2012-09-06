@@ -25,6 +25,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprcros2_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(sprcros2_bgscrollx_w);
 	DECLARE_WRITE8_MEMBER(sprcros2_bgscrolly_w);
+	TILE_GET_INFO_MEMBER(get_sprcros2_bgtile_info);
+	TILE_GET_INFO_MEMBER(get_sprcros2_fgtile_info);
 };
 
 

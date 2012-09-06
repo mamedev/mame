@@ -142,21 +142,20 @@ WRITE8_MEMBER(gsword_state::gsword_scroll_w)
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gsword_state::get_bg_tile_info)
 {
-	gsword_state *state = machine.driver_data<gsword_state>();
-	UINT8 *videoram = state->m_videoram;
-	int code = videoram[tile_index] + ((state->m_charbank & 0x03) << 8);
-	int color = ((code & 0x3c0) >> 6) + 16 * state->m_charpalbank;
-	int flags = state->m_flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	UINT8 *videoram = m_videoram;
+	int code = videoram[tile_index] + ((m_charbank & 0x03) << 8);
+	int color = ((code & 0x3c0) >> 6) + 16 * m_charpalbank;
+	int flags = m_flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( gsword )
 {
 	gsword_state *state = machine.driver_data<gsword_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gsword_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 64);
 }
 

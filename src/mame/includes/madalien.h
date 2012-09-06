@@ -53,6 +53,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_WRITE8_MEMBER(madalien_portA_w);
 	DECLARE_WRITE8_MEMBER(madalien_portB_w);
+	TILEMAP_MAPPER_MEMBER(scan_mode0);
+	TILEMAP_MAPPER_MEMBER(scan_mode1);
+	TILEMAP_MAPPER_MEMBER(scan_mode2);
+	TILEMAP_MAPPER_MEMBER(scan_mode3);
+	TILE_GET_INFO_MEMBER(get_tile_info_BG_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_BG_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_FG);
 };
 
 

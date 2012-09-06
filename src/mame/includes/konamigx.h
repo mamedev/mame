@@ -44,6 +44,11 @@ public:
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
 	DECLARE_DRIVER_INIT(konamigx);
+	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
+	TILE_GET_INFO_MEMBER(get_gx_psac3_tile_info);
+	TILE_GET_INFO_MEMBER(get_gx_psac3_alt_tile_info);
+	TILE_GET_INFO_MEMBER(get_gx_psac1a_tile_info);
+	TILE_GET_INFO_MEMBER(get_gx_psac1b_tile_info);
 };
 
 

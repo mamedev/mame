@@ -61,6 +61,9 @@ public:
 	DECLARE_WRITE16_MEMBER(wgp_piv_ctrl_word_w);
 	DECLARE_DRIVER_INIT(wgp);
 	DECLARE_DRIVER_INIT(wgp2);
+	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
+	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
+	TILE_GET_INFO_MEMBER(get_piv2_tile_info);
 };
 
 

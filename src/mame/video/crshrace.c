@@ -9,20 +9,18 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info1)
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
-	int code = state->m_videoram1[tile_index];
+	int code = m_videoram1[tile_index];
 
-	SET_TILE_INFO(1, (code & 0xfff) + (state->m_roz_bank << 12), code >> 12, 0);
+	SET_TILE_INFO_MEMBER(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
-	int code = state->m_videoram2[tile_index];
+	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
@@ -36,8 +34,8 @@ VIDEO_START( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_tilemap1->set_transparent_pen(0x0f);
 	state->m_tilemap2->set_transparent_pen(0xff);

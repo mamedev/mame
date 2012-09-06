@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cloak_flipscreen_w);
 	void set_current_bitmap_videoram_pointer();
 	void adjust_xy(int offset);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

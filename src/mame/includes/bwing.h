@@ -67,6 +67,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
 	DECLARE_DRIVER_INIT(bwing);
+	TILE_GET_INFO_MEMBER(get_fgtileinfo);
+	TILE_GET_INFO_MEMBER(get_bgtileinfo);
+	TILE_GET_INFO_MEMBER(get_charinfo);
+	TILEMAP_MAPPER_MEMBER(bwing_scan_cols);
 };
 
 

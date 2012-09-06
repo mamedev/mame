@@ -78,6 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mario_sh_tuneselect_w);
 	DECLARE_WRITE8_MEMBER(mario_sh3_w);
 	DECLARE_WRITE8_MEMBER(mario_z80dma_rdy_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 /*----------- defined in video/mario.c -----------*/

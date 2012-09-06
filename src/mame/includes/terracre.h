@@ -31,6 +31,8 @@ public:
 	DECLARE_DRIVER_INIT(amazon);
 	DECLARE_DRIVER_INIT(amatelas);
 	DECLARE_DRIVER_INIT(horekid);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

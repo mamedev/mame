@@ -38,6 +38,9 @@ public:
 	DECLARE_WRITE16_MEMBER(yunsun16_vram_0_w);
 	DECLARE_WRITE16_MEMBER(yunsun16_vram_1_w);
 	DECLARE_DRIVER_INIT(magicbub);
+	TILEMAP_MAPPER_MEMBER(yunsun16_tilemap_scan_pages);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

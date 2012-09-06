@@ -24,6 +24,8 @@ public:
 	DECLARE_READ8_MEMBER(xxmissio_bgram_r);
 	DECLARE_WRITE8_MEMBER(xxmissio_paletteram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(xxmissio_status_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

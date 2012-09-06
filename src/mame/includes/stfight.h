@@ -37,6 +37,11 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_vh_latch_w);
 	DECLARE_DRIVER_INIT(stfight);
 	DECLARE_DRIVER_INIT(empcity);
+	TILEMAP_MAPPER_MEMBER(fg_scan);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(bg_scan);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 

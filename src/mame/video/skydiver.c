@@ -36,11 +36,10 @@ MACHINE_RESET( skydiver )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 {
-	skydiver_state *state = machine.driver_data<skydiver_state>();
-	UINT8 code = state->m_videoram[tile_index];
-	SET_TILE_INFO(0, code & 0x3f, code >> 6, 0);
+	UINT8 code = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 6, 0);
 }
 
 
@@ -54,7 +53,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( skydiver )
 {
 	skydiver_state *state = machine.driver_data<skydiver_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skydiver_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
 

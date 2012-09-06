@@ -119,36 +119,34 @@ READ8_MEMBER(tp84_state::tp84_scanline_r)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tp84_state::get_bg_tile_info)
 {
-	tp84_state *state = machine.driver_data<tp84_state>();
-	int code = ((state->m_bg_colorram[tile_index] & 0x30) << 4) | state->m_bg_videoram[tile_index];
-	int color = ((*state->m_palette_bank & 0x07) << 6) |
-				((*state->m_palette_bank & 0x18) << 1) |
-				(state->m_bg_colorram[tile_index] & 0x0f);
-	int flags = TILE_FLIPYX(state->m_bg_colorram[tile_index] >> 6);
+	int code = ((m_bg_colorram[tile_index] & 0x30) << 4) | m_bg_videoram[tile_index];
+	int color = ((*m_palette_bank & 0x07) << 6) |
+				((*m_palette_bank & 0x18) << 1) |
+				(m_bg_colorram[tile_index] & 0x0f);
+	int flags = TILE_FLIPYX(m_bg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
 {
-	tp84_state *state = machine.driver_data<tp84_state>();
-	int code = ((state->m_fg_colorram[tile_index] & 0x30) << 4) | state->m_fg_videoram[tile_index];
-	int color = ((*state->m_palette_bank & 0x07) << 6) |
-				((*state->m_palette_bank & 0x18) << 1) |
-				(state->m_fg_colorram[tile_index] & 0x0f);
-	int flags = TILE_FLIPYX(state->m_fg_colorram[tile_index] >> 6);
+	int code = ((m_fg_colorram[tile_index] & 0x30) << 4) | m_fg_videoram[tile_index];
+	int color = ((*m_palette_bank & 0x07) << 6) |
+				((*m_palette_bank & 0x18) << 1) |
+				(m_fg_colorram[tile_index] & 0x0f);
+	int flags = TILE_FLIPYX(m_fg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
 VIDEO_START( tp84 )
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tp84_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tp84_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

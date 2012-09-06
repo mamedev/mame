@@ -10,61 +10,58 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	int const lo = state->m_fg_videoram[(tile_index << 1)];
-	int const hi = state->m_fg_videoram[(tile_index << 1) | 1];
+	int const lo = m_fg_videoram[(tile_index << 1)];
+	int const hi = m_fg_videoram[(tile_index << 1) | 1];
 	int const tile = ((hi & 0xc0) << 2) | lo;
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
 }
 
-static TILE_GET_INFO( ninjakd2_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	int const lo = state->m_bg_videoram[(tile_index << 1)];
-	int const hi = state->m_bg_videoram[(tile_index << 1) | 1];
+	int const lo = m_bg_videoram[(tile_index << 1)];
+	int const hi = m_bg_videoram[(tile_index << 1) | 1];
 	int const tile = ((hi & 0xc0) << 2) | lo;
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			color,
 			TILE_FLIPYX(flipyx));
 }
 
-static TILE_GET_INFO( mnight_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	int const lo = state->m_bg_videoram[(tile_index << 1)];
-	int const hi = state->m_bg_videoram[(tile_index << 1) | 1];
+	int const lo = m_bg_videoram[(tile_index << 1)];
+	int const hi = m_bg_videoram[(tile_index << 1) | 1];
 	int const tile = ((hi & 0x10) << 6) | ((hi & 0xc0) << 2) | lo;
 	int const flipy = (hi & 0x20) >> 5;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			color,
 			flipy ? TILE_FLIPY : 0);
 }
 
-static TILEMAP_MAPPER( robokid_bg_scan )
+TILEMAP_MAPPER_MEMBER(ninjakd2_state::robokid_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x10) << 5);
 }
 
-static TILEMAP_MAPPER( omegaf_bg_scan )
+TILEMAP_MAPPER_MEMBER(ninjakd2_state::omegaf_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
@@ -84,22 +81,19 @@ static void robokid_get_bg_tile_info(running_machine& machine, tile_data& tilein
 			0);
 }
 
-static TILE_GET_INFO( robokid_get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg0_tile_info)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	robokid_get_bg_tile_info(machine, tileinfo, tile_index, 2, state->m_robokid_bg0_videoram);
+	robokid_get_bg_tile_info(machine(), tileinfo, tile_index, 2, m_robokid_bg0_videoram);
 }
 
-static TILE_GET_INFO( robokid_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg1_tile_info)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	robokid_get_bg_tile_info(machine, tileinfo, tile_index, 3, state->m_robokid_bg1_videoram);
+	robokid_get_bg_tile_info(machine(), tileinfo, tile_index, 3, m_robokid_bg1_videoram);
 }
 
-static TILE_GET_INFO( robokid_get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
 {
-	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
-	robokid_get_bg_tile_info(machine, tileinfo, tile_index, 4, state->m_robokid_bg2_videoram);
+	robokid_get_bg_tile_info(machine(), tileinfo, tile_index, 4, m_robokid_bg2_videoram);
 }
 
 
@@ -135,8 +129,8 @@ VIDEO_START( ninjakd2 )
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	videoram_alloc(machine, 0);
 
-	state->m_fg_tilemap = tilemap_create(         machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, ninjakd2_get_bg_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::ninjakd2_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(TRANSPARENTCODE);
 
@@ -149,8 +143,8 @@ VIDEO_START( mnight )
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	videoram_alloc(machine, 0);
 
-	state->m_fg_tilemap = tilemap_create(       machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, mnight_get_bg_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(TRANSPARENTCODE);
 
@@ -163,8 +157,8 @@ VIDEO_START( arkarea )
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	videoram_alloc(machine, 0);
 
-	state->m_fg_tilemap = tilemap_create(       machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, mnight_get_bg_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::mnight_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(TRANSPARENTCODE);
 
@@ -179,10 +173,10 @@ VIDEO_START( robokid )
 
 	videoram_alloc(machine, 0x0800);
 
-	state->m_fg_tilemap  = tilemap_create(        machine, get_fg_tile_info,  TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
-	state->m_bg0_tilemap = tilemap_create(machine, robokid_get_bg0_tile_info, robokid_bg_scan,    16, 16, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, robokid_get_bg1_tile_info, robokid_bg_scan,    16, 16, 32, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, robokid_get_bg2_tile_info, robokid_bg_scan,    16, 16, 32, 32);
+	state->m_fg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),state),  TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),state), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),state),    16, 16, 32, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),state),    16, 16, 32, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(ninjakd2_state::robokid_bg_scan),state),    16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(TRANSPARENTCODE);
 	state->m_bg1_tilemap->set_transparent_pen(TRANSPARENTCODE);
@@ -199,10 +193,10 @@ VIDEO_START( omegaf )
 
 	videoram_alloc(machine, 0x2000);
 
-	state->m_fg_tilemap  = tilemap_create(        machine, get_fg_tile_info,  TILEMAP_SCAN_ROWS,   8,  8,  32, 32);
-	state->m_bg0_tilemap = tilemap_create(machine, robokid_get_bg0_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, robokid_get_bg1_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, robokid_get_bg2_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
+	state->m_fg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::get_fg_tile_info),state),  TILEMAP_SCAN_ROWS,   8,  8,  32, 32);
+	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg0_tile_info),state), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),state),     16, 16, 128, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg1_tile_info),state), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),state),     16, 16, 128, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ninjakd2_state::robokid_get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(ninjakd2_state::omegaf_bg_scan),state),     16, 16, 128, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(TRANSPARENTCODE);
 	state->m_bg0_tilemap->set_transparent_pen(TRANSPARENTCODE);

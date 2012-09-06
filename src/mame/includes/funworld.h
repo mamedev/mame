@@ -25,6 +25,7 @@ public:
 	DECLARE_DRIVER_INIT(soccernw);
 	DECLARE_DRIVER_INIT(tabblue);
 	DECLARE_DRIVER_INIT(magicd2a);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

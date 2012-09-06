@@ -104,28 +104,26 @@ Offset:
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info_0a )
+TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
 	UINT8 code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
-	code	=	state->m_vram_0[ tile_index * 2 + 0x40 ];
-//  color   =   state->m_vram_0[ tile_index * 2 + 0x41 ];
-	SET_TILE_INFO(
+	code	=	m_vram_0[ tile_index * 2 + 0x40 ];
+//  color   =   m_vram_0[ tile_index * 2 + 0x41 ];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			0,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_0b )
+TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
 	UINT8 code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
-	code	=	state->m_vram_0[ tile_index * 2 + 0x00 ];
-//  color   =   state->m_vram_0[ tile_index * 2 + 0x01 ];
-	SET_TILE_INFO(
+	code	=	m_vram_0[ tile_index * 2 + 0x00 ];
+//  color   =   m_vram_0[ tile_index * 2 + 0x01 ];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			0,
@@ -160,7 +158,7 @@ Offset:
 ***************************************************************************/
 
 /* logical (col,row) -> memory offset */
-static TILEMAP_MAPPER( tilemap_scan_rows_extra )
+TILEMAP_MAPPER_MEMBER(clshroad_state::tilemap_scan_rows_extra)
 {
 	// The leftmost columns come from the bottom rows
 	if (col <= 0x01)	return row + (col + 0x1e) * 0x20;
@@ -176,25 +174,23 @@ static TILEMAP_MAPPER( tilemap_scan_rows_extra )
 	return (col-2) + row * 0x20;
 }
 
-static TILE_GET_INFO( get_tile_info_fb1 )
+TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
-	UINT8 code	=	state->m_vram_1[ tile_index + 0x000 ];
-	UINT8 color	=	state->m_vram_1[ tile_index + 0x400 ] & 0x3f;
+	UINT8 code	=	m_vram_1[ tile_index + 0x000 ];
+	UINT8 color	=	m_vram_1[ tile_index + 0x400 ] & 0x3f;
 	tileinfo.group = color;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
-	UINT8 code	=	state->m_vram_1[ tile_index + 0x000 ];
-	UINT8 color	=	state->m_vram_1[ tile_index + 0x400 ];
-	SET_TILE_INFO(
+	UINT8 code	=	m_vram_1[ tile_index + 0x000 ];
+	UINT8 color	=	m_vram_1[ tile_index + 0x400 ];
+	SET_TILE_INFO_MEMBER(
 			2,
 			code + ((color & 0xf0)<<4),
 			color & 0x0f,
@@ -212,10 +208,10 @@ VIDEO_START( firebatl )
 {
 	clshroad_state *state = machine.driver_data<clshroad_state>();
 	/* These 2 use the graphics and scroll value */
-	state->m_tilemap_0a = tilemap_create(machine, get_tile_info_0a,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
-	state->m_tilemap_0b = tilemap_create(machine, get_tile_info_0b,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	state->m_tilemap_0a = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	state->m_tilemap_0b = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_fb1,tilemap_scan_rows_extra,8,8,0x24,0x20);
+	state->m_tilemap_1  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_fb1),state),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),state),8,8,0x24,0x20);
 
 	state->m_tilemap_0a->set_scroll_rows(1);
 	state->m_tilemap_0b->set_scroll_rows(1);
@@ -236,10 +232,10 @@ VIDEO_START( clshroad )
 {
 	clshroad_state *state = machine.driver_data<clshroad_state>();
 	/* These 2 use the graphics and scroll value */
-	state->m_tilemap_0a = tilemap_create(machine, get_tile_info_0a,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
-	state->m_tilemap_0b = tilemap_create(machine, get_tile_info_0b,TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	state->m_tilemap_0a = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	state->m_tilemap_0b = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),state),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	state->m_tilemap_1  = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows_extra,8,8,0x24,0x20);
+	state->m_tilemap_1  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_1),state),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),state),8,8,0x24,0x20);
 
 	state->m_tilemap_0a->set_scroll_rows(1);
 	state->m_tilemap_0b->set_scroll_rows(1);

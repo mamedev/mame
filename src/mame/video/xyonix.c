@@ -31,15 +31,14 @@ PALETTE_INIT( xyonix )
 }
 
 
-static TILE_GET_INFO( get_xyonix_tile_info )
+TILE_GET_INFO_MEMBER(xyonix_state::get_xyonix_tile_info)
 {
-	xyonix_state *state = machine.driver_data<xyonix_state>();
 	int tileno;
-	int attr = state->m_vidram[tile_index+0x1000+1];
+	int attr = m_vidram[tile_index+0x1000+1];
 
-	tileno = (state->m_vidram[tile_index+1] << 0) | ((attr & 0x0f) << 8);
+	tileno = (m_vidram[tile_index+1] << 0) | ((attr & 0x0f) << 8);
 
-	SET_TILE_INFO(0,tileno,attr >> 4,0);
+	SET_TILE_INFO_MEMBER(0,tileno,attr >> 4,0);
 }
 
 WRITE8_MEMBER(xyonix_state::xyonix_vidram_w)
@@ -53,7 +52,7 @@ VIDEO_START(xyonix)
 {
 	xyonix_state *state = machine.driver_data<xyonix_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_xyonix_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xyonix_state::get_xyonix_tile_info),state), TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
 }
 
 SCREEN_UPDATE_IND16(xyonix)

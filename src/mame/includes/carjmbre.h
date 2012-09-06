@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(carjmbre_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(carjmbre_8806_w);
 	DECLARE_WRITE8_MEMBER(carjmbre_videoram_w);
+	TILE_GET_INFO_MEMBER(get_carjmbre_tile_info);
 };
 
 

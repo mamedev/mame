@@ -5,14 +5,13 @@
 #include "includes/shangkid.h"
 
 
-static TILE_GET_INFO( get_bg_tile_info ){
-	shangkid_state *state = machine.driver_data<shangkid_state>();
-	UINT8 *videoram = state->m_videoram;
+TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
+	UINT8 *videoram = m_videoram;
 	int attributes = videoram[tile_index+0x800];
 	int tile_number = videoram[tile_index]+0x100*(attributes&0x3);
 	int color;
 
-	if( state->m_gfx_type==1 )
+	if( m_gfx_type==1 )
 	{
 		/* Shanghai Kid:
             ------xx    bank
@@ -21,7 +20,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
         */
 		color = attributes>>3;
 		color = (color&0x03)|((color&0x1c)<<1);
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				0,
 				tile_number,
 				color,
@@ -35,7 +34,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
             x-------    flipx?
         */
 		color = (attributes>>2)&0x1f;
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				0,
 				tile_number,
 				color,
@@ -43,13 +42,13 @@ static TILE_GET_INFO( get_bg_tile_info ){
 	}
 
 	tileinfo.category =
-		(machine.root_device().memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
+		(machine().root_device().memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START( shangkid )
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
-	state->m_background = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)

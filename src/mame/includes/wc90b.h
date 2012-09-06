@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER(wc90b_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(wc90b_txvideoram_w);
 	DECLARE_WRITE8_MEMBER(adpcm_control_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 

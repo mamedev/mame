@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint8_lockout_w);
 	DECLARE_WRITE8_MEMBER(sprint8_int_reset_w);
 	DECLARE_WRITE8_MEMBER(sprint8_video_ram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
 };
 
 

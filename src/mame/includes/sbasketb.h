@@ -39,6 +39,7 @@ public:
 	UINT8 m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
 	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 /*----------- defined in video/sbasketb.c -----------*/

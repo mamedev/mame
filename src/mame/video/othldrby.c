@@ -28,19 +28,19 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	tileinfo.category = (attr & 0x0600) >> 9;
 }
 
-static TILE_GET_INFO( get_tile_info0 )
+TILE_GET_INFO_MEMBER(othldrby_state::get_tile_info0)
 {
-	get_tile_info(machine, tileinfo, tile_index, 0);
+	get_tile_info(machine(), tileinfo, tile_index, 0);
 }
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(othldrby_state::get_tile_info1)
 {
-	get_tile_info(machine, tileinfo, tile_index, 1);
+	get_tile_info(machine(), tileinfo, tile_index, 1);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(othldrby_state::get_tile_info2)
 {
-	get_tile_info(machine, tileinfo, tile_index, 2);
+	get_tile_info(machine(), tileinfo, tile_index, 2);
 }
 
 
@@ -55,9 +55,9 @@ VIDEO_START( othldrby )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info0),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_vram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
 	state->m_buf_spriteram = auto_alloc_array(machine, UINT16, 2 * SPRITERAM_SIZE);

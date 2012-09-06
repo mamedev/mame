@@ -44,6 +44,10 @@ public:
 	DECLARE_WRITE16_MEMBER(sslam_snd_w);
 	DECLARE_DRIVER_INIT(sslam);
 	DECLARE_DRIVER_INIT(powerbls);
+	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
+	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_powerbls_bg_tile_info);
 };
 
 

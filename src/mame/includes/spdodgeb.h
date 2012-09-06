@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spdodgeb_scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(spdodgeb_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spdodgeb_videoram_w);
+	TILEMAP_MAPPER_MEMBER(background_scan);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

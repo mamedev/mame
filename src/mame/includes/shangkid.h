@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 	DECLARE_DRIVER_INIT(shangkid);
 	DECLARE_DRIVER_INIT(chinhero);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

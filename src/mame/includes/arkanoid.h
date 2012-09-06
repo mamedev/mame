@@ -73,6 +73,7 @@ public:
 	DECLARE_DRIVER_INIT(arkangc2);
 	DECLARE_DRIVER_INIT(arkbloc2);
 	DECLARE_DRIVER_INIT(arkangc);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

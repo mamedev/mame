@@ -208,25 +208,24 @@ READ8_MEMBER(bking_state::bking_pos_r)
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
 {
-	bking_state *state = machine.driver_data<bking_state>();
-	UINT8 code0 = state->m_playfield_ram[2 * tile_index + 0];
-	UINT8 code1 = state->m_playfield_ram[2 * tile_index + 1];
+	UINT8 code0 = m_playfield_ram[2 * tile_index + 0];
+	UINT8 code1 = m_playfield_ram[2 * tile_index + 1];
 
 	int flags = 0;
 
 	if (code1 & 4) flags |= TILE_FLIPX;
 	if (code1 & 8) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO(0, code0 + 256 * code1, state->m_palette_bank, flags);
+	SET_TILE_INFO_MEMBER(0, code0 + 256 * code1, m_palette_bank, flags);
 }
 
 
 VIDEO_START( bking )
 {
 	bking_state *state = machine.driver_data<bking_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap1);
 	machine.primary_screen->register_screen_bitmap(state->m_tmp_bitmap2);
 

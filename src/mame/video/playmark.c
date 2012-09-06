@@ -8,103 +8,94 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( bigtwin_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_tx_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT16 code = state->m_videoram1[2 * tile_index];
-	UINT16 color = state->m_videoram1[2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code = m_videoram1[2 * tile_index];
+	UINT16 color = m_videoram1[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( bigtwin_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_fg_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT16 code = state->m_videoram2[2 * tile_index];
-	UINT16 color = state->m_videoram2[2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code = m_videoram2[2 * tile_index];
+	UINT16 color = m_videoram2[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( wbeachvl_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_tx_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT16 code = state->m_videoram1[2 * tile_index];
-	UINT16 color = state->m_videoram1[2 * tile_index + 1];
+	UINT16 code = m_videoram1[2 * tile_index];
+	UINT16 color = m_videoram1[2 * tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			color / 4,
 			0);
 }
 
-static TILE_GET_INFO( wbeachvl_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT16 code = state->m_videoram2[2 * tile_index];
-	UINT16 color = state->m_videoram2[2 * tile_index + 1];
+	UINT16 code = m_videoram2[2 * tile_index];
+	UINT16 color = m_videoram2[2 * tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0x7fff,
 			color / 4 + 8,
 			(code & 0x8000) ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( wbeachvl_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT16 code = state->m_videoram3[2 * tile_index];
-	UINT16 color = state->m_videoram3[2 * tile_index + 1];
+	UINT16 code = m_videoram3[2 * tile_index];
+	UINT16 color = m_videoram3[2 * tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0x7fff,
 			color / 4,
 			(code & 0x8000) ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( hrdtimes_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_tx_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int code = state->m_videoram1[tile_index] & 0x03ff;
-	int colr = state->m_videoram1[tile_index] & 0xe000;
+	int code = m_videoram1[tile_index] & 0x03ff;
+	int colr = m_videoram1[tile_index] & 0xe000;
 
-	SET_TILE_INFO(2,code + state->m_txt_tile_offset, colr >> 13, 0);
+	SET_TILE_INFO_MEMBER(2,code + m_txt_tile_offset, colr >> 13, 0);
 }
 
-static TILE_GET_INFO( bigtwinb_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int code = state->m_videoram1[tile_index] & 0x0fff;
-	int colr = state->m_videoram1[tile_index] & 0xf000;
+	int code = m_videoram1[tile_index] & 0x0fff;
+	int colr = m_videoram1[tile_index] & 0xf000;
 
-	SET_TILE_INFO(2,code + state->m_txt_tile_offset, colr >> 12, 0);
+	SET_TILE_INFO_MEMBER(2,code + m_txt_tile_offset, colr >> 12, 0);
 }
 
-static TILE_GET_INFO( hrdtimes_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int code = state->m_videoram2[tile_index] & 0x1fff;
-	int colr = state->m_videoram2[tile_index] & 0xe000;
+	int code = m_videoram2[tile_index] & 0x1fff;
+	int colr = m_videoram2[tile_index] & 0xe000;
 
-	SET_TILE_INFO(1,code + 0x2000,(colr >> 13) + 8,0);
+	SET_TILE_INFO_MEMBER(1,code + 0x2000,(colr >> 13) + 8,0);
 }
 
-static TILE_GET_INFO( hrdtimes_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int code = state->m_videoram3[tile_index] & 0x1fff;
-	int colr = state->m_videoram3[tile_index] & 0xe000;
+	int code = m_videoram3[tile_index] & 0x1fff;
+	int colr = m_videoram3[tile_index] & 0xe000;
 
-	SET_TILE_INFO(1, code, colr >> 13, 0);
+	SET_TILE_INFO_MEMBER(1, code, colr >> 13, 0);
 }
 
 /***************************************************************************
@@ -117,8 +108,8 @@ VIDEO_START( bigtwin )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 
@@ -136,9 +127,9 @@ VIDEO_START( bigtwinb )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, bigtwinb_get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwinb_get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -159,9 +150,9 @@ VIDEO_START( wbeachvl )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, wbeachvl_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, wbeachvl_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_bg_tilemap = tilemap_create(machine, wbeachvl_get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -179,8 +170,8 @@ VIDEO_START( excelsr )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, bigtwin_get_tx_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, bigtwin_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 
@@ -197,9 +188,9 @@ VIDEO_START( hotmind )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -221,9 +212,9 @@ VIDEO_START( hrdtimes )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, hrdtimes_get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

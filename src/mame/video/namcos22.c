@@ -1793,16 +1793,15 @@ static void UpdatePalette(running_machine &machine)
 } /* UpdatePalette */
 
 
-static TILE_GET_INFO( TextTilemapGetInfo )
+TILE_GET_INFO_MEMBER(namcos22_state::TextTilemapGetInfo)
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	UINT16 data = nthword( state->m_textram,tile_index );
+	UINT16 data = nthword( m_textram,tile_index );
    /**
     * xxxx.----.----.---- palette select
     * ----.xx--.----.---- flip
     * ----.--xx.xxxx.xxxx code
     */
-	SET_TILE_INFO( GFX_CHAR,data&0x03ff,data>>12,TILE_FLIPYX((data&0x0c00)>>10) );
+	SET_TILE_INFO_MEMBER( GFX_CHAR,data&0x03ff,data>>12,TILE_FLIPYX((data&0x0c00)>>10) );
 }
 
 READ32_MEMBER(namcos22_state::namcos22_textram_r)
@@ -2731,7 +2730,7 @@ static VIDEO_START( common )
 	int code;
 
 	state->m_mix_bitmap = auto_bitmap_ind16_alloc(machine,640,480);
-	state->m_bgtilemap = tilemap_create( machine, TextTilemapGetInfo,TILEMAP_SCAN_ROWS,16,16,64,64 );
+	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos22_state::TextTilemapGetInfo),state),TILEMAP_SCAN_ROWS,16,16,64,64 );
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
 	state->m_mbDSPisActive = 0;

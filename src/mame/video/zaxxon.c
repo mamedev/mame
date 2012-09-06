@@ -67,47 +67,44 @@ PALETTE_INIT( zaxxon )
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
 {
-	const UINT8 *source = machine.root_device().memregion("tilemap_dat")->base();
-	int size = machine.root_device().memregion("tilemap_dat")->bytes() / 2;
+	const UINT8 *source = machine().root_device().memregion("tilemap_dat")->base();
+	int size = machine().root_device().memregion("tilemap_dat")->bytes() / 2;
 	int eff_index = tile_index & (size - 1);
 	int code = source[eff_index] + 256 * (source[eff_index + size] & 3);
 	int color = source[eff_index + size] >> 4;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
-static TILE_GET_INFO( zaxxon_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	int sx = tile_index % 32;
 	int sy = tile_index / 32;
-	int code = state->m_videoram[tile_index];
-	int color = state->m_color_codes[sx + 32 * (sy / 4)] & 0x0f;
+	int code = m_videoram[tile_index];
+	int color = m_color_codes[sx + 32 * (sy / 4)] & 0x0f;
 
-	SET_TILE_INFO(0, code, color * 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color * 2, 0);
 }
 
 
-static TILE_GET_INFO( razmataz_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_color_codes[code] & 0x0f;
+	int code = m_videoram[tile_index];
+	int color = m_color_codes[code] & 0x0f;
 
-	SET_TILE_INFO(0, code, color * 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color * 2, 0);
 }
 
 
-static TILE_GET_INFO( congo_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(zaxxon_state::congo_get_fg_tile_info)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	int code = state->m_videoram[tile_index] + (state->m_congo_fg_bank << 8);
-	int color = state->m_colorram[tile_index] & 0x1f;
+	int code = m_videoram[tile_index] + (m_congo_fg_bank << 8);
+	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO(0, code, color * 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color * 2, 0);
 }
 
 
@@ -118,7 +115,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
  *
  *************************************/
 
-static void video_start_common(running_machine &machine, tile_get_info_func fg_tile_info)
+static void video_start_common(running_machine &machine, tilemap_get_info_delegate fg_tile_info)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
@@ -132,8 +129,8 @@ static void video_start_common(running_machine &machine, tile_get_info_func fg_t
 	memset(state->m_congo_custom, 0, sizeof(state->m_congo_custom));
 
 	/* create a background and foreground tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,512);
-	state->m_fg_tilemap = tilemap_create(machine, fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(zaxxon_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,512);
+	state->m_fg_tilemap = &machine.tilemap().create(fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
 	state->m_fg_tilemap->set_transparent_pen(0);
@@ -150,13 +147,15 @@ static void video_start_common(running_machine &machine, tile_get_info_func fg_t
 
 VIDEO_START( zaxxon )
 {
-	video_start_common(machine, zaxxon_get_fg_tile_info);
+	zaxxon_state *state = machine.driver_data<zaxxon_state>();
+	video_start_common(machine, tilemap_get_info_delegate(FUNC(zaxxon_state::zaxxon_get_fg_tile_info),state));
 }
 
 
 VIDEO_START( razmataz )
 {
-	video_start_common(machine, razmataz_get_fg_tile_info);
+	zaxxon_state *state = machine.driver_data<zaxxon_state>();
+	video_start_common(machine, tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),state));
 }
 
 
@@ -172,7 +171,7 @@ VIDEO_START( congo )
 	state->save_item(NAME(state->m_congo_color_bank));
 	state->save_item(NAME(state->m_congo_custom));
 
-	video_start_common(machine, congo_get_fg_tile_info);
+	video_start_common(machine, tilemap_get_info_delegate(FUNC(zaxxon_state::congo_get_fg_tile_info),state));
 }
 
 

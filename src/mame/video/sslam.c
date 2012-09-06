@@ -91,13 +91,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 /* Text Layer */
 
-static TILE_GET_INFO( get_sslam_tx_tile_info )
+TILE_GET_INFO_MEMBER(sslam_state::get_sslam_tx_tile_info)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
-	int code = state->m_tx_tileram[tile_index] & 0x0fff;
-	int colr = state->m_tx_tileram[tile_index] & 0xf000;
+	int code = m_tx_tileram[tile_index] & 0x0fff;
+	int colr = m_tx_tileram[tile_index] & 0xf000;
 
-	SET_TILE_INFO(3,code+0xc000 ,colr >> 12,0);
+	SET_TILE_INFO_MEMBER(3,code+0xc000 ,colr >> 12,0);
 }
 
 WRITE16_MEMBER(sslam_state::sslam_tx_tileram_w)
@@ -109,13 +108,12 @@ WRITE16_MEMBER(sslam_state::sslam_tx_tileram_w)
 
 /* Middle Layer */
 
-static TILE_GET_INFO( get_sslam_md_tile_info )
+TILE_GET_INFO_MEMBER(sslam_state::get_sslam_md_tile_info)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
-	int code = state->m_md_tileram[tile_index] & 0x0fff;
-	int colr = state->m_md_tileram[tile_index] & 0xf000;
+	int code = m_md_tileram[tile_index] & 0x0fff;
+	int colr = m_md_tileram[tile_index] & 0xf000;
 
-	SET_TILE_INFO(2,code+0x2000 ,colr >> 12,0);
+	SET_TILE_INFO_MEMBER(2,code+0x2000 ,colr >> 12,0);
 }
 
 WRITE16_MEMBER(sslam_state::sslam_md_tileram_w)
@@ -127,13 +125,12 @@ WRITE16_MEMBER(sslam_state::sslam_md_tileram_w)
 
 /* Background Layer */
 
-static TILE_GET_INFO( get_sslam_bg_tile_info )
+TILE_GET_INFO_MEMBER(sslam_state::get_sslam_bg_tile_info)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
-	int code = state->m_bg_tileram[tile_index] & 0x1fff;
-	int colr = state->m_bg_tileram[tile_index] & 0xe000;
+	int code = m_bg_tileram[tile_index] & 0x1fff;
+	int colr = m_bg_tileram[tile_index] & 0xe000;
 
-	SET_TILE_INFO(1,code ,colr >> 13,0);
+	SET_TILE_INFO_MEMBER(1,code ,colr >> 13,0);
 }
 
 WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
@@ -143,16 +140,15 @@ WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_powerbls_bg_tile_info )
+TILE_GET_INFO_MEMBER(sslam_state::get_powerbls_bg_tile_info)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
-	int code = state->m_bg_tileram[tile_index*2+1] & 0x0fff;
-	int colr = (state->m_bg_tileram[tile_index*2+1] & 0xf000) >> 12;
-	code |= (state->m_bg_tileram[tile_index*2] & 0x0f00) << 4;
+	int code = m_bg_tileram[tile_index*2+1] & 0x0fff;
+	int colr = (m_bg_tileram[tile_index*2+1] & 0xf000) >> 12;
+	code |= (m_bg_tileram[tile_index*2] & 0x0f00) << 4;
 
-	//(state->m_bg_tileram[tile_index*2] & 0x0f00) == 0xf000 ???
+	//(m_bg_tileram[tile_index*2] & 0x0f00) == 0xf000 ???
 
-	SET_TILE_INFO(1,code,colr,0);
+	SET_TILE_INFO_MEMBER(1,code,colr,0);
 }
 
 WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)
@@ -166,9 +162,9 @@ VIDEO_START(sslam)
 {
 	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_sslam_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_md_tilemap = tilemap_create(machine, get_sslam_md_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tx_tilemap = tilemap_create(machine, get_sslam_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_md_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_transparent_pen(0);
@@ -181,7 +177,7 @@ VIDEO_START(powerbls)
 {
 	sslam_state *state = machine.driver_data<sslam_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_powerbls_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_powerbls_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_sprites_x_offset = -21;
 	state->save_item(NAME(state->m_sprites_x_offset));

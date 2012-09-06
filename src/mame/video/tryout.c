@@ -38,10 +38,9 @@ PALETTE_INIT( tryout )
 	}
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 {
-	tryout_state *state = machine.driver_data<tryout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code, attr, color;
 
 	code = videoram[tile_index];
@@ -49,13 +48,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 	code |= ((attr & 0x03) << 8);
 	color = ((attr & 0x4)>>2)+6;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
 {
-	tryout_state *state = machine.driver_data<tryout_state>();
-	SET_TILE_INFO(2, state->m_vram[tile_index] & 0x7f, 2, 0);
+	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_MEMBER(tryout_state::tryout_vram_r)
@@ -148,12 +146,12 @@ WRITE8_MEMBER(tryout_state::tryout_flipscreen_w)
 	flip_screen_set(data & 1);
 }
 
-static TILEMAP_MAPPER( get_fg_memory_offset )
+TILEMAP_MAPPER_MEMBER(tryout_state::get_fg_memory_offset)
 {
 	return (row ^ 0x1f) + (col << 5);
 }
 
-static TILEMAP_MAPPER( get_bg_memory_offset )
+TILEMAP_MAPPER_MEMBER(tryout_state::get_bg_memory_offset)
 {
 	int a;
 //  if (col&0x20)
@@ -168,8 +166,8 @@ static TILEMAP_MAPPER( get_bg_memory_offset )
 VIDEO_START( tryout )
 {
 	tryout_state *state = machine.driver_data<tryout_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,get_fg_memory_offset,8,8,32,32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,get_bg_memory_offset,16,16,64,16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),state),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),state),8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),state),16,16,64,16);
 
 	state->m_vram=auto_alloc_array(machine, UINT8, 8 * 0x800);
 	state->m_vram_gfx=auto_alloc_array(machine, UINT8, 0x6000);

@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE16_MEMBER(thoop_vram_encrypted_w);
 	DECLARE_WRITE16_MEMBER(thoop_encrypted_w);
 	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen0);
+	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen1);
 };
 
 

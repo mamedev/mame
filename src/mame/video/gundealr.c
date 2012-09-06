@@ -16,30 +16,28 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
 {
-	gundealr_state *state = machine.driver_data<gundealr_state>();
-	UINT8 attr = state->m_bg_videoram[2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT8 attr = m_bg_videoram[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_bg_videoram[2 * tile_index] + ((attr & 0x07) << 8),
+			m_bg_videoram[2 * tile_index] + ((attr & 0x07) << 8),
 			(attr & 0xf0) >> 4,
 			0);
 }
 
-static TILEMAP_MAPPER( gundealr_scan )
+TILEMAP_MAPPER_MEMBER(gundealr_state::gundealr_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x10) << 6);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 {
-	gundealr_state *state = machine.driver_data<gundealr_state>();
-	UINT8 attr = state->m_fg_videoram[2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT8 attr = m_fg_videoram[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_fg_videoram[2 * tile_index] + ((attr & 0x03) << 8),
+			m_fg_videoram[2 * tile_index] + ((attr & 0x03) << 8),
 			(attr & 0xf0) >> 4,
 			0);
 }
@@ -55,8 +53,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( gundealr )
 {
 	gundealr_state *state = machine.driver_data<gundealr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, gundealr_scan, 16, 16, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gundealr_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gundealr_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(gundealr_state::gundealr_scan),state), 16, 16, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 }

@@ -93,45 +93,42 @@ WRITE8_MEMBER(sidearms_state::sidearms_star_scrolly_w)
 }
 
 
-static TILE_GET_INFO( get_sidearms_bg_tile_info )
+TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 	int code, attr, color, flags;
 
-	code = state->m_tilerom[tile_index];
-	attr = state->m_tilerom[tile_index + 1];
+	code = m_tilerom[tile_index];
+	attr = m_tilerom[tile_index + 1];
 	code |= attr<<8 & 0x100;
 	color = attr>>3 & 0x1f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_philko_bg_tile_info )
+TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 	int code, attr, color, flags;
 
-	code = state->m_tilerom[tile_index];
-	attr = state->m_tilerom[tile_index + 1];
+	code = m_tilerom[tile_index];
+	attr = m_tilerom[tile_index + 1];
 	code |= (((attr>>6 & 0x02) | (attr & 0x01)) * 0x100);
 	color = attr>>3 & 0x0f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + (attr<<2 & 0x300);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILEMAP_MAPPER( sidearms_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(sidearms_state::sidearms_tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
 	int offset = ((row << 7) + col) << 1;
@@ -147,17 +144,17 @@ VIDEO_START( sidearms )
 
 	if (!state->m_gameid)
 	{
-		state->m_bg_tilemap = tilemap_create(machine, get_sidearms_bg_tile_info, sidearms_tilemap_scan,
+		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),state), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),state),
 			 32, 32, 128, 128);
 
 		state->m_bg_tilemap->set_transparent_pen(15);
 	}
 	else
 	{
-		state->m_bg_tilemap = tilemap_create(machine, get_philko_bg_tile_info, sidearms_tilemap_scan, 32, 32, 128, 128);
+		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),state), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),state), 32, 32, 128, 128);
 	}
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidearms_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 64);
 
 	state->m_fg_tilemap->set_transparent_pen(3);

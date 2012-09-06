@@ -64,6 +64,8 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 class percuss_state : public zodiack_state

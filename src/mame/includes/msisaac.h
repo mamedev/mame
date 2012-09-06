@@ -65,6 +65,9 @@ public:
 	DECLARE_WRITE8_MEMBER(msisaac_bg2_videoram_w);
 	DECLARE_WRITE8_MEMBER(msisaac_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_control_0_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

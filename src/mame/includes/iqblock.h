@@ -26,6 +26,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port_C_w);
 	DECLARE_DRIVER_INIT(grndtour);
 	DECLARE_DRIVER_INIT(iqblock);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

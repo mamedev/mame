@@ -45,6 +45,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tbowl_bg2xscroll_hi);
 	DECLARE_WRITE8_MEMBER(tbowl_bg2yscroll_lo);
 	DECLARE_WRITE8_MEMBER(tbowl_bg2yscroll_hi);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

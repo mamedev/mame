@@ -83,14 +83,13 @@ WRITE8_MEMBER(carjmbre_state::carjmbre_videoram_w)
 
 
 
-static TILE_GET_INFO( get_carjmbre_tile_info )
+TILE_GET_INFO_MEMBER(carjmbre_state::get_carjmbre_tile_info)
 {
-	carjmbre_state *state = machine.driver_data<carjmbre_state>();
-	UINT32 tile_number = state->m_videoram[tile_index] & 0xff;
-	UINT8 attr = state->m_videoram[tile_index + 0x400];
+	UINT32 tile_number = m_videoram[tile_index] & 0xff;
+	UINT8 attr = m_videoram[tile_index + 0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			attr & 0xf,
@@ -101,7 +100,7 @@ VIDEO_START( carjmbre )
 {
 	carjmbre_state *state = machine.driver_data<carjmbre_state>();
 
-	state->m_cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_cj_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(carjmbre_state::get_carjmbre_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_bgcolor));
 }

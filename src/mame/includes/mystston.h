@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
 	DECLARE_WRITE8_MEMBER(mystston_video_control_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

@@ -98,6 +98,7 @@ public:
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
+	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
 };
 
 

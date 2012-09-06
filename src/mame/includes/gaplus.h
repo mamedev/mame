@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(out_lamps0);
 	DECLARE_WRITE8_MEMBER(out_lamps1);
 	DECLARE_DRIVER_INIT(gaplus);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

@@ -66,27 +66,25 @@ WRITE8_MEMBER(kopunch_state::kopunch_gfxbank_w)
 	m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(kopunch_state::get_fg_tile_info)
 {
-	kopunch_state *state = machine.driver_data<kopunch_state>();
-	int code = state->m_videoram[tile_index];
+	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
 {
-	kopunch_state *state = machine.driver_data<kopunch_state>();
-	int code = (state->m_videoram2[tile_index] & 0x7f) + 128 * state->m_gfxbank;
+	int code = (m_videoram2[tile_index] & 0x7f) + 128 * m_gfxbank;
 
-	SET_TILE_INFO(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 VIDEO_START( kopunch )
 {
 	kopunch_state *state = machine.driver_data<kopunch_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kopunch_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kopunch_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 

@@ -54,26 +54,24 @@ PALETTE_INIT( timelimt ) {
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
 {
-	timelimt_state *state = machine.driver_data<timelimt_state>();
-	SET_TILE_INFO(1, state->m_bg_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(1, m_bg_videoram[tile_index], 0, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 {
-	timelimt_state *state = machine.driver_data<timelimt_state>();
-	UINT8 *videoram = state->m_videoram;
-	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
+	UINT8 *videoram = m_videoram;
+	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
 }
 
 VIDEO_START( timelimt )
 {
 	timelimt_state *state = machine.driver_data<timelimt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timelimt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 32);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timelimt_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);

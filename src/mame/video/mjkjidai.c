@@ -8,14 +8,13 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 {
-	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 
-	int attr = state->m_videoram[tile_index + 0x800];
-	int code = state->m_videoram[tile_index] + ((attr & 0x1f) << 8);
-	int color = state->m_videoram[tile_index + 0x1000];
-	SET_TILE_INFO(0,code,color >> 3,0);
+	int attr = m_videoram[tile_index + 0x800];
+	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
+	int color = m_videoram[tile_index + 0x1000];
+	SET_TILE_INFO_MEMBER(0,code,color >> 3,0);
 }
 
 
@@ -29,7 +28,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( mjkjidai )
 {
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 

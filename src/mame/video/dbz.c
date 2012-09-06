@@ -44,16 +44,15 @@ WRITE16_MEMBER(dbz_state::dbz_bg2_videoram_w)
 	m_bg2_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_dbz_bg2_tile_info )
+TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
 	int tileno, colour, flag;
 
-	tileno = state->m_bg2_videoram[tile_index * 2 + 1] & 0x7fff;
-	colour = (state->m_bg2_videoram[tile_index * 2] & 0x000f);
-	flag = (state->m_bg2_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
+	tileno = m_bg2_videoram[tile_index * 2 + 1] & 0x7fff;
+	colour = (m_bg2_videoram[tile_index * 2] & 0x000f);
+	flag = (m_bg2_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, tileno, colour + (state->m_layer_colorbase[5] << 1), flag);
+	SET_TILE_INFO_MEMBER(0, tileno, colour + (m_layer_colorbase[5] << 1), flag);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_bg1_videoram_w)
@@ -62,24 +61,23 @@ WRITE16_MEMBER(dbz_state::dbz_bg1_videoram_w)
 	m_bg1_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_dbz_bg1_tile_info )
+TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
 {
-	dbz_state *state = machine.driver_data<dbz_state>();
 	int tileno, colour, flag;
 
-	tileno = state->m_bg1_videoram[tile_index * 2 + 1] & 0x7fff;
-	colour = (state->m_bg1_videoram[tile_index * 2] & 0x000f);
-	flag = (state->m_bg1_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
+	tileno = m_bg1_videoram[tile_index * 2 + 1] & 0x7fff;
+	colour = (m_bg1_videoram[tile_index * 2] & 0x000f);
+	flag = (m_bg1_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, tileno, colour + (state->m_layer_colorbase[4] << 1), flag);
+	SET_TILE_INFO_MEMBER(1, tileno, colour + (m_layer_colorbase[4] << 1), flag);
 }
 
 VIDEO_START( dbz )
 {
 	dbz_state *state = machine.driver_data<dbz_state>();
 
-	state->m_bg1_tilemap = tilemap_create(machine, get_dbz_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_dbz_bg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	state->m_bg1_tilemap->set_transparent_pen(0);
 	state->m_bg2_tilemap->set_transparent_pen(0);

@@ -471,10 +471,9 @@ static void draw_layer( running_machine &machine, bitmap_ind16 &bitmap, int opaq
 	}
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(twin16_state::get_text_tile_info)
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	const UINT16 *source = state->m_text_ram;
+	const UINT16 *source = m_text_ram;
 	int attr = source[tile_index];
 	/* fedcba9876543210
        -x-------------- yflip
@@ -489,13 +488,13 @@ static TILE_GET_INFO( get_text_tile_info )
 	if (attr&0x2000) flags|=TILE_FLIPX;
 	if (attr&0x4000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( twin16 )
 {
 	twin16_state *state = machine.driver_data<twin16_state>();
-	state->m_text_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(twin16_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_text_tilemap->set_transparent_pen(0);
 
 	palette_set_shadow_factor(machine,0.4); // screenshots estimate

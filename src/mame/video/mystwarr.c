@@ -140,11 +140,10 @@ static void martchmp_sprite_callback(running_machine &machine, int *code, int *c
 
 
 
-static TILE_GET_INFO( get_gai_936_tile_info )
+TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 	int tileno, colour;
-	UINT8 *ROM = state->memregion("gfx4")->base();
+	UINT8 *ROM = memregion("gfx4")->base();
 	UINT8 *dat1 = ROM, *dat2 = ROM + 0x20000, *dat3 = ROM + 0x60000;
 
 	tileno = dat3[tile_index] | ((dat2[tile_index]&0x3f)<<8);
@@ -156,9 +155,9 @@ static TILE_GET_INFO( get_gai_936_tile_info )
 
 	if (dat2[tile_index] & 0x80) colour |= 0x10;
 
-	colour |= state->m_sub1_colorbase << 4;
+	colour |= m_sub1_colorbase << 4;
 
-	SET_TILE_INFO(0, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 }
 
 VIDEO_START(gaiapols)
@@ -185,22 +184,21 @@ VIDEO_START(gaiapols)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
 
-	state->m_ult_936_tilemap = tilemap_create(machine, get_gai_936_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	state->m_ult_936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mystwarr_state::get_gai_936_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
 	state->m_ult_936_tilemap->set_transparent_pen(0);
 }
 
-static TILE_GET_INFO( get_ult_936_tile_info )
+TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 	int tileno, colour;
-	UINT8 *ROM = state->memregion("gfx4")->base();
+	UINT8 *ROM = memregion("gfx4")->base();
 	UINT8 *dat1 = ROM, *dat2 = ROM + 0x40000;
 
 	tileno = dat2[tile_index] | ((dat1[tile_index]&0x1f)<<8);
 
-	colour = state->m_sub1_colorbase;
+	colour = m_sub1_colorbase;
 
-	SET_TILE_INFO(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
 }
 
 VIDEO_START(dadandrn)
@@ -229,7 +227,7 @@ VIDEO_START(dadandrn)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
 
-	state->m_ult_936_tilemap = tilemap_create(machine, get_ult_936_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	state->m_ult_936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mystwarr_state::get_ult_936_tile_info),state), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
 	state->m_ult_936_tilemap->set_transparent_pen(0);
 }
 

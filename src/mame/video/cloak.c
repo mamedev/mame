@@ -153,20 +153,19 @@ WRITE8_MEMBER(cloak_state::cloak_flipscreen_w)
 	flip_screen_set(data & 0x80);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(cloak_state::get_bg_tile_info)
 {
-	cloak_state *state = machine.driver_data<cloak_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 VIDEO_START( cloak )
 {
 	cloak_state *state = machine.driver_data<cloak_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cloak_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bitmap_videoram1 = auto_alloc_array(machine, UINT8, 256*256);
 	state->m_bitmap_videoram2 = auto_alloc_array(machine, UINT8, 256*256);

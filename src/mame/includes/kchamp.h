@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(kchampvs);
 	DECLARE_DRIVER_INIT(kchampvs2);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

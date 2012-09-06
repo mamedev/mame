@@ -3,15 +3,14 @@
 #include "emu.h"
 #include "includes/sbugger.h"
 
-static TILE_GET_INFO( get_sbugger_tile_info )
+TILE_GET_INFO_MEMBER(sbugger_state::get_sbugger_tile_info)
 {
-	sbugger_state *state = machine.driver_data<sbugger_state>();
 	int tileno, color;
 
-	tileno = state->m_videoram[tile_index];
-	color = state->m_videoram_attr[tile_index];
+	tileno = m_videoram[tile_index];
+	color = m_videoram_attr[tile_index];
 
-	SET_TILE_INFO(0,tileno,color,0);
+	SET_TILE_INFO_MEMBER(0,tileno,color,0);
 }
 
 WRITE8_MEMBER(sbugger_state::sbugger_videoram_w)
@@ -31,7 +30,7 @@ WRITE8_MEMBER(sbugger_state::sbugger_videoram_attr_w)
 VIDEO_START(sbugger)
 {
 	sbugger_state *state = machine.driver_data<sbugger_state>();
-	state->m_tilemap = tilemap_create(machine, get_sbugger_tile_info, TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sbugger_state::get_sbugger_tile_info),state), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
 }
 
 SCREEN_UPDATE_IND16(sbugger)

@@ -15,6 +15,8 @@ public:
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_WRITE16_MEMBER(skullxbo_mobwr_w);
 	DECLARE_DRIVER_INIT(skullxbo);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

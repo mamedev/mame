@@ -40,34 +40,32 @@ WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 {
-	bombjack_state *state = machine.driver_data<bombjack_state>();
-	UINT8 *tilerom = state->memregion("gfx4")->base();
+	UINT8 *tilerom = memregion("gfx4")->base();
 
-	int offs = (state->m_background_image & 0x07) * 0x200 + tile_index;
-	int code = (state->m_background_image & 0x10) ? tilerom[offs] : 0;
+	int offs = (m_background_image & 0x07) * 0x200 + tile_index;
+	int code = (m_background_image & 0x10) ? tilerom[offs] : 0;
 	int attr = tilerom[offs + 0x100];
 	int color = attr & 0x0f;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
 {
-	bombjack_state *state = machine.driver_data<bombjack_state>();
-	int code = state->m_videoram[tile_index] + 16 * (state->m_colorram[tile_index] & 0x10);
-	int color = state->m_colorram[tile_index] & 0x0f;
+	int code = m_videoram[tile_index] + 16 * (m_colorram[tile_index] & 0x10);
+	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( bombjack )
 {
 	bombjack_state *state = machine.driver_data<bombjack_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bombjack_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bombjack_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

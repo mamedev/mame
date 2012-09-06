@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(circusc_colorram_w);
 	DECLARE_WRITE8_MEMBER(circusc_flipscreen_w);
 	DECLARE_DRIVER_INIT(circusc);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

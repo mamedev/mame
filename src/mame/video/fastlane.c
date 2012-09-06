@@ -47,14 +47,13 @@ static void set_pens( running_machine &machine )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info0 )
+TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 {
-	fastlane_state *state = machine.driver_data<fastlane_state>();
-	UINT8 ctrl_3 = k007121_ctrlram_r(state->m_k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(state->m_k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(state->m_k007121, 5);
-	int attr = state->m_videoram1[tile_index];
-	int code = state->m_videoram1[tile_index + 0x400];
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, 5);
+	int attr = m_videoram1[tile_index];
+	int code = m_videoram1[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -69,21 +68,20 @@ static TILE_GET_INFO( get_tile_info0 )
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code+bank*256,
 			1 + 64 * (attr & 0x0f),
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 {
-	fastlane_state *state = machine.driver_data<fastlane_state>();
-	UINT8 ctrl_3 = k007121_ctrlram_r(state->m_k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(state->m_k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(state->m_k007121, 5);
-	int attr = state->m_videoram2[tile_index];
-	int code = state->m_videoram2[tile_index + 0x400];
+	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, 5);
+	int attr = m_videoram2[tile_index];
+	int code = m_videoram2[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -98,7 +96,7 @@ static TILE_GET_INFO( get_tile_info1 )
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code+bank*256,
 			0 + 64 * (attr & 0x0f),
@@ -115,8 +113,8 @@ VIDEO_START( fastlane )
 {
 	fastlane_state *state = machine.driver_data<fastlane_state>();
 
-	state->m_layer0 = tilemap_create(machine, get_tile_info0, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_layer1 = tilemap_create(machine, get_tile_info1, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_layer0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_layer1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_layer0->set_scroll_rows(32);
 

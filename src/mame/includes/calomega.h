@@ -40,6 +40,7 @@ public:
 	DECLARE_DRIVER_INIT(standard);
 	DECLARE_DRIVER_INIT(comg080);
 	DECLARE_DRIVER_INIT(jjpoker);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

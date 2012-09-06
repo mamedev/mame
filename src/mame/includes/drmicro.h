@@ -28,6 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(pcm_set_w);
 	DECLARE_WRITE8_MEMBER(drmicro_videoram_w);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

@@ -62,11 +62,10 @@ colorram format (2 bytes per one tilemap character line, 8 pixels height):
     offset 1    xxxx xxxx   x scroll (8 LSB bits)
 */
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
-	int tile_number = state->m_videoram[tile_index];
-	int tile_attrib = state->m_colorram[(tile_index / 64) * 2];
+	int tile_number = m_videoram[tile_index];
+	int tile_attrib = m_colorram[(tile_index / 64) * 2];
 	int tile_h_bank = (tile_attrib & 0x40) << 3;	/* 0x40->0x200 */
 	int tile_l_bank = (tile_attrib & 0x18) << 3;	/* 0x10->0x80, 0x08->0x40 */
 
@@ -75,7 +74,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 		code = (code & 0x3f) | tile_l_bank | 0x100;
 	code |= tile_h_bank;
 
-	SET_TILE_INFO(	0,
+	SET_TILE_INFO_MEMBER(	0,
 			code,
 			tile_attrib & 0x07,
 			0);
@@ -110,7 +109,7 @@ VIDEO_START( fortyl )
 	state->m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine, 256, 256);
 	state->m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine, 256, 256);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_xoffset = 128;	// this never changes
 

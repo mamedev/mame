@@ -9,48 +9,45 @@
 #include "emu.h"
 #include "includes/flstory.h"
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	int code = state->m_videoram[tile_index * 2];
-	int attr = state->m_videoram[tile_index * 2 + 1];
-	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * state->m_char_bank;
+	int code = m_videoram[tile_index * 2];
+	int attr = m_videoram[tile_index * 2 + 1];
+	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * m_char_bank;
 	int flags = TILE_FLIPYX((attr & 0x18) >> 3);
 	tileinfo.category = (attr & 0x20) >> 5;
 	tileinfo.group = (attr & 0x20) >> 5;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			attr & 0x0f,
 			flags);
 }
 
-static TILE_GET_INFO( victnine_get_tile_info )
+TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	int code = state->m_videoram[tile_index * 2];
-	int attr = state->m_videoram[tile_index * 2 + 1];
+	int code = m_videoram[tile_index * 2];
+	int attr = m_videoram[tile_index * 2 + 1];
 	int tile_number = ((attr & 0x38) << 5) + code;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			attr & 0x07,
 			flags);
 }
 
-static TILE_GET_INFO( get_rumba_tile_info )
+TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
-	int code = state->m_videoram[tile_index * 2];
-	int attr = state->m_videoram[tile_index * 2 + 1];
-	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * state->m_char_bank;
+	int code = m_videoram[tile_index * 2];
+	int attr = m_videoram[tile_index * 2 + 1];
+	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * m_char_bank;
 	int col = (attr & 0x0f);
 
 	tileinfo.category = (attr & 0x20) >> 5;
 	tileinfo.group = (attr & 0x20) >> 5;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			col,
@@ -60,7 +57,7 @@ static TILE_GET_INFO( get_rumba_tile_info )
 VIDEO_START( flstory )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  state->m_bg_tilemap->set_transparent_pen(15);
 	state->m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -73,7 +70,7 @@ VIDEO_START( flstory )
 VIDEO_START( rumba )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_rumba_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  state->m_bg_tilemap->set_transparent_pen(15);
 	state->m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -86,7 +83,7 @@ VIDEO_START( rumba )
 VIDEO_START( victnine )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	state->m_bg_tilemap = tilemap_create(machine, victnine_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->m_generic_paletteram_8.allocate(0x200);

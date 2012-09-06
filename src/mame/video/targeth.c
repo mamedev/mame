@@ -32,24 +32,22 @@
       1  | xxxxxxxx x------- | not used?
 */
 
-static TILE_GET_INFO( get_tile_info_targeth_screen0 )
+TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen0)
 {
-	targeth_state *state = machine.driver_data<targeth_state>();
-	int data = state->m_videoram[tile_index << 1];
-	int data2 = state->m_videoram[(tile_index << 1) + 1];
+	int data = m_videoram[tile_index << 1];
+	int data2 = m_videoram[(tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
-static TILE_GET_INFO( get_tile_info_targeth_screen1 )
+TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
 {
-	targeth_state *state = machine.driver_data<targeth_state>();
-	int data = state->m_videoram[(0x2000/2) + (tile_index << 1)];
-	int data2 = state->m_videoram[(0x2000/2) + (tile_index << 1) + 1];
+	int data = m_videoram[(0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
 /***************************************************************************
@@ -74,8 +72,8 @@ WRITE16_MEMBER(targeth_state::targeth_vram_w)
 VIDEO_START( targeth )
 {
 	targeth_state *state = machine.driver_data<targeth_state>();
-	state->m_pant[0] = tilemap_create(machine, get_tile_info_targeth_screen0,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_pant[1] = tilemap_create(machine, get_tile_info_targeth_screen1,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen0),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen1),state),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	state->m_pant[0]->set_transparent_pen(0);
 }

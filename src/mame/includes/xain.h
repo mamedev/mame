@@ -62,6 +62,10 @@ public:
 	DECLARE_WRITE8_MEMBER(xain_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(xain_vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	TILEMAP_MAPPER_MEMBER(back_scan);
+	TILE_GET_INFO_MEMBER(get_bgram0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bgram1_tile_info);
+	TILE_GET_INFO_MEMBER(get_char_tile_info);
 };
 
 

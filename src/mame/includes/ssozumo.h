@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ssozumo_scroll_w);
 	DECLARE_WRITE8_MEMBER(ssozumo_flipscreen_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

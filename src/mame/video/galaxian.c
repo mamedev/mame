@@ -235,7 +235,7 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
  *************************************/
 
 static void state_save_register(running_machine &machine);
-static TILE_GET_INFO( bg_get_tile_info );
+
 
 static void sprites_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *spritebase);
 
@@ -396,7 +396,7 @@ VIDEO_START( galaxian )
 	if (!state->m_sfx_tilemap)
 	{
 		/* normal galaxian hardware is row-based and individually scrolling columns */
-		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS, GALAXIAN_XSCALE*8,8, 32,32);
+		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxian_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS, GALAXIAN_XSCALE*8,8, 32,32);
 		state->m_bg_tilemap->set_scroll_cols(32);
 		state->m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
 		state->m_bg_tilemap->set_scrolldy(0, 8);
@@ -404,7 +404,7 @@ VIDEO_START( galaxian )
 	else
 	{
 		/* sfx hardware is column-based and individually scrolling rows */
-		state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_COLS, GALAXIAN_XSCALE*8,8, 32,32);
+		state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxian_state::bg_get_tile_info),state), TILEMAP_SCAN_COLS, GALAXIAN_XSCALE*8,8, 32,32);
 		state->m_bg_tilemap->set_scroll_rows(32);
 		state->m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
 		state->m_bg_tilemap->set_scrolldy(0, 8);
@@ -481,20 +481,19 @@ SCREEN_UPDATE_RGB32( galaxian )
  *
  *************************************/
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 {
-	galaxian_state *state = machine.driver_data<galaxian_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	UINT8 x = tile_index & 0x1f;
 
 	UINT16 code = videoram[tile_index];
-	UINT8 attrib = state->m_spriteram[x*2+1];
+	UINT8 attrib = m_spriteram[x*2+1];
 	UINT8 color = attrib & 7;
 
-	if (state->m_extend_tile_info_ptr != NULL)
-		(*state->m_extend_tile_info_ptr)(machine, &code, &color, attrib, x);
+	if (m_extend_tile_info_ptr != NULL)
+		(*m_extend_tile_info_ptr)(machine(), &code, &color, attrib, x);
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 

@@ -4,20 +4,19 @@
 #include "includes/speedspn.h"
 
 
-static TILE_GET_INFO( get_speedspn_tile_info )
+TILE_GET_INFO_MEMBER(speedspn_state::get_speedspn_tile_info)
 {
-	speedspn_state *state = machine.driver_data<speedspn_state>();
-	int code = state->m_vidram[tile_index*2+1] | (state->m_vidram[tile_index*2] << 8);
-	int attr = state->m_attram[tile_index^0x400];
+	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
+	int attr = m_attram[tile_index^0x400];
 
-	SET_TILE_INFO(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 VIDEO_START(speedspn)
 {
 	speedspn_state *state = machine.driver_data<speedspn_state>();
 	state->m_vidram = auto_alloc_array(machine, UINT8, 0x1000 * 2);
-	state->m_tilemap = tilemap_create(machine, get_speedspn_tile_info,TILEMAP_SCAN_COLS, 8, 8,64,32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(speedspn_state::get_speedspn_tile_info),state),TILEMAP_SCAN_COLS, 8, 8,64,32);
 }
 
 WRITE8_MEMBER(speedspn_state::speedspn_vidram_w)

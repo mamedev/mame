@@ -21,6 +21,7 @@ public:
 	DECLARE_READ8_MEMBER(dsw2_2r);
 	DECLARE_READ8_MEMBER(dsw2_3r);
 	DECLARE_READ8_MEMBER(dsw2_4r);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

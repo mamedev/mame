@@ -17,50 +17,46 @@
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mcr3_state::get_bg_tile_info)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = (data >> 12) & 3;
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 }
 #endif
 
 
-static TILE_GET_INFO( mcrmono_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mcr3_state::mcrmono_get_bg_tile_info)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = ((data >> 12) & 3) ^ 3;
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 }
 
 
-static TILEMAP_MAPPER( spyhunt_bg_scan )
+TILEMAP_MAPPER_MEMBER(mcr3_state::spyhunt_bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) | ((col & 0x3f) << 4) | ((row & 0x10) << 6);
 }
 
 
-static TILE_GET_INFO( spyhunt_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_bg_tile_info)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
-	SET_TILE_INFO(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
 
 
-static TILE_GET_INFO( spyhunt_get_alpha_tile_info )
+TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
-	SET_TILE_INFO(2, state->m_spyhunt_alpharam[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }
 
 
@@ -93,7 +89,7 @@ VIDEO_START( mcr3 )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 #endif
 
@@ -102,7 +98,7 @@ VIDEO_START( mcrmono )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, mcrmono_get_bg_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 
 
@@ -110,10 +106,10 @@ VIDEO_START( spyhunt )
 {
 	mcr3_state *state = machine.driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, spyhunt_get_bg_tile_info, spyhunt_bg_scan,  64,32, 64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),state),  64,32, 64,32);
 
 	/* initialize the text tilemap */
-	state->m_alpha_tilemap = tilemap_create(machine, spyhunt_get_alpha_tile_info, TILEMAP_SCAN_COLS,  16,16, 32,32);
+	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),state), TILEMAP_SCAN_COLS,  16,16, 32,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 	state->m_alpha_tilemap->set_scrollx(0, 16);
 

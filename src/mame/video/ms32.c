@@ -20,48 +20,44 @@ priority should be given to
 
 /********** Tilemaps **********/
 
-static TILE_GET_INFO( get_ms32_tx_tile_info )
+TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno, colour;
 
-	tileno = state->m_txram_16[tile_index *2]   & 0xffff;
-	colour = state->m_txram_16[tile_index *2+1] & 0x000f;
+	tileno = m_txram_16[tile_index *2]   & 0xffff;
+	colour = m_txram_16[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO(3,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
 }
 
-static TILE_GET_INFO( get_ms32_roz_tile_info )
+TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno,colour;
 
-	tileno = state->m_rozram_16[tile_index *2]   & 0xffff;
-	colour = state->m_rozram_16[tile_index *2+1] & 0x000f;
+	tileno = m_rozram_16[tile_index *2]   & 0xffff;
+	colour = m_rozram_16[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-static TILE_GET_INFO( get_ms32_bg_tile_info )
+TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno,colour;
 
-	tileno = state->m_bgram_16[tile_index *2]   & 0xffff;
-	colour = state->m_bgram_16[tile_index *2+1] & 0x000f;
+	tileno = m_bgram_16[tile_index *2]   & 0xffff;
+	colour = m_bgram_16[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO(2,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
 }
 
-static TILE_GET_INFO( get_ms32_extra_tile_info )
+TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 	int tileno,colour;
 
-	tileno = state->m_f1superb_extraram_16[tile_index *2]   & 0xffff;
-	colour = state->m_f1superb_extraram_16[tile_index *2+1] & 0x000f;
+	tileno = m_f1superb_extraram_16[tile_index *2]   & 0xffff;
+	colour = m_f1superb_extraram_16[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO(4,tileno,colour+0x50,0);
+	SET_TILE_INFO_MEMBER(4,tileno,colour+0x50,0);
 }
 
 
@@ -78,10 +74,10 @@ VIDEO_START( ms32 )
 	state->m_bgram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
 	state->m_txram_16   = auto_alloc_array_clear(machine, UINT16, 0x4000);
 
-	state->m_tx_tilemap = tilemap_create(machine, get_ms32_tx_tile_info,TILEMAP_SCAN_ROWS,8, 8,64,64);
-	state->m_bg_tilemap = tilemap_create(machine, get_ms32_bg_tile_info,TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_bg_tilemap_alt = tilemap_create(machine, get_ms32_bg_tile_info,TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
-	state->m_roz_tilemap = tilemap_create(machine, get_ms32_roz_tile_info,TILEMAP_SCAN_ROWS,16,16,128,128);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_tx_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,64,64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_bg_tilemap_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
+	state->m_roz_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_roz_tile_info),state),TILEMAP_SCAN_ROWS,16,16,128,128);
 
 
 	/* set up tile layers */
@@ -119,7 +115,7 @@ VIDEO_START( f1superb )
 	VIDEO_START_CALL( ms32 );
 
 	state->m_f1superb_extraram_16  = auto_alloc_array_clear(machine, UINT16, 0x10000);
-	state->m_extra_tilemap = tilemap_create(machine, get_ms32_extra_tile_info,TILEMAP_SCAN_ROWS,2048,1,1,0x400);
+	state->m_extra_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_extra_tile_info),state),TILEMAP_SCAN_ROWS,2048,1,1,0x400);
 
 }
 

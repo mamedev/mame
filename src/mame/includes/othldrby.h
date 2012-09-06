@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE16_MEMBER(othldrby_vreg_addr_w);
 	DECLARE_WRITE16_MEMBER(othldrby_vreg_w);
 	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
 };
 
 

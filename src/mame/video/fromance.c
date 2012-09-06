@@ -30,8 +30,8 @@ INLINE void get_fromance_tile_info( running_machine &machine, tile_data &tileinf
 	SET_TILE_INFO(layer, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_fromance_bg_tile_info ) { get_fromance_tile_info(machine, tileinfo, tile_index, 0); }
-static TILE_GET_INFO( get_fromance_fg_tile_info ) { get_fromance_tile_info(machine, tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(machine(), tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fromance_state::get_fromance_fg_tile_info){ get_fromance_tile_info(machine(), tileinfo, tile_index, 1); }
 
 
 INLINE void get_nekkyoku_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer )
@@ -44,8 +44,8 @@ INLINE void get_nekkyoku_tile_info( running_machine &machine, tile_data &tileinf
 	SET_TILE_INFO(layer, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_nekkyoku_bg_tile_info ) { get_nekkyoku_tile_info(machine, tileinfo, tile_index, 0); }
-static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machine, tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(machine(), tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_tile_info(machine(), tileinfo, tile_index, 1); }
 
 
 
@@ -94,8 +94,8 @@ VIDEO_START( fromance )
 	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_fromance_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fromance_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common(machine);
 }
@@ -105,8 +105,8 @@ VIDEO_START( nekkyoku )
 	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* allocate tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_nekkyoku_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_nekkyoku_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common(machine);
 }

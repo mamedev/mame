@@ -22,6 +22,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(darkmist_hw_w);
 	DECLARE_DRIVER_INIT(darkmist);
+	TILE_GET_INFO_MEMBER(get_bgtile_info);
+	TILE_GET_INFO_MEMBER(get_fgtile_info);
+	TILE_GET_INFO_MEMBER(get_txttile_info);
 };
 
 

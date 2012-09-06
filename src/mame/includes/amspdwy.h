@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(amspdwy_videoram_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_colorram_w);
 	DECLARE_READ8_MEMBER(amspdwy_sound_r);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
 };
 
 

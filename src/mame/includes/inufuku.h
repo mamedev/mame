@@ -44,6 +44,8 @@ public:
 	DECLARE_READ16_MEMBER(inufuku_tx_videoram_r);
 	DECLARE_WRITE16_MEMBER(inufuku_tx_videoram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
+	TILE_GET_INFO_MEMBER(get_inufuku_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_inufuku_tx_tile_info);
 };
 
 

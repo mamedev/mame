@@ -57,6 +57,8 @@ public:
 	DECLARE_DRIVER_INIT(funystrp);
 	DECLARE_DRIVER_INIT(splash);
 	DECLARE_DRIVER_INIT(rebus);
+	TILE_GET_INFO_MEMBER(get_tile_info_splash_tilemap0);
+	TILE_GET_INFO_MEMBER(get_tile_info_splash_tilemap1);
 };
 
 

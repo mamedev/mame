@@ -34,7 +34,7 @@ PALETTE_INIT( mainsnk )
 	}
 }
 
-static TILEMAP_MAPPER( marvins_tx_scan_cols )
+TILEMAP_MAPPER_MEMBER(mainsnk_state::marvins_tx_scan_cols)
 {
 	// tilemap is 36x28, the central part is from the first RAM page and the
 	// extra 4 columns are from the second page
@@ -45,25 +45,23 @@ static TILEMAP_MAPPER( marvins_tx_scan_cols )
 		return row + (col << 5);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
 {
-	mainsnk_state *state = machine.driver_data<mainsnk_state>();
-	int code = state->m_fgram[tile_index];
+	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO(0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 {
-	mainsnk_state *state = machine.driver_data<mainsnk_state>();
-	int code = (state->m_bgram[tile_index]);
+	int code = (m_bgram[tile_index]);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_bg_tile_offset + code,
+			m_bg_tile_offset + code,
 			0,
 			0);
 }
@@ -73,8 +71,8 @@ VIDEO_START(mainsnk)
 {
 	mainsnk_state *state = machine.driver_data<mainsnk_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,    8, 8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),state), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),state), 8, 8, 36, 28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_scrolldy(8, 8);

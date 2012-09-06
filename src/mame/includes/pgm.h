@@ -108,6 +108,8 @@ public:
 	DECLARE_DRIVER_INIT(drgw3);
 	DECLARE_DRIVER_INIT(orlegend);
 	DECLARE_DRIVER_INIT(pstar);
+	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);
+	TILE_GET_INFO_MEMBER(get_pgm_bg_tilemap_tile_info);
 };
 
 

@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE16_MEMBER(blmbycar_vram_0_w);
 	DECLARE_WRITE16_MEMBER(blmbycar_vram_1_w);
 	DECLARE_DRIVER_INIT(blmbycar);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

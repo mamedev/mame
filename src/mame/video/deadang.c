@@ -32,52 +32,50 @@ WRITE16_MEMBER(deadang_state::deadang_bank_w)
 
 /******************************************************************************/
 
-static TILEMAP_MAPPER( bg_scan )
+TILEMAP_MAPPER_MEMBER(deadang_state::bg_scan)
 {
 	return (col&0xf) | ((row&0xf)<<4) | ((col&0x70)<<4) | ((row&0xf0)<<7);
 }
 
-static TILE_GET_INFO( get_pf3_tile_info )
+TILE_GET_INFO_MEMBER(deadang_state::get_pf3_tile_info)
 {
-	const UINT16 *bgMap = (const UINT16 *)machine.root_device().memregion("gfx6")->base();
+	const UINT16 *bgMap = (const UINT16 *)machine().root_device().memregion("gfx6")->base();
 	int code= bgMap[tile_index];
-	SET_TILE_INFO(4,code&0x7ff,code>>12,0);
+	SET_TILE_INFO_MEMBER(4,code&0x7ff,code>>12,0);
 }
 
-static TILE_GET_INFO( get_pf2_tile_info )
+TILE_GET_INFO_MEMBER(deadang_state::get_pf2_tile_info)
 {
-	const UINT16 *bgMap = (const UINT16 *)machine.root_device().memregion("gfx7")->base();
+	const UINT16 *bgMap = (const UINT16 *)machine().root_device().memregion("gfx7")->base();
 	int code= bgMap[tile_index];
-	SET_TILE_INFO(3,code&0x7ff,code>>12,0);
+	SET_TILE_INFO_MEMBER(3,code&0x7ff,code>>12,0);
 }
 
-static TILE_GET_INFO( get_pf1_tile_info )
+TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
 {
-	deadang_state *state = machine.driver_data<deadang_state>();
-	int tile=state->m_video_data[tile_index];
+	int tile=m_video_data[tile_index];
 	int color=tile >> 12;
 	tile=tile&0xfff;
 
-	SET_TILE_INFO(2,tile+state->m_deadangle_tilebank*0x1000,color,0);
+	SET_TILE_INFO_MEMBER(2,tile+m_deadangle_tilebank*0x1000,color,0);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
 {
-	deadang_state *state = machine.driver_data<deadang_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int tile=(videoram[tile_index] & 0xff) | ((videoram[tile_index] >> 6) & 0x300);
 	int color=(videoram[tile_index] >> 8)&0xf;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 VIDEO_START( deadang )
 {
 	deadang_state *state = machine.driver_data<deadang_state>();
-	state->m_pf3_layer = tilemap_create(machine, get_pf3_tile_info,bg_scan,               16,16,128,256);
-	state->m_pf2_layer = tilemap_create(machine, get_pf2_tile_info,bg_scan,          16,16,128,256);
-	state->m_pf1_layer = tilemap_create(machine, get_pf1_tile_info,TILEMAP_SCAN_COLS,16,16, 32, 32);
-	state->m_text_layer = tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_pf3_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_pf3_tile_info),state),tilemap_mapper_delegate(FUNC(deadang_state::bg_scan),state),16,16,128,256);
+	state->m_pf2_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_pf2_tile_info),state),tilemap_mapper_delegate(FUNC(deadang_state::bg_scan),state),16,16,128,256);
+	state->m_pf1_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_pf1_tile_info),state),TILEMAP_SCAN_COLS,16,16, 32, 32);
+	state->m_text_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_pf2_layer->set_transparent_pen(15);
 	state->m_pf1_layer->set_transparent_pen(15);

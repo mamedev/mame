@@ -478,19 +478,18 @@ static GFXDECODE_START( laserbat )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 )	/* Sprites   */
 GFXDECODE_END
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
 {
-	laserbat_state *state = machine.driver_data<laserbat_state>();
 
 	// wrong color index!
-	SET_TILE_INFO(0, state->m_videoram[tile_index], state->m_colorram[tile_index] & 0x7f, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
 }
 
 static VIDEO_START( laserbat )
 {
 	laserbat_state *state = machine.driver_data<laserbat_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->save_item(NAME(state->m_videoram));
 	state->save_item(NAME(state->m_colorram));

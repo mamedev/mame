@@ -69,60 +69,56 @@ WRITE16_MEMBER(dcon_state::dcon_text_w)
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(dcon_state::get_back_tile_info)
 {
-	dcon_state *state = machine.driver_data<dcon_state>();
-	int tile=state->m_back_data[tile_index];
+	int tile=m_back_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile&=0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_fore_tile_info )
+TILE_GET_INFO_MEMBER(dcon_state::get_fore_tile_info)
 {
-	dcon_state *state = machine.driver_data<dcon_state>();
-	int tile=state->m_fore_data[tile_index];
+	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile&=0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_mid_tile_info )
+TILE_GET_INFO_MEMBER(dcon_state::get_mid_tile_info)
 {
-	dcon_state *state = machine.driver_data<dcon_state>();
-	int tile=state->m_mid_data[tile_index];
+	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile&=0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
-			tile|state->m_gfx_bank_select,
+			tile|m_gfx_bank_select,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
 {
-	dcon_state *state = machine.driver_data<dcon_state>();
-	int tile = state->m_textram[tile_index];
+	int tile = m_textram[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile&=0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -132,10 +128,10 @@ static TILE_GET_INFO( get_text_tile_info )
 VIDEO_START( dcon )
 {
 	dcon_state *state = machine.driver_data<dcon_state>();
-	state->m_background_layer = tilemap_create(machine, get_back_tile_info,TILEMAP_SCAN_ROWS,     16,16,32,32);
-	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,  8,8,64,32);
+	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,32,32);
+	state->m_foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_fore_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_midground_layer =  &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_mid_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_text_layer =       &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	state->m_midground_layer->set_transparent_pen(15);
 	state->m_foreground_layer->set_transparent_pen(15);

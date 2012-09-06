@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE8_MEMBER(champbas_dac2_w);
 	DECLARE_DRIVER_INIT(exctsccr);
 	DECLARE_DRIVER_INIT(champbas);
+	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
 };
 
 

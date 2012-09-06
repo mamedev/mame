@@ -55,20 +55,19 @@ WRITE8_MEMBER(markham_state::markham_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
 {
-	markham_state *state = machine.driver_data<markham_state>();
-	int attr = state->m_videoram[tile_index * 2];
-	int code = state->m_videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
+	int attr = m_videoram[tile_index * 2];
+	int code = m_videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( markham )
 {
 	markham_state *state = machine.driver_data<markham_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(markham_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(32);
 }

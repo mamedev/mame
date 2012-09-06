@@ -12,35 +12,32 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
-	int tile_number = state->m_videoram[tile_index];
-	SET_TILE_INFO( 0,
+	int tile_number = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER( 0,
 			tile_number,
 			0x10,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(msisaac_state::get_bg_tile_info)
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
-	int tile_number = state->m_videoram2[tile_index];
-	SET_TILE_INFO( 1,
+	int tile_number = m_videoram2[tile_index];
+	SET_TILE_INFO_MEMBER( 1,
 			0x100 + tile_number,
 			0x30,
 			0);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(msisaac_state::get_bg2_tile_info)
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
-	int tile_number = state->m_videoram3[tile_index];
+	int tile_number = m_videoram3[tile_index];
 
 	/* graphics 0 or 1 */
-	int gfx_b = (state->m_bg2_textbank >> 3) & 1;
+	int gfx_b = (m_bg2_textbank >> 3) & 1;
 
-	SET_TILE_INFO( gfx_b,
+	SET_TILE_INFO_MEMBER( gfx_b,
 			tile_number,
 			0x20,
 			0);
@@ -55,9 +52,9 @@ static TILE_GET_INFO( get_bg2_tile_info )
 VIDEO_START( msisaac )
 {
 	msisaac_state *state = machine.driver_data<msisaac_state>();
-	state->m_bg_tilemap  = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap  = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(msisaac_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(msisaac_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(msisaac_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg2_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

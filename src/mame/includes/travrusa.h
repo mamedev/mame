@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
 	DECLARE_DRIVER_INIT(shtridra);
 	DECLARE_DRIVER_INIT(motorace);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 /*----------- defined in video/travrusa.c -----------*/

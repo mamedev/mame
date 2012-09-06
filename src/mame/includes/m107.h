@@ -47,6 +47,7 @@ public:
 	DECLARE_DRIVER_INIT(firebarr);
 	DECLARE_DRIVER_INIT(dsoccr94);
 	DECLARE_DRIVER_INIT(wpksoc);
+	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 };
 
 

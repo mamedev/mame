@@ -39,18 +39,17 @@ WRITE8_MEMBER(jack_state::jack_flipscreen_w)
 	flip_screen_set(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x18) << 5);
-	int color = state->m_colorram[tile_index] & 0x07;
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x18) << 5);
+	int color = m_colorram[tile_index] & 0x07;
 
-	// striv: state->m_colorram[tile_index] & 0x80 ???
+	// striv: m_colorram[tile_index] & 0x80 ???
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILEMAP_MAPPER( tilemap_scan_cols_flipy )
+TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
 {
 	/* logical (col,row) -> memory offset */
 	return (col * num_rows) + (num_rows - 1 - row);
@@ -59,7 +58,7 @@ static TILEMAP_MAPPER( tilemap_scan_cols_flipy )
 VIDEO_START( jack )
 {
 	jack_state *state = machine.driver_data<jack_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flipy, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jack_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),state), 8, 8, 32, 32);
 }
 
 static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -133,19 +132,18 @@ PALETTE_INIT( joinem )
 	}
 }
 
-static TILE_GET_INFO( joinem_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x03) << 8);
-	int color = (state->m_colorram[tile_index] & 0x38) >> 3;
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
+	int color = (m_colorram[tile_index] & 0x38) >> 3;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( joinem )
 {
 	jack_state *state = machine.driver_data<jack_state>();
-	state->m_bg_tilemap = tilemap_create(machine, joinem_get_bg_tile_info, tilemap_scan_cols_flipy, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jack_state::joinem_get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),state), 8, 8, 32, 32);
 }
 
 static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

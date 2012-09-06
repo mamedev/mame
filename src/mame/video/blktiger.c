@@ -12,21 +12,20 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( bg8x4_scan )
+TILEMAP_MAPPER_MEMBER(blktiger_state::bg8x4_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4) + ((row & 0x30) << 7);
 }
 
-static TILEMAP_MAPPER( bg4x8_scan )
+TILEMAP_MAPPER_MEMBER(blktiger_state::bg4x8_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x30) << 4) + ((row & 0x70) << 6);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 {
-	blktiger_state *state = machine.driver_data<blktiger_state>();
 	/* the tile priority table is a guess compiled by looking at the game. It
        was not derived from a PROM so it could be wrong. */
 	static const UINT8 split_table[16] =
@@ -36,23 +35,22 @@ static TILE_GET_INFO( get_bg_tile_info )
 		0,0,0,0,
 		0,0,0,0
 	};
-	UINT8 attr = state->m_scroll_ram[2 * tile_index + 1];
+	UINT8 attr = m_scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
+			m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
 			color,
 			(attr & 0x80) ? TILE_FLIPX : 0);
 	tileinfo.group = split_table[color];
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 {
-	blktiger_state *state = machine.driver_data<blktiger_state>();
-	UINT8 attr = state->m_txvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	UINT8 attr = m_txvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
+			m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
 			0);
 }
@@ -75,9 +73,9 @@ VIDEO_START( blktiger )
 
 	state->m_scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	state->m_tx_tilemap =    tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap8x4 = tilemap_create(machine, get_bg_tile_info, bg8x4_scan, 16, 16, 128, 64);
-	state->m_bg_tilemap4x8 = tilemap_create(machine, get_bg_tile_info, bg4x8_scan, 16, 16, 64, 128);
+	state->m_tx_tilemap =    &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap8x4 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),state), 16, 16, 128, 64);
+	state->m_bg_tilemap4x8 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(blktiger_state::bg4x8_scan),state), 16, 16, 64, 128);
 
 	state->m_tx_tilemap->set_transparent_pen(3);
 

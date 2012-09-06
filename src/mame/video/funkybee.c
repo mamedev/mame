@@ -71,16 +71,15 @@ WRITE8_MEMBER(funkybee_state::funkybee_flipscreen_w)
 	flip_screen_set(data & 0x01);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(funkybee_state::get_bg_tile_info)
 {
-	funkybee_state *state = machine.driver_data<funkybee_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x80) << 1);
-	int color = state->m_colorram[tile_index] & 0x03;
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
+	int color = m_colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO(state->m_gfx_bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfx_bank, code, color, 0);
 }
 
-static TILEMAP_MAPPER( funkybee_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return 256 * row + col;
@@ -89,7 +88,7 @@ static TILEMAP_MAPPER( funkybee_tilemap_scan )
 VIDEO_START( funkybee )
 {
 	funkybee_state *state = machine.driver_data<funkybee_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, funkybee_tilemap_scan, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(funkybee_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(funkybee_state::funkybee_tilemap_scan),state), 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

@@ -34,16 +34,15 @@ PALETTE_INIT( ultratnk )
 }
 
 
-static TILE_GET_INFO( ultratnk_tile_info )
+TILE_GET_INFO_MEMBER(ultratnk_state::ultratnk_tile_info)
 {
-	ultratnk_state *state = machine.driver_data<ultratnk_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	UINT8 code = videoram[tile_index];
 
 	if (code & 0x20)
-		SET_TILE_INFO(0, code, code >> 6, 0);
+		SET_TILE_INFO_MEMBER(0, code, code >> 6, 0);
 	else
-		SET_TILE_INFO(0, code, 4, 0);
+		SET_TILE_INFO_MEMBER(0, code, 4, 0);
 }
 
 
@@ -52,7 +51,7 @@ VIDEO_START( ultratnk )
 	ultratnk_state *state = machine.driver_data<ultratnk_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_playfield = tilemap_create(machine, ultratnk_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_playfield = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ultratnk_state::ultratnk_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

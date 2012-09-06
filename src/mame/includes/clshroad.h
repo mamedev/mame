@@ -20,6 +20,11 @@ public:
 	DECLARE_WRITE8_MEMBER(clshroad_vram_0_w);
 	DECLARE_WRITE8_MEMBER(clshroad_vram_1_w);
 	DECLARE_DRIVER_INIT(firebatl);
+	TILE_GET_INFO_MEMBER(get_tile_info_0a);
+	TILE_GET_INFO_MEMBER(get_tile_info_0b);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_extra);
+	TILE_GET_INFO_MEMBER(get_tile_info_fb1);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

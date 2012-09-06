@@ -8,32 +8,30 @@
 #include "includes/quizpani.h"
 
 
-static TILEMAP_MAPPER( bg_scan )
+TILEMAP_MAPPER_MEMBER(quizpani_state::bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-static TILE_GET_INFO( bg_tile_info )
+TILE_GET_INFO_MEMBER(quizpani_state::bg_tile_info)
 {
-	quizpani_state *state = machine.driver_data<quizpani_state>();
-	int code = state->m_bg_videoram[tile_index];
+	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			(code & 0xfff) + (0x1000 * state->m_bgbank),
+			(code & 0xfff) + (0x1000 * m_bgbank),
 			code >> 12,
 			0);
 }
 
-static TILE_GET_INFO( txt_tile_info )
+TILE_GET_INFO_MEMBER(quizpani_state::txt_tile_info)
 {
-	quizpani_state *state = machine.driver_data<quizpani_state>();
-	int code = state->m_txt_videoram[tile_index];
+	int code = m_txt_videoram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			(code & 0xfff) + (0x1000 * state->m_txtbank),
+			(code & 0xfff) + (0x1000 * m_txtbank),
 			code >> 12,
 			0);
 }
@@ -71,8 +69,8 @@ WRITE16_MEMBER(quizpani_state::quizpani_tilesbank_w)
 VIDEO_START( quizpani )
 {
 	quizpani_state *state = machine.driver_data<quizpani_state>();
-	state->m_bg_tilemap  = tilemap_create(machine, bg_tile_info, bg_scan,16,16,256,32);
-	state->m_txt_tilemap = tilemap_create(machine, txt_tile_info,bg_scan,16,16,256,32);
+	state->m_bg_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),state), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),state),16,16,256,32);
+	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),state),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),state),16,16,256,32);
 	state->m_txt_tilemap->set_transparent_pen(15);
 }
 

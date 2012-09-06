@@ -28,6 +28,7 @@ public:
 	DECLARE_READ8_MEMBER(poolshrk_input_r);
 	DECLARE_READ8_MEMBER(poolshrk_irq_reset_r);
 	DECLARE_DRIVER_INIT(poolshrk);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

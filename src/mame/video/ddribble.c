@@ -87,30 +87,28 @@ WRITE8_MEMBER(ddribble_state::K005885_1_w)
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(ddribble_state::tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);	/* skip 0x400 */
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
 {
-	ddribble_state *state = machine.driver_data<ddribble_state>();
-	UINT8 attr = state->m_fg_videoram[tile_index];
-	int num = state->m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((state->m_charbank[0] & 2) << 10);
-	SET_TILE_INFO(
+	UINT8 attr = m_fg_videoram[tile_index];
+	int num = m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((m_charbank[0] & 2) << 10);
+	SET_TILE_INFO_MEMBER(
 			0,
 			num,
 			0,
 			TILE_FLIPYX((attr & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 {
-	ddribble_state *state = machine.driver_data<ddribble_state>();
-	UINT8 attr = state->m_bg_videoram[tile_index];
-	int num = state->m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (state->m_charbank[1] << 11);
-	SET_TILE_INFO(
+	UINT8 attr = m_bg_videoram[tile_index];
+	int num = m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (m_charbank[1] << 11);
+	SET_TILE_INFO_MEMBER(
 			1,
 			num,
 			0,
@@ -127,8 +125,8 @@ VIDEO_START( ddribble )
 {
 	ddribble_state *state = machine.driver_data<ddribble_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan, 8, 8, 64, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),state), 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),state), 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

@@ -111,7 +111,7 @@ PALETTE_INIT( warpwarp )
 ***************************************************************************/
 
 /* convert from 32x32 to 34x28 */
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(warpwarp_state::tilemap_scan)
 {
 	int offs;
 
@@ -125,37 +125,34 @@ static TILEMAP_MAPPER( tilemap_scan )
 	return offs;
 }
 
-static TILE_GET_INFO( geebee_get_tile_info )
+TILE_GET_INFO_MEMBER(warpwarp_state::geebee_get_tile_info)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	int code = state->m_geebee_videoram[tile_index];
-	int color = (state->m_geebee_bgw & 1) | ((code & 0x80) >> 6);
-	SET_TILE_INFO(
+	int code = m_geebee_videoram[tile_index];
+	int color = (m_geebee_bgw & 1) | ((code & 0x80) >> 6);
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( navarone_get_tile_info )
+TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	int code = state->m_geebee_videoram[tile_index];
-	int color = state->m_geebee_bgw & 1;
-	SET_TILE_INFO(
+	int code = m_geebee_videoram[tile_index];
+	int color = m_geebee_bgw & 1;
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( warpwarp_get_tile_info )
+TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index],
-			state->m_videoram[tile_index + 0x400],
+			m_videoram[tile_index],
+			m_videoram[tile_index + 0x400],
 			0);
 }
 
@@ -170,19 +167,19 @@ static TILE_GET_INFO( warpwarp_get_tile_info )
 VIDEO_START( geebee )
 {
 	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_bg_tilemap = tilemap_create(machine, geebee_get_tile_info,tilemap_scan,8,8,34,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),state),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),state),8,8,34,28);
 }
 
 VIDEO_START( navarone )
 {
 	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_bg_tilemap = tilemap_create(machine, navarone_get_tile_info,tilemap_scan,8,8,34,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),state),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),state),8,8,34,28);
 }
 
 VIDEO_START( warpwarp )
 {
 	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	state->m_bg_tilemap = tilemap_create(machine, warpwarp_get_tile_info,tilemap_scan,8,8,34,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),state),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),state),8,8,34,28);
 }
 
 

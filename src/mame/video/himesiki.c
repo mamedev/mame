@@ -10,21 +10,20 @@ Video hardware
 #include "emu.h"
 #include "includes/himesiki.h"
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
 {
-	himesiki_state *state = machine.driver_data<himesiki_state>();
-	int code = state->m_bg_ram[tile_index * 2] + state->m_bg_ram[tile_index * 2 + 1] * 0x100 ;
+	int code = m_bg_ram[tile_index * 2] + m_bg_ram[tile_index * 2 + 1] * 0x100 ;
 	int col = code >> 12;
 
 	code &= 0xfff;
 
-	SET_TILE_INFO(0, code, col, 0);
+	SET_TILE_INFO_MEMBER(0, code, col, 0);
 }
 
 VIDEO_START( himesiki )
 {
 	himesiki_state *state = machine.driver_data<himesiki_state>();
-	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(himesiki_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(himesiki_state::himesiki_bg_ram_w)

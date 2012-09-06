@@ -75,13 +75,12 @@ PALETTE_INIT( suprloco )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
-	suprloco_state *state = machine.driver_data<suprloco_state>();
-	UINT8 attr = state->m_videoram[2*tile_index+1];
-	SET_TILE_INFO(
+	UINT8 attr = m_videoram[2*tile_index+1];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[2*tile_index] | ((attr & 0x03) << 8),
+			m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0);
 	tileinfo.category = (attr & 0x20) >> 5;
@@ -98,7 +97,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( suprloco )
 {
 	suprloco_state *state = machine.driver_data<suprloco_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprloco_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_scroll_rows(32);
 }

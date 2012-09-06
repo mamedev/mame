@@ -100,29 +100,27 @@ PALETTE_INIT( robowres )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(appoooh_state::get_fg_tile_info)
 {
-	appoooh_state *state = machine.driver_data<appoooh_state>();
-	int code = state->m_fg_videoram[tile_index] + 256 * ((state->m_fg_colorram[tile_index] >> 5) & 7);
+	int code = m_fg_videoram[tile_index] + 256 * ((m_fg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
-			state->m_fg_colorram[tile_index] & 0x0f,
-			(state->m_fg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
+			m_fg_colorram[tile_index] & 0x0f,
+			(m_fg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
 	);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(appoooh_state::get_bg_tile_info)
 {
-	appoooh_state *state = machine.driver_data<appoooh_state>();
-	int code = state->m_bg_videoram[tile_index] + 256 * ((state->m_bg_colorram[tile_index] >> 5) & 7);
+	int code = m_bg_videoram[tile_index] + 256 * ((m_bg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
-			state->m_bg_colorram[tile_index] & 0x0f,
-			(state->m_bg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
+			m_bg_colorram[tile_index] & 0x0f,
+			(m_bg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
 	);
 }
 
@@ -136,8 +134,8 @@ VIDEO_START( appoooh )
 {
 	appoooh_state *state = machine.driver_data<appoooh_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(appoooh_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(appoooh_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrolldy(8, 8);

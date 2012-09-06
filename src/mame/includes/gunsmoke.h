@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gunsmoke_colorram_w);
 	DECLARE_WRITE8_MEMBER(gunsmoke_c804_w);
 	DECLARE_WRITE8_MEMBER(gunsmoke_d806_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

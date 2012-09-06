@@ -70,10 +70,10 @@ INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, tilemap
 	SET_TILE_INFO( _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
-static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine, tileinfo, tile_index, 0); }
-static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine, tileinfo, tile_index, 1); }
-static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine, tileinfo, tile_index, 2); }
-static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info(machine, tileinfo, tile_index, 3); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(machine(), tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_1){ get_tile_info(machine(), tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
 
 INLINE void lordgun_vram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
@@ -102,20 +102,16 @@ VIDEO_START( lordgun )
 	int h = machine.primary_screen->height();
 
 	// 0x800 x 200
-	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
-								 8,8, 0x100, 0x40 );
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
 
 	// 0x800 x 200
-	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
-								 16,16, 0x80,0x20 );
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS,16,16, 0x80,0x20 );
 
 	// 0x800 x 200
-	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info_2, TILEMAP_SCAN_ROWS,
-								 32,32, 0x40,0x10 );
+	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_2),state), TILEMAP_SCAN_ROWS,32,32, 0x40,0x10 );
 
 	// 0x200 x 100
-	state->m_tilemap[3] = tilemap_create(	machine, get_tile_info_3, TILEMAP_SCAN_ROWS,
-								 8,8, 0x40,0x20 );
+	state->m_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_3),state), TILEMAP_SCAN_ROWS,8,8, 0x40,0x20 );
 
 	state->m_tilemap[0]->set_scroll_rows(1);
 	state->m_tilemap[0]->set_scroll_cols(1);

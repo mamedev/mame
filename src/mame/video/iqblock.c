@@ -8,22 +8,20 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(iqblock_state::get_bg_tile_info)
 {
-	iqblock_state *state = machine.driver_data<iqblock_state>();
-	int code = state->m_bgvideoram[tile_index] + (state->m_bgvideoram[tile_index + 0x800] << 8);
-	SET_TILE_INFO(
+	int code = m_bgvideoram[tile_index] + (m_bgvideoram[tile_index + 0x800] << 8);
+	SET_TILE_INFO_MEMBER(
 			0,
-			code &(state->m_video_type ? 0x1fff : 0x3fff),
-			state->m_video_type? (2*(code >> 13)+1) : (4*(code >> 14)+3),
+			code &(m_video_type ? 0x1fff : 0x3fff),
+			m_video_type? (2*(code >> 13)+1) : (4*(code >> 14)+3),
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(iqblock_state::get_fg_tile_info)
 {
-	iqblock_state *state = machine.driver_data<iqblock_state>();
-	int code = state->m_fgvideoram[tile_index];
-	SET_TILE_INFO(
+	int code = m_fgvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0x7f,
 			(code & 0x80) ? 3 : 0,
@@ -41,8 +39,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( iqblock )
 {
 	iqblock_state *state = machine.driver_data<iqblock_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,     8, 8,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,32,64, 8);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(iqblock_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     8, 8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(iqblock_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,32,64, 8);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scroll_cols(64);

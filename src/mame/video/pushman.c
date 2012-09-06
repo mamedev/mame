@@ -7,31 +7,30 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( background_scan_rows )
+TILEMAP_MAPPER_MEMBER(pushman_state::background_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x7)) + ((7 - (row & 0x7)) << 3) + ((col & 0x78) << 3) + ((0x38 - (row & 0x38)) << 7);
 }
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 {
-	UINT8 *bg_map = machine.root_device().memregion("gfx4")->base();
+	UINT8 *bg_map = machine().root_device().memregion("gfx4")->base();
 	int tile;
 
 	tile = bg_map[tile_index << 1] + (bg_map[(tile_index << 1) + 1] << 8);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			(tile & 0xff) | ((tile & 0x4000) >> 6),
 			(tile >> 8) & 0xf,
 			(tile & 0x2000) ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 {
-	pushman_state *state = machine.driver_data<pushman_state>();
 
-	int tile = state->m_videoram[tile_index];
-	SET_TILE_INFO(
+	int tile = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			(tile & 0xff) | ((tile & 0xc000) >> 6) | ((tile & 0x2000) >> 3),
 			(tile >> 8) & 0xf,
@@ -50,8 +49,8 @@ VIDEO_START( pushman )
 {
 	pushman_state *state = machine.driver_data<pushman_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_back_tile_info, background_scan_rows, 32, 32, 128, 64);
-	state->m_tx_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_back_tile_info),state), tilemap_mapper_delegate(FUNC(pushman_state::background_scan_rows),state), 32, 32, 128, 64);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(3);
 }

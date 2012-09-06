@@ -198,28 +198,26 @@ WRITE8_MEMBER(psychic5_state::bombsa_unknown_w)
   Callbacks for the tilemap code
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(psychic5_state::get_bg_tile_info)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
 	int offs = tile_index << 1;
-	int attr = state->m_bg_videoram[offs + 1];
-	int code = state->m_bg_videoram[offs] | ((attr & 0xc0) << 2);
+	int attr = m_bg_videoram[offs + 1];
+	int code = m_bg_videoram[offs] | ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
 	int offs = tile_index << 1;
-	int attr = state->m_fg_videoram[offs + 1];
-	int code = state->m_fg_videoram[offs] | ((attr & 0xc0) << 2);
+	int attr = m_fg_videoram[offs + 1];
+	int code = m_fg_videoram[offs] | ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
 
@@ -231,8 +229,8 @@ VIDEO_START( psychic5 )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h  col  row */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 
@@ -255,8 +253,8 @@ VIDEO_START( bombsa )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	/*                          info              offset             w   h   col  row */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,  8,  8,  32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 

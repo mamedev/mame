@@ -47,6 +47,8 @@ public:
 	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
 	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
 	DECLARE_WRITE16_MEMBER(rng_936_videoram_w);
+	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
+	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 };
 
 

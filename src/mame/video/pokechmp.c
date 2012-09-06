@@ -20,20 +20,19 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(pokechmp_state::get_bg_tile_info)
 {
-	pokechmp_state *state = machine.driver_data<pokechmp_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index*2+1] + ((videoram[tile_index*2] & 0x3f) << 8);
 	int color = videoram[tile_index*2] >> 6;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( pokechmp )
 {
 	pokechmp_state *state = machine.driver_data<pokechmp_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pokechmp_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

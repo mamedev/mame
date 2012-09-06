@@ -46,4 +46,5 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
+	TILE_GET_INFO_MEMBER(get_zerozone_tile_info);
 };

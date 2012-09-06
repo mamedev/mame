@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dogfgt_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(dogfgt_scroll_w);
 	DECLARE_WRITE8_MEMBER(dogfgt_1800_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

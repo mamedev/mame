@@ -70,12 +70,11 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_palette_w)
 #define DIM_NX		(0x40)
 #define DIM_NY		(0x20)
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_0)
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
-	UINT16 code = state->m_vram_0[tile_index * 2 + 0];
-	UINT16 attr = state->m_vram_0[tile_index * 2 + 1];
-	SET_TILE_INFO(
+	UINT16 code = m_vram_0[tile_index * 2 + 0];
+	UINT16 attr = m_vram_0[tile_index * 2 + 1];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			attr & 0x1f,
@@ -84,12 +83,11 @@ static TILE_GET_INFO( get_tile_info_0 )
 	tileinfo.category = (attr >> 5) & 1;
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_1)
 {
-	blmbycar_state *state = machine.driver_data<blmbycar_state>();
-	UINT16 code = state->m_vram_1[tile_index * 2 + 0];
-	UINT16 attr = state->m_vram_1[tile_index * 2 + 1];
-	SET_TILE_INFO(
+	UINT16 code = m_vram_1[tile_index * 2 + 0];
+	UINT16 attr = m_vram_1[tile_index * 2 + 1];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			attr & 0x1f,
@@ -124,8 +122,8 @@ VIDEO_START( blmbycar )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 
 	state->m_tilemap_0->set_scroll_rows(1);
 	state->m_tilemap_0->set_scroll_cols(1);

@@ -123,6 +123,15 @@ public:
 	DECLARE_DRIVER_INIT(rp36c3);
 	DECLARE_DRIVER_INIT(magoddsc);
 	DECLARE_DRIVER_INIT(nfb96_c1);
+	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_goldstar_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
+	TILE_GET_INFO_MEMBER(get_unkch_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_unkch_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_unkch_reel3_tile_info);
 };
 
 

@@ -52,23 +52,21 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	SET_TILE_INFO( 0, tilenum, color, flags );
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(portrait_state::get_bg_tile_info)
 {
-	portrait_state *state = machine.driver_data<portrait_state>();
-	get_tile_info( machine, tileinfo, tile_index, state->m_bgvideoram );
+	get_tile_info( machine(), tileinfo, tile_index, m_bgvideoram );
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(portrait_state::get_fg_tile_info)
 {
-	portrait_state *state = machine.driver_data<portrait_state>();
-	get_tile_info( machine, tileinfo, tile_index, state->m_fgvideoram );
+	get_tile_info( machine(), tileinfo, tile_index, m_fgvideoram );
 }
 
 VIDEO_START( portrait )
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
-	state->m_background = tilemap_create( machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,       16, 16, 32, 32 );
-	state->m_foreground = tilemap_create( machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  16, 16, 32, 32 );
+	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(portrait_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
+	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
 
 	state->m_foreground->set_transparent_pen(7 );
 }

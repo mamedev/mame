@@ -120,6 +120,7 @@ public:
 	DECLARE_DRIVER_INIT(jsk);
 	DECLARE_DRIVER_INIT(twineag2);
 	DECLARE_DRIVER_INIT(mslider);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
 };
 
 /*----------- defined in video/ssv.c -----------*/

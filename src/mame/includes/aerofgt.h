@@ -68,6 +68,12 @@ public:
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
 	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
+	TILE_GET_INFO_MEMBER(get_pspikes_tile_info);
+	TILE_GET_INFO_MEMBER(karatblz_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(karatblz_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(spinlbrk_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

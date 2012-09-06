@@ -63,15 +63,14 @@ WRITE8_MEMBER(cheekyms_state::cheekyms_port_80_w)
 
 
 
-static TILE_GET_INFO( cheekyms_get_tile_info )
+TILE_GET_INFO_MEMBER(cheekyms_state::cheekyms_get_tile_info)
 {
-	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	int color;
 
 	int x = tile_index & 0x1f;
 	int y = tile_index >> 5;
-	int code = state->m_videoram[tile_index];
-	int palette = (*state->m_port_80 >> 2) & 0x10;
+	int code = m_videoram[tile_index];
+	int palette = (*m_port_80 >> 2) & 0x10;
 
 	if (x >= 0x1e)
 	{
@@ -90,7 +89,7 @@ static TILE_GET_INFO( cheekyms_get_tile_info )
 			color = palette | (x >> 1);
 	}
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( cheekyms )
@@ -102,7 +101,7 @@ VIDEO_START( cheekyms )
 	height = machine.primary_screen->height();
 	state->m_bitmap_buffer = auto_bitmap_ind16_alloc(machine, width, height);
 
-	state->m_cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_cm_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cheekyms_state::cheekyms_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_cm_tilemap->set_transparent_pen(0);
 }
 

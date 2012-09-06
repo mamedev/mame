@@ -123,12 +123,11 @@ READ8_MEMBER(tetrisp2_state::tetrisp2_priority_r)
 #define NX_0  (0x40)
 #define NY_0  (0x40)
 
-static TILE_GET_INFO( get_tile_info_bg )
+TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	UINT16 code_hi = state->m_vram_bg[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_vram_bg[ 2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code_hi = m_vram_bg[ 2 * tile_index + 0];
+	UINT16 code_lo = m_vram_bg[ 2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code_hi,
 			code_lo & 0xf,
@@ -145,12 +144,11 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_bg_w)
 #define NX_1  (0x40)
 #define NY_1  (0x40)
 
-static TILE_GET_INFO( get_tile_info_fg )
+TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	UINT16 code_hi = state->m_vram_fg[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_vram_fg[ 2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code_hi = m_vram_fg[ 2 * tile_index + 0];
+	UINT16 code_lo = m_vram_fg[ 2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			3,
 			code_hi,
 			code_lo & 0xf,
@@ -164,12 +162,11 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_fg_w)
 }
 
 
-static TILE_GET_INFO( get_tile_info_rot )
+TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	UINT16 code_hi = state->m_vram_rot[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_vram_rot[ 2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code_hi = m_vram_rot[ 2 * tile_index + 0];
+	UINT16 code_lo = m_vram_rot[ 2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			2,
 			code_hi,
 			code_lo & 0xf,
@@ -182,12 +179,11 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_rot_w)
 	m_tilemap_rot->mark_tile_dirty(offset/2);
 }
 
-static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
+TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	UINT16 code_hi = state->m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code_hi = m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
+	UINT16 code_lo = m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			5,
 			code_hi,
 			code_lo & 0xf,
@@ -201,12 +197,11 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_bg_w)
 }
 
 
-static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
+TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	UINT16 code_hi = state->m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code_hi = m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
+	UINT16 code_lo = m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			7,
 			code_hi,
 			code_lo & 0xf,
@@ -220,12 +215,11 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_fg_w)
 }
 
 
-static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
+TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	UINT16 code_hi = state->m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code_hi = m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
+	UINT16 code_lo = m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			6,
 			code_hi,
 			code_lo & 0xf,
@@ -245,18 +239,9 @@ VIDEO_START( tetrisp2 )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	state->m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,
-
-								16,16,NX_0,NY_0);
-
-	state->m_tilemap_fg = tilemap_create(	machine, get_tile_info_fg,TILEMAP_SCAN_ROWS,
-
-								8,8,NX_1,NY_1);
-
-	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,TILEMAP_SCAN_ROWS,
-
-								16,16,NX_0*2,NY_0*2);
-
+	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
+	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
+	state->m_tilemap_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),state),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
 	state->m_tilemap_bg->set_transparent_pen(0);
 	state->m_tilemap_fg->set_transparent_pen(0);
 	state->m_tilemap_rot->set_transparent_pen(0);
@@ -278,17 +263,9 @@ VIDEO_START( rockntread )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	state->m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,
-
-								16, 16, 256, 16);	// rockn ms(main),1,2,3,4
-
-	state->m_tilemap_fg = tilemap_create(	machine, get_tile_info_fg,TILEMAP_SCAN_ROWS,
-
-								8, 8, 64, 64);
-
-	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,TILEMAP_SCAN_ROWS,
-
-								16, 16, 128, 128);
+	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,16, 16, 256, 16);	// rockn ms(main),1,2,3,4
+	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
+	state->m_tilemap_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),state),TILEMAP_SCAN_ROWS,16, 16, 128, 128);
 
 	state->m_tilemap_bg->set_transparent_pen(0);
 	state->m_tilemap_fg->set_transparent_pen(0);
@@ -305,17 +282,9 @@ VIDEO_START( rocknms )
 	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
 	VIDEO_START_CALL( rockntread );
 
-	state->m_tilemap_sub_bg = tilemap_create(machine, get_tile_info_rocknms_sub_bg,TILEMAP_SCAN_ROWS,
-
-					16, 16, 32, 256);	// rockn ms(sub)
-
-	state->m_tilemap_sub_fg = tilemap_create(machine, get_tile_info_rocknms_sub_fg,TILEMAP_SCAN_ROWS,
-
-					8, 8, 64, 64);
-
-	state->m_tilemap_sub_rot = tilemap_create( machine, get_tile_info_rocknms_sub_rot,TILEMAP_SCAN_ROWS,
-
-					16, 16, 128, 128);
+	state->m_tilemap_sub_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_bg),state),TILEMAP_SCAN_ROWS,16, 16, 32, 256);	// rockn ms(sub)
+	state->m_tilemap_sub_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_fg),state),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
+	state->m_tilemap_sub_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_rot),state),TILEMAP_SCAN_ROWS,16, 16, 128, 128);
 
 	state->m_tilemap_sub_bg->set_transparent_pen(0);
 	state->m_tilemap_sub_fg->set_transparent_pen(0);
@@ -760,18 +729,17 @@ SCREEN_UPDATE_RGB32( rocknms_right )
 
 // Temporary hack for stpestag: unaltered ASCII bytes are written in the most significant byte
 // of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
-static TILE_GET_INFO( stepstag_get_tile_info_fg )
+TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 {
-	stepstag_state *state = machine.driver_data<stepstag_state>();
-	UINT16 code_hi = state->m_vram_fg[ 2 * tile_index + 0];
-	UINT16 code_lo = state->m_vram_fg[ 2 * tile_index + 1];
+	UINT16 code_hi = m_vram_fg[ 2 * tile_index + 0];
+	UINT16 code_lo = m_vram_fg[ 2 * tile_index + 1];
 
 	// ASCII -> tile codes
 	code_hi = (code_hi & 0xff00) >> 8;
 	code_hi = (code_hi & 0x0f) + (code_hi & 0xf0)*2;
 	code_hi += 0xbd6c;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code_hi,
 			code_lo & 0xf,
@@ -783,16 +751,10 @@ VIDEO_START( stepstag )
 	stepstag_state *state = machine.driver_data<stepstag_state>();
 	state->m_flipscreen_old = -1;
 
-	state->m_tilemap_bg = tilemap_create(	machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,
-											16,16,NX_0,NY_0);
-
+	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
 	// Temporary hack
-	state->m_tilemap_fg = tilemap_create(	machine, stepstag_get_tile_info_fg,TILEMAP_SCAN_ROWS,
-											8,8,NX_1,NY_1);
-
-	state->m_tilemap_rot = tilemap_create(	machine, get_tile_info_rot,TILEMAP_SCAN_ROWS,
-											16,16,NX_0*2,NY_0*2);
-
+	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::stepstag_get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
+	state->m_tilemap_rot = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),state),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
 	state->m_tilemap_bg->set_transparent_pen(0);
 	state->m_tilemap_fg->set_transparent_pen(0);
 	state->m_tilemap_rot->set_transparent_pen(0);

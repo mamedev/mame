@@ -89,32 +89,30 @@ WRITE8_MEMBER(airbustr_state::airbustr_scrollregs_w)
 	m_fg_tilemap->set_scrollx(0, ((m_highbits << 8) & 0x100) + m_fg_scrollx);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(airbustr_state::get_fg_tile_info)
 {
-	airbustr_state *state = machine.driver_data<airbustr_state>();
-	int attr = state->m_colorram2[tile_index];
-	int code = state->m_videoram2[tile_index] + ((attr & 0x0f) << 8);
+	int attr = m_colorram2[tile_index];
+	int code = m_videoram2[tile_index] + ((attr & 0x0f) << 8);
 	int color = attr >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(airbustr_state::get_bg_tile_info)
 {
-	airbustr_state *state = machine.driver_data<airbustr_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x0f) << 8);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4) + 16;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( airbustr )
 {
 	airbustr_state *state = machine.driver_data<airbustr_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(airbustr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(airbustr_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	machine.primary_screen->register_screen_bitmap(state->m_sprites_bitmap);
 	state->m_fg_tilemap->set_transparent_pen(0);

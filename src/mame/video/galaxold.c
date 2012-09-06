@@ -12,8 +12,8 @@
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
 
 
-static TILE_GET_INFO( get_tile_info );
-static TILE_GET_INFO( rockclim_get_tile_info );
+
+
 static void mooncrst_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
 static void   pisces_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
 static void mimonkey_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
@@ -478,7 +478,7 @@ VIDEO_START( galaxold_plain )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -694,7 +694,7 @@ VIDEO_START( rockclim )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	VIDEO_START_CALL(galaxold);
-	state->m_rockclim_tilemap = tilemap_create(machine, rockclim_get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_rockclim_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::rockclim_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_draw_background = rockclim_draw_background;
 	state->m_modify_charcode = mooncrst_modify_charcode;
@@ -705,25 +705,24 @@ VIDEO_START( rockclim )
 	state_save_register_global(machine, state->m_rockclim_h);
 }
 
-static TILE_GET_INFO( drivfrcg_get_tile_info )
+TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int code = state->m_videoram[tile_index];
+	int code = m_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
-	UINT8 color = state->m_attributesram[(x << 1) | 1] & 7;
-	UINT8 bank = state->m_attributesram[(x << 1) | 1] & 0x30;
+	UINT8 color = m_attributesram[(x << 1) | 1] & 7;
+	UINT8 bank = m_attributesram[(x << 1) | 1] & 0x30;
 
 	code |= (bank << 4);
-	color |= ((state->m_attributesram[(x << 1) | 1] & 0x40) >> 3);
+	color |= ((m_attributesram[(x << 1) | 1] & 0x40) >> 3);
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( drivfrcg )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -738,7 +737,7 @@ VIDEO_START( ad2083 )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, drivfrcg_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -759,24 +758,23 @@ WRITE8_MEMBER(galaxold_state::racknrol_tiles_bank_w)
 	m_bg_tilemap->mark_all_dirty();
 }
 
-static TILE_GET_INFO( racknrol_get_tile_info )
+TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int code = state->m_videoram[tile_index];
+	int code = m_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
-	UINT8 color = state->m_attributesram[(x << 1) | 1] & 7;
-	UINT8 bank = state->m_racknrol_tiles_bank[x] & 7;
+	UINT8 color = m_attributesram[(x << 1) | 1] & 7;
+	UINT8 bank = m_racknrol_tiles_bank[x] & 7;
 
 	code |= (bank << 8);
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( racknrol )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	video_start_common(machine);
-	state->m_bg_tilemap = tilemap_create(machine, racknrol_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::racknrol_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
@@ -792,25 +790,24 @@ VIDEO_START( bongo )
 	state->m_modify_spritecode = batman2_modify_spritecode;
 }
 
-static TILE_GET_INFO( dambustr_get_tile_info2 )
+TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	UINT8 x = tile_index & 0x1f;
 
-	UINT16 code = state->m_dambustr_videoram2[tile_index];
-	UINT8 color = state->m_attributesram[(x << 1) | 1] & state->m_color_mask;
+	UINT16 code = m_dambustr_videoram2[tile_index];
+	UINT8 color = m_attributesram[(x << 1) | 1] & m_color_mask;
 
-	if (state->m_modify_charcode)
+	if (m_modify_charcode)
 	{
-		(*state->m_modify_charcode)(machine, &code, x);
+		(*m_modify_charcode)(machine(), &code, x);
 	}
 
-	if (state->m_modify_color)
+	if (m_modify_color)
 	{
-		(*state->m_modify_color)(&color);
+		(*m_modify_color)(&color);
 	}
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( dambustr )
@@ -836,7 +833,7 @@ VIDEO_START( dambustr )
 
 	/* make a copy of the tilemap to emulate background priority */
 	state->m_dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
-	state->m_dambustr_tilemap2 = tilemap_create(machine, dambustr_get_tile_info2,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_dambustr_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::dambustr_get_tile_info2),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_dambustr_tilemap2->set_transparent_pen(0);
 }
@@ -1660,32 +1657,30 @@ static void start_stars_scroll_timer(running_machine &machine)
 
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	UINT8 x = tile_index & 0x1f;
 
-	UINT16 code = state->m_videoram[tile_index];
-	UINT8 color = state->m_attributesram[(x << 1) | 1] & state->m_color_mask;
+	UINT16 code = m_videoram[tile_index];
+	UINT8 color = m_attributesram[(x << 1) | 1] & m_color_mask;
 
-	if (state->m_modify_charcode)
+	if (m_modify_charcode)
 	{
-		(*state->m_modify_charcode)(machine, &code, x);
+		(*m_modify_charcode)(machine(), &code, x);
 	}
 
-	if (state->m_modify_color)
+	if (m_modify_color)
 	{
-		(*state->m_modify_color)(&color);
+		(*m_modify_color)(&color);
 	}
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( rockclim_get_tile_info )
+TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	UINT16 code = state->m_rockclim_videoram[tile_index];
-	SET_TILE_INFO(2, code, 0, 0);
+	UINT16 code = m_rockclim_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(2, code, 0, 0);
 }
 
 static void draw_bullets_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

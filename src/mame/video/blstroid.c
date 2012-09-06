@@ -17,13 +17,12 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(blstroid_state::get_playfield_tile_info)
 {
-	blstroid_state *state = machine.driver_data<blstroid_state>();
-	UINT16 data = state->m_playfield[tile_index];
+	UINT16 data = m_playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -75,7 +74,7 @@ VIDEO_START( blstroid )
 	blstroid_state *state = machine.driver_data<blstroid_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blstroid_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);

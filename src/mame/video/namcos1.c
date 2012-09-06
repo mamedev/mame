@@ -72,40 +72,34 @@ INLINE void fg_get_info(running_machine &machine,tile_data &tileinfo,int tile_in
 	tileinfo.mask_data = &state->m_tilemap_maskdata[code << 3];
 }
 
-static TILE_GET_INFO( bg_get_info0 )
+TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info0)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	bg_get_info(machine,tileinfo,tile_index,&state->m_videoram[0x0000]);
+	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x0000]);
 }
 
-static TILE_GET_INFO( bg_get_info1 )
+TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info1)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	bg_get_info(machine,tileinfo,tile_index,&state->m_videoram[0x2000]);
+	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x2000]);
 }
 
-static TILE_GET_INFO( bg_get_info2 )
+TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info2)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	bg_get_info(machine,tileinfo,tile_index,&state->m_videoram[0x4000]);
+	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x4000]);
 }
 
-static TILE_GET_INFO( bg_get_info3 )
+TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info3)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	bg_get_info(machine,tileinfo,tile_index,&state->m_videoram[0x6000]);
+	bg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x6000]);
 }
 
-static TILE_GET_INFO( fg_get_info4 )
+TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info4)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	fg_get_info(machine,tileinfo,tile_index,&state->m_videoram[0x7010]);
+	fg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x7010]);
 }
 
-static TILE_GET_INFO( fg_get_info5 )
+TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info5)
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	fg_get_info(machine,tileinfo,tile_index,&state->m_videoram[0x7810]);
+	fg_get_info(machine(),tileinfo,tile_index,&m_videoram[0x7810]);
 }
 
 
@@ -128,12 +122,12 @@ VIDEO_START( namcos1 )
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
 
 	/* initialize playfields */
-	state->m_bg_tilemap[0] = tilemap_create(machine, bg_get_info0,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg_tilemap[1] = tilemap_create(machine, bg_get_info1,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg_tilemap[2] = tilemap_create(machine, bg_get_info2,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_bg_tilemap[3] = tilemap_create(machine, bg_get_info3,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[4] = tilemap_create(machine, fg_get_info4,TILEMAP_SCAN_ROWS,8,8,36,28);
-	state->m_bg_tilemap[5] = tilemap_create(machine, fg_get_info5,TILEMAP_SCAN_ROWS,8,8,36,28);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info1),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info2),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_bg_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info3),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),state),TILEMAP_SCAN_ROWS,8,8,36,28);
+	state->m_bg_tilemap[5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),state),TILEMAP_SCAN_ROWS,8,8,36,28);
 
 	state->m_bg_tilemap[4]->set_scrolldx(73,512-73);
 	state->m_bg_tilemap[5]->set_scrolldx(73,512-73);

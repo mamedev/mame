@@ -55,6 +55,10 @@ public:
 	DECLARE_WRITE8_MEMBER(blktiger_video_control_w);
 	DECLARE_WRITE8_MEMBER(blktiger_video_enable_w);
 	DECLARE_WRITE8_MEMBER(blktiger_screen_layout_w);
+	TILEMAP_MAPPER_MEMBER(bg8x4_scan);
+	TILEMAP_MAPPER_MEMBER(bg4x8_scan);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 

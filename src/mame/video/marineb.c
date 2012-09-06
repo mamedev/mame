@@ -45,16 +45,15 @@ PALETTE_INIT( marineb )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
 {
-	marineb_state *state = machine.driver_data<marineb_state>();
 
-	UINT8 code = state->m_videoram[tile_index];
-	UINT8 col = state->m_colorram[tile_index];
+	UINT8 code = m_videoram[tile_index];
+	UINT8 col = m_colorram[tile_index];
 
-	SET_TILE_INFO(0,
+	SET_TILE_INFO_MEMBER(0,
 				  code | ((col & 0xc0) << 2),
-				  (col & 0x0f) | (state->m_palette_bank << 4),
+				  (col & 0x0f) | (m_palette_bank << 4),
 				  TILE_FLIPXY((col >> 4) & 0x03));
 }
 
@@ -70,7 +69,7 @@ VIDEO_START( marineb )
 {
 	marineb_state *state = machine.driver_data<marineb_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(marineb_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_item(NAME(state->m_palette_bank));

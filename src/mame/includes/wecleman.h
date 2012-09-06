@@ -69,6 +69,9 @@ public:
 	DECLARE_WRITE8_MEMBER(hotchase_3_k007232_w);
 	DECLARE_DRIVER_INIT(wecleman);
 	DECLARE_DRIVER_INIT(hotchase);
+	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
+	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
 };
 
 

@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nvram_enable_w);
 	DECLARE_WRITE8_MEMBER(atetris_videoram_w);
 	DECLARE_DRIVER_INIT(atetris);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 /*----------- defined in video/atetris.c -----------*/

@@ -15,21 +15,20 @@ WRITE8_MEMBER(bsktball_state::bsktball_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bsktball_state::get_bg_tile_info)
 {
-	bsktball_state *state = machine.driver_data<bsktball_state>();
-	int attr = state->m_videoram[tile_index];
+	int attr = m_videoram[tile_index];
 	int code = ((attr & 0x0f) << 2) | ((attr & 0x30) >> 4);
 	int color = (attr & 0x40) >> 6;
 	int flags = (attr & 0x80) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( bsktball )
 {
 	bsktball_state *state = machine.driver_data<bsktball_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bsktball_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine,  bitmap_ind16 &bitmap, const rectangle &cliprect )

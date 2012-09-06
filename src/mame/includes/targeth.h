@@ -17,6 +17,8 @@ public:
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(targeth_coin_counter_w);
 	DECLARE_WRITE16_MEMBER(targeth_vram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_targeth_screen0);
+	TILE_GET_INFO_MEMBER(get_tile_info_targeth_screen1);
 };
 
 

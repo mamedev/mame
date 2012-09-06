@@ -49,6 +49,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bbusters_video_w);
 	DECLARE_WRITE16_MEMBER(bbusters_pf1_w);
 	DECLARE_WRITE16_MEMBER(bbusters_pf2_w);
+	TILE_GET_INFO_MEMBER(get_bbusters_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 };
 
 

@@ -34,15 +34,14 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 	int color, tile_number, attrib;
 
-	attrib = state->m_txvideoram16[tile_index];
+	attrib = m_txvideoram16[tile_index];
 	tile_number = attrib & 0x3ff;
 	color = ((attrib >> 10) | 0x40) & 0x7f;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile_number,
 			color,
@@ -60,7 +59,7 @@ static void truxton2_create_tx_tilemap(running_machine &machine)
 {
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_tx_tilemap->set_scroll_rows(8*32);	/* line scrolling */
 	state->m_tx_tilemap->set_scroll_cols(1);
 	state->m_tx_tilemap->set_transparent_pen(0);

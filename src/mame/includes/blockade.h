@@ -21,6 +21,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blockade_videoram_w);
 	DECLARE_WRITE8_MEMBER(blockade_env_on_w);
 	DECLARE_WRITE8_MEMBER(blockade_env_off_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

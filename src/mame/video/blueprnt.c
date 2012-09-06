@@ -72,23 +72,22 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 {
-	blueprnt_state *state = machine.driver_data<blueprnt_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + 256 * state->m_gfx_bank;
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
 	int color = attr & 0x7f;
 
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( blueprnt )
 {
 	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);
 

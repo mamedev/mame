@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE16_MEMBER(ddragon3_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

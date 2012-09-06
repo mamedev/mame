@@ -76,15 +76,14 @@ WRITE8_MEMBER(mustache_state::mustache_scroll_w)
 	m_bg_tilemap->set_scrollx(3, 0x100);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mustache_state::get_bg_tile_info)
 {
-	mustache_state *state = machine.driver_data<mustache_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int attr = videoram[2 * tile_index + 1];
-	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((state->m_control_byte & 0x08) << 7);
+	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((m_control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
+	SET_TILE_INFO_MEMBER(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
 
 
 }
@@ -92,7 +91,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( mustache )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS_FLIP_X,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mustache_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS_FLIP_X,
 		 8, 8, 64, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(4);

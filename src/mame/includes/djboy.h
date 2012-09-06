@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(djboy_paletteram_w);
 	DECLARE_DRIVER_INIT(djboy);
 	DECLARE_DRIVER_INIT(djboyj);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

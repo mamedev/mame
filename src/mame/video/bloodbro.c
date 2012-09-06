@@ -14,33 +14,30 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bloodbro_state::get_bg_tile_info)
 {
-	bloodbro_state *state = machine.driver_data<bloodbro_state>();
-	int code = state->m_bgvideoram[tile_index];
-	SET_TILE_INFO(
+	int code = m_bgvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0xfff,
 			(code >> 12),
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(bloodbro_state::get_fg_tile_info)
 {
-	bloodbro_state *state = machine.driver_data<bloodbro_state>();
-	int code = state->m_fgvideoram[tile_index];
-	SET_TILE_INFO(
+	int code = m_fgvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			2,
 			(code & 0xfff)+0x1000,
 			(code >> 12),
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(bloodbro_state::get_tx_tile_info)
 {
-	bloodbro_state *state = machine.driver_data<bloodbro_state>();
-	int code = state->m_txvideoram[tile_index];
-	SET_TILE_INFO(
+	int code = m_txvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0xfff,
 			code >> 12,
@@ -58,9 +55,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( bloodbro )
 {
 	bloodbro_state *state = machine.driver_data<bloodbro_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,     16,16,32,16);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,16,16,32,16);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,32,16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,16);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);

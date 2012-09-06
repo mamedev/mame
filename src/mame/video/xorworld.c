@@ -66,20 +66,19 @@ WRITE16_MEMBER(xorworld_state::xorworld_videoram16_w)
       0  | xxxx---- -------- | color
 */
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(xorworld_state::get_bg_tile_info)
 {
-	xorworld_state *state = machine.driver_data<xorworld_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = data & 0x0fff;
 
-	SET_TILE_INFO(0, code, data >> 12, 0);
+	SET_TILE_INFO_MEMBER(0, code, data >> 12, 0);
 }
 
 VIDEO_START( xorworld )
 {
 	xorworld_state *state = machine.driver_data<xorworld_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xorworld_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

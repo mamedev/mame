@@ -27,23 +27,21 @@ static TIMER_CALLBACK( reset_yscroll_callback );
  *
  *************************************/
 
-static TILE_GET_INFO( get_alpha_tile_info )
+TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	UINT16 data = state->m_alpha[tile_index];
+	UINT16 data = m_alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
-	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	UINT16 data = state->m_playfield[tile_index];
-	int code = state->m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
+	UINT16 data = m_playfield[tile_index];
+	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (~data >> 14) & 3;
 }
 
@@ -100,13 +98,13 @@ VIDEO_START( atarisy2 )
 	state->m_playfield.set_target(&state->m_vram[0x2000], 0x2000);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_ROWS,  8,8, 128,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarisy2_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,48);
+	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarisy2_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,48);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* reset the statics */

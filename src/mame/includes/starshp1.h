@@ -75,6 +75,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
 	DECLARE_WRITE8_MEMBER(starshp1_audio_w);
 	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

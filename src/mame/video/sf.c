@@ -7,37 +7,36 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 {
-	UINT8 *base = machine.root_device().memregion("gfx5")->base() + 2 * tile_index;
+	UINT8 *base = machine().root_device().memregion("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
 			TILE_FLIPYX(attr & 3));
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 {
-	UINT8 *base = machine.root_device().memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
+	UINT8 *base = machine().root_device().memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			color,
 			TILE_FLIPYX(attr & 3));
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
 {
-	sf_state *state = machine.driver_data<sf_state>();
-	int code = state->m_videoram[tile_index];
-	SET_TILE_INFO(
+	int code = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			3,
 			code & 0x3ff,
 			code>>12,
@@ -56,9 +55,9 @@ VIDEO_START( sf )
 {
 	sf_state *state = machine.driver_data<sf_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sf_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(3);

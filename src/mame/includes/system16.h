@@ -173,6 +173,16 @@ public:
 	DECLARE_DRIVER_INIT(tturfbl);
 	DECLARE_DRIVER_INIT(goldnaxeb1);
 	DECLARE_DRIVER_INIT(common);
+	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
+	TILEMAP_MAPPER_MEMBER(sys16_text_map);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_infotxt);
+	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_info0);
+	TILE_GET_INFO_MEMBER(get_s16a_bootleg_tile_info1);
 };
 
 /*----------- defined in video/system16.c -----------*/

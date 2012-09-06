@@ -90,6 +90,7 @@ public:
 	DECLARE_DRIVER_INIT(tshoot);
 	DECLARE_DRIVER_INIT(robotron);
 	DECLARE_DRIVER_INIT(bubbles);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

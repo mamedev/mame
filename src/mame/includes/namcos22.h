@@ -249,6 +249,7 @@ public:
 	DECLARE_DRIVER_INIT(alpiner);
 	DECLARE_DRIVER_INIT(ridgeraj);
 	DECLARE_DRIVER_INIT(alpinesa);
+	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 };
 
 

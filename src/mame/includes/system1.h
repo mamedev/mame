@@ -98,6 +98,7 @@ public:
 	DECLARE_DRIVER_INIT(seganinj);
 	DECLARE_DRIVER_INIT(gardia);
 	DECLARE_DRIVER_INIT(spatter);
+	TILE_GET_INFO_MEMBER(tile_get_info);
 };
 
 

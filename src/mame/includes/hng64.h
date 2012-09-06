@@ -175,6 +175,14 @@ public:
 	void m_set_irq(UINT32 irq_vector);
 	UINT32 m_irq_pending;
 	int m_irq_level;
+	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile1_8x8_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile1_16x16_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile2_8x8_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
+	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
 };
 
 

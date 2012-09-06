@@ -34,12 +34,11 @@ PALETTE_INIT( sprint2 )
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
 {
-	sprint2_state *state = machine.driver_data<sprint2_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 7, 0);
 }
 
 
@@ -48,7 +47,7 @@ VIDEO_START( sprint2 )
 	sprint2_state *state = machine.driver_data<sprint2_state>();
 	machine.primary_screen->register_screen_bitmap(state->m_helper);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sprint2_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 

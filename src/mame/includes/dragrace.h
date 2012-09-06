@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(dragrace_input_r);
 	DECLARE_READ8_MEMBER(dragrace_steering_r);
 	DECLARE_READ8_MEMBER(dragrace_scanline_r);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

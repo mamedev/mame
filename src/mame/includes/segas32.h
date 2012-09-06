@@ -170,6 +170,7 @@ public:
 	DECLARE_DRIVER_INIT(radr);
 	DECLARE_DRIVER_INIT(f1lap);
 	DECLARE_DRIVER_INIT(orunners);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

@@ -52,6 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(ladyfrog_scrlram_r);
 	DECLARE_WRITE8_MEMBER(ladyfrog_scrlram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

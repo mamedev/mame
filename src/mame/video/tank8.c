@@ -69,10 +69,9 @@ WRITE8_MEMBER(tank8_state::tank8_video_ram_w)
 
 
 
-static TILE_GET_INFO( tank8_get_tile_info )
+TILE_GET_INFO_MEMBER(tank8_state::tank8_get_tile_info)
 {
-	tank8_state *state = machine.driver_data<tank8_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = m_video_ram[tile_index];
 
 	int color = 0;
 
@@ -95,7 +94,7 @@ static TILE_GET_INFO( tank8_get_tile_info )
 			color |= 4;
 	}
 
-	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -107,7 +106,7 @@ VIDEO_START( tank8 )
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 	machine.primary_screen->register_screen_bitmap(state->m_helper3);
 
-	state->m_tilemap = tilemap_create(machine, tank8_get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tank8_state::tank8_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 

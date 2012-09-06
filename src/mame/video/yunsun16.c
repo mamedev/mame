@@ -38,7 +38,7 @@
 #define PAGES_PER_TMAP_X	(0x4)
 #define PAGES_PER_TMAP_Y	(0x4)
 
-static TILEMAP_MAPPER( yunsun16_tilemap_scan_pages )
+TILEMAP_MAPPER_MEMBER(yunsun16_state::yunsun16_tilemap_scan_pages)
 {
 	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
@@ -47,24 +47,22 @@ static TILEMAP_MAPPER( yunsun16_tilemap_scan_pages )
 			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
 }
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
 {
-	yunsun16_state *state = machine.driver_data<yunsun16_state>();
-	UINT16 code = state->m_vram_0[2 * tile_index + 0];
-	UINT16 attr = state->m_vram_0[2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code = m_vram_0[2 * tile_index + 0];
+	UINT16 attr = m_vram_0[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			TMAP_GFX,
 			code,
 			attr & 0xf,
 			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
 {
-	yunsun16_state *state = machine.driver_data<yunsun16_state>();
-	UINT16 code = state->m_vram_1[2 * tile_index + 0];
-	UINT16 attr = state->m_vram_1[2 * tile_index + 1];
-	SET_TILE_INFO(
+	UINT16 code = m_vram_1[2 * tile_index + 0];
+	UINT16 attr = m_vram_1[2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(
 			TMAP_GFX,
 			code,
 			attr & 0xf,
@@ -98,9 +96,9 @@ VIDEO_START( yunsun16 )
 {
 	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0,yunsun16_tilemap_scan_pages,
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_0),state),tilemap_mapper_delegate(FUNC(yunsun16_state::yunsun16_tilemap_scan_pages),state),
 								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1,yunsun16_tilemap_scan_pages,
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_1),state),tilemap_mapper_delegate(FUNC(yunsun16_state::yunsun16_tilemap_scan_pages),state),
 								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	state->m_tilemap_0->set_scrolldx(-0x34, 0);

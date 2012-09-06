@@ -28,6 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tiamc1_bg_vshift_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_bg_hshift_w);
 	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

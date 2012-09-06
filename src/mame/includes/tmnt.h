@@ -119,6 +119,8 @@ public:
 	DECLARE_DRIVER_INIT(mia);
 	DECLARE_DRIVER_INIT(tmnt);
 	DECLARE_DRIVER_INIT(cuebrick);
+	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
+	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
 };
 
 

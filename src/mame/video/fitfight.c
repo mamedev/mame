@@ -41,15 +41,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static TILE_GET_INFO( get_fof_bak_tile_info )
+TILE_GET_INFO_MEMBER(fitfight_state::get_fof_bak_tile_info)
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	int code = state->m_fof_bak_tileram[tile_index * 2 + 1];
-	int colr = state->m_fof_bak_tileram[tile_index * 2] & 0x1f;
-	int xflip = (state->m_fof_bak_tileram[tile_index * 2] & 0x0020) >> 5;
+	int code = m_fof_bak_tileram[tile_index * 2 + 1];
+	int colr = m_fof_bak_tileram[tile_index * 2] & 0x1f;
+	int xflip = (m_fof_bak_tileram[tile_index * 2] & 0x0020) >> 5;
 	xflip ^= 1;
 
-	SET_TILE_INFO(2, code, colr, TILE_FLIPYX(xflip));
+	SET_TILE_INFO_MEMBER(2, code, colr, TILE_FLIPYX(xflip));
 }
 
 WRITE16_MEMBER(fitfight_state::fof_bak_tileram_w)
@@ -60,15 +59,14 @@ WRITE16_MEMBER(fitfight_state::fof_bak_tileram_w)
 }
 
 
-static TILE_GET_INFO( get_fof_mid_tile_info )
+TILE_GET_INFO_MEMBER(fitfight_state::get_fof_mid_tile_info)
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	int code = state->m_fof_mid_tileram[tile_index * 2 + 1];
-	int colr = state->m_fof_mid_tileram[tile_index * 2] & 0x1f;
-	int xflip = (state->m_fof_mid_tileram[tile_index * 2] & 0x0020) >> 5;
+	int code = m_fof_mid_tileram[tile_index * 2 + 1];
+	int colr = m_fof_mid_tileram[tile_index * 2] & 0x1f;
+	int xflip = (m_fof_mid_tileram[tile_index * 2] & 0x0020) >> 5;
 	xflip ^= 1;
 
-	SET_TILE_INFO(1, code, colr, TILE_FLIPYX(xflip));
+	SET_TILE_INFO_MEMBER(1, code, colr, TILE_FLIPYX(xflip));
 }
 
 WRITE16_MEMBER(fitfight_state::fof_mid_tileram_w)
@@ -78,15 +76,14 @@ WRITE16_MEMBER(fitfight_state::fof_mid_tileram_w)
 	m_fof_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_fof_txt_tile_info )
+TILE_GET_INFO_MEMBER(fitfight_state::get_fof_txt_tile_info)
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	int code = state->m_fof_txt_tileram[tile_index * 2 + 1];
-	int colr = state->m_fof_txt_tileram[tile_index * 2] & 0x1f;
-	int xflip = (state->m_fof_txt_tileram[tile_index * 2] & 0x0020) >> 5;
+	int code = m_fof_txt_tileram[tile_index * 2 + 1];
+	int colr = m_fof_txt_tileram[tile_index * 2] & 0x1f;
+	int xflip = (m_fof_txt_tileram[tile_index * 2] & 0x0020) >> 5;
 	xflip ^= 1;
 
-	SET_TILE_INFO(0, code, colr, TILE_FLIPYX(xflip));
+	SET_TILE_INFO_MEMBER(0, code, colr, TILE_FLIPYX(xflip));
 }
 
 WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
@@ -101,13 +98,13 @@ WRITE16_MEMBER(fitfight_state::fof_txt_tileram_w)
 VIDEO_START(fitfight)
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
-	state->m_fof_bak_tilemap = tilemap_create(machine, get_fof_bak_tile_info, TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	state->m_fof_bak_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_bak_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	/* opaque */
 
-	state->m_fof_mid_tilemap = tilemap_create(machine, get_fof_mid_tile_info, TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	state->m_fof_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_mid_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	state->m_fof_mid_tilemap->set_transparent_pen(0);
 
-	state->m_fof_txt_tilemap = tilemap_create(machine, get_fof_txt_tile_info, TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+	state->m_fof_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fitfight_state::get_fof_txt_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
 	state->m_fof_txt_tilemap->set_transparent_pen(0);
 }
 

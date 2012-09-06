@@ -72,6 +72,16 @@ public:
 	DECLARE_DRIVER_INIT(tumbleb2);
 	DECLARE_DRIVER_INIT(chokchok);
 	DECLARE_DRIVER_INIT(fncywld);
+	TILEMAP_MAPPER_MEMBER(tumblep_scan);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fncywld_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_fncywld_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_fncywld_fg_tile_info);
+	TILE_GET_INFO_MEMBER(pangpang_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(pangpang_get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(pangpang_get_fg_tile_info);
 };
 
 /*----------- defined in video/tumbleb.c -----------*/

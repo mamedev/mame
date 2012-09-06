@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE16_MEMBER( glass_mainram_w );
 
 	DECLARE_DRIVER_INIT(glass);
+	TILE_GET_INFO_MEMBER(get_tile_info_glass_screen0);
+	TILE_GET_INFO_MEMBER(get_tile_info_glass_screen1);
 };
 
 

@@ -77,14 +77,13 @@ PALETTE_INIT( vulgus )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
 {
-	vulgus_state *state = machine.driver_data<vulgus_state>();
 	int code, color;
 
-	code = state->m_fgvideoram[tile_index];
-	color = state->m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	code = m_fgvideoram[tile_index];
+	color = m_fgvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
@@ -92,17 +91,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	tileinfo.group = color & 0x3f;
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(vulgus_state::get_bg_tile_info)
 {
-	vulgus_state *state = machine.driver_data<vulgus_state>();
 	int code, color;
 
-	code = state->m_bgvideoram[tile_index];
-	color = state->m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	code = m_bgvideoram[tile_index];
+	color = m_bgvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code + ((color & 0x80) << 1),
-			(color & 0x1f) + (0x20 * state->m_palette_bank),
+			(color & 0x1f) + (0x20 * m_palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
@@ -116,8 +114,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( vulgus )
 {
 	vulgus_state *state = machine.driver_data<vulgus_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_COLS,16,16,32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vulgus_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vulgus_state::get_bg_tile_info),state),TILEMAP_SCAN_COLS,16,16,32,32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 47);
 }

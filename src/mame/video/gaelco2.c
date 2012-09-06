@@ -101,24 +101,22 @@ Multi monitor notes:
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info_gaelco2_screen0 )
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0)
 {
-	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	int data = state->m_videoram[(((state->m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = state->m_videoram[(((state->m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
+	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
-static TILE_GET_INFO( get_tile_info_gaelco2_screen1 )
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
 {
-	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	int data = state->m_videoram[(((state->m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = state->m_videoram[(((state->m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
+	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -144,24 +142,22 @@ static TILE_GET_INFO( get_tile_info_gaelco2_screen1 )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info_gaelco2_screen0_dual )
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0_dual)
 {
-	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	int data = state->m_videoram[(((state->m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = state->m_videoram[(((state->m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
+	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
-static TILE_GET_INFO( get_tile_info_gaelco2_screen1_dual )
+TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
 {
-	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	int data = state->m_videoram[(((state->m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
-	int data2 = state->m_videoram[(((state->m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
+	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO(0, code, 0x40 + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, 0x40 + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -266,8 +262,8 @@ VIDEO_START( gaelco2 )
 	state->m_videoram = state->m_spriteram->live();
 
 	/* create tilemaps */
-	state->m_pant[0] = tilemap_create(machine, get_tile_info_gaelco2_screen0,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_pant[1] = tilemap_create(machine, get_tile_info_gaelco2_screen1,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1),state),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
 	state->m_pant[0]->set_transparent_pen(0);
@@ -287,8 +283,8 @@ VIDEO_START( gaelco2_dual )
 	state->m_videoram = state->m_spriteram->live();
 
 	/* create tilemaps */
-	state->m_pant[0] = tilemap_create(machine, get_tile_info_gaelco2_screen0_dual,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_pant[1] = tilemap_create(machine, get_tile_info_gaelco2_screen1_dual,TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen0_dual),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_pant[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaelco2_state::get_tile_info_gaelco2_screen1_dual),state),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	/* set tilemap properties */
 	state->m_pant[0]->set_transparent_pen(0);

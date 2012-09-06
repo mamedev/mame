@@ -20,43 +20,39 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_alpha_tile_info )
+TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	UINT16 data = state->m_alpha[tile_index];
+	UINT16 data = m_alpha[tile_index];
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO(2, code, color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
 }
 
 
-static TILE_GET_INFO( get_alpha2_tile_info )
+TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	UINT16 data = state->m_alpha2[tile_index];
+	UINT16 data = m_alpha2[tile_index];
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
-	SET_TILE_INFO(2, code, 0x80 | color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(2, code, 0x80 | color, (data >> 15) & 1);
 }
 
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	UINT16 data = state->m_playfield[tile_index];
+	UINT16 data = m_playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
 }
 
 
-static TILE_GET_INFO( get_playfield2_tile_info )
+TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
 {
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	UINT16 data = state->m_playfield2[tile_index];
+	UINT16 data = m_playfield2[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO(0, code, 0x80 | color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, 0x80 | color, (data >> 15) & 1);
 }
 
 
@@ -145,21 +141,21 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &mo0desc);
 	atarimo_set_slipram(0, &state->m_current_slip[0]);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,32);
+	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate the second screen if necessary */
 	if (screens == 2)
 	{
 		/* initialize the playfield */
-		state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,64);
+		state->m_playfield2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield2_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,64);
 		state->m_playfield2_tilemap->set_scrollx(0, 0);
 
 		/* initialize the motion objects */
@@ -167,7 +163,7 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 		atarimo_set_slipram(1, &state->m_current_slip[1]);
 
 		/* initialize the alphanumerics */
-		state->m_alpha2_tilemap = tilemap_create(machine, get_alpha2_tile_info, TILEMAP_SCAN_ROWS,  16,8, 64,32);
+		state->m_alpha2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha2_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,32);
 		state->m_alpha2_tilemap->set_scrollx(0, 0);
 		state->m_alpha2_tilemap->set_transparent_pen(0);
 	}

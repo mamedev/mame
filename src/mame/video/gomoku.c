@@ -54,15 +54,14 @@ PALETTE_INIT( gomoku )
 
 ******************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
 {
-	gomoku_state *state = machine.driver_data<gomoku_state>();
-	int code = (state->m_videoram[tile_index]);
-	int attr = (state->m_colorram[tile_index]);
+	int code = (m_videoram[tile_index]);
+	int attr = (m_colorram[tile_index]);
 	int color = (attr& 0x0f);
 	int flipyx = (attr & 0xc0) >> 6;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
@@ -115,7 +114,7 @@ VIDEO_START( gomoku )
 
 	machine.primary_screen->register_screen_bitmap(state->m_bg_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gomoku_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 

@@ -192,6 +192,12 @@ public:
 	DECLARE_DRIVER_INIT(ssf2tb);
 	DECLARE_DRIVER_INIT(pzloop2);
 	DECLARE_DRIVER_INIT(gigaman2);
+	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
+	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
+	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
+	TILE_GET_INFO_MEMBER(get_tile0_info);
+	TILE_GET_INFO_MEMBER(get_tile1_info);
+	TILE_GET_INFO_MEMBER(get_tile2_info);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ultratnk_fire_2_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_attract_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_explosion_w);
+	TILE_GET_INFO_MEMBER(ultratnk_tile_info);
 };
 
 

@@ -35,6 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gundealr_fg_scroll_w);
 	DECLARE_WRITE8_MEMBER(yamyam_fg_scroll_w);
 	DECLARE_WRITE8_MEMBER(gundealr_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(gundealr_scan);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

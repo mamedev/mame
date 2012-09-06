@@ -15,12 +15,11 @@ WRITE8_MEMBER(canyon_state::canyon_videoram_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(canyon_state::get_bg_tile_info)
 {
-	canyon_state *state = machine.driver_data<canyon_state>();
-	UINT8 code = state->m_videoram[tile_index];
+	UINT8 code = m_videoram[tile_index];
 
-	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 7, 0);
 }
 
 
@@ -28,7 +27,7 @@ VIDEO_START( canyon )
 {
 	canyon_state *state = machine.driver_data<canyon_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(canyon_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

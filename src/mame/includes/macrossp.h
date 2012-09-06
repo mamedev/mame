@@ -64,6 +64,10 @@ public:
 	DECLARE_WRITE32_MEMBER(macrossp_text_videoram_w);
 	DECLARE_DRIVER_INIT(quizmoon);
 	DECLARE_DRIVER_INIT(macrossp);
+	TILE_GET_INFO_MEMBER(get_macrossp_scra_tile_info);
+	TILE_GET_INFO_MEMBER(get_macrossp_scrb_tile_info);
+	TILE_GET_INFO_MEMBER(get_macrossp_scrc_tile_info);
+	TILE_GET_INFO_MEMBER(get_macrossp_text_tile_info);
 };
 
 /*----------- defined in video/macrossp.c -----------*/

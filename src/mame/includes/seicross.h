@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(seicross_colorram_w);
 	DECLARE_READ8_MEMBER(friskyt_portB_r);
 	DECLARE_WRITE8_MEMBER(friskyt_portB_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

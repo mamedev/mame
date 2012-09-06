@@ -5,14 +5,13 @@
 
 /* background tilemap stuff */
 
-static TILE_GET_INFO( get_pass_bg_tile_info )
+TILE_GET_INFO_MEMBER(pass_state::get_pass_bg_tile_info)
 {
-	pass_state *state = machine.driver_data<pass_state>();
 	int tileno, fx;
 
-	tileno = state->m_bg_videoram[tile_index] & 0x1fff;
-	fx = (state->m_bg_videoram[tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1, tileno, 0, TILE_FLIPYX(fx));
+	tileno = m_bg_videoram[tile_index] & 0x1fff;
+	fx = (m_bg_videoram[tile_index] & 0xc000) >> 14;
+	SET_TILE_INFO_MEMBER(1, tileno, 0, TILE_FLIPYX(fx));
 
 }
 
@@ -25,15 +24,14 @@ WRITE16_MEMBER(pass_state::pass_bg_videoram_w)
 
 /* foreground 'sprites' tilemap stuff */
 
-static TILE_GET_INFO( get_pass_fg_tile_info )
+TILE_GET_INFO_MEMBER(pass_state::get_pass_fg_tile_info)
 {
-	pass_state *state = machine.driver_data<pass_state>();
 	int tileno, flip;
 
-	tileno = state->m_fg_videoram[tile_index] & 0x3fff;
-	flip = (state->m_fg_videoram[tile_index] & 0xc000) >>14;
+	tileno = m_fg_videoram[tile_index] & 0x3fff;
+	flip = (m_fg_videoram[tile_index] & 0xc000) >>14;
 
-	SET_TILE_INFO(0, tileno, 0, TILE_FLIPYX(flip));
+	SET_TILE_INFO_MEMBER(0, tileno, 0, TILE_FLIPYX(flip));
 
 }
 
@@ -49,8 +47,8 @@ VIDEO_START( pass )
 {
 	pass_state *state = machine.driver_data<pass_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_pass_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_pass_fg_tile_info, TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pass_state::get_pass_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,  64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pass_state::get_pass_fg_tile_info),state), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
 
 	state->m_fg_tilemap->set_transparent_pen(255);
 }

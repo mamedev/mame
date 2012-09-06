@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sidepckt_flipscreen_w);
 	DECLARE_DRIVER_INIT(sidepckt);
 	DECLARE_DRIVER_INIT(sidepctj);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

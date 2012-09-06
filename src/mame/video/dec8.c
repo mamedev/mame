@@ -280,14 +280,13 @@ SCREEN_UPDATE_IND16( cobracom )
 /******************************************************************************/
 
 
-static TILE_GET_INFO( get_cobracom_fix_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
+	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xe000) >> 13;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile & 0xfff,
 			color,
@@ -297,7 +296,7 @@ static TILE_GET_INFO( get_cobracom_fix_tile_info )
 VIDEO_START( cobracom )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_cobracom_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 
@@ -318,14 +317,13 @@ SCREEN_UPDATE_IND16( ghostb )
 	return 0;
 }
 
-static TILE_GET_INFO( get_ghostb_fix_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
+	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc00) >> 10;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile & 0x3ff,
 			color,
@@ -335,7 +333,7 @@ static TILE_GET_INFO( get_ghostb_fix_tile_info )
 VIDEO_START( ghostb )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_ghostb_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fix_tilemap->set_transparent_pen(0);
 
 	state->m_game_uses_priority = 0;
@@ -357,14 +355,13 @@ SCREEN_UPDATE_IND16( oscar )
 	return 0;
 }
 
-static TILE_GET_INFO( get_oscar_fix_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
+	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xf000) >> 14;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile&0xfff,
 			color,
@@ -374,7 +371,7 @@ static TILE_GET_INFO( get_oscar_fix_tile_info )
 VIDEO_START( oscar )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_oscar_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 
@@ -412,39 +409,37 @@ SCREEN_UPDATE_IND16( shackled )
 	return 0;
 }
 
-static TILEMAP_MAPPER( lastmisn_scan_rows )
+TILEMAP_MAPPER_MEMBER(dec8_state::lastmisn_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x0f) + ((row & 0x0f) << 4)) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static TILE_GET_INFO( get_lastmisn_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index * 2;
-	int tile = state->m_bg_data[offs + 1] + (state->m_bg_data[offs] << 8);
+	int tile = m_bg_data[offs + 1] + (m_bg_data[offs] << 8);
 	int color = tile >> 12;
 
-	if (color > 7 && state->m_game_uses_priority)
+	if (color > 7 && m_game_uses_priority)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile & 0xfff,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_lastmisn_fix_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
+	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc000) >> 14;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile&0xfff,
 			color,
@@ -454,8 +449,8 @@ static TILE_GET_INFO( get_lastmisn_fix_tile_info )
 VIDEO_START( lastmisn )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
-	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),state), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),state), 16, 16, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_game_uses_priority = 0;
@@ -464,8 +459,8 @@ VIDEO_START( lastmisn )
 VIDEO_START( shackled )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
-	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),state), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),state), 16, 16, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transmask(0, 0x000f, 0xfff0); /* Bottom 12 pens */
@@ -487,10 +482,9 @@ SCREEN_UPDATE_IND16( srdarwin )
 	return 0;
 }
 
-static TILE_GET_INFO( get_srdarwin_fix_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	int tile = state->m_videoram[tile_index];
+	int tile = m_videoram[tile_index];
 	int color = 0; /* ? */
 
 	if (color > 1)
@@ -498,7 +492,7 @@ static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -506,17 +500,16 @@ static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 }
 
 //AT: improved priority and fixed stage 4+ crashes caused by bank overflow
-static TILE_GET_INFO( get_srdarwin_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
-	int tile = state->m_bg_data[2 * tile_index + 1] + (state->m_bg_data[2 * tile_index] << 8);
+	int tile = m_bg_data[2 * tile_index + 1] + (m_bg_data[2 * tile_index] << 8);
 	int color = tile >> 12 & 3;
 	int bank;
 
 	tile = tile & 0x3ff;
 	bank = (tile / 0x100) + 2;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			bank,
 			tile,
 			color,
@@ -527,8 +520,8 @@ static TILE_GET_INFO( get_srdarwin_tile_info )
 VIDEO_START( srdarwin )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_srdarwin_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
-	state->m_fix_tilemap = tilemap_create(machine, get_srdarwin_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); //* draw as background only
@@ -566,33 +559,31 @@ SCREEN_UPDATE_IND16( garyoret )
 	return 0;
 }
 
-static TILE_GET_INFO( get_gondo_fix_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_gondo_fix_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index * 2;
-	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
+	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0x7000) >> 12;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile&0xfff,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_gondo_tile_info )
+TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 {
-	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index * 2;
-	int tile = state->m_bg_data[offs + 1] + (state->m_bg_data[offs] << 8);
+	int tile = m_bg_data[offs + 1] + (m_bg_data[offs] << 8);
 	int color = tile>> 12;
 
-	if (color > 7 && state->m_game_uses_priority)
+	if (color > 7 && m_game_uses_priority)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile&0xfff,
 			color,
@@ -602,8 +593,8 @@ static TILE_GET_INFO( get_gondo_tile_info )
 VIDEO_START( gondo )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transmask(0, 0x00ff, 0xff00); /* Bottom 8 pens */
@@ -613,8 +604,8 @@ VIDEO_START( gondo )
 VIDEO_START( garyoret )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 	state->m_game_uses_priority = 1;

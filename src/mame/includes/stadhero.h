@@ -13,6 +13,7 @@ public:
 	DECLARE_READ16_MEMBER(stadhero_control_r);
 	DECLARE_WRITE16_MEMBER(stadhero_control_w);
 	DECLARE_WRITE16_MEMBER(stadhero_pf1_data_w);
+	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 };
 
 

@@ -117,6 +117,9 @@ public:
 	DECLARE_DRIVER_INIT(perfrman);
 	DECLARE_DRIVER_INIT(gtstarb2);
 	DECLARE_DRIVER_INIT(tigerh);
+	TILE_GET_INFO_MEMBER(get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
+	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 };
 
 

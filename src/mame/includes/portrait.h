@@ -18,6 +18,8 @@ public:
 	DECLARE_WRITE8_MEMBER(portrait_negative_scroll_w);
 	DECLARE_WRITE8_MEMBER(portrait_bgvideo_write);
 	DECLARE_WRITE8_MEMBER(portrait_fgvideo_write);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

@@ -33,6 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(canyon_options_r);
 	DECLARE_WRITE8_MEMBER(canyon_led_w);
 	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

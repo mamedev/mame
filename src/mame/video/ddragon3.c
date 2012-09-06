@@ -54,34 +54,32 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_fg_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
 {
-	ddragon3_state *state = machine.driver_data<ddragon3_state>();
-	UINT16 attr = state->m_bg_videoram[tile_index];
-	int code = (attr & 0x0fff) | ((state->m_bg_tilebase & 0x01) << 12);
+	UINT16 attr = m_bg_videoram[tile_index];
+	int code = (attr & 0x0fff) | ((m_bg_tilebase & 0x01) << 12);
 	int color = ((attr & 0xf000) >> 12) + 16;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
 {
-	ddragon3_state *state = machine.driver_data<ddragon3_state>();
 	int offs = tile_index * 2;
-	UINT16 attr = state->m_fg_videoram[offs];
-	int code = state->m_fg_videoram[offs + 1] & 0x1fff;
+	UINT16 attr = m_fg_videoram[offs];
+	int code = m_fg_videoram[offs + 1] & 0x1fff;
 	int color = attr & 0xf;
 	int flags = (attr & 0x40) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( ddragon3 )
 {
 	ddragon3_state *state = machine.driver_data<ddragon3_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddragon3_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddragon3_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

@@ -127,43 +127,42 @@ WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = machine.root_device().memregion("gfx5")->base();
+	UINT8 *tilerom = machine().root_device().memregion("gfx5")->base();
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
 	int color = tilerom[tile_index + (8 * 8)];
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(exedexes_state::get_fg_tile_info)
 {
-	int code = machine.root_device().memregion("gfx5")->base()[tile_index];
+	int code = machine().root_device().memregion("gfx5")->base()[tile_index];
 
-	SET_TILE_INFO(2, code, 0, 0);
+	SET_TILE_INFO_MEMBER(2, code, 0, 0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
 {
-	exedexes_state *state = machine.driver_data<exedexes_state>();
-	int code = state->m_videoram[tile_index] + 2 * (state->m_colorram[tile_index] & 0x80);
-	int color = state->m_colorram[tile_index] & 0x3f;
+	int code = m_videoram[tile_index] + 2 * (m_colorram[tile_index] & 0x80);
+	int color = m_colorram[tile_index] & 0x3f;
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILEMAP_MAPPER( exedexes_bg_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_bg_tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col * 32 & 0xe0) >> 5) + ((row * 32 & 0xe0) >> 2) + ((col * 32 & 0x3f00) >> 1) + 0x4000;
 }
 
-static TILEMAP_MAPPER( exedexes_fg_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_fg_tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col * 16 & 0xf0) >> 4) + (row * 16 & 0xf0) + (col * 16 & 0x700) + ((row * 16 & 0x700) << 3);
@@ -173,9 +172,9 @@ VIDEO_START( exedexes )
 {
 	exedexes_state *state = machine.driver_data<exedexes_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, exedexes_bg_tilemap_scan, 32, 32, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, exedexes_fg_tilemap_scan, 16, 16, 128, 128);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_bg_tilemap_scan),state), 32, 32, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_fg_tilemap_scan),state), 16, 16, 128, 128);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0xcf);

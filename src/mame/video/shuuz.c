@@ -16,14 +16,13 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(shuuz_state::get_playfield_tile_info)
 {
-	shuuz_state *state = machine.driver_data<shuuz_state>();
-	UINT16 data1 = state->m_playfield[tile_index];
-	UINT16 data2 = state->m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = m_playfield[tile_index];
+	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x3fff;
 	int color = data2 & 0x0f;
-	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 }
 
 
@@ -75,7 +74,7 @@ VIDEO_START( shuuz )
 	shuuz_state *state = machine.driver_data<shuuz_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shuuz_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);

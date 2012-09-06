@@ -73,6 +73,10 @@ public:
 	DECLARE_DRIVER_INIT(mastninj);
 	DECLARE_DRIVER_INIT(shadoww);
 	DECLARE_DRIVER_INIT(wildfang);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 

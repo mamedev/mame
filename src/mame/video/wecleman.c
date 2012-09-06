@@ -417,11 +417,10 @@ static void sprite_draw(running_machine &machine, _BitmapClass &bitmap, const re
                 [ Frontmost (text) layer + video registers ]
 ------------------------------------------------------------------------*/
 
-static TILE_GET_INFO( wecleman_get_txt_tile_info )
+TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_txt_tile_info)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
-	int code = state->m_txtram[tile_index];
-	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	int code = m_txtram[tile_index];
+	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
@@ -464,27 +463,25 @@ WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
                             [ Background ]
 ------------------------------------------------------------------------*/
 
-static TILE_GET_INFO( wecleman_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_bg_tile_info)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
-	int page = state->m_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
-	int code = state->m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
+	int page = m_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
+	int code = m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
-	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
                             [ Foreground ]
 ------------------------------------------------------------------------*/
 
-static TILE_GET_INFO( wecleman_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_fg_tile_info)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
-	int page = state->m_fgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
-	int code = state->m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
+	int page = m_fgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
+	int code = m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
 	if (!code || code==0xffff) code = 0x20;
-	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -933,19 +930,19 @@ VIDEO_START( wecleman )
 
 	state->m_sprite_list = auto_alloc_array_clear(machine, struct sprite, NUM_SPRITES);
 
-	state->m_bg_tilemap = tilemap_create(machine, wecleman_get_bg_tile_info,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),state),
 								TILEMAP_SCAN_ROWS,
 									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
-	state->m_fg_tilemap = tilemap_create(machine, wecleman_get_fg_tile_info,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_fg_tile_info),state),
 								TILEMAP_SCAN_ROWS,
 
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
-	state->m_txt_tilemap = tilemap_create(machine, wecleman_get_txt_tile_info,
+	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),state),
 								 TILEMAP_SCAN_ROWS,
 
 								 8,8,

@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

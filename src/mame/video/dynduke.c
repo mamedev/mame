@@ -33,46 +33,43 @@ WRITE16_MEMBER(dynduke_state::dynduke_text_w)
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 {
-	dynduke_state *state = machine.driver_data<dynduke_state>();
-	int tile=state->m_back_data[tile_index];
+	int tile=m_back_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			tile+state->m_back_bankbase,
+			tile+m_back_bankbase,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 {
-	dynduke_state *state = machine.driver_data<dynduke_state>();
-	int tile=state->m_fore_data[tile_index];
+	int tile=m_fore_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
-			tile+state->m_fore_bankbase,
+			tile+m_fore_bankbase,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 {
-	dynduke_state *state = machine.driver_data<dynduke_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	int tile=videoram[tile_index];
 	int color=(tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -82,9 +79,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( dynduke )
 {
 	dynduke_state *state = machine.driver_data<dynduke_state>();
-	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_COLS,      16,16,32,32);
-	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_COLS,16,16,32,32);
-	state->m_tx_layer = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynduke_state::get_bg_tile_info),state),TILEMAP_SCAN_COLS,      16,16,32,32);
+	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynduke_state::get_fg_tile_info),state),TILEMAP_SCAN_COLS,16,16,32,32);
+	state->m_tx_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynduke_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_fg_layer->set_transparent_pen(15);
 	state->m_tx_layer->set_transparent_pen(15);

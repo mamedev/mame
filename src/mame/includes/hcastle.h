@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE8_MEMBER(hcastle_pf1_control_w);
 	DECLARE_WRITE8_MEMBER(hcastle_pf2_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

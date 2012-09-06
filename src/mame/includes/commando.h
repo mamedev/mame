@@ -41,6 +41,8 @@ public:
 	DECLARE_WRITE8_MEMBER(commando_c804_w);
 	DECLARE_DRIVER_INIT(spaceinv);
 	DECLARE_DRIVER_INIT(commando);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

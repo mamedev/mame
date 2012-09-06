@@ -132,25 +132,23 @@ WRITE8_MEMBER(bankp_state::bankp_out_w)
 	/* bits 6-7 unknown */
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
 {
-	bankp_state *state = machine.driver_data<bankp_state>();
-	int code = state->m_videoram2[tile_index] + 256 * (state->m_colorram2[tile_index] & 0x07);
-	int color = state->m_colorram2[tile_index] >> 4;
-	int flags = (state->m_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
+	int code = m_videoram2[tile_index] + 256 * (m_colorram2[tile_index] & 0x07);
+	int color = m_colorram2[tile_index] >> 4;
+	int flags = (m_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 	tileinfo.group = color;
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
 {
-	bankp_state *state = machine.driver_data<bankp_state>();
-	int code = state->m_videoram[tile_index] + 256 * ((state->m_colorram[tile_index] & 3) >> 0);
-	int color = state->m_colorram[tile_index] >> 3;
-	int flags = (state->m_colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
+	int code = m_videoram[tile_index] + 256 * ((m_colorram[tile_index] & 3) >> 0);
+	int color = m_colorram[tile_index] >> 3;
+	int flags = (m_colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 	tileinfo.group = color;
 }
 
@@ -158,8 +156,8 @@ VIDEO_START( bankp )
 {
 	bankp_state *state = machine.driver_data<bankp_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bankp_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bankp_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0);

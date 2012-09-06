@@ -9,75 +9,69 @@
 #include "includes/ashnojoe.h"
 
 
-static TILE_GET_INFO( get_joe_tile_info )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram[tile_index];
+	int code = m_tileram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code & 0xfff,
 			((code >> 12) & 0x0f),
 			0);
 }
 
-static TILE_GET_INFO( get_joe_tile_info_2 )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_2)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram_2[tile_index * 2];
-	int attr = state->m_tileram_2[tile_index * 2 + 1];
+	int code = m_tileram_2[tile_index * 2];
+	int attr = m_tileram_2[tile_index * 2 + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x40,
 			0);
 }
 
-static TILE_GET_INFO( get_joe_tile_info_3 )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_3)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram_3[tile_index];
+	int code = m_tileram_3[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x10,
 			0);
 }
 
-static TILE_GET_INFO( get_joe_tile_info_4 )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_4)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram_4[tile_index];
+	int code = m_tileram_4[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x60,
 			0);
 }
 
-static TILE_GET_INFO( get_joe_tile_info_5 )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_5)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram_5[tile_index * 2];
-	int attr = state->m_tileram_5[tile_index * 2 + 1];
+	int code = m_tileram_5[tile_index * 2];
+	int attr = m_tileram_5[tile_index * 2 + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x20,
 			0);
 }
 
-static TILE_GET_INFO( get_joe_tile_info_6 )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_6)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram_6[tile_index * 2];
-	int attr = state->m_tileram_6[tile_index * 2 + 1];
+	int code = m_tileram_6[tile_index * 2];
+	int attr = m_tileram_6[tile_index * 2 + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
@@ -85,13 +79,12 @@ static TILE_GET_INFO( get_joe_tile_info_6 )
 }
 
 
-static TILE_GET_INFO( get_joe_tile_info_7 )
+TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_7)
 {
-	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
-	int code = state->m_tileram_7[tile_index * 2];
-	int attr = state->m_tileram_7[tile_index * 2 + 1];
+	int code = m_tileram_7[tile_index * 2];
+	int attr = m_tileram_7[tile_index * 2 + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
@@ -200,13 +193,13 @@ VIDEO_START( ashnojoe )
 {
 	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->m_joetilemap = tilemap_create(machine, get_joe_tile_info,  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_joetilemap2 = tilemap_create(machine, get_joe_tile_info_2, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_joetilemap3 = tilemap_create(machine, get_joe_tile_info_3, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_joetilemap4 = tilemap_create(machine, get_joe_tile_info_4, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_joetilemap5 = tilemap_create(machine, get_joe_tile_info_5, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_joetilemap6 = tilemap_create(machine, get_joe_tile_info_6, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_joetilemap7 = tilemap_create(machine, get_joe_tile_info_7, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info),state),  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_joetilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_2),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_3),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_joetilemap4 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_4),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_joetilemap5 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_5),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap6 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_6),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_joetilemap7 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_7),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_joetilemap->set_transparent_pen(15);
 	state->m_joetilemap2->set_transparent_pen(15);

@@ -135,11 +135,10 @@ SCREEN_UPDATE_IND16( karnov )
 
 /******************************************************************************/
 
-static TILE_GET_INFO( get_fix_tile_info )
+TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
-	int tile = state->m_videoram[tile_index];
-	SET_TILE_INFO(
+	int tile = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile&0xfff,
 			tile>>14,
@@ -166,7 +165,7 @@ VIDEO_START( karnov )
 
 	/* Allocate bitmap & tilemap */
 	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->m_bitmap_f));
 
@@ -179,7 +178,7 @@ VIDEO_START( wndrplnt )
 
 	/* Allocate bitmap & tilemap */
 	state->m_bitmap_f = auto_bitmap_ind16_alloc(machine, 512, 512);
-	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	state->save_item(NAME(*state->m_bitmap_f));
 

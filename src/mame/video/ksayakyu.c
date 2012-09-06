@@ -45,12 +45,12 @@ PALETTE_INIT( ksayakyu )
 	}
 }
 
-static TILE_GET_INFO( get_ksayakyu_tile_info )
+TILE_GET_INFO_MEMBER(ksayakyu_state::get_ksayakyu_tile_info)
 {
-	int code = machine.root_device().memregion("user1")->base()[tile_index];
-	int attr = machine.root_device().memregion("user1")->base()[tile_index + 0x2000];
+	int code = machine().root_device().memregion("user1")->base()[tile_index];
+	int attr = machine().root_device().memregion("user1")->base()[tile_index + 0x2000];
 	code += (attr & 3) << 8;
-	SET_TILE_INFO(1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 /*
@@ -58,17 +58,16 @@ xy-- ---- flip bits
 --cc cc-- color
 ---- --bb bank select
 */
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
 {
-	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	int code = state->m_videoram[tile_index * 2 + 1];
-	int attr = state->m_videoram[tile_index * 2];
+	int code = m_videoram[tile_index * 2 + 1];
+	int attr = m_videoram[tile_index * 2];
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 	int color = (attr & 0x3c) >> 2;
 
 	code |= (attr & 3) << 8;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 /*
@@ -117,8 +116,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 VIDEO_START(ksayakyu)
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	state->m_tilemap = tilemap_create(machine, get_ksayakyu_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
-	state->m_textmap = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
+	state->m_textmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_textmap->set_transparent_pen(0);
 }
 

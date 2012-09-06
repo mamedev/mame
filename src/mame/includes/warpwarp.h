@@ -36,6 +36,10 @@ public:
 	DECLARE_DRIVER_INIT(sos);
 	DECLARE_DRIVER_INIT(kaitei);
 	DECLARE_DRIVER_INIT(bombbee);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(geebee_get_tile_info);
+	TILE_GET_INFO_MEMBER(navarone_get_tile_info);
+	TILE_GET_INFO_MEMBER(warpwarp_get_tile_info);
 };
 
 

@@ -66,20 +66,19 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tankbatt_state::get_bg_tile_info)
 {
-	tankbatt_state *state = machine.driver_data<tankbatt_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 	int color = videoram[tile_index] | 0x01;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( tankbatt )
 {
 	tankbatt_state *state = machine.driver_data<tankbatt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

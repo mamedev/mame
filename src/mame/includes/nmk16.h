@@ -106,6 +106,15 @@ public:
 	DECLARE_DRIVER_INIT(grdnstrm);
 	DECLARE_DRIVER_INIT(spec2k);
 	DECLARE_DRIVER_INIT(bjtwin);
+	TILEMAP_MAPPER_MEMBER(afega_tilemap_scan_pages);
+	TILE_GET_INFO_MEMBER(macross_get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(macross_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(macross_get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(macross_get_bg3_tile_info);
+	TILE_GET_INFO_MEMBER(strahl_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(macross_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
 };
 
 

@@ -136,17 +136,16 @@ WRITE16_MEMBER(m92_state::m92_paletteram_w)
 
 /*****************************************************************************/
 
-static TILE_GET_INFO( get_pf_tile_info )
+TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 {
-	m92_state *state = machine.driver_data<m92_state>();
 	pf_layer_info *layer = (pf_layer_info *)param;
 	int tile, attrib;
 	tile_index = 2 * tile_index + layer->vram_base;
 
-	attrib = state->m_vram_data[tile_index + 1];
-	tile = state->m_vram_data[tile_index] + ((attrib & 0x8000) << 1);
+	attrib = m_vram_data[tile_index + 1];
+	tile = m_vram_data[tile_index] + ((attrib & 0x8000) << 1);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			attrib & 0x7f,
@@ -249,8 +248,8 @@ VIDEO_START( m92 )
 		pf_layer_info *layer = &state->m_pf_layer[laynum];
 
 		/* allocate two tilemaps per layer, one normal, one wide */
-		layer->tmap = tilemap_create(machine, get_pf_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,64);
-		layer->wide_tmap = tilemap_create(machine, get_pf_tile_info, TILEMAP_SCAN_ROWS,  8,8, 128,64);
+		layer->tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m92_state::get_pf_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,64);
+		layer->wide_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m92_state::get_pf_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 128,64);
 
 		/* set the user data for each one to point to the layer */
 		layer->tmap->set_user_data(&state->m_pf_layer[laynum]);

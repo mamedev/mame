@@ -104,21 +104,20 @@ WRITE8_MEMBER(rocnrope_state::rocnrope_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(rocnrope_state::get_bg_tile_info)
 {
-	rocnrope_state *state = machine.driver_data<rocnrope_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + 2 * (attr & 0x80);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 2 * (attr & 0x80);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 VIDEO_START( rocnrope )
 {
 	rocnrope_state *state = machine.driver_data<rocnrope_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rocnrope_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

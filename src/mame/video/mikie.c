@@ -121,18 +121,17 @@ WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
 {
-	mikie_state *state = machine.driver_data<mikie_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x20) << 3);
-	int color = (state->m_colorram[tile_index] & 0x0f) + 16 * state->m_palettebank;
-	int flags = ((state->m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
-	if (state->m_colorram[tile_index] & 0x10)
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x20) << 3);
+	int color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
+	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	if (m_colorram[tile_index] & 0x10)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 
 
 }
@@ -140,7 +139,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( mikie )
 {
 	mikie_state *state = machine.driver_data<mikie_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mikie_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)

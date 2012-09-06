@@ -20,6 +20,8 @@ public:
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
 	DECLARE_READ16_MEMBER(special_port1_r);
 	DECLARE_DRIVER_INIT(toobin);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

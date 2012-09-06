@@ -90,16 +90,15 @@ WRITE8_MEMBER(gotya_state::gotya_video_control_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gotya_state::get_bg_tile_info)
 {
-	gotya_state *state = machine.driver_data<gotya_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index] & 0x0f;
+	int code = m_videoram[tile_index];
+	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
+TILEMAP_MAPPER_MEMBER(gotya_state::tilemap_scan_rows_thehand)
 {
 	/* logical (col,row) -> memory offset */
 	row = 31 - row;
@@ -110,7 +109,7 @@ static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
 VIDEO_START( gotya )
 {
 	gotya_state *state = machine.driver_data<gotya_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_thehand, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gotya_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(gotya_state::tilemap_scan_rows_thehand),state), 8, 8, 64, 32);
 }
 
 static void draw_status_row( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int col )

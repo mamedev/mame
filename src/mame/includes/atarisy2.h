@@ -73,6 +73,8 @@ public:
 	DECLARE_DRIVER_INIT(csprint);
 	DECLARE_DRIVER_INIT(paperboy);
 	DECLARE_DRIVER_INIT(720);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

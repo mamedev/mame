@@ -113,14 +113,13 @@ PALETTE_INIT( zaccaria )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 {
-	zaccaria_state *state = machine.driver_data<zaccaria_state>();
-	UINT8 attr = state->m_videoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	UINT8 attr = m_videoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index] + ((attr & 0x03) << 8),
-			((attr & 0x0c) >> 2) + ((state->m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
+			m_videoram[tile_index] + ((attr & 0x03) << 8),
+			((attr & 0x0c) >> 2) + ((m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
 			0);
 }
 
@@ -135,7 +134,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( zaccaria )
 {
 	zaccaria_state *state = machine.driver_data<zaccaria_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(zaccaria_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 }

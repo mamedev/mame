@@ -19,6 +19,8 @@ public:
 	DECLARE_WRITE8_MEMBER(news_fgram_w);
 	DECLARE_WRITE8_MEMBER(news_bgram_w);
 	DECLARE_WRITE8_MEMBER(news_bgpic_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

@@ -29,6 +29,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sderby_md_videoram_w);
 	DECLARE_WRITE16_MEMBER(sderby_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(sderby_scroll_w);
+	TILE_GET_INFO_MEMBER(get_sderby_tile_info);
+	TILE_GET_INFO_MEMBER(get_sderby_md_tile_info);
+	TILE_GET_INFO_MEMBER(get_sderby_fg_tile_info);
 };
 
 

@@ -344,61 +344,57 @@ WRITE8_MEMBER(cclimber_state::cannonb_flip_screen_w)
 }
 
 
-static TILE_GET_INFO( cclimber_get_pf_tile_info )
+TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int code, color;
 
-	int flags = TILE_FLIPYX(state->m_colorram[tile_index] >> 6);
+	int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
 
 	/* vertical flipping flips two adjacent characters */
 	if (flags & 0x02)
 		tile_index = tile_index ^ 0x20;
 
-	code = ((state->m_colorram[tile_index] & 0x10) << 5) |
-		   ((state->m_colorram[tile_index] & 0x20) << 3) |
-			 state->m_videoram[tile_index];
+	code = ((m_colorram[tile_index] & 0x10) << 5) |
+		   ((m_colorram[tile_index] & 0x20) << 3) |
+			 m_videoram[tile_index];
 
-	color = state->m_colorram[tile_index] & 0x0f;
+	color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
-static TILE_GET_INFO( swimmer_get_pf_tile_info )
+TILE_GET_INFO_MEMBER(cclimber_state::swimmer_get_pf_tile_info)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int code, color;
 
-	int flags = TILE_FLIPYX(state->m_colorram[tile_index] >> 6);
+	int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
 
 	/* vertical flipping flips two adjacent characters */
 	if (flags & 0x02)
 		tile_index = tile_index ^ 0x20;
 
-	code = ((state->m_colorram[tile_index] & 0x10) << 4) | state->m_videoram[tile_index];
-	color = ((*state->m_swimmer_palettebank & 0x01) << 4) | (state->m_colorram[tile_index] & 0x0f);
+	code = ((m_colorram[tile_index] & 0x10) << 4) | m_videoram[tile_index];
+	color = ((*m_swimmer_palettebank & 0x01) << 4) | (m_colorram[tile_index] & 0x0f);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
-static TILE_GET_INFO( toprollr_get_pf_tile_info )
+TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_pf_tile_info)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int code, attr, color;
 
-	attr = tile_index & 0x10 ? state->m_colorram[tile_index & ~0x20] : state->m_colorram[tile_index];
-	code = ((attr & 0x30) << 4) | state->m_videoram[tile_index];
+	attr = tile_index & 0x10 ? m_colorram[tile_index & ~0x20] : m_colorram[tile_index];
+	code = ((attr & 0x30) << 4) | m_videoram[tile_index];
 	color = attr & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
-static TILE_GET_INFO( cclimber_get_bs_tile_info )
+TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int code, color;
 
 	/* only the lower right is visible */
@@ -407,16 +403,15 @@ static TILE_GET_INFO( cclimber_get_bs_tile_info )
 	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
 
-	code = ((state->m_bigsprite_control[1] & 0x08) << 5) | state->m_bigsprite_videoram[tile_index];
-	color = state->m_bigsprite_control[1] & 0x07;
+	code = ((m_bigsprite_control[1] & 0x08) << 5) | m_bigsprite_videoram[tile_index];
+	color = m_bigsprite_control[1] & 0x07;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
-static TILE_GET_INFO( toprollr_get_bs_tile_info )
+TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_bs_tile_info)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
 	int code, color;
 
 	/* only the lower right is visible */
@@ -425,31 +420,30 @@ static TILE_GET_INFO( toprollr_get_bs_tile_info )
 	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
 	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
 
-	code = ((state->m_bigsprite_control[1] & 0x18) << 5) | state->m_bigsprite_videoram[tile_index];
-	color = state->m_bigsprite_control[1] & 0x07;
+	code = ((m_bigsprite_control[1] & 0x18) << 5) | m_bigsprite_videoram[tile_index];
+	color = m_bigsprite_control[1] & 0x07;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
-static TILE_GET_INFO( toproller_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(cclimber_state::toproller_get_bg_tile_info)
 {
-	cclimber_state *state = machine.driver_data<cclimber_state>();
-	int code = ((state->m_toprollr_bg_coloram[tile_index] & 0x40) << 2) | state->m_toprollr_bg_videoram[tile_index];
-	int color = state->m_toprollr_bg_coloram[tile_index] & 0x0f;
+	int code = ((m_toprollr_bg_coloram[tile_index] & 0x40) << 2) | m_toprollr_bg_videoram[tile_index];
+	int color = m_toprollr_bg_coloram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(3, code, color, TILE_FLIPX);
+	SET_TILE_INFO_MEMBER(3, code, color, TILE_FLIPX);
 }
 
 
 VIDEO_START( cclimber )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	state->m_pf_tilemap = tilemap_create(machine, cclimber_get_pf_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_pf_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_pf_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_pf_tilemap->set_transparent_pen(0);
 	state->m_pf_tilemap->set_scroll_cols(32);
 
-	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bs_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_bs_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bs_tilemap->set_scroll_cols(1);
 	state->m_bs_tilemap->set_scroll_rows(1);
 	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
@@ -460,11 +454,11 @@ VIDEO_START( cclimber )
 VIDEO_START( swimmer )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	state->m_pf_tilemap = tilemap_create(machine, swimmer_get_pf_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_pf_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::swimmer_get_pf_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_pf_tilemap->set_transparent_pen(0);
 	state->m_pf_tilemap->set_scroll_cols(32);
 
-	state->m_bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bs_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_bs_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bs_tilemap->set_scroll_cols(1);
 	state->m_bs_tilemap->set_scroll_rows(1);
 	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */
@@ -475,13 +469,13 @@ VIDEO_START( swimmer )
 VIDEO_START( toprollr )
 {
 	cclimber_state *state = machine.driver_data<cclimber_state>();
-	state->m_pf_tilemap = tilemap_create(machine, toprollr_get_pf_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_pf_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::toprollr_get_pf_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_pf_tilemap->set_transparent_pen(0);
 
-	state->m_toproller_bg_tilemap = tilemap_create(machine, toproller_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_toproller_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::toproller_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_toproller_bg_tilemap->set_scroll_rows(1);
 
-	state->m_bs_tilemap = tilemap_create(machine, toprollr_get_bs_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bs_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cclimber_state::toprollr_get_bs_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bs_tilemap->set_scroll_cols(1);
 	state->m_bs_tilemap->set_scroll_rows(1);
 	state->m_bs_tilemap->set_transmask(0, 0x01, 0);	/* pen 0 is transaprent */

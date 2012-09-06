@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kopunch_gfxbank_w);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 /*----------- defined in video/kopunch.c -----------*/

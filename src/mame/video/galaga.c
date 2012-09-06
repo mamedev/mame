@@ -391,7 +391,7 @@ PALETTE_INIT( galaga )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(galaga_state::tilemap_scan)
 {
 	int offs;
 
@@ -406,20 +406,19 @@ static TILEMAP_MAPPER( tilemap_scan )
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 {
 	/* the hardware has two character sets, one normal and one x-flipped. When
        screen is flipped, character y flip is done by the hardware inverting the
        timing signals, while x flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
-	galaga_state *state =  machine.driver_data<galaga_state>();
-    int color = state->m_videoram[tile_index + 0x400] & 0x3f;
-	SET_TILE_INFO(
+    int color = m_videoram[tile_index + 0x400] & 0x3f;
+	SET_TILE_INFO_MEMBER(
 			0,
-			(state->m_videoram[tile_index] & 0x7f) | (state->flip_screen() ? 0x80 : 0) | (state->m_galaga_gfxbank << 8),
+			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
 			color,
-			state->flip_screen() ? TILE_FLIPX : 0);
+			flip_screen() ? TILE_FLIPX : 0);
 	tileinfo.group = color;
 }
 
@@ -434,7 +433,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( galaga )
 {
 	galaga_state *state =  machine.driver_data<galaga_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),state),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),state),8,8,36,28);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x1f);
 
 	state->m_galaga_gfxbank = 0;

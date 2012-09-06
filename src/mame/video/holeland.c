@@ -16,34 +16,32 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( holeland_get_tile_info )
+TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 {
-	holeland_state *state = machine.driver_data<holeland_state>();
-	int attr = state->m_colorram[tile_index];
-	int tile_number = state->m_videoram[tile_index] | ((attr & 0x03) << 8);
+	int attr = m_colorram[tile_index];
+	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-/*if (machine.input().code_pressed(KEYCODE_Q) && (attr & 0x10)) tile_number = rand(); */
-/*if (machine.input().code_pressed(KEYCODE_W) && (attr & 0x20)) tile_number = rand(); */
-/*if (machine.input().code_pressed(KEYCODE_E) && (attr & 0x40)) tile_number = rand(); */
-/*if (machine.input().code_pressed(KEYCODE_R) && (attr & 0x80)) tile_number = rand(); */
-	SET_TILE_INFO(
+/*if (machine().input().code_pressed(KEYCODE_Q) && (attr & 0x10)) tile_number = rand(); */
+/*if (machine().input().code_pressed(KEYCODE_W) && (attr & 0x20)) tile_number = rand(); */
+/*if (machine().input().code_pressed(KEYCODE_E) && (attr & 0x40)) tile_number = rand(); */
+/*if (machine().input().code_pressed(KEYCODE_R) && (attr & 0x80)) tile_number = rand(); */
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
-			state->m_palette_offset + ((attr >> 4) & 0x0f),
+			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
 	tileinfo.group = (attr >> 4) & 1;
 }
 
-static TILE_GET_INFO( crzrally_get_tile_info )
+TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 {
-	holeland_state *state = machine.driver_data<holeland_state>();
-	int attr = state->m_colorram[tile_index];
-	int tile_number = state->m_videoram[tile_index] | ((attr & 0x03) << 8);
+	int attr = m_colorram[tile_index];
+	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
-			state->m_palette_offset + ((attr >> 4) & 0x0f),
+			m_palette_offset + ((attr >> 4) & 0x0f),
 			TILE_FLIPYX((attr >> 2) & 0x03));
 	tileinfo.group = (attr >> 4) & 1;
 }
@@ -57,7 +55,7 @@ static TILE_GET_INFO( crzrally_get_tile_info )
 VIDEO_START( holeland )
 {
 	holeland_state *state = machine.driver_data<holeland_state>();
-	state->m_bg_tilemap = tilemap_create(machine, holeland_get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	state->m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
@@ -66,7 +64,7 @@ VIDEO_START( holeland )
 VIDEO_START( crzrally )
 {
 	holeland_state *state = machine.driver_data<holeland_state>();
-	state->m_bg_tilemap = tilemap_create(machine, crzrally_get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 }
 
 WRITE8_MEMBER(holeland_state::holeland_videoram_w)

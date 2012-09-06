@@ -145,30 +145,28 @@ PALETTE_INIT( polepos )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 {
-	polepos_state *state = machine.driver_data<polepos_state>();
-	UINT16 word = state->m_view16_memory[tile_index];
+	UINT16 word = m_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( tx_get_tile_info )
+TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 {
-	polepos_state *state = machine.driver_data<polepos_state>();
-	UINT16 word = state->m_alpha16_memory[tile_index];
+	UINT16 word = m_alpha16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
 
 	/* I assume the purpose of CHACL is to allow the Z80 to control
        the display (therefore using only the bottom 8 bits of tilemap RAM)
        in case the Z8002 is not working. */
-	if (state->m_chacl == 0)
+	if (m_chacl == 0)
 	{
 		code &= 0xff;
 		color = 0;
@@ -177,7 +175,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 	/* 128V input to the palette PROM */
 	if (tile_index >= 32*16) color |= 0x40;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
@@ -196,8 +194,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 VIDEO_START( polepos )
 {
 	polepos_state *state = machine.driver_data<polepos_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_COLS,8,8,64,16);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(polepos_state::bg_get_tile_info),state),TILEMAP_SCAN_COLS,8,8,64,16);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(polepos_state::tx_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 0x2f);
 }

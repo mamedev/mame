@@ -37,6 +37,13 @@ public:
 	DECLARE_DRIVER_INIT(legiongfx);
 	DECLARE_DRIVER_INIT(cupsoc);
 	DECLARE_DRIVER_INIT(denjinmk);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info_denji);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info_cupsoc);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info_denji);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

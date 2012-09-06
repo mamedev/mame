@@ -93,6 +93,9 @@ public:
 	DECLARE_DRIVER_INIT(005);
 	DECLARE_DRIVER_INIT(monster2);
 	DECLARE_DRIVER_INIT(astrob);
+	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
+	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 };
 
 

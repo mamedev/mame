@@ -15,6 +15,8 @@ public:
 	DECLARE_WRITE8_MEMBER(speedbal_coincounter_w);
 	DECLARE_WRITE8_MEMBER(speedbal_foreground_videoram_w);
 	DECLARE_WRITE8_MEMBER(speedbal_background_videoram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 };
 
 

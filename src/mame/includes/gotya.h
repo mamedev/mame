@@ -31,6 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gotya_colorram_w);
 	DECLARE_WRITE8_MEMBER(gotya_video_control_w);
 	DECLARE_WRITE8_MEMBER(gotya_soundlatch_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_thehand);
 };
 
 

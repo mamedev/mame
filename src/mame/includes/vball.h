@@ -28,6 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vb_videoram_w);
 	DECLARE_READ8_MEMBER(vb_attrib_r);
 	DECLARE_WRITE8_MEMBER(vb_attrib_w);
+	TILEMAP_MAPPER_MEMBER(background_scan);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

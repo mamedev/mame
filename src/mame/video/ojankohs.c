@@ -153,30 +153,28 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( ojankohs_get_tile_info )
+TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
 {
-	ojankohs_state *state = machine.driver_data<ojankohs_state>();
-	int tile = state->m_videoram[tile_index] | ((state->m_colorram[tile_index] & 0x0f) << 8);
-	int color = (state->m_colorram[tile_index] & 0xe0) >> 5;
+	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
+	int color = (m_colorram[tile_index] & 0xe0) >> 5;
 
-	if (state->m_colorram[tile_index] & 0x10)
+	if (m_colorram[tile_index] & 0x10)
 	{
-		tile |= (state->m_gfxreg & 0x07) << 12;
-		color |= (state->m_gfxreg & 0xe0) >> 2;
+		tile |= (m_gfxreg & 0x07) << 12;
+		color |= (m_gfxreg & 0xe0) >> 2;
 	}
 
-	SET_TILE_INFO(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-static TILE_GET_INFO( ojankoy_get_tile_info )
+TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 {
-	ojankohs_state *state = machine.driver_data<ojankohs_state>();
-	int tile = state->m_videoram[tile_index] | (state->m_videoram[tile_index + 0x1000] << 8);
-	int color = state->m_colorram[tile_index] & 0x3f;
-	int flipx = ((state->m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
-	int flipy = ((state->m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
+	int tile = m_videoram[tile_index] | (m_videoram[tile_index + 0x1000] << 8);
+	int color = m_colorram[tile_index] & 0x3f;
+	int flipx = ((m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
+	int flipy = ((m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
 
-	SET_TILE_INFO(0, tile, color, (flipx | flipy));
+	SET_TILE_INFO_MEMBER(0, tile, color, (flipx | flipy));
 }
 
 
@@ -263,7 +261,7 @@ VIDEO_START( ojankohs )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_tilemap = tilemap_create(machine, ojankohs_get_tile_info, TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ojankohs_state::ojankohs_get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 //  state->m_colorram = auto_alloc_array(machine, UINT8, 0x1000);
 //  state->m_paletteram = auto_alloc_array(machine, UINT8, 0x800);
@@ -273,7 +271,7 @@ VIDEO_START( ojankoy )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_tilemap = tilemap_create(machine, ojankoy_get_tile_info, TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  state->m_videoram = auto_alloc_array(machine, UINT8, 0x2000);
 //  state->m_colorram = auto_alloc_array(machine, UINT8, 0x1000);
 }

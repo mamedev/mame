@@ -89,33 +89,31 @@ PALETTE_INIT( 1942 )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 {
-	_1942_state *state = machine.driver_data<_1942_state>();
 	int code, color;
 
-	code = state->m_fg_videoram[tile_index];
-	color = state->m_fg_videoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	code = m_fg_videoram[tile_index];
+	color = m_fg_videoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
 {
-	_1942_state *state = machine.driver_data<_1942_state>();
 	int code, color;
 
 	tile_index = (tile_index & 0x0f) | ((tile_index & 0x01f0) << 1);
 
-	code = state->m_bg_videoram[tile_index];
-	color = state->m_bg_videoram[tile_index + 0x10];
-	SET_TILE_INFO(
+	code = m_bg_videoram[tile_index];
+	color = m_bg_videoram[tile_index + 0x10];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code + ((color & 0x80) << 1),
-			(color & 0x1f) + (0x20 * state->m_palette_bank),
+			(color & 0x1f) + (0x20 * m_palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
@@ -128,8 +126,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( 1942 )
 {
 	_1942_state *state = machine.driver_data<_1942_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1942_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

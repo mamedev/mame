@@ -35,6 +35,7 @@ public:
 	DECLARE_READ8_MEMBER(popeye_portA_r);
 	DECLARE_DRIVER_INIT(skyskipr);
 	DECLARE_DRIVER_INIT(popeye);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

@@ -67,6 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(kuniokun);
 	DECLARE_DRIVER_INIT(kuniokunb);
 	DECLARE_DRIVER_INIT(renegade);
+	TILE_GET_INFO_MEMBER(get_bg_tilemap_info);
+	TILE_GET_INFO_MEMBER(get_fg_tilemap_info);
 };
 
 

@@ -65,34 +65,31 @@ WRITE8_MEMBER(lkage_state::lkage_videoram_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(lkage_state::get_bg_tile_info)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	int code = state->m_videoram[tile_index + 0x800] + 256 * (state->m_bg_tile_bank ? 5 : 1);
-	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
+	int code = m_videoram[tile_index + 0x800] + 256 * (m_bg_tile_bank ? 5 : 1);
+	SET_TILE_INFO_MEMBER( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(lkage_state::get_fg_tile_info)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	int code = state->m_videoram[tile_index + 0x400] + 256 * (state->m_fg_tile_bank ? 1 : 0);
-	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
+	int code = m_videoram[tile_index + 0x400] + 256 * (m_fg_tile_bank ? 1 : 0);
+	SET_TILE_INFO_MEMBER( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(lkage_state::get_tx_tile_info)
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	int code = state->m_videoram[tile_index] + 256 * (state->m_tx_tile_bank ? 4 : 0);
-	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
+	int code = m_videoram[tile_index] + 256 * (m_tx_tile_bank ? 4 : 0);
+	SET_TILE_INFO_MEMBER( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 VIDEO_START( lkage )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lkage_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_transparent_pen(0);

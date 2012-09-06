@@ -12,30 +12,28 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 {
-	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	UINT8 attributes = state->m_bg_videoram[2*tile_index+1];
-	int tile_number = state->m_bg_videoram[2*tile_index];
+	UINT8 attributes = m_bg_videoram[2*tile_index+1];
+	int tile_number = m_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;	 /* legacy */
 	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			attributes & 0x1f,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
 {
-	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	int tile_number = state->m_videoram[tile_index];
-	if (state->m_textbank1 & 0x01) tile_number += 256; /* legacy */
-	if (state->m_textbank2 & 0x01) tile_number += 512; /* Mission 660 add-on */
-	SET_TILE_INFO(
+	int tile_number = m_videoram[tile_index];
+	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
+	if (m_textbank2 & 0x01) tile_number += 512; /* Mission 660 add-on */
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile_number,
-			state->m_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
+			m_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
 			0);
 }
 
@@ -49,8 +47,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( tsamurai )
 {
 	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	state->m_background = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_background->set_transparent_pen(0);
 	state->m_foreground->set_transparent_pen(0);
@@ -234,13 +232,12 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_color_w)
 }
 
 
-static TILE_GET_INFO( get_vsgongf_tile_info )
+TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 {
-	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	int tile_number = state->m_videoram[tile_index];
-	int color = state->m_vsgongf_color&0x1f;
-	if( state->m_textbank1 ) tile_number += 0x100;
-	SET_TILE_INFO(
+	int tile_number = m_videoram[tile_index];
+	int color = m_vsgongf_color&0x1f;
+	if( m_textbank1 ) tile_number += 0x100;
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile_number,
 			color,
@@ -250,7 +247,7 @@ static TILE_GET_INFO( get_vsgongf_tile_info )
 VIDEO_START( vsgongf )
 {
 	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	state->m_foreground = tilemap_create(machine, get_vsgongf_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
 SCREEN_UPDATE_IND16( vsgongf )

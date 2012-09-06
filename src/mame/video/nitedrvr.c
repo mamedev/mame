@@ -23,12 +23,11 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_hvc_w)
 		watchdog_reset_w(space, 0, 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
 {
-	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
-	int code = state->m_videoram[tile_index] & 0x3f;
+	int code = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
@@ -36,7 +35,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( nitedrvr )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey )

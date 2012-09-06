@@ -41,6 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(gigas);
 	DECLARE_DRIVER_INIT(gigasb);
 	DECLARE_DRIVER_INIT(pbillrds);
+	TILE_GET_INFO_MEMBER(get_freek_tile_info);
 };
 
 

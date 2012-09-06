@@ -221,7 +221,7 @@ struct cache_entry
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info );
+
 static void sprite_erase_buffer(segas32_state *state);
 static void sprite_swap_buffers(segas32_state *state);
 static void sprite_render_list(running_machine &machine);
@@ -252,7 +252,7 @@ static void common_start(running_machine &machine, int multi32)
 	{
 		struct cache_entry *entry = auto_alloc(machine, struct cache_entry);
 
-		entry->tmap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  16,16, 32,16);
+		entry->tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segas32_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = state->m_cache_head;
@@ -747,12 +747,11 @@ static tilemap_t *find_cache_entry(segas32_state *state, int page, int bank)
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
 {
-	segas32_state *state = machine.driver_data<segas32_state>();
 	struct cache_entry *entry = (struct cache_entry *)param;
-	UINT16 data = state->m_system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];
-	SET_TILE_INFO(0, (entry->bank << 13) + (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
+	UINT16 data = m_system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];
+	SET_TILE_INFO_MEMBER(0, (entry->bank << 13) + (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
 }
 
 

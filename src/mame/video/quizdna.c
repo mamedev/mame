@@ -13,23 +13,21 @@ Video hardware
 #include "includes/quizdna.h"
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 {
-	quizdna_state *state = machine.driver_data<quizdna_state>();
-	int code = state->m_bg_ram[tile_index*2] + state->m_bg_ram[tile_index*2+1]*0x100 ;
-	int col = state->m_bg_ram[tile_index*2+0x1000] & 0x7f;
+	int code = m_bg_ram[tile_index*2] + m_bg_ram[tile_index*2+1]*0x100 ;
+	int col = m_bg_ram[tile_index*2+0x1000] & 0x7f;
 
 	if (code>0x7fff)
 		code &= 0x83ff;
 
-	SET_TILE_INFO(1, code, col, 0);
+	SET_TILE_INFO_MEMBER(1, code, col, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 {
-	quizdna_state *state = machine.driver_data<quizdna_state>();
 	int code,col,x,y;
-	UINT8 *FG = state->memregion("user1")->base();
+	UINT8 *FG = memregion("user1")->base();
 
 	x = tile_index & 0x1f;
 	y = FG[(tile_index >> 5) & 0x1f] & 0x3f;
@@ -37,12 +35,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	y >>= 1;
 
-	col = state->m_fg_ram[x*2 + y*0x40 + 1];
-	code += (state->m_fg_ram[x*2 + y*0x40] + (col & 0x1f) * 0x100) * 2;
+	col = m_fg_ram[x*2 + y*0x40 + 1];
+	code += (m_fg_ram[x*2 + y*0x40] + (col & 0x1f) * 0x100) * 2;
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
-	SET_TILE_INFO(0, code, col, 0);
+	SET_TILE_INFO_MEMBER(0, code, col, 0);
 }
 
 
@@ -57,8 +55,8 @@ VIDEO_START( quizdna )
 	state->m_bg_ram = auto_alloc_array(machine, UINT8, 0x2000);
 	state->m_fg_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32 );
-	state->m_fg_tilemap = tilemap_create( machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,16,8,32,32 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizdna_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizdna_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,8,32,32 );
 
 	state->m_fg_tilemap->set_transparent_pen(0 );
 }

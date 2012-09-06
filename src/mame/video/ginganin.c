@@ -74,11 +74,11 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #define BG_NX  (16*32)
 #define BG_NY  (16*2)
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
-	UINT8 *gfx = machine.root_device().memregion("gfx5")->base();
+	UINT8 *gfx = machine().root_device().memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			BG_GFX,
 			code,
 			code >> 12,
@@ -92,11 +92,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 #define FG_NX  (16*16)
 #define FG_NY  (16*2)
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 {
-	ginganin_state *state = machine.driver_data<ginganin_state>();
-	UINT16 code = state->m_fgram[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_fgram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			FG_GFX,
 			code,
 			code >> 12,
@@ -116,11 +115,10 @@ WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 #define TXT_NX	(32)
 #define TXT_NY	(32)
 
-static TILE_GET_INFO( get_txt_tile_info )
+TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
-	ginganin_state *state = machine.driver_data<ginganin_state>();
-	UINT16 code = state->m_txtram[tile_index];
-	SET_TILE_INFO(
+	UINT16 code = m_txtram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			TXT_GFX,
 			code,
 			code >> 12,
@@ -137,9 +135,9 @@ WRITE16_MEMBER(ginganin_state::ginganin_txtram16_w)
 VIDEO_START( ginganin )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
-	state->m_tx_tilemap = tilemap_create(machine, get_txt_tile_info, TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ginganin_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ginganin_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ginganin_state::get_txt_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);

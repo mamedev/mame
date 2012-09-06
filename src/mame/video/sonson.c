@@ -120,21 +120,20 @@ WRITE8_MEMBER(sonson_state::sonson_flipscreen_w)
 	flip_screen_set(~data & 0x01);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
 {
-	sonson_state *state = machine.driver_data<sonson_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + 256 * (attr & 0x03);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 256 * (attr & 0x03);
 	int color = attr >> 2;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( sonson )
 {
 	sonson_state *state = machine.driver_data<sonson_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sonson_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_rows(32);
 }
 

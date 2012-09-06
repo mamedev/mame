@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE8_MEMBER(srumbler_background_w);
 	DECLARE_WRITE8_MEMBER(srumbler_4009_w);
 	DECLARE_WRITE8_MEMBER(srumbler_scroll_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

@@ -14,49 +14,45 @@
  *
  *************************************/
 
-static TILE_GET_INFO( centiped_get_tile_info )
+TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
 {
-	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
 	int data = videoram[tile_index];
-	SET_TILE_INFO(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
+	SET_TILE_INFO_MEMBER(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
 }
 
 
-static TILE_GET_INFO( warlords_get_tile_info )
+TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
 {
-	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index];
-	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (state->m_flipscreen >> 5);
+	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (m_flipscreen >> 5);
 
-	SET_TILE_INFO(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
+	SET_TILE_INFO_MEMBER(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
 }
 
 
-static TILE_GET_INFO( milliped_get_tile_info )
+TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
 {
-	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index];
-	int bank = ((data >> 6) & 1) | (state->m_gfx_bank << 1);
+	int bank = ((data >> 6) & 1) | (m_gfx_bank << 1);
 	int color = (data >> 6) & 3;
 	/* Flip both x and y if flipscreen is non-zero */
-	int flip_tiles = (state->m_flipscreen) ? 0x03 : 0;
+	int flip_tiles = (m_flipscreen) ? 0x03 : 0;
 
-	SET_TILE_INFO(0, (data & 0x3f) + 0x40 + (bank * 0x80), color, TILE_FLIPYX(flip_tiles));
+	SET_TILE_INFO_MEMBER(0, (data & 0x3f) + 0x40 + (bank * 0x80), color, TILE_FLIPYX(flip_tiles));
 }
 
 
-static TILE_GET_INFO( bullsdrt_get_tile_info )
+TILE_GET_INFO_MEMBER(centiped_state::bullsdrt_get_tile_info)
 {
-	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index];
-	int bank = state->m_bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
+	int bank = m_bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
 
-	SET_TILE_INFO(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
+	SET_TILE_INFO_MEMBER(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
 }
 
 
@@ -103,7 +99,7 @@ VIDEO_START( centiped )
 	init_penmask(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, centiped_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::centiped_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -112,7 +108,7 @@ VIDEO_START( warlords )
 	init_common(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, warlords_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::warlords_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -122,7 +118,7 @@ VIDEO_START( milliped )
 	init_penmask(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, milliped_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::milliped_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -132,7 +128,7 @@ VIDEO_START( bullsdrt )
 	init_penmask(machine);
 
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->m_bg_tilemap = tilemap_create(machine, bullsdrt_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::bullsdrt_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

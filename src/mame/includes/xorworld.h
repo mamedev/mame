@@ -16,6 +16,7 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_serial_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_data_w);
 	DECLARE_DRIVER_INIT(xorworld);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

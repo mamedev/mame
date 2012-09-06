@@ -105,7 +105,7 @@
 
 static void blitter_init(running_machine &machine, int blitter_config, const UINT8 *remap_prom);
 static void create_palette_lookup(running_machine &machine);
-static TILE_GET_INFO( get_tile_info );
+
 static int blitter_core(address_space *space, int sstart, int dstart, int w, int h, int data);
 
 
@@ -157,7 +157,7 @@ VIDEO_START( williams2 )
 	state->m_generic_paletteram_8.allocate(0x400 * 2);
 
 	/* create the tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS,  24,16, 128,16);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(williams_state::get_tile_info),state), TILEMAP_SCAN_COLS,  24,16, 128,16);
 	state->m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register(machine);
@@ -375,15 +375,14 @@ READ8_MEMBER(williams_state::williams2_video_counter_r)
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(williams_state::get_tile_info)
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	int mask = machine.gfx[0]->elements() - 1;
-	int data = state->m_williams2_tileram[tile_index];
+	int mask = machine().gfx[0]->elements() - 1;
+	int data = m_williams2_tileram[tile_index];
 	int y = (tile_index >> 1) & 7;
 	int color = 0;
 
-	switch (state->m_williams2_tilemap_config)
+	switch (m_williams2_tilemap_config)
 	{
 		case WILLIAMS_TILEMAP_MYSTICM:
 		{
@@ -406,7 +405,7 @@ static TILE_GET_INFO( get_tile_info )
 			break;
 	}
 
-	SET_TILE_INFO(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
 

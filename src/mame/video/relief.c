@@ -17,25 +17,23 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(relief_state::get_playfield_tile_info)
 {
-	relief_state *state = machine.driver_data<relief_state>();
-	UINT16 data1 = state->m_playfield[tile_index];
-	UINT16 data2 = state->m_playfield_upper[tile_index] & 0xff;
+	UINT16 data1 = m_playfield[tile_index];
+	UINT16 data2 = m_playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x20 + (data2 & 0x0f);
-	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 }
 
 
-static TILE_GET_INFO( get_playfield2_tile_info )
+TILE_GET_INFO_MEMBER(relief_state::get_playfield2_tile_info)
 {
-	relief_state *state = machine.driver_data<relief_state>();
-	UINT16 data1 = state->m_playfield2[tile_index];
-	UINT16 data2 = state->m_playfield_upper[tile_index] >> 8;
+	UINT16 data1 = m_playfield2[tile_index];
+	UINT16 data2 = m_playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
-	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 }
 
 
@@ -90,10 +88,10 @@ VIDEO_START( relief )
 	machine.gfx[1]->set_granularity(16);
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(relief_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the second playfield */
-	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
+	state->m_playfield2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(relief_state::get_playfield2_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
 	state->m_playfield2_tilemap->set_transparent_pen(0);
 
 	/* initialize the motion objects */

@@ -97,6 +97,12 @@ public:
 	DECLARE_DRIVER_INIT(nspirit);
 	DECLARE_DRIVER_INIT(loht);
 	DECLARE_DRIVER_INIT(imgfight);
+	TILE_GET_INFO_MEMBER(m72_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(m72_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(hharry_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
 };
 
 

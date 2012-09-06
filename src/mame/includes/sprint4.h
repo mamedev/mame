@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_screech_4_w);
 	DECLARE_WRITE8_MEMBER(sprint4_bang_w);
 	DECLARE_WRITE8_MEMBER(sprint4_attract_w);
+	TILE_GET_INFO_MEMBER(sprint4_tile_info);
 };
 
 

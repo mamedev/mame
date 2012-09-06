@@ -47,6 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(triplhnt_misc_r);
 	DECLARE_READ8_MEMBER(triplhnt_da_latch_r);
 	DECLARE_DRIVER_INIT(triplhnt);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

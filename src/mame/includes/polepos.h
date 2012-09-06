@@ -74,6 +74,8 @@ public:
 	DECLARE_READ8_MEMBER(steering_delta_r);
 	DECLARE_DRIVER_INIT(topracern);
 	DECLARE_DRIVER_INIT(polepos2);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 };
 
 

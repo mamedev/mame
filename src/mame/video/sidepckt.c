@@ -42,13 +42,12 @@ PALETTE_INIT( sidepckt )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 {
-	sidepckt_state *state = machine.driver_data<sidepckt_state>();
-	UINT8 attr = state->m_colorram[tile_index];
-	SET_TILE_INFO(
+	UINT8 attr = m_colorram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index] + ((attr & 0x07) << 8),
+			m_videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);
 	tileinfo.group = (attr & 0x80) >> 7;
@@ -65,7 +64,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( sidepckt )
 {
 	sidepckt_state *state = machine.driver_data<sidepckt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sidepckt_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_bg_tilemap->set_transmask(0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	state->m_bg_tilemap->set_transmask(1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */

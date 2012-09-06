@@ -26,6 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

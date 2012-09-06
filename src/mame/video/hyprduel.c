@@ -256,22 +256,19 @@ INLINE void hyprduel_vram_w( running_machine &machine, offs_t offset, UINT16 dat
 
 
 
-static TILE_GET_INFO( get_tile_info_0_8bit )
+TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_0_8bit)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	get_tile_info_8bit(machine, tileinfo, tile_index, 0, state->m_vram_0);
+	get_tile_info_8bit(machine(), tileinfo, tile_index, 0, m_vram_0);
 }
 
-static TILE_GET_INFO( get_tile_info_1_8bit )
+TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_1_8bit)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	get_tile_info_8bit(machine, tileinfo, tile_index, 1, state->m_vram_1);
+	get_tile_info_8bit(machine(), tileinfo, tile_index, 1, m_vram_1);
 }
 
-static TILE_GET_INFO( get_tile_info_2_8bit )
+TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_2_8bit)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	get_tile_info_8bit(machine, tileinfo, tile_index, 2, state->m_vram_2);
+	get_tile_info_8bit(machine(), tileinfo, tile_index, 2, m_vram_2);
 }
 
 WRITE16_MEMBER(hyprduel_state::hyprduel_vram_0_w)
@@ -370,9 +367,9 @@ static VIDEO_START( common_14220 )
 	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable.bytes() / 2);
 	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable.bytes() / 4);
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit, TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_0_8bit),state), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_1_8bit),state), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_2_8bit),state), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
 
 	state->m_bg_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
 	state->m_bg_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);

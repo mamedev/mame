@@ -62,22 +62,22 @@ void jackal_mark_tile_dirty( running_machine &machine, int offset )
 	state->m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
 {
-	UINT8 *RAM = machine.root_device().memregion("master")->base();
+	UINT8 *RAM = machine().root_device().memregion("master")->base();
 
 	int attr = RAM[0x2000 + tile_index];
 	int code = RAM[0x2400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
 	int color = 0;//attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( jackal )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackal_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

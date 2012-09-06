@@ -63,6 +63,11 @@ public:
 	DECLARE_WRITE8_MEMBER(grchamp_portB_0_w);
 	DECLARE_WRITE8_MEMBER(grchamp_portA_2_w);
 	DECLARE_WRITE8_MEMBER(grchamp_portB_2_w);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_left_tile_info);
+	TILE_GET_INFO_MEMBER(get_right_tile_info);
+	TILE_GET_INFO_MEMBER(get_center_tile_info);
+	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 };
 
 /* Discrete Sound Input Nodes */

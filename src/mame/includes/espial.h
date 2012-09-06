@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(espial_attributeram_w);
 	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
 	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 /*----------- defined in video/espial.c -----------*/

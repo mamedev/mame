@@ -258,6 +258,16 @@ public:
 	DECLARE_DRIVER_INIT(cleopatr);
 	DECLARE_DRIVER_INIT(scfinals);
 	DECLARE_DRIVER_INIT(pbobbl2x);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_GET_INFO_MEMBER(get_tile_info3);
+	TILE_GET_INFO_MEMBER(get_tile_info4);
+	TILE_GET_INFO_MEMBER(get_tile_info5);
+	TILE_GET_INFO_MEMBER(get_tile_info6);
+	TILE_GET_INFO_MEMBER(get_tile_info7);
+	TILE_GET_INFO_MEMBER(get_tile_info8);
+	TILE_GET_INFO_MEMBER(get_tile_info_vram);
+	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
 };
 
 

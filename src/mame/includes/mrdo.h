@@ -28,6 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mrdo_scrollx_w);
 	DECLARE_WRITE8_MEMBER(mrdo_scrolly_w);
 	DECLARE_WRITE8_MEMBER(mrdo_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

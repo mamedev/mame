@@ -71,46 +71,43 @@ INLINE int scan_helper(int col, int row, int section)
 }
 
 
-static TILEMAP_MAPPER( scan_mode0 )
+TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode0)
 {
 	return scan_helper(col, row, 0);
 }
-static TILEMAP_MAPPER( scan_mode1 )
+TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode1)
 {
 	return scan_helper(col, row, 1);
 }
-static TILEMAP_MAPPER( scan_mode2 )
+TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode2)
 {
 	return scan_helper(col, row, BIT(col, 4) ? 1 : 0);
 }
-static TILEMAP_MAPPER( scan_mode3 )
+TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode3)
 {
 	return scan_helper(col, row, BIT(col, 4) ? 0 : 1);
 }
 
 
-static TILE_GET_INFO( get_tile_info_BG_1 )
+TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
-	UINT8 *map = state->memregion("user1")->base() + ((*state->m_video_flags & 0x08) << 6);
+	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
-	SET_TILE_INFO(1, map[tile_index], BIT(*state->m_video_flags, 2) ? 2 : 0, 0);
+	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
-static TILE_GET_INFO( get_tile_info_BG_2 )
+TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
-	UINT8 *map = state->memregion("user1")->base() + ((*state->m_video_flags & 0x08) << 6) + 0x80;
+	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
-	SET_TILE_INFO(1, map[tile_index], BIT(*state->m_video_flags, 2) ? 2 : 0, 0);
+	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
-static TILE_GET_INFO( get_tile_info_FG )
+TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
-	SET_TILE_INFO(0, state->m_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
 WRITE8_MEMBER(madalien_state::madalien_videoram_w)
@@ -125,9 +122,12 @@ static VIDEO_START( madalien )
 	madalien_state *state = machine.driver_data<madalien_state>();
 	int i;
 
-	static const tilemap_mapper_func scan_functions[4] =
+	static const tilemap_mapper_delegate scan_functions[4] =
 	{
-		scan_mode0, scan_mode1, scan_mode2, scan_mode3
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),state), 
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),state), 
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),state),
+		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),state)
 	};
 
 	static const int tilemap_cols[4] =
@@ -135,18 +135,18 @@ static VIDEO_START( madalien )
 		16, 16, 32, 32
 	};
 
-	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_FG, TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),state), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	state->m_tilemap_fg->set_transparent_pen(0);
 	state->m_tilemap_fg->set_scrolldx(0, 0x50);
 	state->m_tilemap_fg->set_scrolldy(0, 0x20);
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_tilemap_edge1[i] = tilemap_create(machine, get_tile_info_BG_1, scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		state->m_tilemap_edge1[i] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),state), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 		state->m_tilemap_edge1[i]->set_scrolldx(0, 0x50);
 		state->m_tilemap_edge1[i]->set_scrolldy(0, 0x20);
 
-		state->m_tilemap_edge2[i] = tilemap_create(machine, get_tile_info_BG_2, scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		state->m_tilemap_edge2[i] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),state), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 		state->m_tilemap_edge2[i]->set_scrolldx(0, 0x50);
 		state->m_tilemap_edge2[i]->set_scrolldy(0, machine.primary_screen->height() - 256);
 	}

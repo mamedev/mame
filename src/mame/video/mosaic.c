@@ -15,24 +15,22 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(mosaic_state::get_fg_tile_info)
 {
-	mosaic_state *state = machine.driver_data<mosaic_state>();
 	tile_index *= 2;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fgvideoram[tile_index] + (state->m_fgvideoram[tile_index+1] << 8),
+			m_fgvideoram[tile_index] + (m_fgvideoram[tile_index+1] << 8),
 			0,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mosaic_state::get_bg_tile_info)
 {
-	mosaic_state *state = machine.driver_data<mosaic_state>();
 	tile_index *= 2;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_bgvideoram[tile_index] + (state->m_bgvideoram[tile_index+1] << 8),
+			m_bgvideoram[tile_index] + (m_bgvideoram[tile_index+1] << 8),
 			0,
 			0);
 }
@@ -49,8 +47,8 @@ VIDEO_START( mosaic )
 {
 	mosaic_state *state = machine.driver_data<mosaic_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mosaic_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mosaic_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0xff);
 }

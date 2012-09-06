@@ -42,6 +42,10 @@ public:
 	DECLARE_READ8_MEMBER(dday_colorram_r);
 	DECLARE_WRITE8_MEMBER(dday_sl_control_w);
 	DECLARE_WRITE8_MEMBER(dday_control_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_sl_tile_info);
 };
 
 

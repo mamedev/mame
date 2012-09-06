@@ -62,6 +62,22 @@ public:
 	DECLARE_DRIVER_INIT(spelunk2);
 	DECLARE_DRIVER_INIT(kidniki);
 	DECLARE_DRIVER_INIT(battroad);
+	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_ldrun_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_ldrun2_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_battroad_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_battroad_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_ldrun4_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_lotlot_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_lotlot_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_kidniki_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_kidniki_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_spelunkr_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_spelunkr_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_spelunk2_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_youjyudn_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_youjyudn_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_horizon_bg_tile_info);
 };
 
 

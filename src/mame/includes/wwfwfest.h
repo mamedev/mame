@@ -38,6 +38,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
 	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 };
 
 

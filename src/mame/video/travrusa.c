@@ -197,17 +197,16 @@ PALETTE_INIT( shtrider )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 {
-	travrusa_state *state = machine.driver_data<travrusa_state>();
-	UINT8 attr = state->m_videoram[2 * tile_index + 1];
+	UINT8 attr = m_videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
 	tileinfo.group = ((attr & 0x0f) == 0x0f) ? 1 : 0;	/* tunnels */
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[2 * tile_index] + ((attr & 0xc0) << 2),
+			m_videoram[2 * tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			flags);
 }
@@ -226,7 +225,7 @@ VIDEO_START( travrusa )
 
 	state->save_item(NAME(state->m_scrollx));
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(travrusa_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	state->m_bg_tilemap->set_transmask(1, 0x3f, 0xc0); /* split type 1 has pens 6 and 7 opaque - tunnels */

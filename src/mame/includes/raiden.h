@@ -34,6 +34,9 @@ public:
 	DECLARE_DRIVER_INIT(raidenk);
 	DECLARE_DRIVER_INIT(raiden);
 	DECLARE_DRIVER_INIT(raidena);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

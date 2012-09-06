@@ -16,44 +16,41 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_pf_tile_info )	/* For Performan only */
+TILE_GET_INFO_MEMBER(slapfght_state::get_pf_tile_info)/* For Performan only */
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
 	int tile,color;
 
-	tile=state->m_slapfight_videoram[tile_index] + ((state->m_slapfight_colorram[tile_index] & 0x03) << 8);
-	color=(state->m_slapfight_colorram[tile_index] >> 3) & 0x0f;
-	SET_TILE_INFO(
+	tile=m_slapfight_videoram[tile_index] + ((m_slapfight_colorram[tile_index] & 0x03) << 8);
+	color=(m_slapfight_colorram[tile_index] >> 3) & 0x0f;
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_pf1_tile_info )
+TILE_GET_INFO_MEMBER(slapfght_state::get_pf1_tile_info)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
 	int tile,color;
 
-	tile=state->m_slapfight_videoram[tile_index] + ((state->m_slapfight_colorram[tile_index] & 0x0f) << 8);
-	color=(state->m_slapfight_colorram[tile_index] & 0xf0) >> 4;
+	tile=m_slapfight_videoram[tile_index] + ((m_slapfight_colorram[tile_index] & 0x0f) << 8);
+	color=(m_slapfight_colorram[tile_index] & 0xf0) >> 4;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_fix_tile_info )
+TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
 	int tile,color;
 
-	tile=state->m_slapfight_fixvideoram[tile_index] + ((state->m_slapfight_fixcolorram[tile_index] & 0x03) << 8);
-	color=(state->m_slapfight_fixcolorram[tile_index] & 0xfc) >> 2;
+	tile=m_slapfight_fixvideoram[tile_index] + ((m_slapfight_fixcolorram[tile_index] & 0x03) << 8);
+	color=(m_slapfight_fixcolorram[tile_index] & 0xfc) >> 2;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -70,7 +67,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 VIDEO_START( perfrman )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_pf_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_pf1_tilemap->set_transparent_pen(0);
 }
@@ -78,8 +75,8 @@ VIDEO_START( perfrman )
 VIDEO_START( slapfight )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	state->m_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_fix_tilemap = tilemap_create(machine, get_fix_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_pf1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(slapfght_state::get_fix_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fix_tilemap->set_transparent_pen(0);
 }

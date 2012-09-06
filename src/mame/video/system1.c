@@ -96,14 +96,14 @@
  *
  *************************************/
 
-static TILE_GET_INFO( tile_get_info )
+TILE_GET_INFO_MEMBER(system1_state::tile_get_info)
 {
 	const UINT8 *rambase = (const UINT8 *)param;
 	UINT32 tiledata = rambase[tile_index*2+0] | (rambase[tile_index*2+1] << 8);
 	UINT32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	UINT32 color = (tiledata >> 5) & 0xff;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -130,7 +130,7 @@ static void video_start_common(running_machine &machine, int pagecount)
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
-		state->m_tilemap_page[pagenum] = tilemap_create(machine, tile_get_info, TILEMAP_SCAN_ROWS, 8,8, 32,32);
+		state->m_tilemap_page[pagenum] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(system1_state::tile_get_info),state), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 		state->m_tilemap_page[pagenum]->set_transparent_pen(0);
 		state->m_tilemap_page[pagenum]->set_user_data(state->m_videoram + 0x800 * pagenum);
 	}

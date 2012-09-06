@@ -94,21 +94,20 @@ WRITE8_MEMBER(lvcards_state::lvcards_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(lvcards_state::get_bg_tile_info)
 {
-	lvcards_state *state = machine.driver_data<lvcards_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
 	int color = attr & 0x0f;
 	int flags = (attr & 0x40) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( lvcards )
 {
 	lvcards_state *state = machine.driver_data<lvcards_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lvcards_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 }
 

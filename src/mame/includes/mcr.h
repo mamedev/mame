@@ -78,6 +78,9 @@ public:
 	DECLARE_DRIVER_INIT(nflfoot);
 	DECLARE_DRIVER_INIT(journey);
 	DECLARE_DRIVER_INIT(solarfox);
+	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
+	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
+	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);
 };
 
 

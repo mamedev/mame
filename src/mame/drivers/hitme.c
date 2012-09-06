@@ -28,13 +28,12 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_hitme_tile_info )
+TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
-	hitme_state *state = machine.driver_data<hitme_state>();
 
 	/* the code is the low 6 bits */
-	UINT8 code = state->m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO(0, code, 0, 0);
+	UINT8 code = m_videoram[tile_index] & 0x3f;
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
@@ -57,14 +56,14 @@ WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 static VIDEO_START( hitme )
 {
 	hitme_state *state = machine.driver_data<hitme_state>();
-	state->m_tilemap = tilemap_create(machine, get_hitme_tile_info, TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),state), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
 }
 
 
 static VIDEO_START( barricad )
 {
 	hitme_state *state = machine.driver_data<hitme_state>();
-	state->m_tilemap = tilemap_create(machine, get_hitme_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
 
 

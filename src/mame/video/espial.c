@@ -66,13 +66,12 @@ PALETTE_INIT( espial )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 {
-	espial_state *state = machine.driver_data<espial_state>();
-	UINT8 code = state->m_videoram[tile_index];
-	UINT8 col = state->m_colorram[tile_index];
-	UINT8 attr = state->m_attributeram[tile_index];
-	SET_TILE_INFO(0,
+	UINT8 code = m_videoram[tile_index];
+	UINT8 col = m_colorram[tile_index];
+	UINT8 attr = m_attributeram[tile_index];
+	SET_TILE_INFO_MEMBER(0,
 				  code | ((attr & 0x03) << 8),
 				  col & 0x3f,
 				  TILE_FLIPYX(attr >> 2));
@@ -90,7 +89,7 @@ VIDEO_START( espial )
 {
 	espial_state *state = machine.driver_data<espial_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(espial_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_item(NAME(state->m_flipscreen));
@@ -101,7 +100,7 @@ VIDEO_START( netwars )
 	espial_state *state = machine.driver_data<espial_state>();
 
 	/* Net Wars has a tile map that's twice as big as Espial's */
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(espial_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 	state->m_bg_tilemap->set_scrolldy(0, 0x100);

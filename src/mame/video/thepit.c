@@ -95,23 +95,21 @@ PALETTE_INIT( suprmous )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( solid_get_tile_info )
+TILE_GET_INFO_MEMBER(thepit_state::solid_get_tile_info)
 {
-	thepit_state *state = machine.driver_data<thepit_state>();
-	UINT8 back_color = (state->m_colorram[tile_index] & 0x70) >> 4;
-	int priority = (back_color != 0) && ((state->m_colorram[tile_index] & 0x80) == 0);
-	tileinfo.pen_data = state->m_dummy_tile;
+	UINT8 back_color = (m_colorram[tile_index] & 0x70) >> 4;
+	int priority = (back_color != 0) && ((m_colorram[tile_index] & 0x80) == 0);
+	tileinfo.pen_data = m_dummy_tile;
 	tileinfo.palette_base = back_color + 32;
 	tileinfo.category = priority;
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
 {
-	thepit_state *state = machine.driver_data<thepit_state>();
-	UINT8 fore_color = state->m_colorram[tile_index] % machine.gfx[0]->colors();
-	UINT8 code = state->m_videoram[tile_index];
-	SET_TILE_INFO(2 * state->m_graphics_bank, code, fore_color, 0);
+	UINT8 fore_color = m_colorram[tile_index] % machine().gfx[0]->colors();
+	UINT8 code = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(2 * m_graphics_bank, code, fore_color, 0);
 }
 
 
@@ -125,9 +123,9 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( thepit )
 {
 	thepit_state *state = machine.driver_data<thepit_state>();
-	state->m_solid_tilemap = tilemap_create(machine, solid_get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_solid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(thepit_state::solid_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	state->m_tilemap = tilemap_create(machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(thepit_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 	state->m_tilemap->set_transparent_pen(0);
 
 	state->m_solid_tilemap->set_scroll_cols(32);

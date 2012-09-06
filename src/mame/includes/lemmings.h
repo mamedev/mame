@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
 	DECLARE_WRITE16_MEMBER(lemmings_vram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

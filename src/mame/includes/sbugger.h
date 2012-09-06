@@ -13,6 +13,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sbugger_videoram_w);
 	DECLARE_WRITE8_MEMBER(sbugger_videoram_attr_w);
 	DECLARE_WRITE_LINE_MEMBER(sbugger_interrupt);
+	TILE_GET_INFO_MEMBER(get_sbugger_tile_info);
 };
 
 

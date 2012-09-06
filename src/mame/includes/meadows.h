@@ -42,6 +42,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(minferno);
 	DECLARE_DRIVER_INIT(gypsyjug);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

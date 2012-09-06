@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
 	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
 	DECLARE_DRIVER_INIT(gyruss);
+	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
 };
 
 

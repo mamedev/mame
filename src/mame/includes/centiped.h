@@ -63,6 +63,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
 	DECLARE_DRIVER_INIT(multiped);
 	DECLARE_DRIVER_INIT(bullsdrt);
+	TILE_GET_INFO_MEMBER(centiped_get_tile_info);
+	TILE_GET_INFO_MEMBER(warlords_get_tile_info);
+	TILE_GET_INFO_MEMBER(milliped_get_tile_info);
+	TILE_GET_INFO_MEMBER(bullsdrt_get_tile_info);
 };
 
 

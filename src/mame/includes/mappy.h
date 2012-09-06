@@ -34,6 +34,11 @@ public:
 	DECLARE_WRITE8_MEMBER(grobda_DAC_w);
 	DECLARE_DRIVER_INIT(digdug2);
 	DECLARE_DRIVER_INIT(grobda);
+	TILEMAP_MAPPER_MEMBER(superpac_tilemap_scan);
+	TILEMAP_MAPPER_MEMBER(mappy_tilemap_scan);
+	TILE_GET_INFO_MEMBER(superpac_get_tile_info);
+	TILE_GET_INFO_MEMBER(phozon_get_tile_info);
+	TILE_GET_INFO_MEMBER(mappy_get_tile_info);
 };
 
 

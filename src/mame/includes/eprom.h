@@ -24,6 +24,9 @@ public:
 	DECLARE_DRIVER_INIT(klaxp);
 	DECLARE_DRIVER_INIT(guts);
 	DECLARE_DRIVER_INIT(eprom);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	TILE_GET_INFO_MEMBER(guts_get_playfield_tile_info);
 };
 
 

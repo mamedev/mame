@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
 	DECLARE_WRITE8_MEMBER(nitedrvr_videoram_w);
 	DECLARE_WRITE8_MEMBER(nitedrvr_hvc_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

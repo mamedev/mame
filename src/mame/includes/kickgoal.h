@@ -63,6 +63,13 @@ public:
 	DECLARE_WRITE16_MEMBER(kickgoal_snd_w);
 	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
 	DECLARE_DRIVER_INIT(kickgoal);
+	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_kickgoal_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_kickgoal_bg2_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksfg);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_kicksbg2);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_actionhwbg2);
 };
 
 

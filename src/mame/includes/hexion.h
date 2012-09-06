@@ -19,6 +19,8 @@ public:
 	DECLARE_WRITE8_MEMBER(hexion_gfxrom_select_w);
 	DECLARE_WRITE_LINE_MEMBER(hexion_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hexion_nmi_ack_w);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
 };
 
 

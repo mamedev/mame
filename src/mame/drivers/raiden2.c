@@ -820,48 +820,44 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 /* TILEMAP RELATED (move to video file) */
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	int tile = state->back_data[tile_index];
+	int tile = back_data[tile_index];
 	int color = (tile >> 12) | (0 << 4);
 
-	tile = (tile & 0xfff) | (state->bg_bank << 12);
+	tile = (tile & 0xfff) | (bg_bank << 12);
 
-	SET_TILE_INFO(1,tile+0x0000,color,0);
+	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
 }
 
-static TILE_GET_INFO( get_mid_tile_info )
+TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	int tile = state->mid_data[tile_index];
+	int tile = mid_data[tile_index];
 	int color = (tile >> 12) | (2 << 4);
 
-	tile = (tile & 0xfff) | (state->mid_bank << 12);
+	tile = (tile & 0xfff) | (mid_bank << 12);
 
-	SET_TILE_INFO(1,tile,color,0);
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-static TILE_GET_INFO( get_fore_tile_info )
+TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	int tile = state->fore_data[tile_index];
+	int tile = fore_data[tile_index];
 	int color = (tile >> 12) | (1 << 4);
 
-	tile = (tile & 0xfff) | (state->fg_bank << 12);
+	tile = (tile & 0xfff) | (fg_bank << 12);
 
-	SET_TILE_INFO(1,tile,color,0);
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 {
-	raiden2_state *state = machine.driver_data<raiden2_state>();
-	int tile = state->text_data[tile_index];
+	int tile = text_data[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 /* VIDEO START (move to video file) */
@@ -870,10 +866,10 @@ static TILE_GET_INFO( get_text_tile_info )
 static VIDEO_START( raiden2 )
 {
 	raiden2_state *state = machine.driver_data<raiden2_state>();
-	state->text_layer       = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	state->background_layer = tilemap_create(machine, get_back_tile_info, TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	state->foreground_layer = tilemap_create(machine, get_fore_tile_info, TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	state->text_layer       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	state->background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),state), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	state->midground_layer  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),state),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	state->foreground_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),state), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 
 	state->midground_layer->set_transparent_pen(15);
 	state->foreground_layer->set_transparent_pen(15);

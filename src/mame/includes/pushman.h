@@ -41,6 +41,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pushman_68000_w);
 	DECLARE_WRITE16_MEMBER(pushman_scroll_w);
 	DECLARE_WRITE16_MEMBER(pushman_videoram_w);
+	TILEMAP_MAPPER_MEMBER(background_scan_rows);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

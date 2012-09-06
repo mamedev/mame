@@ -50,29 +50,27 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_paletteram_w)
 
 /****************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
 {
-	xxmissio_state *state = machine.driver_data<xxmissio_state>();
-	int code = ((state->m_bgram[0x400 | tile_index] & 0xc0) << 2) | state->m_bgram[0x000 | tile_index];
-	int color =  state->m_bgram[0x400 | tile_index] & 0x0f;
+	int code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
+	int color =  m_bgram[0x400 | tile_index] & 0x0f;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
 {
-	xxmissio_state *state = machine.driver_data<xxmissio_state>();
-	int code = state->m_fgram[0x000 | tile_index];
-	int color = state->m_fgram[0x400 | tile_index] & 0x07;
+	int code = m_fgram[0x000 | tile_index];
+	int color = m_fgram[0x400 | tile_index] & 0x07;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( xxmissio )
 {
 	xxmissio_state *state = machine.driver_data<xxmissio_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xxmissio_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(xxmissio_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_cols(1);
 	state->m_bg_tilemap->set_scroll_rows(1);

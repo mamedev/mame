@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(yunsung8_videoram_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

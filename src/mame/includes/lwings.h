@@ -48,6 +48,11 @@ public:
 	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
 	DECLARE_WRITE8_MEMBER(msm5205_w);
+	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(lwings_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

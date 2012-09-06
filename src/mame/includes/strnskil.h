@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(strnskil_scrl_ctrl_w);
 	DECLARE_DRIVER_INIT(banbam);
 	DECLARE_DRIVER_INIT(pettanp);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

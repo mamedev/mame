@@ -61,11 +61,10 @@ PALETTE_INIT( cop01 )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 {
-	cop01_state *state = machine.driver_data<cop01_state>();
-	int tile = state->m_bgvideoram[tile_index];
-	int attr = state->m_bgvideoram[tile_index + 0x800];
+	int tile = m_bgvideoram[tile_index];
+	int attr = m_bgvideoram[tile_index + 0x800];
 	int pri = (attr & 0x80) >> 7;
 
 	/* kludge: priority is not actually pen based, but color based. Since the
@@ -81,15 +80,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (attr & 0x10)
 		pri = 0;
 
-	SET_TILE_INFO(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
+	SET_TILE_INFO_MEMBER(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
 	tileinfo.group = pri;
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
 {
-	cop01_state *state = machine.driver_data<cop01_state>();
-	int tile = state->m_fgvideoram[tile_index];
-	SET_TILE_INFO(0, tile, 0, 0);
+	int tile = m_fgvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
 }
 
 
@@ -103,8 +101,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( cop01 )
 {
 	cop01_state *state = machine.driver_data<cop01_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cop01_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cop01_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 

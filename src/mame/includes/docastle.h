@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(docastle_flipscreen_on_w);
 	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
 	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

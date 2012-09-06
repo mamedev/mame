@@ -73,6 +73,10 @@ public:
 	DECLARE_DRIVER_INIT(cischeat);
 	DECLARE_DRIVER_INIT(bigrun);
 	DECLARE_DRIVER_INIT(f1gpstar);
+	TILEMAP_MAPPER_MEMBER(cischeat_scan_8x8);
+	TILEMAP_MAPPER_MEMBER(cischeat_scan_16x16);
+	TILE_GET_INFO_MEMBER(cischeat_get_scroll_tile_info_8x8);
+	TILE_GET_INFO_MEMBER(cischeat_get_scroll_tile_info_16x16);
 };
 
 

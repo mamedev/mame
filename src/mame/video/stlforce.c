@@ -5,15 +5,14 @@
 
 /* background, appears to be the bottom layer */
 
-static TILE_GET_INFO( get_stlforce_bg_tile_info )
+TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
-	tileno = state->m_bg_videoram[tile_index] & 0x0fff;
-	colour = state->m_bg_videoram[tile_index] & 0xe000;
+	tileno = m_bg_videoram[tile_index] & 0x0fff;
+	colour = m_bg_videoram[tile_index] & 0xe000;
 	colour = colour >> 13;
-	SET_TILE_INFO(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
@@ -25,18 +24,17 @@ WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
 
 /* middle layer, low */
 
-static TILE_GET_INFO( get_stlforce_mlow_tile_info )
+TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
-	tileno = state->m_mlow_videoram[tile_index] & 0x0fff;
-	colour = state->m_mlow_videoram[tile_index] & 0xe000;
+	tileno = m_mlow_videoram[tile_index] & 0x0fff;
+	colour = m_mlow_videoram[tile_index] & 0xe000;
 	colour = colour >> 13;
 	colour += 8;
 	tileno += 0x1000;
 
-	SET_TILE_INFO(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
@@ -48,18 +46,17 @@ WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
 
 /* middle layer, high */
 
-static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
+TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
-	tileno = state->m_mhigh_videoram[tile_index] & 0x0fff;
-	colour = state->m_mhigh_videoram[tile_index] & 0xe000;
+	tileno = m_mhigh_videoram[tile_index] & 0x0fff;
+	colour = m_mhigh_videoram[tile_index] & 0xe000;
 	colour = colour >> 13;
 	colour += 16;
 	tileno += 0x2000;
 
-	SET_TILE_INFO(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
@@ -71,19 +68,18 @@ WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
 
 /* text layer, appears to be the top layer */
 
-static TILE_GET_INFO( get_stlforce_tx_tile_info )
+TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
 	int tileno,colour;
 
-	tileno = state->m_tx_videoram[tile_index] & 0x0fff;
-	colour = state->m_tx_videoram[tile_index] & 0xe000;
+	tileno = m_tx_videoram[tile_index] & 0x0fff;
+	colour = m_tx_videoram[tile_index] & 0xe000;
 	colour = colour >> 13;
 
 	tileno += 0xc000;
 
 	colour += 24;
-	SET_TILE_INFO(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
@@ -184,10 +180,10 @@ VIDEO_START( stlforce )
 {
 	stlforce_state *state = machine.driver_data<stlforce_state>();
 
-	state->m_bg_tilemap    = tilemap_create(machine, get_stlforce_bg_tile_info,   TILEMAP_SCAN_COLS,      16,16,64,16);
-	state->m_mlow_tilemap  = tilemap_create(machine, get_stlforce_mlow_tile_info, TILEMAP_SCAN_COLS, 16,16,64,16);
-	state->m_mhigh_tilemap = tilemap_create(machine, get_stlforce_mhigh_tile_info,TILEMAP_SCAN_COLS, 16,16,64,16);
-	state->m_tx_tilemap    = tilemap_create(machine, get_stlforce_tx_tile_info,   TILEMAP_SCAN_ROWS,  8, 8,64,32);
+	state->m_bg_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),state),   TILEMAP_SCAN_COLS,      16,16,64,16);
+	state->m_mlow_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),state), TILEMAP_SCAN_COLS, 16,16,64,16);
+	state->m_mhigh_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),state),TILEMAP_SCAN_COLS, 16,16,64,16);
+	state->m_tx_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_tx_tile_info),state),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
 
 	state->m_mlow_tilemap->set_transparent_pen(0);
 	state->m_mhigh_tilemap->set_transparent_pen(0);

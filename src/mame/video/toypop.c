@@ -78,7 +78,7 @@ PALETTE_INIT( toypop )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(toypop_state::tilemap_scan)
 {
 	int offs;
 
@@ -92,14 +92,13 @@ static TILEMAP_MAPPER( tilemap_scan )
 	return offs;
 }
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(toypop_state::get_tile_info)
 {
-	toypop_state *state = machine.driver_data<toypop_state>();
-	UINT8 attr = state->m_videoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	UINT8 attr = m_videoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index],
-			(attr & 0x3f) + 0x40 * state->m_palettebank,
+			m_videoram[tile_index],
+			(attr & 0x3f) + 0x40 * m_palettebank,
 			0);
 }
 
@@ -114,7 +113,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( toypop )
 {
 	toypop_state *state = machine.driver_data<toypop_state>();
-	state->m_bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toypop_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(toypop_state::tilemap_scan),state),8,8,36,28);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 }

@@ -400,65 +400,61 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	}
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
-	int tile = (state->m_tilemap_ram[offs + state->m_text_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
+	int tile = (m_tilemap_ram[offs + m_text_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
-	int tile = (state->m_tilemap_ram[offs] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
+	int tile = (m_tilemap_ram[offs] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 13) & 0x7;
 
 	tile &= 0x1fff;
 
-	if( state->m_rf2_layer_bank[0] )
+	if( m_rf2_layer_bank[0] )
 		tile |= 0x4000;
 
-	SET_TILE_INFO(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_mid_tile_info )
+TILE_GET_INFO_MEMBER(seibuspi_state::get_mid_tile_info)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
-	int tile = (state->m_tilemap_ram[offs + state->m_mid_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
+	int tile = (m_tilemap_ram[offs + m_mid_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 13) & 0x7;
 
 	tile &= 0x1fff;
 	tile |= 0x2000;
 
-	if( state->m_rf2_layer_bank[1] )
+	if( m_rf2_layer_bank[1] )
 		tile |= 0x4000;
 
-	SET_TILE_INFO(1, tile, color + 16, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
 }
 
-static TILE_GET_INFO( get_fore_tile_info )
+TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 {
-	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	int offs = tile_index / 2;
-	int tile = (state->m_tilemap_ram[offs + state->m_fore_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
+	int tile = (m_tilemap_ram[offs + m_fore_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
 	int color = (tile >> 13) & 0x7;
 
 	tile &= 0x1fff;
-	tile |= state->m_bg_fore_layer_position;
+	tile |= m_bg_fore_layer_position;
 
-	if( state->m_rf2_layer_bank[2] )
+	if( m_rf2_layer_bank[2] )
 		tile |= 0x4000;
 
-	tile |= ((state->m_layer_bank >> 27) & 0x1) << 13;
+	tile |= ((m_layer_bank >> 27) & 0x1) << 13;
 
-	SET_TILE_INFO(1, tile, color + 8, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
 }
 
 VIDEO_START( spi )
@@ -467,10 +463,10 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
-	state->m_text_layer	= tilemap_create( machine, get_text_tile_info, TILEMAP_SCAN_ROWS,  8,8,64,32 );
-	state->m_back_layer	= tilemap_create( machine, get_back_tile_info, TILEMAP_SCAN_COLS,  16,16,32,32 );
-	state->m_mid_layer	= tilemap_create( machine, get_mid_tile_info, TILEMAP_SCAN_COLS,  16,16,32,32 );
-	state->m_fore_layer	= tilemap_create( machine, get_fore_tile_info, TILEMAP_SCAN_COLS,  16,16,32,32 );
+	state->m_text_layer	= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS,  8,8,64,32 );
+	state->m_back_layer	= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),state), TILEMAP_SCAN_COLS,  16,16,32,32 );
+	state->m_mid_layer	= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_mid_tile_info),state), TILEMAP_SCAN_COLS,  16,16,32,32 );
+	state->m_fore_layer	= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_fore_tile_info),state), TILEMAP_SCAN_COLS,  16,16,32,32 );
 
 	state->m_text_layer->set_transparent_pen(31);
 	state->m_mid_layer->set_transparent_pen(63);

@@ -17,6 +17,9 @@ public:
 	DECLARE_WRITE16_MEMBER(quizpani_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(quizpani_txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(quizpani_tilesbank_w);
+	TILEMAP_MAPPER_MEMBER(bg_scan);
+	TILE_GET_INFO_MEMBER(bg_tile_info);
+	TILE_GET_INFO_MEMBER(txt_tile_info);
 };
 
 

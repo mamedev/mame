@@ -70,6 +70,7 @@ public:
 	DECLARE_DRIVER_INIT(lethalth);
 	DECLARE_DRIVER_INIT(m92);
 	DECLARE_DRIVER_INIT(m92_bank);
+	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 };
 
 

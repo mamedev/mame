@@ -45,6 +45,10 @@ public:
 	DECLARE_READ8_MEMBER(rthunder_spriteram_r);
 	DECLARE_WRITE8_MEMBER(rthunder_spriteram_w);
 	DECLARE_DRIVER_INIT(namco86);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_GET_INFO_MEMBER(get_tile_info3);
 };
 
 

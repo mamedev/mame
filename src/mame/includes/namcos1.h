@@ -85,6 +85,12 @@ public:
 	DECLARE_DRIVER_INIT(ws89);
 	DECLARE_DRIVER_INIT(dspirit);
 	DECLARE_DRIVER_INIT(pistoldm);
+	TILE_GET_INFO_MEMBER(bg_get_info0);
+	TILE_GET_INFO_MEMBER(bg_get_info1);
+	TILE_GET_INFO_MEMBER(bg_get_info2);
+	TILE_GET_INFO_MEMBER(bg_get_info3);
+	TILE_GET_INFO_MEMBER(fg_get_info4);
+	TILE_GET_INFO_MEMBER(fg_get_info5);
 };
 
 

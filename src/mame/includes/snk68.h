@@ -39,6 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
 	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
 	DECLARE_DRIVER_INIT(searchar);
+	TILE_GET_INFO_MEMBER(get_pow_tile_info);
+	TILE_GET_INFO_MEMBER(get_searchar_tile_info);
 };
 
 

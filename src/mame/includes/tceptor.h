@@ -53,6 +53,9 @@ public:
 	DECLARE_WRITE8_MEMBER(voice_w);
 
 	optional_device<namco_c45_road_device> m_c45_road;
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 

@@ -17,6 +17,7 @@ public:
 	int                  m_flipscreen;
 	DECLARE_WRITE8_MEMBER(m57_videoram_w);
 	DECLARE_WRITE8_MEMBER(m57_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 /*----------- defined in video/m57.c -----------*/

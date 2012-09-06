@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(out_coin0);
 	DECLARE_WRITE8_MEMBER(out_coin1);
 	DECLARE_WRITE8_MEMBER(flip);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

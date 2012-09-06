@@ -133,22 +133,21 @@ WRITE8_MEMBER(shaolins_state::shaolins_nmi_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
 {
-	shaolins_state *state = machine.driver_data<shaolins_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x40) << 2);
-	int color = (attr & 0x0f) + 16 * state->m_palettebank;
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x40) << 2);
+	int color = (attr & 0x0f) + 16 * m_palettebank;
 	int flags = (attr & 0x20) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( shaolins )
 {
 	shaolins_state *state = machine.driver_data<shaolins_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shaolins_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_cols(32);

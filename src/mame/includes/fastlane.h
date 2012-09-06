@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fastlane_k1_k007232_w);
 	DECLARE_READ8_MEMBER(fastlane_k2_k007232_r);
 	DECLARE_WRITE8_MEMBER(fastlane_k2_k007232_w);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
 };
 
 

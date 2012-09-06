@@ -81,13 +81,12 @@ PALETTE_INIT( kncljoe )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
 {
-	kncljoe_state *state = machine.driver_data<kncljoe_state>();
-	int attr = state->m_videoram[2 * tile_index + 1];
-	int code = state->m_videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (state->m_tile_bank << 10);
+	int attr = m_videoram[2 * tile_index + 1];
+	int code = m_videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (m_tile_bank << 10);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			attr & 0xf,
@@ -105,7 +104,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( kncljoe )
 {
 	kncljoe_state *state = machine.driver_data<kncljoe_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kncljoe_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_bg_tilemap->set_scroll_rows(4);
 }

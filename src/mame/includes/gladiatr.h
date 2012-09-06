@@ -58,6 +58,8 @@ public:
 	DECLARE_READ8_MEMBER(f1_r);
 	DECLARE_DRIVER_INIT(gladiatr);
 	DECLARE_DRIVER_INIT(ppking);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 };
 
 /*----------- defined in video/gladiatr.c -----------*/

@@ -48,33 +48,31 @@ WRITE8_MEMBER(pbaction_state::pbaction_flipscreen_w)
 	flip_screen_set(data & 0x01);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
 {
-	pbaction_state *state = machine.driver_data<pbaction_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + 0x10 * (attr & 0x70);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 0x10 * (attr & 0x70);
 	int color = attr & 0x07;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(pbaction_state::get_fg_tile_info)
 {
-	pbaction_state *state = machine.driver_data<pbaction_state>();
-	int attr = state->m_colorram2[tile_index];
-	int code = state->m_videoram2[tile_index] + 0x10 * (attr & 0x30);
+	int attr = m_colorram2[tile_index];
+	int code = m_videoram2[tile_index] + 0x10 * (attr & 0x30);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( pbaction )
 {
 	pbaction_state *state = machine.driver_data<pbaction_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pbaction_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pbaction_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

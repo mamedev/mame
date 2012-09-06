@@ -122,112 +122,105 @@ BG0 palette intensity ( $C47F, $C4FF )
   Callbacks for the tilemap code
 ***************************************************************************/
 
-static TILE_GET_INFO( argus_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
 
-	lo = state->m_txram[tile_index];
-	hi = state->m_txram[tile_index + 1];
+	lo = m_txram[tile_index];
+	hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( argus_get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
 
-	lo = state->m_dummy_bg0ram[tile_index];
-	hi = state->m_dummy_bg0ram[tile_index + 1];
+	lo = m_dummy_bg0ram[tile_index];
+	hi = m_dummy_bg0ram[tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( argus_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
 
-	lo = state->m_bg1ram[tile_index];
-	hi = state->m_bg1ram[tile_index + 1];
+	lo = m_bg1ram[tile_index];
+	hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( valtric_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
 
-	lo = state->m_txram[tile_index];
-	hi = state->m_txram[tile_index + 1];
+	lo = m_txram[tile_index];
+	hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( valtric_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index <<= 1;
 
-	lo = state->m_bg1ram[tile_index];
-	hi = state->m_bg1ram[tile_index + 1];
+	lo = m_bg1ram[tile_index];
+	hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			((hi & 0xc0) << 2) | ((hi & 0x20) << 5) | lo,
 			hi & 0x0f,
 			0);
 }
 
-static TILE_GET_INFO( butasan_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 
 	tile_index ^= 0x3e0;
 	tile_index <<= 1;
 
-	lo = state->m_butasan_txram[tile_index];
-	hi = state->m_butasan_txram[tile_index + 1];
+	lo = m_butasan_txram[tile_index];
+	hi = m_butasan_txram[tile_index + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( butasan_get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	UINT8 hi, lo;
 	int attrib;
 
@@ -235,27 +228,26 @@ static TILE_GET_INFO( butasan_get_bg0_tile_info )
 	attrib ^= 0x0f0;
 	attrib <<= 1;
 
-	lo = state->m_butasan_bg0ram[attrib];
-	hi = state->m_butasan_bg0ram[attrib + 1];
+	lo = m_butasan_bg0ram[attrib];
+	hi = m_butasan_bg0ram[attrib + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( butasan_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg1_tile_info)
 {
-	argus_state *state = machine.driver_data<argus_state>();
 	int attrib, tile;
 
 	attrib = (tile_index & 0x00f) | ((tile_index & 0x3e0) >> 1) | ((tile_index & 0x010) << 5);
 	attrib ^= 0x0f0;
 
-	tile = state->m_butasan_bg1ram[attrib] | ((state->m_butasan_bg1_status & 2) << 7);
+	tile = m_butasan_bg1ram[attrib] | ((m_butasan_bg1_status & 2) << 7);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			(tile & 0x80) >> 7,
@@ -279,9 +271,9 @@ VIDEO_START( argus )
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                     offset             w   h  col  row */
-	state->m_bg0_tilemap = tilemap_create(machine, argus_get_bg0_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, argus_get_bg1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_tx_tilemap  = tilemap_create(machine, argus_get_tx_tile_info,  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_tx_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::argus_get_tx_tile_info),state),  TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	state->m_bg1_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);
@@ -307,8 +299,8 @@ VIDEO_START( valtric )
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                      offset             w   h  col  row */
-	state->m_bg1_tilemap = tilemap_create(machine, valtric_get_bg_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_tx_tilemap  = tilemap_create(machine, valtric_get_tx_tile_info, TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::valtric_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_tx_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::valtric_get_tx_tile_info),state), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 
@@ -328,9 +320,9 @@ VIDEO_START( butasan )
 {
 	argus_state *state = machine.driver_data<argus_state>();
 	/*                           info                       offset             w   h  col  row */
-	state->m_bg0_tilemap = tilemap_create(machine, butasan_get_bg0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, butasan_get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tx_tilemap  = tilemap_create(machine, butasan_get_tx_tile_info,  TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(argus_state::butasan_get_tx_tile_info),state),  TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
 
 	state->m_bg1_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);

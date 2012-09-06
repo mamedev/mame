@@ -25,6 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rocnrope_flipscreen_w);
 	DECLARE_DRIVER_INIT(rocnrope);
 	DECLARE_DRIVER_INIT(rocnropk);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 /*----------- defined in video/rocnrope.c -----------*/

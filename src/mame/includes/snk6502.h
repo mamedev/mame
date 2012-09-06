@@ -47,6 +47,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(snk6502_music0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
 };
 
 

@@ -237,6 +237,8 @@ public:
 	DECLARE_DRIVER_INIT(dkingjr);
 	DECLARE_DRIVER_INIT(drakton);
 	DECLARE_DRIVER_INIT(dkongx);
+	TILE_GET_INFO_MEMBER(dkong_bg_tile_info);
+	TILE_GET_INFO_MEMBER(radarscp1_bg_tile_info);
 };
 
 /*----------- defined in video/dkong.c -----------*/

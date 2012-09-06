@@ -31,21 +31,20 @@ PALETTE_INIT(usgames)
 
 
 
-static TILE_GET_INFO( get_usgames_tile_info )
+TILE_GET_INFO_MEMBER(usgames_state::get_usgames_tile_info)
 {
-	usgames_state *state = machine.driver_data<usgames_state>();
 	int tileno, colour;
 
-	tileno = state->m_videoram[tile_index*2];
-	colour = state->m_videoram[tile_index*2+1];
+	tileno = m_videoram[tile_index*2];
+	colour = m_videoram[tile_index*2+1];
 
-	SET_TILE_INFO(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 VIDEO_START(usgames)
 {
 	usgames_state *state = machine.driver_data<usgames_state>();
-	state->m_tilemap = tilemap_create(machine, get_usgames_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(usgames_state::get_usgames_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	machine.gfx[0]->set_source(state->m_charram);
 }
 

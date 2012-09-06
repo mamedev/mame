@@ -3,15 +3,14 @@
 
 /* BG Layer */
 
-static TILE_GET_INFO( get_sderby_tile_info )
+TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
 {
-	sderby_state *state = machine.driver_data<sderby_state>();
 	int tileno,colour;
 
-	tileno = state->m_videoram[tile_index*2];
-	colour = state->m_videoram[tile_index*2+1] & 0x0f;
+	tileno = m_videoram[tile_index*2];
+	colour = m_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_videoram_w)
@@ -23,15 +22,14 @@ WRITE16_MEMBER(sderby_state::sderby_videoram_w)
 
 /* MD Layer */
 
-static TILE_GET_INFO( get_sderby_md_tile_info )
+TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
 {
-	sderby_state *state = machine.driver_data<sderby_state>();
 	int tileno,colour;
 
-	tileno = state->m_md_videoram[tile_index*2];
-	colour = state->m_md_videoram[tile_index*2+1] & 0x0f;
+	tileno = m_md_videoram[tile_index*2];
+	colour = m_md_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(1,tileno,colour+16,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour+16,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
@@ -43,15 +41,14 @@ WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
 
 /* FG Layer */
 
-static TILE_GET_INFO( get_sderby_fg_tile_info )
+TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
 {
-	sderby_state *state = machine.driver_data<sderby_state>();
 	int tileno,colour;
 
-	tileno = state->m_fg_videoram[tile_index*2];
-	colour = state->m_fg_videoram[tile_index*2+1] & 0x0f;
+	tileno = m_fg_videoram[tile_index*2];
+	colour = m_fg_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(0,tileno,colour+32,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour+32,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
@@ -96,12 +93,12 @@ VIDEO_START( sderby )
 {
 	sderby_state *state = machine.driver_data<sderby_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_sderby_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	state->m_md_tilemap = tilemap_create(machine, get_sderby_md_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	state->m_md_tilemap->set_transparent_pen(0);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_sderby_fg_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_fg_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

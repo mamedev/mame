@@ -127,19 +127,18 @@ WRITE8_MEMBER(tagteam_state::tagteam_flipscreen_w)
 	coin_counter_w(machine(), 1, data & 0x40);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
 {
-	tagteam_state *state = machine.driver_data<tagteam_state>();
-	int code = state->m_videoram[tile_index] + 256 * state->m_colorram[tile_index];
-	int color = state->m_palettebank << 1;
+	int code = m_videoram[tile_index] + 256 * m_colorram[tile_index];
+	int color = m_palettebank << 1;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( tagteam )
 {
 	tagteam_state *state = machine.driver_data<tagteam_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS_FLIP_X,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS_FLIP_X,
 		 8, 8, 32, 32);
 }
 

@@ -196,44 +196,42 @@ PALETTE_INIT( lucky74 )
 }
 
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(lucky74_state::get_fg_tile_info)
 {
-	lucky74_state *state = machine.driver_data<lucky74_state>();
 /*  - bits -
     7654 3210
     ---- xxxx   tiles color.
     xxxx ----   tiles page offset.
 */
 	int bank = 0;
-	int attr = state->m_fg_colorram[tile_index];
-	int code = state->m_fg_videoram[tile_index] + ((attr & 0xf0) << 4);
+	int attr = m_fg_colorram[tile_index];
+	int code = m_fg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(lucky74_state::get_bg_tile_info)
 {
-	lucky74_state *state = machine.driver_data<lucky74_state>();
 /*  - bits -
     7654 3210
     ---- xxxx   tiles color.
     xxxx ----   tiles page offset.
 */
 	int bank = 1;
-	int attr = state->m_bg_colorram[tile_index];
-	int code = state->m_bg_videoram[tile_index] + ((attr & 0xf0) << 4);
+	int attr = m_bg_colorram[tile_index];
+	int code = m_bg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 
 VIDEO_START( lucky74 )
 {
 	lucky74_state *state = machine.driver_data<lucky74_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lucky74_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lucky74_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

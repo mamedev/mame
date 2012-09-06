@@ -45,6 +45,8 @@ public:
 	DECLARE_DRIVER_INIT(dbza);
 	DECLARE_DRIVER_INIT(dbz);
 	DECLARE_DRIVER_INIT(dbz2);
+	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
 };
 
 

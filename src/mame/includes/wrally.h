@@ -21,6 +21,8 @@ public:
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(wrally_coin_counter_w);
 	DECLARE_WRITE16_MEMBER(wrally_coin_lockout_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_wrally_screen0);
+	TILE_GET_INFO_MEMBER(get_tile_info_wrally_screen1);
 };
 
 

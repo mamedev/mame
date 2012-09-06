@@ -18,12 +18,11 @@
 
 /******************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 {
-	lemmings_state *state = machine.driver_data<lemmings_state>();
-	UINT16 tile = state->m_vram_data[tile_index];
+	UINT16 tile = m_vram_data[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile&0x7ff,
 			(tile>>12)&0xf,
@@ -33,7 +32,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( lemmings )
 {
 	lemmings_state *state = machine.driver_data<lemmings_state>();
-	state->m_vram_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	state->m_vram_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lemmings_state::get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	state->m_vram_tilemap->set_transparent_pen(0);
 	state->m_bitmap0.fill(0x100);

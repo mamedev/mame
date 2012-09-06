@@ -109,6 +109,7 @@ public:
 	DECLARE_DRIVER_INIT(fixeightbl);
 	DECLARE_DRIVER_INIT(vfive);
 	DECLARE_DRIVER_INIT(batrider);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/

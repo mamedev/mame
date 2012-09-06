@@ -23,6 +23,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pingpong_colorram_w);
 	DECLARE_DRIVER_INIT(cashquiz);
 	DECLARE_DRIVER_INIT(merlinmm);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

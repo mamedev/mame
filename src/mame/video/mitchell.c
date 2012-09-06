@@ -14,12 +14,11 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
-	UINT8 attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[2 * tile_index] + (state->m_videoram[2 * tile_index + 1] << 8);
-	SET_TILE_INFO(
+	UINT8 attr = m_colorram[tile_index];
+	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			attr & 0x7f,
@@ -38,7 +37,7 @@ VIDEO_START( pang )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mitchell_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_bg_tilemap->set_transparent_pen(15);
 
 	/* OBJ RAM */

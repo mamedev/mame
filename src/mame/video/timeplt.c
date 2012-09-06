@@ -90,28 +90,26 @@ PALETTE_INIT( timeplt )
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
 {
-	timeplt_state *state = machine.driver_data<timeplt_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + 8 * (attr & 0x20);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 8 * (attr & 0x20);
 	int color = attr & 0x1f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x10) >> 4;
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-static TILE_GET_INFO( get_chkun_tile_info )
+TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 {
-	timeplt_state *state = machine.driver_data<timeplt_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x60) << 3);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x60) << 3);
 	int color = attr & 0x1f;
 	int flags = 0;//TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x80) >> 7;
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
@@ -125,13 +123,13 @@ static TILE_GET_INFO( get_chkun_tile_info )
 VIDEO_START( timeplt )
 {
 	timeplt_state *state = machine.driver_data<timeplt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 VIDEO_START( chkun )
 {
 	timeplt_state *state = machine.driver_data<timeplt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_chkun_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

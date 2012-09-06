@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);
 	DECLARE_WRITE8_MEMBER(cheekyms_port_80_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(cheekyms_get_tile_info);
 };
 
 

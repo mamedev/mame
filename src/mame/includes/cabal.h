@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
 	DECLARE_DRIVER_INIT(cabal);
 	DECLARE_DRIVER_INIT(cabalbl2);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

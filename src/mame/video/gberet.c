@@ -105,25 +105,24 @@ WRITE8_MEMBER(gberet_state::gberet_sprite_bank_w)
 	m_spritebank = data;
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gberet_state::get_bg_tile_info)
 {
-	gberet_state *state = machine.driver_data<gberet_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x40) << 2);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x40) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
 	tileinfo.group = color;
 	tileinfo.category = (attr & 0x80) >> 7;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( gberet )
 {
 	gberet_state *state = machine.driver_data<gberet_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gberet_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 0x10);
 	state->m_bg_tilemap->set_scroll_rows(32);
 }

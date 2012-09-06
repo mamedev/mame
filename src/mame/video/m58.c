@@ -144,21 +144,20 @@ WRITE8_MEMBER(m58_state::yard_scroll_panel_w)
  *
  *************************************/
 
-static TILE_GET_INFO( yard_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(m58_state::yard_get_bg_tile_info)
 {
-	m58_state *state = machine.driver_data<m58_state>();
 
 	int offs = tile_index * 2;
-	int attr = state->m_videoram[offs + 1];
-	int code = state->m_videoram[offs] + ((attr & 0xc0) << 2);
+	int attr = m_videoram[offs + 1];
+	int code = m_videoram[offs] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
-static TILEMAP_MAPPER( yard_tilemap_scan_rows )
+TILEMAP_MAPPER_MEMBER(m58_state::yard_tilemap_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	if (col >= 32)
@@ -183,7 +182,7 @@ VIDEO_START( yard )
 	int height = machine.primary_screen->height();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->m_bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m58_state::yard_get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(m58_state::yard_tilemap_scan_rows),state),  8, 8, 64, 32);
 	state->m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
 	state->m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 

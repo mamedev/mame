@@ -295,6 +295,8 @@ public:
 	DECLARE_DRIVER_INIT(vidvince);
 	DECLARE_DRIVER_INIT(ramtiles);
 	DECLARE_DRIVER_INIT(stooges);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 };
 
 

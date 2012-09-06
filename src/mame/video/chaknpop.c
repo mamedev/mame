@@ -128,22 +128,21 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_attrram_w)
  *  I'm not sure how to handle attributes about color
  */
 
-static TILE_GET_INFO( chaknpop_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(chaknpop_state::chaknpop_get_tx_tile_info)
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	int tile = state->m_tx_ram[tile_index];
-	int tile_h_bank = (state->m_gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */
-	int color = state->m_attr_ram[TX_COLOR2];
+	int tile = m_tx_ram[tile_index];
+	int tile_h_bank = (m_gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */
+	int color = m_attr_ram[TX_COLOR2];
 
 	if (tile == 0x74)
-		color = state->m_attr_ram[TX_COLOR1];
+		color = m_attr_ram[TX_COLOR1];
 
-	if (state->m_gfxmode & GFX_TX_BANK1 && tile >= 0xc0)
+	if (m_gfxmode & GFX_TX_BANK1 && tile >= 0xc0)
 		tile += 0xc0;					/* 0xc0-0xff -> 0x180-0x1bf */
 
 	tile |= tile_h_bank;
 
-	SET_TILE_INFO(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
 
@@ -157,7 +156,7 @@ VIDEO_START( chaknpop )
 	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	state->m_tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(chaknpop_state::chaknpop_get_tx_tile_info),state), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
 	state->m_vram1 = &RAM[0x10000];
 	state->m_vram2 = &RAM[0x12000];

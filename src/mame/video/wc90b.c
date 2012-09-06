@@ -8,37 +8,34 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(wc90b_state::get_bg_tile_info)
 {
-	wc90b_state *state = machine.driver_data<wc90b_state>();
-	int attr = state->m_bgvideoram[tile_index];
-	int tile = state->m_bgvideoram[tile_index + 0x800];
-	SET_TILE_INFO(
+	int attr = m_bgvideoram[tile_index];
+	int tile = m_bgvideoram[tile_index + 0x800];
+	SET_TILE_INFO_MEMBER(
 			9 + ((attr & 3) + ((attr >> 1) & 4)),
 			tile,
 			attr >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
 {
-	wc90b_state *state = machine.driver_data<wc90b_state>();
-	int attr = state->m_fgvideoram[tile_index];
-	int tile = state->m_fgvideoram[tile_index + 0x800];
-	SET_TILE_INFO(
+	int attr = m_fgvideoram[tile_index];
+	int tile = m_fgvideoram[tile_index + 0x800];
+	SET_TILE_INFO_MEMBER(
 			1 + ((attr & 3) + ((attr >> 1) & 4)),
 			tile,
 			attr >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(wc90b_state::get_tx_tile_info)
 {
-	wc90b_state *state = machine.driver_data<wc90b_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_txvideoram[tile_index + 0x800] + ((state->m_txvideoram[tile_index] & 0x07) << 8),
-			state->m_txvideoram[tile_index] >> 4,
+			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
+			m_txvideoram[tile_index] >> 4,
 			0);
 }
 
@@ -53,9 +50,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( wc90b )
 {
 	wc90b_state *state = machine.driver_data<wc90b_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,     16,16,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90b_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90b_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90b_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(15);
 	state->m_tx_tilemap->set_transparent_pen(15);

@@ -47,6 +47,9 @@ public:
 	DECLARE_DRIVER_INIT(treahunt);
 	DECLARE_DRIVER_INIT(loverboy);
 	DECLARE_DRIVER_INIT(jack);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
+	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
 };
 
 

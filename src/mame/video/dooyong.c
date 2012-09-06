@@ -261,61 +261,55 @@ INLINE void rshark_get_tile_info(running_machine &machine, tile_data &tileinfo, 
 	SET_TILE_INFO(graphics, code, color, flags);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(dooyong_state::get_bg_tile_info)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	if (state->m_bg_tilerom2 != NULL)
-		rshark_get_tile_info(machine, tileinfo, tile_index, state->m_bg_tilerom, state->m_bg_tilerom2, state->m_bgscroll8, state->m_bg_gfx);
+	if (m_bg_tilerom2 != NULL)
+		rshark_get_tile_info(machine(), tileinfo, tile_index, m_bg_tilerom, m_bg_tilerom2, m_bgscroll8, m_bg_gfx);
 	else
-		lastday_get_tile_info(machine, tileinfo, tile_index, state->m_bg_tilerom, state->m_bgscroll8, state->m_bg_gfx);
+		lastday_get_tile_info(machine(), tileinfo, tile_index, m_bg_tilerom, m_bgscroll8, m_bg_gfx);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(dooyong_state::get_bg2_tile_info)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	if (state->m_bg2_tilerom2 != NULL)
-		rshark_get_tile_info(machine, tileinfo, tile_index, state->m_bg2_tilerom, state->m_bg2_tilerom2, state->m_bg2scroll8, state->m_bg2_gfx);
+	if (m_bg2_tilerom2 != NULL)
+		rshark_get_tile_info(machine(), tileinfo, tile_index, m_bg2_tilerom, m_bg2_tilerom2, m_bg2scroll8, m_bg2_gfx);
 	else
-		lastday_get_tile_info(machine, tileinfo, tile_index, state->m_bg2_tilerom, state->m_bg2scroll8, state->m_bg2_gfx);
+		lastday_get_tile_info(machine(), tileinfo, tile_index, m_bg2_tilerom, m_bg2scroll8, m_bg2_gfx);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(dooyong_state::get_fg_tile_info)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	if (state->m_fg_tilerom2 != NULL)
-		rshark_get_tile_info(machine, tileinfo, tile_index, state->m_fg_tilerom, state->m_fg_tilerom2, state->m_fgscroll8, state->m_fg_gfx);
+	if (m_fg_tilerom2 != NULL)
+		rshark_get_tile_info(machine(), tileinfo, tile_index, m_fg_tilerom, m_fg_tilerom2, m_fgscroll8, m_fg_gfx);
 	else
-		lastday_get_tile_info(machine, tileinfo, tile_index, state->m_fg_tilerom, state->m_fgscroll8, state->m_fg_gfx);
+		lastday_get_tile_info(machine(), tileinfo, tile_index, m_fg_tilerom, m_fgscroll8, m_fg_gfx);
 }
 
-static TILE_GET_INFO( get_fg2_tile_info )
+TILE_GET_INFO_MEMBER(dooyong_state::get_fg2_tile_info)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	if (state->m_fg2_tilerom2 != NULL)
-		rshark_get_tile_info(machine, tileinfo, tile_index, state->m_fg2_tilerom, state->m_fg2_tilerom2, state->m_fg2scroll8, state->m_fg2_gfx);
+	if (m_fg2_tilerom2 != NULL)
+		rshark_get_tile_info(machine(), tileinfo, tile_index, m_fg2_tilerom, m_fg2_tilerom2, m_fg2scroll8, m_fg2_gfx);
 	else
-		lastday_get_tile_info(machine, tileinfo, tile_index, state->m_fg2_tilerom, state->m_fg2scroll8, state->m_fg2_gfx);
+		lastday_get_tile_info(machine(), tileinfo, tile_index, m_fg2_tilerom, m_fg2scroll8, m_fg2_gfx);
 }
 
 /* flytiger uses some palette banking technique or something maybe a trash protection */
 
-static TILE_GET_INFO( flytiger_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(dooyong_state::flytiger_get_fg_tile_info)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	const UINT8 *tilerom = state->m_fg_tilerom;
+	const UINT8 *tilerom = m_fg_tilerom;
 
-	int offs = (tile_index + (state->m_fgscroll8[1] << 6)) * 2;
+	int offs = (tile_index + (m_fgscroll8[1] << 6)) * 2;
 	int attr = tilerom[offs];
 	int code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
 	int color = (attr & 0x78) >> 3;
 	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(state->m_fg_gfx, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_fg_gfx, code, color, flags);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
 	/* Each tile takes two bytes of memory:
                      MSB   LSB
        [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
@@ -323,20 +317,20 @@ static TILE_GET_INFO( get_tx_tile_info )
        c = gfx code
        C = color code */
 	int offs, attr, code, color;
-	if (state->m_tx_tilemap_mode == 0)
+	if (m_tx_tilemap_mode == 0)
 	{	/* lastday/gulfstrm/pollux/flytiger */
 		offs = tile_index;
-		attr = state->m_txvideoram[offs | 0x0800];
+		attr = m_txvideoram[offs | 0x0800];
 	}
 	else
 	{	/* bluehawk/primella */
 		offs = tile_index * 2;
-		attr = state->m_txvideoram[offs + 1];
+		attr = m_txvideoram[offs + 1];
 	}
-	code = state->m_txvideoram[offs] | ((attr & 0x0f) << 8);
+	code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
 	color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -638,11 +632,11 @@ VIDEO_START( lastday )
 	state->m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -678,11 +672,11 @@ VIDEO_START( gulfstrm )
 	state->m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -717,11 +711,11 @@ VIDEO_START( pollux )
 	state->m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -756,13 +750,13 @@ VIDEO_START( bluehawk )
 	state->m_tx_tilemap_mode = 1;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -794,11 +788,11 @@ VIDEO_START( flytiger )
 	state->m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg_tilemap = tilemap_create(machine, flytiger_get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::flytiger_get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -830,11 +824,11 @@ VIDEO_START( primella )
 	state->m_tx_tilemap_mode = 1;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_COLS,
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),state), TILEMAP_SCAN_COLS,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -870,13 +864,13 @@ VIDEO_START( rshark )
 	state->m_fg2_gfx = 1;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 16, 16, 64, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg2_tile_info),state), TILEMAP_SCAN_COLS,
 		 16, 16, 64, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),state), TILEMAP_SCAN_COLS,
 		 16, 16, 64, 32);
-	state->m_fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, TILEMAP_SCAN_COLS,
+	state->m_fg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),state), TILEMAP_SCAN_COLS,
 		 16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -905,7 +899,7 @@ VIDEO_START( popbingo )
 	state->m_bg_gfx = 1;
 
 	/* Create tilemaps */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 32, 32, 32, 8);
 	state->m_bg2_tilemap = state->m_fg_tilemap = state->m_fg2_tilemap = NULL;	/* Stop scroll handler from crashing on these */
 

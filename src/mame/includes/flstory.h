@@ -104,6 +104,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_1_w);
 	DECLARE_WRITE8_MEMBER(sound_control_2_w);
 	DECLARE_WRITE8_MEMBER(sound_control_3_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
+	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
 };
 
 

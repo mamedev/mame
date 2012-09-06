@@ -21,15 +21,14 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 {
-	aeroboto_state *state = machine.driver_data<aeroboto_state>();
-	UINT8 code = state->m_videoram[tile_index];
-	SET_TILE_INFO(
+	UINT8 code = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			code + (state->m_charbank << 8),
-			state->m_tilecolor[code],
-			(state->m_tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);
+			code + (m_charbank << 8),
+			m_tilecolor[code],
+			(m_tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);
 }
 // transparency should only affect tiles with color 0x33 or higher
 
@@ -44,7 +43,7 @@ VIDEO_START( aeroboto )
 {
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(aeroboto_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_rows(64);
 

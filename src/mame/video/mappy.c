@@ -235,7 +235,7 @@ PALETTE_INIT( phozon )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static TILEMAP_MAPPER( superpac_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(mappy_state::superpac_tilemap_scan)
 {
 	int offs;
 
@@ -250,7 +250,7 @@ static TILEMAP_MAPPER( superpac_tilemap_scan )
 }
 
 /* tilemap is a composition of a 32x60 scrolling portion and two 2x28 fixed portions on the sides */
-static TILEMAP_MAPPER( mappy_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
 {
 	int offs;
 
@@ -271,44 +271,41 @@ static TILEMAP_MAPPER( mappy_tilemap_scan )
 	return offs;
 }
 
-static TILE_GET_INFO( superpac_get_tile_info )
+TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
-	UINT8 attr = state->m_videoram[tile_index + 0x400];
+	UINT8 attr = m_videoram[tile_index + 0x400];
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index],
+			m_videoram[tile_index],
 			attr & 0x3f,
 			0);
 }
 
-static TILE_GET_INFO( phozon_get_tile_info )
+TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
-	UINT8 attr = state->m_videoram[tile_index + 0x400];
+	UINT8 attr = m_videoram[tile_index + 0x400];
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index] + ((attr & 0x80) << 1),
+			m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
 }
 
-static TILE_GET_INFO( mappy_get_tile_info )
+TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
-	UINT8 attr = state->m_videoram[tile_index + 0x800];
+	UINT8 attr = m_videoram[tile_index + 0x800];
 
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index],
+			m_videoram[tile_index],
 			attr & 0x3f,
 			0);
 }
@@ -325,7 +322,7 @@ VIDEO_START( superpac )
 {
 	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, superpac_get_tile_info,superpac_tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),state),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),state),8,8,36,28);
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 31);
@@ -335,7 +332,7 @@ VIDEO_START( phozon )
 {
 	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, phozon_get_tile_info,superpac_tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),state),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),state),8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 15);
 
@@ -346,7 +343,7 @@ VIDEO_START( mappy )
 {
 	mappy_state *state = machine.driver_data<mappy_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, mappy_get_tile_info,mappy_tilemap_scan,8,8,36,60);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::mappy_get_tile_info),state),tilemap_mapper_delegate(FUNC(mappy_state::mappy_tilemap_scan),state),8,8,36,60);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 31);
 	state->m_bg_tilemap->set_scroll_cols(36);

@@ -71,24 +71,22 @@ Offset:
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
 {
-	psikyo_state *state = machine.driver_data<psikyo_state>();
-	UINT16 code = ((UINT16 *)state->m_vram_0.target())[BYTE_XOR_BE(tile_index)];
-	SET_TILE_INFO(
+	UINT16 code = ((UINT16 *)m_vram_0.target())[BYTE_XOR_BE(tile_index)];
+	SET_TILE_INFO_MEMBER(
 			1,
-			(code & 0x1fff) + 0x2000 * state->m_tilemap_0_bank,
+			(code & 0x1fff) + 0x2000 * m_tilemap_0_bank,
 			(code >> 13) & 7,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
 {
-	psikyo_state *state = machine.driver_data<psikyo_state>();
-	UINT16 code = ((UINT16 *)state->m_vram_1.target())[BYTE_XOR_BE(tile_index)];
-	SET_TILE_INFO(
+	UINT16 code = ((UINT16 *)m_vram_1.target())[BYTE_XOR_BE(tile_index)];
+	SET_TILE_INFO_MEMBER(
 			1,
-			(code & 0x1fff) + 0x2000 * state->m_tilemap_1_bank,
+			(code & 0x1fff) + 0x2000 * m_tilemap_1_bank,
 			((code >> 13) & 7) + 0x40, // So we only have to decode the gfx once.
 			0);
 }
@@ -166,15 +164,15 @@ VIDEO_START( psikyo )
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
        the various sized tilemaps now as opposed to later */
 
-	state->m_tilemap_0_size0 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
-	state->m_tilemap_0_size1 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
-	state->m_tilemap_0_size2 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
-	state->m_tilemap_0_size3 = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
+	state->m_tilemap_0_size0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
+	state->m_tilemap_0_size1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
+	state->m_tilemap_0_size2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
+	state->m_tilemap_0_size3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
 
-	state->m_tilemap_1_size0 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
-	state->m_tilemap_1_size1 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
-	state->m_tilemap_1_size2 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
-	state->m_tilemap_1_size3 = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
+	state->m_tilemap_1_size0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x80);
+	state->m_tilemap_1_size1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x40, 0x40);
+	state->m_tilemap_1_size2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
+	state->m_tilemap_1_size3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
 
 	state->m_spritebuf1 = auto_alloc_array(machine, UINT32, 0x2000 / 4);
 	state->m_spritebuf2 = auto_alloc_array(machine, UINT32, 0x2000 / 4);

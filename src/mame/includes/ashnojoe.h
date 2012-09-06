@@ -63,6 +63,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ym2203_write_a);
 	DECLARE_WRITE8_MEMBER(ym2203_write_b);
 	DECLARE_DRIVER_INIT(ashnojoe);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info_3);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info_4);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info_5);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info_6);
+	TILE_GET_INFO_MEMBER(get_joe_tile_info_7);
 };
 
 

@@ -102,6 +102,11 @@ public:
 	DECLARE_DRIVER_INIT(xday2);
 	DECLARE_DRIVER_INIT(exbania);
 	DECLARE_DRIVER_INIT(emeraldj);
+	TILE_GET_INFO_MEMBER(tilemap_get_info0);
+	TILE_GET_INFO_MEMBER(tilemap_get_info1);
+	TILE_GET_INFO_MEMBER(tilemap_get_info2);
+	TILE_GET_INFO_MEMBER(tilemap_get_info3);
+	TILE_GET_INFO_MEMBER(roz_get_info);
 };
 
 

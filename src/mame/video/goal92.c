@@ -40,40 +40,37 @@ WRITE16_MEMBER(goal92_state::goal92_foreground_w)
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(goal92_state::get_text_tile_info)
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
-	int tile = state->m_tx_data[tile_index];
+	int tile = m_tx_data[tile_index];
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
 
 	tile |= 0xc000;
 
-	SET_TILE_INFO(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
-	int tile = state->m_bg_data[tile_index];
+	int tile = m_bg_data[tile_index];
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(2, tile, color, 0);
+	SET_TILE_INFO_MEMBER(2, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_fore_tile_info )
+TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
-	int tile = state->m_fg_data[tile_index];
+	int tile = m_fg_data[tile_index];
 	int color = (tile >> 12) & 0xf;
 	int region;
 
 	tile &= 0xfff;
 
-	if(state->m_fg_bank & 0xff)
+	if(m_fg_bank & 0xff)
 	{
 		region = 3;
 		tile |= 0x1000;
@@ -84,7 +81,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 		tile |= 0x2000;
 	}
 
-	SET_TILE_INFO(region, tile, color, 0);
+	SET_TILE_INFO_MEMBER(region, tile, color, 0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
@@ -135,9 +132,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 VIDEO_START( goal92 )
 {
 	goal92_state *state = machine.driver_data<goal92_state>();
-	state->m_bg_layer = tilemap_create(machine, get_back_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_layer = tilemap_create(machine, get_fore_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tx_layer = tilemap_create(machine, get_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_back_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_fore_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tx_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goal92_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, 0x400 * 2);
 	state_save_register_global_pointer(machine, state->m_buffered_spriteram, 0x400 * 2);

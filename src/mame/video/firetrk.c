@@ -121,55 +121,51 @@ PALETTE_INIT( montecar )
 }
 
 
-static TILE_GET_INFO( firetrk_get_tile_info1 )
+TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info1)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	int code = state->m_playfield_ram[tile_index] & 0x3f;
-	int color = (state->m_playfield_ram[tile_index] >> 6) & 0x03;
+	int code = m_playfield_ram[tile_index] & 0x3f;
+	int color = (m_playfield_ram[tile_index] >> 6) & 0x03;
 
-	if (*state->m_blink && (code >= 0x04) && (code <= 0x0b))
+	if (*m_blink && (code >= 0x04) && (code <= 0x0b))
 		color = 0;
 
-	if (state->m_flash)
+	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
-static TILE_GET_INFO( superbug_get_tile_info1 )
+TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info1)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	int code = state->m_playfield_ram[tile_index] & 0x3f;
-	int color = (state->m_playfield_ram[tile_index] >> 6) & 0x03;
+	int code = m_playfield_ram[tile_index] & 0x3f;
+	int color = (m_playfield_ram[tile_index] >> 6) & 0x03;
 
-	if (*state->m_blink && (code >= 0x08) && (code <= 0x0f))
+	if (*m_blink && (code >= 0x08) && (code <= 0x0f))
 		color = 0;
 
-	if (state->m_flash)
+	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
-static TILE_GET_INFO( montecar_get_tile_info1 )
+TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info1)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	int code = state->m_playfield_ram[tile_index] & 0x3f;
-	int color = (state->m_playfield_ram[tile_index] >> 6) & 0x03;
+	int code = m_playfield_ram[tile_index] & 0x3f;
+	int color = (m_playfield_ram[tile_index] >> 6) & 0x03;
 
-	if (state->m_flash)
+	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
-static TILE_GET_INFO( firetrk_get_tile_info2 )
+TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info2)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	UINT8 code = state->m_playfield_ram[tile_index] & 0x3f;
+	UINT8 code = m_playfield_ram[tile_index] & 0x3f;
 	int color = 0;
 
 	/* palette 1 for crash and palette 2 for skid */
@@ -179,14 +175,13 @@ static TILE_GET_INFO( firetrk_get_tile_info2 )
 	if ((code & 0x3c) == 0x0c)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
-static TILE_GET_INFO( superbug_get_tile_info2 )
+TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info2)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	UINT8 code = state->m_playfield_ram[tile_index] & 0x3f;
+	UINT8 code = m_playfield_ram[tile_index] & 0x3f;
 	int color = 0;
 
 	/* palette 1 for crash and palette 2 for skid */
@@ -196,14 +191,13 @@ static TILE_GET_INFO( superbug_get_tile_info2 )
 	if ((code & 0x38) == 0x00)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
-static TILE_GET_INFO( montecar_get_tile_info2 )
+TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info2)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	UINT8 code = state->m_playfield_ram[tile_index];
+	UINT8 code = m_playfield_ram[tile_index];
 	int color = 0;
 
 	/* palette 1 for crash and palette 2 for skid */
@@ -219,7 +213,7 @@ static TILE_GET_INFO( montecar_get_tile_info2 )
 	if ((code & 0x30) == 0x30)
 		color = 0;   /* palette 0, 0 */
 
-	SET_TILE_INFO(2, code & 0x3f, color, 0);
+	SET_TILE_INFO_MEMBER(2, code & 0x3f, color, 0);
 }
 
 
@@ -229,8 +223,8 @@ VIDEO_START( firetrk )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -240,8 +234,8 @@ VIDEO_START( superbug )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, superbug_get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, superbug_get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -251,8 +245,8 @@ VIDEO_START( montecar )
 	machine.primary_screen->register_screen_bitmap(state->m_helper1);
 	machine.primary_screen->register_screen_bitmap(state->m_helper2);
 
-	state->m_tilemap1 = tilemap_create(machine, montecar_get_tile_info1, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, montecar_get_tile_info2, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info1),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info2),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

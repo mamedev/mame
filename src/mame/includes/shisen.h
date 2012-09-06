@@ -15,6 +15,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sichuan2_videoram_w);
 	DECLARE_WRITE8_MEMBER(sichuan2_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sichuan2_paletteram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

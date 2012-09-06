@@ -43,6 +43,9 @@ public:
 	DECLARE_WRITE16_MEMBER(oneshot_mid_videoram_w);
 	DECLARE_WRITE16_MEMBER(oneshot_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(soundbank_w);
+	TILE_GET_INFO_MEMBER(get_oneshot_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_oneshot_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_oneshot_fg_tile_info);
 };
 
 /*----------- defined in video/oneshot.c -----------*/

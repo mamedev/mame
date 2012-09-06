@@ -8,48 +8,44 @@
 #include "includes/tecmosys.h"
 
 
-static TILE_GET_INFO( get_bg0tile_info )
+TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			state->m_bg0tilemap_ram[2*tile_index+1],
-			(state->m_bg0tilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((state->m_bg0tilemap_ram[2*tile_index]&0xc0)>>6));
+			m_bg0tilemap_ram[2*tile_index+1],
+			(m_bg0tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((m_bg0tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-static TILE_GET_INFO( get_bg1tile_info )
+TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
-			state->m_bg1tilemap_ram[2*tile_index+1],
-			(state->m_bg1tilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((state->m_bg1tilemap_ram[2*tile_index]&0xc0)>>6));
+			m_bg1tilemap_ram[2*tile_index+1],
+			(m_bg1tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((m_bg1tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-static TILE_GET_INFO( get_bg2tile_info )
+TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
-			state->m_bg2tilemap_ram[2*tile_index+1],
-			(state->m_bg2tilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((state->m_bg2tilemap_ram[2*tile_index]&0xc0)>>6));
+			m_bg2tilemap_ram[2*tile_index+1],
+			(m_bg2tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((m_bg2tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tecmosys_state::get_fg_tile_info)
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fgtilemap_ram[2*tile_index+1],
-			(state->m_fgtilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((state->m_fgtilemap_ram[2*tile_index]&0xc0)>>6));
+			m_fgtilemap_ram[2*tile_index+1],
+			(m_fgtilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((m_fgtilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
 
@@ -345,15 +341,15 @@ VIDEO_START(tecmosys)
 	state->m_tmp_tilemap_renderbitmap.fill(0x0000);
 
 
-	state->m_txt_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
+	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
 	state->m_txt_tilemap->set_transparent_pen(0);
 
-	state->m_bg0tilemap = tilemap_create(machine, get_bg0tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_bg0tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
 	state->m_bg0tilemap->set_transparent_pen(0);
 
-	state->m_bg1tilemap = tilemap_create(machine, get_bg1tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_bg1tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
 	state->m_bg1tilemap->set_transparent_pen(0);
 
-	state->m_bg2tilemap = tilemap_create(machine, get_bg2tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_bg2tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
 	state->m_bg2tilemap->set_transparent_pen(0);
 }

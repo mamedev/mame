@@ -25,6 +25,8 @@ public:
 	DECLARE_DRIVER_INIT(gaunt2p);
 	DECLARE_DRIVER_INIT(gauntlet);
 	DECLARE_DRIVER_INIT(vindctr2);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

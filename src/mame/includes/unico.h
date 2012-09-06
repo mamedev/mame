@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE32_MEMBER(unico_vram32_w);
 	DECLARE_WRITE16_MEMBER(burglarx_sound_bank_w);
 	DECLARE_WRITE32_MEMBER(zeropnt2_eeprom_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info32);
 };
 
 

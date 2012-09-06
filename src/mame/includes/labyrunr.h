@@ -36,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER(labyrunr_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(labyrunr_vram1_w);
 	DECLARE_WRITE8_MEMBER(labyrunr_vram2_w);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
 };
 
 

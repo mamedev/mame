@@ -420,80 +420,70 @@ INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int til
 	tileinfo.pen_mask = (extra_planes << 4) | 0x0f;
 }
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info1)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_1);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_1);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info2)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_2);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_2);
 }
 
-static TILE_GET_INFO( get_tile_info3 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info3)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_3);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_3);
 }
 
-static TILE_GET_INFO( get_tile_info4 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info4)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_4);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_4);
 }
 
-static TILE_GET_INFO( get_tile_info5 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info5)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_5);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_5);
 }
 
-static TILE_GET_INFO( get_tile_info6 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info6)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_6);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_6);
 }
 
-static TILE_GET_INFO( get_tile_info7 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info7)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_7);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_7);
 }
 
-static TILE_GET_INFO( get_tile_info8 )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info8)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_8);
+	get_tile_info(machine(),tileinfo,tile_index,m_f3_pf_data_8);
 }
 
 
-static TILE_GET_INFO( get_tile_info_vram )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_vram)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int vram_tile;
 	int flags=0;
 
-	vram_tile = (state->m_videoram[tile_index]&0xffff);
+	vram_tile = (m_videoram[tile_index]&0xffff);
 
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			vram_tile&0xff,
 			(vram_tile>>9)&0x3f,
 			flags);
 }
 
-static TILE_GET_INFO( get_tile_info_pixel )
+TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int vram_tile,col_off;
 	int flags=0;
-	int y_offs=(state->m_f3_control_1[5]&0x1ff);
-	if (state->m_flipscreen) y_offs+=0x100;
+	int y_offs=(m_f3_control_1[5]&0x1ff);
+	if (m_flipscreen) y_offs+=0x100;
 
 	/* Colour is shared with VRAM layer */
 	if ((((tile_index%32)*8 + y_offs)&0x1ff)>0xff)
@@ -501,12 +491,12 @@ static TILE_GET_INFO( get_tile_info_pixel )
 	else
 		col_off=((tile_index%32)*0x40)+((tile_index&0xfe0)>>5);
 
-	vram_tile = (state->m_videoram[col_off]&0xffff);
+	vram_tile = (m_videoram[col_off]&0xffff);
 
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			tile_index,
 			(vram_tile>>9)&0x3f,
@@ -588,10 +578,10 @@ VIDEO_START( f3 )
 	state->m_spriteram =    auto_alloc_array_clear(machine, UINT16, 0x10000/2);
 
 	if (state->m_f3_game_config->extend) {
-		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,16,16,64,32);
-		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,TILEMAP_SCAN_ROWS,16,16,64,32);
-		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,TILEMAP_SCAN_ROWS,16,16,64,32);
-		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info2),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info3),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+		state->m_pf4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info4),state),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
 		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x2000/2);
@@ -609,14 +599,14 @@ VIDEO_START( f3 )
 
 
 	} else {
-		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf5_tilemap = tilemap_create(machine, get_tile_info5,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf6_tilemap = tilemap_create(machine, get_tile_info6,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf7_tilemap = tilemap_create(machine, get_tile_info7,TILEMAP_SCAN_ROWS,16,16,32,32);
-		state->m_pf8_tilemap = tilemap_create(machine, get_tile_info8,TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info2),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info3),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info4),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf5_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info5),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf6_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info6),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf7_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info7),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+		state->m_pf8_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info8),state),TILEMAP_SCAN_ROWS,16,16,32,32);
 
 		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
 		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x1000/2);
@@ -644,8 +634,8 @@ VIDEO_START( f3 )
 	state->m_spriteram16_buffered = auto_alloc_array(machine, UINT16, 0x10000/2);
 	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 	state->m_sprite_end = state->m_spritelist;
-	state->m_vram_layer = tilemap_create(machine, get_tile_info_vram,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_pixel_layer = tilemap_create(machine, get_tile_info_pixel,TILEMAP_SCAN_COLS,8,8,64,32);
+	state->m_vram_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_vram),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_pixel_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_pixel),state),TILEMAP_SCAN_COLS,8,8,64,32);
 	state->m_pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
 	state->m_sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
 	machine.primary_screen->register_screen_bitmap(state->m_pri_alp_bitmap);

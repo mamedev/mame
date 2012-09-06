@@ -208,12 +208,11 @@ VIDEO_START( eaglshot )
 	machine.gfx[1]->set_source((UINT8 *)state->m_eaglshot_gfxram);
 }
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
-	UINT16 tile = state->m_gdfs_tmapram[tile_index];
+	UINT16 tile = m_gdfs_tmapram[tile_index];
 
-	SET_TILE_INFO(2, tile, 0, TILE_FLIPXY( tile >> 14 ));
+	SET_TILE_INFO_MEMBER(2, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
@@ -230,8 +229,7 @@ VIDEO_START( gdfs )
 	VIDEO_START_CALL(ssv);
 
 
-	state->m_gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
-											 16,16, 0x100,0x100	);
+	state->m_gdfs_tmap	= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ssv_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
 
 	state->m_gdfs_tmap->set_transparent_pen(0);
 }

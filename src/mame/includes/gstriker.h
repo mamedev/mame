@@ -98,6 +98,9 @@ public:
 	DECLARE_DRIVER_INIT(twrldc94a);
 	DECLARE_DRIVER_INIT(vgoalsoc);
 	DECLARE_DRIVER_INIT(twrldc94);
+	TILE_GET_INFO_MEMBER(VS920A_get_tile_info);
+	TILE_GET_INFO_MEMBER(MB60553_get_tile_info);
+	TILEMAP_MAPPER_MEMBER(twc94_scan);
 };
 
 

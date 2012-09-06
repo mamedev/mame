@@ -156,6 +156,7 @@ public:
 	DECLARE_DRIVER_INIT(dendego2);
 	DECLARE_DRIVER_INIT(dangcurv);
 	DECLARE_DRIVER_INIT(taitojc);
+	TILE_GET_INFO_MEMBER(taitojc_tile_info);
 };
 
 

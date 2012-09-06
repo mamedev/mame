@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE16_MEMBER(taotaido_sprite_character_bank_select_w);
 	DECLARE_WRITE16_MEMBER(taotaido_tileregs_w);
 	DECLARE_WRITE16_MEMBER(taotaido_bgvideoram_w);
+	TILE_GET_INFO_MEMBER(taotaido_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(taotaido_tilemap_scan_rows);
 };
 
 

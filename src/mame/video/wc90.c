@@ -8,62 +8,57 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(wc90_state::get_bg_tile_info)
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	int attr = state->m_bgvideoram[tile_index];
-	int tile = state->m_bgvideoram[tile_index + 0x800] +
+	int attr = m_bgvideoram[tile_index];
+	int tile = m_bgvideoram[tile_index + 0x800] +
 					256 * ((attr & 3) + ((attr >> 1) & 4));
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			attr >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(wc90_state::get_fg_tile_info)
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	int attr = state->m_fgvideoram[tile_index];
-	int tile = state->m_fgvideoram[tile_index + 0x800] +
+	int attr = m_fgvideoram[tile_index];
+	int tile = m_fgvideoram[tile_index + 0x800] +
 					256 * ((attr & 3) + ((attr >> 1) & 4));
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			attr >> 4,
 			0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(wc90_state::get_tx_tile_info)
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_txvideoram[tile_index + 0x800] + ((state->m_txvideoram[tile_index] & 0x07) << 8),
-			state->m_txvideoram[tile_index] >> 4,
+			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
+			m_txvideoram[tile_index] >> 4,
 			0);
 }
 
-static TILE_GET_INFO( track_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(wc90_state::track_get_bg_tile_info)
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	int attr = state->m_bgvideoram[tile_index];
-	int tile = state->m_bgvideoram[tile_index + 0x800] +
+	int attr = m_bgvideoram[tile_index];
+	int tile = m_bgvideoram[tile_index + 0x800] +
 					256 * (attr & 7);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile,
 			attr >> 4,
 			0);
 }
 
-static TILE_GET_INFO( track_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 {
-	wc90_state *state = machine.driver_data<wc90_state>();
-	int attr = state->m_fgvideoram[tile_index];
-	int tile = state->m_fgvideoram[tile_index + 0x800] +
+	int attr = m_fgvideoram[tile_index];
+	int tile = m_fgvideoram[tile_index + 0x800] +
 					256 * (attr & 7);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			attr >> 4,
@@ -80,9 +75,9 @@ static TILE_GET_INFO( track_get_fg_tile_info )
 VIDEO_START( wc90 )
 {
 	wc90_state *state = machine.driver_data<wc90_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,     16,16,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_transparent_pen(0);
@@ -91,9 +86,9 @@ VIDEO_START( wc90 )
 VIDEO_START( wc90t )
 {
 	wc90_state *state = machine.driver_data<wc90_state>();
-	state->m_bg_tilemap = tilemap_create(machine, track_get_bg_tile_info,TILEMAP_SCAN_ROWS,     16,16,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, track_get_fg_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::track_get_bg_tile_info),state),TILEMAP_SCAN_ROWS,     16,16,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::track_get_fg_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_tx_tilemap->set_transparent_pen(0);

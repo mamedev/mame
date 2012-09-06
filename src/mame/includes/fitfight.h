@@ -55,6 +55,9 @@ public:
 	DECLARE_DRIVER_INIT(fitfight);
 	DECLARE_DRIVER_INIT(histryma);
 	DECLARE_DRIVER_INIT(bbprot);
+	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
+	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);
 };
 
 

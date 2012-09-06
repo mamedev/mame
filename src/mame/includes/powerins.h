@@ -25,6 +25,9 @@ public:
 	DECLARE_WRITE16_MEMBER(powerins_paletteram16_w);
 	DECLARE_WRITE16_MEMBER(powerins_vram_0_w);
 	DECLARE_WRITE16_MEMBER(powerins_vram_1_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILEMAP_MAPPER_MEMBER(powerins_get_memory_offset_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

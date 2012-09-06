@@ -78,6 +78,15 @@ public:
 	DECLARE_DRIVER_INIT(bigtwin);
 	DECLARE_DRIVER_INIT(powerbal);
 	DECLARE_DRIVER_INIT(magicstk);
+	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(wbeachvl_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(wbeachvl_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(hrdtimes_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(bigtwinb_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(hrdtimes_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(hrdtimes_get_bg_tile_info);
 };
 
 /*----------- defined in video/playmark.c -----------*/

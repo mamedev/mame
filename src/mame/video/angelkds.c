@@ -14,13 +14,12 @@ enable / disable tilemap bits might be wrong
 
 */
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
 	int tileno;
 
-	tileno = state->m_txvideoram[tile_index] + (state->m_txbank * 0x100);
-	SET_TILE_INFO(0, tileno, 0, 0);
+	tileno = m_txvideoram[tile_index] + (m_txbank * 0x100);
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
@@ -44,15 +43,14 @@ WRITE8_MEMBER(angelkds_state::angelkds_txbank_write)
 
 */
 
-static TILE_GET_INFO( get_bgtop_tile_info )
+TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
 	int tileno;
 
-	tileno = state->m_bgtopvideoram[tile_index];
+	tileno = m_bgtopvideoram[tile_index];
 
-	tileno += state->m_bgtopbank * 0x100 ;
-	SET_TILE_INFO(1, tileno, 0, 0);
+	tileno += m_bgtopbank * 0x100 ;
+	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
@@ -82,15 +80,14 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgtopscroll_write)
 
 */
 
-static TILE_GET_INFO( get_bgbot_tile_info )
+TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
 	int tileno;
 
-	tileno = state->m_bgbotvideoram[tile_index];
+	tileno = m_bgbotvideoram[tile_index];
 
-	tileno += state->m_bgbotbank * 0x100 ;
-	SET_TILE_INFO(2, tileno, 1, 0);
+	tileno += m_bgbotbank * 0x100 ;
+	SET_TILE_INFO_MEMBER(2, tileno, 1, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
@@ -250,13 +247,13 @@ VIDEO_START( angelkds )
 {
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_tx_tilemap->set_transparent_pen(0);
 
-	state->m_bgbot_tilemap = tilemap_create(machine, get_bgbot_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bgbot_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_bgbot_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bgbot_tilemap->set_transparent_pen(15);
 
-	state->m_bgtop_tilemap = tilemap_create(machine, get_bgtop_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bgtop_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_bgtop_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bgtop_tilemap->set_transparent_pen(15);
 }
 

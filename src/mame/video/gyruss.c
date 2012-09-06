@@ -99,23 +99,22 @@ WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
 }
 
 
-static TILE_GET_INFO( gyruss_get_tile_info )
+TILE_GET_INFO_MEMBER(gyruss_state::gyruss_get_tile_info)
 {
-	gyruss_state *state = machine.driver_data<gyruss_state>();
-	int code = ((state->m_colorram[tile_index] & 0x20) << 3) | state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index] & 0x0f;
-	int flags = TILE_FLIPYX(state->m_colorram[tile_index] >> 6);
+	int code = ((m_colorram[tile_index] & 0x20) << 3) | m_videoram[tile_index];
+	int color = m_colorram[tile_index] & 0x0f;
+	int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
 
-	tileinfo.group = (state->m_colorram[tile_index] & 0x10) ? 0 : 1;
+	tileinfo.group = (m_colorram[tile_index] & 0x10) ? 0 : 1;
 
-	SET_TILE_INFO(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
 
 VIDEO_START( gyruss )
 {
 	gyruss_state *state = machine.driver_data<gyruss_state>();
-	state->m_tilemap = tilemap_create(machine, gyruss_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gyruss_state::gyruss_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_tilemap->set_transmask(0, 0x00, 0);	/* opaque */
 	state->m_tilemap->set_transmask(1, 0x0f, 0);  /* transparent */
 }

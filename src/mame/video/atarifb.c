@@ -27,27 +27,24 @@ static void get_tile_info_common( running_machine &machine, tile_data &tileinfo,
 }
 
 
-static TILE_GET_INFO( alpha1_get_tile_info )
+TILE_GET_INFO_MEMBER(atarifb_state::alpha1_get_tile_info)
 {
-	atarifb_state *state = machine.driver_data<atarifb_state>();
-	get_tile_info_common(machine, tileinfo, tile_index, state->m_alphap1_videoram);
+	get_tile_info_common(machine(), tileinfo, tile_index, m_alphap1_videoram);
 }
 
 
-static TILE_GET_INFO( alpha2_get_tile_info )
+TILE_GET_INFO_MEMBER(atarifb_state::alpha2_get_tile_info)
 {
-	atarifb_state *state = machine.driver_data<atarifb_state>();
-	get_tile_info_common(machine, tileinfo, tile_index, state->m_alphap2_videoram);
+	get_tile_info_common(machine(), tileinfo, tile_index, m_alphap2_videoram);
 }
 
 
-static TILE_GET_INFO( field_get_tile_info )
+TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
 {
-	atarifb_state *state = machine.driver_data<atarifb_state>();
-	int code = state->m_field_videoram[tile_index] & 0x3f;
-	int flipyx = state->m_field_videoram[tile_index] >> 6;
+	int code = m_field_videoram[tile_index] & 0x3f;
+	int flipyx = m_field_videoram[tile_index] >> 6;
 
-	SET_TILE_INFO(1, code, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -94,9 +91,9 @@ VIDEO_START( atarifb )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->m_alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	state->m_alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	state->m_field_tilemap  = tilemap_create(machine, field_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_alpha1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha1_get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	state->m_alpha2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha2_get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	state->m_field_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::field_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

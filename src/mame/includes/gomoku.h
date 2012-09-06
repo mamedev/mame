@@ -22,6 +22,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gomoku_bgram_w);
 	DECLARE_WRITE8_MEMBER(gomoku_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(gomoku_bg_dispsw_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

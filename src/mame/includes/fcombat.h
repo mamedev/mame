@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(fcombat);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

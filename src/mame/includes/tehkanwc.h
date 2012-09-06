@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tehkanwc_portB_w);
 	DECLARE_WRITE8_MEMBER(msm_reset_w);
 	DECLARE_DRIVER_INIT(teedoff);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

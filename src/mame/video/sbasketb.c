@@ -116,21 +116,20 @@ WRITE8_MEMBER(sbasketb_state::sbasketb_flipscreen_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(sbasketb_state::get_bg_tile_info)
 {
-	sbasketb_state *state = machine.driver_data<sbasketb_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x20) << 3);
-	int color = state->m_colorram[tile_index] & 0x0f;
-	int flags = ((state->m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x20) << 3);
+	int color = m_colorram[tile_index] & 0x0f;
+	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( sbasketb )
 {
 	sbasketb_state *state = machine.driver_data<sbasketb_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sbasketb_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 }
 

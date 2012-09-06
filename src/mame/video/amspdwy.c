@@ -42,12 +42,11 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(amspdwy_state::get_tile_info)
 {
-	amspdwy_state *state = machine.driver_data<amspdwy_state>();
-	UINT8 code = state->m_videoram[tile_index];
-	UINT8 color = state->m_colorram[tile_index];
-	SET_TILE_INFO(
+	UINT8 code = m_videoram[tile_index];
+	UINT8 color = m_colorram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code + ((color & 0x18)<<5),
 			color & 0x07,
@@ -68,7 +67,7 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_colorram_w)
 
 
 /* logical (col,row) -> memory offset */
-static TILEMAP_MAPPER( tilemap_scan_cols_back )
+TILEMAP_MAPPER_MEMBER(amspdwy_state::tilemap_scan_cols_back)
 {
 	return col * num_rows + (num_rows - row - 1);
 }
@@ -77,7 +76,7 @@ static TILEMAP_MAPPER( tilemap_scan_cols_back )
 VIDEO_START( amspdwy )
 {
 	amspdwy_state *state = machine.driver_data<amspdwy_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols_back, 8, 8, 0x20, 0x20);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),state), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),state), 8, 8, 0x20, 0x20);
 }
 
 

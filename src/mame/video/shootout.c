@@ -39,28 +39,26 @@ PALETTE_INIT( shootout )
 
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(shootout_state::get_bg_tile_info)
 {
-	shootout_state *state = machine.driver_data<shootout_state>();
-	int attributes = state->m_videoram[tile_index+0x400]; /* CCCC -TTT */
-	int tile_number = state->m_videoram[tile_index] + 256*(attributes&7);
+	int attributes = m_videoram[tile_index+0x400]; /* CCCC -TTT */
+	int tile_number = m_videoram[tile_index] + 256*(attributes&7);
 	int color = attributes>>4;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tile_number,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
 {
-	shootout_state *state = machine.driver_data<shootout_state>();
-	int attributes = state->m_textram[tile_index+0x400]; /* CCCC --TT */
-	int tile_number = state->m_textram[tile_index] + 256*(attributes&0x3);
+	int attributes = m_textram[tile_index+0x400]; /* CCCC --TT */
+	int tile_number = m_textram[tile_index] + 256*(attributes&0x3);
 	int color = attributes>>4;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile_number,
 			color,
@@ -85,8 +83,8 @@ VIDEO_START( shootout )
 {
 	shootout_state *state = machine.driver_data<shootout_state>();
 
-	state->m_background = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_foreground = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_background = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_foreground = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_foreground->set_transparent_pen(0 );
 }
 

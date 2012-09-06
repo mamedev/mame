@@ -43,6 +43,8 @@ public:
 	DECLARE_READ8_MEMBER(timeplt_scanline_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(chkun_sound_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_chkun_tile_info);
 };
 
 

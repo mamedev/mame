@@ -22,6 +22,8 @@ public:
 	DECLARE_WRITE8_MEMBER(output_port_1_w);
 	DECLARE_WRITE8_MEMBER(snookr10_videoram_w);
 	DECLARE_WRITE8_MEMBER(snookr10_colorram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
 };
 
 

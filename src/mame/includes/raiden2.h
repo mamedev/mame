@@ -121,6 +121,10 @@ public:
 	DECLARE_DRIVER_INIT(xsedae);
 	DECLARE_DRIVER_INIT(zeroteam);
 	DECLARE_DRIVER_INIT(raiden2);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

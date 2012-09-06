@@ -1812,7 +1812,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 
 
 /* Run and Gun 2 / Rushing Heroes */
-static TILE_GET_INFO( get_gx_psac_tile_info )
+TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 {
 	int tileno, colour, col, flip = 0;
 	if (tile_index&1)
@@ -1834,7 +1834,7 @@ static TILE_GET_INFO( get_gx_psac_tile_info )
 
 	colour = (psac_colorbase << 4) + col;
 
-	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flip));
+	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flip));
 }
 
 UINT32* konamigx_type3_psac2_bank;
@@ -1860,10 +1860,10 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 
 
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
- static TILE_GET_INFO( get_gx_psac3_tile_info )
+TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
  {
 	int tileno, colour, flip;
-	UINT8 *tmap = machine.root_device().memregion("gfx4")->base();
+	UINT8 *tmap = machine().root_device().memregion("gfx4")->base();
 
 	int base_index = tile_index;
 
@@ -1878,13 +1878,13 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
-	SET_TILE_INFO(0, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
  }
 
- static TILE_GET_INFO( get_gx_psac3_alt_tile_info )
+TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
  {
 	int tileno, colour, flip;
-	UINT8 *tmap = machine.root_device().memregion("gfx4")->base()+0x20000;
+	UINT8 *tmap = machine().root_device().memregion("gfx4")->base()+0x20000;
 
 	int base_index = tile_index;
 
@@ -1899,14 +1899,14 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
-	SET_TILE_INFO(0, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
  }
 
 
 /* PSAC4 */
 /* these tilemaps are weird in both format and content, one of them
    doesn't really look like it should be displayed? - it's height data */
-static TILE_GET_INFO( get_gx_psac1a_tile_info )
+TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -1925,10 +1925,10 @@ static TILE_GET_INFO( get_gx_psac1a_tile_info )
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
 
-	SET_TILE_INFO(1, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(1, tileno, colour, flip);
 }
 
-static TILE_GET_INFO( get_gx_psac1b_tile_info )
+TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -1947,7 +1947,7 @@ static TILE_GET_INFO( get_gx_psac1b_tile_info )
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
 
-	SET_TILE_INFO(0, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
 }
 
 static void konamigx_type2_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)
@@ -2144,6 +2144,7 @@ VIDEO_START(konamigx_6bpp)
 
 VIDEO_START(konamigx_type3)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
@@ -2155,8 +2156,8 @@ VIDEO_START(konamigx_type3)
 
 	_gxcommoninitnosprites(machine);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac3_tile_info, TILEMAP_SCAN_COLS,  16, 16, 256, 256);
-	gx_psac_tilemap_alt = tilemap_create(machine, get_gx_psac3_alt_tile_info, TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
+	gx_psac_tilemap_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac3_alt_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 256, 256);
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 2;
@@ -2183,6 +2184,7 @@ VIDEO_START(konamigx_type3)
 
 VIDEO_START(konamigx_type4)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
@@ -2194,7 +2196,7 @@ VIDEO_START(konamigx_type4)
 
 	_gxcommoninitnosprites(machine);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
@@ -2214,6 +2216,7 @@ VIDEO_START(konamigx_type4)
 
 VIDEO_START(konamigx_type4_vsn)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
@@ -2225,7 +2228,7 @@ VIDEO_START(konamigx_type4_vsn)
 
 	_gxcommoninitnosprites(machine);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
@@ -2244,6 +2247,7 @@ VIDEO_START(konamigx_type4_vsn)
 
 VIDEO_START(konamigx_type4_sd2)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
@@ -2255,7 +2259,7 @@ VIDEO_START(konamigx_type4_sd2)
 
 	_gxcommoninitnosprites(machine);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
@@ -2294,6 +2298,7 @@ VIDEO_START(konamigx_6bpp_2)
 
 VIDEO_START(opengolf)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
@@ -2304,8 +2309,8 @@ VIDEO_START(opengolf)
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac1a_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
-	gx_psac_tilemap2 = tilemap_create(machine, get_gx_psac1b_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//gx_psac_tilemap->set_transparent_pen(0);
@@ -2332,6 +2337,7 @@ VIDEO_START(opengolf)
 
 VIDEO_START(racinfrc)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
@@ -2342,8 +2348,8 @@ VIDEO_START(racinfrc)
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac1a_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
-	gx_psac_tilemap2 = tilemap_create(machine, get_gx_psac1b_tile_info, TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1a_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
+	gx_psac_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(konamigx_state::get_gx_psac1b_tile_info),state), TILEMAP_SCAN_COLS,  16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//gx_psac_tilemap->set_transparent_pen(0);

@@ -45,9 +45,8 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_bg1_videoram_w)
 /*******************************************************************************
  Tilemap Related Functions
 *******************************************************************************/
-static TILE_GET_INFO( get_fg0_tile_info )
+TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 {
-	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- FG0 RAM Format -**
 
       4 bytes per tile
@@ -67,19 +66,18 @@ static TILE_GET_INFO( get_fg0_tile_info )
 	UINT16 *tilebase;
 	int tileno;
 	int colbank;
-	tilebase =  &state->m_fg0_videoram[tile_index*2];
+	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[0] & 0x00ff) | ((tilebase[1] & 0x000f) << 8);
 	colbank = (tilebase[1] & 0x00f0) >> 4;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tileno,
 			colbank,
 			0);
 }
 
-static TILE_GET_INFO( get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(wwfwfest_state::get_bg0_tile_info)
 {
-	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- BG0 RAM Format -**
 
       4 bytes per tile
@@ -98,19 +96,18 @@ static TILE_GET_INFO( get_bg0_tile_info )
 	UINT16 *tilebase;
 	int tileno,colbank;
 
-	tilebase =  &state->m_bg0_videoram[tile_index*2];
+	tilebase =  &m_bg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x0fff);
 	colbank = (tilebase[0] & 0x000f);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tileno,
 			colbank,
 			TILE_FLIPYX((tilebase[0] & 0x00c0) >> 6));
 }
 
-static TILE_GET_INFO( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(wwfwfest_state::get_bg1_tile_info)
 {
-	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- BG1 RAM Format -**
 
       2 bytes per tile
@@ -125,10 +122,10 @@ static TILE_GET_INFO( get_bg1_tile_info )
 	UINT16 *tilebase;
 	int tileno;
 	int colbank;
-	tilebase =  &state->m_bg1_videoram[tile_index];
+	tilebase =  &m_bg1_videoram[tile_index];
 	tileno =  (tilebase[0] & 0x0fff);
 	colbank = (tilebase[0] & 0xf000) >> 12;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			tileno,
 			colbank,
@@ -231,9 +228,9 @@ VIDEO_START( wwfwfest )
     state_save_register_global(machine, state->m_bg1_scrollx);
     state_save_register_global(machine, state->m_bg1_scrolly);
 
-	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_fg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_fg0_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg1_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg0_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	state->m_fg0_tilemap->set_transparent_pen(0);
 	state->m_bg1_tilemap->set_transparent_pen(0);

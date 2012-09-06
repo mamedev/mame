@@ -153,34 +153,32 @@ WRITE16_MEMBER(cischeat_state::cischeat_scrollram_0_w){ scrollram_w(&space, offs
 WRITE16_MEMBER(cischeat_state::cischeat_scrollram_1_w){ scrollram_w(&space, offset, data, mem_mask, 1); }
 WRITE16_MEMBER(cischeat_state::cischeat_scrollram_2_w){ scrollram_w(&space, offset, data, mem_mask, 2); }
 
-static TILEMAP_MAPPER( cischeat_scan_8x8 )
+TILEMAP_MAPPER_MEMBER(cischeat_state::cischeat_scan_8x8)
 {
 	return (col * TILES_PER_PAGE_Y) +
 		   (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE * (num_cols / TILES_PER_PAGE_X) +
 		   (row % TILES_PER_PAGE_Y);
 }
 
-static TILEMAP_MAPPER( cischeat_scan_16x16 )
+TILEMAP_MAPPER_MEMBER(cischeat_state::cischeat_scan_16x16)
 {
 	return ( ((col / 2) * (TILES_PER_PAGE_Y / 2)) +
 			 ((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
 			 ((row / 2) % (TILES_PER_PAGE_Y / 2)) )*4 + (row&1) + (col&1)*2;
 }
 
-static TILE_GET_INFO( cischeat_get_scroll_tile_info_8x8 )
+TILE_GET_INFO_MEMBER(cischeat_state::cischeat_get_scroll_tile_info_8x8)
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int tmap = (FPTR)param;
-	UINT16 code = state->m_scrollram[tmap][tile_index];
-	SET_TILE_INFO(tmap, (code & 0xfff), code >> (16 - state->m_bits_per_color_code), 0);
+	UINT16 code = m_scrollram[tmap][tile_index];
+	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff), code >> (16 - m_bits_per_color_code), 0);
 }
 
-static TILE_GET_INFO( cischeat_get_scroll_tile_info_16x16 )
+TILE_GET_INFO_MEMBER(cischeat_state::cischeat_get_scroll_tile_info_16x16)
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int tmap = (FPTR)param;
-	UINT16 code = state->m_scrollram[tmap][tile_index/4];
-	SET_TILE_INFO(tmap, (code & 0xfff) * 4 + (tile_index & 3), code >> (16 - state->m_bits_per_color_code), 0);
+	UINT16 code = m_scrollram[tmap][tile_index/4];
+	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff) * 4 + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }
 
 static void create_tilemaps(running_machine &machine)
@@ -191,23 +189,23 @@ static void create_tilemaps(running_machine &machine)
 	for (layer = 0; layer < 3; layer++)
 	{
 		/* 16x16 tilemaps */
-		state->m_tilemap[layer][0][0] = tilemap_create(machine, cischeat_get_scroll_tile_info_16x16, cischeat_scan_16x16,
+		state->m_tilemap[layer][0][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
 								 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
-		state->m_tilemap[layer][0][1] = tilemap_create(machine, cischeat_get_scroll_tile_info_16x16, cischeat_scan_16x16,
+		state->m_tilemap[layer][0][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
 								 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
-		state->m_tilemap[layer][0][2] = tilemap_create(machine, cischeat_get_scroll_tile_info_16x16, cischeat_scan_16x16,
+		state->m_tilemap[layer][0][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
 								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
-		state->m_tilemap[layer][0][3] = tilemap_create(machine, cischeat_get_scroll_tile_info_16x16, cischeat_scan_16x16,
+		state->m_tilemap[layer][0][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_16x16),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_16x16),state),
 								 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
 
 		/* 8x8 tilemaps */
-		state->m_tilemap[layer][1][0] = tilemap_create(machine, cischeat_get_scroll_tile_info_8x8, cischeat_scan_8x8,
+		state->m_tilemap[layer][1][0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
 								 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
-		state->m_tilemap[layer][1][1] = tilemap_create(machine, cischeat_get_scroll_tile_info_8x8, cischeat_scan_8x8,
+		state->m_tilemap[layer][1][1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
 								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
-		state->m_tilemap[layer][1][2] = tilemap_create(machine, cischeat_get_scroll_tile_info_8x8, cischeat_scan_8x8,
+		state->m_tilemap[layer][1][2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
 								 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
-		state->m_tilemap[layer][1][3] = tilemap_create(machine, cischeat_get_scroll_tile_info_8x8, cischeat_scan_8x8,
+		state->m_tilemap[layer][1][3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cischeat_state::cischeat_get_scroll_tile_info_8x8),state), tilemap_mapper_delegate(FUNC(cischeat_state::cischeat_scan_8x8),state),
 								 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
 
 		/* set user data and transparency */

@@ -15,26 +15,24 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
 {
-	goindol_state *state = machine.driver_data<goindol_state>();
-	int code = state->m_fg_videoram[2 * tile_index + 1];
-	int attr = state->m_fg_videoram[2 * tile_index];
-	SET_TILE_INFO(
+	int code = m_fg_videoram[2 * tile_index + 1];
+	int attr = m_fg_videoram[2 * tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			code | ((attr & 0x7) << 8) | (state->m_char_bank << 11),
+			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 {
-	goindol_state *state = machine.driver_data<goindol_state>();
-	int code = state->m_bg_videoram[2 * tile_index + 1];
-	int attr = state->m_bg_videoram[2 * tile_index];
-	SET_TILE_INFO(
+	int code = m_bg_videoram[2 * tile_index + 1];
+	int attr = m_bg_videoram[2 * tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
-			code | ((attr & 0x7) << 8) | (state->m_char_bank << 11),
+			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
 }
@@ -50,8 +48,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( goindol )
 {
 	goindol_state *state = machine.driver_data<goindol_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goindol_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goindol_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

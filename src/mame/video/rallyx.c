@@ -216,7 +216,7 @@ PALETTE_INIT( jungler )
 ***************************************************************************/
 
 /* the video RAM has space for 32x32 tiles and is only partially used for the radar */
-static TILEMAP_MAPPER( fg_tilemap_scan )
+TILEMAP_MAPPER_MEMBER(rallyx_state::fg_tilemap_scan)
 {
 	return col + (row << 5);
 }
@@ -234,14 +234,14 @@ INLINE void rallyx_get_tile_info( running_machine &machine, tile_data &tileinfo,
 			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX);
 }
 
-static TILE_GET_INFO( rallyx_bg_get_tile_info )
+TILE_GET_INFO_MEMBER(rallyx_state::rallyx_bg_get_tile_info)
 {
-	rallyx_get_tile_info(machine, tileinfo, tile_index, 0x400);
+	rallyx_get_tile_info(machine(), tileinfo, tile_index, 0x400);
 }
 
-static TILE_GET_INFO( rallyx_fg_get_tile_info )
+TILE_GET_INFO_MEMBER(rallyx_state::rallyx_fg_get_tile_info)
 {
-	rallyx_get_tile_info(machine, tileinfo, tile_index, 0x000);
+	rallyx_get_tile_info(machine(), tileinfo, tile_index, 0x000);
 }
 
 
@@ -259,14 +259,14 @@ INLINE void locomotn_get_tile_info(running_machine &machine,tile_data &tileinfo,
 			(attr & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
-static TILE_GET_INFO( locomotn_bg_get_tile_info )
+TILE_GET_INFO_MEMBER(rallyx_state::locomotn_bg_get_tile_info)
 {
-	locomotn_get_tile_info(machine, tileinfo, tile_index, 0x400);
+	locomotn_get_tile_info(machine(), tileinfo, tile_index, 0x400);
 }
 
-static TILE_GET_INFO( locomotn_fg_get_tile_info )
+TILE_GET_INFO_MEMBER(rallyx_state::locomotn_fg_get_tile_info)
 {
-	locomotn_get_tile_info(machine, tileinfo, tile_index, 0x000);
+	locomotn_get_tile_info(machine(), tileinfo, tile_index, 0x000);
 }
 
 
@@ -343,8 +343,8 @@ VIDEO_START( rallyx )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),state), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),state), 8, 8, 8, 32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
 	state->m_bg_tilemap->set_scrolldx(3, 3);
@@ -359,8 +359,8 @@ VIDEO_START( jungler )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),state), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),state), 8, 8, 8, 32);
 
 	state->m_spriteram_base = 0x14;
 
@@ -373,8 +373,8 @@ VIDEO_START( locomotn )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),state), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),state), 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
 	if (machine.primary_screen->visible_area().max_x == 32 * 8 - 1)
@@ -394,8 +394,8 @@ VIDEO_START( commsega )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),state), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),state), 8, 8, 8, 32);
 
 	/* handle reduced visible area in some games */
 	if (machine.primary_screen->visible_area().max_x == 32 * 8 - 1)

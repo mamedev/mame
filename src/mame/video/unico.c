@@ -88,20 +88,20 @@ WRITE32_MEMBER(unico_state::unico_palette32_w)
 ***************************************************************************/
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 {
 	UINT16 *vram = (UINT16 *)param;
 	UINT16 code = vram[2 * tile_index + 0 ];
 	UINT16 attr = vram[2 * tile_index + 1 ];
-	SET_TILE_INFO(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
+	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
-static TILE_GET_INFO( get_tile_info32 )
+TILE_GET_INFO_MEMBER(unico_state::get_tile_info32)
 {
 	UINT32 *vram = (UINT32 *)param;
 	UINT16 code = vram[tile_index] >> 16;
 	UINT16 attr = vram[tile_index] & 0xff;
-	SET_TILE_INFO(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
+	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
 WRITE16_MEMBER(unico_state::unico_vram_w)
@@ -134,13 +134,13 @@ WRITE32_MEMBER(unico_state::unico_vram32_w)
 VIDEO_START( unico )
 {
 	unico_state *state = machine.driver_data<unico_state>();
-	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info,TILEMAP_SCAN_ROWS,
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),state),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info,TILEMAP_SCAN_ROWS,
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),state),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info,TILEMAP_SCAN_ROWS,
+	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),state),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
 	state->m_tilemap[0]->set_user_data(&state->m_vram[0x8000/2]);
@@ -166,13 +166,13 @@ VIDEO_START( unico )
 VIDEO_START( zeropnt2 )
 {
 	unico_state *state = machine.driver_data<unico_state>();
-	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info32,TILEMAP_SCAN_ROWS,
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),state),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info32,TILEMAP_SCAN_ROWS,
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),state),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
-	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info32,TILEMAP_SCAN_ROWS,
+	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info32),state),TILEMAP_SCAN_ROWS,
 									16,16,	0x40, 0x40);
 
 	state->m_tilemap[0]->set_user_data(&state->m_vram32[0x8000/4]);

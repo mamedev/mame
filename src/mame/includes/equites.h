@@ -94,6 +94,10 @@ public:
 	DECLARE_DRIVER_INIT(gekisou);
 	DECLARE_DRIVER_INIT(splndrbt);
 	DECLARE_DRIVER_INIT(equites);
+	TILE_GET_INFO_MEMBER(equites_fg_info);
+	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
+	TILE_GET_INFO_MEMBER(equites_bg_info);
+	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
 };
 
 

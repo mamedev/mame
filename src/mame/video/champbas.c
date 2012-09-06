@@ -129,22 +129,20 @@ PALETTE_INIT( exctsccr )
 
 
 
-static TILE_GET_INFO( champbas_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
-	int code = state->m_bg_videoram[tile_index] | (state->m_gfx_bank << 8);
-	int color = (state->m_bg_videoram[tile_index + 0x400] & 0x1f) | 0x20;
+	int code = m_bg_videoram[tile_index] | (m_gfx_bank << 8);
+	int color = (m_bg_videoram[tile_index + 0x400] & 0x1f) | 0x20;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( exctsccr_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
-	int code = state->m_bg_videoram[tile_index] | (state->m_gfx_bank << 8);
-	int color = state->m_bg_videoram[tile_index + 0x400] & 0x0f;
+	int code = m_bg_videoram[tile_index] | (m_gfx_bank << 8);
+	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -152,13 +150,13 @@ static TILE_GET_INFO( exctsccr_get_bg_tile_info )
 VIDEO_START( champbas )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_bg_tilemap = tilemap_create(machine, champbas_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 VIDEO_START( exctsccr )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_bg_tilemap = tilemap_create(machine, exctsccr_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

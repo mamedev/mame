@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(psychic5_paged_ram_w);
 	DECLARE_WRITE8_MEMBER(bombsa_paged_ram_w);
 	DECLARE_WRITE8_MEMBER(bombsa_unknown_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

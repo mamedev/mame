@@ -41,21 +41,20 @@ WRITE8_MEMBER(shisen_state::sichuan2_paletteram_w)
 	palette_set_color_rgb(machine(), offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
 {
-	shisen_state *state = machine.driver_data<shisen_state>();
 	int offs = tile_index * 2;
-	int code = state->m_videoram[offs] + ((state->m_videoram[offs + 1] & 0x0f) << 8) + (state->m_gfxbank << 12);
-	int color = (state->m_videoram[offs + 1] & 0xf0) >> 4;
+	int code = m_videoram[offs] + ((m_videoram[offs + 1] & 0x0f) << 8) + (m_gfxbank << 12);
+	int color = (m_videoram[offs + 1] & 0xf0) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( sichuan2 )
 {
 	shisen_state *state = machine.driver_data<shisen_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 64, 32);
 }
 

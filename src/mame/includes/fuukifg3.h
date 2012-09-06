@@ -54,6 +54,10 @@ public:
 	DECLARE_WRITE32_MEMBER(fuuki32_vram_1_w);
 	DECLARE_WRITE32_MEMBER(fuuki32_vram_2_w);
 	DECLARE_WRITE32_MEMBER(fuuki32_vram_3_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_3);
 };
 
 

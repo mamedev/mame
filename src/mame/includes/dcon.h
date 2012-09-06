@@ -32,6 +32,10 @@ public:
 	DECLARE_WRITE16_MEMBER(dcon_midground_w);
 	DECLARE_WRITE16_MEMBER(dcon_text_w);
 	DECLARE_DRIVER_INIT(sdgndmps);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

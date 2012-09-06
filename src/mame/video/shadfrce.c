@@ -1,17 +1,16 @@
 #include "emu.h"
 #include "includes/shadfrce.h"
 
-static TILE_GET_INFO( get_shadfrce_fgtile_info )
+TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_fgtile_info)
 {
 
 	/* ---- ----  tttt tttt  ---- ----  pppp TTTT */
-	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 	int tileno, colour;
 
-	tileno = (state->m_fgvideoram[tile_index *2] & 0x00ff) | ((state->m_fgvideoram[tile_index *2+1] & 0x000f) << 8);
-	colour = (state->m_fgvideoram[tile_index *2+1] & 0x00f0) >>4;
+	tileno = (m_fgvideoram[tile_index *2] & 0x00ff) | ((m_fgvideoram[tile_index *2+1] & 0x000f) << 8);
+	colour = (m_fgvideoram[tile_index *2+1] & 0x00f0) >>4;
 
-	SET_TILE_INFO(0,tileno,colour*4,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour*4,0);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_fgvideoram_w)
@@ -21,19 +20,18 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_fgvideoram_w)
 	m_fgtilemap->mark_tile_dirty(offset/2);
 }
 
-static TILE_GET_INFO( get_shadfrce_bg0tile_info )
+TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
 {
 
 	/* ---- ----  ---- cccc  --TT TTTT TTTT TTTT */
-	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 	int tileno, colour,fyx;
 
-	tileno = (state->m_bg0videoram[tile_index *2+1] & 0x3fff);
-	colour = state->m_bg0videoram[tile_index *2] & 0x001f;
+	tileno = (m_bg0videoram[tile_index *2+1] & 0x3fff);
+	colour = m_bg0videoram[tile_index *2] & 0x001f;
 	if (colour & 0x10) colour ^= 0x30;	/* skip hole */
-	fyx = (state->m_bg0videoram[tile_index *2] & 0x00c0) >>6;
+	fyx = (m_bg0videoram[tile_index *2] & 0x00c0) >>6;
 
-	SET_TILE_INFO(2,tileno,colour,TILE_FLIPYX(fyx));
+	SET_TILE_INFO_MEMBER(2,tileno,colour,TILE_FLIPYX(fyx));
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0videoram_w)
@@ -43,15 +41,14 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg0videoram_w)
 	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
-static TILE_GET_INFO( get_shadfrce_bg1tile_info )
+TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg1tile_info)
 {
-	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 	int tileno, colour;
 
-	tileno = (state->m_bg1videoram[tile_index] & 0x0fff);
-	colour = (state->m_bg1videoram[tile_index] & 0xf000) >> 12;
+	tileno = (m_bg1videoram[tile_index] & 0x0fff);
+	colour = (m_bg1videoram[tile_index] & 0xf000) >> 12;
 
-	SET_TILE_INFO(2,tileno,colour+64,0);
+	SET_TILE_INFO_MEMBER(2,tileno,colour+64,0);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
@@ -68,13 +65,13 @@ VIDEO_START( shadfrce )
 {
 	shadfrce_state *state = machine.driver_data<shadfrce_state>();
 
-	state->m_fgtilemap = tilemap_create(machine, get_shadfrce_fgtile_info,TILEMAP_SCAN_ROWS,    8,  8,64,32);
+	state->m_fgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_fgtile_info),state),TILEMAP_SCAN_ROWS,    8,  8,64,32);
 	state->m_fgtilemap->set_transparent_pen(0);
 
-	state->m_bg0tilemap = tilemap_create(machine, get_shadfrce_bg0tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_bg0tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg0tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 	state->m_bg0tilemap->set_transparent_pen(0);
 
-	state->m_bg1tilemap = tilemap_create(machine, get_shadfrce_bg1tile_info,TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	state->m_bg1tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg1tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	state->m_spvideoram_old = auto_alloc_array(machine, UINT16, state->m_spvideoram.bytes()/2);
 }

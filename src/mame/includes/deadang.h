@@ -26,6 +26,11 @@ public:
 	DECLARE_WRITE16_MEMBER(deadang_bank_w);
 	DECLARE_DRIVER_INIT(deadang);
 	DECLARE_DRIVER_INIT(ghunter);
+	TILEMAP_MAPPER_MEMBER(bg_scan);
+	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

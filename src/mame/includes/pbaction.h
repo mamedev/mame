@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
 	DECLARE_DRIVER_INIT(pbactio3);
 	DECLARE_DRIVER_INIT(pbactio4);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

@@ -218,6 +218,7 @@ public:
 	DECLARE_DRIVER_INIT(superbon);
 	DECLARE_DRIVER_INIT(calipso);
 	DECLARE_DRIVER_INIT(moonwar);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 };
 
 

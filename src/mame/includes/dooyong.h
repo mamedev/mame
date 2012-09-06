@@ -63,6 +63,12 @@ public:
 	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
 	DECLARE_WRITE16_MEMBER(rshark_ctrl_w);
 	DECLARE_READ8_MEMBER(unk_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
+	TILE_GET_INFO_MEMBER(flytiger_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 

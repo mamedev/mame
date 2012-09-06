@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
 	DECLARE_DRIVER_INIT(ohmygod);
 	DECLARE_DRIVER_INIT(naname);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

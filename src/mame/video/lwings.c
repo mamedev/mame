@@ -15,61 +15,57 @@
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( get_bg2_memory_offset )
+TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
 {
 	return (row * 0x800) | (col * 2);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
-	int code = state->m_fgvideoram[tile_index];
-	int color = state->m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	int code = m_fgvideoram[tile_index];
+	int color = m_fgvideoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code + ((color & 0xc0) << 2),
 			color & 0x0f,
 			TILE_FLIPYX((color & 0x30) >> 4));
 }
 
-static TILE_GET_INFO( lwings_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
-	int code = state->m_bg1videoram[tile_index];
-	int color = state->m_bg1videoram[tile_index + 0x400];
-	SET_TILE_INFO(
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code + ((color & 0xe0) << 3),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x18) >> 3));
 }
 
-static TILE_GET_INFO( trojan_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
-	int code = state->m_bg1videoram[tile_index];
-	int color = state->m_bg1videoram[tile_index + 0x400];
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
 	code += (color & 0xe0)<<3;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
-			state->m_bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
+			m_bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
 			((color & 0x10) ? TILE_FLIPX : 0));
 
 	tileinfo.group = (color & 0x08) >> 3;
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
 	int code, color;
-	UINT8 *rom = state->memregion("gfx5")->base();
-	int mask = state->memregion("gfx5")->bytes() - 1;
+	UINT8 *rom = memregion("gfx5")->base();
+	int mask = memregion("gfx5")->bytes() - 1;
 
-	tile_index = (tile_index + state->m_bg2_image * 0x20) & mask;
+	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
 	code = rom[tile_index];
 	color = rom[tile_index + 1];
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			3,
 			code + ((color & 0x80) << 1),
 			color & 0x07,
@@ -86,8 +82,8 @@ VIDEO_START( lwings )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, lwings_get_bg1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(3);
 }
@@ -96,9 +92,9 @@ VIDEO_START( trojan )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_bg1_tilemap = tilemap_create(machine, trojan_get_bg1_tile_info,TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, get_bg2_memory_offset, 16, 16, 32, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),state),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),state), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),state), 16, 16, 32, 16);
 
 	state->m_fg_tilemap->set_transparent_pen(3);
 	state->m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); /* split type 0 is totally transparent in front half */

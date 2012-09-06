@@ -149,21 +149,20 @@ WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 	/* bit 6 - 7 unknown */
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	int offs = tile_index * 2;
-	int code = state->m_videoram[offs + 1] + ((state->m_videoram[offs] & 0x07) << 8) + 2048 * state->m_gfxbank;
-	int color = ((state->m_videoram[offs] & 0xf8) >> 3) + 32 * state->m_palettebank;
+	int code = m_videoram[offs + 1] + ((m_videoram[offs] & 0x07) << 8) + 2048 * m_gfxbank;
+	int color = ((m_videoram[offs] & 0xf8) >> 3) + 32 * m_palettebank;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( arkanoid )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(arkanoid_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

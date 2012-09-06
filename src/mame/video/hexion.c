@@ -20,16 +20,14 @@ INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info0 )
+TILE_GET_INFO_MEMBER(hexion_state::get_tile_info0)
 {
-	hexion_state *state = machine.driver_data<hexion_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_vram[0]);
+	get_tile_info(machine(),tileinfo,tile_index,m_vram[0]);
 }
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(hexion_state::get_tile_info1)
 {
-	hexion_state *state = machine.driver_data<hexion_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->m_vram[1]);
+	get_tile_info(machine(),tileinfo,tile_index,m_vram[1]);
 }
 
 
@@ -43,8 +41,8 @@ static TILE_GET_INFO( get_tile_info1 )
 VIDEO_START( hexion )
 {
 	hexion_state *state = machine.driver_data<hexion_state>();
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info0,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info1,TILEMAP_SCAN_ROWS,     8,8,64,32);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,     8,8,64,32);
 
 	state->m_bg_tilemap[0]->set_transparent_pen(0);
 	state->m_bg_tilemap[1]->set_scrollx(0,-4);

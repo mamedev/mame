@@ -165,9 +165,9 @@ WRITE8_MEMBER(_1943_state::c1943_d806_w)
 	m_obj_on = data & 0x40;
 }
 
-static TILE_GET_INFO( c1943_get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg2_tile_info)
 {
-	UINT8 *tilerom = machine.root_device().memregion("gfx5")->base() + 0x8000;
+	UINT8 *tilerom = machine().root_device().memregion("gfx5")->base() + 0x8000;
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];
@@ -175,12 +175,12 @@ static TILE_GET_INFO( c1943_get_bg2_tile_info )
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
-static TILE_GET_INFO( c1943_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg_tile_info)
 {
-	UINT8 *tilerom = machine.root_device().memregion("gfx5")->base();
+	UINT8 *tilerom = machine().root_device().memregion("gfx5")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];
@@ -189,25 +189,24 @@ static TILE_GET_INFO( c1943_get_bg_tile_info )
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
 	tileinfo.group = color;
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( c1943_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(_1943_state::c1943_get_fg_tile_info)
 {
-	_1943_state *state = machine.driver_data<_1943_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0xe0) << 3);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0xe0) << 3);
 	int color = attr & 0x1f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( 1943 )
 {
 	_1943_state *state = machine.driver_data<_1943_state>();
-	state->m_bg2_tilemap = tilemap_create(machine, c1943_get_bg2_tile_info, TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
-	state->m_bg_tilemap = tilemap_create(machine, c1943_get_bg_tile_info, TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
-	state->m_fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg2_tile_info),state), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg_tile_info),state), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0x0f);
 	state->m_fg_tilemap->set_transparent_pen(0);

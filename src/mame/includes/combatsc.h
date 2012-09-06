@@ -66,6 +66,12 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
 	DECLARE_WRITE8_MEMBER(combatscb_dac_w);
 	DECLARE_DRIVER_INIT(combatsc);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_text_info);
+	TILE_GET_INFO_MEMBER(get_tile_info0_bootleg);
+	TILE_GET_INFO_MEMBER(get_tile_info1_bootleg);
+	TILE_GET_INFO_MEMBER(get_text_info_bootleg);
 };
 
 

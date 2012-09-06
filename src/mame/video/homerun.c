@@ -43,19 +43,18 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
 }
 
-static TILE_GET_INFO( get_homerun_tile_info )
+TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 {
-	homerun_state *state = machine.driver_data<homerun_state>();
-	int tileno = (state->m_videoram[tile_index]) + ((state->m_videoram[tile_index + 0x1000] & 0x38) << 5) + ((state->m_gfx_ctrl & 1) << 11);
-	int palno = (state->m_videoram[tile_index + 0x1000] & 0x07);
+	int tileno = (m_videoram[tile_index]) + ((m_videoram[tile_index + 0x1000] & 0x38) << 5) + ((m_gfx_ctrl & 1) << 11);
+	int palno = (m_videoram[tile_index + 0x1000] & 0x07);
 
-	SET_TILE_INFO(0, tileno, palno, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
 }
 
 VIDEO_START( homerun )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
-	state->m_tilemap = tilemap_create(machine, get_homerun_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(homerun_state::get_homerun_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )

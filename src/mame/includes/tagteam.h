@@ -24,6 +24,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tagteam_control_w);
 	DECLARE_WRITE8_MEMBER(tagteam_flipscreen_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

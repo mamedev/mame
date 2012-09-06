@@ -9,32 +9,30 @@
 #include "emu.h"
 #include "includes/cabal.h"
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 {
-	cabal_state *state = machine.driver_data<cabal_state>();
 
-	int tile = state->m_videoram[tile_index];
+	int tile = m_videoram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_text_tile_info )
+TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 {
-	cabal_state *state = machine.driver_data<cabal_state>();
 
-	int tile = state->m_colorram[tile_index];
+	int tile = m_colorram[tile_index];
 	int color = (tile>>10);
 
 	tile &= 0x3ff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -46,8 +44,8 @@ VIDEO_START( cabal )
 {
 	cabal_state *state = machine.driver_data<cabal_state>();
 
-	state->m_background_layer = tilemap_create(machine, get_back_tile_info,TILEMAP_SCAN_ROWS,16,16,16,16);
-	state->m_text_layer       = tilemap_create(machine, get_text_tile_info,TILEMAP_SCAN_ROWS,  8,8,32,32);
+	state->m_background_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_back_tile_info),state),TILEMAP_SCAN_ROWS,16,16,16,16);
+	state->m_text_layer       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_text_tile_info),state),TILEMAP_SCAN_ROWS,  8,8,32,32);
 
 	state->m_text_layer->set_transparent_pen(3);
 	state->m_background_layer->set_transparent_pen(15);

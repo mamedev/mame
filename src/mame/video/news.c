@@ -8,28 +8,26 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(news_state::get_fg_tile_info)
 {
-	news_state *state = machine.driver_data<news_state>();
-	int code = (state->m_fgram[tile_index * 2] << 8) | state->m_fgram[tile_index * 2 + 1];
-	SET_TILE_INFO(
+	int code = (m_fgram[tile_index * 2] << 8) | m_fgram[tile_index * 2 + 1];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(news_state::get_bg_tile_info)
 {
-	news_state *state = machine.driver_data<news_state>();
-	int code = (state->m_bgram[tile_index * 2] << 8) | state->m_bgram[tile_index * 2 + 1];
+	int code = (m_bgram[tile_index * 2] << 8) | m_bgram[tile_index * 2 + 1];
 	int color = (code & 0xf000) >> 12;
 
 	code &= 0x0fff;
 	if ((code & 0x0e00) == 0x0e00)
-		code = (code & 0x1ff) | (state->m_bgpic << 9);
+		code = (code & 0x1ff) | (m_bgpic << 9);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
@@ -48,10 +46,10 @@ VIDEO_START( news )
 {
 	news_state *state = machine.driver_data<news_state>();
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(news_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(news_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

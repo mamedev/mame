@@ -83,6 +83,8 @@ public:
 	DECLARE_DRIVER_INIT(tengai);
 	DECLARE_DRIVER_INIT(s1945jn);
 	DECLARE_DRIVER_INIT(gunbird);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

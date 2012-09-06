@@ -49,13 +49,12 @@ PALETTE_INIT( dogfgt )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(dogfgt_state::get_tile_info)
 {
-	dogfgt_state *state = machine.driver_data<dogfgt_state>();
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_bgvideoram[tile_index],
-			state->m_bgvideoram[tile_index + 0x400] & 0x03,
+			m_bgvideoram[tile_index],
+			m_bgvideoram[tile_index + 0x400] & 0x03,
 			0);
 }
 
@@ -69,7 +68,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( dogfgt )
 {
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
 	state->save_pointer(NAME(state->m_bitmapram), BITMAPRAM_SIZE);

@@ -79,6 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(bking_pos_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

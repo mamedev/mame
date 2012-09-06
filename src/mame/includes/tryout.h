@@ -28,6 +28,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tryout_vram_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tryout_flipscreen_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
+	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
 };
 
 

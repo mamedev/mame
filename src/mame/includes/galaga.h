@@ -50,6 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(custom_mod_r);
 	DECLARE_DRIVER_INIT(galaga);
 	DECLARE_DRIVER_INIT(gatsbee);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 class xevious_state : public galaga_state

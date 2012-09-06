@@ -141,6 +141,16 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
 	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
 	DECLARE_DRIVER_INIT(countryc);
+	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
+	TILE_GET_INFO_MEMBER(marvins_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(ikari_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(gwar_get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(marvins_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(marvins_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(aso_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(tnk3_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(ikari_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(gwar_get_bg_tile_info);
 };
 
 

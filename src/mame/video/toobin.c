@@ -17,24 +17,22 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_alpha_tile_info )
+TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
 {
-	toobin_state *state = machine.driver_data<toobin_state>();
-	UINT16 data = state->m_alpha[tile_index];
+	UINT16 data = m_alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	SET_TILE_INFO(2, code, color, (data >> 10) & 1);
+	SET_TILE_INFO_MEMBER(2, code, color, (data >> 10) & 1);
 }
 
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
 {
-	toobin_state *state = machine.driver_data<toobin_state>();
-	UINT16 data1 = state->m_playfield[tile_index * 2];
-	UINT16 data2 = state->m_playfield[tile_index * 2 + 1];
+	UINT16 data1 = m_playfield[tile_index * 2];
+	UINT16 data2 = m_playfield[tile_index * 2 + 1];
 	int code = data2 & 0x3fff;
 	int color = data1 & 0x0f;
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX(data2 >> 14));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data2 >> 14));
 	tileinfo.category = (data1 >> 4) & 3;
 }
 
@@ -87,13 +85,13 @@ VIDEO_START( toobin )
 	toobin_state *state = machine.driver_data<toobin_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_ROWS,  8,8, 128,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toobin_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,48);
+	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toobin_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,48);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate a playfield bitmap for rendering */

@@ -43,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cbasebal_scrollx_w);
 	DECLARE_WRITE8_MEMBER(cbasebal_scrolly_w);
 	DECLARE_DRIVER_INIT(cbasebal);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 /*----------- defined in video/cbasebal.c -----------*/

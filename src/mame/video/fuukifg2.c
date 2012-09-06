@@ -52,10 +52,10 @@ INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, tilemap
 	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
-static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine, tileinfo, tile_index, 0); }
-static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine, tileinfo, tile_index, 1); }
-static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine, tileinfo, tile_index, 2); }
-static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info(machine, tileinfo, tile_index, 3); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_0){ get_tile_info(machine(), tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(machine(), tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
 
 INLINE void fuuki16_vram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
@@ -95,10 +95,10 @@ PALETTE_INIT( fuuki16 )
 VIDEO_START( fuuki16 )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_2),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_3),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_tilemap[0]->set_transparent_pen(0x0f);	// 4 bits
 	state->m_tilemap[1]->set_transparent_pen(0xff);	// 8 bits

@@ -20,6 +20,8 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxia_dataport_w);
 	DECLARE_READ8_MEMBER(galaxia_collision_r);
 	DECLARE_READ8_MEMBER(galaxia_collision_clear);
+	TILE_GET_INFO_MEMBER(get_galaxia_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_astrowar_bg_tile_info);
 };
 
 

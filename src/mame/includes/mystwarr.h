@@ -52,6 +52,8 @@ public:
 	DECLARE_READ16_MEMBER(ddd_053936_tilerom_1_r);
 	DECLARE_READ16_MEMBER(gai_053936_tilerom_2_r);
 	DECLARE_READ16_MEMBER(ddd_053936_tilerom_2_r);
+	TILE_GET_INFO_MEMBER(get_gai_936_tile_info);
+	TILE_GET_INFO_MEMBER(get_ult_936_tile_info);
 };
 
 

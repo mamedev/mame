@@ -46,6 +46,10 @@ public:
 	DECLARE_WRITE8_MEMBER(popper_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(popper_e002_w);
 	DECLARE_WRITE8_MEMBER(popper_gfx_bank_w);
+	TILE_GET_INFO_MEMBER(get_popper_p123_tile_info);
+	TILE_GET_INFO_MEMBER(get_popper_p0_tile_info);
+	TILE_GET_INFO_MEMBER(get_popper_ol_p123_tile_info);
+	TILE_GET_INFO_MEMBER(get_popper_ol_p0_tile_info);
 };
 
 

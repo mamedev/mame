@@ -18,6 +18,7 @@ public:
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_READ16_MEMBER(leta_r);
 	DECLARE_READ16_MEMBER(special_port0_r);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

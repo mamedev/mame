@@ -33,7 +33,7 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_bg0_videoram_w)
  Tilemap Related Functions
 *******************************************************************************/
 
-static TILE_GET_INFO( get_fg0_tile_info )
+TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 {
 	/*- FG0 RAM Format -**
 
@@ -50,27 +50,26 @@ static TILE_GET_INFO( get_fg0_tile_info )
 
     **- End of Comments -*/
 
-	wwfsstar_state *state = machine.driver_data<wwfsstar_state>();
 	UINT16 *tilebase;
 	int tileno;
 	int colbank;
 
-	tilebase =  &state->m_fg0_videoram[tile_index*2];
+	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x00f0) >> 4;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tileno,
 			colbank,
 			0);
 }
 
-static TILEMAP_MAPPER( bg0_scan )
+TILEMAP_MAPPER_MEMBER(wwfsstar_state::bg0_scan)
 {
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static TILE_GET_INFO( get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 {
 	/*- BG0 RAM Format -**
 
@@ -88,15 +87,14 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
     **- End of Comments -*/
 
-	wwfsstar_state *state = machine.driver_data<wwfsstar_state>();
 	UINT16 *tilebase;
 	int tileno, colbank, flipx;
 
-	tilebase =  &state->m_bg0_videoram[tile_index*2];
+	tilebase =  &m_bg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x0070) >> 4;
 	flipx   = (tilebase[0] & 0x0080) >> 7;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tileno,
 			colbank,
@@ -211,10 +209,10 @@ VIDEO_START( wwfsstar )
 {
 	wwfsstar_state *state = machine.driver_data<wwfsstar_state>();
 
-	state->m_fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_fg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfsstar_state::get_fg0_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 	state->m_fg0_tilemap->set_transparent_pen(0);
 
-	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,bg0_scan, 16, 16,32,32);
+	state->m_bg0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wwfsstar_state::get_bg0_tile_info),state),tilemap_mapper_delegate(FUNC(wwfsstar_state::bg0_scan),state), 16, 16,32,32);
 	state->m_fg0_tilemap->set_transparent_pen(0);
 }
 

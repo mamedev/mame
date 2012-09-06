@@ -18,6 +18,7 @@ public:
 	DECLARE_READ8_MEMBER(zac_s2636_r);
 	DECLARE_WRITE8_MEMBER(zac_s2636_w);
 	DECLARE_READ8_MEMBER(tinvader_port_0_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

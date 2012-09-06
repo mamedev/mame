@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pitnrun_h_heed_w);
 	DECLARE_WRITE8_MEMBER(pitnrun_v_heed_w);
 	DECLARE_WRITE8_MEMBER(pitnrun_color_select_w);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
 };
 
 

@@ -55,24 +55,22 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "includes/metro.h"
 #include "video/konicdev.h"
 
-static TILE_GET_INFO( metro_k053936_get_tile_info )
+TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	int code = state->m_k053936_ram[tile_index];
+	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code & 0x7fff,
 			0x1e,
 			0);
 }
 
-static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
+TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	int code = state->m_k053936_ram[tile_index];
+	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			(code & 0x7fff)>>2,
 			0x1e,
@@ -85,7 +83,7 @@ WRITE16_MEMBER(metro_state::metro_k053936_w)
 	m_k053936_tilemap->mark_tile_dirty(offset);
 }
 
-static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
+TILEMAP_MAPPER_MEMBER(metro_state::tilemap_scan_gstrik2)
 {
 	/* logical (col,row) -> memory offset */
 	int val;
@@ -358,7 +356,7 @@ VIDEO_START( blzntrnd )
 
 	state->m_has_zoom = 1;
 
-	state->m_k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
+	state->m_k053936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
 	state->m_bg_tilemap_scrolldx[0] = 8;
 	state->m_bg_tilemap_scrolldx[1] = 8;
@@ -373,7 +371,7 @@ VIDEO_START( gstrik2 )
 
 	state->m_has_zoom = 1;
 
-	state->m_k053936_tilemap = tilemap_create(machine, metro_k053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16, 16, 128, 256);
+	state->m_k053936_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),state), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),state), 16, 16, 128, 256);
 
 	state->m_bg_tilemap_scrolldx[0] = 8;
 	state->m_bg_tilemap_scrolldx[1] = 0;

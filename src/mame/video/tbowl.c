@@ -8,16 +8,15 @@
 
 /* Foreground Layer (tx) Tilemap */
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
 {
-	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int tileno;
 	int col;
 
-	tileno = state->m_txvideoram[tile_index] | ((state->m_txvideoram[tile_index+0x800] & 0x07) << 8);
-	col = (state->m_txvideoram[tile_index+0x800] & 0xf0) >> 4;
+	tileno = m_txvideoram[tile_index] | ((m_txvideoram[tile_index+0x800] & 0x07) << 8);
+	col = (m_txvideoram[tile_index+0x800] & 0xf0) >> 4;
 
-	SET_TILE_INFO(0,tileno,col,0);
+	SET_TILE_INFO_MEMBER(0,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_txvideoram_w)
@@ -28,16 +27,15 @@ WRITE8_MEMBER(tbowl_state::tbowl_txvideoram_w)
 
 /* Bottom BG Layer (bg) Tilemap */
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tbowl_state::get_bg_tile_info)
 {
-	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int tileno;
 	int col;
 
-	tileno = state->m_bgvideoram[tile_index] | ((state->m_bgvideoram[tile_index+0x1000] & 0x0f) << 8);
-	col = (state->m_bgvideoram[tile_index+0x1000] & 0xf0) >> 4;
+	tileno = m_bgvideoram[tile_index] | ((m_bgvideoram[tile_index+0x1000] & 0x0f) << 8);
+	col = (m_bgvideoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO(1,tileno,col,0);
+	SET_TILE_INFO_MEMBER(1,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_bg2videoram_w)
@@ -68,17 +66,16 @@ WRITE8_MEMBER(tbowl_state::tbowl_bgyscroll_hi)
 
 /* Middle BG Layer (bg2) Tilemaps */
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(tbowl_state::get_bg2_tile_info)
 {
-	tbowl_state *state = machine.driver_data<tbowl_state>();
 	int tileno;
 	int col;
 
-	tileno = state->m_bg2videoram[tile_index] | ((state->m_bg2videoram[tile_index+0x1000] & 0x0f) << 8);
+	tileno = m_bg2videoram[tile_index] | ((m_bg2videoram[tile_index+0x1000] & 0x0f) << 8);
 	tileno ^= 0x400;
-	col = (state->m_bg2videoram[tile_index+0x1000] & 0xf0) >> 4;
+	col = (m_bg2videoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO(2,tileno,col,0);
+	SET_TILE_INFO_MEMBER(2,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_bgvideoram_w)
@@ -193,9 +190,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 VIDEO_START( tbowl )
 {
 	tbowl_state *state = machine.driver_data<tbowl_state>();
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16,128,32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16,128,32);
 
 	state->m_tx_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);

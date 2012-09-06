@@ -37,15 +37,14 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_paletteram_w)
 
 /******************************************************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
 {
-	alpha68k_state *state = machine.driver_data<alpha68k_state>();
-	int tile = state->m_videoram[2 * tile_index] & 0xff;
-	int color = state->m_videoram[2 * tile_index + 1] & 0x0f;
+	int tile = m_videoram[2 * tile_index] & 0xff;
+	int color = m_videoram[2 * tile_index + 1] & 0x0f;
 
-	tile = tile | (state->m_bank_base << 8);
+	tile = tile | (m_bank_base << 8);
 
-	SET_TILE_INFO(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
@@ -66,7 +65,7 @@ VIDEO_START( alpha68k )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	state->m_fix_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fix_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(alpha68k_state::get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	state->m_fix_tilemap->set_transparent_pen(0);
 }
 

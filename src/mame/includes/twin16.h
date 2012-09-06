@@ -57,6 +57,7 @@ public:
 	DECLARE_DRIVER_INIT(fround);
 	DECLARE_DRIVER_INIT(twin16);
 	DECLARE_DRIVER_INIT(cuebrickj);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 };
 
 

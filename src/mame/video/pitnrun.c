@@ -21,28 +21,26 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 
 
-static TILE_GET_INFO( get_tile_info1 )
+TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code;
 	code = videoram[tile_index];
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 		0,
 		code,
 		0,
 		0);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	int code;
-	code = state->m_videoram2[tile_index];
-	SET_TILE_INFO(
+	code = m_videoram2[tile_index];
+	SET_TILE_INFO_MEMBER(
 		1,
-		code + (state->m_char_bank<<8),
-		state->m_color_select&1,
+		code + (m_char_bank<<8),
+		m_color_select&1,
 		0);
 }
 
@@ -165,8 +163,8 @@ PALETTE_INIT (pitnrun)
 VIDEO_START(pitnrun)
 {
 	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	state->m_fg = tilemap_create( machine, get_tile_info1,TILEMAP_SCAN_ROWS,8,8,32,32 );
-	state->m_bg = tilemap_create( machine, get_tile_info2,TILEMAP_SCAN_ROWS,8,8,32*4,32 );
+	state->m_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info1),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	state->m_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info2),state),TILEMAP_SCAN_ROWS,8,8,32*4,32 );
 	state->m_fg->set_transparent_pen(0 );
 	state->m_tmp_bitmap[0] = auto_bitmap_ind16_alloc(machine,128,128);
 	state->m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine,128,128);

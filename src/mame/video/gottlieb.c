@@ -121,26 +121,24 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 	if ((code & 0x80) == 0)
-		SET_TILE_INFO(state->m_gfxcharlo, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO(state->m_gfxcharhi, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
 }
 
-static TILE_GET_INFO( get_screwloo_bg_tile_info )
+TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 	if ((code & 0xc0) == 0)
-		SET_TILE_INFO(state->m_gfxcharlo, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO(state->m_gfxcharhi, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
 }
 
 
@@ -159,7 +157,7 @@ VIDEO_START( gottlieb )
 	state->m_transparent0 = FALSE;
 
 	/* configure the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
@@ -186,7 +184,7 @@ VIDEO_START( screwloo )
 	state->m_transparent0 = FALSE;
 
 	/* configure the background tilemap */
-	state->m_bg_tilemap = tilemap_create(machine, get_screwloo_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(0, 318 - 256);
 

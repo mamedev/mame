@@ -94,20 +94,19 @@ PALETTE_INIT( snookr10 )
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 {
-	snookr10_state *state = machine.driver_data<snookr10_state>();
 /*  - bits -
     7654 3210
     xxxx ----   tiles color.
     ---- xxxx   seems unused.
 */
 	int offs = tile_index;
-	int attr = state->m_videoram[offs] + (state->m_colorram[offs] << 8);
+	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
 	int code = attr & 0xfff;
-	int color = state->m_colorram[offs] >> 4;
+	int color = m_colorram[offs] >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -158,33 +157,32 @@ PALETTE_INIT( apple10 )
 	}
 }
 
-static TILE_GET_INFO( apple10_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 {
-	snookr10_state *state = machine.driver_data<snookr10_state>();
 /*  - bits -
     7654 3210
     xxxx ----   tiles color.
     ---- xxxx   seems unused.
 */
 	int offs = tile_index;
-	int attr = state->m_videoram[offs] + (state->m_colorram[offs] << 8);
+	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
 	int code = BITSWAP16((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7);	/* encrypted tile matrix */
-	int color = state->m_colorram[offs] >> 4;
+	int color = m_colorram[offs] >> 4;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
 VIDEO_START( snookr10 )
 {
 	snookr10_state *state = machine.driver_data<snookr10_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snookr10_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 VIDEO_START( apple10 )
 {
 	snookr10_state *state = machine.driver_data<snookr10_state>();
-	state->m_bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(snookr10_state::apple10_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
 SCREEN_UPDATE_IND16( snookr10 )

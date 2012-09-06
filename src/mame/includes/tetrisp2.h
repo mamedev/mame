@@ -95,6 +95,13 @@ public:
 	DECLARE_DRIVER_INIT(rockn);
 	DECLARE_DRIVER_INIT(rockn3);
 	DECLARE_DRIVER_INIT(rocknms);
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	TILE_GET_INFO_MEMBER(get_tile_info_rot);
+	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_bg);
+	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
+	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);
+	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
 };
 
 class stepstag_state : public tetrisp2_state

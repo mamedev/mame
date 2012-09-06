@@ -110,14 +110,13 @@ PALETTE_INIT( m57 )
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 {
-	m57_state *state = machine.driver_data<m57_state>();
 
-	UINT8 attr = state->m_videoram[tile_index * 2 + 0];
-	UINT16 code = state->m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
+	UINT8 attr = m_videoram[tile_index * 2 + 0];
+	UINT16 code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
-	SET_TILE_INFO(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
+	SET_TILE_INFO_MEMBER(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
 
 
@@ -145,7 +144,7 @@ VIDEO_START( m57 )
 {
 	m57_state *state = machine.driver_data<m57_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_rows(256);
 
 	state->save_item(NAME(state->m_flipscreen));

@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(battlane_spriteram_w);
 	DECLARE_WRITE8_MEMBER(battlane_bitmap_w);
 	DECLARE_WRITE8_MEMBER(battlane_video_ctrl_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILEMAP_MAPPER_MEMBER(battlane_tilemap_scan_rows_2x2);
 };
 
 

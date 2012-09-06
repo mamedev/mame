@@ -62,38 +62,36 @@ WRITE8_MEMBER(tehkanwc_state::gridiron_led1_w)
 	m_led1 = data;
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tehkanwc_state::get_bg_tile_info)
 {
-	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
 	int offs = tile_index * 2;
-	int attr = state->m_videoram2[offs + 1];
-	int code = state->m_videoram2[offs] + ((attr & 0x30) << 4);
+	int attr = m_videoram2[offs + 1];
+	int code = m_videoram2[offs] + ((attr & 0x30) << 4);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tehkanwc_state::get_fg_tile_info)
 {
-	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x10) << 4);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x10) << 4);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
 	tileinfo.category = (attr & 0x20) ? 0 : 1;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START( tehkanwc )
 {
 	tehkanwc_state *state = machine.driver_data<tehkanwc_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tehkanwc_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 16, 8, 32, 32);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tehkanwc_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);

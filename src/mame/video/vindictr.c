@@ -16,24 +16,22 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_alpha_tile_info )
+TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
 {
-	vindictr_state *state = machine.driver_data<vindictr_state>();
-	UINT16 data = state->m_alpha[tile_index];
+	UINT16 data = m_alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
-static TILE_GET_INFO( get_playfield_tile_info )
+TILE_GET_INFO_MEMBER(vindictr_state::get_playfield_tile_info)
 {
-	vindictr_state *state = machine.driver_data<vindictr_state>();
-	UINT16 data = state->m_playfield[tile_index];
-	int code = (state->m_playfield_tile_bank * 0x1000) + (data & 0xfff);
+	UINT16 data = m_playfield[tile_index];
+	int code = (m_playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
-	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -85,13 +83,13 @@ VIDEO_START( vindictr )
 	vindictr_state *state = machine.driver_data<vindictr_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, TILEMAP_SCAN_COLS,  8,8, 64,64);
+	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vindictr_state::get_playfield_tile_info),state), TILEMAP_SCAN_COLS,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vindictr_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 	state->m_alpha_tilemap->set_transparent_pen(0);
 
 	/* save states */

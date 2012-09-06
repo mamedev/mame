@@ -115,11 +115,10 @@ PALETTE_INIT( m52 )
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 {
-	m52_state *state = machine.driver_data<m52_state>();
-	UINT8 video = state->m_videoram[tile_index];
-	UINT8 color = state->m_colorram[tile_index];
+	UINT8 video = m_videoram[tile_index];
+	UINT8 color = m_colorram[tile_index];
 
 	int flag = 0;
 	int code = 0;
@@ -136,7 +135,7 @@ static TILE_GET_INFO( get_tile_info )
 		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO(0, code, color & 0x3f, flag);
+	SET_TILE_INFO_MEMBER(0, code, color & 0x3f, flag);
 }
 
 
@@ -151,7 +150,7 @@ VIDEO_START( m52 )
 {
 	m52_state *state = machine.driver_data<m52_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scrolldx(128 - 1, -1);

@@ -529,18 +529,17 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 // pppppppp ff--atttt tttttttt tttttttt
 #define HNG64_GET_TILE_INFO                                                    \
 {                                                                              \
-	hng64_state *state = machine.driver_data<hng64_state>();                 \
-	UINT16 tilemapinfo = (state->m_videoregs[reg]>>shift)&0xffff;                 \
+	UINT16 tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                 \
 	int tileno,pal, flip;                                                      \
                                                                                \
-	tileno = state->m_videoram[tile_index+(offset/4)];                            \
+	tileno = m_videoram[tile_index+(offset/4)];                            \
                                                                                \
 	pal = (tileno&0xff000000)>>24;                                             \
 	flip =(tileno&0x00c00000)>>22;                                             \
                                                                                \
 	if (tileno&0x200000)                                                       \
 	{                                                                          \
-		tileno = (tileno & state->m_videoregs[0x0b]) | state->m_videoregs[0x0c];     \
+		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];     \
 	}                                                                          \
                                                                                \
 	tileno &= 0x1fffff;                                                        \
@@ -549,28 +548,28 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
 		{                                                                      \
-			SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));               \
+			SET_TILE_INFO_MEMBER(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));               \
 		}                                                                      \
 		else                                                                   \
 		{                                                                      \
-			SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX(flip));                    \
+			SET_TILE_INFO_MEMBER(0,tileno, pal,TILE_FLIPYX(flip));                    \
 		}                                                                      \
 	}                                                                          \
 	else                                                                       \
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
 		{                                                                      \
-			SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));               \
+			SET_TILE_INFO_MEMBER(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));               \
 		}                                                                      \
 		else                                                                   \
 		{                                                                      \
-			SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
+			SET_TILE_INFO_MEMBER(2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
 		}                                                                      \
 	}                                                                          \
 }                                                                              \
 	                                                                           \
 
-static TILE_GET_INFO( get_hng64_tile0_8x8_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_8x8_info)
 {
 	int offset = 0x00000;
 	int size = 0;
@@ -580,7 +579,7 @@ static TILE_GET_INFO( get_hng64_tile0_8x8_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile0_16x16_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_16x16_info)
 {
 	int offset = 0x00000;
 	int size = 1;
@@ -590,7 +589,7 @@ static TILE_GET_INFO( get_hng64_tile0_16x16_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile1_8x8_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile1_8x8_info)
 {
 	int offset = 0x10000;
 	int size = 0;
@@ -600,7 +599,7 @@ static TILE_GET_INFO( get_hng64_tile1_8x8_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile1_16x16_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile1_16x16_info)
 {
 	int offset = 0x10000;
 	int size = 1;
@@ -610,7 +609,7 @@ static TILE_GET_INFO( get_hng64_tile1_16x16_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile2_8x8_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile2_8x8_info)
 {
 	int offset = 0x20000;
 	int size = 0;
@@ -620,7 +619,7 @@ static TILE_GET_INFO( get_hng64_tile2_8x8_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile2_16x16_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile2_16x16_info)
 {
 	int offset = 0x20000;
 	int size = 1;
@@ -630,7 +629,7 @@ static TILE_GET_INFO( get_hng64_tile2_16x16_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile3_8x8_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_8x8_info)
 {
 	int offset = 0x30000;
 	int size = 0;
@@ -640,7 +639,7 @@ static TILE_GET_INFO( get_hng64_tile3_8x8_info )
 	HNG64_GET_TILE_INFO
 }
 
-static TILE_GET_INFO( get_hng64_tile3_16x16_info )
+TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_16x16_info)
 {
 	int offset = 0x30000;
 	int size = 1;
@@ -1658,21 +1657,21 @@ VIDEO_START( hng64 )
 	state->m_old_tileflags2 = -1;
 	state->m_old_tileflags3 = -1;
 
-	state->m_tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap0_16x16_alt = tilemap_create(machine, get_hng64_tile0_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_8x8       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_8x8_info),state),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_16x16     = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_16x16_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->m_tilemap1_8x8       = tilemap_create(machine, get_hng64_tile1_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap1_16x16     = tilemap_create(machine, get_hng64_tile1_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap1_16x16_alt = tilemap_create(machine, get_hng64_tile1_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_8x8       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_8x8_info),state),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_16x16     = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_16x16_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->m_tilemap2_8x8       = tilemap_create(machine, get_hng64_tile2_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap2_16x16     = tilemap_create(machine, get_hng64_tile2_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap2_16x16_alt = tilemap_create(machine, get_hng64_tile2_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_8x8       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_8x8_info),state),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_16x16     = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_16x16_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->m_tilemap3_8x8       = tilemap_create(machine, get_hng64_tile3_8x8_info,   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->m_tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_8x8       = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_8x8_info),state),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_16x16     = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_16x16_alt = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),state), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
 	state->m_tilemap0_8x8->set_transparent_pen(0);
 	state->m_tilemap0_16x16->set_transparent_pen(0);

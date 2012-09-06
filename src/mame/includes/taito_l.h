@@ -104,6 +104,9 @@ public:
 	DECLARE_WRITE8_MEMBER(champwr_msm5205_volume_w);
 	DECLARE_WRITE8_MEMBER(portA_w);
 	DECLARE_DRIVER_INIT(plottinga);
+	TILE_GET_INFO_MEMBER(get_bg18_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg19_tile_info);
+	TILE_GET_INFO_MEMBER(get_ch1a_tile_info);
 };
 
 /*----------- defined in video/taito_l.c -----------*/

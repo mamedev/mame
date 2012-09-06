@@ -33,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER(multiply_w);
 	DECLARE_WRITE8_MEMBER(flkatck_k007121_w);
 	DECLARE_WRITE8_MEMBER(flkatck_k007121_regs_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_A);
+	TILE_GET_INFO_MEMBER(get_tile_info_B);
 };
 
 

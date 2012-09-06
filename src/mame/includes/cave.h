@@ -181,6 +181,11 @@ public:
 	DECLARE_DRIVER_INIT(sailormn);
 	DECLARE_DRIVER_INIT(dfeveron);
 	DECLARE_DRIVER_INIT(metmqstr);
+	TILE_GET_INFO_MEMBER(sailormn_get_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_3);
 };
 
 /*----------- defined in video/cave.c -----------*/

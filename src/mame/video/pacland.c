@@ -157,31 +157,29 @@ PALETTE_INIT( pacland )
 
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(pacland_state::get_bg_tile_info)
 {
-	pacland_state *state = machine.driver_data<pacland_state>();
 	int offs = tile_index * 2;
-	int attr = state->m_videoram2[offs + 1];
-	int code = state->m_videoram2[offs] + ((attr & 0x01) << 8);
+	int attr = m_videoram2[offs + 1];
+	int code = m_videoram2[offs] + ((attr & 0x01) << 8);
 	int color = ((attr & 0x3e) >> 1) + ((code & 0x1c0) >> 1);
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
 {
-	pacland_state *state = machine.driver_data<pacland_state>();
 	int offs = tile_index * 2;
-	int attr = state->m_videoram[offs + 1];
-	int code = state->m_videoram[offs] + ((attr & 0x01) << 8);
+	int attr = m_videoram[offs + 1];
+	int code = m_videoram[offs] + ((attr & 0x01) << 8);
 	int color = ((attr & 0x1e) >> 1) + ((code & 0x1e0) >> 1);
 	int flags = TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x20) ? 1 : 0;
 	tileinfo.group = color;
 
-	SET_TILE_INFO(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
@@ -200,8 +198,8 @@ VIDEO_START( pacland )
 	machine.primary_screen->register_screen_bitmap(state->m_fg_bitmap);
 	state->m_fg_bitmap.fill(0xffff);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fg_tilemap->set_scroll_rows(32);
 

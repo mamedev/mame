@@ -43,6 +43,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tecmo16_scroll2_y_w);
 	DECLARE_WRITE16_MEMBER(tecmo16_scroll_char_x_w);
 	DECLARE_WRITE16_MEMBER(tecmo16_scroll_char_y_w);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 };
 
 

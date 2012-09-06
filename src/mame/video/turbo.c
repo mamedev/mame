@@ -165,11 +165,10 @@ PALETTE_INIT( buckrog )
  *
  *************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
 {
-	turbo_state *state = machine.driver_data<turbo_state>();
-	int code = state->m_videoram[tile_index];
-	SET_TILE_INFO(0, code, code >> 2, 0);
+	int code = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, code >> 2, 0);
 }
 
 
@@ -178,7 +177,7 @@ VIDEO_START( turbo )
 	turbo_state *state = machine.driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 }
 
 
@@ -187,7 +186,7 @@ VIDEO_START( buckrog )
 	turbo_state *state = machine.driver_data<turbo_state>();
 
 	/* initialize the foreground tilemap */
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* allocate the bitmap RAM */
 	state->m_buckrog_bitmap_ram = auto_alloc_array(machine, UINT8, 0xe000);

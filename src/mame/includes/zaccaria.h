@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(zaccaria_port0b_w);
 	DECLARE_WRITE8_MEMBER(zaccaria_port1b_w);
 	DECLARE_WRITE8_MEMBER(mc1408_data_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

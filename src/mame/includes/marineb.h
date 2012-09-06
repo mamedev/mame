@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(marineb_palette_bank_1_w);
 	DECLARE_WRITE8_MEMBER(marineb_flipscreen_x_w);
 	DECLARE_WRITE8_MEMBER(marineb_flipscreen_y_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

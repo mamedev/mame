@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(solomon_videoram2_w);
 	DECLARE_WRITE8_MEMBER(solomon_colorram2_w);
 	DECLARE_WRITE8_MEMBER(solomon_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

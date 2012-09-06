@@ -45,6 +45,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
 	DECLARE_DRIVER_INIT(crshrace2);
 	DECLARE_DRIVER_INIT(crshrace);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
 };
 
 /*----------- defined in video/crshrace.c -----------*/

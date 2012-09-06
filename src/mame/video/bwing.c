@@ -170,27 +170,24 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 //****************************************************************************
 // Initializations
 
-static TILE_GET_INFO( get_fgtileinfo )
+TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
-	tileinfo.pen_data = machine.gfx[2]->get_data(state->m_fgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo.palette_base = machine.gfx[2]->colorbase() + ((state->m_fgdata[tile_index] >> 7) << 3);
+	tileinfo.pen_data = machine().gfx[2]->get_data(m_fgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo.palette_base = machine().gfx[2]->colorbase() + ((m_fgdata[tile_index] >> 7) << 3);
 }
 
-static TILE_GET_INFO( get_bgtileinfo )
+TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
-	tileinfo.pen_data = machine.gfx[3]->get_data(state->m_bgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo.palette_base = machine.gfx[3]->colorbase() + ((state->m_bgdata[tile_index] >> 7) << 3);
+	tileinfo.pen_data = machine().gfx[3]->get_data(m_bgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo.palette_base = machine().gfx[3]->colorbase() + ((m_bgdata[tile_index] >> 7) << 3);
 }
 
-static TILE_GET_INFO( get_charinfo )
+TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
-	SET_TILE_INFO(0, state->m_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-static TILEMAP_MAPPER( bwing_scan_cols )
+TILEMAP_MAPPER_MEMBER(bwing_state::bwing_scan_cols)
 {
 	return ((col << 6) + row);
 }
@@ -202,9 +199,9 @@ VIDEO_START( bwing )
 //	UINT32 *dwptr;
 	int i;
 
-	state->m_charmap = tilemap_create(machine, get_charinfo, TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	state->m_fgmap = tilemap_create(machine, get_fgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
-	state->m_bgmap = tilemap_create(machine, get_bgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
+	state->m_charmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),state), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	state->m_fgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),state), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),state), 16, 16, 64, 64);
+	state->m_bgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),state), tilemap_mapper_delegate(FUNC(bwing_state::bwing_scan_cols),state), 16, 16, 64, 64);
 
 	state->m_charmap->set_transparent_pen(0);
 	state->m_fgmap->set_transparent_pen(0);

@@ -64,6 +64,9 @@ public:
 	DECLARE_WRITE16_MEMBER(f1gp_fgscroll_w);
 	DECLARE_WRITE16_MEMBER(f1gp_gfxctrl_w);
 	DECLARE_WRITE16_MEMBER(f1gp2_gfxctrl_w);
+	TILE_GET_INFO_MEMBER(f1gp_get_roz_tile_info);
+	TILE_GET_INFO_MEMBER(f1gp2_get_roz_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 /*----------- defined in video/f1gp.c -----------*/

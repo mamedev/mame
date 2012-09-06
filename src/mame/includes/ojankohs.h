@@ -59,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ojankohs_adpcm_reset_w);
 	DECLARE_READ8_MEMBER(ojankohs_ay8910_0_r);
 	DECLARE_READ8_MEMBER(ojankohs_ay8910_1_r);
+	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
+	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
 };
 
 

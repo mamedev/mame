@@ -100,6 +100,16 @@ public:
 	DECLARE_DRIVER_INIT(lastmisn);
 	DECLARE_DRIVER_INIT(gondo);
 	DECLARE_DRIVER_INIT(oscar);
+	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
+	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
+	TILE_GET_INFO_MEMBER(get_oscar_fix_tile_info);
+	TILEMAP_MAPPER_MEMBER(lastmisn_scan_rows);
+	TILE_GET_INFO_MEMBER(get_lastmisn_tile_info);
+	TILE_GET_INFO_MEMBER(get_lastmisn_fix_tile_info);
+	TILE_GET_INFO_MEMBER(get_srdarwin_fix_tile_info);
+	TILE_GET_INFO_MEMBER(get_srdarwin_tile_info);
+	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
+	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
 };
 
 /*----------- defined in video/dec8.c -----------*/

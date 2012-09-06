@@ -103,9 +103,9 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
 	m_objon = data & 0x20;
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = machine.root_device().memregion("gfx4")->base();
+	UINT8 *tilerom = machine().root_device().memregion("gfx4")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];
@@ -113,26 +113,25 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(gunsmoke_state::get_fg_tile_info)
 {
-	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0xe0) << 2);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0xe0) << 2);
 	int color = attr & 0x1f;
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( gunsmoke )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,  32, 32, 2048, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gunsmoke_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,  32, 32, 2048, 8);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gunsmoke_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x4f);
 }

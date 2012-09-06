@@ -52,6 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tsamurai_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(tsamurai_fg_colorram_w);
 	DECLARE_WRITE8_MEMBER(vsgongf_color_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
 };
 
 

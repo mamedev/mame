@@ -30,6 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m52_bgcontrol_w);
 	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(alpha1v_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 /*----------- defined in video/m52.c -----------*/

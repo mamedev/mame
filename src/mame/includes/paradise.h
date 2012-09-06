@@ -45,6 +45,9 @@ public:
 	DECLARE_DRIVER_INIT(torus);
 	DECLARE_DRIVER_INIT(paradise);
 	DECLARE_DRIVER_INIT(tgtball);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_2);
 };
 
 /*----------- defined in video/paradise.c -----------*/

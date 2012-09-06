@@ -18,26 +18,24 @@
 
 ***************************************************************************/
 
-static TILE_GET_INFO( pb_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(superqix_state::pb_get_bg_tile_info)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	int attr = state->m_videoram[tile_index + 0x400];
-	int code = state->m_videoram[tile_index] + 256 * (attr & 0x7);
+	int attr = m_videoram[tile_index + 0x400];
+	int code = m_videoram[tile_index] + 256 * (attr & 0x7);
 	int color = (attr & 0xf0) >> 4;
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( sqix_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	int attr = state->m_videoram[tile_index + 0x400];
+	int attr = m_videoram[tile_index + 0x400];
 	int bank = (attr & 0x04) ? 0 : 1;
-	int code = state->m_videoram[tile_index] + 256 * (attr & 0x03);
+	int code = m_videoram[tile_index] + 256 * (attr & 0x03);
 	int color = (attr & 0xf0) >> 4;
 
-	if (bank) code += 1024 * state->m_gfxbank;
+	if (bank) code += 1024 * m_gfxbank;
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 	tileinfo.group = (attr & 0x08) >> 3;
 }
 
@@ -52,7 +50,7 @@ static TILE_GET_INFO( sqix_get_bg_tile_info )
 VIDEO_START( pbillian )
 {
 	superqix_state *state = machine.driver_data<superqix_state>();
-	state->m_bg_tilemap = tilemap_create(machine, pb_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8,32,32);
 }
 
 VIDEO_START( superqix )
@@ -60,7 +58,7 @@ VIDEO_START( superqix )
 	superqix_state *state = machine.driver_data<superqix_state>();
 	state->m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine, 256, 256);
 	state->m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine, 256, 256);
-	state->m_bg_tilemap = tilemap_create(machine, sqix_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	state->m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */

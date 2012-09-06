@@ -52,6 +52,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gcpinbal_tilemaps_word_w);
 	DECLARE_READ16_MEMBER(gcpinbal_ctrl_word_r);
 	DECLARE_WRITE16_MEMBER(gcpinbal_ctrl_word_w);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

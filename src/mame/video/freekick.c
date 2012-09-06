@@ -4,21 +4,20 @@
 #include "includes/freekick.h"
 
 
-static TILE_GET_INFO( get_freek_tile_info )
+TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)
 {
-	freekick_state *state = machine.driver_data<freekick_state>();
 	int tileno, palno;
 
-	tileno = state->m_videoram[tile_index] + ((state->m_videoram[tile_index + 0x400] & 0xe0) << 3);
-	palno = state->m_videoram[tile_index + 0x400] & 0x1f;
-	SET_TILE_INFO(0, tileno, palno, 0);
+	tileno = m_videoram[tile_index] + ((m_videoram[tile_index + 0x400] & 0xe0) << 3);
+	palno = m_videoram[tile_index + 0x400] & 0x1f;
+	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
 }
 
 
 VIDEO_START( freekick )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
-	state->m_freek_tilemap = tilemap_create(machine, get_freek_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_freek_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(freekick_state::get_freek_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

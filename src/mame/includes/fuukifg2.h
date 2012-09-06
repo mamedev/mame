@@ -36,6 +36,10 @@ public:
 	DECLARE_WRITE16_MEMBER(fuuki16_vram_2_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_vram_3_w);
 	DECLARE_WRITE8_MEMBER(fuuki16_oki_banking_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_3);
 };
 
 

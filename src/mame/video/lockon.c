@@ -139,14 +139,13 @@ WRITE16_MEMBER(lockon_state::lockon_char_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_lockon_tile_info )
+TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
 {
-	lockon_state *state = machine.driver_data<lockon_state>();
-	UINT32 tileno = state->m_char_ram[tile_index] & 0x03ff;
-	UINT32 col = (state->m_char_ram[tile_index] >> 10) & 0x3f;
+	UINT32 tileno = m_char_ram[tile_index] & 0x03ff;
+	UINT32 col = (m_char_ram[tile_index] >> 10) & 0x3f;
 
 	col = (col & 0x1f) + (col & 0x20 ? 64 : 0);
-	SET_TILE_INFO(0, tileno, col, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, col, 0);
 }
 
 
@@ -900,7 +899,7 @@ VIDEO_START( lockon )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_lockon_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	state->m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */

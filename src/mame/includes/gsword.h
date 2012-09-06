@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
 	DECLARE_DRIVER_INIT(gsword);
 	DECLARE_DRIVER_INIT(gsword2);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

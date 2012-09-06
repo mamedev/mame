@@ -137,6 +137,11 @@ public:
 	DECLARE_DRIVER_INIT(bullsdrtg);
 	DECLARE_DRIVER_INIT(ladybugg);
 	DECLARE_DRIVER_INIT(4in1);
+	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
+	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
+	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
 };
 
 

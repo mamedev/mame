@@ -54,6 +54,9 @@ public:
 	DECLARE_WRITE8_MEMBER(wwjgtin_video_control_w);
 	DECLARE_WRITE8_MEMBER(pinbo_video_control_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
+	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
 };
 
 

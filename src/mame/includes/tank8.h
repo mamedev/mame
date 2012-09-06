@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tank8_attract_w);
 	DECLARE_WRITE8_MEMBER(tank8_motor_w);
 	DECLARE_DRIVER_INIT(decode);
+	TILE_GET_INFO_MEMBER(tank8_get_tile_info);
 };
 
 

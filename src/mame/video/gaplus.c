@@ -81,7 +81,7 @@ PALETTE_INIT( gaplus )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static TILEMAP_MAPPER( tilemap_scan )
+TILEMAP_MAPPER_MEMBER(gaplus_state::tilemap_scan)
 {
 	int offs;
 
@@ -95,15 +95,14 @@ static TILEMAP_MAPPER( tilemap_scan )
 	return offs;
 }
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(gaplus_state::get_tile_info)
 {
-	gaplus_state *state = machine.driver_data<gaplus_state>();
-	UINT8 attr = state->m_videoram[tile_index + 0x400];
+	UINT8 attr = m_videoram[tile_index + 0x400];
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_videoram[tile_index] + ((attr & 0x80) << 1),
+			m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
 }
@@ -183,7 +182,7 @@ static void starfield_init(running_machine &machine)
 VIDEO_START( gaplus )
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gaplus_state::get_tile_info),state),tilemap_mapper_delegate(FUNC(gaplus_state::tilemap_scan),state),8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 0xff);
 

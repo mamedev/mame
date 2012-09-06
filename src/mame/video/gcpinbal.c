@@ -5,38 +5,35 @@
 /*******************************************************************/
 
 
-static TILE_GET_INFO( get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 tilenum = state->m_tilemapram[0 + tile_index * 2];
-	UINT16 attr    = state->m_tilemapram[1 + tile_index * 2];
+	UINT16 tilenum = m_tilemapram[0 + tile_index * 2];
+	UINT16 attr    = m_tilemapram[1 + tile_index * 2];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			(tilenum & 0xfff) + state->m_bg0_gfxset,
+			(tilenum & 0xfff) + m_bg0_gfxset,
 			(attr & 0x1f),
 			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
 
-static TILE_GET_INFO( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 tilenum = state->m_tilemapram[0x800 + tile_index * 2];
-	UINT16 attr    = state->m_tilemapram[0x801 + tile_index * 2];
+	UINT16 tilenum = m_tilemapram[0x800 + tile_index * 2];
+	UINT16 attr    = m_tilemapram[0x801 + tile_index * 2];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
-			(tilenum & 0xfff) + 0x2000 + state->m_bg1_gfxset,
+			(tilenum & 0xfff) + 0x2000 + m_bg1_gfxset,
 			(attr & 0x1f) + 0x30,
 			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(gcpinbal_state::get_fg_tile_info)
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 tilenum = state->m_tilemapram[0x1000 + tile_index];
+	UINT16 tilenum = m_tilemapram[0x1000 + tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			(tilenum & 0xfff),
 			(tilenum >> 12) | 0x70,
@@ -49,9 +46,9 @@ static void gcpinbal_core_vh_start( running_machine &machine )
 	int xoffs = 0;
 	int yoffs = 0;
 
-	state->m_tilemap[0] = tilemap_create(machine, get_bg0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_tilemap[1] = tilemap_create(machine, get_bg1_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_tilemap[2] = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg0_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg1_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_tilemap[0]->set_transparent_pen(0);
 	state->m_tilemap[1]->set_transparent_pen(0);

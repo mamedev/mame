@@ -151,6 +151,9 @@ public:
 	DECLARE_DRIVER_INIT(dharmak);
 	DECLARE_DRIVER_INIT(puzzlet);
 	DECLARE_DRIVER_INIT(metro);
+	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
+	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
 };
 
 

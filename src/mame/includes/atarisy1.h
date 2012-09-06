@@ -59,6 +59,8 @@ public:
 	DECLARE_DRIVER_INIT(marble);
 	DECLARE_DRIVER_INIT(roadrunn);
 	DECLARE_DRIVER_INIT(indytemp);
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 };
 
 

@@ -79,12 +79,11 @@ WRITE8_MEMBER(scotrsht_state::scotrsht_palettebank_w)
 }
 
 
-static TILE_GET_INFO( scotrsht_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(scotrsht_state::scotrsht_get_bg_tile_info)
 {
-	scotrsht_state *state = machine.driver_data<scotrsht_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + (state->m_charbank << 9) + ((attr & 0x40) << 2);
-	int color = (attr & 0x0f) + state->m_palette_bank * 16;
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + (m_charbank << 9) + ((attr & 0x40) << 2);
+	int color = (attr & 0x0f) + m_palette_bank * 16;
 	int flag = 0;
 
 	if(attr & 0x10)	flag |= TILE_FLIPX;
@@ -92,7 +91,7 @@ static TILE_GET_INFO( scotrsht_get_bg_tile_info )
 
 	// data & 0x80 -> tile priority?
 
-	SET_TILE_INFO(0, code, color, flag);
+	SET_TILE_INFO_MEMBER(0, code, color, flag);
 }
 
 /* Same as Jailbreak + palette bank */
@@ -130,7 +129,7 @@ VIDEO_START( scotrsht )
 {
 	scotrsht_state *state = machine.driver_data<scotrsht_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, scotrsht_get_bg_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(scotrsht_state::scotrsht_get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state->m_bg_tilemap->set_scroll_cols(64);
 }

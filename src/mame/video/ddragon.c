@@ -50,41 +50,38 @@ Sprite layout.
 
 ***************************************************************************/
 
-static TILEMAP_MAPPER( background_scan )
+TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	UINT8 attr = state->m_bgvideoram[2 * tile_index];
-	SET_TILE_INFO(
+	UINT8 attr = m_bgvideoram[2 * tile_index];
+	SET_TILE_INFO_MEMBER(
 			2,
-			state->m_bgvideoram[2 * tile_index+1] + ((attr & 0x07) << 8),
+			m_bgvideoram[2 * tile_index+1] + ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	UINT8 attr = state->m_fgvideoram[2 * tile_index];
-	SET_TILE_INFO(
+	UINT8 attr = m_fgvideoram[2 * tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fgvideoram[2 * tile_index + 1] + ((attr & 0x07) << 8),
+			m_fgvideoram[2 * tile_index + 1] + ((attr & 0x07) << 8),
 			attr >> 5,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_16color_tile_info )
+TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 {
-	ddragon_state *state = machine.driver_data<ddragon_state>();
-	UINT8 attr = state->m_fgvideoram[2 * tile_index];
-	SET_TILE_INFO(
+	UINT8 attr = m_fgvideoram[2 * tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
-			state->m_fgvideoram[2 * tile_index+1] + ((attr & 0x0f) << 8),
+			m_fgvideoram[2 * tile_index+1] + ((attr & 0x0f) << 8),
 			attr >> 4,
 			0);
 }
@@ -100,8 +97,8 @@ VIDEO_START( ddragon )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, background_scan, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(ddragon_state::background_scan),state), 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrolldx(0, 384 - 256);
@@ -114,8 +111,8 @@ VIDEO_START( chinagat )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_16color_tile_info,TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(ddragon_state::background_scan),state), 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_fg_16color_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_scrolldy(-8, -8);

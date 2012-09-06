@@ -150,15 +150,14 @@ static void spaceod_bg_init_palette(running_machine &machine)
  *
  *************************************/
 
-static TILE_GET_INFO( spaceod_get_tile_info )
+TILE_GET_INFO_MEMBER(segag80r_state::spaceod_get_tile_info)
 {
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	int code = state->memregion("gfx2")->base()[tile_index + 0x1000 * (state->m_spaceod_bg_control >> 6)];
-	SET_TILE_INFO(1, code + 0x100 * ((state->m_spaceod_bg_control >> 2) & 1), 0, 0);
+	int code = memregion("gfx2")->base()[tile_index + 0x1000 * (m_spaceod_bg_control >> 6)];
+	SET_TILE_INFO_MEMBER(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
 
-static TILEMAP_MAPPER( spaceod_scan_rows )
+TILEMAP_MAPPER_MEMBER(segag80r_state::spaceod_scan_rows)
 {
 	/* this works for both horizontal and vertical tilemaps */
 	/* which are 4 32x32 sections */
@@ -166,11 +165,10 @@ static TILEMAP_MAPPER( spaceod_scan_rows )
 }
 
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
 {
-	segag80r_state *state = machine.driver_data<segag80r_state>();
-	int code = state->memregion("gfx2")->base()[tile_index];
-	SET_TILE_INFO(1, code + 0x100 * state->m_bg_char_bank, code >> 4, 0);
+	int code = memregion("gfx2")->base()[tile_index];
+	SET_TILE_INFO_MEMBER(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
 }
 
 
@@ -210,19 +208,19 @@ VIDEO_START( segag80r )
 		/* and one vertically scrolling */
 		case G80_BACKGROUND_SPACEOD:
 			spaceod_bg_init_palette(machine);
-			state->m_spaceod_bg_htilemap = tilemap_create(machine, spaceod_get_tile_info, spaceod_scan_rows,  8,8, 128,32);
-			state->m_spaceod_bg_vtilemap = tilemap_create(machine, spaceod_get_tile_info, spaceod_scan_rows,  8,8, 32,128);
+			state->m_spaceod_bg_htilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::spaceod_get_tile_info),state), tilemap_mapper_delegate(FUNC(segag80r_state::spaceod_scan_rows),state),  8,8, 128,32);
+			state->m_spaceod_bg_vtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::spaceod_get_tile_info),state), tilemap_mapper_delegate(FUNC(segag80r_state::spaceod_scan_rows),state),  8,8, 32,128);
 			break;
 
 		/* background tilemap is effectively 1 screen x n screens */
 		case G80_BACKGROUND_MONSTERB:
-			state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,machine.root_device().memregion("gfx2")->bytes() / 32);
+			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,machine.root_device().memregion("gfx2")->bytes() / 32);
 			break;
 
 		/* background tilemap is effectively 4 screens x n screens */
 		case G80_BACKGROUND_PIGNEWT:
 		case G80_BACKGROUND_SINDBADM:
-			state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 128,machine.root_device().memregion("gfx2")->bytes() / 128);
+			state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 128,machine.root_device().memregion("gfx2")->bytes() / 128);
 			break;
 	}
 

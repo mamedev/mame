@@ -22,6 +22,8 @@ public:
 	DECLARE_WRITE8_MEMBER(timelimt_scroll_x_lsb_w);
 	DECLARE_WRITE8_MEMBER(timelimt_scroll_x_msb_w);
 	DECLARE_WRITE8_MEMBER(timelimt_scroll_y_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 

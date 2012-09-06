@@ -83,6 +83,20 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
 	DECLARE_DRIVER_INIT(fromanc4);
 	DECLARE_DRIVER_INIT(fromanc2);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l0_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l1_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l2_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v0_l3_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v1_l0_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v1_l1_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v1_l2_tile_info);
+	TILE_GET_INFO_MEMBER(fromanc2_get_v1_l3_tile_info);
+	TILE_GET_INFO_MEMBER(fromancr_get_v0_l0_tile_info);
+	TILE_GET_INFO_MEMBER(fromancr_get_v0_l1_tile_info);
+	TILE_GET_INFO_MEMBER(fromancr_get_v0_l2_tile_info);
+	TILE_GET_INFO_MEMBER(fromancr_get_v1_l0_tile_info);
+	TILE_GET_INFO_MEMBER(fromancr_get_v1_l1_tile_info);
+	TILE_GET_INFO_MEMBER(fromancr_get_v1_l2_tile_info);
 };
 
 

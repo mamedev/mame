@@ -31,6 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(battlex_flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(battlex_in0_b4_r);
 	DECLARE_DRIVER_INIT(battlex);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

@@ -105,16 +105,15 @@ WRITE16_MEMBER(suprslam_state::suprslam_screen_videoram_w)
 }
 
 
-static TILE_GET_INFO( get_suprslam_tile_info )
+TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_tile_info)
 {
-	suprslam_state *state = machine.driver_data<suprslam_state>();
-	int tileno = state->m_screen_videoram[tile_index] & 0x0fff;
-	int colour = state->m_screen_videoram[tile_index] & 0xf000;
+	int tileno = m_screen_videoram[tile_index] & 0x0fff;
+	int colour = m_screen_videoram[tile_index] & 0xf000;
 
-	tileno += state->m_screen_bank;
+	tileno += m_screen_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO(0, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 }
 
 
@@ -127,16 +126,15 @@ WRITE16_MEMBER(suprslam_state::suprslam_bg_videoram_w)
 }
 
 
-static TILE_GET_INFO( get_suprslam_bg_tile_info )
+TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 {
-	suprslam_state *state = machine.driver_data<suprslam_state>();
-	int tileno = state->m_bg_videoram[tile_index] & 0x0fff;
-	int colour = state->m_bg_videoram[tile_index] & 0xf000;
+	int tileno = m_bg_videoram[tile_index] & 0x0fff;
+	int colour = m_bg_videoram[tile_index] & 0xf000;
 
-	tileno += state->m_bg_bank;
+	tileno += m_bg_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO(2, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
 
@@ -144,8 +142,8 @@ VIDEO_START( suprslam )
 {
 	suprslam_state *state = machine.driver_data<suprslam_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_suprslam_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_screen_tilemap = tilemap_create(machine, get_suprslam_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_screen_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->m_screen_tilemap->set_transparent_pen(15);
 }

@@ -372,8 +372,8 @@ INLINE void twineagl_tile_info( running_machine &machine, tile_data &tileinfo, i
 	SET_TILE_INFO( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-static TILE_GET_INFO( twineagl_get_tile_info_0 ) { twineagl_tile_info( machine, tileinfo, tile_index, 0x0000 ); }
-static TILE_GET_INFO( twineagl_get_tile_info_1 ) { twineagl_tile_info( machine, tileinfo, tile_index, 0x1000 ); }
+TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info( machine(), tileinfo, tile_index, 0x0000 ); }
+TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_1){ twineagl_tile_info( machine(), tileinfo, tile_index, 0x1000 ); }
 
 
 INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer, int offset )
@@ -397,10 +397,10 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	SET_TILE_INFO( gfx, state->m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info( machine, tileinfo, tile_index, 0, 0x0000 ); }
-static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info( machine, tileinfo, tile_index, 0, 0x1000 ); }
-static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info( machine, tileinfo, tile_index, 1, 0x0000 ); }
-static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info( machine, tileinfo, tile_index, 1, 0x1000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info( machine(), tileinfo, tile_index, 0, 0x0000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_1){ get_tile_info( machine(), tileinfo, tile_index, 0, 0x1000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_2){ get_tile_info( machine(), tileinfo, tile_index, 1, 0x0000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info( machine(), tileinfo, tile_index, 1, 0x1000 ); }
 
 
 WRITE16_MEMBER(seta_state::seta_vram_0_w)
@@ -449,18 +449,18 @@ VIDEO_START( seta_2_layers )
        at any given time */
 
 	/* layer 0 */
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 
 	/* layer 1 */
-	state->m_tilemap_2 = tilemap_create(	machine, get_tile_info_2, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_2),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_3 = tilemap_create(	machine, get_tile_info_3, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_3),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 	state->m_tilemaps_flip = 0;
@@ -484,10 +484,10 @@ VIDEO_START( seta_1_layer )
        at any given time */
 
 	/* layer 0 */
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 	state->m_color_mode_shift = 4;
@@ -506,10 +506,10 @@ VIDEO_START( twineagl_1_layer )
        at any given time */
 
 	/* layer 0 */
-	state->m_tilemap_0 = tilemap_create(	machine, twineagl_get_tile_info_0, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_0),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
-	state->m_tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, TILEMAP_SCAN_ROWS,
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_1),state), TILEMAP_SCAN_ROWS,
 								 16,16, 64,32 );
 
 	state->m_tilemap_0->set_transparent_pen(0);

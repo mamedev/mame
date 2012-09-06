@@ -22,6 +22,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mainsnk_fgram_w);
 	DECLARE_WRITE8_MEMBER(mainsnk_bgram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mainsnk_sound_r);
+	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 

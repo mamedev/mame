@@ -14,25 +14,24 @@ WRITE8_MEMBER(orbit_state::orbit_playfield_w)
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
-	UINT8 code = state->m_playfield_ram[tile_index];
+	UINT8 code = m_playfield_ram[tile_index];
 	int flags = 0;
 
 	if (BIT(code, 6))
 		flags |= TILE_FLIPX;
-	if (state->m_flip_screen)
+	if (m_flip_screen)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO(3, code & 0x3f, 0, flags);
+	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flags);
 }
 
 
 VIDEO_START( orbit )
 {
 	orbit_state *state = machine.driver_data<orbit_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(orbit_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 30);
 }
 
 

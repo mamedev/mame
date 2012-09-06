@@ -57,9 +57,9 @@ WRITE16_MEMBER(prehisle_state::prehisle_control16_w)
 	}
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(prehisle_state::get_bg2_tile_info)
 {
-	UINT8 *tilerom = machine.root_device().memregion("gfx5")->base();
+	UINT8 *tilerom = machine().root_device().memregion("gfx5")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1] + (tilerom[offs] << 8);
@@ -67,41 +67,39 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
 {
-	prehisle_state *state = machine.driver_data<prehisle_state>();
-	int attr = state->m_bg_videoram16[tile_index];
+	int attr = m_bg_videoram16[tile_index];
 	int code = attr & 0x7ff;
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 {
-	prehisle_state *state = machine.driver_data<prehisle_state>();
-	int attr = state->m_videoram[tile_index];
+	int attr = m_videoram[tile_index];
 	int code = attr & 0xfff;
 	int color = attr >> 12;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 VIDEO_START( prehisle )
 {
 	prehisle_state *state = machine.driver_data<prehisle_state>();
 
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg2_tile_info),state), TILEMAP_SCAN_COLS,
 		 16, 16, 1024, 32);
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS,
 		 16, 16, 256, 32);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,
 		 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(15);

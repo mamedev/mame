@@ -42,17 +42,16 @@
 
 /*****************************************************************************/
 
-static TILE_GET_INFO( get_pf_tile_info )
+TILE_GET_INFO_MEMBER(m107_state::get_pf_tile_info)
 {
-	m107_state *state = machine.driver_data<m107_state>();
 	pf_layer_info *layer = (pf_layer_info *)param;
 	int tile, attrib;
 	tile_index = 2 * tile_index + layer->vram_base;
 
-	attrib = state->m_vram_data[tile_index + 1];
-	tile = state->m_vram_data[tile_index] + ((attrib & 0x1000) << 4);
+	attrib = m_vram_data[tile_index + 1];
+	tile = m_vram_data[tile_index] + ((attrib & 0x1000) << 4);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			attrib & 0x7f,
@@ -129,7 +128,7 @@ VIDEO_START( m107 )
 		pf_layer_info *layer = &state->m_pf_layer[laynum];
 
 		/* allocate a tilemaps per layer */
-		layer->tmap = tilemap_create(machine, get_pf_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,64);
+		layer->tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m107_state::get_pf_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 64,64);
 
 		/* set the user data to point to the layer */
 		layer->tmap->set_user_data(&state->m_pf_layer[laynum]);

@@ -88,6 +88,7 @@ public:
 	DECLARE_DRIVER_INIT(brickzn);
 	DECLARE_DRIVER_INIT(hardhead);
 	DECLARE_DRIVER_INIT(suna8);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 

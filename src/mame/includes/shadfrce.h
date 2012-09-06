@@ -38,6 +38,9 @@ public:
 	DECLARE_WRITE16_MEMBER(shadfrce_bg1scrollx_w);
 	DECLARE_WRITE16_MEMBER(shadfrce_bg1scrolly_w);
 	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	TILE_GET_INFO_MEMBER(get_shadfrce_fgtile_info);
+	TILE_GET_INFO_MEMBER(get_shadfrce_bg0tile_info);
+	TILE_GET_INFO_MEMBER(get_shadfrce_bg1tile_info);
 };
 
 

@@ -14,40 +14,37 @@
 
 /******************************************************************************/
 
-static TILE_GET_INFO( fg_get_tile_info )
+TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
 {
-	tecmo16_state *state = machine.driver_data<tecmo16_state>();
-	int tile = state->m_videoram[tile_index] & 0x1fff;
-	int color = state->m_colorram[tile_index] & 0x0f;
+	int tile = m_videoram[tile_index] & 0x1fff;
+	int color = m_colorram[tile_index] & 0x0f;
 
 	/* bit 4 controls blending */
-	tileinfo.category = (state->m_colorram[tile_index] & 0x10) >> 4;
+	tileinfo.category = (m_colorram[tile_index] & 0x10) >> 4;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color | (tileinfo.category ? 0x70 : 0x00),
 			0);
 }
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 {
-	tecmo16_state *state = machine.driver_data<tecmo16_state>();
-	int tile = state->m_videoram2[tile_index] & 0x1fff;
-	int color = (state->m_colorram2[tile_index] & 0x0f)+0x10;
+	int tile = m_videoram2[tile_index] & 0x1fff;
+	int color = (m_colorram2[tile_index] & 0x0f)+0x10;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( tx_get_tile_info )
+TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
 {
-	tecmo16_state *state = machine.driver_data<tecmo16_state>();
-	int tile = state->m_charram[tile_index];
-	SET_TILE_INFO(
+	int tile = m_charram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile & 0x0fff,
 			tile >> 12,
@@ -67,9 +64,9 @@ VIDEO_START( fstarfrc )
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::fg_get_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::tx_get_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);
@@ -91,9 +88,9 @@ VIDEO_START( ginkun )
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::fg_get_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::tx_get_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);
@@ -113,9 +110,9 @@ VIDEO_START( riot )
 	/* set up sprites */
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_bitmap);
 
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,TILEMAP_SCAN_ROWS,16,16,64,32);
-	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::fg_get_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::bg_get_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tecmo16_state::tx_get_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_transparent_pen(0);

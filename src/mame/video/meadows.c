@@ -18,11 +18,10 @@
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
 {
-	meadows_state *state = machine.driver_data<meadows_state>();
-	UINT8 *videoram = state->m_videoram;
-	SET_TILE_INFO(0, videoram[tile_index] & 0x7f, 0, 0);
+	UINT8 *videoram = m_videoram;
+	SET_TILE_INFO_MEMBER(0, videoram[tile_index] & 0x7f, 0, 0);
 }
 
 
@@ -36,7 +35,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( meadows )
 {
 	meadows_state *state = machine.driver_data<meadows_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,30);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(meadows_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,30);
 }
 
 

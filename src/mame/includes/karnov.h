@@ -51,6 +51,7 @@ public:
 	DECLARE_DRIVER_INIT(chelnovu);
 	DECLARE_DRIVER_INIT(chelnovj);
 	DECLARE_DRIVER_INIT(chelnov);
+	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 };
 
 enum {
