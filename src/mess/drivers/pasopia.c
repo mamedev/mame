@@ -17,6 +17,7 @@
 #include "machine/z80pio.h"
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
+#include "includes/pasopia.h"
 
 class pasopia_state : public driver_device
 {
@@ -55,12 +56,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(testa_w);
 	DECLARE_WRITE_LINE_MEMBER(testb_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_READ8_MEMBER(keyb_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
 
 	UINT8 m_hblank;
 	UINT16 m_vram_addr;
 	UINT8 m_vram_latch;
 	UINT8 m_attr_latch;
 //  UINT8 m_gfx_mode;
+	UINT8 m_mux_data;
 	bool m_video_wl;
 	bool m_ram_bank;
 	UINT8 *m_p_vram;
@@ -125,13 +130,14 @@ static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
 //  0x1c - 0x1f something
 	AM_RANGE(0x20,0x23) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x28,0x2b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x30,0x33) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x30,0x33) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 //  0x38 printer
 	AM_RANGE(0x3c,0x3c) AM_WRITE(pasopia_ctrl_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pasopia )
+	PASOPIA_KEYBOARD
 INPUT_PORTS_END
 
 static MACHINE_START(pasopia)
@@ -243,37 +249,49 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		// ZC/TO2 callback
 };
 
-READ8_MEMBER( pasopia_state::testa_r )
+READ8_MEMBER( pasopia_state::mux_r )
 {
-	printf("A R\n");
-	return 0xff;
+	return m_mux_data;
 }
 
-READ8_MEMBER( pasopia_state::testb_r )
+READ8_MEMBER( pasopia_state::keyb_r )
 {
-	printf("B R\n");
-	return 0xff;
+	const char *const keynames[3][4] = { { "KEY0", "KEY1", "KEY2", "KEY3" },
+					                     { "KEY4", "KEY5", "KEY6", "KEY7" },
+							             { "KEY8", "KEY9", "KEYA", "KEYB" } };
+	int i,j;
+	UINT8 res;
+
+	res = 0;
+	for(j=0;j<3;j++)
+	{
+		if(m_mux_data & 0x10 << j)
+		{
+			for(i=0;i<4;i++)
+			{
+				if(m_mux_data & 1 << i)
+					res |= ioport(keynames[j][i])->read();
+			}
+		}
+	}
+
+	return res ^ 0xff;
 }
 
-WRITE_LINE_MEMBER( pasopia_state::testa_w )
+WRITE8_MEMBER( pasopia_state::mux_w )
 {
-	printf("A %02x\n",state);
-}
-
-WRITE_LINE_MEMBER( pasopia_state::testb_w )
-{
-	printf("B %02x\n",state);
+	m_mux_data = data;
 }
 
 static Z80PIO_INTERFACE( z80pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
-	DEVCB_DRIVER_MEMBER(pasopia_state, testa_r), // port A read
-	DEVCB_NULL, // port A write
-	DEVCB_DRIVER_LINE_MEMBER(pasopia_state, testa_w), // ready A
-	DEVCB_DRIVER_MEMBER(pasopia_state, testb_r), // port B read
-	DEVCB_NULL, // port B write
-	DEVCB_DRIVER_LINE_MEMBER(pasopia_state, testb_w) // ready B
+	DEVCB_DRIVER_MEMBER(pasopia_state, mux_r),
+	DEVCB_DRIVER_MEMBER(pasopia_state, mux_w),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pasopia_state, keyb_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const mc6845_interface mc6845_intf =
@@ -313,17 +331,7 @@ static const z80_daisy_config pasopia_daisy[] =
 	{ NULL }
 };
 
-// temporary hack
-WRITE8_MEMBER( pasopia_state::kbd_put )
-{
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
-	mem->write_byte(0xfe79, data);
-}
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(pasopia_state, kbd_put)
-};
 
 DRIVER_INIT_MEMBER(pasopia_state,pasopia)
 {
@@ -364,9 +372,6 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_4MHz, ctc_intf )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
-
-	// temporary hack
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

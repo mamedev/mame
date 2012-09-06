@@ -23,6 +23,7 @@
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 #include "rendlay.h"
+#include "includes/pasopia.h"
 
 class pasopia7_state : public driver_device
 {
@@ -63,9 +64,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pasopia7_fdc_w);
 	DECLARE_READ8_MEMBER(pasopia7_io_r);
 	DECLARE_WRITE8_MEMBER(pasopia7_io_w);
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE_LINE_MEMBER(testa_w);
-	DECLARE_WRITE_LINE_MEMBER(testb_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_READ8_MEMBER(keyb_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(crtc_portb_r);
 	DECLARE_WRITE8_MEMBER(screen_mode_w);
 	DECLARE_WRITE8_MEMBER(plane_reg_w);
@@ -101,6 +102,7 @@ public:
 	UINT8 m_screen_type;
 	int m_addr_latch;
 	void pasopia_nmi_trap();
+	UINT8 m_mux_data;
 	DECLARE_DRIVER_INIT(p7_lcd);
 	DECLARE_DRIVER_INIT(p7_raster);
 };
@@ -128,76 +130,6 @@ static VIDEO_START( pasopia7 )
 		ram_space->write_byte(0xfce1,_charset_); \
 	} \
 
-/* cheap kludge to use the keyboard without going nuts with the debugger ... */
-static void fake_keyboard_data(running_machine &machine)
-{
-	address_space *ram_space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-	ram_space->write_byte(0xfda4,0x00); //clear flag
-
-	keyb_press(KEYCODE_Z, 'z');
-	keyb_press(KEYCODE_X, 'x');
-	keyb_press(KEYCODE_C, 'c');
-	keyb_press(KEYCODE_V, 'v');
-	keyb_press(KEYCODE_B, 'b');
-	keyb_press(KEYCODE_N, 'n');
-	keyb_press(KEYCODE_M, 'm');
-
-	keyb_press(KEYCODE_A, 'a');
-	keyb_press(KEYCODE_S, 's');
-	keyb_press(KEYCODE_D, 'd');
-	keyb_press(KEYCODE_F, 'f');
-	keyb_press(KEYCODE_G, 'g');
-	keyb_press(KEYCODE_H, 'h');
-	keyb_press(KEYCODE_J, 'j');
-	keyb_press(KEYCODE_K, 'k');
-	keyb_press(KEYCODE_L, 'l');
-
-	keyb_press(KEYCODE_Q, 'q');
-	keyb_press(KEYCODE_W, 'w');
-	keyb_press(KEYCODE_E, 'e');
-	keyb_press(KEYCODE_R, 'r');
-	keyb_press(KEYCODE_T, 't');
-	keyb_press(KEYCODE_Y, 'y');
-	keyb_press(KEYCODE_U, 'u');
-	keyb_press(KEYCODE_I, 'i');
-	keyb_press(KEYCODE_O, 'o');
-	keyb_press(KEYCODE_P, 'p');
-
-	keyb_press(KEYCODE_0, '0');
-	keyb_press(KEYCODE_1, '1');
-	keyb_press(KEYCODE_2, '2');
-	keyb_press(KEYCODE_3, '3');
-	keyb_press(KEYCODE_4, '4');
-	keyb_press(KEYCODE_5, '5');
-	keyb_press(KEYCODE_6, '6');
-	keyb_press(KEYCODE_7, '7');
-	keyb_press(KEYCODE_8, '8');
-	keyb_press(KEYCODE_9, '9');
-
-	keyb_shift_press(KEYCODE_0, '=');
-	keyb_shift_press(KEYCODE_1, '!');
-	keyb_shift_press(KEYCODE_2, '"');
-	keyb_shift_press(KEYCODE_3, '?');
-	keyb_shift_press(KEYCODE_4, '$');
-	keyb_shift_press(KEYCODE_5, '%');
-	keyb_shift_press(KEYCODE_6, '&');
-	keyb_shift_press(KEYCODE_7, '/');
-	keyb_shift_press(KEYCODE_8, '(');
-	keyb_shift_press(KEYCODE_9, ')');
-
-	keyb_press(KEYCODE_ENTER, 0x0d);
-	keyb_press(KEYCODE_SPACE, ' ');
-	keyb_press(KEYCODE_STOP, '.');
-	keyb_shift_press(KEYCODE_STOP, ':');
-	keyb_press(KEYCODE_BACKSPACE, 0x08);
-	keyb_press(KEYCODE_0_PAD, '@'); //@
-	keyb_press(KEYCODE_COMMA, ',');
-	keyb_shift_press(KEYCODE_COMMA, ';');
-	keyb_press(KEYCODE_MINUS_PAD, '-');
-	keyb_press(KEYCODE_PLUS_PAD, '+');
-	keyb_press(KEYCODE_ASTERISK, '*');
-}
 
 static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
@@ -375,8 +307,6 @@ static SCREEN_UPDATE_IND16( pasopia7 )
 	int width;
 
 	bitmap.fill(screen.machine().pens[0], cliprect);
-
-	fake_keyboard_data(screen.machine());
 
 	width = state->m_x_width ? 80 : 40;
 
@@ -656,9 +586,6 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x30 && io_port <= 0x33)
-		printf("[%02x]\n",offset & 3);
-
 	if(io_port >= 0x08 && io_port <= 0x0b)
 		return m_ppi0->read(space, io_port & 3);
 	else
@@ -679,7 +606,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 		return m_ctc->read(space,io_port & 3);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
-		return m_pio->read_alt(space, io_port & 3);
+		return m_pio->read(space, io_port & 3);
 //  else if(io_port == 0x3a)                    { SN1 }
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
@@ -708,9 +635,6 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x30 && io_port <= 0x33)
-		printf("[%02x] <- %02x\n",offset & 3,data);
-
 	if(io_port >= 0x08 && io_port <= 0x0b)
 		m_ppi0->write(space, io_port & 3, data);
 	else
@@ -733,7 +657,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		m_ctc->write(space, io_port & 3, data);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
-		m_pio->write_alt(space, io_port & 3, data);
+		m_pio->write(space, io_port & 3, data);
 	else
 	if(io_port == 0x3a)
 		m_sn1->write(space, 0, data);
@@ -766,8 +690,9 @@ static ADDRESS_MAP_START(pasopia7_io, AS_IO, 8, pasopia7_state)
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE( pasopia7_io_r, pasopia7_io_w )
 ADDRESS_MAP_END
 
-/* Input ports */
+/* TODO: where are SPACE and RETURN keys? */
 static INPUT_PORTS_START( pasopia7 )
+	PASOPIA_KEYBOARD
 INPUT_PORTS_END
 
 static const gfx_layout p7_chars_8x8 =
@@ -819,30 +744,50 @@ static Z80CTC_INTERFACE( z80ctc_intf )
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		// ZC/TO2 callback
 };
 
-READ8_MEMBER( pasopia7_state::test_r )
+
+READ8_MEMBER( pasopia7_state::mux_r )
 {
-	return machine().rand();
+	return m_mux_data;
 }
 
-WRITE_LINE_MEMBER( pasopia7_state::testa_w )
+READ8_MEMBER( pasopia7_state::keyb_r )
 {
-	printf("A %02x\n",state);
+	const char *const keynames[3][4] = { { "KEY0", "KEY1", "KEY2", "KEY3" },
+					                     { "KEY4", "KEY5", "KEY6", "KEY7" },
+							             { "KEY8", "KEY9", "KEYA", "KEYB" } };
+	int i,j;
+	UINT8 res;
+
+	res = 0;
+	for(j=0;j<3;j++)
+	{
+		if(m_mux_data & 0x10 << j)
+		{
+			for(i=0;i<4;i++)
+			{
+				if(m_mux_data & 1 << i)
+					res |= ioport(keynames[j][i])->read();
+			}
+		}
+	}
+
+	return res ^ 0xff;
 }
 
-WRITE_LINE_MEMBER( pasopia7_state::testb_w )
+WRITE8_MEMBER( pasopia7_state::mux_w )
 {
-	printf("B %02x\n",state);
+	m_mux_data = data;
 }
 
 static Z80PIO_INTERFACE( z80pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
-	DEVCB_DRIVER_MEMBER(pasopia7_state, test_r),
+	DEVCB_DRIVER_MEMBER(pasopia7_state, mux_r),
+	DEVCB_DRIVER_MEMBER(pasopia7_state, mux_w),
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pasopia7_state, testa_w),
-	DEVCB_DRIVER_MEMBER(pasopia7_state, test_r),
+	DEVCB_DRIVER_MEMBER(pasopia7_state, keyb_r),
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pasopia7_state, testb_w)
+	DEVCB_NULL
 };
 
 static const z80_daisy_config p7_daisy[] =
@@ -1049,8 +994,8 @@ static const floppy_interface pasopia7_floppy_interface =
  *  Sound interface
  *
  *************************************/
- 
- 
+
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------

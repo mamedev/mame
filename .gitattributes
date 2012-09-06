@@ -6135,6 +6135,7 @@ src/mess/includes/osborne1.h svneol=native#text/plain
 src/mess/includes/osi.h svneol=native#text/plain
 src/mess/includes/p2000t.h svneol=native#text/plain
 src/mess/includes/partner.h svneol=native#text/plain
+src/mess/includes/pasopia.h svneol=native#text/plain
 src/mess/includes/pc.h svneol=native#text/plain
 src/mess/includes/pc1251.h svneol=native#text/plain
 src/mess/includes/pc1350.h svneol=native#text/plain
