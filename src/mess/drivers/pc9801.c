@@ -22,6 +22,8 @@
     - fix CPU for some clones;
 
     TODO: (PC-486MU)
+    - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
+      port. This causes a jump to invalid program area;
     - Dies on ARTIC check;
     - Presumably one ROM is undumped?
 
@@ -311,6 +313,8 @@ public:
 
 	/* PC9821 specific */
 	UINT8 m_analog256,m_analog256e;
+	UINT8 m_sdip[24], m_sdip_bank;
+
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
 	DECLARE_WRITE8_MEMBER(pc9801_xx_w);
 	DECLARE_READ8_MEMBER(pc9801_00_r);
@@ -374,6 +378,37 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc9801rs_access_ctrl_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_access_ctrl_w);
+
+	DECLARE_READ8_MEMBER(sdip_0_r);
+	DECLARE_READ8_MEMBER(sdip_1_r);
+	DECLARE_READ8_MEMBER(sdip_2_r);
+	DECLARE_READ8_MEMBER(sdip_3_r);
+	DECLARE_READ8_MEMBER(sdip_4_r);
+	DECLARE_READ8_MEMBER(sdip_5_r);
+	DECLARE_READ8_MEMBER(sdip_6_r);
+	DECLARE_READ8_MEMBER(sdip_7_r);
+	DECLARE_READ8_MEMBER(sdip_8_r);
+	DECLARE_READ8_MEMBER(sdip_9_r);
+	DECLARE_READ8_MEMBER(sdip_a_r);
+	DECLARE_READ8_MEMBER(sdip_b_r);
+
+	DECLARE_WRITE8_MEMBER(sdip_0_w);
+	DECLARE_WRITE8_MEMBER(sdip_1_w);
+	DECLARE_WRITE8_MEMBER(sdip_2_w);
+	DECLARE_WRITE8_MEMBER(sdip_3_w);
+	DECLARE_WRITE8_MEMBER(sdip_4_w);
+	DECLARE_WRITE8_MEMBER(sdip_5_w);
+	DECLARE_WRITE8_MEMBER(sdip_6_w);
+	DECLARE_WRITE8_MEMBER(sdip_7_w);
+	DECLARE_WRITE8_MEMBER(sdip_8_w);
+	DECLARE_WRITE8_MEMBER(sdip_9_w);
+	DECLARE_WRITE8_MEMBER(sdip_a_w);
+	DECLARE_WRITE8_MEMBER(sdip_b_w);
+
+private:
+	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
+	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
+
 };
 
 
@@ -1652,6 +1687,62 @@ READ8_MEMBER(pc9801_state::ide_status_r)
 	return 0x50; // status
 }
 
+UINT8 pc9801_state::m_sdip_read(UINT16 port, UINT8 sdip_offset)
+{
+	if(port == 2)
+		return m_sdip[sdip_offset];
+
+	printf("Warning: read from unknown SDIP area %02x %04x\n",port,0x841c + port + (sdip_offset % 12)*0x100);
+	return 0xff;
+}
+
+void pc9801_state::m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data)
+{
+	if(port == 2)
+	{
+		m_sdip[sdip_offset] = data;
+		return;
+	}
+
+	printf("Warning: write from unknown SDIP area %02x %04x %02x\n",port,0x841c + port + (sdip_offset % 12)*0x100,data);
+}
+
+READ8_MEMBER(pc9801_state::sdip_0_r) { return m_sdip_read(offset, 0+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_1_r) { return m_sdip_read(offset, 1+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_2_r) { return m_sdip_read(offset, 2+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_3_r) { return m_sdip_read(offset, 3+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_4_r) { return m_sdip_read(offset, 4+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_5_r) { return m_sdip_read(offset, 5+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_6_r) { return m_sdip_read(offset, 6+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_7_r) { return m_sdip_read(offset, 7+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_8_r) { return m_sdip_read(offset, 8+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_9_r) { return m_sdip_read(offset, 9+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_a_r) { return m_sdip_read(offset, 10+m_sdip_bank*12); }
+READ8_MEMBER(pc9801_state::sdip_b_r) { return m_sdip_read(offset, 11+m_sdip_bank*12); }
+
+WRITE8_MEMBER(pc9801_state::sdip_0_w) { m_sdip_write(offset,0+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_1_w) { m_sdip_write(offset,1+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_2_w) { m_sdip_write(offset,2+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_3_w) { m_sdip_write(offset,3+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_4_w) { m_sdip_write(offset,4+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_5_w) { m_sdip_write(offset,5+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_6_w) { m_sdip_write(offset,6+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_7_w) { m_sdip_write(offset,7+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_8_w) { m_sdip_write(offset,8+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_9_w) { m_sdip_write(offset,9+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_a_w) { m_sdip_write(offset,10+m_sdip_bank*12,data); }
+WRITE8_MEMBER(pc9801_state::sdip_b_w)
+{
+	if(offset == 3)
+		m_sdip_bank = (data & 0x40) >> 6;
+
+	if(offset == 2)
+		m_sdip_write(offset,11+m_sdip_bank*12,data);
+
+	if((offset & 2) == 0)
+		printf("SDIP area B write %02x %02x\n",offset,data);
+}
+
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
@@ -1700,6 +1791,18 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 //  AM_RANGE(0x3fd8, 0x3fdf) <undefined> / pit mirror ports
 //  AM_RANGE(0x7fd8, 0x7fdf) <undefined> / mouse ppi8255 ports
+	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
+	AM_RANGE(0x851c, 0x851f) AM_READWRITE8(sdip_1_r,sdip_1_w,0xffffffff)
+	AM_RANGE(0x861c, 0x861f) AM_READWRITE8(sdip_2_r,sdip_2_w,0xffffffff)
+	AM_RANGE(0x871c, 0x871f) AM_READWRITE8(sdip_3_r,sdip_3_w,0xffffffff)
+	AM_RANGE(0x881c, 0x881f) AM_READWRITE8(sdip_4_r,sdip_4_w,0xffffffff)
+	AM_RANGE(0x891c, 0x891f) AM_READWRITE8(sdip_5_r,sdip_5_w,0xffffffff)
+	AM_RANGE(0x8a1c, 0x8a1f) AM_READWRITE8(sdip_6_r,sdip_6_w,0xffffffff)
+	AM_RANGE(0x8b1c, 0x8b1f) AM_READWRITE8(sdip_7_r,sdip_7_w,0xffffffff)
+	AM_RANGE(0x8c1c, 0x8c1f) AM_READWRITE8(sdip_8_r,sdip_8_w,0xffffffff)
+	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
+	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
+	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
 //  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
 //  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -2485,6 +2588,14 @@ static MACHINE_RESET(pc9801rs)
 	state->m_ram_size = machine.device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
 
+static MACHINE_START(pc9821)
+{
+	pc9801_state *state = machine.driver_data<pc9801_state>();
+
+	MACHINE_START_CALL(pc9801);
+	state_save_register_global_pointer(machine, state->m_sdip, 24);
+}
+
 static INTERRUPT_GEN(pc9801_vrtc_irq)
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
@@ -2642,7 +2753,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT("screen",pc9801_vrtc_irq)
 
-	MCFG_MACHINE_START(pc9801)
+	MCFG_MACHINE_START(pc9821)
 	MCFG_MACHINE_RESET(pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
