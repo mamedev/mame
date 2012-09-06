@@ -77,6 +77,15 @@ public:
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 	DECLARE_DRIVER_INIT(jingbell);
+	TILE_GET_INFO_MEMBER(get_jingbell_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_gp98_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_jingbell_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_gp98_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_jingbell_reel3_tile_info);
+	TILE_GET_INFO_MEMBER(get_gp98_reel3_tile_info);
+	TILE_GET_INFO_MEMBER(get_jingbell_reel4_tile_info);
+	TILE_GET_INFO_MEMBER(get_gp98_reel4_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -92,12 +101,11 @@ WRITE8_MEMBER(igs009_state::gp98_reel1_ram_w)
 	m_gp98_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jingbell_reel1_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel1_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel1_ram[tile_index];
+	int code = m_gp98_reel1_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
@@ -105,12 +113,11 @@ static TILE_GET_INFO( get_jingbell_reel1_tile_info )
 }
 
 
-static TILE_GET_INFO( get_gp98_reel1_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel1_ram[tile_index];
+	int code = m_gp98_reel1_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code*4)+(tile_index&0x3),
 			0,
@@ -124,24 +131,22 @@ WRITE8_MEMBER(igs009_state::gp98_reel2_ram_w)
 	m_gp98_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jingbell_reel2_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel2_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel2_ram[tile_index];
+	int code = m_gp98_reel2_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
-static TILE_GET_INFO( get_gp98_reel2_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel2_ram[tile_index];
+	int code = m_gp98_reel2_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code*4)+(tile_index&0x3),
 			0,
@@ -156,24 +161,22 @@ WRITE8_MEMBER(igs009_state::gp98_reel3_ram_w)
 	m_gp98_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jingbell_reel3_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel3_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel3_ram[tile_index];
+	int code = m_gp98_reel3_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
-static TILE_GET_INFO( get_gp98_reel3_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel3_ram[tile_index];
+	int code = m_gp98_reel3_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code*4)+(tile_index&0x3),
 			0,
@@ -188,24 +191,22 @@ WRITE8_MEMBER(igs009_state::gp98_reel4_ram_w)
 	m_gp98_reel4_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jingbell_reel4_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel4_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel4_ram[tile_index];
+	int code = m_gp98_reel4_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
 			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
-static TILE_GET_INFO( get_gp98_reel4_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_gp98_reel4_ram[tile_index];
+	int code = m_gp98_reel4_ram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code*4)+(tile_index&0x3),
 			0,
@@ -225,11 +226,10 @@ WRITE8_MEMBER(igs009_state::bg_scroll_w)
 }
 
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
 {
-	igs009_state *state = machine.driver_data<igs009_state>();
-	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
-	SET_TILE_INFO(1, code, (4*(code >> 14)+3), 0);
+	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
+	SET_TILE_INFO_MEMBER(1, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(igs009_state::fg_tile_w)
@@ -247,13 +247,13 @@ WRITE8_MEMBER(igs009_state::fg_color_w)
 static VIDEO_START(jingbell)
 {
 	igs009_state *state = machine.driver_data<igs009_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_jingbell_reel1_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_jingbell_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_jingbell_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_jingbell_reel4_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel4_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	state->m_gp98_reel1_tilemap->set_scroll_cols(128);
 	state->m_gp98_reel2_tilemap->set_scroll_cols(128);
@@ -265,13 +265,13 @@ static VIDEO_START(jingbell)
 static VIDEO_START(gp98)
 {
 	igs009_state *state = machine.driver_data<igs009_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	0x80,0x20);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->m_gp98_reel1_tilemap = tilemap_create(machine,get_gp98_reel1_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	state->m_gp98_reel2_tilemap = tilemap_create(machine,get_gp98_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	state->m_gp98_reel3_tilemap = tilemap_create(machine,get_gp98_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	state->m_gp98_reel4_tilemap = tilemap_create(machine,get_gp98_reel4_tile_info,TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	state->m_gp98_reel4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel4_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	state->m_gp98_reel1_tilemap->set_scroll_cols(128);
 	state->m_gp98_reel2_tilemap->set_scroll_cols(128);

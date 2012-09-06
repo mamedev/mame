@@ -117,6 +117,9 @@ public:
 	DECLARE_DRIVER_INIT(magic102);
 	DECLARE_DRIVER_INIT(magic10);
 	DECLARE_DRIVER_INIT(hotslot);
+	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
+	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
+	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 };
 
 
@@ -149,38 +152,35 @@ WRITE16_MEMBER(magic10_state::paletteram_w)
 }
 
 
-static TILE_GET_INFO( get_layer0_tile_info )
+TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	SET_TILE_INFO
+	SET_TILE_INFO_MEMBER
 	(
 		1,
-		state->m_layer0_videoram[tile_index * 2],
-		state->m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((state->m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
+		m_layer0_videoram[tile_index * 2],
+		m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
 	);
 }
 
-static TILE_GET_INFO( get_layer1_tile_info )
+TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	SET_TILE_INFO
+	SET_TILE_INFO_MEMBER
 	(
 		1,
-		state->m_layer1_videoram[tile_index * 2],
-		state->m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((state->m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
+		m_layer1_videoram[tile_index * 2],
+		m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
 	);
 }
 
-static TILE_GET_INFO( get_layer2_tile_info )
+TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
 {
-	magic10_state *state = machine.driver_data<magic10_state>();
-	SET_TILE_INFO
+	SET_TILE_INFO_MEMBER
 	(
 		0,
-		state->m_layer2_videoram[tile_index * 2],
-		state->m_layer2_videoram[tile_index * 2 + 1] & 0x0f,
+		m_layer2_videoram[tile_index * 2],
+		m_layer2_videoram[tile_index * 2 + 1] & 0x0f,
 		0
 	);
 }
@@ -189,9 +189,9 @@ static TILE_GET_INFO( get_layer2_tile_info )
 static VIDEO_START( magic10 )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->m_layer0_tilemap = tilemap_create(machine, get_layer0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_layer0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer0_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_layer1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_layer2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magic10_state::get_layer2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	state->m_layer1_tilemap->set_transparent_pen(0);
 	state->m_layer2_tilemap->set_transparent_pen(0);

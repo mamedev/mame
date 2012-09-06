@@ -441,6 +441,7 @@ public:
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 
 	DECLARE_WRITE8_MEMBER(debug_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -480,26 +481,25 @@ WRITE8_MEMBER( avt_state::avt_colorram_w )
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 {
-	avt_state *state = machine.driver_data<avt_state>();
 /*  - bits -
     7654 3210
     xxxx ----   color code.
     ---- xxxx   seems unused.
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] | ((attr & 1) << 8);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] | ((attr & 1) << 8);
 	int color = (attr & 0xf0)>>4;
 
-	SET_TILE_INFO( 0, code, color, 0);
+	SET_TILE_INFO_MEMBER( 0, code, color, 0);
 }
 
 
 static VIDEO_START( avt )
 {
 	avt_state *state = machine.driver_data<avt_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(avt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
 }
 
 

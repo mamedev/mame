@@ -134,6 +134,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jollyjgr_attrram_w);
 	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
 	DECLARE_WRITE8_MEMBER(jollyjgr_coin_lookout_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -435,18 +436,17 @@ static PALETTE_INIT( jollyjgr )
 }
 
 /* Tilemap is the same as in Galaxian */
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
 {
-	jollyjgr_state *state = machine.driver_data<jollyjgr_state>();
-	int color = state->m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
-	int region = (state->m_tilemap_bank & 0x20) ? 2 : 0;
-	SET_TILE_INFO(region, state->m_videoram[tile_index], color, 0);
+	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
+	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
+	SET_TILE_INFO_MEMBER(region, m_videoram[tile_index], color, 0);
 }
 
 static VIDEO_START( jollyjgr )
 {
 	jollyjgr_state *state = machine.driver_data<jollyjgr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jollyjgr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(32);

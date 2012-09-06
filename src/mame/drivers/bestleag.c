@@ -46,49 +46,50 @@ public:
 	DECLARE_WRITE16_MEMBER(bestleag_bgram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_fgram_w);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(bsb_bg_scan);
 };
 
 
 /* Video Handling */
 
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(bestleag_state::get_tx_tile_info)
 {
-	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_txram[tile_index];
+	int code = m_txram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code & 0x0fff)|0x8000,
 			(code & 0xf000) >> 12,
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(bestleag_state::get_bg_tile_info)
 {
-	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_bgram[tile_index];
+	int code = m_bgram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			(code & 0x0fff),
 			(code & 0xf000) >> 12,
 			0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(bestleag_state::get_fg_tile_info)
 {
-	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_fgram[tile_index];
+	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			(code & 0x0fff)|0x1000,
 			((code & 0xf000) >> 12)|0x10,
 			0);
 }
 
-static TILEMAP_MAPPER( bsb_bg_scan )
+TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
 {
 	int offset;
 
@@ -102,9 +103,9 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 static VIDEO_START(bestleag)
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,256, 32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,bsb_bg_scan,16,16,128, 64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,bsb_bg_scan,16,16,128, 64);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_tx_tile_info),state),TILEMAP_SCAN_COLS,8,8,256, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),state),16,16,128, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bestleag_state::get_fg_tile_info),state),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),state),16,16,128, 64);
 
 	state->m_tx_tilemap->set_transparent_pen(15);
 	state->m_fg_tilemap->set_transparent_pen(15);

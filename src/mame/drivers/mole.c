@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mole_tilebank_w);
 	DECLARE_WRITE8_MEMBER(mole_flipscreen_w);
 	DECLARE_READ8_MEMBER(mole_protection_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -86,19 +87,18 @@ static PALETTE_INIT( mole )
 		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
-	mole_state *state = machine.driver_data<mole_state>();
-	UINT16 code = state->m_tileram[tile_index];
+	UINT16 code = m_tileram[tile_index];
 
-	SET_TILE_INFO((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
+	SET_TILE_INFO_MEMBER((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
 }
 
 static VIDEO_START( mole )
 {
 	mole_state *state = machine.driver_data<mole_state>();
 	memset(state->m_tileram, 0, sizeof(state->m_tileram));
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	state->save_item(NAME(state->m_tileram));
 }

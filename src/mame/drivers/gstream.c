@@ -177,6 +177,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
 	DECLARE_DRIVER_INIT(gstream);
+	TILE_GET_INFO_MEMBER(get_gs1_tile_info);
+	TILE_GET_INFO_MEMBER(get_gs2_tile_info);
+	TILE_GET_INFO_MEMBER(get_gs3_tile_info);
 };
 
 
@@ -441,38 +444,35 @@ GFXDECODE_END
 
 
 
-static TILE_GET_INFO( get_gs1_tile_info )
+TILE_GET_INFO_MEMBER(gstream_state::get_gs1_tile_info)
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO(0, tileno, palette + 0x10, 0);
+	int tileno = (m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
+	int palette = (m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
+	SET_TILE_INFO_MEMBER(0, tileno, palette + 0x10, 0);
 }
 
-static TILE_GET_INFO( get_gs2_tile_info )
+TILE_GET_INFO_MEMBER(gstream_state::get_gs2_tile_info)
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO(0, tileno + 0x1000, palette + 0x14, 0);
+	int tileno = (m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
+	int palette = (m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
+	SET_TILE_INFO_MEMBER(0, tileno + 0x1000, palette + 0x14, 0);
 }
 
 
-static TILE_GET_INFO( get_gs3_tile_info )
+TILE_GET_INFO_MEMBER(gstream_state::get_gs3_tile_info)
 {
-	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO(0, tileno + 0x2000, palette + 0x18, 0);
+	int tileno = (m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
+	int palette = (m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
+	SET_TILE_INFO_MEMBER(0, tileno + 0x2000, palette + 0x18, 0);
 }
 
 
 static VIDEO_START(gstream)
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	state->m_tilemap1 = tilemap_create(machine, get_gs1_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-	state->m_tilemap2 = tilemap_create(machine, get_gs2_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-	state->m_tilemap3 = tilemap_create(machine, get_gs3_tile_info, TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs1_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs2_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
+	state->m_tilemap3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs3_tile_info),state), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
 
 	state->m_tilemap1->set_transparent_pen(0);
 	state->m_tilemap2->set_transparent_pen(0);

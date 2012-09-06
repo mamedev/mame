@@ -115,15 +115,15 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 	DECLARE_DRIVER_INIT(spool99);
+	TILE_GET_INFO_MEMBER(get_spool99_tile_info);
 };
 
-static TILE_GET_INFO( get_spool99_tile_info )
+TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
 {
-	spool99_state *state = machine.driver_data<spool99_state>();
-	int code = ((state->m_vram[tile_index*2+1]<<8) | (state->m_vram[tile_index*2+0]));
-	int color = state->m_cram[tile_index*2+0];
+	int code = ((m_vram[tile_index*2+1]<<8) | (m_vram[tile_index*2+0]));
+	int color = m_cram[tile_index*2+0];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0x3fff,
 			color & 0x1f,
@@ -134,7 +134,7 @@ static VIDEO_START(spool99)
 {
 	spool99_state *state = machine.driver_data<spool99_state>();
 
-	state->m_sc0_tilemap = tilemap_create(machine, get_spool99_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spool99_state::get_spool99_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE_IND16(spool99)

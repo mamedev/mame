@@ -102,6 +102,11 @@ public:
 	DECLARE_READ8_MEMBER(ret_00);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
+	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
 };
 
 
@@ -122,39 +127,34 @@ WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 }
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
 {
-	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
-	SET_TILE_INFO(0, code, 0, TILE_FLIPYX( 0 ));
+	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
+	SET_TILE_INFO_MEMBER(0, code, 0, TILE_FLIPYX( 0 ));
 }
 
-static TILE_GET_INFO( get_reel_1_tile_info )
+TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
-	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_1_ram[ tile_index ] + (state->m_reeltileshigh_1_ram[ tile_index ] << 8);
-	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
+	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
+	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
-static TILE_GET_INFO( get_reel_2_tile_info )
+TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
 {
-	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_2_ram[ tile_index ] + (state->m_reeltileshigh_2_ram[ tile_index ] << 8);
-	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
+	UINT16 code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
+	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
-static TILE_GET_INFO( get_reel_3_tile_info )
+TILE_GET_INFO_MEMBER(skylncr_state::get_reel_3_tile_info)
 {
-	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_3_ram[ tile_index ] + (state->m_reeltileshigh_3_ram[ tile_index ] << 8);
-	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
+	UINT16 code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
+	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
-static TILE_GET_INFO( get_reel_4_tile_info )
+TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 {
-	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_4_ram[ tile_index ] + (state->m_reeltileshigh_4_ram[ tile_index ] << 8);
-	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
+	UINT16 code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
+	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 
@@ -162,12 +162,12 @@ static VIDEO_START( skylncr )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
 
-	state->m_tmap = tilemap_create(	machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20	);
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20	);
 
-	state->m_reel_1_tilemap = tilemap_create(machine, get_reel_1_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	state->m_reel_2_tilemap = tilemap_create(machine, get_reel_2_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	state->m_reel_3_tilemap = tilemap_create(machine, get_reel_3_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	state->m_reel_4_tilemap = tilemap_create(machine, get_reel_4_tile_info, TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_3_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	state->m_reel_4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_4_tile_info),state), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
 
 	state->m_reel_2_tilemap->set_scroll_cols(0x40);
 	state->m_reel_3_tilemap->set_scroll_cols(0x40);

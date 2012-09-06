@@ -356,6 +356,7 @@ public:
 	DECLARE_WRITE8_MEMBER(baby_sound_p2_w);
 	DECLARE_READ8_MEMBER(baby_sound_p3_r);
 	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -492,27 +493,26 @@ static PALETTE_INIT( fortune1 )
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
 {
-	videopkr_state *state = machine.driver_data<videopkr_state>();
 	int offs = tile_index;
-	int attr = state->m_color_ram[offs] + state->ioport("IN2")->read(); /* Color Switch Action */
-	int code = state->m_video_ram[offs];
+	int attr = m_color_ram[offs] + ioport("IN2")->read(); /* Color Switch Action */
+	int code = m_video_ram[offs];
 	int color = attr;
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
 static VIDEO_START( videopkr )
 {
 	videopkr_state *state = machine.driver_data<videopkr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static VIDEO_START( vidadcba )
 {
 	videopkr_state *state = machine.driver_data<videopkr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(videopkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 

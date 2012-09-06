@@ -148,6 +148,8 @@ public:
 	DECLARE_DRIVER_INIT(tarzana);
 	DECLARE_DRIVER_INIT(lhzb2a);
 	DECLARE_DRIVER_INIT(mgdha);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -178,19 +180,17 @@ static VIDEO_RESET( igs017 )
 
 #define COLOR(_X)	(((_X)>>2)&7)
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(igs017_state::get_fg_tile_info)
 {
-	igs017_state *state = machine.driver_data<igs017_state>();
-	int code = state->m_fg_videoram[tile_index*4+0] + (state->m_fg_videoram[tile_index*4+1] << 8);
-	int attr = state->m_fg_videoram[tile_index*4+2] + (state->m_fg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
+	int code = m_fg_videoram[tile_index*4+0] + (m_fg_videoram[tile_index*4+1] << 8);
+	int attr = m_fg_videoram[tile_index*4+2] + (m_fg_videoram[tile_index*4+3] << 8);
+	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
 }
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(igs017_state::get_bg_tile_info)
 {
-	igs017_state *state = machine.driver_data<igs017_state>();
-	int code = state->m_bg_videoram[tile_index*4+0] + (state->m_bg_videoram[tile_index*4+1] << 8);
-	int attr = state->m_bg_videoram[tile_index*4+2] + (state->m_bg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
+	int code = m_bg_videoram[tile_index*4+0] + (m_bg_videoram[tile_index*4+1] << 8);
+	int attr = m_bg_videoram[tile_index*4+2] + (m_bg_videoram[tile_index*4+3] << 8);
+	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
 }
 
 WRITE8_MEMBER(igs017_state::fg_w)
@@ -264,8 +264,8 @@ static void expand_sprites(running_machine &machine)
 static VIDEO_START( igs017 )
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs017_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(igs017_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_fg_tilemap->set_transparent_pen(0xf);
 	state->m_bg_tilemap->set_transparent_pen(0xf);

@@ -72,15 +72,15 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(yumefuda_output_w);
+	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
 };
 
-static TILE_GET_INFO( y_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
 {
-	albazg_state *state = machine.driver_data<albazg_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index];
+	int code = m_videoram[tile_index];
+	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code + ((color & 0xf8) << 3),
 			color & 0x7,
@@ -91,7 +91,7 @@ static TILE_GET_INFO( y_get_bg_tile_info )
 static VIDEO_START( yumefuda )
 {
 	albazg_state *state = machine.driver_data<albazg_state>();
-	state->m_bg_tilemap = tilemap_create(machine, y_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( yumefuda )

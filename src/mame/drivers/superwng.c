@@ -67,44 +67,44 @@ public:
 	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
 	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
 	DECLARE_READ8_MEMBER(superwng_sound_byte_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 {
-	superwng_state *state = machine.driver_data<superwng_state>();
-	int code = state->m_videoram_bg[tile_index];
-	int attr = state->m_colorram_bg[tile_index];
+	int code = m_videoram_bg[tile_index];
+	int attr = m_colorram_bg[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
-	code|=state->m_tile_bank?0x200:0;
+	code|=m_tile_bank?0x200:0;
 
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 {
-	superwng_state *state = machine.driver_data<superwng_state>();
-	int code = state->m_videoram_fg[tile_index];
-	int attr = state->m_colorram_fg[tile_index];
+	int code = m_videoram_fg[tile_index];
+	int attr = m_colorram_fg[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
 
-	code|=state->m_tile_bank?0x200:0;
+	code|=m_tile_bank?0x200:0;
 
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
 }
 
 static VIDEO_START( superwng )
 {
 	superwng_state *state = machine.driver_data<superwng_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scrollx(0, 64);
 }

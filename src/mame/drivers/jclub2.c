@@ -138,6 +138,8 @@ public:
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
 	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
 	DECLARE_DRIVER_INIT(darkhors);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 
@@ -155,20 +157,18 @@ static VIDEO_START( darkhors );
 static SCREEN_UPDATE_IND16( darkhors );
 
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
 {
-	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT16 tile		=	state->m_tmapram[tile_index] >> 16;
-	UINT16 color	=	state->m_tmapram[tile_index] & 0xffff;
-	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	UINT16 tile		=	m_tmapram[tile_index] >> 16;
+	UINT16 color	=	m_tmapram[tile_index] & 0xffff;
+	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
 {
-	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT16 tile		=	state->m_tmapram2[tile_index] >> 16;
-	UINT16 color	=	state->m_tmapram2[tile_index] & 0xffff;
-	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	UINT16 tile		=	m_tmapram2[tile_index] >> 16;
+	UINT16 color	=	m_tmapram2[tile_index] & 0xffff;
+	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_tmapram_w)
@@ -220,12 +220,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static VIDEO_START( darkhors )
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	state->m_tmap			=	tilemap_create(	machine, get_tile_info_0, TILEMAP_SCAN_ROWS,
-												16,16, 0x40,0x40	);
-
-	state->m_tmap2			=	tilemap_create(	machine, get_tile_info_1, TILEMAP_SCAN_ROWS,
-												16,16, 0x40,0x40	);
-
+	state->m_tmap =	&machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),state), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	state->m_tmap2= &machine.tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),state), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	state->m_tmap->set_transparent_pen(0);
 	state->m_tmap2->set_transparent_pen(0);
 

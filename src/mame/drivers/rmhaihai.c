@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(themj_rombank_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_DRIVER_INIT(rmhaihai);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -72,20 +73,19 @@ WRITE8_MEMBER(rmhaihai_state::rmhaihai_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(rmhaihai_state::get_bg_tile_info)
 {
-	rmhaihai_state *state = machine.driver_data<rmhaihai_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + (state->m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
-	int color = (state->m_gfxbank << 5) + (attr >> 3);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + (m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
+	int color = (m_gfxbank << 5) + (attr >> 3);
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 static VIDEO_START( rmhaihai )
 {
 	rmhaihai_state *state = machine.driver_data<rmhaihai_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rmhaihai_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,
 		8, 8, 64, 32);
 }
 

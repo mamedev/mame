@@ -27,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
 	DECLARE_WRITE8_MEMBER(mogura_dac_w);
 	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
+	TILE_GET_INFO_MEMBER(get_mogura_tile_info);
 };
 
 
@@ -63,13 +64,12 @@ static PALETTE_INIT( mogura )
 }
 
 
-static TILE_GET_INFO( get_mogura_tile_info )
+TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 {
-	mogura_state *state = machine.driver_data<mogura_state>();
-	int code = state->m_tileram[tile_index];
-	int attr = state->m_tileram[tile_index + 0x800];
+	int code = m_tileram[tile_index];
+	int attr = m_tileram[tile_index + 0x800];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			(attr >> 1) & 7,
@@ -81,7 +81,7 @@ static VIDEO_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
 	machine.gfx[0]->set_source(state->m_gfxram);
-	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE_IND16( mogura )

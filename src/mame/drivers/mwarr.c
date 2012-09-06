@@ -92,6 +92,10 @@ public:
 	DECLARE_WRITE16_MEMBER(sprites_commands_w);
 	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
 	DECLARE_WRITE16_MEMBER(oki1_bank_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
+	TILE_GET_INFO_MEMBER(get_mhigh_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 
@@ -351,50 +355,46 @@ GFXDECODE_END
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(mwarr_state::get_bg_tile_info)
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_bg_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_bg_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = m_bg_videoram[tile_index] & 0x1fff;
+	int colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO(4, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
 }
 
-static TILE_GET_INFO( get_mlow_tile_info )
+TILE_GET_INFO_MEMBER(mwarr_state::get_mlow_tile_info)
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_mlow_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_mlow_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = m_mlow_videoram[tile_index] & 0x1fff;
+	int colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO(3, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(3, tileno, colour, 0);
 }
 
-static TILE_GET_INFO( get_mhigh_tile_info )
+TILE_GET_INFO_MEMBER(mwarr_state::get_mhigh_tile_info)
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_mhigh_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_mhigh_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = m_mhigh_videoram[tile_index] & 0x1fff;
+	int colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO(2, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_tx_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_tx_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = m_tx_videoram[tile_index] & 0x1fff;
+	int colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO(1, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
 }
 
 static VIDEO_START( mwarr )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
 
-	state->m_bg_tilemap    = tilemap_create(machine, get_bg_tile_info,    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_mlow_tilemap  = tilemap_create(machine, get_mlow_tile_info,  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_mhigh_tilemap = tilemap_create(machine, get_mhigh_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_tx_tilemap    = tilemap_create(machine, get_tx_tile_info,    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	state->m_bg_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),state),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_mlow_tilemap  = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),state),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_mhigh_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_tx_tilemap    = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_tx_tile_info),state),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	state->m_mlow_tilemap->set_transparent_pen(0);
 	state->m_mhigh_tilemap->set_transparent_pen(0);

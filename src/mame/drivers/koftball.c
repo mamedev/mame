@@ -62,25 +62,25 @@ public:
 	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
 	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
 	DECLARE_DRIVER_INIT(koftball);
+	TILE_GET_INFO_MEMBER(get_t1_tile_info);
+	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 };
 
 
-static TILE_GET_INFO( get_t1_tile_info )
+TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
 {
-	koftball_state *state = machine.driver_data<koftball_state>();
-	int data = state->m_bmc_1_videoram[tile_index];
-	SET_TILE_INFO(
+	int data = m_bmc_1_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			data,
 			0,
 			0);
 }
 
-static TILE_GET_INFO( get_t2_tile_info )
+TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 {
-	koftball_state *state = machine.driver_data<koftball_state>();
-	int data = state->m_bmc_2_videoram[tile_index];
-	SET_TILE_INFO(
+	int data = m_bmc_2_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			data,
 			0,
@@ -90,8 +90,8 @@ static TILE_GET_INFO( get_t2_tile_info )
 static VIDEO_START( koftball )
 {
 	koftball_state *state = machine.driver_data<koftball_state>();
-	state->m_tilemap_1 = tilemap_create(machine, get_t1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_2 = tilemap_create(machine, get_t2_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_tilemap_1->set_transparent_pen(0);
 }

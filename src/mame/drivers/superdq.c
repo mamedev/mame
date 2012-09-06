@@ -46,21 +46,21 @@ public:
 	DECLARE_WRITE8_MEMBER(superdq_io_w);
 	DECLARE_READ8_MEMBER(superdq_ld_r);
 	DECLARE_WRITE8_MEMBER(superdq_ld_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
 {
-	superdq_state *state = machine.driver_data<superdq_state>();
-	int tile = state->m_videoram[tile_index];
+	int tile = m_videoram[tile_index];
 
-	SET_TILE_INFO(0, tile, state->m_color_bank, 0);
+	SET_TILE_INFO_MEMBER(0, tile, m_color_bank, 0);
 }
 
 static VIDEO_START( superdq )
 {
 	superdq_state *state = machine.driver_data<superdq_state>();
 
-	state->m_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(superdq_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_RGB32( superdq )

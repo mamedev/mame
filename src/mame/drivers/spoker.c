@@ -54,6 +54,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 	DECLARE_DRIVER_INIT(spk116it);
 	DECLARE_DRIVER_INIT(3super8);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)
@@ -63,18 +65,16 @@ WRITE8_MEMBER(spoker_state::bg_tile_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(spoker_state::get_bg_tile_info)
 {
-	spoker_state *state = machine.driver_data<spoker_state>();
-	int code = state->m_bg_tile_ram[tile_index];
-	SET_TILE_INFO(1 + (tile_index & 3), code & 0xff, 0, 0);
+	int code = m_bg_tile_ram[tile_index];
+	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 {
-	spoker_state *state = machine.driver_data<spoker_state>();
-	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
-	SET_TILE_INFO(0, code, (4*(code >> 14)+3), 0);
+	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
+	SET_TILE_INFO_MEMBER(0, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(spoker_state::fg_tile_w)
@@ -95,8 +95,8 @@ static VIDEO_START(spoker)
 {
 	spoker_state *state = machine.driver_data<spoker_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,	8,  32,	128, 8);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	128, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  32,	128, 8);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	128, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

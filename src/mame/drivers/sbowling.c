@@ -70,15 +70,15 @@ public:
 	DECLARE_WRITE8_MEMBER(system_w);
 	DECLARE_WRITE8_MEMBER(graph_control_w);
 	DECLARE_READ8_MEMBER(controls_r);
+	TILE_GET_INFO_MEMBER(get_sb_tile_info);
 };
 
-static TILE_GET_INFO( get_sb_tile_info )
+TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
 {
-	sbowling_state *state = machine.driver_data<sbowling_state>();
-	UINT8 *rom = state->memregion("user1")->base();
-	int tileno = rom[tile_index + state->m_bgmap * 1024];
+	UINT8 *rom = memregion("user1")->base();
+	int tileno = rom[tile_index + m_bgmap * 1024];
 
-	SET_TILE_INFO(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int flip)
@@ -129,7 +129,7 @@ static VIDEO_START(sbowling)
 	sbowling_state *state = machine.driver_data<sbowling_state>();
 
 	state->m_tmpbitmap = auto_bitmap_ind16_alloc(machine,32*8,32*8);
-	state->m_sb_tilemap = tilemap_create(machine, get_sb_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_sb_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 WRITE8_MEMBER(sbowling_state::pix_shift_w)

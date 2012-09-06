@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(unknown_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
@@ -77,14 +78,13 @@ public:
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 {
-	koikoi_state *state = machine.driver_data<koikoi_state>();
-	int code  = state->m_videoram[tile_index] | ((state->m_videoram[tile_index + 0x400] & 0x40) << 2);
-	int color = (state->m_videoram[tile_index + 0x400] & 0x1f);
-	int flip  = (state->m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int code  = m_videoram[tile_index] | ((m_videoram[tile_index + 0x400] & 0x40) << 2);
+	int color = (m_videoram[tile_index + 0x400] & 0x1f);
+	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
-	SET_TILE_INFO( 0, code, color, flip);
+	SET_TILE_INFO_MEMBER( 0, code, color, flip);
 }
 
 static PALETTE_INIT( koikoi )
@@ -136,7 +136,7 @@ static PALETTE_INIT( koikoi )
 static VIDEO_START(koikoi)
 {
 	koikoi_state *state = machine.driver_data<koikoi_state>();
-	state->m_tmap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16(koikoi)

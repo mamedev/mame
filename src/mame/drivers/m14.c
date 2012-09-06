@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 };
 
 
@@ -107,16 +108,15 @@ static PALETTE_INIT( m14 )
 	}
 }
 
-static TILE_GET_INFO( m14_get_tile_info )
+TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 {
-	m14_state *state = machine.driver_data<m14_state>();
 
-	int code = state->m_video_ram[tile_index];
-	int color = state->m_color_ram[tile_index] & 0x0f;
+	int code = m_video_ram[tile_index];
+	int color = m_color_ram[tile_index] & 0x0f;
 
 	/* colorram & 0xf0 used but unknown purpose*/
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code,
 			color,
@@ -127,7 +127,7 @@ static VIDEO_START( m14 )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	state->m_m14_tilemap = tilemap_create(machine, m14_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_m14_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m14_state::m14_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( m14 )

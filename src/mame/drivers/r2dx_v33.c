@@ -51,6 +51,10 @@ public:
 	DECLARE_DRIVER_INIT(rdx_v33);
 	DECLARE_DRIVER_INIT(nzerotea);
 	DECLARE_DRIVER_INIT(zerotm2k);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_md_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 
@@ -58,44 +62,44 @@ static UINT16 *seibu_crtc_regs;
 static UINT16 *bg_vram,*md_vram,*fg_vram,*tx_vram;
 static tilemap_t *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(r2dx_v33_state::get_bg_tile_info)
 {
 	int tile = bg_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(1,tile + 0x0000,color,0);
+	SET_TILE_INFO_MEMBER(1,tile + 0x0000,color,0);
 }
 
-static TILE_GET_INFO( get_md_tile_info )
+TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
 {
 	int tile = md_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(2,tile + 0x2000,color,0);
+	SET_TILE_INFO_MEMBER(2,tile + 0x2000,color,0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
 {
 	int tile = fg_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(3,tile + 0x1000,color,0);
+	SET_TILE_INFO_MEMBER(3,tile + 0x1000,color,0);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
 {
 	int tile = tx_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(4,tile,color,0);
+	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
 /* copied from Legionnaire */
@@ -187,10 +191,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 static VIDEO_START( rdx_v33 )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
-	md_tilemap = tilemap_create(machine, get_md_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,16,16,32,32);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info, TILEMAP_SCAN_ROWS,8, 8, 64,32);
+	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
+	bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS,8, 8, 64,32);
 
 	bg_tilemap->set_transparent_pen(15);
 	md_tilemap->set_transparent_pen(15);

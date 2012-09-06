@@ -88,32 +88,33 @@ public:
 	DECLARE_READ16_MEMBER(ac_devices_r);
 	DECLARE_WRITE16_MEMBER(ac_devices_w);
 	DECLARE_WRITE16_MEMBER(ac_unk2_w);
+	TILEMAP_MAPPER_MEMBER(bg_scan);
+	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
 };
 
 
 
-static TILEMAP_MAPPER( bg_scan )
+TILEMAP_MAPPER_MEMBER(acommand_state::bg_scan)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-static TILE_GET_INFO( ac_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
 {
-	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->m_ac_bgvram[tile_index];
-	SET_TILE_INFO(
+	int code = m_ac_bgvram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
 			0);
 }
 
-static TILE_GET_INFO( ac_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(acommand_state::ac_get_tx_tile_info)
 {
-	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->m_ac_txvram[tile_index];
-	SET_TILE_INFO(
+	int code = m_ac_txvram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
@@ -182,8 +183,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static VIDEO_START( acommand )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	state->m_tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,TILEMAP_SCAN_COLS,8,8,512,32);
-	state->m_bg_tilemap = tilemap_create(machine, ac_get_bg_tile_info,bg_scan,16,16,256,16);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),state),TILEMAP_SCAN_COLS,8,8,512,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),state),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),state),16,16,256,16);
 
 	state->m_ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);
 

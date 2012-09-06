@@ -215,6 +215,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
 	DECLARE_DRIVER_INIT(cybertnk);
+	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
+	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
+	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 };
 
 /* tile format
@@ -228,42 +231,39 @@ public:
 
 */
 
-static TILE_GET_INFO( get_tilemap0_tile_info )
+TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
 {
-	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	int code = state->m_tilemap0_vram[tile_index];
+	int code = m_tilemap0_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0x1fff,
 			pal,
 			0);
 }
 
-static TILE_GET_INFO( get_tilemap1_tile_info )
+TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
 {
-	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	int code = state->m_tilemap1_vram[tile_index];
+	int code = m_tilemap1_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code & 0x1fff,
 			pal,
 			0);
 }
 
-static TILE_GET_INFO( get_tilemap2_tile_info )
+TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 {
-	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	int code = state->m_tilemap2_vram[tile_index];
+	int code = m_tilemap2_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code & 0x1fff,
 			pal,
@@ -273,13 +273,13 @@ static TILE_GET_INFO( get_tilemap2_tile_info )
 static VIDEO_START( cybertnk )
 {
 	cybertnk_state *state = machine.driver_data<cybertnk_state>();
-	state->m_tilemap0_tilemap = tilemap_create(machine, get_tilemap0_tile_info,TILEMAP_SCAN_ROWS,8,8,128,32);
+	state->m_tilemap0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,32);
 	state->m_tilemap0_tilemap->set_transparent_pen(0);
 
-	state->m_tilemap1_tilemap = tilemap_create(machine, get_tilemap1_tile_info,TILEMAP_SCAN_ROWS,8,8,128,32);
+	state->m_tilemap1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,32);
 	state->m_tilemap1_tilemap->set_transparent_pen(0);
 
-	state->m_tilemap2_tilemap = tilemap_create(machine, get_tilemap2_tile_info,TILEMAP_SCAN_ROWS,8,8,128,32);
+	state->m_tilemap2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,32);
 	state->m_tilemap2_tilemap->set_transparent_pen(0);
 }
 

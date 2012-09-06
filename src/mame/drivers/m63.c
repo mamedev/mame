@@ -177,6 +177,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_DRIVER_INIT(wilytowr);
 	DECLARE_DRIVER_INIT(fghtbskt);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -284,32 +286,30 @@ WRITE8_MEMBER(m63_state::fghtbskt_flipscreen_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 {
-	m63_state *state = machine.driver_data<m63_state>();
 
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] | ((attr & 0x30) << 4);
-	int color = (attr & 0x0f) + (state->m_pal_bank << 4);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
+	int color = (attr & 0x0f) + (m_pal_bank << 4);
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 {
-	m63_state *state = machine.driver_data<m63_state>();
 
-	int code = state->m_videoram2[tile_index];
+	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO(0, code, 0, state->m_fg_flag);
+	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
 }
 
 static VIDEO_START( m63 )
 {
 	m63_state *state = machine.driver_data<m63_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_bg_tilemap->set_scroll_cols(32);
 	state->m_fg_tilemap->set_transparent_pen(0);

@@ -433,6 +433,8 @@ public:
 	DECLARE_WRITE8_MEMBER(magicfly_colorram_w);
 	DECLARE_READ8_MEMBER(mux_port_r);
 	DECLARE_WRITE8_MEMBER(mux_port_w);
+	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
+	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
 };
 
 
@@ -453,9 +455,8 @@ WRITE8_MEMBER(magicfly_state::magicfly_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_magicfly_tile_info )
+TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 {
-	magicfly_state *state = machine.driver_data<magicfly_state>();
 /*  - bits -
     7654 3210
     ---- -xxx   Tiles color.
@@ -465,29 +466,28 @@ static TILE_GET_INFO( get_magicfly_tile_info )
     x--- ----   Mirrored from bit 3. The code check this one to boot the game.
 
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
 	int bank = (attr & 0x10) >> 4;   /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;         /* bits 0-2 for color */
 
     /* Seems that bit 7 is mirrored from bit 3 to have a normal boot */
     /* Boot only check the first color RAM offset */
 
-	state->m_colorram[0] = state->m_colorram[0] | ((state->m_colorram[0] & 0x08) << 4);	/* only for 1st offset */
-	//state->m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
+	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);	/* only for 1st offset */
+	//m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 static VIDEO_START(magicfly)
 {
 	magicfly_state *state = machine.driver_data<magicfly_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_magicfly_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
-static TILE_GET_INFO( get_7mezzo_tile_info )
+TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 {
-	magicfly_state *state = machine.driver_data<magicfly_state>();
 /*  - bits -
     7654 3210
     ---- -xxx   Tiles color.
@@ -497,24 +497,24 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
     x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
 	int bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;          /* bits 0-2 for color */
 
     /* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
     /* Boot only check the first color RAM offset */
 
-	state->m_colorram[0] = state->m_colorram[0] | ((state->m_colorram[0] & 0x04) << 5);	/* only for 1st offset */
-	//state->m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
+	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x04) << 5);	/* only for 1st offset */
+	//m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 static VIDEO_START( 7mezzo )
 {
 	magicfly_state *state = machine.driver_data<magicfly_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_7mezzo_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 static SCREEN_UPDATE_IND16( magicfly )

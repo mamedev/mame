@@ -101,6 +101,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_READ8_MEMBER(unk_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -116,12 +117,11 @@ WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 {
-	jubilee_state *state = machine.driver_data<jubilee_state>();
-	int code = state->m_videoram[tile_index];
+	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO( 0, code, 0, 0);
+	SET_TILE_INFO_MEMBER( 0, code, 0, 0);
 }
 
 
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( jubileep )
 {
 	jubilee_state *state = machine.driver_data<jubilee_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

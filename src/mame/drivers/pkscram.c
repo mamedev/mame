@@ -38,6 +38,9 @@ public:
 	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
 	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
 	DECLARE_WRITE16_MEMBER(pkscramble_output_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_md_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -184,31 +187,28 @@ static INPUT_PORTS_START( pkscramble )
 INPUT_PORTS_END
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(pkscram_state::get_bg_tile_info)
 {
-	pkscram_state *state = machine.driver_data<pkscram_state>();
-	int tile  = state->m_pkscramble_bgtilemap_ram[tile_index*2];
-	int color = state->m_pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
+	int tile  = m_pkscramble_bgtilemap_ram[tile_index*2];
+	int color = m_pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static TILE_GET_INFO( get_md_tile_info )
+TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
 {
-	pkscram_state *state = machine.driver_data<pkscram_state>();
-	int tile  = state->m_pkscramble_mdtilemap_ram[tile_index*2];
-	int color = state->m_pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
+	int tile  = m_pkscramble_mdtilemap_ram[tile_index*2];
+	int color = m_pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
 {
-	pkscram_state *state = machine.driver_data<pkscram_state>();
-	int tile  = state->m_pkscramble_fgtilemap_ram[tile_index*2];
-	int color = state->m_pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
+	int tile  = m_pkscramble_fgtilemap_ram[tile_index*2];
+	int color = m_pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
@@ -233,9 +233,9 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 static VIDEO_START( pkscramble )
 {
 	pkscram_state *state = machine.driver_data<pkscram_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_md_tilemap = tilemap_create(machine, get_md_tile_info, TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_md_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pkscram_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	state->m_md_tilemap->set_transparent_pen(15);
 	state->m_fg_tilemap->set_transparent_pen(15);

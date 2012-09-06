@@ -159,6 +159,8 @@ public:
 	DECLARE_DRIVER_INIT(mtrain);
 	DECLARE_DRIVER_INIT(saklove);
 	DECLARE_DRIVER_INIT(xplan);
+	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
+	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 };
 
 
@@ -182,17 +184,15 @@ INLINE void ss9601_get_tile_info(layer_t *l, running_machine &machine, tile_data
 }
 
 // Layer 0
-static TILE_GET_INFO( ss9601_get_tile_info_0 )
+TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_0)
 {
-	subsino2_state *state = machine.driver_data<subsino2_state>();
-	ss9601_get_tile_info(&state->m_layers[0], machine, tileinfo, tile_index, param);
+	ss9601_get_tile_info(&m_layers[0], machine(), tileinfo, tile_index, param);
 }
 
 // Layer 1
-static TILE_GET_INFO( ss9601_get_tile_info_1 )
+TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_1)
 {
-	subsino2_state *state = machine.driver_data<subsino2_state>();
-	ss9601_get_tile_info(&state->m_layers[1], machine, tileinfo, tile_index, param);
+	ss9601_get_tile_info(&m_layers[1], machine(), tileinfo, tile_index, param);
 }
 
 
@@ -577,7 +577,7 @@ static VIDEO_START( subsino2 )
 	{
 		layer_t *l = &state->m_layers[i];
 
-		l->tmap = tilemap_create(machine, i ? ss9601_get_tile_info_1 : ss9601_get_tile_info_0, TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
+		l->tmap = &machine.tilemap().create(i ? tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),state) : tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),state), TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
 
 		l->tmap->set_transparent_pen(0);
 

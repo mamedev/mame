@@ -113,6 +113,8 @@ public:
 	DECLARE_READ8_MEMBER(pturn_protection_r);
 	DECLARE_READ8_MEMBER(pturn_protection2_r);
 	DECLARE_DRIVER_INIT(pturn);
+	TILE_GET_INFO_MEMBER(get_pturn_tile_info);
+	TILE_GET_INFO_MEMBER(get_pturn_bg_tile_info);
 };
 
 
@@ -126,39 +128,37 @@ static const UINT8 tile_lookup[0x10]=
 	0xa0, 0xb0, 0xe0, 0xf0
 };
 
-static TILE_GET_INFO( get_pturn_tile_info )
+TILE_GET_INFO_MEMBER(pturn_state::get_pturn_tile_info)
 {
-	pturn_state *state = machine.driver_data<pturn_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int tileno;
 	tileno = videoram[tile_index];
 
-	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(state->m_fgbank<<8);
+	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(m_fgbank<<8);
 
-	SET_TILE_INFO(0,tileno,state->m_fgpalette,0);
+	SET_TILE_INFO_MEMBER(0,tileno,m_fgpalette,0);
 }
 
 
 
-static TILE_GET_INFO( get_pturn_bg_tile_info )
+TILE_GET_INFO_MEMBER(pturn_state::get_pturn_bg_tile_info)
 {
-	pturn_state *state = machine.driver_data<pturn_state>();
 	int tileno,palno;
-	tileno = state->memregion("user1")->base()[tile_index];
-	palno=state->m_bgpalette;
+	tileno = memregion("user1")->base()[tile_index];
+	palno=m_bgpalette;
 	if(palno==1)
 	{
 		palno=25;
 	}
-	SET_TILE_INFO(1,tileno+state->m_bgbank*256,palno,0);
+	SET_TILE_INFO_MEMBER(1,tileno+m_bgbank*256,palno,0);
 }
 
 static VIDEO_START(pturn)
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
-	state->m_fgmap = tilemap_create(machine, get_pturn_tile_info,TILEMAP_SCAN_ROWS,8, 8,32,32);
+	state->m_fgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,32,32);
 	state->m_fgmap->set_transparent_pen(0);
-	state->m_bgmap = tilemap_create(machine, get_pturn_bg_tile_info,TILEMAP_SCAN_ROWS,8, 8,32,32*8);
+	state->m_bgmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_bg_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
 	state->m_bgmap->set_transparent_pen(0);
 }
 

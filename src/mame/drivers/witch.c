@@ -234,17 +234,19 @@ public:
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
 	DECLARE_DRIVER_INIT(witch);
+	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
+	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
+	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 };
 
 
 #define UNBANKED_SIZE 0x800
 
 
-static TILE_GET_INFO( get_gfx0b_tile_info )
+TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
 {
-	witch_state *state = machine.driver_data<witch_state>();
-	int code  = state->m_gfx0_vram[tile_index];
-	int color = state->m_gfx0_cram[tile_index];
+	int code  = m_gfx0_vram[tile_index];
+	int color = m_gfx0_cram[tile_index];
 
 	code=code | ((color & 0xe0) << 3);
 
@@ -253,18 +255,17 @@ static TILE_GET_INFO( get_gfx0b_tile_info )
 		code=0;
 	}
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,//tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
 }
 
-static TILE_GET_INFO( get_gfx0a_tile_info )
+TILE_GET_INFO_MEMBER(witch_state::get_gfx0a_tile_info)
 {
-	witch_state *state = machine.driver_data<witch_state>();
-	int code  = state->m_gfx0_vram[tile_index];
-	int color = state->m_gfx0_cram[tile_index];
+	int code  = m_gfx0_vram[tile_index];
+	int color = m_gfx0_cram[tile_index];
 
 	code=code | ((color & 0xe0) << 3);
 
@@ -273,20 +274,19 @@ static TILE_GET_INFO( get_gfx0a_tile_info )
 		code=0;
 	}
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,//tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
 }
 
-static TILE_GET_INFO( get_gfx1_tile_info )
+TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
 {
-	witch_state *state = machine.driver_data<witch_state>();
-	int code  = state->m_gfx1_vram[tile_index];
-	int color = state->m_gfx1_cram[tile_index];
+	int code  = m_gfx1_vram[tile_index];
+	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code | ((color & 0xf0) << 4),
 			(color>>0) & 0x0f,
@@ -705,9 +705,9 @@ GFXDECODE_END
 static VIDEO_START(witch)
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	state->m_gfx0a_tilemap = tilemap_create(machine, get_gfx0a_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_gfx0b_tilemap = tilemap_create(machine, get_gfx0b_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
-	state->m_gfx1_tilemap = tilemap_create(machine, get_gfx1_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_gfx0a_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx0a_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_gfx0b_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx0b_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_gfx1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_gfx0a_tilemap->set_transparent_pen(0);
 	state->m_gfx0b_tilemap->set_transparent_pen(0);

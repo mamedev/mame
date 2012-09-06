@@ -32,28 +32,28 @@ public:
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
 	DECLARE_DRIVER_INIT(mv4in1);
+	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 };
 
 
 /* Video */
 
-static TILE_GET_INFO( get_ltcasino_tile_info )
+TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
 {
-	ltcasino_state *state = machine.driver_data<ltcasino_state>();
 	int tileno, colour;
 
-	tileno = state->m_tile_num_ram[tile_index];
-	colour = state->m_tile_atr_ram[tile_index];
+	tileno = m_tile_num_ram[tile_index];
+	colour = m_tile_atr_ram[tile_index];
 
 	tileno += (colour & 0x80) << 1;
 
-	SET_TILE_INFO(0,tileno,0,0);
+	SET_TILE_INFO_MEMBER(0,tileno,0,0);
 }
 
 static VIDEO_START(ltcasino)
 {
 	ltcasino_state *state = machine.driver_data<ltcasino_state>();
-	state->m_tilemap = tilemap_create(machine, get_ltcasino_tile_info,TILEMAP_SCAN_ROWS,8, 8,64,32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ltcasino_state::get_ltcasino_tile_info),state),TILEMAP_SCAN_ROWS,8, 8,64,32);
 }
 
 

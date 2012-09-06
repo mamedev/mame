@@ -483,6 +483,7 @@ public:
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
 	DECLARE_DRIVER_INIT(fclown);
+	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 };
 
 
@@ -507,9 +508,8 @@ WRITE8_MEMBER(_5clown_state::fclown_colorram_w)
 }
 
 
-static TILE_GET_INFO( get_fclown_tile_info )
+TILE_GET_INFO_MEMBER(_5clown_state::get_fclown_tile_info)
 {
-	_5clown_state *state = machine.driver_data<_5clown_state>();
 
 /*  - bits -
     7654 3210
@@ -520,19 +520,19 @@ static TILE_GET_INFO( get_fclown_tile_info )
     x--- ----   Extra color for 7's.
 */
 
-	int attr = state->m_colorram[tile_index];
-	int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | state->m_videoram[tile_index];	/* bit 8 for extended char set */
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];	/* bit 8 for extended char set */
 	int bank = (attr & 0x02) >> 1;													/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);							/* bits 2-3-4-5-7 for color */
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 
 static VIDEO_START(fclown)
 {
 	_5clown_state *state = machine.driver_data<_5clown_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_fclown_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(_5clown_state::get_fclown_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

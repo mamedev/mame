@@ -73,6 +73,8 @@ public:
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_bank_w);
 	DECLARE_WRITE8_MEMBER(safarir_audio_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -146,12 +148,11 @@ static PALETTE_INIT( safarir )
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 {
 	int color;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	safarir_state *state = machine.driver_data<safarir_state>();
-	UINT8 code = state->ram_r(*space,tile_index | 0x400);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 code = ram_r(*space,tile_index | 0x400);
 
 	if (code & 0x80)
 		color = 6;	/* yellow */
@@ -165,16 +166,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 			color |= (tile_index & 0xc0) ? 1 : 0;
 	}
 
-	SET_TILE_INFO(0, code & 0x7f, color, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x7f, color, 0);
 }
 
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 {
 	int color, flags;
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	safarir_state *state = machine.driver_data<safarir_state>();
-	UINT8 code = state->ram_r(*space,tile_index);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 code = ram_r(*space,tile_index);
 
 	if (code & 0x80)
 		color = 7;	/* white */
@@ -183,7 +183,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	flags = ((tile_index & 0x1f) >= 0x03) ? 0 : TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO(1, code & 0x7f, color, flags);
+	SET_TILE_INFO_MEMBER(1, code & 0x7f, color, flags);
 }
 
 
@@ -191,8 +191,8 @@ static VIDEO_START( safarir )
 {
 	safarir_state *state = machine.driver_data<safarir_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(safarir_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(safarir_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

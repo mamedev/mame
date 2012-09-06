@@ -83,25 +83,25 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_irq_w);
 	DECLARE_WRITE8_MEMBER(music_irq_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
 {
-	dacholer_state *state = machine.driver_data<dacholer_state>();
-	SET_TILE_INFO(1, state->m_bgvideoram[tile_index] + state->m_bg_bank * 0x100, 0, 0);
+	SET_TILE_INFO_MEMBER(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 {
-	dacholer_state *state = machine.driver_data<dacholer_state>();
-	SET_TILE_INFO(0, state->m_fgvideoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
 }
 
 static VIDEO_START( dacholer )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

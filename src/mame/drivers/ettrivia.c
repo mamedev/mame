@@ -56,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(b000_w);
 	DECLARE_READ8_MEMBER(b000_r);
 	DECLARE_WRITE8_MEMBER(b800_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 };
 
 
@@ -201,16 +203,14 @@ INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int til
 	SET_TILE_INFO(gfx_code,code,color,0);
 }
 
-static TILE_GET_INFO( get_tile_info_bg )
+TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_bg)
 {
-	ettrivia_state *state = machine.driver_data<ettrivia_state>();
-	get_tile_info(machine, tileinfo, tile_index, state->m_bg_videoram, 0);
+	get_tile_info(machine(), tileinfo, tile_index, m_bg_videoram, 0);
 }
 
-static TILE_GET_INFO( get_tile_info_fg )
+TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 {
-	ettrivia_state *state = machine.driver_data<ettrivia_state>();
-	get_tile_info(machine, tileinfo, tile_index, state->m_fg_videoram, 1);
+	get_tile_info(machine(), tileinfo, tile_index, m_fg_videoram, 1);
 }
 
 static PALETTE_INIT( ettrivia )
@@ -253,8 +253,8 @@ static PALETTE_INIT( ettrivia )
 static VIDEO_START( ettrivia )
 {
 	ettrivia_state *state = machine.driver_data<ettrivia_state>();
-	state->m_bg_tilemap = tilemap_create( machine, get_tile_info_bg,TILEMAP_SCAN_ROWS,8,8,64,32 );
-	state->m_fg_tilemap = tilemap_create( machine, get_tile_info_fg,TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_bg),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_fg),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

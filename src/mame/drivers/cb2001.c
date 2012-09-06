@@ -66,6 +66,9 @@ public:
 	DECLARE_WRITE16_MEMBER(cb2001_vidctrl_w);
 	DECLARE_WRITE16_MEMBER(cb2001_vidctrl2_w);
 	DECLARE_WRITE16_MEMBER(cb2001_bg_w);
+	TILE_GET_INFO_MEMBER(get_cb2001_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
 };
 
 
@@ -456,10 +459,9 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
 }
 
 
-static TILE_GET_INFO( get_cb2001_reel1_tile_info )
+TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel1_tile_info)
 {
-	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->m_vram_bg[(0x0000/2) + tile_index/2];
+	int code = m_vram_bg[(0x0000/2) + tile_index/2];
 
 	if (tile_index&1)
 		code >>=8;
@@ -468,17 +470,16 @@ static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 
 	int colour = 0;//= (cb2001_out_c&0x7) + 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code+0x800,
 			colour,
 			0);
 }
 
-static TILE_GET_INFO( get_cb2001_reel2_tile_info )
+TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel2_tile_info)
 {
-	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->m_vram_bg[(0x0200/2) + tile_index/2];
+	int code = m_vram_bg[(0x0200/2) + tile_index/2];
 
 	if (tile_index&1)
 		code >>=8;
@@ -487,7 +488,7 @@ static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code+0x800,
 			colour,
@@ -495,10 +496,9 @@ static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 }
 
 
-static TILE_GET_INFO( get_cb2001_reel3_tile_info )
+TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel3_tile_info)
 {
-	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->m_vram_bg[(0x0400/2) + tile_index/2];
+	int code = m_vram_bg[(0x0400/2) + tile_index/2];
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
 	if (tile_index&1)
@@ -506,7 +506,7 @@ static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 
 	code &=0xff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code+0x800,
 			colour,
@@ -517,9 +517,9 @@ static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 static VIDEO_START(cb2001)
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	state->m_reel1_tilemap = tilemap_create(machine,get_cb2001_reel1_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_cb2001_reel2_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_cb2001_reel3_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel2_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel3_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);

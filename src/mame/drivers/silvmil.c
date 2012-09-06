@@ -105,32 +105,33 @@ public:
 
 
 	DECLARE_DRIVER_INIT(silvmil);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
 };
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 {
-	silvmil_state *state = machine.driver_data<silvmil_state>();
-	int data  = state->m_bg_videoram[tile_index];
+	int data  = m_bg_videoram[tile_index];
 	int tile  = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	int bank = state->m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
+	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
 
-	SET_TILE_INFO(1, tile + bank, color + 0x20, 0);
+	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 {
-	silvmil_state *state = machine.driver_data<silvmil_state>();
-	int data  = state->m_fg_videoram[tile_index];
+	int data  = m_fg_videoram[tile_index];
 	int tile  = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	int bank = state->m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
+	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
 
-	SET_TILE_INFO(1, tile + bank, color + 0x10, 0);
+	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
 }
 
-static TILEMAP_MAPPER( deco16_scan_rows )
+TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
@@ -139,8 +140,8 @@ static TILEMAP_MAPPER( deco16_scan_rows )
 VIDEO_START( silvmil )
 {
 	silvmil_state *state = machine.driver_data<silvmil_state>();
-	state->m_bg_layer = tilemap_create(machine, get_bg_tile_info, deco16_scan_rows, 16, 16, 64, 32);
-	state->m_fg_layer = tilemap_create(machine, get_fg_tile_info, deco16_scan_rows, 16, 16, 64, 32);
+	state->m_bg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),state), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),state), 16, 16, 64, 32);
+	state->m_fg_layer = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),state), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),state), 16, 16, 64, 32);
 
 	state->m_fg_layer->set_transparent_pen(0);
 }

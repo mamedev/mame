@@ -60,54 +60,54 @@ public:
 	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
 	DECLARE_DRIVER_INIT(umipoker);
 	DECLARE_DRIVER_INIT(saiyukip);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_3);
 };
 
-static TILE_GET_INFO( get_tile_info_0 )
+TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_0[tile_index*2+0];
-	int color = state->m_vram_0[tile_index*2+1] & 0x3f;
+	int tile = m_vram_0[tile_index*2+0];
+	int color = m_vram_0[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
+TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_1)
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_1[tile_index*2+0];
-	int color = state->m_vram_1[tile_index*2+1] & 0x3f;
+	int tile = m_vram_1[tile_index*2+0];
+	int color = m_vram_1[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_2 )
+TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_2)
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_2[tile_index*2+0];
-	int color = state->m_vram_2[tile_index*2+1] & 0x3f;
+	int tile = m_vram_2[tile_index*2+0];
+	int color = m_vram_2[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info_3 )
+TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 {
-	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_3[tile_index*2+0];
-	int color = state->m_vram_3[tile_index*2+1] & 0x3f;
+	int tile = m_vram_3[tile_index*2+0];
+	int color = m_vram_3[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -118,10 +118,10 @@ static VIDEO_START( umipoker )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
 
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2,TILEMAP_SCAN_ROWS,8,8,64,32);
-	state->m_tilemap_3 = tilemap_create(machine, get_tile_info_3,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_0 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_tilemap_3 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	state->m_tilemap_0->set_transparent_pen(0);
 	state->m_tilemap_1->set_transparent_pen(0);

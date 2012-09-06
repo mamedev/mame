@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
 	DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(debug_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -101,28 +102,27 @@ WRITE8_MEMBER(nsmpoker_state::nsmpoker_colorram_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
 {
-	nsmpoker_state *state = machine.driver_data<nsmpoker_state>();
 /*  - bits -
     7654 3210
     ---- ----   bank select.
     ---- ----   color code.
     ---- ----   seems unused.
 */
-//  int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+//  int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 
-	SET_TILE_INFO( 0 /* bank */, code, 0 /* color */, 0);
+	SET_TILE_INFO_MEMBER( 0 /* bank */, code, 0 /* color */, 0);
 }
 
 
 static VIDEO_START( nsmpoker )
 {
 	nsmpoker_state *state = machine.driver_data<nsmpoker_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

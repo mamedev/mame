@@ -132,6 +132,10 @@ public:
 	DECLARE_WRITE32_MEMBER(rabbit_blitter_w);
 	DECLARE_WRITE32_MEMBER(rabbit_eeprom_write);
 	DECLARE_DRIVER_INIT(rabbit);
+	TILE_GET_INFO_MEMBER(get_rabbit_tilemap0_tile_info);
+	TILE_GET_INFO_MEMBER(get_rabbit_tilemap1_tile_info);
+	TILE_GET_INFO_MEMBER(get_rabbit_tilemap2_tile_info);
+	TILE_GET_INFO_MEMBER(get_rabbit_tilemap3_tile_info);
 };
 
 
@@ -197,24 +201,24 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinf
 	}
 }
 
-static TILE_GET_INFO( get_rabbit_tilemap0_tile_info )
+TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap0_tile_info)
 {
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,0,1);
+	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,0,1);
 }
 
-static TILE_GET_INFO( get_rabbit_tilemap1_tile_info )
+TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap1_tile_info)
 {
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,1,1);
+	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,1,1);
 }
 
-static TILE_GET_INFO( get_rabbit_tilemap2_tile_info )
+TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap2_tile_info)
 {
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,2,1);
+	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,2,1);
 }
 
-static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
+TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap3_tile_info)
 {
-	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
+	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,3,0);
 }
 
 WRITE32_MEMBER(rabbit_state::rabbit_tilemap0_w)
@@ -392,10 +396,10 @@ static VIDEO_START(rabbit)
 	state->m_tilemap_ram[2] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
 	state->m_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
 
-	state->m_tilemap[0] = tilemap_create(machine, get_rabbit_tilemap0_tile_info,TILEMAP_SCAN_ROWS,16, 16, 128,32);
-	state->m_tilemap[1] = tilemap_create(machine, get_rabbit_tilemap1_tile_info,TILEMAP_SCAN_ROWS,16, 16, 128,32);
-	state->m_tilemap[2] = tilemap_create(machine, get_rabbit_tilemap2_tile_info,TILEMAP_SCAN_ROWS,16, 16, 128,32);
-	state->m_tilemap[3] = tilemap_create(machine, get_rabbit_tilemap3_tile_info,TILEMAP_SCAN_ROWS, 8,  8, 128,32);
+	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap0_tile_info),state),TILEMAP_SCAN_ROWS,16, 16, 128,32);
+	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap1_tile_info),state),TILEMAP_SCAN_ROWS,16, 16, 128,32);
+	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap2_tile_info),state),TILEMAP_SCAN_ROWS,16, 16, 128,32);
+	state->m_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(rabbit_state::get_rabbit_tilemap3_tile_info),state),TILEMAP_SCAN_ROWS, 8,  8, 128,32);
 
 	/* the tilemaps mix 4bpp and 8bbp tiles, we split these into 2 groups, and set a different transpen for each group */
     state->m_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);

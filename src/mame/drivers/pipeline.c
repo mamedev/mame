@@ -97,26 +97,26 @@ public:
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
 };
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 {
-	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code = state->m_vram2[tile_index]+state->m_vram2[tile_index+0x800]*256;
-	SET_TILE_INFO(
+	int code = m_vram2[tile_index]+m_vram2[tile_index+0x800]*256;
+	SET_TILE_INFO_MEMBER(
 		0,
 		code,
 		0,
 		0);
 }
 
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 {
-	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code =state->m_vram1[tile_index]+((state->m_vram1[tile_index+0x800]>>4))*256;
-	int color=((state->m_vram1[tile_index+0x800])&0xf);
-	SET_TILE_INFO
+	int code =m_vram1[tile_index]+((m_vram1[tile_index+0x800]>>4))*256;
+	int color=((m_vram1[tile_index+0x800])&0xf);
+	SET_TILE_INFO_MEMBER
 	(
 		1,
 		code,
@@ -129,8 +129,8 @@ static VIDEO_START ( pipeline )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
 	state->m_palram=auto_alloc_array(machine, UINT8, 0x1000);
-	state->m_tilemap1 = tilemap_create( machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32 );
-	state->m_tilemap2 = tilemap_create( machine, get_tile_info2,TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_tilemap1 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	state->m_tilemap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),state),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	state->m_tilemap2->set_transparent_pen(0);
 }
 

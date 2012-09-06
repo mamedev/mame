@@ -83,6 +83,9 @@ public:
 	DECLARE_DRIVER_INIT(dynabomb);
 	DECLARE_DRIVER_INIT(legendoh);
 	DECLARE_DRIVER_INIT(spotty);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_md_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -295,28 +298,25 @@ ADDRESS_MAP_END
   VIDEO HARDWARE EMULATION
 *****************************************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(limenko_state::get_bg_tile_info)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	int tile  = state->m_bg_videoram[tile_index] & 0x7ffff;
-	int color = (state->m_bg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO(0,tile,color,0);
+	int tile  = m_bg_videoram[tile_index] & 0x7ffff;
+	int color = (m_bg_videoram[tile_index]>>28) & 0xf;
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static TILE_GET_INFO( get_md_tile_info )
+TILE_GET_INFO_MEMBER(limenko_state::get_md_tile_info)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	int tile  = state->m_md_videoram[tile_index] & 0x7ffff;
-	int color = (state->m_md_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO(0,tile,color,0);
+	int tile  = m_md_videoram[tile_index] & 0x7ffff;
+	int color = (m_md_videoram[tile_index]>>28) & 0xf;
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 {
-	limenko_state *state = machine.driver_data<limenko_state>();
-	int tile  = state->m_fg_videoram[tile_index] & 0x7ffff;
-	int color = (state->m_fg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO(0,tile,color,0);
+	int tile  = m_fg_videoram[tile_index] & 0x7ffff;
+	int color = (m_fg_videoram[tile_index]>>28) & 0xf;
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
@@ -503,9 +503,9 @@ static void copy_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_
 static VIDEO_START( limenko )
 {
 	limenko_state *state = machine.driver_data<limenko_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
-	state->m_md_tilemap = tilemap_create(machine, get_md_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,TILEMAP_SCAN_ROWS,8,8,128,64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
+	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),state),TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	state->m_md_tilemap->set_transparent_pen(0);
 	state->m_fg_tilemap->set_transparent_pen(0);

@@ -104,17 +104,20 @@ public:
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 	DECLARE_DRIVER_INIT(jackie);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_jackie_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_jackie_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_jackie_reel3_tile_info);
 };
 
 
 
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(jackie_state::get_fg_tile_info)
 {
-	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
+	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(jackie_state::fg_tile_w)
@@ -144,11 +147,10 @@ WRITE8_MEMBER(jackie_state::jackie_reel1_ram_w)
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jackie_reel1_tile_info )
+TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel1_tile_info)
 {
-	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel1_ram[tile_index];
-	SET_TILE_INFO(1, code, 0, 0);
+	int code = m_reel1_ram[tile_index];
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 
@@ -159,11 +161,10 @@ WRITE8_MEMBER(jackie_state::jackie_reel2_ram_w)
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jackie_reel2_tile_info )
+TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel2_tile_info)
 {
-	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel2_ram[tile_index];
-	SET_TILE_INFO(1, code, 0, 0);
+	int code = m_reel2_ram[tile_index];
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 
@@ -173,25 +174,24 @@ WRITE8_MEMBER(jackie_state::jackie_reel3_ram_w)
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_jackie_reel3_tile_info )
+TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel3_tile_info)
 {
-	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel3_ram[tile_index];
-	SET_TILE_INFO(1, code, 0, 0);
+	int code = m_reel3_ram[tile_index];
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 static VIDEO_START(jackie)
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	state->m_reel1_tilemap = tilemap_create(machine,get_jackie_reel1_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_jackie_reel2_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_jackie_reel3_tile_info,TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel1_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel2_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_jackie_reel3_tile_info),state),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);
 	state->m_reel3_tilemap->set_scroll_cols(64);
 
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,	8,  8,	64, 32);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

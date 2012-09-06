@@ -35,25 +35,25 @@ public:
 	DECLARE_WRITE16_MEMBER(drtomy_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(drtomy_vram_bg_w);
 	DECLARE_WRITE16_MEMBER(drtomy_okibank_w);
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 };
 
 
 
-static TILE_GET_INFO( get_tile_info_fg )
+TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_fg)
 {
-	drtomy_state *state = machine.driver_data<drtomy_state>();
-	int code  = state->m_videoram_fg[tile_index] & 0xfff;
-	int color = (state->m_videoram_fg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO(2, code, color, 0);
+	int code  = m_videoram_fg[tile_index] & 0xfff;
+	int color = (m_videoram_fg[tile_index] & 0xf000) >> 12;
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
-static TILE_GET_INFO( get_tile_info_bg )
+TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
 {
-	drtomy_state *state = machine.driver_data<drtomy_state>();
-	int code  = state->m_videoram_bg[tile_index] & 0xfff;
-	int color = (state->m_videoram_bg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO(1, code, color, 0);
+	int code  = m_videoram_bg[tile_index] & 0xfff;
+	int color = (m_videoram_bg[tile_index] & 0xf000) >> 12;
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -123,8 +123,8 @@ static VIDEO_START( drtomy )
 {
 	drtomy_state *state = machine.driver_data<drtomy_state>();
 
-	state->m_tilemap_bg = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_tilemap_fg = tilemap_create(machine, get_tile_info_fg, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap_bg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_tilemap_fg = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	state->m_tilemap_fg->set_transparent_pen(0);
 }

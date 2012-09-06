@@ -59,6 +59,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
 	DECLARE_DRIVER_INIT(quizshow);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
@@ -87,21 +88,20 @@ PALETTE_INIT( quizshow )
 		colortable_entry_set_value(machine.colortable, i, lut_pal[i]);
 }
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 {
-	quizshow_state *state = machine.driver_data<quizshow_state>();
-	UINT8 code = state->m_main_ram[tile_index];
+	UINT8 code = m_main_ram[tile_index];
 
 	// d6: blink, d7: invert
-	UINT8 color = (code & (state->m_blink_state | 0x80)) >> 6;
+	UINT8 color = (code & (m_blink_state | 0x80)) >> 6;
 
-	SET_TILE_INFO(0, code & 0x3f, color, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
 }
 
 VIDEO_START( quizshow )
 {
 	quizshow_state *state = machine.driver_data<quizshow_state>();
-	state->m_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 }
 
 SCREEN_UPDATE_IND16( quizshow )

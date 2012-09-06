@@ -233,29 +233,29 @@ public:
 	DECLARE_DRIVER_INIT(gnomeent);
 	DECLARE_DRIVER_INIT(lhauntent);
 	DECLARE_DRIVER_INIT(fcockt2ent);
+	TILE_GET_INFO_MEMBER(get_multfish_tile_info);
+	TILE_GET_INFO_MEMBER(get_multfish_reel_tile_info);
 };
 
-static TILE_GET_INFO( get_multfish_tile_info )
+TILE_GET_INFO_MEMBER(multfish_state::get_multfish_tile_info)
 {
-	multfish_state *state = machine.driver_data<multfish_state>();
-	int code = state->m_vid[tile_index*2+0x0000] | (state->m_vid[tile_index*2+0x0001] << 8);
-	int attr = state->m_vid[tile_index*2+0x1000] | (state->m_vid[tile_index*2+0x1001] << 8);
+	int code = m_vid[tile_index*2+0x0000] | (m_vid[tile_index*2+0x0001] << 8);
+	int attr = m_vid[tile_index*2+0x1000] | (m_vid[tile_index*2+0x1001] << 8);
 
 	tileinfo.category = (attr&0x100)>>8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			code&0x1fff,
 			attr&0x7,
 			0);
 }
 
-static TILE_GET_INFO( get_multfish_reel_tile_info )
+TILE_GET_INFO_MEMBER(multfish_state::get_multfish_reel_tile_info)
 {
-	multfish_state *state = machine.driver_data<multfish_state>();
-	int code = state->m_vid[tile_index*2+0x2000] | (state->m_vid[tile_index*2+0x2001] << 8);
+	int code = m_vid[tile_index*2+0x2000] | (m_vid[tile_index*2+0x2001] << 8);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code&0x1fff)+0x2000,
 			(code>>14)+0x8,
@@ -269,10 +269,10 @@ static VIDEO_START(multfish)
 	memset(state->m_vid,0x00,sizeof(state->m_vid));
 	state->save_item(NAME(state->m_vid));
 
-	state->m_tilemap = tilemap_create(machine,get_multfish_tile_info,TILEMAP_SCAN_ROWS,16,16, 64, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(multfish_state::get_multfish_tile_info),state),TILEMAP_SCAN_ROWS,16,16, 64, 32);
 	state->m_tilemap->set_transparent_pen(255);
 
-	state->m_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,TILEMAP_SCAN_ROWS,16,16, 64, 64);
+	state->m_reel_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(multfish_state::get_multfish_reel_tile_info),state),TILEMAP_SCAN_ROWS,16,16, 64, 64);
 	state->m_reel_tilemap->set_transparent_pen(255);
 	state->m_reel_tilemap->set_scroll_cols(64);
 }

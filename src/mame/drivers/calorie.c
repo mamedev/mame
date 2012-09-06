@@ -107,6 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bogus_w);
 	DECLARE_DRIVER_INIT(calorie);
 	DECLARE_DRIVER_INIT(calorieb);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -116,25 +118,23 @@ public:
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
 {
-	calorie_state *state = machine.driver_data<calorie_state>();
-	UINT8 *src = state->memregion("user1")->base();
-	int bg_base = (state->m_bg_bank & 0x0f) * 0x200;
+	UINT8 *src = memregion("user1")->base();
+	int bg_base = (m_bg_bank & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
 	int flag  = src[bg_base + tile_index + 0x100] & 0x40 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flag);
+	SET_TILE_INFO_MEMBER(1, code, color, flag);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 {
-	calorie_state *state = machine.driver_data<calorie_state>();
-	int code  = ((state->m_fg_ram[tile_index + 0x400] & 0x30) << 4) | state->m_fg_ram[tile_index];
-	int color = state->m_fg_ram[tile_index + 0x400] & 0x0f;
+	int code  = ((m_fg_ram[tile_index + 0x400] & 0x30) << 4) | m_fg_ram[tile_index];
+	int color = m_fg_ram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((state->m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 
@@ -142,8 +142,8 @@ static VIDEO_START( calorie )
 {
 	calorie_state *state = machine.driver_data<calorie_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	state->m_fg_tilemap->set_transparent_pen(0);
 }

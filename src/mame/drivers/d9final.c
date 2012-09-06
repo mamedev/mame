@@ -42,17 +42,17 @@ public:
 	DECLARE_WRITE8_MEMBER(sc0_cram);
 	DECLARE_WRITE8_MEMBER(d9final_bank_w);
 	DECLARE_READ8_MEMBER(prot_latch_r);
+	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 };
 
 
 
-static TILE_GET_INFO( get_sc0_tile_info )
+TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 {
-	d9final_state *state = machine.driver_data<d9final_state>();
-	int tile = ((state->m_hi_vram[tile_index] & 0x3f)<<8) | state->m_lo_vram[tile_index];
-	int color = state->m_cram[tile_index] & 0x3f;
+	int tile = ((m_hi_vram[tile_index] & 0x3f)<<8) | m_lo_vram[tile_index];
+	int color = m_cram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static VIDEO_START(d9final)
 {
 	d9final_state *state = machine.driver_data<d9final_state>();
-	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,64,32);
+	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 static SCREEN_UPDATE_IND16(d9final)

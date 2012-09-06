@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(input_sel_w);
 	DECLARE_READ8_MEMBER(key_matrix_1p_r);
 	DECLARE_READ8_MEMBER(key_matrix_2p_r);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
@@ -50,19 +51,18 @@ public:
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(mayumi_state::get_tile_info)
 {
-	mayumi_state *state = machine.driver_data<mayumi_state>();
-	int code = state->m_videoram[tile_index] + (state->m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
-	int col = (state->m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
+	int code = m_videoram[tile_index] + (m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
+	int col = (m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
 
-	SET_TILE_INFO(0, code, col, 0);
+	SET_TILE_INFO_MEMBER(0, code, col, 0);
 }
 
 static VIDEO_START( mayumi )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
-	state->m_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mayumi_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)

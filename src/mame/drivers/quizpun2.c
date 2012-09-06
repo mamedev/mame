@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE8_MEMBER(quizpun2_rombank_w);
 	DECLARE_WRITE8_MEMBER(quizpun2_irq_ack);
 	DECLARE_WRITE8_MEMBER(quizpun2_soundlatch_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -117,19 +119,17 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
 {
-	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	UINT16 code = state->m_bg_ram[ tile_index * 2 ] + state->m_bg_ram[ tile_index * 2 + 1 ] * 256;
-	SET_TILE_INFO(0, code, 0, 0);
+	UINT16 code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 {
-	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	UINT16 code  = state->m_fg_ram[ tile_index * 4 ] + state->m_fg_ram[ tile_index * 4 + 1 ] * 256;
-	UINT8  color = state->m_fg_ram[ tile_index * 4 + 2 ];
-	SET_TILE_INFO(1, code, color & 0x0f, 0);
+	UINT16 code  = m_fg_ram[ tile_index * 4 ] + m_fg_ram[ tile_index * 4 + 1 ] * 256;
+	UINT8  color = m_fg_ram[ tile_index * 4 + 2 ];
+	SET_TILE_INFO_MEMBER(1, code, color & 0x0f, 0);
 }
 
 WRITE8_MEMBER(quizpun2_state::bg_ram_w)
@@ -147,8 +147,8 @@ WRITE8_MEMBER(quizpun2_state::fg_ram_w)
 static VIDEO_START(quizpun2)
 {
 	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	state->m_bg_tmap = tilemap_create(	machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,	8,16, 0x20,0x20	);
-	state->m_fg_tmap = tilemap_create(	machine, get_fg_tile_info, TILEMAP_SCAN_ROWS,	8,16, 0x20,0x20	);
+	state->m_bg_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizpun2_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,8,16,0x20,0x20);
+	state->m_fg_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(quizpun2_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,8,16,0x20,0x20);
 
 	state->m_bg_tmap->set_transparent_pen(0);
 	state->m_fg_tmap->set_transparent_pen(0);

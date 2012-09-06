@@ -62,6 +62,7 @@ public:
 	DECLARE_READ8_MEMBER(sync_r);
 	DECLARE_READ8_MEMBER(sync2_r);
 	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -296,19 +297,18 @@ READ8_MEMBER(sbrkout_state::sync2_r)
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(sbrkout_state::get_bg_tile_info)
 {
-	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
 static VIDEO_START( sbrkout )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(sbrkout_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

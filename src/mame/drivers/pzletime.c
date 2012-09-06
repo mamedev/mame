@@ -53,26 +53,26 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_txt_tile_info);
 };
 
 
-static TILE_GET_INFO( get_mid_tile_info )
+TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
 {
-	pzletime_state *state = machine.driver_data<pzletime_state>();
-	int tileno = state->m_mid_videoram[tile_index] & 0x0fff;
-	int colour = state->m_mid_videoram[tile_index] & 0xf000;
+	int tileno = m_mid_videoram[tile_index] & 0x0fff;
+	int colour = m_mid_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
-	SET_TILE_INFO(2, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
-static TILE_GET_INFO( get_txt_tile_info )
+TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 {
-	pzletime_state *state = machine.driver_data<pzletime_state>();
-	int tileno = state->m_txt_videoram[tile_index] & 0x0fff;
-	int colour = state->m_txt_videoram[tile_index] & 0xf000;
+	int tileno = m_txt_videoram[tile_index] & 0x0fff;
+	int colour = m_txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
 
-	SET_TILE_INFO(0, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 
 	tileinfo.category = BIT(colour, 3);
 }
@@ -81,8 +81,8 @@ static VIDEO_START( pzletime )
 {
 	pzletime_state *state = machine.driver_data<pzletime_state>();
 
-	state->m_mid_tilemap = tilemap_create(machine, get_mid_tile_info, TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	state->m_txt_tilemap = tilemap_create(machine, get_txt_tile_info, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	state->m_mid_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pzletime_state::get_mid_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	state->m_txt_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(pzletime_state::get_txt_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	state->m_mid_tilemap->set_transparent_pen(0);
 	state->m_txt_tilemap->set_transparent_pen(0);

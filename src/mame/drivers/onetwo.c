@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(onetwo_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(palette1_w);
 	DECLARE_WRITE8_MEMBER(palette2_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -82,21 +83,20 @@ public:
  *
  *************************************/
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
 {
-	onetwo_state *state = machine.driver_data<onetwo_state>();
-	int code = (state->m_fgram[tile_index * 2 + 1] << 8) | state->m_fgram[tile_index * 2];
-	int color = (state->m_fgram[tile_index * 2 + 1] & 0x80) >> 7;
+	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
+	int color = (m_fgram[tile_index * 2 + 1] & 0x80) >> 7;
 
 	code &= 0x7fff;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 static VIDEO_START( onetwo )
 {
 	onetwo_state *state = machine.driver_data<onetwo_state>();
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE_IND16( onetwo )

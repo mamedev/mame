@@ -105,6 +105,8 @@ public:
 	DECLARE_READ8_MEMBER(key_matrix_r);
 	DECLARE_READ8_MEMBER(sound_cmd_r);
 	DECLARE_WRITE8_MEMBER(outportb_w);
+	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
+	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 };
 
 
@@ -129,47 +131,45 @@ xxxx ---- basic color?
 ---- ---x tile bank
 */
 
-static TILE_GET_INFO( get_sc0_tile_info )
+TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
 {
-	kingdrby_state *state = machine.driver_data<kingdrby_state>();
-	int tile = state->m_vram[tile_index] | state->m_attr[tile_index]<<8;
-	int color = (state->m_attr[tile_index] & 0x06)>>1;
+	int tile = m_vram[tile_index] | m_attr[tile_index]<<8;
+	int color = (m_attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color|0x40,
 			0);
 }
 
-static TILE_GET_INFO( get_sc1_tile_info )
+TILE_GET_INFO_MEMBER(kingdrby_state::get_sc1_tile_info)
 {
-	kingdrby_state *state = machine.driver_data<kingdrby_state>();
-	int tile = state->m_vram[tile_index] | state->m_attr[tile_index]<<8;
-	int color = (state->m_attr[tile_index] & 0x06)>>1;
+	int tile = m_vram[tile_index] | m_attr[tile_index]<<8;
+	int color = (m_attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 	//original 0xc
 	//0x13
 	//
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			tile,
 			color|0x40,
 			0);
 
-	tileinfo.category = (state->m_attr[tile_index] & 0x08)>>3;
+	tileinfo.category = (m_attr[tile_index] & 0x08)>>3;
 }
 
 static VIDEO_START(kingdrby)
 {
 	kingdrby_state *state = machine.driver_data<kingdrby_state>();
-	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,32,24);
-	state->m_sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,TILEMAP_SCAN_ROWS,8,8,32,24);
-	state->m_sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,24);
+	state->m_sc1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,24);
+	state->m_sc0w_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(kingdrby_state::get_sc0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	state->m_sc1_tilemap->set_transparent_pen(0);
 }

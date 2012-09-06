@@ -488,6 +488,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(pulses_w);
 	DECLARE_DRIVER_INIT(majorpkr);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 };
 
 
@@ -495,26 +497,24 @@ public:
 *     Video Hardware     *
 *************************/
 
-static TILE_GET_INFO( bg_get_tile_info )
+TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 {
-	majorpkr_state *state = machine.driver_data<majorpkr_state>();
 
-	int code = state->m_videoram[0x800 + 2 * tile_index] + (state->m_videoram[0x800 + 2 * tile_index + 1] << 8);
+	int code = m_videoram[0x800 + 2 * tile_index] + (m_videoram[0x800 + 2 * tile_index + 1] << 8);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			(code & 0x1fff),
 			code >> 13,
 			0);
 }
 
-static TILE_GET_INFO( fg_get_tile_info )
+TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 {
-	majorpkr_state *state = machine.driver_data<majorpkr_state>();
 
-	int code = state->m_videoram[2 * tile_index] + (state->m_videoram[2 * tile_index + 1] << 8);
+	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			(code & 0x07ff),
 			code >> 13,
@@ -526,8 +526,8 @@ static VIDEO_START(majorpkr)
 {
 	majorpkr_state *state = machine.driver_data<majorpkr_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::fg_get_tile_info),state), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
 	state->m_generic_paletteram_8.allocate(4 * 0x800);

@@ -116,6 +116,9 @@ public:
 	DECLARE_READ16_MEMBER(varia_dips_bit1_r);
 	DECLARE_WRITE8_MEMBER(vmetal_control_w);
 	DECLARE_WRITE8_MEMBER(vmetal_es8712_w);
+	TILE_GET_INFO_MEMBER(get_vmetal_texttilemap_tile_info);
+	TILE_GET_INFO_MEMBER(get_vmetal_mid1tilemap_tile_info);
+	TILE_GET_INFO_MEMBER(get_vmetal_mid2tilemap_tile_info);
 };
 
 
@@ -383,13 +386,12 @@ static GFXDECODE_START( vmetal )
 GFXDECODE_END
 
 
-static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
+TILE_GET_INFO_MEMBER(vmetal_state::get_vmetal_texttilemap_tile_info)
 {
-	vmetal_state *state = machine.driver_data<vmetal_state>();
 	UINT32 tile;
-	UINT16 color, data = state->m_texttileram[tile_index];
+	UINT16 color, data = m_texttileram[tile_index];
 	int idx = ((data & 0x7fff) >> 4) * 2;
-	UINT32 lookup = (state->m_tlookup[idx] << 16) | state->m_tlookup[idx + 1];
+	UINT32 lookup = (m_tlookup[idx] << 16) | m_tlookup[idx + 1];
 
 	tile = (data & 0xf) | (lookup & 0x7fff0);
 	color = ((lookup >> 20) & 0x1f) + 0xe0;
@@ -397,34 +399,32 @@ static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 	if (data & 0x8000)
 		tile = 0;
 
-	SET_TILE_INFO(1, tile, color, TILE_FLIPYX(0x0));
+	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPYX(0x0));
 }
 
 
-static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
+TILE_GET_INFO_MEMBER(vmetal_state::get_vmetal_mid1tilemap_tile_info)
 {
-	vmetal_state *state = machine.driver_data<vmetal_state>();
-	UINT16 tile, color, data = state->m_mid1tileram[tile_index];
+	UINT16 tile, color, data = m_mid1tileram[tile_index];
 
-	get_vmetal_tlookup(machine, data, &tile, &color);
+	get_vmetal_tlookup(machine(), data, &tile, &color);
 
 	if (data & 0x8000)
 		tile = 0;
 
-	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
+	SET_TILE_INFO_MEMBER(0, tile, color, TILE_FLIPYX(0x0));
 }
 
-static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
+TILE_GET_INFO_MEMBER(vmetal_state::get_vmetal_mid2tilemap_tile_info)
 {
-	vmetal_state *state = machine.driver_data<vmetal_state>();
-	UINT16 tile, color, data = state->m_mid2tileram[tile_index];
+	UINT16 tile, color, data = m_mid2tileram[tile_index];
 
-	get_vmetal_tlookup(machine, data, &tile, &color);
+	get_vmetal_tlookup(machine(), data, &tile, &color);
 
 	if (data & 0x8000)
 		tile = 0;
 
-	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
+	SET_TILE_INFO_MEMBER(0, tile, color, TILE_FLIPYX(0x0));
 }
 
 static void expand_gfx1(running_machine &machine)
@@ -445,9 +445,9 @@ static VIDEO_START(varia)
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
 
-	state->m_texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info, TILEMAP_SCAN_ROWS,  8,  8, 256, 256);
-	state->m_mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
-	state->m_mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
+	state->m_texttilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_texttilemap_tile_info),state), TILEMAP_SCAN_ROWS,  8,  8, 256, 256);
+	state->m_mid1tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_mid1tilemap_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
+	state->m_mid2tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(vmetal_state::get_vmetal_mid2tilemap_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 256, 256);
 
 	state->m_texttilemap->set_transparent_pen(15);
 	state->m_mid1tilemap->set_transparent_pen(15);

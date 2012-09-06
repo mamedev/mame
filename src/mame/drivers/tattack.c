@@ -34,22 +34,22 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_tmap;
 	DECLARE_DRIVER_INIT(tattack);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 {
-	tattack_state *state = machine.driver_data<tattack_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index];
+	int code = m_videoram[tile_index];
+	int color = m_colorram[tile_index];
 
 	if((color&1 ) || (color>15) )
 		logerror("COLOR %i\n",color);
 
 	color>>=1;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 		0,
 		code,
 		color,
@@ -67,7 +67,7 @@ static SCREEN_UPDATE_IND16( tattack )
 static VIDEO_START( tattack )
 {
 	tattack_state *state = machine.driver_data<tattack_state>();
-		state->m_tmap = tilemap_create( machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )

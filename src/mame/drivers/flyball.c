@@ -54,6 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flyball_pitcher_vert_w);
 	DECLARE_WRITE8_MEMBER(flyball_pitcher_horz_w);
 	DECLARE_WRITE8_MEMBER(flyball_misc_w);
+	TILEMAP_MAPPER_MEMBER(flyball_get_memory_offset);
+	TILE_GET_INFO_MEMBER(flyball_get_tile_info);
 };
 
 
@@ -63,7 +65,7 @@ public:
  *
  *************************************/
 
-static TILEMAP_MAPPER( flyball_get_memory_offset )
+TILEMAP_MAPPER_MEMBER(flyball_state::flyball_get_memory_offset)
 {
 	if (col == 0)
 		col = num_cols;
@@ -72,10 +74,9 @@ static TILEMAP_MAPPER( flyball_get_memory_offset )
 }
 
 
-static TILE_GET_INFO( flyball_get_tile_info )
+TILE_GET_INFO_MEMBER(flyball_state::flyball_get_tile_info)
 {
-	flyball_state *state = machine.driver_data<flyball_state>();
-	UINT8 data = state->m_playfield_ram[tile_index];
+	UINT8 data = m_playfield_ram[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
 	int code = data & 63;
 
@@ -84,14 +85,14 @@ static TILE_GET_INFO( flyball_get_tile_info )
 		code += 64;
 	}
 
-	SET_TILE_INFO(0, code, 0, flags);
+	SET_TILE_INFO_MEMBER(0, code, 0, flags);
 }
 
 
 static VIDEO_START( flyball )
 {
 	flyball_state *state = machine.driver_data<flyball_state>();
-	state->m_tmap = tilemap_create(machine, flyball_get_tile_info, flyball_get_memory_offset, 8, 16, 32, 16);
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(flyball_state::flyball_get_tile_info),state), tilemap_mapper_delegate(FUNC(flyball_state::flyball_get_memory_offset),state), 8, 16, 32, 16);
 }
 
 

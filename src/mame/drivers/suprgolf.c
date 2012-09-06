@@ -65,15 +65,15 @@ public:
 	DECLARE_WRITE8_MEMBER(suprgolf_writeA);
 	DECLARE_WRITE8_MEMBER(suprgolf_writeB);
 	DECLARE_DRIVER_INIT(suprgolf);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 {
-	suprgolf_state *state = machine.driver_data<suprgolf_state>();
-	int code = state->m_videoram[tile_index*2]+256*(state->m_videoram[tile_index*2+1]);
-	int color = state->m_videoram[tile_index*2+0x800] & 0x7f;
+	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
+	int color = m_videoram[tile_index*2+0x800] & 0x7f;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 		0,
 		code,
 		color,
@@ -84,7 +84,7 @@ static VIDEO_START( suprgolf )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
-	state->m_tilemap = tilemap_create( machine, get_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->m_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
 	state->m_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);

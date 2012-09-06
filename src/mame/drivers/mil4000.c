@@ -117,59 +117,59 @@ public:
 	DECLARE_WRITE16_MEMBER(sc2_vram_w);
 	DECLARE_WRITE16_MEMBER(sc3_vram_w);
 	DECLARE_WRITE16_MEMBER(output_w);
+	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
+	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
+	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
+	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
 };
 
 
-static TILE_GET_INFO( get_sc0_tile_info )
+TILE_GET_INFO_MEMBER(mil4000_state::get_sc0_tile_info)
 {
-	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc0_vram[tile_index*2]<<16) | state->m_sc0_vram[tile_index*2+1];
+	UINT32 data = (m_sc0_vram[tile_index*2]<<16) | m_sc0_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc0_vram[tile_index*2+1] & 0x1f)+0;
+	int color = (m_sc0_vram[tile_index*2+1] & 0x1f)+0;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_sc1_tile_info )
+TILE_GET_INFO_MEMBER(mil4000_state::get_sc1_tile_info)
 {
-	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc1_vram[tile_index*2]<<16) | state->m_sc1_vram[tile_index*2+1];
+	UINT32 data = (m_sc1_vram[tile_index*2]<<16) | m_sc1_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
+	int color = (m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_sc2_tile_info )
+TILE_GET_INFO_MEMBER(mil4000_state::get_sc2_tile_info)
 {
-	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc2_vram[tile_index*2]<<16) | state->m_sc2_vram[tile_index*2+1];
+	UINT32 data = (m_sc2_vram[tile_index*2]<<16) | m_sc2_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
+	int color = (m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
 			0);
 }
 
-static TILE_GET_INFO( get_sc3_tile_info )
+TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 {
-	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc3_vram[tile_index*2]<<16) | state->m_sc3_vram[tile_index*2+1];
+	UINT32 data = (m_sc3_vram[tile_index*2]<<16) | m_sc3_vram[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
+	int color = (m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color,
@@ -179,10 +179,10 @@ static TILE_GET_INFO( get_sc3_tile_info )
 static VIDEO_START(mil4000)
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
-	state->m_sc3_tilemap = tilemap_create(machine, get_sc3_tile_info,TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mil4000_state::get_sc0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mil4000_state::get_sc1_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mil4000_state::get_sc2_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
+	state->m_sc3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mil4000_state::get_sc3_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	state->m_sc1_tilemap->set_transparent_pen(0);
 	state->m_sc2_tilemap->set_transparent_pen(0);

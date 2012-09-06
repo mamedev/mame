@@ -39,15 +39,15 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_DRIVER_INIT(wink);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 {
-	wink_state *state = machine.driver_data<wink_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
-	code |= 0x200 * state->m_tile_bank;
+	code |= 0x200 * m_tile_bank;
 
 	// the 2 parts of the screen use different tile banking
 	if(tile_index < 0x360)
@@ -55,13 +55,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 		code |= 0x100;
 	}
 
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 static VIDEO_START( wink )
 {
 	wink_state *state = machine.driver_data<wink_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wink_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( wink )

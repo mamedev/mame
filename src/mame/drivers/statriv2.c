@@ -104,6 +104,8 @@ public:
 	DECLARE_DRIVER_INIT(addr_lmhe);
 	DECLARE_DRIVER_INIT(addr_xhl);
 	DECLARE_DRIVER_INIT(laserdisc);
+	TILE_GET_INFO_MEMBER(horizontal_tile_info);
+	TILE_GET_INFO_MEMBER(vertical_tile_info);
 };
 
 
@@ -116,24 +118,22 @@ public:
  *
  *************************************/
 
-static TILE_GET_INFO( horizontal_tile_info )
+TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 {
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(0, code, attr, 0);
+	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-static TILE_GET_INFO( vertical_tile_info )
+TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 {
-	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
+	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
 
 
@@ -158,13 +158,13 @@ static PALETTE_INIT( statriv2 )
 static VIDEO_START( horizontal )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_tilemap = tilemap_create(machine, horizontal_tile_info ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),state) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
 }
 
 static VIDEO_START( vertical )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->m_tilemap = tilemap_create(machine, vertical_tile_info, TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }
 
 

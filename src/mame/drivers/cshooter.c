@@ -115,19 +115,19 @@ public:
 	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 	DECLARE_DRIVER_INIT(cshootere);
 	DECLARE_DRIVER_INIT(cshooter);
+	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
 };
 
 
-static TILE_GET_INFO( get_cstx_tile_info )
+TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 {
-	cshooter_state *state = machine.driver_data<cshooter_state>();
-	int code = (state->m_txram[tile_index*2]);
-	int attr = (state->m_txram[tile_index*2+1]);
+	int code = (m_txram[tile_index*2]);
+	int attr = (m_txram[tile_index*2+1]);
 	int rg;
 	rg=0;
 	if (attr & 0x20) rg = 1;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 
 			rg,
 			(code & 0x1ff),
@@ -144,7 +144,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 static VIDEO_START(cshooter)
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
-	state->m_txtilemap = tilemap_create(machine, get_cstx_tile_info,TILEMAP_SCAN_ROWS, 8,8,32, 32);
+	state->m_txtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cshooter_state::get_cstx_tile_info),state),TILEMAP_SCAN_ROWS, 8,8,32, 32);
 	state->m_txtilemap->set_transparent_pen(3);
 }
 

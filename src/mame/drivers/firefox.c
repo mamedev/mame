@@ -95,6 +95,7 @@ public:
 	DECLARE_READ8_MEMBER(riot_porta_r);
 	DECLARE_WRITE8_MEMBER(riot_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(riot_irq);
+	TILE_GET_INFO_MEMBER(bgtile_get_info);
 };
 
 
@@ -190,10 +191,9 @@ WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
  *
  *************************************/
 
-static TILE_GET_INFO( bgtile_get_info )
+TILE_GET_INFO_MEMBER(firefox_state::bgtile_get_info)
 {
-	firefox_state *state = machine.driver_data<firefox_state>();
-	SET_TILE_INFO(0, state->m_tileram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
 }
 
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER(firefox_state::tileram_w)
 static VIDEO_START( firefox )
 {
 	firefox_state *state = machine.driver_data<firefox_state>();
-	state->m_bgtiles = tilemap_create(machine, bgtile_get_info, TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	state->m_bgtiles = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),state), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	state->m_bgtiles->set_transparent_pen(0);
 	state->m_bgtiles->set_scrolldy(machine.primary_screen->visible_area().min_y, 0);
 }

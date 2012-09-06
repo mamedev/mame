@@ -227,6 +227,7 @@ public:
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_DRIVER_INIT(bus);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -241,7 +242,7 @@ WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
 {
 /*  - bits -
     7654 3210
@@ -249,16 +250,15 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   color code.
     ---- ----   seems unused.
 */
-	tmspoker_state *state = machine.driver_data<tmspoker_state>();
-	int code = state->m_videoram[tile_index];
+	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO( 0 /* bank */, code, 0 /* color */, 0);
+	SET_TILE_INFO_MEMBER( 0 /* bank */, code, 0 /* color */, 0);
 }
 
 static VIDEO_START( tmspoker )
 {
 	tmspoker_state *state = machine.driver_data<tmspoker_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(tmspoker_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( tmspoker )

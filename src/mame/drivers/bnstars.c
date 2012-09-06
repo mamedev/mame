@@ -147,30 +147,34 @@ public:
 	DECLARE_READ32_MEMBER(bnstars3_r);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
 	DECLARE_DRIVER_INIT(bnstars);
+	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_roz0_tile_info);
+	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
 };
 
 
 
-static TILE_GET_INFO( get_ms32_tx0_tile_info )
+TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
 	int tileno, colour;
 
-	tileno = state->m_ms32_tx0_ram[tile_index *2+0] & 0x0000ffff;
-	colour = state->m_ms32_tx0_ram[tile_index *2+1] & 0x0000000f;
+	tileno = m_ms32_tx0_ram[tile_index *2+0] & 0x0000ffff;
+	colour = m_ms32_tx0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO(3,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
 }
 
-static TILE_GET_INFO( get_ms32_tx1_tile_info )
+TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
 	int tileno, colour;
 
-	tileno = state->m_ms32_tx1_ram[tile_index *2+0] & 0x0000ffff;
-	colour = state->m_ms32_tx1_ram[tile_index *2+1] & 0x0000000f;
+	tileno = m_ms32_tx1_ram[tile_index *2+0] & 0x0000ffff;
+	colour = m_ms32_tx1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO(7,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(7,tileno,colour,0);
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_tx0_ram_w)
@@ -187,26 +191,24 @@ WRITE32_MEMBER(bnstars_state::ms32_tx1_ram_w)
 
 /* BG Layers */
 
-static TILE_GET_INFO( get_ms32_bg0_tile_info )
+TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
 	int tileno,colour;
 
-	tileno = state->m_ms32_bg0_ram[tile_index *2+0] & 0x0000ffff;
-	colour = state->m_ms32_bg0_ram[tile_index *2+1] & 0x0000000f;
+	tileno = m_ms32_bg0_ram[tile_index *2+0] & 0x0000ffff;
+	colour = m_ms32_bg0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO(2,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
 }
 
-static TILE_GET_INFO( get_ms32_bg1_tile_info )
+TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
 	int tileno,colour;
 
-	tileno = state->m_ms32_bg1_ram[tile_index *2+0] & 0x0000ffff;
-	colour = state->m_ms32_bg1_ram[tile_index *2+1] & 0x0000000f;
+	tileno = m_ms32_bg1_ram[tile_index *2+0] & 0x0000ffff;
+	colour = m_ms32_bg1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO(6,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(6,tileno,colour,0);
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_bg0_ram_w)
@@ -309,26 +311,24 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 }
 
 
-static TILE_GET_INFO( get_ms32_roz0_tile_info )
+TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
 	int tileno,colour;
 
-	tileno = state->m_ms32_roz0_ram[tile_index *2+0] & 0x0000ffff;
-	colour = state->m_ms32_roz0_ram[tile_index *2+1] & 0x0000000f;
+	tileno = m_ms32_roz0_ram[tile_index *2+0] & 0x0000ffff;
+	colour = m_ms32_roz0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-static TILE_GET_INFO( get_ms32_roz1_tile_info )
+TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
 {
-	bnstars_state *state = machine.driver_data<bnstars_state>();
 	int tileno,colour;
 
-	tileno = state->m_ms32_roz1_ram[tile_index *2+0] & 0x0000ffff;
-	colour = state->m_ms32_roz1_ram[tile_index *2+1] & 0x0000000f;
+	tileno = m_ms32_roz1_ram[tile_index *2+0] & 0x0000ffff;
+	colour = m_ms32_roz1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO(5,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(5,tileno,colour,0);
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_roz0_ram_w)
@@ -507,18 +507,18 @@ WRITE32_MEMBER(bnstars_state::ms32_spramx_w)
 static VIDEO_START(bnstars)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
-	state->m_ms32_tx_tilemap[0] = tilemap_create(machine, get_ms32_tx0_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,64);
-	state->m_ms32_tx_tilemap[1] = tilemap_create(machine, get_ms32_tx1_tile_info,TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	state->m_ms32_tx_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	state->m_ms32_tx_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 8,64,64);
 	state->m_ms32_tx_tilemap[0]->set_transparent_pen(0);
 	state->m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
-	state->m_ms32_bg_tilemap[0] = tilemap_create(machine, get_ms32_bg0_tile_info,TILEMAP_SCAN_ROWS,16,16,64,64);
-	state->m_ms32_bg_tilemap[1] = tilemap_create(machine, get_ms32_bg1_tile_info,TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_ms32_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,64);
+	state->m_ms32_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),state),TILEMAP_SCAN_ROWS,16,16,64,64);
 	state->m_ms32_bg_tilemap[0]->set_transparent_pen(0);
 	state->m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
-	state->m_ms32_roz_tilemap[0] = tilemap_create(machine, get_ms32_roz0_tile_info,TILEMAP_SCAN_ROWS,16,16,128,128);
-	state->m_ms32_roz_tilemap[1] = tilemap_create(machine, get_ms32_roz1_tile_info,TILEMAP_SCAN_ROWS,16,16,128,128);
+	state->m_ms32_roz_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),state),TILEMAP_SCAN_ROWS,16,16,128,128);
+	state->m_ms32_roz_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),state),TILEMAP_SCAN_ROWS,16,16,128,128);
 	state->m_ms32_roz_tilemap[0]->set_transparent_pen(0);
 	state->m_ms32_roz_tilemap[1]->set_transparent_pen(0);
 

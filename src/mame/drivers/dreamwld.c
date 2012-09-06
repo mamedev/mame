@@ -158,6 +158,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dreamwld_6295_0_bank_w);
 	DECLARE_WRITE32_MEMBER(dreamwld_6295_1_bank_w);
 	DECLARE_WRITE32_MEMBER(dreamwld_palette_w);
+	TILE_GET_INFO_MEMBER(get_dreamwld_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_dreamwld_bg2_tile_info);
 };
 
 
@@ -234,14 +236,13 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_bg_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-static TILE_GET_INFO( get_dreamwld_bg_tile_info )
+TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg_tile_info)
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	int tileno, colour;
-	tileno = (tile_index & 1) ? (state->m_bg_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (m_bg_videoram[tile_index >> 1] & 0xffff) : ((m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO(1, tileno + state->m_tilebank[0] * 0x2000, 0x80 + colour, 0);
+	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[0] * 0x2000, 0x80 + colour, 0);
 }
 
 
@@ -252,22 +253,21 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
 	m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
+TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	UINT16 tileno, colour;
-	tileno = (tile_index & 1) ? (state->m_bg2_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (m_bg2_videoram[tile_index >> 1] & 0xffff) : ((m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO(1, tileno + state->m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
+	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
 }
 
 static VIDEO_START( dreamwld )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 64,32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,TILEMAP_SCAN_ROWS, 16, 16, 64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),state),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
 	state->m_bg2_tilemap->set_transparent_pen(0);
 
 	state->m_bg_tilemap->set_scroll_rows(256);	// line scrolling

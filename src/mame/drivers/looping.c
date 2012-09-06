@@ -138,6 +138,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_enable_w);
 	DECLARE_WRITE8_MEMBER(speech_enable_w);
 	DECLARE_DRIVER_INIT(looping);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
@@ -195,12 +196,11 @@ static PALETTE_INIT( looping )
  *
  *************************************/
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 {
-	looping_state *state = machine.driver_data<looping_state>();
-	int tile_number = state->m_videoram[tile_index];
-	int color = state->m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
-	SET_TILE_INFO(0, tile_number, color, 0);
+	int tile_number = m_videoram[tile_index];
+	int color = m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
+	SET_TILE_INFO_MEMBER(0, tile_number, color, 0);
 }
 
 
@@ -208,7 +208,7 @@ static VIDEO_START( looping )
 {
 	looping_state *state = machine.driver_data<looping_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	state->m_bg_tilemap->set_scroll_cols(0x20);
 }

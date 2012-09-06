@@ -65,17 +65,17 @@ public:
 	DECLARE_READ8_MEMBER(vvillage_rng_r);
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
+	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 };
 
 
 
-static TILE_GET_INFO( get_sc0_tile_info )
+TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 {
-	caswin_state *state = machine.driver_data<caswin_state>();
-	int tile = (state->m_sc0_vram[tile_index] | ((state->m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
-	int colour = state->m_sc0_attr[tile_index] & 0xf;
+	int tile = (m_sc0_vram[tile_index] | ((m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
+	int colour = m_sc0_attr[tile_index] & 0xf;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			colour,
@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static VIDEO_START(vvillage)
 {
 	caswin_state *state = machine.driver_data<caswin_state>();
-	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,TILEMAP_SCAN_ROWS,8,8,32,32);
+	state->m_sc0_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
 static SCREEN_UPDATE_IND16(vvillage)

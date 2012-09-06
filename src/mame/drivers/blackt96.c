@@ -122,26 +122,33 @@ public:
 	UINT16*		 m_spriteram[8];
 	tilemap_t    *m_bg_tilemap[8];
 
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg5_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg6_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
 };
 
 #define GET_INFO( ram ) \
-	blackt96_state *state = machine.driver_data<blackt96_state>(); \
 	int tileno = (ram[tile_index*2+1] & 0x1fff); \
 	int rgn = (ram[tile_index*2+1] & 0x2000) >> 13; \
 	int flipyx = (ram[tile_index*2+1] & 0xc000)>>14; \
 	int col = (ram[tile_index*2] & 0x00ff); \
 	if (rgn==1) col >>=4; \
-	SET_TILE_INFO(1-rgn, tileno, col, TILE_FLIPYX(flipyx)); \
+	SET_TILE_INFO_MEMBER(1-rgn, tileno, col, TILE_FLIPYX(flipyx)); \
 
 
-static TILE_GET_INFO( get_bg0_tile_info ) { GET_INFO(state->m_spriteram0); }
-static TILE_GET_INFO( get_bg1_tile_info ) { GET_INFO(state->m_spriteram1); }
-static TILE_GET_INFO( get_bg2_tile_info ) { GET_INFO(state->m_spriteram2); }
-static TILE_GET_INFO( get_bg3_tile_info ) { GET_INFO(state->m_spriteram3); }
-static TILE_GET_INFO( get_bg4_tile_info ) { GET_INFO(state->m_spriteram4); }
-static TILE_GET_INFO( get_bg5_tile_info ) { GET_INFO(state->m_spriteram5); }
-static TILE_GET_INFO( get_bg6_tile_info ) { GET_INFO(state->m_spriteram6); }
-static TILE_GET_INFO( get_bg7_tile_info ) { GET_INFO(state->m_spriteram7); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg0_tile_info){ GET_INFO(m_spriteram0); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg1_tile_info){ GET_INFO(m_spriteram1); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg2_tile_info){ GET_INFO(m_spriteram2); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg3_tile_info){ GET_INFO(m_spriteram3); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg4_tile_info){ GET_INFO(m_spriteram4); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg5_tile_info){ GET_INFO(m_spriteram5); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg6_tile_info){ GET_INFO(m_spriteram6); }
+TILE_GET_INFO_MEMBER(blackt96_state::get_bg7_tile_info){ GET_INFO(m_spriteram7); }
 
 WRITE16_MEMBER(blackt96_state::bg_videoram0_w) { COMBINE_DATA(&m_spriteram0[offset]); m_bg_tilemap[0]->mark_tile_dirty(offset/2); }
 WRITE16_MEMBER(blackt96_state::bg_videoram1_w) { COMBINE_DATA(&m_spriteram1[offset]); m_bg_tilemap[1]->mark_tile_dirty(offset/2); }
@@ -156,14 +163,14 @@ static VIDEO_START( blackt96 )
 {
 	blackt96_state *state = machine.driver_data<blackt96_state>();
 
-	state->m_bg_tilemap[0] = tilemap_create(machine, get_bg0_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[1] = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[2] = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[3] = tilemap_create(machine, get_bg3_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[4] = tilemap_create(machine, get_bg4_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[5] = tilemap_create(machine, get_bg5_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[6] = tilemap_create(machine, get_bg6_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	state->m_bg_tilemap[7] = tilemap_create(machine, get_bg7_tile_info, TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg0_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg1_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg2_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg3_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg4_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg5_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg6_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	state->m_bg_tilemap[7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg7_tile_info),state), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	state->m_spriteram[0] = state->m_spriteram0;
 	state->m_spriteram[1] = state->m_spriteram1;

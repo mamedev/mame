@@ -262,6 +262,7 @@ public:
 	DECLARE_DRIVER_INIT(peplus);
 	DECLARE_DRIVER_INIT(peplussb);
 	DECLARE_DRIVER_INIT(peplussbw);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -935,31 +936,30 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 * Video/Character functions *
 ****************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
-	UINT8 *videoram = state->m_videoram;
-	int pr = state->m_palette_ram[tile_index];
-	int pr2 = state->m_palette_ram2[tile_index];
+	UINT8 *videoram = m_videoram;
+	int pr = m_palette_ram[tile_index];
+	int pr2 = m_palette_ram2[tile_index];
 	int vr = videoram[tile_index];
 
 	int code = ((pr & 0x0f)*256) | vr;
 	int color = (pr>>4) & 0x0f;
 
 	// Access 2nd Half of CGs and CAP
-	if (state->m_jumper_e16_e17 && (pr2 & 0x10) == 0x10)
+	if (m_jumper_e16_e17 && (pr2 & 0x10) == 0x10)
 	{
 		code += 0x1000;
 		color += 0x10;
 	}
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 static VIDEO_START( peplus )
 {
 	peplus_state *state = machine.driver_data<peplus_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 	state->m_palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(state->m_palette_ram, 0, 0x3000);
 	state->m_palette_ram2 = auto_alloc_array(machine, UINT8, 0x3000);

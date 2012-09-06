@@ -102,6 +102,8 @@ public:
 	DECLARE_WRITE8_MEMBER(warpspeed_hardware_w);
 	DECLARE_WRITE8_MEMBER(warpspeed_vidram_w);
 	DECLARE_DRIVER_INIT(warpspeed);
+	TILE_GET_INFO_MEMBER(get_warpspeed_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_warpspeed_starfield_tile_info);
 };
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
@@ -109,22 +111,21 @@ WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
 	m_regs[offset] = data;
 }
 
-static TILE_GET_INFO( get_warpspeed_text_tile_info )
+TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_text_tile_info)
 {
-	warpspeed_state *state = machine.driver_data<warpspeed_state>();
 
-	UINT8 code = state->m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO(0, code, 0, 0);
+	UINT8 code = m_videoram[tile_index] & 0x3f;
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-static TILE_GET_INFO( get_warpspeed_starfield_tile_info )
+TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_starfield_tile_info)
 {
 	UINT8 code = 0x3f;
 	if ( tile_index & 1 )
 	{
-		code = machine.root_device().memregion("starfield")->base()[tile_index >> 1] & 0x3f;
+		code = machine().root_device().memregion("starfield")->base()[tile_index >> 1] & 0x3f;
 	}
-	SET_TILE_INFO(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
@@ -137,9 +138,9 @@ WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 static VIDEO_START( warpspeed )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
-	state->m_text_tilemap = tilemap_create(machine, get_warpspeed_text_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_text_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpspeed_state::get_warpspeed_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_text_tilemap->set_transparent_pen(0);
-	state->m_starfield_tilemap = tilemap_create(machine, get_warpspeed_starfield_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_starfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(warpspeed_state::get_warpspeed_starfield_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	state->m_starfield_tilemap->mark_all_dirty();
 }
 

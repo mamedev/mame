@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 	DECLARE_DRIVER_INIT(ddayjlc);
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 };
 
 
@@ -369,20 +370,19 @@ static GFXDECODE_START( ddayjlc )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-static TILE_GET_INFO( get_tile_info_bg )
+TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 {
-	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
-	int code = state->m_bgram[tile_index] + ((state->m_bgram[tile_index + 0x400] & 0x08) << 5);
-	int color = (state->m_bgram[tile_index + 0x400] & 0x7);
-	color |= (state->m_bgram[tile_index + 0x400] & 0x40) >> 3;
+	int code = m_bgram[tile_index] + ((m_bgram[tile_index + 0x400] & 0x08) << 5);
+	int color = (m_bgram[tile_index + 0x400] & 0x7);
+	color |= (m_bgram[tile_index + 0x400] & 0x40) >> 3;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 static VIDEO_START( ddayjlc )
 {
 	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info_bg, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_bg),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( ddayjlc )

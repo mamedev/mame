@@ -1430,6 +1430,7 @@ public:
 	DECLARE_READ8_MEMBER(s23_gun_r);
 	DECLARE_READ8_MEMBER(iob_r);
 	DECLARE_DRIVER_INIT(ss23);
+	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 };
 
 
@@ -1440,17 +1441,16 @@ static UINT16 nthword( const UINT32 *pSource, int offs )
 	return (pSource[0]<<((offs&1)*16))>>16;
 }
 
-static TILE_GET_INFO( TextTilemapGetInfo )
+TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	UINT16 data = nthword( state->m_textram,tile_index );
+	UINT16 data = nthword( m_textram,tile_index );
   /**
     * x---.----.----.---- blend
     * xxxx.----.----.---- palette select
     * ----.xx--.----.---- flip
     * ----.--xx.xxxx.xxxx code
     */
-	SET_TILE_INFO( 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10) );
+	SET_TILE_INFO_MEMBER( 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10) );
 } /* TextTilemapGetInfo */
 
 WRITE32_MEMBER(namcos23_state::namcos23_textram_w)
@@ -2399,7 +2399,7 @@ static VIDEO_START( ss23 )
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
 	machine.gfx[0]->set_source(reinterpret_cast<UINT8 *>(state->m_charram.target()));
-	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	state->m_bgtilemap->set_transparent_pen(0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860

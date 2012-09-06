@@ -86,6 +86,11 @@ public:
 	DECLARE_WRITE16_MEMBER(galaxi_500004_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 };
 
 
@@ -93,39 +98,34 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-static TILE_GET_INFO( get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg1_ram[tile_index];
-	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
+	UINT16 code = m_bg1_ram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg2_ram[tile_index];
-	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
+	UINT16 code = m_bg2_ram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
-static TILE_GET_INFO( get_bg3_tile_info )
+TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg3_ram[tile_index];
-	SET_TILE_INFO(0, code, (code >> 12), 0);
+	UINT16 code = m_bg3_ram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
-static TILE_GET_INFO( get_bg4_tile_info )
+TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg4_ram[tile_index];
-	SET_TILE_INFO(0, code, (code >> 12), 0);
+	UINT16 code = m_bg4_ram[tile_index];
+	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 {
-	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_fg_ram[tile_index];
-	SET_TILE_INFO(1, code, 0x20 + (code >> 12), 0);
+	UINT16 code = m_fg_ram[tile_index];
+	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg1_w)
@@ -162,12 +162,12 @@ static VIDEO_START(galaxi)
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
 
-	state->m_bg1_tmap = tilemap_create(machine, get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	state->m_bg2_tmap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	state->m_bg3_tmap = tilemap_create(machine, get_bg3_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	state->m_bg4_tmap = tilemap_create(machine, get_bg4_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg1_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg2_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg3_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	state->m_bg4_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 
-	state->m_fg_tmap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
+	state->m_fg_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 
 	state->m_bg1_tmap->set_transparent_pen(0);
 	state->m_bg2_tmap->set_transparent_pen(0);

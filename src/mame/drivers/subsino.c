@@ -293,6 +293,14 @@ public:
 	DECLARE_DRIVER_INIT(sharkpye);
 	DECLARE_DRIVER_INIT(tisub);
 	DECLARE_DRIVER_INIT(mtrainnv);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_stisub_tile_info);
+	TILE_GET_INFO_MEMBER(get_subsino_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_stisub_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_subsino_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_stisub_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
+	TILE_GET_INFO_MEMBER(get_stisub_reel3_tile_info);
 };
 
 
@@ -321,29 +329,27 @@ WRITE8_MEMBER(subsino_state::subsino_colorram_w)
 	m_tmap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
+	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	UINT16 color = (code >> 8) & 0x0f;
 	code = ((code & 0xf000) >> 4) + ((code & 0xff) >> 0);
-	code += state->m_tiles_offset;
-	SET_TILE_INFO(0, code, color, 0);
+	code += m_tiles_offset;
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_stisub_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_stisub_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
+	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
 static VIDEO_START( subsino )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_tmap = tilemap_create(	machine, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	state->m_tmap->set_transparent_pen(0 );
 	state->m_tiles_offset = 0;
 }
@@ -356,26 +362,24 @@ WRITE8_MEMBER(subsino_state::subsino_reel1_ram_w)
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_subsino_reel1_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel1_ram[tile_index];
-	int colour = (state->m_out_c&0x7) + 8;
+	int code = m_reel1_ram[tile_index];
+	int colour = (m_out_c&0x7) + 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			colour,
 			0);
 }
 
-static TILE_GET_INFO( get_stisub_reel1_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel1_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel1_ram[tile_index];
-	int attr = state->m_reel1_attr[tile_index];
+	int code = m_reel1_ram[tile_index];
+	int attr = m_reel1_attr[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code | (attr << 8),
 			0,
@@ -389,26 +393,24 @@ WRITE8_MEMBER(subsino_state::subsino_reel2_ram_w)
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_subsino_reel2_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel2_ram[tile_index];
-	int colour = (state->m_out_c&0x7) + 8;
+	int code = m_reel2_ram[tile_index];
+	int colour = (m_out_c&0x7) + 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			colour,
 			0);
 }
 
-static TILE_GET_INFO( get_stisub_reel2_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel2_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel2_ram[tile_index];
-	int attr = state->m_reel2_attr[tile_index];
+	int code = m_reel2_ram[tile_index];
+	int attr = m_reel2_attr[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code | (attr << 8),
 			0,
@@ -421,26 +423,24 @@ WRITE8_MEMBER(subsino_state::subsino_reel3_ram_w)
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_subsino_reel3_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel3_ram[tile_index];
-	int colour = (state->m_out_c&0x7) + 8;
+	int code = m_reel3_ram[tile_index];
+	int colour = (m_out_c&0x7) + 8;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code,
 			colour,
 			0);
 }
 
-static TILE_GET_INFO( get_stisub_reel3_tile_info )
+TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel3_tile_info)
 {
-	subsino_state *state = machine.driver_data<subsino_state>();
-	int code = state->m_reel3_ram[tile_index];
-	int attr = state->m_reel3_attr[tile_index];
+	int code = m_reel3_ram[tile_index];
+	int attr = m_reel3_attr[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			1,
 			code | (attr << 8),
 			0,
@@ -453,9 +453,9 @@ static VIDEO_START( subsino_reels )
 	subsino_state *state = machine.driver_data<subsino_state>();
 	VIDEO_START_CALL( subsino );
 
-	state->m_reel1_tilemap = tilemap_create(machine,get_subsino_reel1_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_subsino_reel2_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_subsino_reel3_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel2_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel3_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);
@@ -466,12 +466,12 @@ static VIDEO_START( subsino_reels )
 static VIDEO_START( stisub )
 {
 	subsino_state *state = machine.driver_data<subsino_state>();
-	state->m_tmap = tilemap_create(	machine, get_stisub_tile_info, TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	state->m_tmap->set_transparent_pen(0 );
 
-	state->m_reel1_tilemap = tilemap_create(machine,get_stisub_reel1_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel2_tilemap = tilemap_create(machine,get_stisub_reel2_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	state->m_reel3_tilemap = tilemap_create(machine,get_stisub_reel3_tile_info,TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel1_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel2_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	state->m_reel3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(subsino_state::get_stisub_reel3_tile_info),state),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	state->m_reel1_tilemap->set_scroll_cols(64);
 	state->m_reel2_tilemap->set_scroll_cols(64);

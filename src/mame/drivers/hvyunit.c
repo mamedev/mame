@@ -122,6 +122,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mermaid_p2_w);
 	DECLARE_READ8_MEMBER(mermaid_p3_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p3_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -160,21 +161,20 @@ static MACHINE_RESET( hvyunit )
  *
  *************************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 {
-	hvyunit_state *state = machine.driver_data<hvyunit_state>();
 
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0x0f) << 8);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
 
-	SET_TILE_INFO(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 static VIDEO_START( hvyunit )
 {
 	hvyunit_state *state = machine.driver_data<hvyunit_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( hvyunit )

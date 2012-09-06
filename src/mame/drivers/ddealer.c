@@ -152,6 +152,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ddealer_mcu_shared_w);
 	DECLARE_READ16_MEMBER(ddealer_mcu_r);
 	DECLARE_DRIVER_INIT(ddealer);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
 };
 
 
@@ -161,11 +162,10 @@ WRITE16_MEMBER(ddealer_state::ddealer_flipscreen_w)
 	m_flipscreen = data & 0x01;
 }
 
-static TILE_GET_INFO( get_back_tile_info )
+TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
-	ddealer_state *state = machine.driver_data<ddealer_state>();
-	int code = state->m_back_vram[tile_index];
-	SET_TILE_INFO(
+	int code = m_back_vram[tile_index];
+	SET_TILE_INFO_MEMBER(
 			0,
 			code & 0xfff,
 			code >> 12,
@@ -176,7 +176,7 @@ static VIDEO_START( ddealer )
 {
 	ddealer_state *state = machine.driver_data<ddealer_state>();
 	state->m_flipscreen = 0;
-	state->m_back_tilemap = tilemap_create(machine, get_back_tile_info, TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	state->m_back_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(ddealer_state::get_back_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 }
 
 static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)

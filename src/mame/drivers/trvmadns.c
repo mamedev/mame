@@ -83,6 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(w2);
 	DECLARE_WRITE8_MEMBER(w3);
 	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -259,13 +260,12 @@ static GFXDECODE_START( trvmadns )
 	GFXDECODE_ENTRY( NULL, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)
 {
-	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	int tile,attr,color,flag;
 
-	attr = state->m_tileram[tile_index*2 + 0];
-	tile = state->m_tileram[tile_index*2 + 1] + ((attr & 0x01) << 8);
+	attr = m_tileram[tile_index*2 + 0];
+	tile = m_tileram[tile_index*2 + 1] + ((attr & 0x01) << 8);
 	color = (attr & 0x18) >> 3;
 	flag = TILE_FLIPXY((attr & 0x06) >> 1);
 
@@ -275,7 +275,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	//0x20? tile transparent pen 1?
 	//0x40? tile transparent pen 1?
 
-	SET_TILE_INFO(0,tile,color,flag);
+	SET_TILE_INFO_MEMBER(0,tile,color,flag);
 
 	tileinfo.category = (attr & 0x20)>>5;
 }
@@ -283,7 +283,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( trvmadns )
 {
 	trvmadns_state *state = machine.driver_data<trvmadns_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(trvmadns_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 //  fg_tilemap->set_transparent_pen(1);
 

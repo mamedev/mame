@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -139,17 +140,16 @@ WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	wallc_state *state = machine.driver_data<wallc_state>();
-	UINT8 *videoram = state->m_videoram;
-	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
+	UINT8 *videoram = m_videoram;
+	SET_TILE_INFO_MEMBER(0, videoram[tile_index] + 0x100, 1, 0);
 }
 
 static VIDEO_START( wallc )
 {
 	wallc_state *state = machine.driver_data<wallc_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_COLS_FLIP_Y,	8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),state), TILEMAP_SCAN_COLS_FLIP_Y,	8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( wallc )

@@ -54,6 +54,8 @@ public:
 	tilemap_t  *m_fg_tilemap;
 	DECLARE_WRITE16_MEMBER(fg_tilemapram_w);
 	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -63,12 +65,11 @@ WRITE16_MEMBER(good_state::fg_tilemapram_w)
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(good_state::get_fg_tile_info)
 {
-	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->m_fg_tilemapram[tile_index * 2];
-	int attr = state->m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
-	SET_TILE_INFO(0, tileno, attr, 0);
+	int tileno = m_fg_tilemapram[tile_index * 2];
+	int attr = m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
+	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
 }
 
 WRITE16_MEMBER(good_state::bg_tilemapram_w)
@@ -77,12 +78,11 @@ WRITE16_MEMBER(good_state::bg_tilemapram_w)
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 {
-	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->m_bg_tilemapram[tile_index * 2];
-	int attr = state->m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
-	SET_TILE_INFO(1, tileno, attr, 0);
+	int tileno = m_bg_tilemapram[tile_index * 2];
+	int attr = m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
+	SET_TILE_INFO_MEMBER(1, tileno, attr, 0);
 }
 
 
@@ -90,8 +90,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( good )
 {
 	good_state *state = machine.driver_data<good_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	state->m_fg_tilemap->set_transparent_pen(0xf);
 }
 

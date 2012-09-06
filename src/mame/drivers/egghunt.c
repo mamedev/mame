@@ -75,6 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(egghunt_soundlatch_w);
 	DECLARE_READ8_MEMBER(egghunt_okibanking_r);
 	DECLARE_WRITE8_MEMBER(egghunt_okibanking_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -117,23 +118,22 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 	}
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(egghunt_state::get_bg_tile_info)
 {
-	egghunt_state *state = machine.driver_data<egghunt_state>();
-	int code = ((state->m_bgram[tile_index * 2 + 1] << 8) | state->m_bgram[tile_index * 2]) & 0x3fff;
-	int colour = state->m_atram[tile_index] & 0x3f;
+	int code = ((m_bgram[tile_index * 2 + 1] << 8) | m_bgram[tile_index * 2]) & 0x3fff;
+	int colour = m_atram[tile_index] & 0x3f;
 
 	if(code & 0x2000)
 	{
-		if((state->m_gfx_banking & 3) == 2)
+		if((m_gfx_banking & 3) == 2)
 			code += 0x2000;
-		else if((state->m_gfx_banking & 3) == 3)
+		else if((m_gfx_banking & 3) == 3)
 			code += 0x4000;
-//      else if((state->m_gfx_banking & 3) == 1)
+//      else if((m_gfx_banking & 3) == 1)
 //          code += 0;
 	}
 
-	SET_TILE_INFO(0, code, colour, 0);
+	SET_TILE_INFO_MEMBER(0, code, colour, 0);
 }
 
 READ8_MEMBER(egghunt_state::egghunt_bgram_r)
@@ -172,7 +172,7 @@ static VIDEO_START(egghunt)
 {
 	egghunt_state *state = machine.driver_data<egghunt_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	state->save_item(NAME(state->m_bgram));
 	state->save_item(NAME(state->m_spram));

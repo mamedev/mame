@@ -997,6 +997,8 @@ public:
 	DECLARE_DRIVER_INIT(vkdlswwc);
 	DECLARE_DRIVER_INIT(vkdlswwr);
 	DECLARE_DRIVER_INIT(vkdlswwv);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 };
 
 
@@ -1017,9 +1019,8 @@ WRITE8_MEMBER(goldnpkr_state::goldnpkr_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 {
-	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color.
@@ -1028,17 +1029,16 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   unused.
 */
 
-	int attr = state->m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-static TILE_GET_INFO( wcrdxtnd_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
 {
-	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
 /* 16 graphics banks system for VK extended (up & down) PCB's
 
     - bits -
@@ -1047,24 +1047,24 @@ static TILE_GET_INFO( wcrdxtnd_get_bg_tile_info )
     xx-- --xx   tiles bank.
 */
 
-	int attr = state->m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | m_videoram[tile_index];
 	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);	/* bits 0, 1, 6 & 7 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 static VIDEO_START( goldnpkr )
 {
 	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static VIDEO_START( wcrdxtnd )
 {
 	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, wcrdxtnd_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( goldnpkr )

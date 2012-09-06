@@ -270,6 +270,8 @@ public:
 	DECLARE_DRIVER_INIT(prot_val_10);
 	DECLARE_DRIVER_INIT(prot_val_20);
 	DECLARE_DRIVER_INIT(prot_val_40);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 };
 
 
@@ -836,22 +838,15 @@ static INPUT_PORTS_START( wondstck )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-
-INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, UINT16 *vram, int color )
-{
-	nmg5_state *state = machine.driver_data<nmg5_state>();
-	SET_TILE_INFO(0, vram[tile_index] | (state->m_gfx_bank << 16), color, 0);
-}
-
-static TILE_GET_INFO( fg_get_tile_info ) { nmg5_state *state = machine.driver_data<nmg5_state>();	get_tile_info(machine, tileinfo, tile_index, state->m_fg_videoram, 0); }
-static TILE_GET_INFO( bg_get_tile_info ) { nmg5_state *state = machine.driver_data<nmg5_state>();	get_tile_info(machine, tileinfo, tile_index, state->m_bg_videoram, 1); }
+TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
 
 static VIDEO_START( nmg5 )
 {
 	nmg5_state *state = machine.driver_data<nmg5_state>();
 
-	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 

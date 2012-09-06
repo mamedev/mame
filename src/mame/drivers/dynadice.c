@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(dynadice);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
@@ -192,11 +193,10 @@ static GFXDECODE_START( dynadice )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 {
-	dynadice_state *state = machine.driver_data<dynadice_state>();
-	int code = state->m_videoram[tile_index];
-	SET_TILE_INFO(1, code, 0, 0);
+	int code = m_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 static VIDEO_START( dynadice )
@@ -204,8 +204,8 @@ static VIDEO_START( dynadice )
 	dynadice_state *state = machine.driver_data<dynadice_state>();
 
 	/* pacman - style videoram layout */
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	state->m_top_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_top_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),state), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 	state->m_bg_tilemap->set_scrollx(0, -16);
 }
 

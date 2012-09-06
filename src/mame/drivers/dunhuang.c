@@ -117,6 +117,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dunhuang_rombank_w);
 	DECLARE_WRITE8_MEMBER(dunhuang_82_w);
 	DECLARE_READ8_MEMBER(dunhuang_dsw_r);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
 };
 
 
@@ -125,26 +127,24 @@ public:
 ***************************************************************************/
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
 {
-	dunhuang_state *state = machine.driver_data<dunhuang_state>();
-	UINT16 code = state->m_videoram[tile_index];
-	UINT8 color = state->m_colorram[tile_index] & 0x0f;
-	SET_TILE_INFO(0, code, color, 0);
+	UINT16 code = m_videoram[tile_index];
+	UINT8 color = m_colorram[tile_index] & 0x0f;
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
-static TILE_GET_INFO( get_tile_info2 )
+TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 {
-	dunhuang_state *state = machine.driver_data<dunhuang_state>();
-	UINT16 code = state->m_videoram2[tile_index];
-	UINT8 color = state->m_colorram2[tile_index] & 0x0f;
-	SET_TILE_INFO(1, code, color, 0);
+	UINT16 code = m_videoram2[tile_index];
+	UINT8 color = m_colorram2[tile_index] & 0x0f;
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 static VIDEO_START(dunhuang)
 {
 	dunhuang_state *state = machine.driver_data<dunhuang_state>();
-	state->m_tmap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
-	state->m_tmap2 = tilemap_create(machine, get_tile_info2, TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
+	state->m_tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
+	state->m_tmap2 = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info2),state), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
 
 	state->m_tmap->set_transparent_pen(0);
 	state->m_tmap2->set_transparent_pen(0);

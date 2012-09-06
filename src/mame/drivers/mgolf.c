@@ -33,15 +33,15 @@ public:
 	DECLARE_READ8_MEMBER(mgolf_dial_r);
 	DECLARE_READ8_MEMBER(mgolf_misc_r);
 	DECLARE_WRITE8_MEMBER(mgolf_wram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
 {
-	mgolf_state *state = machine.driver_data<mgolf_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code, code >> 7, 0);
+	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
 }
 
 
@@ -55,7 +55,7 @@ WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
 static VIDEO_START( mgolf )
 {
 	mgolf_state *state = machine.driver_data<mgolf_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(mgolf_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

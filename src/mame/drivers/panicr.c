@@ -93,6 +93,9 @@ public:
 	DECLARE_WRITE8_MEMBER(t5182shared_w);
 
 	DECLARE_DRIVER_INIT(panicr);
+	TILE_GET_INFO_MEMBER(get_bgtile_info);
+	TILE_GET_INFO_MEMBER(get_infotile_info);
+	TILE_GET_INFO_MEMBER(get_txttile_info);
 };
 
 
@@ -164,44 +167,43 @@ static PALETTE_INIT( panicr )
 }
 
 
-static TILE_GET_INFO( get_bgtile_info )
+TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 {
 	int code,attr;
 
-	code=machine.root_device().memregion("user1")->base()[tile_index];
-	attr=machine.root_device().memregion("user2")->base()[tile_index];
+	code=machine().root_device().memregion("user1")->base()[tile_index];
+	attr=machine().root_device().memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 		1,
         code,
 		(attr & 0xf0) >> 4,
         0);
 }
 
-static TILE_GET_INFO( get_infotile_info )
+TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info)
 {
 	int code,attr;
 
-	code=machine.root_device().memregion("user1")->base()[tile_index];
-	attr=machine.root_device().memregion("user2")->base()[tile_index];
+	code=machine().root_device().memregion("user1")->base()[tile_index];
+	attr=machine().root_device().memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 		2,
         code,
 		(attr & 0xf0) >> 4,
         0);
 }
 
-static TILE_GET_INFO( get_txttile_info )
+TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 {
-	panicr_state *state = machine.driver_data<panicr_state>();
-	int code=state->m_textram[tile_index*4];
-	int attr=state->m_textram[tile_index*4+2];
+	int code=m_textram[tile_index*4];
+	int attr=m_textram[tile_index*4+2];
 	int color = attr & 0x07;
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 		0,
 		code + ((attr & 8) << 5),
 		color,
@@ -213,10 +215,10 @@ static VIDEO_START( panicr )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
 
-	state->m_bgtilemap = tilemap_create( machine, get_bgtile_info,TILEMAP_SCAN_ROWS,16,16,1024,16 );
-	state->m_infotilemap = tilemap_create( machine, get_infotile_info,TILEMAP_SCAN_ROWS,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
+	state->m_bgtilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),state),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	state->m_infotilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info),state),TILEMAP_SCAN_ROWS,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
 
-	state->m_txttilemap = tilemap_create( machine, get_txttile_info,TILEMAP_SCAN_ROWS,8,8,32,32 );
+	state->m_txttilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),state),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	colortable_configure_tilemap_groups(machine.colortable, state->m_txttilemap, machine.gfx[0], 0);
 }
 

@@ -27,15 +27,15 @@ public:
 	DECLARE_WRITE8_MEMBER(cball_vram_w);
 	DECLARE_READ8_MEMBER(cball_wram_r);
 	DECLARE_WRITE8_MEMBER(cball_wram_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
-static TILE_GET_INFO( get_tile_info )
+TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 {
-	cball_state *state = machine.driver_data<cball_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code, code >> 7, 0);
+	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
 }
 
 
@@ -49,7 +49,7 @@ WRITE8_MEMBER(cball_state::cball_vram_w)
 static VIDEO_START( cball )
 {
 	cball_state *state = machine.driver_data<cball_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cball_state::get_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

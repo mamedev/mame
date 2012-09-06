@@ -114,6 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
 	DECLARE_DRIVER_INIT(jokrwild);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -136,26 +137,25 @@ WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 {
-	jokrwild_state *state = machine.driver_data<jokrwild_state>();
 /*  - bits -
     7654 3210
     xx-- ----   bank select.
     ---- xxxx   color code.
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] | ((attr & 0xc0) << 2);
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
-	SET_TILE_INFO( 0, code , color , 0);
+	SET_TILE_INFO_MEMBER( 0, code , color , 0);
 }
 
 
 static VIDEO_START( jokrwild )
 {
 	jokrwild_state *state = machine.driver_data<jokrwild_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
 

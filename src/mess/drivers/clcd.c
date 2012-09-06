@@ -28,12 +28,11 @@ public:
 	{
 	}
 
-	static TILE_GET_INFO( get_clcd_tilemap_tile_info )
+	TILE_GET_INFO_MEMBER(get_clcd_tilemap_tile_info)
 	{
-		clcd_state *state = machine.driver_data<clcd_state>();
-		int code  = state->m_ram.target()[((tile_index / 80) * 128) + (tile_index % 80) + 0x800];
+		int code  = m_ram.target()[((tile_index / 80) * 128) + (tile_index % 80) + 0x800];
 
-		SET_TILE_INFO(0, code, 0, 0);
+		SET_TILE_INFO_MEMBER(0, code, 0, 0);
 	}
 
 	virtual void machine_start()
@@ -43,7 +42,7 @@ public:
 
 	virtual void video_start()
 	{
-		m_tilemap = tilemap_create(machine(), get_clcd_tilemap_tile_info, TILEMAP_SCAN_ROWS, 6, 8, 80, 16);
+		m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clcd_state::get_clcd_tilemap_tile_info),this), TILEMAP_SCAN_ROWS, 6, 8, 80, 16);
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

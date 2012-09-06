@@ -66,6 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(bus_r);
 	DECLARE_READ8_MEMBER(drw80pkr_io_r);
 	DECLARE_DRIVER_INIT(drw80pkr);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -323,19 +324,18 @@ READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 * Video/Character functions *
 ****************************/
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 {
-	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	int color = state->m_color_ram[tile_index];
-	int code = state->m_video_ram[tile_index];
+	int color = m_color_ram[tile_index];
+	int code = m_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 static VIDEO_START( drw80pkr )
 {
 	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
 static SCREEN_UPDATE_IND16( drw80pkr )

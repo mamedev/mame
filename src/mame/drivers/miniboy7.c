@@ -165,6 +165,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(miniboy7_videoram_w);
 	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -184,30 +185,29 @@ WRITE8_MEMBER(miniboy7_state::miniboy7_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(miniboy7_state::get_bg_tile_info)
 {
-	miniboy7_state *state = machine.driver_data<miniboy7_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color?.
     ---- --x-   tiles bank.
     xx-- ---x   seems unused. */
 
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color? */
 
 	if (bank == 1)	/* temporary hack to point to the 3rd gfx bank */
 		bank = 2;
 
-	SET_TILE_INFO(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 static VIDEO_START( miniboy7 )
 {
 	miniboy7_state *state = machine.driver_data<miniboy7_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(miniboy7_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
 }
 
 static SCREEN_UPDATE_IND16( miniboy7 )

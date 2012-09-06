@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dderby_sound_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
+	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 };
 
 
@@ -317,17 +318,16 @@ static GFXDECODE_START( dmndrby )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
 GFXDECODE_END
 
-static TILE_GET_INFO( get_dmndrby_tile_info )
+TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 {
-	dmndrby_state *state = machine.driver_data<dmndrby_state>();
-	int code = state->m_racetrack_tilemap_rom[tile_index];
-	int attr = state->m_racetrack_tilemap_rom[tile_index+0x2000];
+	int code = m_racetrack_tilemap_rom[tile_index];
+	int attr = m_racetrack_tilemap_rom[tile_index+0x2000];
 
 	int col = attr&0x1f;
 	int flipx = (attr&0x40)>>6;
 
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			code,
 			col,
@@ -339,7 +339,7 @@ static VIDEO_START(dderby)
 {
 	dmndrby_state *state = machine.driver_data<dmndrby_state>();
 	state->m_racetrack_tilemap_rom = state->memregion("user1")->base();
-	state->m_racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,TILEMAP_SCAN_ROWS,16,16, 16, 512);
+	state->m_racetrack_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),state),TILEMAP_SCAN_ROWS,16,16, 16, 512);
 	state->m_racetrack_tilemap->mark_all_dirty();
 
 }

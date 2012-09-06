@@ -86,6 +86,8 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
 	DECLARE_DRIVER_INIT(chanbara);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 };
 
 
@@ -133,29 +135,27 @@ WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
 }
 
 
-static TILE_GET_INFO( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
 {
-	chanbara_state *state = machine.driver_data<chanbara_state>();
-	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 1) << 8);
-	int color = (state->m_colorram[tile_index] >> 1) & 0x1f;
+	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 1) << 8);
+	int color = (m_colorram[tile_index] >> 1) & 0x1f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
 {
-	chanbara_state *state = machine.driver_data<chanbara_state>();
-	int code = state->m_videoram2[tile_index];
-	int color = (state->m_colorram2[tile_index] >> 1) & 0x1f;
+	int code = m_videoram2[tile_index];
+	int color = (m_colorram2[tile_index] >> 1) & 0x1f;
 
-	SET_TILE_INFO(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 static VIDEO_START(chanbara )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, TILEMAP_SCAN_ROWS,8, 8, 32, 32);
-	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, TILEMAP_SCAN_ROWS,16, 16, 16, 32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(chanbara_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,8, 8, 32, 32);
+	state->m_bg2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(chanbara_state::get_bg2_tile_info),state), TILEMAP_SCAN_ROWS,16, 16, 16, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 }
 
