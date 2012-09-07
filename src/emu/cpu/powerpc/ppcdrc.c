@@ -2313,6 +2313,23 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
     }
 }
 
+/*-----------------------------------------------------
+    generate_shift_flags - compute S/Z flags for shifts
+-------------------------------------------------------*/
+
+static void generate_shift_flags(powerpc_state *ppc, drcuml_block *block, const opcode_desc *desc, UINT32 op)
+{
+    UML_CMP(block, R32(G_RA(op)), 0);               // cmp ra, #0
+    UML_SETc(block, COND_Z, I1);                     // set Z, i1
+    UML_SHL(block, I1, I1, 2);                      // shl i1, i1, #2   (i1 now = FLAG_Z)
+
+    UML_SHR(block, I2, R32(G_RA(op)), 28);          // shr i2, ra, #28
+    UML_AND(block, I2, I2, FLAG_S);                 // and i2, i2, FLAG_S (i2 now = FLAG_S)
+    UML_OR(block, I1, I1, I2);                      // or i1, i1, i2
+    UML_LOAD(block, I0, ppc->impstate->sz_cr_table, I1, SIZE_BYTE, SCALE_x1);	// load    i0,sz_cr_table,i0,byte
+    UML_OR(block, CR32(0), I0, XERSO32);											// or      [cr0],i0,[xerso]
+}
+
 /*-------------------------------------------------
     generate_fp_flags - compute FPSCR floating
     point status flags
@@ -3238,7 +3255,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
             UML_LABEL(block, compiler->labelnum++);             // 0:
 			UML_SHL(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// shl     ra,rs,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
+            // calculate S and Z flags
+            if (op & M_RC)
+            {
+                generate_shift_flags(ppc, block, desc, op);
+            }
 
             UML_LABEL(block, compiler->labelnum++);             // 1:
             return TRUE;
@@ -3259,7 +3280,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
             UML_LABEL(block, compiler->labelnum++);             // 0:
 			UML_SHR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));							// shr     ra,i0,rb
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
+            // calculate S and Z flags
+            if (op & M_RC)
+            {
+                generate_shift_flags(ppc, block, desc, op);
+            }
 
             UML_LABEL(block, compiler->labelnum++);             // 1:
 			return TRUE;
@@ -3293,7 +3318,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
             UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), I2);							// sar     ra,rs,i2
 
             UML_LABEL(block, compiler->labelnum++);             // 2:
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
+            // calculate S and Z flags
+            if (op & M_RC)
+            {
+                generate_shift_flags(ppc, block, desc, op);
+            }
 			return TRUE;
 
 		case 0x338:	/* SRAWIx */
@@ -3306,7 +3335,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 				UML_ROLINS(block, SPR32(SPR_XER), I0, 29, XER_CA);			// rolins  [xer],i0,29,XER_CA
 			}
 			UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), G_SH(op));					// sar     ra,rs,sh
-			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
+            // calculate S and Z flags
+            if (op & M_RC)
+            {
+                generate_shift_flags(ppc, block, desc, op);
+            }
 			return TRUE;
 
 		case 0x01a:	/* CNTLZWx */
