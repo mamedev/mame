@@ -516,7 +516,7 @@ static MACHINE_CONFIG_START( ti89, ti68k_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(ti68k_state, screen_update)

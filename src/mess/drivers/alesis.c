@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_CPU_IO_MAP(hr16_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9*2)
@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( sr16, alesis_state )
 	MCFG_CPU_IO_MAP(sr16_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*8, 9*2)

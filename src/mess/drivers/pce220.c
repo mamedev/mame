@@ -928,7 +928,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 
     /* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_UPDATE_DRIVER(pce220_state, screen_update)
@@ -963,7 +963,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 
     /* video hardware */
 	// 6 lines x 24 characters, resp. 144 x 48 pixel
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)

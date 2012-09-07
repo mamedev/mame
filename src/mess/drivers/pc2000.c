@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
     MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)

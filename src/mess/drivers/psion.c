@@ -473,7 +473,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
     MCFG_CPU_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
 
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
     MCFG_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
 
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)

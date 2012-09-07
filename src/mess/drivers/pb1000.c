@@ -507,7 +507,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_HD61700_CONFIG(pb1000_config)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("hd44352", hd44352_device, screen_update)

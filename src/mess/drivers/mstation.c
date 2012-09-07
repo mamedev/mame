@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
     MCFG_CPU_IO_MAP(mstation_io)
 
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MCFG_SCREEN_UPDATE_DRIVER(mstation_state, screen_update)
