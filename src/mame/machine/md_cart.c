@@ -178,11 +178,6 @@ static int md_get_pcb_id(const char *pcb)
 	return SEGA_STD;
 }
 
-#define MAX_MD_CART_SIZE 0x800000
-
-/* where a fresh copy of rom is stashed for reset and banking setup */
-#define VIRGIN_COPY_GEN 0xd00000
-
 
 /*************************************
  *

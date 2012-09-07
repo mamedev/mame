@@ -2157,6 +2157,24 @@ static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_CONFIG_END
 
+static INTERRUPT_GEN( magicbal_interrupt )
+{
+	address_space *space = device->machine().device<legacy_cpu_device>("maincpu")->space();
+	static int i=0x0000;
+	i^=0xffff;
+
+	space->write_word( 0x12189a, i,0xffff );
+	space->write_word( 0x12189c, i,0xffff );
+	space->write_word( 0x12189e, i,0xffff );
+}
+
+
+static MACHINE_CONFIG_DERIVED( magicbal, metlsavr )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", magicbal_interrupt)
+MACHINE_CONFIG_END
+
+
 
 static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 
@@ -2853,6 +2871,37 @@ ROM_START( sdfight )
 	ROM_LOAD16_BYTE( "8.uj5",  0x300001, 0x80000, CRC(60be7dd1) SHA1(d212dee3acf696cac0843e968a71ec1fb9b16dc9) ) // a
 ROM_END
 
+
+
+ROM_START( magicbal )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "jb17", 0x00000, 0x40000, CRC(501e64dd) SHA1(938c1b5364d02fe982d490118a86d4ca4b1297f2) )
+	ROM_LOAD16_BYTE( "jb18", 0x00001, 0x40000, CRC(84dcdf68) SHA1(83907705c1c45685e1888c187c8136865c43ee0b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "ub5", 0x00000, 0x10000, CRC(48a9e99d) SHA1(d438f86b6cc9f8e145c89bac355a9bd2d634801e) )
+
+	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+//	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, CRC(17aa17a9) SHA1(5b83159c62473f79e7fced0d86acfaf697ad5537) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "uc1", 0x00000, 0x40000, CRC(6e4cec27) SHA1(9dd07684502300589e957d1bcde0239880eaada2) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "rom5", 0x00001, 0x40000, CRC(b9561ae0) SHA1(e2fb11df167a984f98eb6d3a1b77e749646da403) )
+	ROM_LOAD16_BYTE( "rom6", 0x00000, 0x40000, CRC(b03a19ea) SHA1(66ab219111c53f79104aa9db250e4b2133a29924) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "uor1",  0x000000, 0x80000, CRC(1835ac6f) SHA1(3c0b171c248a98e1facb5f4fe1c94f98a07b7149) )
+	ROM_LOAD16_BYTE( "uor2",  0x000001, 0x80000, CRC(c9db161e) SHA1(3b7b45db005a7144e4c6386d917e89096172385e) )
+	ROM_LOAD16_BYTE( "uor3",  0x100000, 0x80000, CRC(69f54d5a) SHA1(10685a14304a0966027e729fc55433c05943391c) )
+	ROM_LOAD16_BYTE( "uor4",  0x100001, 0x80000, CRC(3736eef4) SHA1(c801fbf743a9cea6a605f716fb22cee1322fa340) )
+ROM_END
+
 /*
 
 Wonderleague Star (c) 1995 Mijin  (SemiCom traded under the Mijin name until 1995)
@@ -3491,24 +3540,42 @@ DRIVER_INIT_MEMBER(tumbleb_state,dquizgo)
 	tumblepb_gfx1_rearrange(machine());
 }
 
+DRIVER_INIT_MEMBER(tumbleb_state,magicbal)
+{
+	DRIVER_INIT_CALL(htchctch);
+
+	// wipe out the palette handler for now
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x140000, 0x140fff);
+
+	/* slightly different banking */
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
+}
+
 
 /******************************************************************************/
 
+/* Misc 'bootleg' hardware - close to base Tumble Pop */
 GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, jumpkids, ROT0, "Comad",    "Jump Kids", GAME_SUPPORTS_SAVE )
-GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
 GAME( 1994, pangpang, 0,       pangpang,    tumblepb, tumbleb_state, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
+
+/* Misc 'bootleg' hardware - more changes from base hardware */
 GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, tumbleb_state, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
 GAME( 1996, fncywld,  0,       fncywld,     fncywld, tumbleb_state,  fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
-// Should also be 'Magicball Fighting' (c)1994
+// Unico - Magic Purple almost certainly goes here
+
+/* First Amusement / Mijin / SemiCom hardware (MCU protected) */ 
+GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
+GAME( 1994, magicbal, 0,       magicbal,	metlsavr, tumbleb_state, magicbal, ROT0, "SemiCom", "Magicball Fighting (Korea)", GAME_NOT_WORKING) // also still has the Metal Saver (c)1994 First Amusement tiles in the GFX
+GAME( 1995, chokchok, 0,       cookbib,     chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, tumbleb_state, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
-GAME( 1995, chokchok, 0,       cookbib,     chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)
 GAME( 1996, wondl96,  0,       cookbib_mcu, wondl96, tumbleb_state,  wondl96,  ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sdfight,  0,       sdfight,     sdfight, tumbleb_state,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1997, bcstry,   0,       bcstory,     bcstory, tumbleb_state,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
 GAME( 1997, bcstrya,  bcstry,  bcstory,     bcstory, tumbleb_state,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
 GAME( 1997, semibase, 0,       semibase,    semibase, tumbleb_state, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )// sprite offsets..
 GAME( 1998, dquizgo,  0,       cookbib,     dquizgo, tumbleb_state,  dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // check layer offsets
+

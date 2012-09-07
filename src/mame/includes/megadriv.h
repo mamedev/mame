@@ -23,6 +23,13 @@
 #define SEGACD_CLOCK      12500000
 
 
+#define MAX_MD_CART_SIZE 0x800000
+
+/* where a fresh copy of rom is stashed for reset and banking setup */
+#define VIRGIN_COPY_GEN 0xd00000
+
+#define MD_CPU_REGION_SIZE (MAX_MD_CART_SIZE + VIRGIN_COPY_GEN)
+
 
 /*----------- defined in machine/megadriv.c -----------*/
 
