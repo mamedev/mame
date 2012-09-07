@@ -88,6 +88,7 @@ Notes:
 #include "s1410.h"
 #include "cpu/z80/z80.h"
 #include "machine/devhelpr.h"
+#include "imagedev/harddriv.h"
 
 
 
@@ -180,6 +181,8 @@ static MACHINE_CONFIG_FRAGMENT( s1410 )
 	MCFG_CPU_PROGRAM_MAP(s1410_mem)
 	MCFG_CPU_IO_MAP(s1410_io)
 	MCFG_DEVICE_DISABLE()
+
+	MCFG_HARDDISK_ADD("image")
 MACHINE_CONFIG_END
 
 
