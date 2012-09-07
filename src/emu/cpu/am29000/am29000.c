@@ -274,7 +274,7 @@ static UINT32 read_program_word(am29000_state *state, UINT32 address)
 		return state->direct->read_decrypted_dword(address);
 	else
 	{
-		fatalerror("Am29000 instruction MMU translation enabled!");
+		fatalerror("Am29000 instruction MMU translation enabled!\n");
 	}
 	return 0;
 }
@@ -425,7 +425,7 @@ static CPU_EXECUTE( am29000 )
 			}
 			else
 			{
-				fatalerror("Am29000: Non vectored interrupt fetch!");
+				fatalerror("Am29000: Non vectored interrupt fetch!\n");
 			}
 
 			am29000->exceptions = 0;

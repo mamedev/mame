@@ -288,7 +288,7 @@ int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
             }
             else
             {
-                fatalerror("ARM7: Not Yet Implemented: Coarse Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x", vaddr, domain, R15);
+                fatalerror("ARM7: Not Yet Implemented: Coarse Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15);
             }
             break;
         case COPRO_TLB_SECTION_TABLE:
@@ -323,7 +323,7 @@ int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
             break;
         case COPRO_TLB_FINE_TABLE:
             // Entry is the physical address of a fine second-level table
-            fatalerror("ARM7: Not Yet Implemented: fine second-level TLB lookup, PC = %08x, vaddr = %08x", R15, vaddr);
+            fatalerror("ARM7: Not Yet Implemented: fine second-level TLB lookup, PC = %08x, vaddr = %08x\n", R15, vaddr);
             break;
         default:
             // Entry is the physical address of a three-legged termite-eaten table
@@ -577,7 +577,7 @@ static CPU_EXECUTE( arm7 )
 				UINT32 temp1, temp2;
 				temp1 = GET_CPSR & 0xF00000C3;
 				temp2 = (R15 & 0xF0000000) | ((R15 & 0x0C000000) >> (26 - 6)) | (R15 & 0x00000003);
-				if (temp1 != temp2) fatalerror( "%08X: 32-bit and 26-bit modes are out of sync (%08X %08X)", pc, temp1, temp2);
+				if (temp1 != temp2) fatalerror( "%08X: 32-bit and 26-bit modes are out of sync (%08X %08X)\n", pc, temp1, temp2);
 			}
 #endif
 
@@ -1250,7 +1250,7 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
             {
             	if (!arm7_tlb_translate( cpustate, &R15, 0))
             	{
-            		fatalerror("ARM7_MMU_ENABLE_HACK translate failed");
+            		fatalerror("ARM7_MMU_ENABLE_HACK translate failed\n");
             	}
             }
 #endif

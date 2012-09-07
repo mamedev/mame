@@ -548,7 +548,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_MAPVAR, 4, 0):	// MAPVAR  mapvar,value
 
 				// these opcodes should be processed at compile-time only
-				fatalerror("Unexpected opcode");
+				fatalerror("Unexpected opcode\n");
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):		// DEBUG   pc
@@ -2102,7 +2102,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			default:
-				fatalerror("Unexpected opcode!");
+				fatalerror("Unexpected opcode!\n");
 				break;
 		}
 
@@ -2193,7 +2193,7 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 			break;
 
 		default:
-			fatalerror("Unexpected param->type");
+			fatalerror("Unexpected param->type\n");
 			break;
 	}
 

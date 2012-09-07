@@ -362,13 +362,13 @@ static void InitDasm32025(void)
 				case 'x':
 					bit --;
 					break;
-				default: fatalerror("Invalid instruction encoding '%s %s'",
+				default: fatalerror("Invalid instruction encoding '%s %s'\n",
 					ops[0],ops[1]);
 			}
 		}
 		if (bit != -1 )
 		{
-			fatalerror("not enough bits in encoding '%s %s' %d",
+			fatalerror("not enough bits in encoding '%s %s' %d\n",
 				ops[0],ops[1],bit);
 		}
 		while (isspace((UINT8)*p)) p++;
@@ -455,7 +455,7 @@ CPU_DISASSEMBLE( tms32025 )
 			case 'x': bit--; break;
 			case ' ': break;
 			case '1': case '0': bit--; break;
-			case '\0': fatalerror("premature end of parse string, opcode %x, bit = %d",code,bit);
+			case '\0': fatalerror("premature end of parse string, opcode %x, bit = %d\n",code,bit);
 		}
 		cp++;
 	}
@@ -490,7 +490,7 @@ CPU_DISASSEMBLE( tms32025 )
 				case 'W': sprintf(num,"%04Xh",w); break;
 				case 'X': break;
 				default:
-					fatalerror("illegal escape character in format '%s'",Op[op].fmt);
+					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
 			}
 			q = num; while (*q) *buffer++ = *q++;
 			*buffer = '\0';

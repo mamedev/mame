@@ -350,7 +350,7 @@ drcbe_x86::be_parameter::be_parameter(drcbe_x86 &drcbe, const parameter &param, 
 
 		// everything else is unexpected
 		default:
-			fatalerror("Unexpected parameter type");
+			fatalerror("Unexpected parameter type\n");
 			break;
 	}
 }
@@ -625,7 +625,7 @@ void drcbe_x86::reset()
 	// generate a little bit of glue code to set up the environment
 	drccodeptr *cachetop = m_cache.begin_codegen(500);
 	if (cachetop == NULL)
-		fatalerror("Out of cache space after a reset!");
+		fatalerror("Out of cache space after a reset!\n");
 
 	x86code *dst = (x86code *)*cachetop;
 
@@ -2834,7 +2834,7 @@ void drcbe_x86::fixup_label(void *parameter, drccodeptr labelcodeptr)
 		((UINT32 *)src)[-1] = labelcodeptr - src;
 	}
 	else
-		fatalerror("fixup_label called with invalid jmp source!");
+		fatalerror("fixup_label called with invalid jmp source!\n");
 }
 
 

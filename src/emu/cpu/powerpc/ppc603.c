@@ -160,7 +160,7 @@ void ppc603_exception(int exception)
 			break;
 
 		default:
-			fatalerror("ppc: Unhandled exception %d", exception);
+			fatalerror("ppc: Unhandled exception %d\n", exception);
 			break;
 	}
 }

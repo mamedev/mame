@@ -507,7 +507,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	{
 		/* we don't support the MMU of the 403GCX */
 		if (ppc->flavor == PPC_MODEL_403GCX && (ppc->msr & MSROEA_DR))
-			fatalerror("MMU enabled but not supported!");
+			fatalerror("MMU enabled but not supported!\n");
 
 		/* only check if PE is enabled */
 		if (transtype == TRANSLATE_WRITE && (ppc->msr & MSR4XX_PE))
@@ -2023,7 +2023,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 
 	/* check for unsupported features */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TCE))
-		fatalerror("ppc4xx_dma_exec: DMA_TCE == 0");
+		fatalerror("ppc4xx_dma_exec: DMA_TCE == 0\n");
 
 	/* transfer mode */
 	switch ((dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_TM_MASK) >> 21)
@@ -2058,7 +2058,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 
 		/* fly-by mode DMA */
 		case 1:
-			fatalerror("ppc4xx_dma_exec: fly-by DMA not implemented");
+			fatalerror("ppc4xx_dma_exec: fly-by DMA not implemented\n");
 			break;
 
 		/* software initiated memory-to-memory mode DMA */
@@ -2114,7 +2114,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 
 		/* hardware initiated memory-to-memory mode DMA */
 		case 3:
-			fatalerror("ppc4xx_dma_exec: HW mem-to-mem DMA not implemented");
+			fatalerror("ppc4xx_dma_exec: HW mem-to-mem DMA not implemented\n");
 			break;
 	}
 }
@@ -2225,7 +2225,7 @@ static void ppc4xx_spu_rx_data(powerpc_state *ppc, UINT8 data)
 	/* fail if we are going to overflow */
 	new_rxin = (ppc->spu.rxin + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);
 	if (new_rxin == ppc->spu.rxout)
-		fatalerror("ppc4xx_spu_rx_data: buffer overrun!");
+		fatalerror("ppc4xx_spu_rx_data: buffer overrun!\n");
 
 	/* store the data and accept the new in index */
 	ppc->spu.rxbuffer[ppc->spu.rxin] = data;

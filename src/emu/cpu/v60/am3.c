@@ -718,13 +718,13 @@ static UINT32 am3DirectAddressDeferredIndexed(v60_state *cpustate)
 
 static UINT32 am3Immediate(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - IMM (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - IMM (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 am3ImmediateQuick(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - IMMQ (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - IMMQ (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
@@ -735,33 +735,33 @@ static UINT32 am3ImmediateQuick(v60_state *cpustate)
 
 static UINT32 am3Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - 1 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 am3Error2(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - 2 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
 static UINT32 am3Error3(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - 3 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
 static UINT32 am3Error4(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - 4 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 am3Error5(v60_state *cpustate)
 {
-	fatalerror("CPU - AM3 - 5 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM3 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 

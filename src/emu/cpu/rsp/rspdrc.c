@@ -486,7 +486,7 @@ static void cfunc_get_cop0_reg(void *param)
 	}
 	else
 	{
-		fatalerror("RSP: cfunc_get_cop0_reg: %d", reg);
+		fatalerror("RSP: cfunc_get_cop0_reg: %d\n", reg);
 	}
 }
 
@@ -3457,7 +3457,7 @@ static void code_flush_cache(rsp_state *rsp)
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
-		fatalerror("Unable to generate static RSP code");
+		fatalerror("Unable to generate static RSP code\n");
 	}
 }
 
@@ -3579,7 +3579,7 @@ static void cfunc_unimplemented(void *param)
 {
 	rsp_state *rsp = (rsp_state *)param;
 	UINT32 opcode = rsp->impstate->arg0;
-	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)", rsp->pc, opcode, opcode >> 26, opcode & 0x3f);
+	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)\n", rsp->pc, opcode, opcode >> 26, opcode & 0x3f);
 }
 
 
@@ -3590,7 +3590,7 @@ static void cfunc_unimplemented(void *param)
 #ifdef UNUSED_CODE
 static void cfunc_fatalerror(void *param)
 {
-	fatalerror("fatalerror");
+	fatalerror("fatalerror\n");
 }
 #endif
 

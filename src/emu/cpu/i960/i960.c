@@ -109,7 +109,7 @@ INLINE void send_iac(i960_state_t *i960, UINT32 adr)
 		i960->IP   = iac[3];
 		break;
 	default:
-		fatalerror("I960: %x: IAC %08x %08x %08x %08x", i960->PIP, iac[0], iac[1], iac[2], iac[3]);
+		fatalerror("I960: %x: IAC %08x %08x %08x %08x\n", i960->PIP, iac[0], iac[1], iac[2], iac[3]);
 		break;
 	}
 }
@@ -157,7 +157,7 @@ INLINE UINT32 get_ea(i960_state_t *i960, UINT32 opcode)
 			return ret;
 
 		default:
-			fatalerror("I960: %x: unhandled MEMB mode %x", i960->PIP, mode);
+			fatalerror("I960: %x: unhandled MEMB mode %x\n", i960->PIP, mode);
 			return 0;
 		}
 	}
@@ -192,7 +192,7 @@ INLINE void set_ri(i960_state_t *i960, UINT32 opcode, UINT32 val)
 	if(!(opcode & 0x00002000))
 		i960->r[(opcode>>19) & 0x1f] = val;
 	else {
-		fatalerror("I960: %x: set_ri on literal?", i960->PIP);
+		fatalerror("I960: %x: set_ri on literal?\n", i960->PIP);
 	}
 }
 
@@ -204,7 +204,7 @@ INLINE void set_ri2(i960_state_t *i960, UINT32 opcode, UINT32 val, UINT32 val2)
 		i960->r[((opcode>>19) & 0x1f)+1] = val2;
 	}
 	else {
-		fatalerror("I960: %x: set_ri2 on literal?", i960->PIP);
+		fatalerror("I960: %x: set_ri2 on literal?\n", i960->PIP);
 	}
 }
 
@@ -214,7 +214,7 @@ INLINE void set_ri64(i960_state_t *i960, UINT32 opcode, UINT64 val)
 		i960->r[(opcode>>19) & 0x1f] = val;
 		i960->r[((opcode>>19) & 0x1f)+1] = val >> 32;
 	} else
-		fatalerror("I960: %x: set_ri64 on literal?", i960->PIP);
+		fatalerror("I960: %x: set_ri64 on literal?\n", i960->PIP);
 }
 
 INLINE double get_1_rif(i960_state_t *i960, UINT32 opcode)
@@ -252,7 +252,7 @@ INLINE void set_rif(i960_state_t *i960, UINT32 opcode, double val)
 	else if(!(opcode & 0x00e00000))
 		i960->fp[(opcode>>19) & 3] = val;
 	else
-		fatalerror("I960: %x: set_rif on literal?", i960->PIP);
+		fatalerror("I960: %x: set_rif on literal?\n", i960->PIP);
 }
 
 INLINE double get_1_rifl(i960_state_t *i960, UINT32 opcode)
@@ -296,7 +296,7 @@ INLINE void set_rifl(i960_state_t *i960, UINT32 opcode, double val)
 	} else if(!(opcode & 0x00e00000))
 		i960->fp[(opcode>>19) & 3] = val;
 	else
-		fatalerror("I960: %x: set_rifl on literal?", i960->PIP);
+		fatalerror("I960: %x: set_rifl on literal?\n", i960->PIP);
 }
 
 INLINE UINT32 get_1_ci(i960_state_t *i960, UINT32 opcode)
@@ -608,7 +608,7 @@ static void do_ret(i960_state_t *i960)
 		break;
 
 	default:
-		fatalerror("I960: %x: Unsupported return mode %d", i960->PIP, i960->r[I960_PFP] & 7);
+		fatalerror("I960: %x: Unsupported return mode %d\n", i960->PIP, i960->r[I960_PFP] & 7);
 	}
 }
 
@@ -950,7 +950,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 58.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 58.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1036,7 +1036,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 59.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 59.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1117,7 +1117,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 5a.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 5a.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1160,7 +1160,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 5b.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 5b.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1173,7 +1173,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 5c.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 5c.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1190,7 +1190,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 5d.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 5d.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1207,7 +1207,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 5e.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 5e.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1224,7 +1224,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 5f.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 5f.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1258,7 +1258,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 60.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 60.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1321,7 +1321,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 64.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 64.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1336,7 +1336,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 65.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 65.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1360,7 +1360,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 66.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 66.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1407,7 +1407,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 67.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 67.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1480,7 +1480,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 68.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 68.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1551,7 +1551,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 69.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 69.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1592,7 +1592,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 6c.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 6c.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1605,7 +1605,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 6d.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 6d.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1646,7 +1646,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					set_rifl(i960, opcode, -fabs(t1f));
 				break;
 			default:
-				fatalerror("I960: %x: Unhandled 6e.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 6e.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1677,7 +1677,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 70.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 70.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1717,7 +1717,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 74.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 74.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1752,7 +1752,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 78.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 78.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1787,7 +1787,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				break;
 
 			default:
-				fatalerror("I960: %x: Unhandled 79.%x", i960->PIP, (opcode >> 7) & 0xf);
+				fatalerror("I960: %x: Unhandled 79.%x\n", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
 
@@ -1948,7 +1948,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			break;
 
 		default:
-			fatalerror("I960: %x: Unhandled %02x", i960->PIP, opcode >> 24);
+			fatalerror("I960: %x: Unhandled %02x\n", i960->PIP, opcode >> 24);
 	}
 
 }
@@ -2058,7 +2058,7 @@ static CPU_SET_INFO( i960 )
 	case CPUINFO_INT_INPUT_STATE + I960_IRQ3:	set_irq_line(i960, I960_IRQ3, info->i);		break;
 
 	default:
-		fatalerror("i960_set_info %x", state);
+		fatalerror("i960_set_info %x\n", state);
 	}
 }
 
@@ -2211,7 +2211,7 @@ CPU_GET_INFO( i960 )
 	case CPUINFO_STR_REGISTER + I960_G15:	sprintf(info->s, "fp   :%08x", i960->r[31]);		break;
 
 //  default:
-//      fatalerror("i960_get_info %x          ", state);
+//      fatalerror("i960_get_info %x          \n", state);
 	}
 }
 

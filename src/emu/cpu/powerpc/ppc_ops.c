@@ -6,7 +6,7 @@
 #ifndef PPC_DRC
 static void ppc_unimplemented(UINT32 op)
 {
-	fatalerror("ppc: Unimplemented opcode %08X at %08X", op, ppc.pc);
+	fatalerror("ppc: Unimplemented opcode %08X at %08X\n", op, ppc.pc);
 }
 
 static void ppc_addx(UINT32 op)
@@ -1610,7 +1610,7 @@ static void ppc_xoris(UINT32 op)
 
 static void ppc_invalid(UINT32 op)
 {
-	fatalerror("ppc: Invalid opcode %08X PC : %X", op, ppc.pc);
+	fatalerror("ppc: Invalid opcode %08X PC : %X\n", op, ppc.pc);
 }
 #endif
 
@@ -1951,7 +1951,7 @@ static void ppc_mftb(UINT32 op)
 	{
 		case 268:	REG(RT) = (UINT32)(ppc_read_timebase()); break;
 		case 269:	REG(RT) = (UINT32)(ppc_read_timebase() >> 32); break;
-		default:	fatalerror("ppc: Invalid timebase register %d at %08X", x, ppc.pc); break;
+		default:	fatalerror("ppc: Invalid timebase register %d at %08X\n", x, ppc.pc); break;
 	}
 }
 

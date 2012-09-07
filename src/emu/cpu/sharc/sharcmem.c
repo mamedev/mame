@@ -18,7 +18,7 @@ static UINT32 pm_read32(SHARC_REGS *cpustate, UINT32 address)
 					   (cpustate->internal_ram_block1[addr + 1]);
 	}
 	else {
-		fatalerror("SHARC: PM Bus Read %08X at %08X", address, cpustate->pc);
+		fatalerror("SHARC: PM Bus Read %08X at %08X\n", address, cpustate->pc);
 	}
 }
 
@@ -42,7 +42,7 @@ static void pm_write32(SHARC_REGS *cpustate, UINT32 address, UINT32 data)
 		return;
 	}
 	else {
-		fatalerror("SHARC: PM Bus Write %08X, %08X at %08X", address, data, cpustate->pc);
+		fatalerror("SHARC: PM Bus Write %08X, %08X at %08X\n", address, data, cpustate->pc);
 	}
 }
 
@@ -66,7 +66,7 @@ static UINT64 pm_read48(SHARC_REGS *cpustate, UINT32 address)
 			   ((UINT64)(cpustate->internal_ram_block1[addr + 2]) << 0);
 	}
 	else {
-		fatalerror("SHARC: PM Bus Read %08X at %08X", address, cpustate->pc);
+		fatalerror("SHARC: PM Bus Read %08X at %08X\n", address, cpustate->pc);
 	}
 
 	return 0;
@@ -94,7 +94,7 @@ static void pm_write48(SHARC_REGS *cpustate, UINT32 address, UINT64 data)
 		return;
 	}
 	else {
-		fatalerror("SHARC: PM Bus Write %08X, %04X%08X at %08X", address, (UINT16)(data >> 32),(UINT32)data, cpustate->pc);
+		fatalerror("SHARC: PM Bus Write %08X, %04X%08X at %08X\n", address, (UINT16)(data >> 32),(UINT32)data, cpustate->pc);
 	}
 }
 

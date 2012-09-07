@@ -21,7 +21,7 @@ static void schedule_chained_dma_op(SHARC_REGS *cpustate, int channel, UINT32 dm
 
 	if (cpustate->dmaop_cycles > 0)
 	{
-		fatalerror("schedule_chained_dma_op: DMA operation already scheduled at %08X!", cpustate->pc);
+		fatalerror("schedule_chained_dma_op: DMA operation already scheduled at %08X!\n", cpustate->pc);
 	}
 
 	if (chained_direction)		// Transmit to external
@@ -54,7 +54,7 @@ static void schedule_dma_op(SHARC_REGS *cpustate, int channel, UINT32 src, UINT3
 {
 	if (cpustate->dmaop_cycles > 0)
 	{
-		fatalerror("schedule_dma_op: DMA operation already scheduled at %08X!", cpustate->pc);
+		fatalerror("schedule_dma_op: DMA operation already scheduled at %08X!\n", cpustate->pc);
 	}
 
 	cpustate->dmaop_channel = channel;
@@ -155,9 +155,9 @@ static void sharc_dma_exec(SHARC_REGS *cpustate, int channel)
 	//flsh = (cpustate->dma[channel].control >> 13) & 0x1;
 
 	if (ishake)
-		fatalerror("SHARC: dma_exec: handshake not supported");
+		fatalerror("SHARC: dma_exec: handshake not supported\n");
 	if (intio)
-		fatalerror("SHARC: dma_exec: single-word interrupt enable not supported");
+		fatalerror("SHARC: dma_exec: single-word interrupt enable not supported\n");
 
 
 

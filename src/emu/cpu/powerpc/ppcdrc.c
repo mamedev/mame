@@ -912,7 +912,7 @@ static void code_flush_cache(powerpc_state *ppc)
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
-		fatalerror("Error generating PPC static handlers");
+		fatalerror("Error generating PPC static handlers\n");
 	}
 }
 
@@ -1096,7 +1096,7 @@ static void cfunc_unimplemented(void *param)
 {
 	powerpc_state *ppc = (powerpc_state *)param;
 	UINT32 opcode = ppc->impstate->arg0;
-	fatalerror("PC=%08X: Unimplemented op %08X", ppc->pc, opcode);
+	fatalerror("PC=%08X: Unimplemented op %08X\n", ppc->pc, opcode);
 }
 
 

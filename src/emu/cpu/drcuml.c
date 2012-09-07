@@ -211,7 +211,7 @@ void drcuml_state::reset()
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
-		fatalerror("Out of cache space in drcuml_state::reset");
+		fatalerror("Out of cache space in drcuml_state::reset\n");
 	}
 }
 
@@ -401,7 +401,7 @@ uml::instruction &drcuml_block::append()
 	// get a pointer to the next instruction
 	instruction &curinst = m_inst[m_nextinst++];
 	if (m_nextinst > m_maxinst)
-		fatalerror("Overran maxinst in drcuml_block_append");
+		fatalerror("Overran maxinst in drcuml_block_append\n");
 
 	return curinst;
 }
@@ -771,7 +771,7 @@ static void validate_backend(drcuml_state *drcuml)
 		bevalidate_iterate_over_params(drcuml, handles, test, param, 0);
 		printf("\n");
 	}
-	fatalerror("All tests passed!");
+	fatalerror("All tests passed!\n");
 }
 
 
@@ -1161,7 +1161,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 		printf("\n");
 		printf("Errors:\n");
 		printf("%s\n", errorbuf);
-		fatalerror("Error during validation");
+		fatalerror("Error during validation\n");
 	}
 	return errend != errorbuf;
 }

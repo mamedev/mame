@@ -997,7 +997,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 				/* interlaced timing not supported */
 				if ((SMART_IOREG(tms, DPYCTL) & 0x4000) == 0)
-					fatalerror("Interlaced video configured on the TMS34010 (unsupported)");
+					fatalerror("Interlaced video configured on the TMS34010 (unsupported)\n");
 			}
 		}
 	}

@@ -305,7 +305,7 @@ static void I486OP(group0F01_16)(i386_state *cpustate)		// Opcode 0x0f 01
 				break;
 			}
 		default:
-			fatalerror("i486: unimplemented opcode 0x0f 01 /%d at %08X", (modrm >> 3) & 0x7, cpustate->eip - 2);
+			fatalerror("i486: unimplemented opcode 0x0f 01 /%d at %08X\n", (modrm >> 3) & 0x7, cpustate->eip - 2);
 			break;
 	}
 }
@@ -414,7 +414,7 @@ static void I486OP(group0F01_32)(i386_state *cpustate)		// Opcode 0x0f 01
 				break;
 			}
 		default:
-			fatalerror("i486: unimplemented opcode 0x0f 01 /%d at %08X", (modrm >> 3) & 0x7, cpustate->eip - 2);
+			fatalerror("i486: unimplemented opcode 0x0f 01 /%d at %08X\n", (modrm >> 3) & 0x7, cpustate->eip - 2);
 			break;
 	}
 }

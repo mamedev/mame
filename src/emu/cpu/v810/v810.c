@@ -1067,7 +1067,7 @@ static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
 static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 {
 	if(!(op & 8))
-		fatalerror("V810: unknown BSU opcode %04x",op);
+		fatalerror("V810: unknown BSU opcode %04x\n",op);
 
 	{
 		UINT32 srcbit,dstbit,src,dst,size;

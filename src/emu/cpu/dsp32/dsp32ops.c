@@ -145,7 +145,7 @@ void dsp32c_device::illegal(UINT32 op)
 
 void dsp32c_device::unimplemented(UINT32 op)
 {
-    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)", PC - 4, op, op >> 25, op >> 21);
+    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)\n", PC - 4, op, op >> 25, op >> 21);
 }
 
 
@@ -449,14 +449,14 @@ inline UINT32 dsp32c_device::double_to_dsp(double val)
 
 double dsp32c_device::dau_read_pi_special(int i)
 {
-    fatalerror("Unimplemented dau_read_pi_special(%d)", i);
+    fatalerror("Unimplemented dau_read_pi_special(%d)\n", i);
 	return 0;
 }
 
 
 void dsp32c_device::dau_write_pi_special(int i, double val)
 {
-    fatalerror("Unimplemented dau_write_pi_special(%d)", i);
+    fatalerror("Unimplemented dau_write_pi_special(%d)\n", i);
 }
 
 
@@ -696,7 +696,7 @@ int dsp32c_device::condition(int cond)
 		case 46:	// !ireq2
 		case 47:	// ireq2
 		default:
-		    fatalerror("Unimplemented condition: %X", cond);
+		    fatalerror("Unimplemented condition: %X\n", cond);
 	}
 }
 #endif

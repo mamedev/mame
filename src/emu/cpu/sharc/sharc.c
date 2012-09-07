@@ -245,7 +245,7 @@ static void iop_write_latency_effect(SHARC_REGS *cpustate)
 			break;
 		}
 
-		default:	fatalerror("SHARC: iop_write_latency_effect: unknown IOP register %02X", cpustate->iop_latency_reg);
+		default:	fatalerror("SHARC: iop_write_latency_effect: unknown IOP register %02X\n", cpustate->iop_latency_reg);
 	}
 }
 
@@ -267,7 +267,7 @@ static UINT32 sharc_iop_r(SHARC_REGS *cpustate, UINT32 address)
 			}
 			return r;
 		}
-		default:		fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X", address, cpustate->pc);
+		default:		fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", address, cpustate->pc);
 	}
 	return 0;
 }
@@ -324,7 +324,7 @@ static void sharc_iop_w(SHARC_REGS *cpustate, UINT32 address, UINT32 data)
 		case 0x4e: cpustate->dma[7].ext_modifier = data; return;
 		case 0x4f: cpustate->dma[7].ext_count = data; return;
 
-		default:		fatalerror("sharc_iop_w: Unimplemented IOP reg %02X, %08X at %08X", address, data, cpustate->pc);
+		default:		fatalerror("sharc_iop_w: Unimplemented IOP reg %02X, %08X at %08X\n", address, data, cpustate->pc);
 	}
 }
 
@@ -579,7 +579,7 @@ static CPU_RESET( sharc )
 			break;
 
 		default:
-			fatalerror("SHARC: Unimplemented boot mode %d", cpustate->boot_mode);
+			fatalerror("SHARC: Unimplemented boot mode %d\n", cpustate->boot_mode);
 	}
 
 	cpustate->pc = 0x20004;
@@ -618,7 +618,7 @@ void sharc_set_flag_input(device_t *device, int flag_num, int state)
 		}
 		else
 		{
-			fatalerror("sharc_set_flag_input: flag %d is set output!", flag_num);
+			fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
 		}
 	}
 }
@@ -755,12 +755,12 @@ static CPU_EXECUTE( sharc )
 				}
 				case 1:		// counter-based, length 1
 				{
-					//fatalerror("SHARC: counter-based loop, length 1 at %08X", cpustate->pc);
+					//fatalerror("SHARC: counter-based loop, length 1 at %08X\n", cpustate->pc);
 					//break;
 				}
 				case 2:		// counter-based, length 2
 				{
-					//fatalerror("SHARC: counter-based loop, length 2 at %08X", cpustate->pc);
+					//fatalerror("SHARC: counter-based loop, length 2 at %08X\n", cpustate->pc);
 					//break;
 				}
 				case 3:		// counter-based, length >2

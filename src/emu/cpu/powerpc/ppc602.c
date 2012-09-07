@@ -157,7 +157,7 @@ void ppc602_exception(int exception)
 
 
 		default:
-			fatalerror("ppc: Unhandled exception %d", exception);
+			fatalerror("ppc: Unhandled exception %d\n", exception);
 			break;
 	}
 }

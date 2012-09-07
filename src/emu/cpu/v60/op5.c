@@ -79,7 +79,7 @@ static UINT32 opTRAPFL(v60_state *cpustate)
 	if ((cpustate->TKCW & 0x1F0) & ((v60ReadPSW(cpustate) & 0x1F00) >> 4))
 	{
 		// @@@ FPU exception
-		fatalerror("Hit TRAPFL! cpustate->PC=%x", cpustate->PC);
+		fatalerror("Hit TRAPFL! cpustate->PC=%x\n", cpustate->PC);
 	}
 
 	return 1;

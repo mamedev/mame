@@ -114,7 +114,7 @@ INLINE void compute_add(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	UINT32 r = REG(rx) + REG(ry);
 
 	if (cpustate->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_add: ALU saturation not implemented !");
+		fatalerror("SHARC: compute_add: ALU saturation not implemented!\n");
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -132,7 +132,7 @@ INLINE void compute_sub(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	UINT32 r = REG(rx) - REG(ry);
 
 	if (cpustate->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_sub: ALU saturation not implemented !");
+		fatalerror("SHARC: compute_sub: ALU saturation not implemented!\n");
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -151,7 +151,7 @@ INLINE void compute_add_ci(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	UINT32 r = REG(rx) + REG(ry) + c;
 
 	if (cpustate->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_add_ci: ALU saturation not implemented !");
+		fatalerror("SHARC: compute_add_ci: ALU saturation not implemented!\n");
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -170,7 +170,7 @@ INLINE void compute_sub_ci(SHARC_REGS *cpustate, int rn, int rx, int ry)
 	UINT32 r = REG(rx) - REG(ry) + c - 1;
 
 	if (cpustate->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_sub_ci: ALU saturation not implemented !");
+		fatalerror("SHARC: compute_sub_ci: ALU saturation not implemented!\n");
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -971,11 +971,11 @@ INLINE void compute_multi_mr_to_reg(SHARC_REGS *cpustate, int ai, int rk)
 	{
 		case 0:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrf)); break;
 		case 1:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrf >> 32)); break;
-		case 2:		fatalerror("SHARC: tried to load MR2F"); break;
+		case 2:		fatalerror("SHARC: tried to load MR2F\n"); break;
 		case 4:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrb)); break;
 		case 5:		SET_UREG(cpustate, rk, (UINT32)(cpustate->mrb >> 32)); break;
-		case 6:		fatalerror("SHARC: tried to load MR2B"); break;
-		default:	fatalerror("SHARC: unknown ai %d in mr_to_reg", ai);
+		case 6:		fatalerror("SHARC: tried to load MR2B\n"); break;
+		default:	fatalerror("SHARC: unknown ai %d in mr_to_reg\n", ai);
 	}
 
 	CLEAR_MULTIPLIER_FLAGS();
@@ -987,11 +987,11 @@ INLINE void compute_multi_reg_to_mr(SHARC_REGS *cpustate, int ai, int rk)
 	{
 		case 0:		cpustate->mrf &= ~0xffffffff; cpustate->mrf |= GET_UREG(cpustate, rk); break;
 		case 1:		cpustate->mrf &= 0xffffffff; cpustate->mrf |= (UINT64)(GET_UREG(cpustate, rk)) << 32; break;
-		case 2:		fatalerror("SHARC: tried to write MR2F"); break;
+		case 2:		fatalerror("SHARC: tried to write MR2F\n"); break;
 		case 4:		cpustate->mrb &= ~0xffffffff; cpustate->mrb |= GET_UREG(cpustate, rk); break;
 		case 5:		cpustate->mrb &= 0xffffffff; cpustate->mrb |= (UINT64)(GET_UREG(cpustate, rk)) << 32; break;
-		case 6:		fatalerror("SHARC: tried to write MR2B"); break;
-		default:	fatalerror("SHARC: unknown ai %d in reg_to_mr", ai);
+		case 6:		fatalerror("SHARC: tried to write MR2B\n"); break;
+		default:	fatalerror("SHARC: unknown ai %d in reg_to_mr\n", ai);
 	}
 
 	CLEAR_MULTIPLIER_FLAGS();

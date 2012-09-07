@@ -317,7 +317,7 @@ INLINE UINT32 v60_update_psw_for_exception(v60_state *cpustate, int is_interrupt
 
 static UINT32 opUNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled OpCode found : %02x at %08x", OpRead16(cpustate, cpustate->PC), cpustate->PC);
+	fatalerror("Unhandled OpCode found : %02x at %08x\n", OpRead16(cpustate, cpustate->PC), cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 

@@ -759,7 +759,7 @@ void tms57002_device::execute_run()
 #undef CINTRP
 
 			default:
-				fatalerror("Unhandled opcode in tms57002_execute");
+				fatalerror("Unhandled opcode in tms57002_execute\n");
 			}
 		}
 	inst:

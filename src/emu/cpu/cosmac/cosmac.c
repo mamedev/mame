@@ -219,7 +219,7 @@ void cosmac_device::device_config_complete()
 	// or error out if none provided
 	else
 	{
-		fatalerror("COSMAC_INTERFACE for cpu '%s' not defined!", tag());
+		fatalerror("COSMAC_INTERFACE for cpu '%s' not defined!\n", tag());
 	}
 }
 

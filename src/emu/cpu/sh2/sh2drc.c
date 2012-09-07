@@ -276,7 +276,7 @@ static void cfunc_unimplemented(void *param)
 {
 	sh2_state *sh2 = (sh2_state *)param;
 	UINT16 opcode = sh2->arg0;
-	fatalerror("PC=%08X: Unimplemented op %04X", sh2->pc, opcode);
+	fatalerror("PC=%08X: Unimplemented op %04X\n", sh2->pc, opcode);
 }
 
 /*-------------------------------------------------
@@ -863,7 +863,7 @@ static void code_flush_cache(sh2_state *sh2)
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
-		fatalerror("Unable to generate SH2 static code");
+		fatalerror("Unable to generate SH2 static code\n");
 	}
 
 	sh2->cache_dirty = FALSE;

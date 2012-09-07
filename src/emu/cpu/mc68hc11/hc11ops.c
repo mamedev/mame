@@ -3538,5 +3538,5 @@ static void HC11OP(page4)(hc11_state *cpustate)
 
 static void HC11OP(invalid)(hc11_state *cpustate)
 {
-	fatalerror("HC11: Invalid opcode 0x%02X at %04X", READ8(cpustate, cpustate->pc-1), cpustate->pc-1);
+	fatalerror("HC11: Invalid opcode 0x%02X at %04X\n", READ8(cpustate, cpustate->pc-1), cpustate->pc-1);
 }

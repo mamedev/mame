@@ -247,7 +247,7 @@ static CPU_EXECUTE(h8)
 
 	if (h8->h8err)
 	{
-		fatalerror("H8/3xx: Unknown opcode (PC=%x) %x", h8->ppc, opcode);
+		fatalerror("H8/3xx: Unknown opcode (PC=%x) %x\n", h8->ppc, opcode);
 	}
 }
 

@@ -1434,7 +1434,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			else if (ramsize == 256)
 				info->i = 8;
 			else
-				fatalerror("mcs48_generic_get_info: Invalid RAM size");
+				fatalerror("mcs48_generic_get_info: Invalid RAM size\n");
 			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
@@ -1448,7 +1448,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			else if (romsize == 4096)
 				info->init = CPU_INIT_NAME(mcs48_4k_rom);
 			else
-				fatalerror("mcs48_generic_get_info: Invalid ROM size");
+				fatalerror("mcs48_generic_get_info: Invalid ROM size\n");
 			break;
 
 		case CPUINFO_FCT_DISASSEMBLE:
@@ -1469,7 +1469,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			else if (romsize == 4096)
 				info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);
 			else
-				fatalerror("mcs48_generic_get_info: Invalid RAM size");
+				fatalerror("mcs48_generic_get_info: Invalid RAM size\n");
 			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:
@@ -1480,7 +1480,7 @@ static void mcs48_generic_get_info(legacy_cpu_device *device, UINT32 state, cpui
 			else if (ramsize == 256)
 				info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);
 			else
-				fatalerror("mcs48_generic_get_info: Invalid RAM size");
+				fatalerror("mcs48_generic_get_info: Invalid RAM size\n");
 			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

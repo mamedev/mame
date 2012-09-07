@@ -456,7 +456,7 @@ static UINT32 opCHLVL(v60_state *cpustate)
 
 	if (cpustate->op1 > 3)
 	{
-		fatalerror("Illegal data field on opCHLVL, cpustate->PC=%x", cpustate->PC);
+		fatalerror("Illegal data field on opCHLVL, cpustate->PC=%x\n", cpustate->PC);
 	}
 
 	oldPSW = v60_update_psw_for_exception(cpustate, 0, cpustate->op1);
@@ -762,7 +762,7 @@ static UINT32 opLDPR(v60_state *cpustate)
 	}
 	else
 	{
-		fatalerror("Invalid operand on LDPR cpustate->PC=%x", cpustate->PC);
+		fatalerror("Invalid operand on LDPR cpustate->PC=%x\n", cpustate->PC);
 	}
 	F12END(cpustate);
 }
@@ -2100,7 +2100,7 @@ static UINT32 opSTPR(v60_state *cpustate)
 		cpustate->modwritevalw = cpustate->reg[cpustate->op1 + 36];
 	else
 	{
-		fatalerror("Invalid operand on STPR cpustate->PC=%x", cpustate->PC);
+		fatalerror("Invalid operand on STPR cpustate->PC=%x\n", cpustate->PC);
 	}
 	F12WriteSecondOperand(cpustate, 2);
 	F12END(cpustate);

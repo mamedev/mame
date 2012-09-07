@@ -492,7 +492,7 @@ static CPU_SET_INFO( h8 )
 	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_3002_InterruptRequest(h8, 57, info->i);		break;
 
 	default:
-		fatalerror("h8_set_info unknown request %x", state);
+		fatalerror("h8_set_info unknown request %x\n", state);
 		break;
 	}
 }
@@ -529,7 +529,7 @@ static CPU_SET_INFO( h8s_2394 )
 	case CPUINFO_INT_INPUT_STATE + H8_SCI_1_RX:	h8_3002_InterruptRequest(h8, 85, info->i);		break;
 
 	default:
-		fatalerror("h8_set_info unknown request %x", state);
+		fatalerror("h8_set_info unknown request %x\n", state);
 		break;
 	}
 }

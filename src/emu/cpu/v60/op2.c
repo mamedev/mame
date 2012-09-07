@@ -255,13 +255,13 @@ static UINT32 opCMPF(v60_state *cpustate)
 
 static UINT32 op5FUNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 5F opcode at %08x", cpustate->PC);
+	fatalerror("Unhandled 5F opcode at %08x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 op5CUNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 5C opcode at %08x", cpustate->PC);
+	fatalerror("Unhandled 5C opcode at %08x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 

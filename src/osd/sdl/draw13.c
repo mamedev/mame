@@ -622,7 +622,7 @@ static int draw13_window_create(sdl_window_info *window, int width, int height)
 
 	if (!sdl->sdl_renderer)
 	{
-		fatalerror("Error on creating renderer: %s \n", SDL_GetError());
+		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
 	}
 
     //SDL_SelectRenderer(window->sdl_window);

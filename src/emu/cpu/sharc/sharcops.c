@@ -161,15 +161,15 @@ static void systemreg_write_latency_effect(SHARC_REGS *cpustate)
 
 			if ((data & 0x1) != (oldreg & 0x1))
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable I8 bit-reversing");
+				fatalerror("SHARC: systemreg_latency_op: enable I8 bit-reversing\n");
 			}
 			if ((data & 0x2) != (oldreg & 0x2))
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable I0 bit-reversing");
+				fatalerror("SHARC: systemreg_latency_op: enable I0 bit-reversing\n");
 			}
 			if ((data & 0x4) != (oldreg & 0x4))
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable MR alternate");
+				fatalerror("SHARC: systemreg_latency_op: enable MR alternate\n");
 			}
 
 			if ((data & 0x8) != (oldreg & 0x8))			/* Switch DAG1 7-4 */
@@ -260,7 +260,7 @@ static void systemreg_write_latency_effect(SHARC_REGS *cpustate)
 			}
 			break;
 		}
-		default:	fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X", cpustate->systemreg_latency_reg, cpustate->pc);
+		default:	fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X\n", cpustate->systemreg_latency_reg, cpustate->pc);
 	}
 
 	cpustate->systemreg_latency_reg = -1;
@@ -332,7 +332,7 @@ static UINT32 GET_UREG(SHARC_REGS *cpustate, int ureg)
 			switch(reg)
 			{
 				case 0x4:	return cpustate->pcstack[cpustate->pcstkp];		/* PCSTK */
-				default:	fatalerror("SHARC: GET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+				default:	fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 			}
 			break;
 		}
@@ -358,7 +358,7 @@ static UINT32 GET_UREG(SHARC_REGS *cpustate, int ureg)
 				}
 				case 0xd:	return cpustate->imask;			/* IMASK */
 				case 0xe:	return cpustate->stky;			/* STKY */
-				default:	fatalerror("SHARC: GET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+				default:	fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 			}
 			break;
 		}
@@ -371,12 +371,12 @@ static UINT32 GET_UREG(SHARC_REGS *cpustate, int ureg)
 				case 0xb:	return (UINT32)(cpustate->px);			/* PX */
 				case 0xc:	return (UINT16)(cpustate->px);			/* PX1 */
 				case 0xd:	return (UINT32)(cpustate->px >> 16);	/* PX2 */
-				default:	fatalerror("SHARC: GET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+				default:	fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 			}
 			break;
 		}
 
-		default:			fatalerror("SHARC: GET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+		default:			fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 	}
 }
 
@@ -441,7 +441,7 @@ static void SET_UREG(SHARC_REGS *cpustate, int ureg, UINT32 data)
 			{
 				case 0x5:	cpustate->pcstkp = data; break;		/* PCSTKP */
 				case 0x8:	cpustate->lcntr = data; break;		/* LCNTR */
-				default:	fatalerror("SHARC: SET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+				default:	fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 			}
 			break;
 
@@ -471,7 +471,7 @@ static void SET_UREG(SHARC_REGS *cpustate, int ureg, UINT32 data)
 				}
 
 				case 0xe:	cpustate->stky = data; break;		/* STKY */
-				default:	fatalerror("SHARC: SET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+				default:	fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 			}
 			break;
 
@@ -480,11 +480,11 @@ static void SET_UREG(SHARC_REGS *cpustate, int ureg, UINT32 data)
 			{
 				case 0xc:	cpustate->px &= U64(0xffffffffffff0000); cpustate->px |= (data & 0xffff); break;		/* PX1 */
 				case 0xd:	cpustate->px &= U64(0x000000000000ffff); cpustate->px |= (UINT64)data << 16; break;		/* PX2 */
-				default:	fatalerror("SHARC: SET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+				default:	fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 			}
 			break;
 
-		default:			fatalerror("SHARC: SET_UREG: unknown register %08X at %08X", ureg, cpustate->pc);
+		default:			fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, cpustate->pc);
 	}
 }
 
@@ -694,7 +694,7 @@ static void SHIFT_OPERATION_IMM(SHARC_REGS *cpustate, int shiftop, int data, int
 			break;
 		}
 
-		default:	fatalerror("SHARC: unimplemented shift operation %02X at %08X", shiftop, cpustate->pc);
+		default:	fatalerror("SHARC: unimplemented shift operation %02X at %08X\n", shiftop, cpustate->pc);
 	}
 }
 
@@ -786,7 +786,7 @@ static void COMPUTE(SHARC_REGS *cpustate, UINT32 opcode)
 			}
 
 			default:
-				fatalerror("SHARC: compute: multi-function opcode %02X not implemented ! (%08X, %08X)", multiop, cpustate->pc, opcode);
+				fatalerror("SHARC: compute: multi-function opcode %02X not implemented ! (%08X, %08X)\n", multiop, cpustate->pc, opcode);
 				break;
 		}
 	}
@@ -853,7 +853,7 @@ static void COMPUTE(SHARC_REGS *cpustate, UINT32 opcode)
 						break;
 					}
 
-					default:		fatalerror("SHARC: compute: unimplemented ALU operation %02X (%08X, %08X)", op, cpustate->pc, opcode);
+					default:		fatalerror("SHARC: compute: unimplemented ALU operation %02X (%08X, %08X)\n", op, cpustate->pc, opcode);
 				}
 				break;
 			}
@@ -875,7 +875,7 @@ static void COMPUTE(SHARC_REGS *cpustate, UINT32 opcode)
 					case 0xb2:		REG(rn) = compute_mrb_plus_mul_ssin(cpustate, rx, ry); break;
 
 					default:
-						fatalerror("SHARC: compute: multiplier operation %02X not implemented ! (%08X, %08X)", op, cpustate->pc, opcode);
+						fatalerror("SHARC: compute: multiplier operation %02X not implemented ! (%08X, %08X)\n", op, cpustate->pc, opcode);
 						break;
 				}
 				break;
@@ -1046,13 +1046,13 @@ static void COMPUTE(SHARC_REGS *cpustate, UINT32 opcode)
 					}
 
 					default:
-						fatalerror("SHARC: compute: shift operation %02X not implemented ! (%08X, %08X)", op, cpustate->pc, opcode);
+						fatalerror("SHARC: compute: shift operation %02X not implemented ! (%08X, %08X)\n", op, cpustate->pc, opcode);
 				}
 				break;
 			}
 
 			default:
-				fatalerror("SHARC: compute: invalid single-function operation %02X", cu);
+				fatalerror("SHARC: compute: invalid single-function operation %02X\n", cu);
 		}
 	}
 }
@@ -1062,7 +1062,7 @@ INLINE void PUSH_PC(SHARC_REGS *cpustate, UINT32 pc)
 	cpustate->pcstkp++;
 	if(cpustate->pcstkp >= 32)
 	{
-		fatalerror("SHARC: PC Stack overflow !");
+		fatalerror("SHARC: PC Stack overflow!\n");
 	}
 
 	if (cpustate->pcstkp == 0)
@@ -1084,7 +1084,7 @@ INLINE UINT32 POP_PC(SHARC_REGS *cpustate)
 
 	if(cpustate->pcstkp == 0)
 	{
-		fatalerror("SHARC: PC Stack underflow !");
+		fatalerror("SHARC: PC Stack underflow!\n");
 	}
 
 	cpustate->pcstkp--;
@@ -1111,7 +1111,7 @@ INLINE void PUSH_LOOP(SHARC_REGS *cpustate, UINT32 pc, UINT32 count)
 	cpustate->lstkp++;
 	if(cpustate->lstkp >= 6)
 	{
-		fatalerror("SHARC: Loop Stack overflow !");
+		fatalerror("SHARC: Loop Stack overflow!\n");
 	}
 
 	if (cpustate->lstkp == 0)
@@ -1133,7 +1133,7 @@ INLINE void POP_LOOP(SHARC_REGS *cpustate)
 {
 	if(cpustate->lstkp == 0)
 	{
-		fatalerror("SHARC: Loop Stack underflow !");
+		fatalerror("SHARC: Loop Stack underflow!\n");
 	}
 
 	cpustate->lstkp--;
@@ -1156,7 +1156,7 @@ INLINE void PUSH_STATUS_STACK(SHARC_REGS *cpustate)
 	cpustate->status_stkp++;
 	if (cpustate->status_stkp >= 5)
 	{
-		fatalerror("SHARC: Status stack overflow !");
+		fatalerror("SHARC: Status stack overflow!\n");
 	}
 
 	if (cpustate->status_stkp == 0)
@@ -1180,7 +1180,7 @@ INLINE void POP_STATUS_STACK(SHARC_REGS *cpustate)
 	cpustate->status_stkp--;
 	if (cpustate->status_stkp < 0)
 	{
-		fatalerror("SHARC: Status stack underflow !");
+		fatalerror("SHARC: Status stack underflow!\n");
 	}
 
 	if (cpustate->status_stkp == 0)
@@ -2254,7 +2254,7 @@ static void sharcop_rts(SHARC_REGS *cpustate)
 	int compute = cpustate->opcode & 0x7fffff;
 
 	//if(lr)
-	//  fatalerror("SHARC: rts: loop reentry not implemented !");
+	//  fatalerror("SHARC: rts: loop reentry not implemented!\n");
 
 	if (e)		/* IF...ELSE */
 	{
@@ -2646,7 +2646,7 @@ static void sharcop_sysreg_bitop(SHARC_REGS *cpustate)
 			break;
 		}
 		default:
-			fatalerror("SHARC: sysreg_bitop: invalid bitop %d", bop);
+			fatalerror("SHARC: sysreg_bitop: invalid bitop %d\n", bop);
 			break;
 	}
 
@@ -2681,7 +2681,7 @@ static void sharcop_modify(SHARC_REGS *cpustate)
 /* I register bit-reverse */
 static void sharcop_bit_reverse(SHARC_REGS *cpustate)
 {
-	fatalerror("SHARC: sharcop_bit_reverse unimplemented");
+	fatalerror("SHARC: sharcop_bit_reverse unimplemented\n");
 }
 
 /*****************************************************************************/
@@ -2692,20 +2692,20 @@ static void sharcop_push_pop_stacks(SHARC_REGS *cpustate)
 {
 	if (cpustate->opcode & U64(0x008000000000))
 	{
-		fatalerror("sharcop_push_pop_stacks: push loop not implemented");
+		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
 	}
 	if (cpustate->opcode & U64(0x004000000000))
 	{
-		fatalerror("sharcop_push_pop_stacks: pop loop not implemented");
+		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
 	}
 	if (cpustate->opcode & U64(0x002000000000))
 	{
-		//fatalerror("sharcop_push_pop_stacks: push sts not implemented");
+		//fatalerror("sharcop_push_pop_stacks: push sts not implemented\n");
 		PUSH_STATUS_STACK(cpustate);
 	}
 	if (cpustate->opcode & U64(0x001000000000))
 	{
-		//fatalerror("sharcop_push_pop_stacks: pop sts not implemented");
+		//fatalerror("sharcop_push_pop_stacks: pop sts not implemented\n");
 		POP_STATUS_STACK(cpustate);
 	}
 	if (cpustate->opcode & U64(0x000800000000))
@@ -2750,5 +2750,5 @@ static void sharcop_unimplemented(SHARC_REGS *cpustate)
 	char dasm[1000];
 	CPU_DISASSEMBLE_NAME(sharc)(NULL, dasm, cpustate->pc, NULL, NULL, 0);
 	mame_printf_debug("SHARC: %08X: %s\n", cpustate->pc, dasm);
-	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X", (UINT16)(cpustate->opcode >> 32), (UINT32)(cpustate->opcode), cpustate->pc);
+	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (UINT16)(cpustate->opcode >> 32), (UINT32)(cpustate->opcode), cpustate->pc);
 }

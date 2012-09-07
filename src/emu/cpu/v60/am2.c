@@ -94,7 +94,7 @@ static UINT32 bam2Autoincrement(v60_state *cpustate)
 		cpustate->reg[cpustate->modval & 0x1F] +=4;
 		break;
 	default:
-		fatalerror("CPU - AM2 - 7 (t0 cpustate->PC=%x)", cpustate->PC);
+		fatalerror("CPU - AM2 - 7 (t0 cpustate->PC=%x)\n", cpustate->PC);
 		break;
 	}
 
@@ -139,7 +139,7 @@ static UINT32 bam2Autodecrement(v60_state *cpustate)
 		cpustate->reg[cpustate->modval & 0x1F]-=4;
 		break;
 	default:
-		fatalerror("CPU - BAM2 - 7 (cpustate->PC=%06x)", cpustate->PC);
+		fatalerror("CPU - BAM2 - 7 (cpustate->PC=%06x)\n", cpustate->PC);
 		break;
 	}
 
@@ -963,65 +963,65 @@ static UINT32 am2Error1(v60_state *cpustate)
 
 static UINT32 am2Error2(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 2 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM2 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
 static UINT32 am2Error3(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 3 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM2 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
 static UINT32 am2Error4(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 4 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM2 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 am2Error5(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 5 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM2 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam2Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM2 - 1 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam2Error2(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 2 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM2 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
 static UINT32 bam2Error3(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 3 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM2 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
 static UINT32 bam2Error4(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 4 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM2 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam2Error5(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 5 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM2 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam2Error6(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 6 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM2 - 6 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 

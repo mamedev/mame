@@ -360,7 +360,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					{
 						//printf("dma stalled\n");
 						sh2->dma_timer_active[dma]=2;// mark as stalled
-						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode");
+						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode\n");
 					}
 				}
 

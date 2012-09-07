@@ -1946,7 +1946,7 @@ static CPU_EXECUTE( upd7810 )
 					PC += cpustate->op74[OP2].oplen - 2;
 					break;
 				default:
-					fatalerror("uPD7810 internal error: check cycle counts for main");
+					fatalerror("uPD7810 internal error: check cycle counts for main\n");
 				}
 			}
 			PSW &= ~SK;

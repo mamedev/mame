@@ -965,31 +965,31 @@ static UINT32 opCVTDZP(v60_state *cpustate)
 
 static UINT32 op58UNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 58 opcode at cpustate->PC: /%06x", cpustate->PC);
+	fatalerror("Unhandled 58 opcode at cpustate->PC: /%06x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 op5AUNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 5A opcode at cpustate->PC: /%06x", cpustate->PC);
+	fatalerror("Unhandled 5A opcode at cpustate->PC: /%06x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 op5BUNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 5B opcode at cpustate->PC: /%06x", cpustate->PC);
+	fatalerror("Unhandled 5B opcode at cpustate->PC: /%06x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 op5DUNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 5D opcode at cpustate->PC: /%06x", cpustate->PC);
+	fatalerror("Unhandled 5D opcode at cpustate->PC: /%06x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 op59UNHANDLED(v60_state *cpustate)
 {
-	fatalerror("Unhandled 59 opcode at cpustate->PC: /%06x", cpustate->PC);
+	fatalerror("Unhandled 59 opcode at cpustate->PC: /%06x\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 

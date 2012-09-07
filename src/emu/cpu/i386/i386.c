@@ -289,7 +289,7 @@ static void modrm_to_EA(i386_state *cpustate,UINT8 mod_rm, UINT32* out_ea, UINT8
 	UINT8 segment;
 
 	if( mod_rm >= 0xc0 )
-		fatalerror("i386: Called modrm_to_EA with modrm value %02X !",mod_rm);
+		fatalerror("i386: Called modrm_to_EA with modrm value %02X!\n",mod_rm);
 
 	if( cpustate->address_size ) {
 		switch( rm )
@@ -2719,7 +2719,7 @@ static void report_invalid_opcode(i386_state *cpustate)
 static void report_unimplemented_opcode(i386_state *cpustate)
 {
 #ifndef DEBUG_MISSING_OPCODE
-	fatalerror("i386: Unimplemented opcode %02X at %08X", cpustate->opcode, cpustate->pc - 1 );
+	fatalerror("i386: Unimplemented opcode %02X at %08X\n", cpustate->opcode, cpustate->pc - 1 );
 #else
 	astring errmsg;
 	errmsg.cat("i386: Unimplemented opcode ");

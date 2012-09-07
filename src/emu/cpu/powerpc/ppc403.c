@@ -69,7 +69,7 @@ INLINE void ppc_set_dcr(int dcr, UINT32 value)
 		case DCR_DMACR3:	ppc.dma[3].cr = value; ppc403_dma_exec(3); break;
 
 		default:
-			fatalerror("ppc: set_dcr: Unimplemented DCR %X", dcr);
+			fatalerror("ppc: set_dcr: Unimplemented DCR %X\n", dcr);
 			break;
 	}
 }
@@ -110,7 +110,7 @@ INLINE UINT32 ppc_get_dcr(int dcr)
 		case DCR_DMACR3:	return ppc.dma[3].cr;
 
 		default:
-			fatalerror("ppc: get_dcr: Unimplemented DCR %X", dcr);
+			fatalerror("ppc: get_dcr: Unimplemented DCR %X\n", dcr);
 			break;
 	}
 }
@@ -232,7 +232,7 @@ static CPU_EXECUTE( ppc403 )
 					}
 					break;
 				case 3:
-					fatalerror("PPC: Watchdog Timer caused reset");
+					fatalerror("PPC: Watchdog Timer caused reset\n");
 					break;
 			}
 		}
@@ -395,7 +395,7 @@ void ppc403_exception(int exception)
 		}
 
 		default:
-			fatalerror("ppc: Unhandled exception %d", exception);
+			fatalerror("ppc: Unhandled exception %d\n", exception);
 			break;
 	}
 }
@@ -452,7 +452,7 @@ static void ppc403_set_irq_line(int irqline, int state)
 	}
 	else
 	{
-		fatalerror("PPC: Unknown IRQ line %d", irqline);
+		fatalerror("PPC: Unknown IRQ line %d\n", irqline);
 	}
 }
 
@@ -565,7 +565,7 @@ static UINT8 ppc403_spu_r(UINT32 a)
 		case 0x7:		return ppc.spu.sprc;
 		case 0x8:		return ppc.spu.sptc;
 		case 0x9:		return ppc.spu.sprb;
-		default:		fatalerror("ppc: spu_r: %02X", a & 0xf);
+		default:		fatalerror("ppc: spu_r: %02X\n", a & 0xf);
 	}
 }
 
@@ -671,7 +671,7 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 			break;
 
 		default:
-			fatalerror("ppc: spu_w: %02X, %02X", a & 0xf, d);
+			fatalerror("ppc: spu_w: %02X, %02X\n", a & 0xf, d);
 			break;
 	}
 	//mame_printf_debug("spu_w: %02X, %02X at %08X\n", a & 0xf, d, ppc.pc);
@@ -821,14 +821,14 @@ static void ppc403_dma_exec(int ch)
 #endif
 					}
 					else {
-						fatalerror("ppc: dma_exec: buffered DMA to unknown peripheral ! (channel %d)", ch);
+						fatalerror("ppc: dma_exec: buffered DMA to unknown peripheral ! (channel %d)\n", ch);
 					}
 
 				}
 				break;
 
 			case 1:		/* fly-by DMA */
-				fatalerror("ppc: dma_exec: fly-by DMA not implemented");
+				fatalerror("ppc: dma_exec: fly-by DMA not implemented\n");
 				break;
 
 			case 2:		/* software initiated mem-to-mem DMA */
@@ -879,12 +879,12 @@ static void ppc403_dma_exec(int ch)
 						}
 						break;
 					default:
-						fatalerror("dma: dma_exec: SW mem-to-mem DMA, width = %d", width);
+						fatalerror("dma: dma_exec: SW mem-to-mem DMA, width = %d\n", width);
 				}
 				break;
 
 			case 3:		/* hardware initiated mem-to-mem DMA */
-				fatalerror("ppc: dma_exec: HW mem-to-mem DMA not implemented");
+				fatalerror("ppc: dma_exec: HW mem-to-mem DMA not implemented\n");
 				break;
 		}
 
@@ -892,10 +892,10 @@ static void ppc403_dma_exec(int ch)
 
 		/* DEBUG: check for not yet supported features */
 		if( (ppc.dma[ch].cr & DMA_TCE) == 0 )
-			fatalerror("ppc: dma_exec: DMA_TCE == 0");
+			fatalerror("ppc: dma_exec: DMA_TCE == 0\n");
 
 		if( ppc.dma[ch].cr & DMA_CH )
-			fatalerror("ppc: dma_exec: DMA chaining not implemented");
+			fatalerror("ppc: dma_exec: DMA chaining not implemented\n");
 
 		/* generate interrupts */
 		if( ppc.dma[ch].cr & DMA_CIE )
@@ -931,23 +931,23 @@ static void ppc403_write8(address_space *space, UINT32 a, UINT8 d)
 
 static UINT16 ppc403_read16_unaligned(address_space *space, UINT32 a)
 {
-	fatalerror("ppc: Unaligned read16 %08X at %08X", a, ppc.pc);
+	fatalerror("ppc: Unaligned read16 %08X at %08X\n", a, ppc.pc);
 	return 0;
 }
 
 static UINT32 ppc403_read32_unaligned(address_space *space, UINT32 a)
 {
-	fatalerror("ppc: Unaligned read32 %08X at %08X", a, ppc.pc);
+	fatalerror("ppc: Unaligned read32 %08X at %08X\n", a, ppc.pc);
 	return 0;
 }
 
 static void ppc403_write16_unaligned(address_space *space, UINT32 a, UINT16 d)
 {
-	fatalerror("ppc: Unaligned write16 %08X, %04X at %08X", a, d, ppc.pc);
+	fatalerror("ppc: Unaligned write16 %08X, %04X at %08X\n", a, d, ppc.pc);
 }
 
 static void ppc403_write32_unaligned(address_space *space, UINT32 a, UINT32 d)
 {
-	fatalerror("ppc: Unaligned write32 %08X, %08X at %08X", a, d, ppc.pc);
+	fatalerror("ppc: Unaligned write32 %08X, %08X at %08X\n", a, d, ppc.pc);
 }
 

@@ -397,7 +397,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *de
 	/* allocate enough space for the cache and the core */
 	cache = auto_alloc(device->machine(), drc_cache(CACHE_SIZE + sizeof(*mips3)));
 	if (cache == NULL)
-		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
+		fatalerror("Unable to allocate cache of size %d\n", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
 
 	/* allocate the core memory */
 	*(mips3_state **)device->token() = mips3 = (mips3_state *)cache->alloc_near(sizeof(*mips3));
@@ -744,7 +744,7 @@ static void code_flush_cache(mips3_state *mips3)
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
-		fatalerror("Unrecoverable error generating static code");
+		fatalerror("Unrecoverable error generating static code\n");
 	}
 }
 
@@ -967,7 +967,7 @@ static void cfunc_unimplemented(void *param)
 {
 	mips3_state *mips3 = (mips3_state *)param;
 	UINT32 opcode = mips3->impstate->arg0;
-	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)", mips3->pc, opcode, opcode >> 26, opcode & 0x3f);
+	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)\n", mips3->pc, opcode, opcode >> 26, opcode & 0x3f);
 }
 
 

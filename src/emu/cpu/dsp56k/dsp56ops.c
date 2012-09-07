@@ -2192,7 +2192,7 @@ static size_t dsp56k_op_andi(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 			break;
 
 		default:
-			fatalerror("DSP56k - BAD EE value in andi operation") ;
+			fatalerror("DSP56k - BAD EE value in andi operation\n") ;
 	}
 
 	/* S L E U N Z V C */
@@ -4467,7 +4467,7 @@ static void execute_mm_table(dsp56k_core* cpustate, UINT16 rnum, UINT16 mm)
 		case 0x0: rX = &R0;  nX = &N0;  break;
 		case 0x1: rX = &R1;  nX = &N1;  break;
 		case 0x2: rX = &R2;  nX = &N2;  break;
-		case 0x3: fatalerror("Dsp56k: Error. execute_mm_table specified R3 as its first source!");  break;
+		case 0x3: fatalerror("Dsp56k: Error. execute_mm_table specified R3 as its first source!\n");  break;
 	}
 
 	switch(mm)
@@ -4522,7 +4522,7 @@ static UINT16 execute_q_table(dsp56k_core* cpustate, int RR, UINT16 q)
 	}
 
 	/* Should not get here */
-	fatalerror("dsp56k: execute_q_table did something impossible!");
+	fatalerror("dsp56k: execute_q_table did something impossible!\n");
 	return 0;
 }
 
@@ -4785,12 +4785,12 @@ static void execute_dual_x_memory_data_read(dsp56k_core* cpustate, const UINT16 
 
 	/* Can't do an R3 for S1 */
 	if (R.addr == &R3)
-		fatalerror("Dsp56k: Error. Dual x memory data read specified R3 as its first source!");
+		fatalerror("Dsp56k: Error. Dual x memory data read specified R3 as its first source!\n");
 
 	/* The note on A-142 is very interesting.
        You can effectively access external memory in the last 64 bytes of X data memory! */
 	if (*((UINT16*)D2.addr) >= 0xffc0)
-		fatalerror("Dsp56k: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read.");
+		fatalerror("Dsp56k: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read.\n");
 
 	/* First memmove */
 	srcVal1 = cpustate->data->read_word(ADDRESS(*((UINT16*)R.addr)));

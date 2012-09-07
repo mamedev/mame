@@ -857,7 +857,7 @@ static UINT32 compute_prid_register(const mips3_state *mips)
 			return 0x2700;
 
 		default:
-			fatalerror("Unknown MIPS flavor specified");
+			fatalerror("Unknown MIPS flavor specified\n");
 	}
 	return 0x2000;
 }

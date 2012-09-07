@@ -176,7 +176,7 @@ static int ppc_translate_address(offs_t *addr_ptr, int flags)
 	{
 		/* direct store translation */
 		if ((flags & PPC_TRANSLATE_NOEXCEPTION) == 0)
-			fatalerror("ppc: direct store translation not yet implemented");
+			fatalerror("ppc: direct store translation not yet implemented\n");
 		return 0;
 	}
 	else

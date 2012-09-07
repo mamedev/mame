@@ -170,7 +170,7 @@ void arm7_check_irq_state(arm_state *cpustate)
 
     // Data Abort
     if (cpustate->pendingAbtD) {
-    	if (MODE26) fatalerror( "pendingAbtD (todo)");
+    	if (MODE26) fatalerror( "pendingAbtD (todo)\n");
         SwitchMode(cpustate, eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
         SET_REGISTER(cpustate, 14, pc - 8 + 8);                   /* save PC to R14 */
         SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -184,7 +184,7 @@ void arm7_check_irq_state(arm_state *cpustate)
 
     // FIQ
     if (cpustate->pendingFiq && (cpsr & F_MASK) == 0) {
-    	if (MODE26) fatalerror( "pendingFiq (todo)");
+    	if (MODE26) fatalerror( "pendingFiq (todo)\n");
         SwitchMode(cpustate, eARM7_MODE_FIQ);             /* Set FIQ mode so PC is saved to correct R14 bank */
         SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
         SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -219,7 +219,7 @@ void arm7_check_irq_state(arm_state *cpustate)
 
     // Prefetch Abort
     if (cpustate->pendingAbtP) {
-    	if (MODE26) fatalerror( "pendingAbtP (todo)");
+    	if (MODE26) fatalerror( "pendingAbtP (todo)\n");
         SwitchMode(cpustate, eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
         SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
         SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -233,7 +233,7 @@ void arm7_check_irq_state(arm_state *cpustate)
 
     // Undefined instruction
     if (cpustate->pendingUnd) {
-    	if (MODE26) fatalerror( "pendingUnd (todo)");
+    	if (MODE26) fatalerror( "pendingUnd (todo)\n");
         SwitchMode(cpustate, eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
         // compensate for prefetch (should this also be done for normal IRQ?)
         if (T_IS_SET(GET_CPSR))

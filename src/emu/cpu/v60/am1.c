@@ -105,7 +105,7 @@ static UINT32 bam1Autoincrement(v60_state *cpustate)
 		cpustate->reg[cpustate->modval & 0x1F] +=4;
 		break;
 	default:
-		fatalerror("CPU - BAM1 - 7");
+		fatalerror("CPU - BAM1 - 7\n");
 		break;
 	}
 	return 1;
@@ -144,7 +144,7 @@ static UINT32 bam1Autodecrement(v60_state *cpustate)
 		cpustate->reg[cpustate->modval & 0x1F]-=4;
 		break;
 	default:
-		fatalerror("CPU - BAM1 - 7");
+		fatalerror("CPU - BAM1 - 7\n");
 		break;
 	}
 	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F]);
@@ -1087,69 +1087,69 @@ static UINT32 am1ImmediateQuick(v60_state *cpustate)
 
 static UINT32 am1Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - AM1 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM1 - 1 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam1Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM1 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM1 - 1 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 am1Error2(v60_state *cpustate)
 {
-	fatalerror("CPU - AM1 - 2 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM1 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam1Error2(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM1 - 2 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM1 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
 static UINT32 am1Error3(v60_state *cpustate)
 {
-	fatalerror("CPU - AM1 - 3 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM1 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam1Error3(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM1 - 3 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM1 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
 static UINT32 am1Error4(v60_state *cpustate)
 {
-	fatalerror("CPU - AM1 - 4 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM1 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam1Error4(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM1 - 4 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM1 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 am1Error5(v60_state *cpustate)
 {
-	fatalerror("CPU - AM1 - 5 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - AM1 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam1Error5(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM1 - 5 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM1 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 static UINT32 bam1Error6(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM1 - 6 (cpustate->PC=%06x)", cpustate->PC);
+	fatalerror("CPU - BAM1 - 6 (cpustate->PC=%06x)\n", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 

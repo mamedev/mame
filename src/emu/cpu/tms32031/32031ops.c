@@ -110,7 +110,7 @@ void tms3203x_device::illegal(UINT32 op)
 
 void tms3203x_device::unimplemented(UINT32 op)
 {
-	fatalerror("Unimplemented op @ %06X: %08X (tbl=%03X)", m_pc - 1, op, op >> 21);
+	fatalerror("Unimplemented op @ %06X: %08X (tbl=%03X)\n", m_pc - 1, op, op >> 21);
 }
 
 
@@ -855,7 +855,7 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 #if USE_FP
 void tms3203x_device::norm(tmsreg &dst, tmsreg &src)
 {
-	fatalerror("norm not implemented");
+	fatalerror("norm not implemented\n");
 }
 #else
 void tms3203x_device::norm(tmsreg &dst, tmsreg &src)

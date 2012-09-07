@@ -4194,7 +4194,7 @@ INLINE void hyperstone_extend(hyperstone_state *cpustate, struct regs_decode *de
 
 INLINE void hyperstone_do(hyperstone_state *cpustate, struct regs_decode *decode)
 {
-	fatalerror("Executed hyperstone_do instruction. PC = %08X", PPC);
+	fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PPC);
 }
 
 INLINE void hyperstone_ldwr(hyperstone_state *cpustate, struct regs_decode *decode)

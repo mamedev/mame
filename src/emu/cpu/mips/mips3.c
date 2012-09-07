@@ -688,7 +688,7 @@ INLINE void set_cop0_reg(int idx, UINT64 val)
 			/* update interrupts and cycle counting */
 			UINT32 diff = mips3.core.cpr[0][idx] ^ val;
 //          if (val & 0xe0)
-//              fatalerror("System set 64-bit addressing mode, SR=%08X", val);
+//              fatalerror("System set 64-bit addressing mode, SR=%08X\n", val);
 			mips3.core.cpr[0][idx] = val;
 			if (diff & 0x8000)
 				mips3com_update_cycle_counting(&mips3.core);

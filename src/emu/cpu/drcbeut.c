@@ -561,7 +561,7 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 	{
 		// fatal if we were a leftover
 		if (fatal_on_leftovers && curlabel->m_codeptr == NULL)
-			fatalerror("Label %08X never defined!", curlabel->m_label.label());
+			fatalerror("Label %08X never defined!\n", curlabel->m_label.label());
 
 		// free the label
 		m_cache.dealloc(curlabel, sizeof(*curlabel));

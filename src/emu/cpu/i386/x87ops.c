@@ -4249,7 +4249,7 @@ void x87_fstsw_m2byte(i386_state *cpustate, UINT8 modrm)
 void x87_invalid(i386_state *cpustate, UINT8 modrm)
 {
 	// TODO
-	fatalerror("x87 invalid instruction (PC:%.4x)", cpustate->pc);
+	fatalerror("x87 invalid instruction (PC:%.4x)\n", cpustate->pc);
 }
 
 

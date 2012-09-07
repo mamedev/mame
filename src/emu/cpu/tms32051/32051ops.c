@@ -269,7 +269,7 @@ INLINE INT32 PREG_PSCALER(tms32051_state *cpustate, INT32 preg)
 
 static void op_invalid(tms32051_state *cpustate)
 {
-	fatalerror("32051: invalid op at %08X", cpustate->pc-1);
+	fatalerror("32051: invalid op at %08X\n", cpustate->pc-1);
 }
 
 static void op_group_be(tms32051_state *cpustate);
@@ -279,12 +279,12 @@ static void op_group_bf(tms32051_state *cpustate);
 
 static void op_abs(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op abs at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op abs at %08X\n", cpustate->pc-1);
 }
 
 static void op_adcb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op adcb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op adcb at %08X\n", cpustate->pc-1);
 }
 
 static void op_add_mem(tms32051_state *cpustate)
@@ -339,7 +339,7 @@ static void op_add_limm(tms32051_state *cpustate)
 
 static void op_add_s16_mem(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op add s16 mem at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op add s16 mem at %08X\n", cpustate->pc-1);
 }
 
 static void op_addb(tms32051_state *cpustate)
@@ -351,22 +351,22 @@ static void op_addb(tms32051_state *cpustate)
 
 static void op_addc(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op addc at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op addc at %08X\n", cpustate->pc-1);
 }
 
 static void op_adds(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op adds at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op adds at %08X\n", cpustate->pc-1);
 }
 
 static void op_addt(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op addt at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op addt at %08X\n", cpustate->pc-1);
 }
 
 static void op_and_mem(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op and mem at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op and mem at %08X\n", cpustate->pc-1);
 }
 
 static void op_and_limm(tms32051_state *cpustate)
@@ -381,12 +381,12 @@ static void op_and_limm(tms32051_state *cpustate)
 
 static void op_and_s16_limm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op and s16 limm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op and s16 limm at %08X\n", cpustate->pc-1);
 }
 
 static void op_andb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op andb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op andb at %08X\n", cpustate->pc-1);
 }
 
 static void op_bsar(tms32051_state *cpustate)
@@ -520,7 +520,7 @@ static void op_lacl_mem(tms32051_state *cpustate)
 
 static void op_lact(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op lact at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lact at %08X\n", cpustate->pc-1);
 }
 
 static void op_lamm(tms32051_state *cpustate)
@@ -550,7 +550,7 @@ static void op_neg(tms32051_state *cpustate)
 
 static void op_norm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op norm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op norm at %08X\n", cpustate->pc-1);
 }
 
 static void op_or_mem(tms32051_state *cpustate)
@@ -575,7 +575,7 @@ static void op_or_limm(tms32051_state *cpustate)
 
 static void op_or_s16_limm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op or s16 limm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op or s16 limm at %08X\n", cpustate->pc-1);
 }
 
 static void op_orb(tms32051_state *cpustate)
@@ -587,7 +587,7 @@ static void op_orb(tms32051_state *cpustate)
 
 static void op_rol(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op rol at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op rol at %08X\n", cpustate->pc-1);
 }
 
 static void op_rolb(tms32051_state *cpustate)
@@ -605,12 +605,12 @@ static void op_rolb(tms32051_state *cpustate)
 
 static void op_ror(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op ror at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ror at %08X\n", cpustate->pc-1);
 }
 
 static void op_rorb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op rorb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op rorb at %08X\n", cpustate->pc-1);
 }
 
 static void op_sacb(tms32051_state *cpustate)
@@ -649,12 +649,12 @@ static void op_samm(tms32051_state *cpustate)
 
 static void op_sath(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sath at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sath at %08X\n", cpustate->pc-1);
 }
 
 static void op_satl(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op satl at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op satl at %08X\n", cpustate->pc-1);
 }
 
 static void op_sbb(tms32051_state *cpustate)
@@ -666,7 +666,7 @@ static void op_sbb(tms32051_state *cpustate)
 
 static void op_sbbb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sbbb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sbbb at %08X\n", cpustate->pc-1);
 }
 
 static void op_sfl(tms32051_state *cpustate)
@@ -707,7 +707,7 @@ static void op_sfr(tms32051_state *cpustate)
 
 static void op_sfrb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sfrb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sfrb at %08X\n", cpustate->pc-1);
 }
 
 static void op_sub_mem(tms32051_state *cpustate)
@@ -733,7 +733,7 @@ static void op_sub_mem(tms32051_state *cpustate)
 
 static void op_sub_s16_mem(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sub s16 mem at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sub s16 mem at %08X\n", cpustate->pc-1);
 }
 
 static void op_sub_simm(tms32051_state *cpustate)
@@ -767,22 +767,22 @@ static void op_sub_limm(tms32051_state *cpustate)
 
 static void op_subb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op subb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subb at %08X\n", cpustate->pc-1);
 }
 
 static void op_subc(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op subc at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subc at %08X\n", cpustate->pc-1);
 }
 
 static void op_subs(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op subs at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subs at %08X\n", cpustate->pc-1);
 }
 
 static void op_subt(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op subt at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subt at %08X\n", cpustate->pc-1);
 }
 
 static void op_xor_mem(tms32051_state *cpustate)
@@ -807,17 +807,17 @@ static void op_xor_limm(tms32051_state *cpustate)
 
 static void op_xor_s16_limm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op xor s16 limm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xor s16 limm at %08X\n", cpustate->pc-1);
 }
 
 static void op_xorb(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op xorb at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xorb at %08X\n", cpustate->pc-1);
 }
 
 static void op_zalr(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op zalr at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op zalr at %08X\n", cpustate->pc-1);
 }
 
 static void op_zap(tms32051_state *cpustate)
@@ -911,7 +911,7 @@ static void op_lar_limm(tms32051_state *cpustate)
 
 static void op_ldp_mem(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op ldp mem at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ldp mem at %08X\n", cpustate->pc-1);
 }
 
 static void op_ldp_imm(tms32051_state *cpustate)
@@ -995,7 +995,7 @@ static void op_banz(tms32051_state *cpustate)
 
 static void op_banzd(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op banzd at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op banzd at %08X\n", cpustate->pc-1);
 }
 
 static void op_bcnd(tms32051_state *cpustate)
@@ -1084,7 +1084,7 @@ static void op_calld(tms32051_state *cpustate)
 
 static void op_cc(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op cc at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op cc at %08X\n", cpustate->pc-1);
 }
 
 static void op_ccd(tms32051_state *cpustate)
@@ -1104,12 +1104,12 @@ static void op_ccd(tms32051_state *cpustate)
 
 static void op_intr(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op intr at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op intr at %08X\n", cpustate->pc-1);
 }
 
 static void op_nmi(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op nmi at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op nmi at %08X\n", cpustate->pc-1);
 }
 
 static void op_retc(tms32051_state *cpustate)
@@ -1155,12 +1155,12 @@ static void op_rete(tms32051_state *cpustate)
 
 static void op_reti(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op reti at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op reti at %08X\n", cpustate->pc-1);
 }
 
 static void op_trap(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op trap at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op trap at %08X\n", cpustate->pc-1);
 }
 
 static void op_xc(tms32051_state *cpustate)
@@ -1213,7 +1213,7 @@ static void op_bldd_dlimm(tms32051_state *cpustate)
 
 static void op_bldd_sbmar(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op bldd sbmar at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op bldd sbmar at %08X\n", cpustate->pc-1);
 }
 
 static void op_bldd_dbmar(tms32051_state *cpustate)
@@ -1250,7 +1250,7 @@ static void op_bldp(tms32051_state *cpustate)
 
 static void op_blpd_bmar(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op bpld bmar at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op bpld bmar at %08X\n", cpustate->pc-1);
 }
 
 static void op_blpd_imm(tms32051_state *cpustate)
@@ -1273,12 +1273,12 @@ static void op_blpd_imm(tms32051_state *cpustate)
 
 static void op_dmov(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op dmov at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op dmov at %08X\n", cpustate->pc-1);
 }
 
 static void op_in(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op in at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op in at %08X\n", cpustate->pc-1);
 }
 
 static void op_lmmr(tms32051_state *cpustate)
@@ -1299,7 +1299,7 @@ static void op_lmmr(tms32051_state *cpustate)
 
 static void op_out(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op out at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op out at %08X\n", cpustate->pc-1);
 }
 
 static void op_smmr(tms32051_state *cpustate)
@@ -1373,7 +1373,7 @@ static void op_apl_imm(tms32051_state *cpustate)
 
 static void op_cpl_dbmr(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op cpl dbmr at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op cpl dbmr at %08X\n", cpustate->pc-1);
 }
 
 static void op_cpl_imm(tms32051_state *cpustate)
@@ -1418,12 +1418,12 @@ static void op_splk(tms32051_state *cpustate)
 
 static void op_xpl_dbmr(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op xpl dbmr at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xpl dbmr at %08X\n", cpustate->pc-1);
 }
 
 static void op_xpl_imm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op xpl imm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xpl imm at %08X\n", cpustate->pc-1);
 }
 
 static void op_apac(tms32051_state *cpustate)
@@ -1436,7 +1436,7 @@ static void op_apac(tms32051_state *cpustate)
 
 static void op_lph(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op lph at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lph at %08X\n", cpustate->pc-1);
 }
 
 static void op_lt(tms32051_state *cpustate)
@@ -1474,37 +1474,37 @@ static void op_lta(tms32051_state *cpustate)
 
 static void op_ltd(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op ltd at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ltd at %08X\n", cpustate->pc-1);
 }
 
 static void op_ltp(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op ltp at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ltp at %08X\n", cpustate->pc-1);
 }
 
 static void op_lts(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op lts at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lts at %08X\n", cpustate->pc-1);
 }
 
 static void op_mac(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mac at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mac at %08X\n", cpustate->pc-1);
 }
 
 static void op_macd(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op macd at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op macd at %08X\n", cpustate->pc-1);
 }
 
 static void op_madd(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op madd at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op madd at %08X\n", cpustate->pc-1);
 }
 
 static void op_mads(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mads at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mads at %08X\n", cpustate->pc-1);
 }
 
 static void op_mpy_mem(tms32051_state *cpustate)
@@ -1519,37 +1519,37 @@ static void op_mpy_mem(tms32051_state *cpustate)
 
 static void op_mpy_simm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mpy simm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpy simm at %08X\n", cpustate->pc-1);
 }
 
 static void op_mpy_limm(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mpy limm at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpy limm at %08X\n", cpustate->pc-1);
 }
 
 static void op_mpya(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mpya at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpya at %08X\n", cpustate->pc-1);
 }
 
 static void op_mpys(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mpys at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpys at %08X\n", cpustate->pc-1);
 }
 
 static void op_mpyu(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op mpyu at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpyu at %08X\n", cpustate->pc-1);
 }
 
 static void op_pac(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op pac at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op pac at %08X\n", cpustate->pc-1);
 }
 
 static void op_spac(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op spac at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op spac at %08X\n", cpustate->pc-1);
 }
 
 static void op_sph(tms32051_state *cpustate)
@@ -1563,7 +1563,7 @@ static void op_sph(tms32051_state *cpustate)
 
 static void op_spl(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op spl at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op spl at %08X\n", cpustate->pc-1);
 }
 
 static void op_spm(tms32051_state *cpustate)
@@ -1575,17 +1575,17 @@ static void op_spm(tms32051_state *cpustate)
 
 static void op_sqra(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sqra at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sqra at %08X\n", cpustate->pc-1);
 }
 
 static void op_sqrs(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sqrs at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sqrs at %08X\n", cpustate->pc-1);
 }
 
 static void op_zpr(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op zpr at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op zpr at %08X\n", cpustate->pc-1);
 }
 
 static void op_bit(tms32051_state *cpustate)
@@ -1624,17 +1624,17 @@ static void op_clrc_ext(tms32051_state *cpustate)
 
 static void op_clrc_hold(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op clrc hold at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc hold at %08X\n", cpustate->pc-1);
 }
 
 static void op_clrc_tc(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op clrc tc at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc tc at %08X\n", cpustate->pc-1);
 }
 
 static void op_clrc_carry(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op clrc carry at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc carry at %08X\n", cpustate->pc-1);
 }
 
 static void op_clrc_cnf(tms32051_state *cpustate)
@@ -1655,27 +1655,27 @@ static void op_clrc_intm(tms32051_state *cpustate)
 
 static void op_clrc_xf(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op clrc xf at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc xf at %08X\n", cpustate->pc-1);
 }
 
 static void op_idle(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op idle at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op idle at %08X\n", cpustate->pc-1);
 }
 
 static void op_idle2(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op idle2 at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op idle2 at %08X\n", cpustate->pc-1);
 }
 
 static void op_lst_st0(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op lst st0 at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lst st0 at %08X\n", cpustate->pc-1);
 }
 
 static void op_lst_st1(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op lst st1 at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lst st1 at %08X\n", cpustate->pc-1);
 }
 
 static void op_pop(tms32051_state *cpustate)
@@ -1687,17 +1687,17 @@ static void op_pop(tms32051_state *cpustate)
 
 static void op_popd(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op popd at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op popd at %08X\n", cpustate->pc-1);
 }
 
 static void op_pshd(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op pshd at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op pshd at %08X\n", cpustate->pc-1);
 }
 
 static void op_push(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op push at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op push at %08X\n", cpustate->pc-1);
 }
 
 static void op_rpt_mem(tms32051_state *cpustate)
@@ -1741,7 +1741,7 @@ static void op_rptb(tms32051_state *cpustate)
 
 static void op_rptz(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op rptz at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op rptz at %08X\n", cpustate->pc-1);
 }
 
 static void op_setc_ov(tms32051_state *cpustate)
@@ -1760,22 +1760,22 @@ static void op_setc_ext(tms32051_state *cpustate)
 
 static void op_setc_hold(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op setc hold at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc hold at %08X\n", cpustate->pc-1);
 }
 
 static void op_setc_tc(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op setc tc at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc tc at %08X\n", cpustate->pc-1);
 }
 
 static void op_setc_carry(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op setc carry at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc carry at %08X\n", cpustate->pc-1);
 }
 
 static void op_setc_xf(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op setc xf at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc xf at %08X\n", cpustate->pc-1);
 }
 
 static void op_setc_cnf(tms32051_state *cpustate)
@@ -1796,10 +1796,10 @@ static void op_setc_intm(tms32051_state *cpustate)
 
 static void op_sst_st0(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sst st0 at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sst st0 at %08X\n", cpustate->pc-1);
 }
 
 static void op_sst_st1(tms32051_state *cpustate)
 {
-	fatalerror("32051: unimplemented op sst st1 at %08X", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sst st1 at %08X\n", cpustate->pc-1);
 }
