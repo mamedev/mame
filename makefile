@@ -710,12 +710,6 @@ emulator: maketree $(BUILD) $(EMULATOR)
 
 buildtools: maketree $(BUILD)
 
-# In order to keep dependencies reasonable, we exclude objects in the base of
-# $(SRC)/emu, as well as all the OSD objects and anything in the $(OBJ) tree
-depend: maketree $(MAKEDEP_TARGET)
-	@echo Rebuilding depend_$(TARGET).mak...
-	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... src/$(TARGET) > depend_$(TARGET).mak
-
 tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))

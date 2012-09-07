@@ -21,7 +21,7 @@ $(DRIVLISTSRC): $(SRC)/mame/mame.lst $(SRC)/mess/mess.lst
 include $(SRC)/mame/mame.mak
 include $(SRC)/mess/mess.mak
 
-depend_ume: maketree $(MAKEDEP_TARGET)
+depend: maketree $(MAKEDEP_TARGET)
 	@echo Rebuilding depend_$(TARGET).mak...
 	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... src/mame > depend_mame.mak
 	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... src/mess > depend_mess.mak
