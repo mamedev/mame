@@ -23665,31 +23665,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="oonitap" cloneof="oonita">
-		<!-- unknown/auction -->
-		<description>Oonita Atsushi FMW (Jpn, Prototype)</description>
-		<year>1993</year>
-		<publisher>Pony Canyon</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-4PV5B-01" />
-			<feature name="u1" value="U1 EPROM" />
-			<feature name="u2" value="U2 EPROM" />
-			<feature name="u3" value="U3 EPROM" />
-			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
-			<feature name="u5" value="U5 SRAM" />
-			<feature name="u6" value="U6 PLD" />
-			<feature name="u7" value="U7 74LS157" />
-			<feature name="u8" value="U8 CIC" />
-			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="n/a" /> <!-- similar to SHVC-006 -->
-			<dataarea name="rom" size="1572864">
-				<rom name="u1" size="524288" crc="8e95b72f" sha1="0fc6359ef462bfae0389ee3552d75ac41fb1df80" offset="0x000000" />
-				<rom name="u2" size="524288" crc="8fc77187" sha1="d02bb52ee5d020a145df4627b83bf2cd6a1224e0" offset="0x080000" />
-				<rom name="u3" size="524288" crc="0274f099" sha1="e3a9621a08402bb8931108aec8b069d03871b580" offset="0x100000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pagemstrup3" cloneof="pagemstr">
 		<!-- nesworld.com -->
 		<!-- Notes: a sticker on the board says 'THE PAGEMASTER 8/29/94 Property of Fox Interactive'
@@ -24630,31 +24605,6 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tonymeolp" cloneof="worldsoc">
-		<!-- nesworld.com -->
-		<!-- retrogamesuk -->
-		<!-- Notes: the second chip is probably corrupt -->
-		<description>Tony Meola's Sidekicks Soccer (USA, Prototype)</description>
-		<year>1993</year>
-		<publisher>Electro Brain</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-2P3B-01" />
-			<feature name="u1" value="U1 EPROM(J)" />
-			<feature name="u2" value="U2 EPROM(J)" />
-			<feature name="u3" value="U3 SRAM" />
-			<feature name="u4" value="U4 74F139" />
-			<feature name="u5" value="U5 CIC" />
-			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="no shell" />
-			<dataarea name="rom" size="1048576">
-				<rom name="tony meola rm0 22d4.u1" size="524288" crc="0d206b93" sha1="44d96aed93c9af3a894b95b3755c18be0cc64175" offset="0x000000" />
-				<rom name="tony meola rm1 b3d6.u2" size="524288" crc="4be204b7" sha1="f96f4c0b2b48afd53cf7e07ed19bb3f531b661b3" offset="0x080000" status="baddump" />
-			</dataarea>
-			<dataarea name="sram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 <!--
 	<software name="ultramanj" cloneof="ultraman">
 		<!- - retrogamesuk - ->
@@ -24752,7 +24702,8 @@ Alternate board (XL-1)
 <!-- End of verified prototypes -->
 
 
-<!-- ROMs labeled as prototypes without conclusive evidence or without any documentation -->
+<!-- Unconfirmed prototypes 
+     ROMs labeled as prototypes without documentation or with doubts on their legitimacy -->
 
 	<software name="arcus">
 		<!-- Notes: not much is known about this rom, this title was displayed at the 1993 Summer CES but there is no evidence of any localization progress -->
@@ -24848,6 +24799,30 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="darkkingp" cloneof="darkking">
+		<!-- unknown/auction -->
+		<description>Dark Kingdom (Jpn, Prototype Ver. 0.55)</description>
+		<year>1994</year>
+		<publisher>Nihon Telenet</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<dataarea name="rom" size="1572864">
+				<rom name="u1" size="524288" crc="216825e3" sha1="9067843ef43bbdd1c5a2f13e3e70707c5f8913bd" offset="0x000000" />
+				<rom name="u2" size="524288" crc="8c19ea99" sha1="11f721a0d74d9a9455ebe8270150c7a8308cfd52" offset="0x080000" />
+				<rom name="u3" size="524288" crc="3f542226" sha1="99cd66ceab0f5f3bbcb76277e88be9631e2c8cd9" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="demonblzp" cloneof="demoncrt">
 		<!-- Notes: this rom image was released without any documentation -->
@@ -25013,6 +24988,31 @@ Alternate board (XL-1)
 				<rom name="nfl quarterback club 96 (usa) (beta).sfc" size="3145728" crc="b87abc7e" sha1="b13d6e5f98c7340d71ddf6855a81438200c958c0" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oonitap" cloneof="oonita">
+		<!-- unknown/auction -->
+		<description>Oonita Atsushi FMW (Jpn, Prototype)</description>
+		<year>1993</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="n/a" /> <!-- similar to SHVC-006 -->
+			<dataarea name="rom" size="1572864">
+				<rom name="u1" size="524288" crc="8e95b72f" sha1="0fc6359ef462bfae0389ee3552d75ac41fb1df80" offset="0x000000" />
+				<rom name="u2" size="524288" crc="8fc77187" sha1="d02bb52ee5d020a145df4627b83bf2cd6a1224e0" offset="0x080000" />
+				<rom name="u3" size="524288" crc="0274f099" sha1="e3a9621a08402bb8931108aec8b069d03871b580" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25774,6 +25774,37 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="mariopntup" cloneof="mariopnt">
+		<!-- nintendoplayer.com -->
+		<!-- Notes: contains corrupt data,
+		            the sram is only 64Kibits instead of 256Kibits of the retail release -->
+		<description>Mario Paint (Prototype Ver. E-5)</description>
+		<year>1992</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="SHVC-MP" />
+		<info name="release" value="19920714 (JPN), 199208xx (USA)" />
+		<info name="alt_title" value="マリオペイント" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mario paint ver e-5 prg 0.u1" size="524288" crc="5fb99df0" sha1="1666ff7c2ecadcaf47c21f965f99e53411ddbae1" offset="0x000000" status="baddump" />
+				<rom name="mario paint ver e-5 prg 1.u2" size="524288" crc="10878c55" sha1="06f96c0afdc7d3565e2a894c8e97891074ab7f66" offset="0x080000" status="baddump" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="popntwinjs" cloneof="popntwin">
 		<description>Pop'n TwinBee (Jpn, Sample)</description>
 		<year>1993</year>
@@ -25975,6 +26006,31 @@ Alternate board (XL-1)
 				<rom name="binary" size="131072" crc="ee4fca82" sha1="839f9fbb0d84bd0d43fda3c92bb1abf3e4ec0615" offset="0x000000" status="baddump" />
 				<!-- rom name="syndicat rom 0 ntsc.u1" size="524288" crc="" sha1="" offset="0x000000" /-->
 				<!-- rom name="u2"                     size="524288" crc="" sha1="" offset="0x080000" /-->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tonymeolp" cloneof="worldsoc">
+		<!-- nesworld.com -->
+		<!-- retrogamesuk -->
+		<!-- Notes: the second chip is probably corrupt -->
+		<description>Tony Meola's Sidekicks Soccer (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Electro Brain</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<dataarea name="rom" size="1048576">
+				<rom name="tony meola rm0 22d4.u1" size="524288" crc="0d206b93" sha1="44d96aed93c9af3a894b95b3755c18be0cc64175" offset="0x000000" />
+				<rom name="tony meola rm1 b3d6.u2" size="524288" crc="4be204b7" sha1="f96f4c0b2b48afd53cf7e07ed19bb3f531b661b3" offset="0x080000" status="baddump" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -32674,6 +32730,7 @@ Alternate board (XL-1)
 		<info name="serial" value="SHVC-EM" /> <!-- NP cart: SHVC-MMSA-JPN-1 -->
 		<info name="release" value="19940121" />
 		<info name="alt_title" value="ファイアーエムブレム 紋章の謎" />
+<!-- nintendo power cart -->
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-MMS-02" />
 			<feature name="u1" value="U1 CIC" />
@@ -32686,11 +32743,16 @@ Alternate board (XL-1)
 			<feature name="battery" value="BAT1" />
 			<feature name="cart_model" value="SHVC-041" />
 			<dataarea name="rom" size="3145728">
+			<!--dataarea name="rom" size="4194304"-->
 				<rom name="fire emblem - monshou no nazo (japan) (rev 1).sfc" size="3145728" crc="a427b7e6" sha1="b0b03831d9104e3c5df551d50ebc275a1692149e" offset="0x000000" />
+				<!--rom name="u3" size="2097152" crc="" sha1="" offset="0x000000" /-->
+				<!--rom name="u4" size="2097152" crc="" sha1="" offset="0x200000" /-->
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			<!--dataarea name="sram" size="32768"-->
 			</dataarea>
 		</part>
+<!-- end of nintendo power cart -->
 	</software>
 
 	<software name="firembthnp" cloneof="firembth">
@@ -49452,19 +49514,34 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="fireprxp">
+		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Super Fire Pro Wrestling X Premium (Jpn)</description>
 		<year>1996</year>
 		<publisher>Human Entertainment</publisher>
-		<info name="serial" value="SHVC-AF6J-JPN" />
+		<info name="serial" value="SHVC-AF6J-JPN" /> <!-- NP cart: SHVC-MMSA-JPN-1 -->
 		<info name="release" value="19960329" />
 		<info name="alt_title" value="スーパーファイヤープロレスリングX プレミ アム" />
+<!-- nintendo power cart -->
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-MMS-02" />
+			<feature name="u1" value="U1 CIC" />
+			<feature name="u2" value="U2 MX15001" />
+			<feature name="u3" value="U3 16M FLASH" />
+			<feature name="u4" value="U4 16M FLASH" />
+			<feature name="u5" value="U5 16M FLASH" /> <!-- empty socket -->
+			<feature name="u6" value="U6 256K SRAM" />
+			<feature name="u7" value="U7 MM1134BF" />
+			<feature name="battery" value="BAT1" />
+			<feature name="cart_model" value="SHVC-041" />
 			<dataarea name="rom" size="4194304">
 				<rom name="super fire pro wrestling x premium (japan).sfc" size="4194304" crc="82de1380" sha1="1d3b397ce08f88b6787df63d1914bdaeb2c3999c" offset="0x000000" />
+				<!--rom name="u3" size="2097152" crc="" sha1="" offset="0x000000" /-->
+				<!--rom name="u4" size="2097152" crc="" sha1="" offset="0x200000" /-->
 			</dataarea>
 			<dataarea name="sram" size="32768">
 			</dataarea>
 		</part>
+<!-- end of nintendo power cart -->
 	</software>
 
 	<software name="fishbigf">
@@ -56800,32 +56877,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="excitebike - bunbun mario battle - stadium 1 (japan).bs" size="1048576" crc="cf37df6c" sha1="8cb5406e7c136ea8779f793f052c60cfcdfa024a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This has some difference compared to the above, but it also seems to miss chunks of data -->
-	<software name="bsexbik1a" cloneof="bsexbik1" supported="no">
-		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (Jpn, Alt Bad?)</description>
-		<!-- BS -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bad_bs_excitebike_dump_(alt_data).bs" size="1048576" crc="499fd328" sha1="0b43ca399fe2ddcaf8fae1ba4d1de4e7a625c575" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This comes from the one above with the addition of the data from the parent instead of the blanked out chunks -->
-	<software name="bsexbik1b" cloneof="bsexbik1" supported="no">
-		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (Jpn, Alt Hacked)</description>
-		<!-- BS -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bad bs excitebike hack.bs" size="1048576" crc="da9ffb05" sha1="ae181856ffe726f870cd1e9008bf2b00229bf7cd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
