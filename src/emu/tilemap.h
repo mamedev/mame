@@ -433,7 +433,6 @@ typedef delegate<tilemap_memory_index (UINT32, UINT32, UINT32, UINT32)> tilemap_
 
 // legacy callbacks
 typedef void (*tile_get_info_func)(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, void *param);
-typedef void (*tile_get_info_device_func)(device_t *device, tile_data &tileinfo, tilemap_memory_index tile_index, void *param);
 typedef tilemap_memory_index (*tilemap_mapper_func)(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
 
 
@@ -676,7 +675,6 @@ private:
 // function definition for a get info callback
 #define TILE_GET_INFO(_name)			void _name(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
 #define TILE_GET_INFO_MEMBER(_name)		void _name(tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
-#define TILE_GET_INFO_DEVICE(_name)		void _name(device_t *device, tile_data &tileinfo, tilemap_memory_index tile_index, void *param)
 
 // function definition for a logical-to-memory mapper
 #define TILEMAP_MAPPER(_name)			tilemap_memory_index _name(running_machine &machine, UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
@@ -685,7 +683,6 @@ private:
 // useful macro inside of a TILE_GET_INFO callback to set tile information
 #define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS)         tileinfo.set(machine, GFX, CODE, COLOR, FLAGS)
 #define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(machine(), GFX, CODE, COLOR, FLAGS)
-#define SET_TILE_INFO_DEVICE(GFX,CODE,COLOR,FLAGS)  tileinfo.set(device->machine(), GFX, CODE, COLOR, FLAGS)
 
 // Macros for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0
@@ -708,14 +705,6 @@ inline tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func ti
 
 inline tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
 { return &machine.tilemap().create(tilemap_get_info_delegate(tile_get_info, "", &machine), mapper, tilewidth, tileheight, cols, rows); }
-
-// create a new tilemap that is owned by a device
-inline tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
-{ return &device->machine().tilemap().create(tilemap_get_info_delegate(tile_get_info, "", device), tilemap_mapper_delegate(mapper, "", &device->machine()), tilewidth, tileheight, cols, rows); }
-
-inline tilemap_t *tilemap_create_device(device_t *device, tile_get_info_device_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
-{ return &device->machine().tilemap().create(tilemap_get_info_delegate(tile_get_info, "", device), mapper, tilewidth, tileheight, cols, rows); }
-
 
 
 //**************************************************************************

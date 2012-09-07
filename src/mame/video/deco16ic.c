@@ -213,15 +213,15 @@ INLINE const deco16ic_interface *get_interface( device_t *device )
 
 /*****************************************************************************************/
 
-static TILEMAP_MAPPER( deco16_scan_rows )
+TILEMAP_MAPPER_MEMBER(deco16ic_device::deco16_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-static TILE_GET_INFO_DEVICE( get_pf2_tile_info )
+TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 {
-	deco16ic_state *deco16ic = get_safe_token(device);
+	deco16ic_state *deco16ic = get_safe_token(this);
 	UINT16 tile = deco16ic->pf2_data[tile_index];
 	UINT8 colour = (tile >> 12) & 0xf;
 	UINT8 flags = 0;
@@ -240,16 +240,16 @@ static TILE_GET_INFO_DEVICE( get_pf2_tile_info )
 		}
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			deco16ic->pf12_16x16_gfx_bank,
 			(tile & 0xfff) | deco16ic->pf2_bank,
 			(colour & deco16ic->pf2_colourmask) + deco16ic->pf2_colour_bank,
 			flags);
 }
 
-static TILE_GET_INFO_DEVICE( get_pf1_tile_info )
+TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 {
-	deco16ic_state *deco16ic = get_safe_token(device);
+	deco16ic_state *deco16ic = get_safe_token(this);
 	UINT16 tile = deco16ic->pf1_data[tile_index];
 	UINT8 colour = (tile >> 12) & 0xf;
 	UINT8 flags = 0;
@@ -273,7 +273,7 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info )
 		// Captain America operates this chip in 8bpp mode.
 		// In 8bpp mode you appear to only get 1 layer, not 2, but you also
 		// have an extra 2 tile bits, and 2 less colour bits.
-		SET_TILE_INFO_DEVICE(
+		SET_TILE_INFO_MEMBER(
 				deco16ic->pf12_16x16_gfx_bank,
 				(tile & 0x3fff) | deco16ic->pf1_bank,
 				((colour & deco16ic->pf1_colourmask) + deco16ic->pf1_colour_bank)>>2,
@@ -281,7 +281,7 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info )
 	}
 	else
 	{
-		SET_TILE_INFO_DEVICE(
+		SET_TILE_INFO_MEMBER(
 				deco16ic->pf12_16x16_gfx_bank,
 				(tile & 0xfff) | deco16ic->pf1_bank,
 				(colour & deco16ic->pf1_colourmask) + deco16ic->pf1_colour_bank,
@@ -289,9 +289,9 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info )
 	}
 }
 
-static TILE_GET_INFO_DEVICE( get_pf2_tile_info_b )
+TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 {
-	deco16ic_state *deco16ic = get_safe_token(device);
+	deco16ic_state *deco16ic = get_safe_token(this);
 	UINT16 tile = deco16ic->pf2_data[tile_index];
 	UINT8 colour = (tile >> 12) & 0xf;
 	UINT8 flags = 0;
@@ -310,16 +310,16 @@ static TILE_GET_INFO_DEVICE( get_pf2_tile_info_b )
 		}
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			deco16ic->pf12_8x8_gfx_bank,
 			(tile & 0xfff) | deco16ic->pf2_bank,
 			(colour & deco16ic->pf2_colourmask) + deco16ic->pf2_colour_bank,
 			flags);
 }
 
-static TILE_GET_INFO_DEVICE( get_pf1_tile_info_b )
+TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
 {
-	deco16ic_state *deco16ic = get_safe_token(device);
+	deco16ic_state *deco16ic = get_safe_token(this);
 	UINT16 tile = deco16ic->pf1_data[tile_index];
 	UINT8 colour = (tile >> 12) & 0xf;
 	UINT8 flags = 0;
@@ -338,7 +338,7 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info_b )
 		}
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			deco16ic->pf12_8x8_gfx_bank,
 			(tile & 0xfff) | deco16ic->pf1_bank,
 			(colour & deco16ic->pf1_colourmask) + deco16ic->pf1_colour_bank,
@@ -899,95 +899,6 @@ void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_rgb32 &bitmap, co
 	custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf1_tilemap_16x16, 0, deco16ic->pf2_tilemap_16x16, deco16ic->pf1_rowscroll_ptr, deco16ic->pf12_control[1], deco16ic->pf12_control[2], deco16ic->pf12_control[5] & 0xff, deco16ic->pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
 }
 
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( deco16ic )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	const deco16ic_interface *intf = get_interface(device);
-
-	deco16ic->bank_cb[0] = intf->bank_cb0;
-	deco16ic->bank_cb[1] = intf->bank_cb1;
-
-	deco16ic->pf1_trans_mask = intf->trans_mask1;
-	deco16ic->pf2_trans_mask = intf->trans_mask2;
-
-	deco16ic->pf1_colour_bank = intf->col_base1;
-	deco16ic->pf2_colour_bank = intf->col_base2;
-
-	deco16ic->pf1_colourmask = intf->col_mask1;
-	deco16ic->pf2_colourmask = intf->col_mask2;
-
-	int fullheight = 0;
-	int fullwidth = 0;
-
-	if (intf->full_width12&2)
-		fullheight = 1;
-
-	if (intf->full_width12&1)
-		fullwidth = 1;
-
-	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
-//  deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, TILEMAP_SCAN_ROWS, 8, 8, intf->full_width12 ? 64 : 32, 32);
-	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
-
-	deco16ic->pf12_8x8_gfx_bank = intf->_8x8_gfxregion;
-	deco16ic->pf12_16x16_gfx_bank = intf->_16x16_gfxregion;
-
-	if (intf->split)
-		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
-	else
-		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
-
-	deco16ic->pf2_tilemap_8x8 = tilemap_create_device(device, get_pf2_tile_info_b, TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
-
-	deco16ic->pf1_tilemap_8x8->set_transparent_pen(0);
-	deco16ic->pf2_tilemap_8x8->set_transparent_pen(0);
-	deco16ic->pf1_tilemap_16x16->set_transparent_pen(0);
-	deco16ic->pf2_tilemap_16x16->set_transparent_pen(0);
-
-	if (intf->split) /* Caveman Ninja only */
-		deco16ic->pf2_tilemap_16x16->set_transmask(0, 0x00ff, 0xff01);
-
-	deco16ic->pf1_8bpp_mode = 0;
-
-	deco16ic->pf1_data = auto_alloc_array_clear(device->machine(), UINT16, 0x2000 / 2);
-	deco16ic->pf2_data = auto_alloc_array_clear(device->machine(), UINT16, 0x2000 / 2);
-	deco16ic->pf12_control = auto_alloc_array_clear(device->machine(), UINT16, 0x10 / 2);
-
-
-	device->save_item(NAME(deco16ic->use_custom_pf1));
-	device->save_item(NAME(deco16ic->use_custom_pf2));
-	device->save_item(NAME(deco16ic->pf1_bank));
-	device->save_item(NAME(deco16ic->pf2_bank));
-	device->save_item(NAME(deco16ic->pf12_8x8_gfx_bank));
-	device->save_item(NAME(deco16ic->pf12_16x16_gfx_bank));
-	device->save_item(NAME(deco16ic->pf12_last_small));
-	device->save_item(NAME(deco16ic->pf12_last_big));
-
-	device->save_item(NAME(deco16ic->pf1_8bpp_mode));
-
-	device->save_pointer(NAME(deco16ic->pf1_data), 0x2000 / 2);
-	device->save_pointer(NAME(deco16ic->pf2_data), 0x2000 / 2);
-	device->save_pointer(NAME(deco16ic->pf12_control), 0x10 / 2);
-
-}
-
-static DEVICE_RESET( deco16ic )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	deco16ic->pf1_bank = deco16ic->pf2_bank = 0;
-	deco16ic->pf12_last_small = deco16ic->pf12_last_big = -1;
-	deco16ic->use_custom_pf1 = deco16ic->use_custom_pf2 = 0;
-	deco16ic->pf1_rowscroll_ptr = 0;
-	deco16ic->pf2_rowscroll_ptr = 0;
-}
-
-
 const device_type DECO16IC = &device_creator<deco16ic_device>;
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -1012,7 +923,73 @@ void deco16ic_device::device_config_complete()
 
 void deco16ic_device::device_start()
 {
-	DEVICE_START_NAME( deco16ic )(this);
+	deco16ic_state *deco16ic = get_safe_token(this);
+	const deco16ic_interface *intf = get_interface(this);
+
+	deco16ic->bank_cb[0] = intf->bank_cb0;
+	deco16ic->bank_cb[1] = intf->bank_cb1;
+
+	deco16ic->pf1_trans_mask = intf->trans_mask1;
+	deco16ic->pf2_trans_mask = intf->trans_mask2;
+
+	deco16ic->pf1_colour_bank = intf->col_base1;
+	deco16ic->pf2_colour_bank = intf->col_base2;
+
+	deco16ic->pf1_colourmask = intf->col_mask1;
+	deco16ic->pf2_colourmask = intf->col_mask2;
+
+	int fullheight = 0;
+	int fullwidth = 0;
+
+	if (intf->full_width12&2)
+		fullheight = 1;
+
+	if (intf->full_width12&1)
+		fullwidth = 1;
+
+	deco16ic->pf1_tilemap_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
+//  deco16ic->pf1_tilemap_8x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, intf->full_width12 ? 64 : 32, 32);
+	deco16ic->pf1_tilemap_8x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
+
+	deco16ic->pf12_8x8_gfx_bank = intf->_8x8_gfxregion;
+	deco16ic->pf12_16x16_gfx_bank = intf->_16x16_gfxregion;
+
+	if (intf->split)
+		deco16ic->pf2_tilemap_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+	else
+		deco16ic->pf2_tilemap_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+
+	deco16ic->pf2_tilemap_8x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+
+	deco16ic->pf1_tilemap_8x8->set_transparent_pen(0);
+	deco16ic->pf2_tilemap_8x8->set_transparent_pen(0);
+	deco16ic->pf1_tilemap_16x16->set_transparent_pen(0);
+	deco16ic->pf2_tilemap_16x16->set_transparent_pen(0);
+
+	if (intf->split) /* Caveman Ninja only */
+		deco16ic->pf2_tilemap_16x16->set_transmask(0, 0x00ff, 0xff01);
+
+	deco16ic->pf1_8bpp_mode = 0;
+
+	deco16ic->pf1_data = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	deco16ic->pf2_data = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	deco16ic->pf12_control = auto_alloc_array_clear(machine(), UINT16, 0x10 / 2);
+
+
+	save_item(NAME(deco16ic->use_custom_pf1));
+	save_item(NAME(deco16ic->use_custom_pf2));
+	save_item(NAME(deco16ic->pf1_bank));
+	save_item(NAME(deco16ic->pf2_bank));
+	save_item(NAME(deco16ic->pf12_8x8_gfx_bank));
+	save_item(NAME(deco16ic->pf12_16x16_gfx_bank));
+	save_item(NAME(deco16ic->pf12_last_small));
+	save_item(NAME(deco16ic->pf12_last_big));
+
+	save_item(NAME(deco16ic->pf1_8bpp_mode));
+
+	save_pointer(NAME(deco16ic->pf1_data), 0x2000 / 2);
+	save_pointer(NAME(deco16ic->pf2_data), 0x2000 / 2);
+	save_pointer(NAME(deco16ic->pf12_control), 0x10 / 2);
 }
 
 //-------------------------------------------------
@@ -1021,7 +998,13 @@ void deco16ic_device::device_start()
 
 void deco16ic_device::device_reset()
 {
-	DEVICE_RESET_NAME( deco16ic )(this);
+	deco16ic_state *deco16ic = get_safe_token(this);
+
+	deco16ic->pf1_bank = deco16ic->pf2_bank = 0;
+	deco16ic->pf12_last_small = deco16ic->pf12_last_big = -1;
+	deco16ic->use_custom_pf1 = deco16ic->use_custom_pf2 = 0;
+	deco16ic->pf1_rowscroll_ptr = 0;
+	deco16ic->pf2_rowscroll_ptr = 0;
 }
 
 

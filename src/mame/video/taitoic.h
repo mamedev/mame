@@ -121,6 +121,9 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(pc080sn_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(pc080sn_get_fg_tile_info);
 };
 
 extern const device_type PC080SN;
@@ -160,6 +163,10 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(tc0080vco_get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(tc0080vco_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(tc0080vco_get_tx_tile_info);	
 };
 
 extern const device_type TC0080VCO;
@@ -180,6 +187,10 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(tc0100scn_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(tc0100scn_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(tc0100scn_get_tx_tile_info);	
 };
 
 extern const device_type TC0100SCN;
@@ -200,6 +211,8 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(tc0280grd_get_tile_info);
 };
 
 extern const device_type TC0280GRD;
@@ -241,6 +254,12 @@ protected:
 private:
 	// internal state
 	void *m_token;
+		
+	TILE_GET_INFO_MEMBER(tc0480scp_get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(tc0480scp_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(tc0480scp_get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(tc0480scp_get_bg3_tile_info);
+	TILE_GET_INFO_MEMBER(tc0480scp_get_tx_tile_info);	
 };
 
 extern const device_type TC0480SCP;
@@ -300,6 +319,10 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);	
 };
 
 extern const device_type TC0180VCU;

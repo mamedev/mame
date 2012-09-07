@@ -194,6 +194,10 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILEMAP_MAPPER_MEMBER(k007342_scan);
+	TILE_GET_INFO_MEMBER(k007342_get_tile_info0);
+	TILE_GET_INFO_MEMBER(k007342_get_tile_info1);
 };
 
 extern const device_type K007342;
@@ -234,6 +238,10 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(k052109_get_tile_info0);
+	TILE_GET_INFO_MEMBER(k052109_get_tile_info1);
+	TILE_GET_INFO_MEMBER(k052109_get_tile_info2);
 };
 
 extern const device_type K052109;
@@ -336,6 +344,8 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(k051316_get_tile_info0);
 };
 
 extern const device_type K051316;
@@ -435,6 +445,23 @@ protected:
 private:
 	// internal state
 	void *m_token;
+
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info0);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info1);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info2);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info3);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info4);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info5);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info6);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info7);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info8);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_info9);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_infoa);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_infob);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_infoc);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_infod);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_infoe);
+	TILE_GET_INFO_MEMBER(k056832_get_tile_infof);
 };
 
 extern const device_type K056832;
@@ -536,6 +563,19 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_0_size0);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_0_size1);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_1_size0);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_1_size1);
+	TILEMAP_MAPPER_MEMBER(slrasslt_scan_layer_8x8_0_size0);
+	TILEMAP_MAPPER_MEMBER(slrasslt_scan_layer_8x8_1_size0);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_0_size0);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_0_size1);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_1_size0);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_1_size1);
+	TILE_GET_INFO_MEMBER(k001604_tile_info_layer_8x8);
+	TILE_GET_INFO_MEMBER(k001604_tile_info_layer_roz);
 };
 
 extern const device_type K001604;
@@ -556,6 +596,9 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	
+	TILE_GET_INFO_MEMBER(k037122_tile_info_layer0);
+	TILE_GET_INFO_MEMBER(k037122_tile_info_layer1);
 };
 
 extern const device_type K037122;

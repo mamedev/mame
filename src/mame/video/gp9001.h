@@ -72,6 +72,10 @@ protected:
 
 	address_space_config		m_space_config;
 	UINT8						m_gfxregion;
+	
+	TILE_GET_INFO_MEMBER(get_top0_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);	
 };
 
 extern const device_type GP9001_VDP;

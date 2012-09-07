@@ -51,24 +51,24 @@ void segas24_tile::tile_info(int offset, tile_data &tileinfo, tilemap_memory_ind
 	tileinfo.set(machine(), char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 }
 
-TILE_GET_INFO_DEVICE( segas24_tile::tile_info_0s )
+TILE_GET_INFO_MEMBER(segas24_tile::tile_info_0s)
 {
-	downcast<segas24_tile *>(device)->tile_info(0x0000, tileinfo, tile_index);
+	tile_info(0x0000, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_DEVICE( segas24_tile::tile_info_0w )
+TILE_GET_INFO_MEMBER( segas24_tile::tile_info_0w)
 {
-	downcast<segas24_tile *>(device)->tile_info(0x1000, tileinfo, tile_index);
+	tile_info(0x1000, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_DEVICE( segas24_tile::tile_info_1s )
+TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1s)
 {
-	downcast<segas24_tile *>(device)->tile_info(0x2000, tileinfo, tile_index);
+	tile_info(0x2000, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_DEVICE( segas24_tile::tile_info_1w )
+TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1w)
 {
-	downcast<segas24_tile *>(device)->tile_info(0x3000, tileinfo, tile_index);
+	tile_info(0x3000, tileinfo, tile_index);
 }
 
 void segas24_tile::device_start()
@@ -81,10 +81,10 @@ void segas24_tile::device_start()
 	char_ram = auto_alloc_array(machine(), UINT16, 0x80000/2);
 	tile_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
 
-	tile_layer[0] = tilemap_create_device(this, tile_info_0s, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
-	tile_layer[1] = tilemap_create_device(this, tile_info_0w, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
-	tile_layer[2] = tilemap_create_device(this, tile_info_1s, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
-	tile_layer[3] = tilemap_create_device(this, tile_info_1w, TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_1s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_1w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 
 	tile_layer[0]->set_transparent_pen(0);
 	tile_layer[1]->set_transparent_pen(0);

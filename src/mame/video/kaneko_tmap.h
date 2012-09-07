@@ -21,7 +21,7 @@ public:
 	tilemap_t* m_tmap[2];
 	UINT16 m_vram_tile_addition[2]; // galsnew
 
-	void get_tile_info(kaneko_view2_tilemap_device *device, tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
+	void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
 	void kaneko16_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_);
 
 	// call to do the rendering etc.
@@ -58,8 +58,8 @@ protected:
 	virtual void device_reset();
 
 private:
-
-
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 };
 
 

@@ -53,8 +53,14 @@ protected:
 							UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
 
 private:
-
-
+	TILEMAP_MAPPER_MEMBER(tile_shape0_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape1_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape2_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape0_8x8_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape1_8x8_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape2_8x8_scan);
+	TILE_GET_INFO_MEMBER(get_pf8x8_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
 };
 
 /* 16-bit accessors */

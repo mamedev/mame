@@ -49,10 +49,10 @@ private:
 	static const gfx_layout char_layout;
 
 	void tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index);
-	static TILE_GET_INFO_DEVICE(tile_info_0s);
-	static TILE_GET_INFO_DEVICE(tile_info_0w);
-	static TILE_GET_INFO_DEVICE(tile_info_1s);
-	static TILE_GET_INFO_DEVICE(tile_info_1w);
+	TILE_GET_INFO_MEMBER(tile_info_0s);
+	TILE_GET_INFO_MEMBER(tile_info_0w);
+	TILE_GET_INFO_MEMBER(tile_info_1s);
+	TILE_GET_INFO_MEMBER(tile_info_1w);
 
 	void draw_rect(bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const UINT16 *mask,
 				   UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);

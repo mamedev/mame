@@ -632,16 +632,16 @@ INLINE void common_get_pc080sn_fg_tile_info( device_t *device, tile_data &tilein
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-static TILE_GET_INFO_DEVICE( pc080sn_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(pc080sn_device::pc080sn_get_bg_tile_info)
 {
-	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
-	common_get_pc080sn_bg_tile_info(device, tileinfo, tile_index, pc080sn->bg_ram[0], pc080sn->bg_gfx);
+	pc080sn_state *pc080sn = pc080sn_get_safe_token(this);
+	common_get_pc080sn_bg_tile_info(this, tileinfo, tile_index, pc080sn->bg_ram[0], pc080sn->bg_gfx);
 }
 
-static TILE_GET_INFO_DEVICE( pc080sn_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(pc080sn_device::pc080sn_get_fg_tile_info)
 {
-	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
-	common_get_pc080sn_fg_tile_info(device, tileinfo, tile_index, pc080sn->bg_ram[1], pc080sn->bg_gfx);
+	pc080sn_state *pc080sn = pc080sn_get_safe_token(this);
+	common_get_pc080sn_fg_tile_info(this, tileinfo, tile_index, pc080sn->bg_ram[1], pc080sn->bg_gfx);
 }
 
 
@@ -969,14 +969,32 @@ static void pc080sn_restore_scroll(pc080sn_state *pc080sn)
 	pc080sn->tilemap[1]->set_flip(flip);
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
+const device_type PC080SN = &device_creator<pc080sn_device>;
 
-static DEVICE_START( pc080sn )
+pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock)
 {
-	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
-	const pc080sn_interface *intf = pc080sn_get_interface(device);
+	m_token = global_alloc_array_clear(UINT8, sizeof(pc080sn_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pc080sn_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc080sn_device::device_start()
+{
+	pc080sn_state *pc080sn = pc080sn_get_safe_token(this);
+	const pc080sn_interface *intf = pc080sn_get_interface(this);
 
 	/* use the given gfx set for bg tiles */
 	pc080sn->bg_gfx = intf->gfxnum;
@@ -988,13 +1006,13 @@ static DEVICE_START( pc080sn )
 
 	if (!pc080sn->dblwidth)	/* standard tilemaps */
 	{
-		pc080sn->tilemap[0] = tilemap_create_device(device, pc080sn_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-		pc080sn->tilemap[1] = tilemap_create_device(device, pc080sn_get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		pc080sn->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+		pc080sn->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	}
 	else	/* double width tilemaps */
 	{
-		pc080sn->tilemap[0] = tilemap_create_device(device, pc080sn_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-		pc080sn->tilemap[1] = tilemap_create_device(device, pc080sn_get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+		pc080sn->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+		pc080sn->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pc080sn_device::pc080sn_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	}
 
 	pc080sn->tilemap[0]->set_transparent_pen(0);
@@ -1011,18 +1029,18 @@ static DEVICE_START( pc080sn )
 		pc080sn->tilemap[1]->set_scroll_rows(512);
 	}
 
-	pc080sn->ram = auto_alloc_array_clear(device->machine(), UINT16, PC080SN_RAM_SIZE / 2);
+	pc080sn->ram = auto_alloc_array_clear(machine(), UINT16, PC080SN_RAM_SIZE / 2);
 
 	pc080sn->bg_ram[0]       = pc080sn->ram + 0x0000 /2;
 	pc080sn->bg_ram[1]       = pc080sn->ram + 0x8000 /2;
 	pc080sn->bgscroll_ram[0] = pc080sn->ram + 0x4000 /2;
 	pc080sn->bgscroll_ram[1] = pc080sn->ram + 0xc000 /2;
 
-	device->save_pointer(NAME(pc080sn->ram), PC080SN_RAM_SIZE / 2);
-	device->save_item(NAME(pc080sn->ctrl));
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_restore_scroll), pc080sn));
-}
+	save_pointer(NAME(pc080sn->ram), PC080SN_RAM_SIZE / 2);
+	save_item(NAME(pc080sn->ctrl));
+	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_restore_scroll), pc080sn));
 
+}
 
 /***************************************************************************/
 /*                                                                         */
@@ -1217,6 +1235,42 @@ static DEVICE_RESET( pc090oj )
 	pc090oj->ctrl = 0;
 }
 
+const device_type PC090OJ = &device_creator<pc090oj_device>;
+
+pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(pc090oj_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pc090oj_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc090oj_device::device_start()
+{
+	DEVICE_START_NAME( pc090oj )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pc090oj_device::device_reset()
+{
+	DEVICE_RESET_NAME( pc090oj )(this);
+}
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -1304,9 +1358,9 @@ static const int tc0080vco_zoomy_conv_table[] =
 #endif
 
 
-static TILE_GET_INFO_DEVICE( tc0080vco_get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(tc0080vco_device::tc0080vco_get_bg0_tile_info)
 {
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(this);
 	int color, tile;
 
 	color = tc0080vco->bg0_ram_1[tile_index] & 0x001f;
@@ -1314,16 +1368,16 @@ static TILE_GET_INFO_DEVICE( tc0080vco_get_bg0_tile_info )
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			tc0080vco->bg_gfx,
 			tile,
 			color,
 			TILE_FLIPYX((tc0080vco->bg0_ram_1[tile_index] & 0x00c0) >> 6));
 }
 
-static TILE_GET_INFO_DEVICE( tc0080vco_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(tc0080vco_device::tc0080vco_get_bg1_tile_info)
 {
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(this);
 	int color, tile;
 
 	color = tc0080vco->bg1_ram_1[tile_index] & 0x001f;
@@ -1331,16 +1385,16 @@ static TILE_GET_INFO_DEVICE( tc0080vco_get_bg1_tile_info )
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			tc0080vco->bg_gfx,
 			tile,
 			color,
 			TILE_FLIPYX((tc0080vco->bg1_ram_1[tile_index] & 0x00c0) >> 6));
 }
 
-static TILE_GET_INFO_DEVICE( tc0080vco_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tc0080vco_device::tc0080vco_get_tx_tile_info)
 {
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(this);
 	int tile;
 
 	if (!tc0080vco->flipscreen)
@@ -1360,7 +1414,7 @@ static TILE_GET_INFO_DEVICE( tc0080vco_get_tx_tile_info )
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			tc0080vco->tx_gfx,
 			tile,
 			0x40,
@@ -1847,10 +1901,33 @@ static void tc0080vco_postload(tc0080vco_state *tc0080vco)
     DEVICE INTERFACE
 *****************************************************************************/
 
-static DEVICE_START( tc0080vco )
+
+const device_type TC0080VCO = &device_creator<tc0080vco_device>;
+
+tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock)
 {
-	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
-	const tc0080vco_interface *intf = tc0080vco_get_interface(device);
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0080vco_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0080vco_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0080vco_device::device_start()
+{
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(this);
+	const tc0080vco_interface *intf = tc0080vco_get_interface(this);
 
 	/* use the given gfx sets for bg/tx tiles*/
 	tc0080vco->bg_gfx = intf->gfxnum;
@@ -1861,8 +1938,8 @@ static DEVICE_START( tc0080vco )
 	tc0080vco->bg_flip_yoffs = intf->bg_flip_yoffs;	/* usually -2 */
 	tc0080vco->has_tx = intf->has_fg0;	/* for debugging only */
 
-	tc0080vco->tilemap[0] = tilemap_create_device(device, tc0080vco_get_bg0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	tc0080vco->tilemap[1] = tilemap_create_device(device, tc0080vco_get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	tc0080vco->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::tc0080vco_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	tc0080vco->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::tc0080vco_get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	tc0080vco->tilemap[0]->set_transparent_pen(0);
 	tc0080vco->tilemap[1]->set_transparent_pen(0);
@@ -1876,14 +1953,14 @@ static DEVICE_START( tc0080vco )
 	tc0080vco->tilemap[0]->set_scroll_rows(512);
 
 	/* Perform extra initialisations for text layer */
-	tc0080vco->tilemap[2] = tilemap_create_device(device, tc0080vco_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0080vco->tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0080vco_device::tc0080vco_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	tc0080vco->tilemap[2]->set_scrolldx(0, 0);
 	tc0080vco->tilemap[2]->set_scrolldy(48, -448);
 
 	tc0080vco->tilemap[2]->set_transparent_pen(0);
 
-	tc0080vco->ram = auto_alloc_array_clear(device->machine(), UINT16, TC0080VCO_RAM_SIZE / 2);
+	tc0080vco->ram = auto_alloc_array_clear(machine(), UINT16, TC0080VCO_RAM_SIZE / 2);
 
 	tc0080vco->char_ram      = tc0080vco->ram + 0x00000 / 2;	/* continues at +0x10000 */
 	tc0080vco->tx_ram_0      = tc0080vco->ram + 0x01000 / 2;
@@ -1902,10 +1979,10 @@ static DEVICE_START( tc0080vco )
 	tc0080vco->scroll_ram    = tc0080vco->ram + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine().gfx[tc0080vco->tx_gfx] = auto_alloc(device->machine(), gfx_element(device->machine(), tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0));
+	machine().gfx[tc0080vco->tx_gfx] = auto_alloc(machine(), gfx_element(machine(), tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0));
 
-	device->save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_postload), tc0080vco));
+	save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_postload), tc0080vco));
 }
 
 /***************************************************************************/
@@ -1969,7 +2046,7 @@ INLINE const tc0100scn_interface *tc0100scn_get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-INLINE void common_get_bg0_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+INLINE void common_get_bg0_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int code, attr;
@@ -1986,14 +2063,14 @@ INLINE void common_get_bg0_tile_info( device_t *device, tile_data &tileinfo, int
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			code,
 			(((attr * tc0100scn->bg_col_mult) + tc0100scn->bg0_colbank) & 0xff) + colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_bg1_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+INLINE void common_get_bg1_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int code, attr;
@@ -2010,41 +2087,41 @@ INLINE void common_get_bg1_tile_info( device_t *device, tile_data &tileinfo, int
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			code,
 			(((attr * tc0100scn->bg_col_mult) + tc0100scn->bg1_colbank) & 0xff) + colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_tx_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+INLINE void common_get_tx_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
 {
 	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
 	int attr = ram[tile_index];
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			attr & 0xff,
 			((((attr >> 6) & 0xfc) * tc0100scn->tx_col_mult + (tc0100scn->tx_colbank << 2)) & 0x3ff) + colbank * 4,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-static TILE_GET_INFO_DEVICE( tc0100scn_get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tc0100scn_device::tc0100scn_get_bg_tile_info)
 {
-	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
-	common_get_bg0_tile_info(device, tileinfo, tile_index, tc0100scn->bg_ram, tc0100scn->bg_gfx, tc0100scn->colbank, tc0100scn->dblwidth);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(this);
+	common_get_bg0_tile_info(machine(), this, tileinfo, tile_index, tc0100scn->bg_ram, tc0100scn->bg_gfx, tc0100scn->colbank, tc0100scn->dblwidth);
 }
 
-static TILE_GET_INFO_DEVICE( tc0100scn_get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tc0100scn_device::tc0100scn_get_fg_tile_info)
 {
-	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
-	common_get_bg1_tile_info(device, tileinfo, tile_index, tc0100scn->fg_ram, tc0100scn->bg_gfx, tc0100scn->colbank, tc0100scn->dblwidth);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(this);
+	common_get_bg1_tile_info(machine(), this, tileinfo, tile_index, tc0100scn->fg_ram, tc0100scn->bg_gfx, tc0100scn->colbank, tc0100scn->dblwidth);
 }
 
-static TILE_GET_INFO_DEVICE( tc0100scn_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tc0100scn_device::tc0100scn_get_tx_tile_info)
 {
-	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
-	common_get_tx_tile_info(device, tileinfo, tile_index, tc0100scn->tx_ram, tc0100scn->tx_gfx, tc0100scn->colbank, tc0100scn->dblwidth);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(this);
+	common_get_tx_tile_info(machine(), this, tileinfo, tile_index, tc0100scn->tx_ram, tc0100scn->tx_gfx, tc0100scn->colbank, tc0100scn->dblwidth);
 }
 
 static const gfx_layout tc0100scn_charlayout =
@@ -2411,17 +2488,35 @@ int tc0100scn_bottomlayer( device_t *device )
 	return (tc0100scn->ctrl[6] & 0x8) >> 3;
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
+const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
-static DEVICE_START( tc0100scn )
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock)
 {
-	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
-	const tc0100scn_interface *intf = tc0100scn_get_interface(device);
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0100scn_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0100scn_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0100scn_device::device_start()
+{
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(this);
+	const tc0100scn_interface *intf = tc0100scn_get_interface(this);
 	int xd, yd;
 
-	tc0100scn->screen = device->machine().device<screen_device>(intf->screen);
+	tc0100scn->screen = machine().device<screen_device>(intf->screen);
 
 	/* Set up clipping for multi-TC0100SCN games. We assume
        this code won't ever affect single screen games:
@@ -2435,14 +2530,14 @@ static DEVICE_START( tc0100scn )
 	tc0100scn->tx_gfx = intf->txnum;
 
 	/* Single width versions */
-	tc0100scn->tilemap[0][0] = tilemap_create_device(device, tc0100scn_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	tc0100scn->tilemap[1][0] = tilemap_create_device(device, tc0100scn_get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	tc0100scn->tilemap[2][0] = tilemap_create_device(device, tc0100scn_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0100scn->tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::tc0100scn_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0100scn->tilemap[1][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::tc0100scn_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0100scn->tilemap[2][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::tc0100scn_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	tc0100scn->tilemap[0][1] = tilemap_create_device(device, tc0100scn_get_bg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	tc0100scn->tilemap[1][1] = tilemap_create_device(device, tc0100scn_get_fg_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	tc0100scn->tilemap[2][1] = tilemap_create_device(device, tc0100scn_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	tc0100scn->tilemap[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::tc0100scn_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	tc0100scn->tilemap[1][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::tc0100scn_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	tc0100scn->tilemap[2][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::tc0100scn_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	tc0100scn->tilemap[0][0]->set_transparent_pen(0);
 	tc0100scn->tilemap[1][0]->set_transparent_pen(0);
@@ -2491,35 +2586,38 @@ static DEVICE_START( tc0100scn )
 	tc0100scn->bg_col_mult = 1;	/* multiplier for when bg gfx != 4bpp */
 	tc0100scn->tx_col_mult = 1;	/* multiplier needed when bg gfx is 6bpp */
 
-	if (device->machine().gfx[intf->gfxnum]->granularity() == 2)	/* Yuyugogo, Yesnoj */
+	if (machine().gfx[intf->gfxnum]->granularity() == 2)	/* Yuyugogo, Yesnoj */
 		tc0100scn->bg_col_mult = 8;
 
-	if (device->machine().gfx[intf->gfxnum]->granularity() == 0x40)	/* Undrfire */
+	if (machine().gfx[intf->gfxnum]->granularity() == 0x40)	/* Undrfire */
 		tc0100scn->tx_col_mult = 4;
 
-//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", device->machine().gfx[intf->gfxnum]->granularity(), tc0100scn->tx_col_mult);
+//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", machine().gfx[intf->gfxnum]->granularity(), tc0100scn->tx_col_mult);
 
-	tc0100scn->ram = auto_alloc_array_clear(device->machine(), UINT16, TC0100SCN_RAM_SIZE / 2);
+	tc0100scn->ram = auto_alloc_array_clear(machine(), UINT16, TC0100SCN_RAM_SIZE / 2);
 
 	tc0100scn_set_layer_ptrs(tc0100scn);
 
-	tc0100scn_set_colbanks(device, 0, 0, 0);	/* standard values, only Wgp & multiscreen games change them */
+	tc0100scn_set_colbanks(this, 0, 0, 0);	/* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at VIDEO_START*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine().gfx[tc0100scn->tx_gfx] = auto_alloc(device->machine(), gfx_element(device->machine(), tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0));
+	machine().gfx[tc0100scn->tx_gfx] = auto_alloc(machine(), gfx_element(machine(), tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0));
 
-	device->save_pointer(NAME(tc0100scn->ram), TC0100SCN_RAM_SIZE / 2);
-	device->save_item(NAME(tc0100scn->ctrl));
-	device->save_item(NAME(tc0100scn->dblwidth));
-	device->save_item(NAME(tc0100scn->gfxbank));
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_postload), tc0100scn));
+	save_pointer(NAME(tc0100scn->ram), TC0100SCN_RAM_SIZE / 2);
+	save_item(NAME(tc0100scn->ctrl));
+	save_item(NAME(tc0100scn->dblwidth));
+	save_item(NAME(tc0100scn->gfxbank));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_postload), tc0100scn));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-static DEVICE_RESET( tc0100scn )
+void tc0100scn_device::device_reset()
 {
-	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(device);
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(this);
 	int i;
 
 	tc0100scn->dblwidth = 0;
@@ -2528,8 +2626,9 @@ static DEVICE_RESET( tc0100scn )
 
 	for (i = 0; i < 8; i++)
 		tc0100scn->ctrl[i] = 0;
-
 }
+
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -2573,11 +2672,11 @@ INLINE const tc0280grd_interface *tc0280grd_get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-static TILE_GET_INFO_DEVICE( tc0280grd_get_tile_info )
+TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
 {
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
+	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(this);
 	int attr = tc0280grd->ram[tile_index];
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 			tc0280grd->gfxnum,
 			attr & 0x3fff,
 			((attr & 0xc000) >> 14) + tc0280grd->base_color,
@@ -2678,35 +2777,57 @@ void tc0430grw_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangl
 	zoom_draw(device, bitmap, cliprect, xoffset, yoffset, priority, 1);
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
+const device_type TC0280GRD = &device_creator<tc0280grd_device>;
 
-static DEVICE_START( tc0280grd )
+tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock)
 {
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
-	const tc0280grd_interface *intf = tc0280grd_get_interface(device);
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0280grd_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0280grd_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0280grd_device::device_start()
+{
+	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(this);
+	const tc0280grd_interface *intf = tc0280grd_get_interface(this);
 
 	tc0280grd->gfxnum = intf->gfxnum;
 
-	tc0280grd->tilemap = tilemap_create_device(device, tc0280grd_get_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0280grd->tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	tc0280grd->tilemap->set_transparent_pen(0);
 
-	tc0280grd->ram = auto_alloc_array(device->machine(), UINT16, TC0280GRD_RAM_SIZE / 2);
+	tc0280grd->ram = auto_alloc_array(machine(), UINT16, TC0280GRD_RAM_SIZE / 2);
 
-	device->save_pointer(NAME(tc0280grd->ram), TC0280GRD_RAM_SIZE / 2);
-	device->save_item(NAME(tc0280grd->ctrl));
+	save_pointer(NAME(tc0280grd->ram), TC0280GRD_RAM_SIZE / 2);
+	save_item(NAME(tc0280grd->ctrl));
 }
 
-static DEVICE_RESET( tc0280grd )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0280grd_device::device_reset()
 {
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
+	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(this);
 	int i;
 
 	for (i = 0; i < 8; i++)
 		tc0280grd->ctrl[i] = 0;
-
 }
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -2778,6 +2899,42 @@ static DEVICE_RESET( tc0360pri )
 
 }
 
+const device_type TC0360PRI = &device_creator<tc0360pri_device>;
+
+tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0360pri_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0360pri_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0360pri_device::device_start()
+{
+	DEVICE_START_NAME( tc0360pri )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0360pri_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0360pri )(this);
+}
+
 /***************************************************************************/
 /*                                                                         */
 /*                              TC0480SCP                                  */
@@ -2836,57 +2993,57 @@ INLINE const tc0480scp_interface *tc0480scp_get_interface( device_t *device )
 *****************************************************************************/
 
 
-INLINE void common_get_tc0480bg_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_tc0480bg_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	int code = ram[2 * tile_index + 1] & 0x7fff;
 	int attr = ram[2 * tile_index];
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			code,
 			(attr & 0xff) + tc0480scp->tile_colbase,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_tc0480tx_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_tc0480tx_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
 	int attr = ram[tile_index];
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			attr & 0xff,
 			((attr & 0x3f00) >> 8) + tc0480scp->tile_colbase,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-static TILE_GET_INFO_DEVICE( tc0480scp_get_bg0_tile_info )
+TILE_GET_INFO_MEMBER(tc0480scp_device::tc0480scp_get_bg0_tile_info)
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
-	common_get_tc0480bg_tile_info(device, tileinfo, tile_index, tc0480scp->bg_ram[0], tc0480scp->bg_gfx );
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	common_get_tc0480bg_tile_info(machine(), this, tileinfo, tile_index, tc0480scp->bg_ram[0], tc0480scp->bg_gfx );
 }
 
-static TILE_GET_INFO_DEVICE( tc0480scp_get_bg1_tile_info )
+TILE_GET_INFO_MEMBER(tc0480scp_device::tc0480scp_get_bg1_tile_info)
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
-	common_get_tc0480bg_tile_info(device, tileinfo, tile_index, tc0480scp->bg_ram[1], tc0480scp->bg_gfx);
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	common_get_tc0480bg_tile_info(machine(), this, tileinfo, tile_index, tc0480scp->bg_ram[1], tc0480scp->bg_gfx);
 }
 
-static TILE_GET_INFO_DEVICE( tc0480scp_get_bg2_tile_info )
+TILE_GET_INFO_MEMBER(tc0480scp_device::tc0480scp_get_bg2_tile_info)
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
-	common_get_tc0480bg_tile_info(device, tileinfo, tile_index, tc0480scp->bg_ram[2], tc0480scp->bg_gfx);
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	common_get_tc0480bg_tile_info(machine(), this, tileinfo, tile_index, tc0480scp->bg_ram[2], tc0480scp->bg_gfx);
 }
 
-static TILE_GET_INFO_DEVICE( tc0480scp_get_bg3_tile_info )
+TILE_GET_INFO_MEMBER(tc0480scp_device::tc0480scp_get_bg3_tile_info)
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
-	common_get_tc0480bg_tile_info(device, tileinfo, tile_index, tc0480scp->bg_ram[3], tc0480scp->bg_gfx);
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	common_get_tc0480bg_tile_info(machine(), this, tileinfo, tile_index, tc0480scp->bg_ram[3], tc0480scp->bg_gfx);
 }
 
-static TILE_GET_INFO_DEVICE( tc0480scp_get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tc0480scp_device::tc0480scp_get_tx_tile_info)
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
-	common_get_tc0480tx_tile_info(device, tileinfo, tile_index, tc0480scp->tx_ram, tc0480scp->tx_gfx);
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	common_get_tc0480tx_tile_info(machine(), this, tileinfo, tile_index, tc0480scp->tx_ram, tc0480scp->tx_gfx);
 }
 
 static const gfx_layout tc0480scp_charlayout =
@@ -3623,14 +3780,34 @@ static void tc0480scp_postload(tc0480scp_state *tc0480scp)
 	tc0480scp->tilemap[4][1]->set_scrolly(0, -reg);
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
 
-static DEVICE_START( tc0480scp )
+
+const device_type TC0480SCP = &device_creator<tc0480scp_device>;
+
+tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock)
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
-	const tc0480scp_interface *intf = tc0480scp_get_interface(device);
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0480scp_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0480scp_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0480scp_device::device_start()
+{
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	const tc0480scp_interface *intf = tc0480scp_get_interface(this);
 	int i, xd, yd;
 
 	/* use the given gfx set for bg/tx tiles */
@@ -3646,18 +3823,18 @@ static DEVICE_START( tc0480scp )
 	tc0480scp->y_offs = intf->y_offset;
 
 	/* Single width versions */
-	tc0480scp->tilemap[0][0] = tilemap_create_device(device, tc0480scp_get_bg0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	tc0480scp->tilemap[1][0] = tilemap_create_device(device, tc0480scp_get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	tc0480scp->tilemap[2][0] = tilemap_create_device(device, tc0480scp_get_bg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	tc0480scp->tilemap[3][0] = tilemap_create_device(device, tc0480scp_get_bg3_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	tc0480scp->tilemap[4][0] = tilemap_create_device(device, tc0480scp_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0480scp->tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	tc0480scp->tilemap[1][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	tc0480scp->tilemap[2][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	tc0480scp->tilemap[3][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	tc0480scp->tilemap[4][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	tc0480scp->tilemap[0][1] = tilemap_create_device(device, tc0480scp_get_bg0_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	tc0480scp->tilemap[1][1] = tilemap_create_device(device, tc0480scp_get_bg1_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	tc0480scp->tilemap[2][1] = tilemap_create_device(device, tc0480scp_get_bg2_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	tc0480scp->tilemap[3][1] = tilemap_create_device(device, tc0480scp_get_bg3_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	tc0480scp->tilemap[4][1] = tilemap_create_device(device, tc0480scp_get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	tc0480scp->tilemap[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	tc0480scp->tilemap[1][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	tc0480scp->tilemap[2][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	tc0480scp->tilemap[3][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	tc0480scp->tilemap[4][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0480scp_device::tc0480scp_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	for (i = 0; i < 2; i++)
 	{
@@ -3712,22 +3889,26 @@ static DEVICE_START( tc0480scp )
 		tc0480scp->tilemap[3][i]->set_scroll_rows(512);
 	}
 
-	tc0480scp->ram = auto_alloc_array_clear(device->machine(), UINT16, TC0480SCP_RAM_SIZE / 2);
+	tc0480scp->ram = auto_alloc_array_clear(machine(), UINT16, TC0480SCP_RAM_SIZE / 2);
 
 	tc0480scp_set_layer_ptrs(tc0480scp);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	device->machine().gfx[tc0480scp->tx_gfx] = auto_alloc(device->machine(), gfx_element(device->machine(), tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0));
+	machine().gfx[tc0480scp->tx_gfx] = auto_alloc(machine(), gfx_element(machine(), tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0));
 
-	device->save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
-	device->save_item(NAME(tc0480scp->ctrl));
-	device->save_item(NAME(tc0480scp->dblwidth));
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_postload), tc0480scp));
+	save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
+	save_item(NAME(tc0480scp->ctrl));
+	save_item(NAME(tc0480scp->dblwidth));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_postload), tc0480scp));
 }
 
-static DEVICE_RESET( tc0480scp )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0480scp_device::device_reset()
 {
-	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(device);
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
 	int i;
 
 	tc0480scp->dblwidth = 0;
@@ -3736,6 +3917,7 @@ static DEVICE_RESET( tc0480scp )
 		tc0480scp->ctrl[i] = 0;
 
 }
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -4545,6 +4727,33 @@ static DEVICE_START( tc0150rod )
 
 }
 
+const device_type TC0150ROD = &device_creator<tc0150rod_device>;
+
+tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0150rod_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0150rod_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0150rod_device::device_start()
+{
+	DEVICE_START_NAME( tc0150rod )(this);
+}
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -4767,6 +4976,42 @@ static DEVICE_RESET( tc0110pcr )
 	tc0110pcr->type = 0;	/* default, xBBBBBGGGGGRRRRR */
 }
 
+const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
+
+tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(tc0110pcr_state));
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tc0110pcr_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tc0110pcr_device::device_start()
+{
+	DEVICE_START_NAME( tc0110pcr )(this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tc0110pcr_device::device_reset()
+{
+	DEVICE_RESET_NAME( tc0110pcr )(this);
+}
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -4943,38 +5188,38 @@ WRITE16_DEVICE_HANDLER( tc0180vcu_ctrl_w )
 	}
 }
 
-static TILE_GET_INFO_DEVICE( get_bg_tile_info )
+TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 {
-	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(this);
 	int tile  = tc0180vcu->ram[tile_index + tc0180vcu->bg_rambank[0]];
 	int color = tc0180vcu->ram[tile_index + tc0180vcu->bg_rambank[1]];
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 		1,
 		tile,
 		tc0180vcu->bg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
-static TILE_GET_INFO_DEVICE( get_fg_tile_info )
+TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 {
-	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(this);
 	int tile  = tc0180vcu->ram[tile_index + tc0180vcu->fg_rambank[0]];
 	int color = tc0180vcu->ram[tile_index + tc0180vcu->fg_rambank[1]];
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 		1,
 		tile,
 		tc0180vcu->fg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
-static TILE_GET_INFO_DEVICE( get_tx_tile_info )
+TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 {
-	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(this);
 	int tile = tc0180vcu->ram[tile_index + tc0180vcu->tx_rambank];
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO_MEMBER(
 		0,
 		(tile & 0x07ff) | ((tc0180vcu->ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
 		tc0180vcu->tx_color_base + ((tile >> 12) & 0x0f),
@@ -5064,370 +5309,6 @@ void tc0180vcu_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const recta
 	}
 }
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( tc0180vcu )
-{
-	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
-	const tc0180vcu_interface *intf = tc0180vcu_get_interface(device);
-
-	tc0180vcu->bg_color_base = intf->bg_color_base;
-	tc0180vcu->fg_color_base = intf->fg_color_base;
-	tc0180vcu->tx_color_base = intf->tx_color_base;
-
-	tc0180vcu->tilemap[0] = tilemap_create_device(device, get_bg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	tc0180vcu->tilemap[1] = tilemap_create_device(device, get_fg_tile_info, TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	tc0180vcu->tilemap[2] = tilemap_create_device(device, get_tx_tile_info, TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-	tc0180vcu->tilemap[1]->set_transparent_pen(0);
-	tc0180vcu->tilemap[2]->set_transparent_pen(0);
-
-	tc0180vcu->tilemap[0]->set_scrolldx(0, 24 * 8);
-	tc0180vcu->tilemap[1]->set_scrolldx(0, 24 * 8);
-	tc0180vcu->tilemap[2]->set_scrolldx(0, 24 * 8);
-
-	tc0180vcu->ram = auto_alloc_array_clear(device->machine(), UINT16, TC0180VCU_RAM_SIZE / 2);
-	tc0180vcu->scrollram = auto_alloc_array_clear(device->machine(), UINT16, TC0180VCU_SCROLLRAM_SIZE / 2);
-
-	device->save_pointer(NAME(tc0180vcu->ram), TC0180VCU_RAM_SIZE / 2);
-	device->save_pointer(NAME(tc0180vcu->scrollram), TC0180VCU_SCROLLRAM_SIZE / 2);
-
-	device->save_item(NAME(tc0180vcu->bg_rambank));
-	device->save_item(NAME(tc0180vcu->fg_rambank));
-	device->save_item(NAME(tc0180vcu->tx_rambank));
-
-	device->save_item(NAME(tc0180vcu->framebuffer_page));
-
-	device->save_item(NAME(tc0180vcu->video_control));
-	device->save_item(NAME(tc0180vcu->ctrl));
-}
-
-static DEVICE_RESET( tc0180vcu )
-{
-	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(device);
-	int i;
-
-	for (i = 0; i < 0x10; i++)
-		tc0180vcu->ctrl[i] = 0;
-
-	tc0180vcu->bg_rambank[0] = 0;
-	tc0180vcu->bg_rambank[1] = 0;
-	tc0180vcu->fg_rambank[0] = 0;
-	tc0180vcu->fg_rambank[1] = 0;
-	tc0180vcu->tx_rambank = 0;
-
-	tc0180vcu->framebuffer_page = 0;
-	tc0180vcu->video_control = 0;
-}
-
-const device_type PC080SN = &device_creator<pc080sn_device>;
-
-pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(pc080sn_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pc080sn_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pc080sn_device::device_start()
-{
-	DEVICE_START_NAME( pc080sn )(this);
-}
-
-
-const device_type PC090OJ = &device_creator<pc090oj_device>;
-
-pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(pc090oj_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pc090oj_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pc090oj_device::device_start()
-{
-	DEVICE_START_NAME( pc090oj )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pc090oj_device::device_reset()
-{
-	DEVICE_RESET_NAME( pc090oj )(this);
-}
-
-
-const device_type TC0080VCO = &device_creator<tc0080vco_device>;
-
-tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0080vco_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0080vco_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0080vco_device::device_start()
-{
-	DEVICE_START_NAME( tc0080vco )(this);
-}
-
-
-const device_type TC0100SCN = &device_creator<tc0100scn_device>;
-
-tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0100scn_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0100scn_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0100scn_device::device_start()
-{
-	DEVICE_START_NAME( tc0100scn )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tc0100scn_device::device_reset()
-{
-	DEVICE_RESET_NAME( tc0100scn )(this);
-}
-
-
-const device_type TC0280GRD = &device_creator<tc0280grd_device>;
-
-tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0280grd_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0280grd_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0280grd_device::device_start()
-{
-	DEVICE_START_NAME( tc0280grd )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tc0280grd_device::device_reset()
-{
-	DEVICE_RESET_NAME( tc0280grd )(this);
-}
-
-
-const device_type TC0360PRI = &device_creator<tc0360pri_device>;
-
-tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0360pri_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0360pri_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0360pri_device::device_start()
-{
-	DEVICE_START_NAME( tc0360pri )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tc0360pri_device::device_reset()
-{
-	DEVICE_RESET_NAME( tc0360pri )(this);
-}
-
-
-const device_type TC0480SCP = &device_creator<tc0480scp_device>;
-
-tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0480scp_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0480scp_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0480scp_device::device_start()
-{
-	DEVICE_START_NAME( tc0480scp )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tc0480scp_device::device_reset()
-{
-	DEVICE_RESET_NAME( tc0480scp )(this);
-}
-
-
-const device_type TC0150ROD = &device_creator<tc0150rod_device>;
-
-tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0150rod_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0150rod_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0150rod_device::device_start()
-{
-	DEVICE_START_NAME( tc0150rod )(this);
-}
-
-
-const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
-
-tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock)
-{
-	m_token = global_alloc_array_clear(UINT8, sizeof(tc0110pcr_state));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0110pcr_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tc0110pcr_device::device_start()
-{
-	DEVICE_START_NAME( tc0110pcr )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tc0110pcr_device::device_reset()
-{
-	DEVICE_RESET_NAME( tc0110pcr )(this);
-}
-
-
 const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
 
 tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -5452,7 +5333,39 @@ void tc0180vcu_device::device_config_complete()
 
 void tc0180vcu_device::device_start()
 {
-	DEVICE_START_NAME( tc0180vcu )(this);
+
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(this);
+	const tc0180vcu_interface *intf = tc0180vcu_get_interface(this);
+
+	tc0180vcu->bg_color_base = intf->bg_color_base;
+	tc0180vcu->fg_color_base = intf->fg_color_base;
+	tc0180vcu->tx_color_base = intf->tx_color_base;
+
+	tc0180vcu->tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	tc0180vcu->tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	tc0180vcu->tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	tc0180vcu->tilemap[1]->set_transparent_pen(0);
+	tc0180vcu->tilemap[2]->set_transparent_pen(0);
+
+	tc0180vcu->tilemap[0]->set_scrolldx(0, 24 * 8);
+	tc0180vcu->tilemap[1]->set_scrolldx(0, 24 * 8);
+	tc0180vcu->tilemap[2]->set_scrolldx(0, 24 * 8);
+
+	tc0180vcu->ram = auto_alloc_array_clear(machine(), UINT16, TC0180VCU_RAM_SIZE / 2);
+	tc0180vcu->scrollram = auto_alloc_array_clear(machine(), UINT16, TC0180VCU_SCROLLRAM_SIZE / 2);
+
+	save_pointer(NAME(tc0180vcu->ram), TC0180VCU_RAM_SIZE / 2);
+	save_pointer(NAME(tc0180vcu->scrollram), TC0180VCU_SCROLLRAM_SIZE / 2);
+
+	save_item(NAME(tc0180vcu->bg_rambank));
+	save_item(NAME(tc0180vcu->fg_rambank));
+	save_item(NAME(tc0180vcu->tx_rambank));
+
+	save_item(NAME(tc0180vcu->framebuffer_page));
+
+	save_item(NAME(tc0180vcu->video_control));
+	save_item(NAME(tc0180vcu->ctrl));
 }
 
 //-------------------------------------------------
@@ -5461,7 +5374,20 @@ void tc0180vcu_device::device_start()
 
 void tc0180vcu_device::device_reset()
 {
-	DEVICE_RESET_NAME( tc0180vcu )(this);
+	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(this);
+	int i;
+
+	for (i = 0; i < 0x10; i++)
+		tc0180vcu->ctrl[i] = 0;
+
+	tc0180vcu->bg_rambank[0] = 0;
+	tc0180vcu->bg_rambank[1] = 0;
+	tc0180vcu->fg_rambank[0] = 0;
+	tc0180vcu->fg_rambank[1] = 0;
+	tc0180vcu->tx_rambank = 0;
+
+	tc0180vcu->framebuffer_page = 0;
+	tc0180vcu->video_control = 0;
 }
 
 
