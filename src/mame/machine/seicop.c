@@ -1728,7 +1728,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 static UINT16 cop_status,cop_dist,cop_angle;
 static UINT16 cop_hit_status;
-static UINT32 cop_hit_val_x,cop_hit_val_y;
+static INT32 cop_hit_val_x,cop_hit_val_y;
 static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
 static INT8 cop_angle_compare;
 static UINT8 cop_angle_mod_val;
@@ -1935,7 +1935,18 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x05a/2): pal_brightness_val = data & 0xff; break;
 		case (0x05c/2): pal_brightness_mode = data & 0xff; break;
 
-		/* DMA / layer clearing */
+		/* DMA / layer clearing section */
+		case (0x074/2):
+			/*
+			This sets up a DMA mode of some sort
+				0x0e00: grainbow, cupsoc
+				0x0a00: legionna, godzilla, denjinmk
+				0x0600: heatbrl
+				0x1e00: zeroteam, xsedae
+			raiden2 and raidendx doesn't set this up, this could indicate that this is related to the non-private buffer DMAs
+			(both only uses 0x14 and 0x15 as DMAs)
+			*/
+			break;
 
 		/* used in palette DMAs, for fading effects */
 		case (0x076/2):
