@@ -23,7 +23,6 @@
     - cleanup
     - light pen
     - remove RDY hack
-    - VIC IIe
     - http://hitmen.c02.at/temp/palstuff/
 
 */
@@ -91,17 +90,25 @@ enum
 };
 
 
-static const UINT8 PALETTE[] =
+// VICE palette
+static const rgb_t PALETTE[] =
 {
-// black, white, red, cyan
-// purple, green, blue, yellow
-// orange, brown, light red, dark gray,
-// medium gray, light green, light blue, light gray
-// taken from the vice emulator
-	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
-	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
-	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
-	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0xfd, 0xfe, 0xfc),
+	MAKE_RGB(0xbe, 0x1a, 0x24),
+	MAKE_RGB(0x30, 0xe6, 0xc6),
+	MAKE_RGB(0xb4, 0x1a, 0xe2),
+	MAKE_RGB(0x1f, 0xd2, 0x1e),
+	MAKE_RGB(0x21, 0x1b, 0xae),
+	MAKE_RGB(0xdf, 0xf6, 0x0a),
+	MAKE_RGB(0xb8, 0x41, 0x04),
+	MAKE_RGB(0x6a, 0x33, 0x04),
+	MAKE_RGB(0xfe, 0x4a, 0x57),
+	MAKE_RGB(0x42, 0x45, 0x40),
+	MAKE_RGB(0x70, 0x74, 0x6f),
+	MAKE_RGB(0x59, 0xfe, 0x59),
+	MAKE_RGB(0x5f, 0x53, 0xfe),
+	MAKE_RGB(0xa4, 0xa7, 0xa2)
 };
 
 
@@ -209,8 +216,10 @@ static const UINT8 PALETTE[] =
 const device_type MOS6566 = &device_creator<mos6566_device>;
 const device_type MOS6567 = &device_creator<mos6567_device>;
 const device_type MOS8562 = &device_creator<mos8562_device>;
+const device_type MOS8564 = &device_creator<mos8564_device>;
 const device_type MOS6569 = &device_creator<mos6569_device>;
 const device_type MOS8565 = &device_creator<mos8565_device>;
+const device_type MOS8566 = &device_creator<mos8566_device>;
 
 
 // default address maps
@@ -560,6 +569,9 @@ mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, 
 mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:mos6567_device(mconfig, MOS8562, "MOS8562", tag, owner, clock) { m_variant = TYPE_8562; }
 
+mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:mos6567_device(mconfig, MOS8564, "MOS8564", tag, owner, clock) { m_variant = TYPE_8564; }
+
 mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock) { m_variant = TYPE_6569; }
 
@@ -568,6 +580,9 @@ mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, 
 
 mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:mos6569_device(mconfig, MOS8565, "MOS8565", tag, owner, clock) { m_variant = TYPE_8565; }
+
+mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	:mos6569_device(mconfig, MOS8566, "MOS8566", tag, owner, clock) { m_variant = TYPE_8566; }
 
 
 //-------------------------------------------------
@@ -617,14 +632,9 @@ void mos6566_device::device_start()
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 
 	// initialize palette
-	int i;
+	palette_set_colors(machine(), 0, PALETTE, ARRAY_LENGTH(PALETTE));
 
-	for (i = 0; i < 16; i++)
-	{
-		palette_set_color_rgb(machine(), i, PALETTE[i * 3], PALETTE[i * 3 + 1], PALETTE[i * 3 + 2]);
-	}
-
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		m_expandx[i] = 0;
 		if (i & 1)
@@ -645,7 +655,7 @@ void mos6566_device::device_start()
 			m_expandx[i] |= 0xc000;
 	}
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		m_expandx_multi[i] = 0;
 		if (i & 1)
@@ -717,7 +727,7 @@ void mos6566_device::device_start()
 	save_item(NAME(m_mc_base));
 	save_item(NAME(m_mc));
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_spr_data[i]), i);
 		save_item(NAME(m_spr_draw_data[i]), i);
@@ -2829,3 +2839,12 @@ UINT8 mos6566_device::bus_r()
 {
 	return m_last_data;
 }
+
+
+READ_LINE_MEMBER( mos8564_device::k0_r ) { return VIC2E_K0_LEVEL; }
+READ_LINE_MEMBER( mos8564_device::k1_r ) { return VIC2E_K1_LEVEL; }
+READ_LINE_MEMBER( mos8564_device::k2_r ) { return VIC2E_K2_LEVEL; }
+
+READ_LINE_MEMBER( mos8566_device::k0_r ) { return VIC2E_K0_LEVEL; }
+READ_LINE_MEMBER( mos8566_device::k1_r ) { return VIC2E_K1_LEVEL; }
+READ_LINE_MEMBER( mos8566_device::k2_r ) { return VIC2E_K2_LEVEL; }

@@ -127,6 +127,18 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update) \
 	MCFG_PALETTE_LENGTH(16)
 
+#define MCFG_MOS8564_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_DEVICE_ADD(_tag, MOS8564, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16+16) // 16 for VIC, 16 for VDC
+
 #define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS6569, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
@@ -151,6 +163,18 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update) \
 	MCFG_PALETTE_LENGTH(16)
 
+#define MCFG_MOS8566_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+	MCFG_DEVICE_ADD(_tag, MOS8566, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
+	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update) \
+	MCFG_PALETTE_LENGTH(16+16) // 16 for VIC, 16 for VDC
+
 
 #define MOS6566_INTERFACE(_name) \
 	const mos6566_interface (_name) =
@@ -158,7 +182,13 @@
 #define MOS6567_INTERFACE(_name) \
 	const mos6566_interface (_name) =
 
+#define MOS8564_INTERFACE(_name) \
+	const mos6566_interface (_name) =
+
 #define MOS6569_INTERFACE(_name) \
+	const mos6566_interface (_name) =
+
+#define MOS8566_INTERFACE(_name) \
 	const mos6566_interface (_name) =
 
 
@@ -455,6 +485,20 @@ public:
 };
 
 
+// ======================> mos8564_device
+
+class mos8564_device :  public mos6567_device
+{
+public:
+    // construction/destruction
+    mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    DECLARE_READ_LINE_MEMBER( k0_r );
+    DECLARE_READ_LINE_MEMBER( k1_r );
+    DECLARE_READ_LINE_MEMBER( k2_r );
+};
+
+
 // ======================> mos6569_device
 
 class mos6569_device :  public mos6566_device
@@ -479,12 +523,28 @@ public:
 };
 
 
+// ======================> mos8566_device
+
+class mos8566_device :  public mos6569_device
+{
+public:
+    // construction/destruction
+    mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    DECLARE_READ_LINE_MEMBER( k0_r );
+    DECLARE_READ_LINE_MEMBER( k1_r );
+    DECLARE_READ_LINE_MEMBER( k2_r );
+};
+
+
 // device type definitions
 extern const device_type MOS6566;
 extern const device_type MOS6567;
 extern const device_type MOS8562;
+extern const device_type MOS8564;
 extern const device_type MOS6569;
 extern const device_type MOS8565;
+extern const device_type MOS8566;
 
 
 

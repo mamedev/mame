@@ -123,9 +123,9 @@
 #define FRAMECOLOR (m_reg[0x0f] & 0x07)
 
 
+// VICE palette
 static const rgb_t PALETTE[] =
 {
-/* ripped from vice, a very excellent emulator */
 	MAKE_RGB(0x00, 0x00, 0x00),
 	MAKE_RGB(0xff, 0xff, 0xff),
 	MAKE_RGB(0xf0, 0x00, 0x00),
