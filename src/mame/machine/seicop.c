@@ -1542,7 +1542,8 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 		case (0x026/2): { state->m_scrollram16[3] = seibu_vregs[offset]; break; }
 		case (0x028/2): { state->m_scrollram16[4] = seibu_vregs[offset]; break; }
 		case (0x02a/2): { state->m_scrollram16[5] = seibu_vregs[offset]; break; }
-		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset,data); break; }
+//		case (0x03a/2): Godzilla sets this up to be 0x1ef / 0x1eb, presumably bit 2 is vertical wrap-around on/off?
+		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset*2,data); break; }
 	}
 }
 
@@ -1894,8 +1895,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 
 		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
-		case (0x1c/2): cop_angle_compare = cop_mcu_ram[0x1c/2] & 0xff;	break;
-		case (0x1e/2): cop_angle_mod_val = cop_mcu_ram[0x1e/2] & 0xff; break;
+		case (0x01c/2): cop_angle_compare = cop_mcu_ram[0x1c/2] & 0xff;	break;
+		case (0x01e/2): cop_angle_mod_val = cop_mcu_ram[0x1e/2] & 0xff; break;
 
 		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
 		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
@@ -1930,6 +1931,14 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
+		case (0x03e/2):
+			/*
+			0 in all 68k based games
+			0xffff in raiden2 / raidendx
+			0x2000 in zeroteam / xsedae
+			it's always setted up just before the 0x474 register
+			*/
+			break;
 
 		/* brightness control */
 		case (0x05a/2): pal_brightness_val = data & 0xff; break;
