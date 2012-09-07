@@ -3050,7 +3050,11 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 	}
 
 	// disassemble to our buffer
-	return disassemble(buffer.stringbuffer(200), pc, opbuf, argbuf);
+	char diasmbuf[200];
+	memset(diasmbuf, 0x00, 200);
+	UINT32 result = disassemble(diasmbuf, pc, opbuf, argbuf);
+	buffer.cpy(diasmbuf);
+	return result;
 }
 
 
