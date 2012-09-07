@@ -165,11 +165,11 @@ public:
 	UINT8 m_vgPMUL; // reload value for PMUL_Count
 	UINT8 m_vgPMUL_Count;
 	UINT8 m_vgDownCount; // down counter = number of pixels, loaded from vgDU on execute
-#define VG_DU m_regfile[0]
-#define VG_DVM m_regfile[1]
-#define VG_DIR m_regfile[2]
-#define VG_WOPS m_regfile[3]
-	UINT8 m_regfile[4];
+#define VG_DU m_vgRegFile[0]
+#define VG_DVM m_vgRegFile[1]
+#define VG_DIR m_vgRegFile[2]
+#define VG_WOPS m_vgRegFile[3]
+	UINT8 m_vgRegFile[4];
 	UINT8 m_VG_MODE; // 2 bits, latched on EXEC
 	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
 	UINT8 m_ACTS;
@@ -182,10 +182,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vgSOPS);
 	DECLARE_WRITE8_MEMBER(vgPAT);
 	DECLARE_WRITE8_MEMBER(vgPMUL);
-	DECLARE_WRITE8_MEMBER(vgDU);
-	DECLARE_WRITE8_MEMBER(vgDVM);
-	DECLARE_WRITE8_MEMBER(vgDIR);
-	DECLARE_WRITE8_MEMBER(vgWOPS);
+	DECLARE_WRITE8_MEMBER(vgREG);
 	DECLARE_WRITE8_MEMBER(vgEX);
 	DECLARE_WRITE8_MEMBER(KBDW);
 	DECLARE_WRITE8_MEMBER(BAUD);
@@ -424,46 +421,25 @@ WRITE8_MEMBER(vk100_state::vgPMUL)
 }
 
 /* port 0x60: "DU" load vg vector major register */
-WRITE8_MEMBER(vk100_state::vgDU)
-{
-	VG_DU = data;
-#ifdef VG60_VERBOSE
-	logerror("VG: 0x60: DU Reg loaded with %02X\n", VG_DU);
-#endif
-}
-
 /* port 0x61: "DVM" load vg vector minor register */
-WRITE8_MEMBER(vk100_state::vgDVM)
-{
-	VG_DVM = data;
-#ifdef VG60_VERBOSE
-	logerror("VG: 0x61: DVM Reg loaded with %02X\n", VG_DVM);
-#endif
-}
-
 /* port 0x62: "DIR" load vg Direction register */
-WRITE8_MEMBER(vk100_state::vgDIR)
-{
-	VG_DIR = data;
-#ifdef VG60_VERBOSE
-	logerror("VG: 0x62: DIR Reg loaded with %02X\n", VG_DIR);
-#endif
-}
-
 /* port 0x63: "WOPS" vector 'pixel' write options
  * --Attributes to change --   Enable --  Functions --
  * Blink  Green  Red    Blue   Attrib F1     F0     FN
  *                             Change
  * d7     d6     d5     d4     d3     d2     d1     d0
  */
-WRITE8_MEMBER(vk100_state::vgWOPS)
+WRITE8_MEMBER(vk100_state::vgREG)
 {
-	VG_WOPS = data;
+	m_vgRegFile[offset] = data;
 #ifdef VG60_VERBOSE
-	static const char *const functions[] = { "Overlay", "Replace", "Complement", "Erase" };
-	logerror("VG: 0x64: WOPS Reg loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (VG_WOPS>>7)&1, (VG_WOPS>>6)&1, (VG_WOPS>>5)&1, (VG_WOPS>>4)&1, (VG_WOPS>>3)&1, functions[(VG_WOPS>>1)&3], VG_WOPS&1);
+	static const char *const regDest[4] = { "DU", "DVM", "DIR", "WOPS" };
+	static const char *const wopsFunctions[] = { "Overlay", "Replace", "Complement", "Erase" };
+	if (offset < 3) logerror("VG: 0x%02x: %s Reg loaded with %02X\n", (0x60+offset), regDest[offset], m_vgRegFile[offset]);
+	else logerror("VG: 0x63: WOPS Reg loaded with %02X: KGRB %d%d%d%d, AttrChange %d, Function %s, Negate %d\n", data, (VG_WOPS>>7)&1, (VG_WOPS>>6)&1, (VG_WOPS>>5)&1, (VG_WOPS>>4)&1, (VG_WOPS>>3)&1, wopsFunctions[(VG_WOPS>>1)&3], VG_WOPS&1);
 #endif
 }
+
 
 /* port 0x64: "EX MOV" execute a move (relative move of x and y using du/dvm/dir/err, no writing) */
 /* port 0x65: "EX DOT" execute a dot (draw a dot at x,y?) */
@@ -686,10 +662,7 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	AM_RANGE (0x45, 0x45) AM_MIRROR(0x98) AM_WRITE(vgSOPS)   //LD SOPS (screen options (plus uart dest))
 	AM_RANGE (0x46, 0x46) AM_MIRROR(0x98) AM_WRITE(vgPAT)    //LD PAT (pattern register)
 	AM_RANGE (0x47, 0x47) AM_MIRROR(0x98) AM_WRITE(vgPMUL)   //LD PMUL (pattern multiplier)
-	AM_RANGE (0x60, 0x60) AM_MIRROR(0x80) AM_WRITE(vgDU)     //LD DU (major)
-	AM_RANGE (0x61, 0x61) AM_MIRROR(0x80) AM_WRITE(vgDVM)    //LD DVM (minor)
-	AM_RANGE (0x62, 0x62) AM_MIRROR(0x80) AM_WRITE(vgDIR)    //LD DIR (direction)
-	AM_RANGE (0x63, 0x63) AM_MIRROR(0x80) AM_WRITE(vgWOPS)   //LD WOPS (write options)
+	AM_RANGE (0x60, 0x63) AM_MIRROR(0x80) AM_WRITE(vgREG)     //LD DU, DVM, DIR, WOPS (register file)
 	AM_RANGE (0x64, 0x67) AM_MIRROR(0x80) AM_WRITE(vgEX)    //EX MOV, DOT, VEC, ER
 	AM_RANGE (0x68, 0x68) AM_MIRROR(0x83) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
 	AM_RANGE (0x6C, 0x6C) AM_MIRROR(0x83) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
