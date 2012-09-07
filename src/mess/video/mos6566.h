@@ -100,8 +100,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6566_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6566_device, screen_update)
 
 #define MCFG_MOS6567_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS6567, _clock) \
@@ -112,8 +111,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6567_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6567_device, screen_update)
 
 #define MCFG_MOS8562_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS8562, _clock) \
@@ -124,8 +122,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update)
 
 #define MCFG_MOS8564_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS8564, _clock) \
@@ -136,8 +133,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16+16) // 16 for VIC, 16 for VDC
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update)
 
 #define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS6569, _clock) \
@@ -148,8 +144,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6569_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6569_device, screen_update)
 
 #define MCFG_MOS8565_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS8565, _clock) \
@@ -160,8 +155,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update)
 
 #define MCFG_MOS8566_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
 	MCFG_DEVICE_ADD(_tag, MOS8566, _clock) \
@@ -172,8 +166,7 @@
 	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16+16) // 16 for VIC, 16 for VDC
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update)
 
 
 #define MOS6566_INTERFACE(_name) \
@@ -327,7 +320,7 @@ public:
 
 	UINT8 bus_r();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	enum
@@ -390,7 +383,7 @@ protected:
 
 	UINT16 m_chargenaddr, m_videoaddr, m_bitmapaddr;
 
-	bitmap_ind16 *m_bitmap;
+	bitmap_rgb32 m_bitmap;
 
 	UINT16 m_colors[4], m_spritemulti[4];
 
