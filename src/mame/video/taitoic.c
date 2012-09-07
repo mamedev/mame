@@ -586,7 +586,7 @@ INLINE const pc080sn_interface *pc080sn_get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-INLINE void common_get_pc080sn_bg_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_pc080sn_bg_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	UINT16 code, attr;
@@ -602,14 +602,14 @@ INLINE void common_get_pc080sn_bg_tile_info( device_t *device, tile_data &tilein
 		attr = ram[tile_index];
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			code,
 			(attr & 0x1ff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-INLINE void common_get_pc080sn_fg_tile_info( device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
+INLINE void common_get_pc080sn_fg_tile_info( running_machine &machine,  device_t *device, tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(device);
 	UINT16 code,attr;
@@ -625,7 +625,7 @@ INLINE void common_get_pc080sn_fg_tile_info( device_t *device, tile_data &tilein
 		attr = ram[tile_index];
 	}
 
-	SET_TILE_INFO_DEVICE(
+	SET_TILE_INFO(
 			gfxnum,
 			code,
 			(attr & 0x1ff),
@@ -635,13 +635,13 @@ INLINE void common_get_pc080sn_fg_tile_info( device_t *device, tile_data &tilein
 TILE_GET_INFO_MEMBER(pc080sn_device::pc080sn_get_bg_tile_info)
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(this);
-	common_get_pc080sn_bg_tile_info(this, tileinfo, tile_index, pc080sn->bg_ram[0], pc080sn->bg_gfx);
+	common_get_pc080sn_bg_tile_info(machine(), this, tileinfo, tile_index, pc080sn->bg_ram[0], pc080sn->bg_gfx);
 }
 
 TILE_GET_INFO_MEMBER(pc080sn_device::pc080sn_get_fg_tile_info)
 {
 	pc080sn_state *pc080sn = pc080sn_get_safe_token(this);
-	common_get_pc080sn_fg_tile_info(this, tileinfo, tile_index, pc080sn->bg_ram[1], pc080sn->bg_gfx);
+	common_get_pc080sn_fg_tile_info(machine(), this, tileinfo, tile_index, pc080sn->bg_ram[1], pc080sn->bg_gfx);
 }
 
 
