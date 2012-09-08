@@ -1,4 +1,4 @@
-/*  Konami NWK-TR System
+	/*  Konami NWK-TR System
 
     Driver by Ville Linde
 
@@ -281,7 +281,7 @@ static SCREEN_UPDATE_RGB32( nwktr )
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	k001604_draw_front_layer(k001604, bitmap, cliprect);
+	k001604_draw_front_layer(k001604, bitmap, screen.visible_area());
 
 	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
