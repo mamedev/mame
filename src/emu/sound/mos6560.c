@@ -148,18 +148,6 @@ static const rgb_t PALETTE[] =
 };
 
 
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  initialize_palette -
-//-------------------------------------------------
-
-inline void mos6560_device::initialize_palette()
-{
-	palette_set_colors(machine(), 0, PALETTE, ARRAY_LENGTH(PALETTE));
-}
 
 /*****************************************************************************
     IMPLEMENTATION
@@ -189,14 +177,14 @@ void mos6560_device::draw_character( int ybegin, int yend, int ch, int yoff, int
 	{
 		code = read_videoram((m_chargenaddr + ch * m_charheight + y) & 0x3fff);
 
-		m_bitmap.pix16(y + yoff, xoff + 0) = color[code >> 7];
-		m_bitmap.pix16(y + yoff, xoff + 1) = color[(code >> 6) & 1];
-		m_bitmap.pix16(y + yoff, xoff + 2) = color[(code >> 5) & 1];
-		m_bitmap.pix16(y + yoff, xoff + 3) = color[(code >> 4) & 1];
-		m_bitmap.pix16(y + yoff, xoff + 4) = color[(code >> 3) & 1];
-		m_bitmap.pix16(y + yoff, xoff + 5) = color[(code >> 2) & 1];
-		m_bitmap.pix16(y + yoff, xoff + 6) = color[(code >> 1) & 1];
-		m_bitmap.pix16(y + yoff, xoff + 7) = color[code & 1];
+		m_bitmap.pix32(y + yoff, xoff + 0) = PALETTE[color[code >> 7]];
+		m_bitmap.pix32(y + yoff, xoff + 1) = PALETTE[color[(code >> 6) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 2) = PALETTE[color[(code >> 5) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 3) = PALETTE[color[(code >> 4) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 4) = PALETTE[color[(code >> 3) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 5) = PALETTE[color[(code >> 2) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 6) = PALETTE[color[(code >> 1) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 7) = PALETTE[color[code & 1]];
 	}
 }
 
@@ -213,14 +201,14 @@ void mos6560_device::draw_character_multi( int ybegin, int yend, int ch, int yof
 	{
 		code = read_videoram((m_chargenaddr + ch * m_charheight + y) & 0x3fff);
 
-		m_bitmap.pix16(y + yoff, xoff + 0) =
-			m_bitmap.pix16(y + yoff, xoff + 1) = color[code >> 6];
-		m_bitmap.pix16(y + yoff, xoff + 2) =
-			m_bitmap.pix16(y + yoff, xoff + 3) = color[(code >> 4) & 3];
-		m_bitmap.pix16(y + yoff, xoff + 4) =
-			m_bitmap.pix16(y + yoff, xoff + 5) = color[(code >> 2) & 3];
-		m_bitmap.pix16(y + yoff, xoff + 6) =
-			m_bitmap.pix16(y + yoff, xoff + 7) = color[code & 3];
+		m_bitmap.pix32(y + yoff, xoff + 0) =
+			m_bitmap.pix32(y + yoff, xoff + 1) = PALETTE[color[code >> 6]];
+		m_bitmap.pix32(y + yoff, xoff + 2) =
+			m_bitmap.pix32(y + yoff, xoff + 3) = PALETTE[color[(code >> 4) & 3]];
+		m_bitmap.pix32(y + yoff, xoff + 4) =
+			m_bitmap.pix32(y + yoff, xoff + 5) = PALETTE[color[(code >> 2) & 3]];
+		m_bitmap.pix32(y + yoff, xoff + 6) =
+			m_bitmap.pix32(y + yoff, xoff + 7) = PALETTE[color[code & 3]];
 	}
 }
 
@@ -242,7 +230,7 @@ void mos6560_device::drawlines( int first, int last )
 	for (line = first; (line < m_ypos) && (line < last); line++)
 	{
 		for (j = 0; j < m_total_xsize; j++)
-			m_bitmap.pix16(line, j) = m_framecolor;
+			m_bitmap.pix32(line, j) = PALETTE[m_framecolor];
 	}
 
 	for (vline = line - m_ypos; (line < last) && (line < m_ypos + m_ysize);)
@@ -266,7 +254,7 @@ void mos6560_device::drawlines( int first, int last )
 		{
 			for (i = ybegin; i <= yend; i++)
 				for (j = 0; j < m_xpos; j++)
-					m_bitmap.pix16(yoff + i, j) = m_framecolor;
+					m_bitmap.pix32(yoff + i, j) = PALETTE[m_framecolor];
 		}
 
 		for (xoff = m_xpos; (xoff < m_xpos + m_xsize) && (xoff < m_total_xsize); xoff += 8, offs++)
@@ -313,7 +301,7 @@ void mos6560_device::drawlines( int first, int last )
 		{
 			for (i = ybegin; i <= yend; i++)
 				for (j = xoff; j < m_total_xsize; j++)
-					m_bitmap.pix16(yoff + i, j) = m_framecolor;
+					m_bitmap.pix32(yoff + i, j) = PALETTE[m_framecolor];
 		}
 
 		if (m_matrix8x16)
@@ -330,7 +318,7 @@ void mos6560_device::drawlines( int first, int last )
 
 	for (; line < last; line++)
 		for (j = 0; j < m_total_xsize; j++)
-			m_bitmap.pix16(line, j) = m_framecolor;
+			m_bitmap.pix32(line, j) = PALETTE[m_framecolor];
 }
 
 
@@ -489,7 +477,7 @@ void mos6560_device::raster_interrupt_gen()
      main screen bitmap
 -------------------------------------------------*/
 
-UINT32 mos6560_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mos6560_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
@@ -791,9 +779,6 @@ void mos6560_device::device_start()
 		m_total_vretracerate = MOS6561_VRETRACERATE;
 		break;
 	}
-
-	// initialize palette
-	initialize_palette();
 
 	sound_start();
 

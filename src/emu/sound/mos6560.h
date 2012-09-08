@@ -50,7 +50,6 @@
 	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
 	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16) \
 	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
@@ -63,7 +62,6 @@
 	MCFG_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE) \
 	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16) \
 	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
@@ -76,7 +74,6 @@
 	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE) \
 	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
-	MCFG_PALETTE_LENGTH(16) \
 	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
@@ -160,7 +157,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void raster_interrupt_gen();
 
 protected:
@@ -179,7 +176,6 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-	inline void initialize_palette();
 	inline UINT8 read_videoram(offs_t offset);
 	inline UINT8 read_colorram(offs_t offset);
 
@@ -198,7 +194,7 @@ protected:
 
 	UINT8 m_reg[16];
 
-	bitmap_ind16 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 
 	int m_rasterline, m_lastline;
 	double m_lightpenreadtime;
