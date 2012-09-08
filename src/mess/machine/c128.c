@@ -135,20 +135,21 @@ static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 
 static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
 {
-//	c128_state *state = device->machine().driver_data<c128_state>();
+	c128_state *state = device->machine().driver_data<c128_state>();
 	UINT8 value = 0xff;
 	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), 0);
-	//device_t *vic2e = device->machine().device("vic2e");
+	device_t *vic2e = device->machine().device("vic2e");
+	vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(vic2e);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
-/*
-	if (!vic2e->k0_r())
+
+	if (!intf->k0_r())
 		value &= state->m_keyline[0];
-	if (!vic2e->k1_r())
+	if (!intf->k1_r())
 		value &= state->m_keyline[1];
-	if (!vic2e->k2_r())
+	if (!intf->k2_r())
 		value &= state->m_keyline[2];
-*/
+
 	return value;
 }
 

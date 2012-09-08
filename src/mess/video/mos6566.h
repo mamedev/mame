@@ -477,10 +477,21 @@ public:
     mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class vic2e_device_interface
+{
+public:
+	vic2e_device_interface() {}
+	virtual ~vic2e_device_interface() {}
+
+    virtual DECLARE_READ_LINE_MEMBER( k0_r ) { return 1; }
+    virtual DECLARE_READ_LINE_MEMBER( k1_r ) { return 1; }
+    virtual DECLARE_READ_LINE_MEMBER( k2_r ) { return 1; }
+};
+
 
 // ======================> mos8564_device
 
-class mos8564_device :  public mos6567_device
+class mos8564_device :  public mos6567_device, public vic2e_device_interface
 {
 public:
     // construction/destruction
@@ -518,7 +529,7 @@ public:
 
 // ======================> mos8566_device
 
-class mos8566_device :  public mos6569_device
+class mos8566_device :  public mos6569_device, public vic2e_device_interface
 {
 public:
     // construction/destruction
