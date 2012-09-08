@@ -45,7 +45,6 @@
 #define ADAPTEC_BUF_SIZE			1024
 
 // scsidev
-#define SCSI_CMD_TEST_READY			0x00
 #define SCSI_CMD_RECALIBRATE		0x01
 #define SCSI_CMD_REQUEST_SENSE		0x03
 #define SCSI_CMD_MODE_SELECT    	0x15

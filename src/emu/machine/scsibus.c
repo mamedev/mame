@@ -271,16 +271,6 @@ void scsibus_device::scsibus_exec_command()
 	// Check for locally executed commands, and if found execute them
 	switch (command[0])
 	{
-		// Test ready
-		case SCSI_CMD_TEST_READY:
-			LOG(1,"SCSIBUS: test_ready\n");
-			command_local=1;
-			xfer_count=0;
-			data_last=xfer_count;
-			bytes_left=0;
-			devices[last_id]->SetPhase(SCSI_PHASE_STATUS);
-			break;
-
 		// Recalibrate drive
 		case SCSI_CMD_RECALIBRATE:
 			LOG(1,"SCSIBUS: Recalibrate drive\n");
