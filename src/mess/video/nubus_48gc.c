@@ -342,12 +342,10 @@ READ32_MEMBER( jmfb_device::mac_48gc_r )
 		case 0:
 			return 0x0c00;	// sense 13" RGB for now
 //          return 0x0000;  // sense "RGB Kong" monitor
-			break;
 
 		case 0x1c0/4:
 			m_toggle ^= 0xffffffff;
 			return m_toggle;
-			break;
 	}
 
 	return 0;

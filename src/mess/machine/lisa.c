@@ -1858,19 +1858,19 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			switch ((offset & 0x0600) >> 9)
 			{
             case 0:	/* serial ports control */
-                return m_scc->reg_r(space, offset&7);
+                answer = m_scc->reg_r(space, offset&7);
 				break;
 
 			case 2:	/* parallel port */
 				/* 1 VIA located at 0xD901 */
 				if (ACCESSING_BITS_0_7)
-					return via_1->read(space, (offset >> 2) & 0xf);
+					answer = via_1->read(space, (offset >> 2) & 0xf);
 				break;
 
 			case 3:	/* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
 				if (ACCESSING_BITS_0_7)
-					return via_0->read(space, offset & 0xf);
+					answer = via_0->read(space, offset & 0xf);
 				break;
 			}
 		}

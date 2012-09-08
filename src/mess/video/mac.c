@@ -720,19 +720,15 @@ READ32_MEMBER(mac_state::dafb_r)
 	{
 		case 0x1c:	// inverse of monitor sense
 			return 7;	// 21" color 2-page
-			break;
 
 		case 0x24: // SCSI 539x #1 status
 			return m_dafb_scsi1_drq<<9;
-			break;
 
 		case 0x28: // SCSI 539x #2 status
 			return m_dafb_scsi2_drq<<9;
-			break;
 
 		case 0x108:	// IRQ/VBL status
 			return m_dafb_int_status;
-			break;
 
 		case 0x10c: // clear cursor scanline int
 			m_dafb_int_status &= ~4;

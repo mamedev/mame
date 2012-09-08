@@ -362,7 +362,6 @@ READ8_MEMBER( asc_device::read )
 				}
 
 				return rv;
-				break;
 
 			default:
 				break;

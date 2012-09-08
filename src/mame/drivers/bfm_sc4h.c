@@ -125,8 +125,6 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 		case 1:
 			return sc4_cs1_r(space,offset,mem_mask);
 
-
-
 		case 2:
 			base = 0x800000/2;
 			end = base + 0x10000 / 2;
@@ -225,12 +223,9 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 				return 0x0000;
 			}
 
-			break;
-
 		case 4:
 			logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
 			return 0x0000;//0xffff;
-			break;
 
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d (invalid?)\n", pc, offset*2, mem_mask, cs);

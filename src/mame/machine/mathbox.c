@@ -230,7 +230,7 @@ WRITE8_DEVICE_HANDLER( mathbox_go_w )
       REG5 = (REG5 & 0x00ff) | (data << 8);
       REGf = 0x0000;  /* do everything in one step */
       goto step_048;
-      break;
+      //break; // never reached
 
     case 0x1c:
       /* window test? */

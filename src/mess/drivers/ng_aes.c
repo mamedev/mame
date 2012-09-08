@@ -903,7 +903,6 @@ READ16_MEMBER(ng_aes_state::neocd_control_r)
 	case 0x8c/2:
 	case 0x8e/2:
 		return m_neocd_ctrl.dma_mode[offset-(0x7e/2)];
-		break;
 	case 0x105/2:
 		return m_neocd_ctrl.area_sel;
 	case 0x11c/2:
@@ -911,10 +910,8 @@ READ16_MEMBER(ng_aes_state::neocd_control_r)
 		return 0x0600;  // we'll just force USA region for now
 	case 0x1a0/2:
 		return m_neocd_ctrl.spr_bank_sel;
-		break;
 	case 0x1a2/2:
 		return m_neocd_ctrl.pcm_bank_sel;
-		break;
 	default:
 		logerror("CTRL: Read offset %04x\n",offset);
 	}

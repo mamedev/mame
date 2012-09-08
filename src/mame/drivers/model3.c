@@ -1518,7 +1518,6 @@ READ64_MEMBER(model3_state::model3_sys_r)
 		case 0x18/8:
 //          printf("read irq_state %x (PC %x)\n", m_irq_state, cpu_get_pc(&space.device()));
 			return (UINT64)m_irq_state<<56 | 0xff000000;
-			break;
 	}
 
 	logerror("Unknown model3 sys_r: offs %08X mask %08X\n", offset, (UINT32)mem_mask);

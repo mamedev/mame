@@ -323,8 +323,8 @@ READ8_MEMBER(bbc_state::bbc_6845_r)
 
 	switch (offset&1)
 	{
-		case 0: return mc6845->status_r(space,0); break;
-		case 1: return mc6845->register_r(space,0); break;
+		case 0: return mc6845->status_r(space,0);
+		case 1: return mc6845->register_r(space,0);
 	}
 	return 0;
 }

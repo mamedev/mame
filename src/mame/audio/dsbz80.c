@@ -140,13 +140,10 @@ READ8_MEMBER(dsbz80_device::mpeg_pos_r)
 	{
 		case 0:
 			return (mp_prg>>16)&0xff;
-			break;
 		case 1:
 			return (mp_prg>>8)&0xff;
-			break;
 		case 2:
 			return mp_prg&0xff;
-			break;
 	}
 
 	return 0;

@@ -10390,8 +10390,8 @@ READ32_DEVICE_HANDLER( k001604_reg_r )
 
 	switch (offset)
 	{
-		case 0x54/4:	return device->machine().rand() << 16; break;
-		case 0x5c/4:	return device->machine().rand() << 16 | device->machine().rand(); break;
+		case 0x54/4:	return device->machine().rand() << 16;
+		case 0x5c/4:	return device->machine().rand() << 16 | device->machine().rand();
 	}
 
 	return k001604->reg[offset];

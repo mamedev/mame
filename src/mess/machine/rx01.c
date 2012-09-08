@@ -100,8 +100,8 @@ void rx01_device::device_reset()
 READ16_MEMBER( rx01_device::read )
 {
 	switch(offset & 1) {
-		case 0: return status_read(); break;
-		default: return data_read(); break;
+		case 0: return status_read();
+		default: return data_read();
 	}
 
 }

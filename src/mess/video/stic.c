@@ -54,7 +54,6 @@ READ16_MEMBER( intv_state::intv_stic_r )
 			/*** fall through ***/
 		case STIC_DER:
 			return 0x3FFF;
-			break;
 		case STIC_CSR + STIC_CSR0:
 		case STIC_CSR + STIC_CSR1:
 		case STIC_CSR + STIC_CSR2:

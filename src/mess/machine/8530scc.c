@@ -488,12 +488,12 @@ READ8_MEMBER( scc8530_t::reg_r)
 
 		case 2:
 			/* Channel B (Printer Port) Data */
-			return channel[1].rxData;
+			result = channel[1].rxData;
 			break;
 
 		case 3:
 			/* Channel A (Modem Port) Data */
-			return channel[0].rxData;
+			result = channel[0].rxData;
 			break;
 	}
 	return result;

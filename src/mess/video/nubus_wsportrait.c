@@ -299,7 +299,6 @@ READ32_MEMBER( nubus_wsportrait_device::wsportrait_r )
 		case 0x4004:
 			m_toggle ^= 0x00010000;
 			return m_toggle | 0xfffc0000;	// bit 0 = vbl status, bits 1-3 = monitor type
-			break;
 	}
 	return 0;
 }

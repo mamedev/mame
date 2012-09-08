@@ -707,7 +707,6 @@ WRITE8_MEMBER(pmd85_state::mato_io_w)
 				{
 					case 0x80:	/* Motherboard 8255 */
 							return machine().device<i8255_device>("ppi8255_0")->write(space, offset & 0x03, data);
-							break;
 				}
 				break;
 	}

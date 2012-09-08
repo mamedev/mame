@@ -832,7 +832,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			break;
 		case 0x00a0/4:
 		case 0x00a4/4:
-			return 0;	// (does this actually do anything on real h/w?)
+			retval = 0;	// (does this actually do anything on real h/w?)
 			break;
 		case 0x00b0/4:
 		case 0x00b4/4:
@@ -852,11 +852,12 @@ READ32_MEMBER(gba_state::gba_io_r)
 				#if 0
 				if (((offset-0xb0/4) % 3) == 2)
 				{
-					return m_dma_regs[offset-(0xb0/4)] & 0xff000000;
+					retval = m_dma_regs[offset-(0xb0/4)] & 0xff000000;
 				}
+				else
 				#endif
 
-				return m_dma_regs[offset-(0xb0/4)];
+				retval = m_dma_regs[offset-(0xb0/4)];
 			}
 			break;
 		case 0x0100/4:
@@ -901,7 +902,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 					elapsed = 0;
 				}
 
-				return (m_timer_regs[timer] & 0xffff0000) | (elapsed & 0xffff);
+				retval = (m_timer_regs[timer] & 0xffff0000) | (elapsed & 0xffff);
 			}
 			break;
 		case 0x0120/4:
@@ -943,9 +944,9 @@ READ32_MEMBER(gba_state::gba_io_r)
 		case 0x0130/4:
 			if( (mem_mask) & 0x0000ffff )	// KEYINPUT
 			{
-				return ioport("IN0")->read();
+				retval = ioport("IN0")->read();
 			}
-			if( (mem_mask) & 0xffff0000 )
+			else if( (mem_mask) & 0xffff0000 )
 			{
 				verboselog(machine(), 2, "GBA IO Register Read: KEYCNT (%08x) = %04x\n", 0x04000000 + ( offset << 2 ) + 2, m_KEYCNT );
 				retval |= m_KEYCNT << 16;

@@ -257,12 +257,12 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		{
 			case 13:	// IFR
 //              printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
-				return m_rbv_ifr;
+				data = m_rbv_ifr;
 				break;
 
 			case 14:	// IER
 //              printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
-				return m_rbv_ier;
+				data = m_rbv_ier;
 				break;
 
 			default:
