@@ -463,11 +463,14 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
         PA2
         PA3
         PA4
-        PA5
+        PA5		LITE PEN (FIRE)
         PA6
         PA7     SERIAL ATN OUT
 
     */
+
+    // light pen strobe
+    m_vic->lp_w(BIT(data, 5));
 
 	// serial attention out
 	m_iec->atn_w(!BIT(data, 7));
