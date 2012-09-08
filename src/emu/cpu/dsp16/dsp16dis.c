@@ -10,7 +10,7 @@ astring disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
         case 0x01: ret.printf("a%d = a%d + p, p = x*y", D, S); break;
         case 0x02: ret.printf("p = x*y"); break;
         case 0x03: ret.printf("a%d = a%d - p, p = x*y", D, S); break;
-        case 0x04: ret.printf("a$d = p", D); break;
+        case 0x04: ret.printf("a%d = p", D); break;
         case 0x05: ret.printf("a%d = a%d + p", D, S); break;
         case 0x06: ret.printf("NOP"); break;
         case 0x07: ret.printf("a%d = a%d - p", D, S); break;
