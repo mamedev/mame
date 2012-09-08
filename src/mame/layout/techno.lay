@@ -6,7 +6,7 @@
 
 	<element name="digit" defstate="0">
 		<led16seg>
-			<color red="1.0" green="1.0" blue="0.0" />
+			<color red="1.0" green="0.75" blue="0.0" />
 		</led16seg>
 	</element>
 
@@ -21,7 +21,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="35" right="714" bottom="394" />
+			<bounds left="0" top="35" right="714" bottom="154" />
 		</backdrop>
 
 		<!-- LEDs -->
@@ -80,52 +80,52 @@
 		<!-- Bottom Row -->
 
 		<bezel name="digit45" element="digit">
-			<bounds left="10" top="105" right="44" bottom="184" />
+			<bounds left="10" top="105" right="44" bottom="144" />
 		</bezel>
 		<bezel name="digit44" element="digit">
-			<bounds left="54" top="105" right="88" bottom="184" />
+			<bounds left="54" top="105" right="88" bottom="144" />
 		</bezel>
 		<bezel name="digit43" element="digit">
-			<bounds left="98" top="105" right="132" bottom="184" />
+			<bounds left="98" top="105" right="132" bottom="144" />
 		</bezel>
 		<bezel name="digit42" element="digit">
-			<bounds left="142" top="105" right="176" bottom="184" />
+			<bounds left="142" top="105" right="176" bottom="144" />
 		</bezel>
 		<bezel name="digit41" element="digit">
-			<bounds left="186" top="105" right="220" bottom="184" />
+			<bounds left="186" top="105" right="220" bottom="144" />
 		</bezel>
 		<bezel name="digit40" element="digit">
-			<bounds left="230" top="105" right="264" bottom="184" />
+			<bounds left="230" top="105" right="264" bottom="144" />
 		</bezel>
 		<bezel name="digit39" element="digit">
-			<bounds left="274" top="105" right="308" bottom="184" />
+			<bounds left="274" top="105" right="308" bottom="144" />
 		</bezel>
 		<bezel name="digit38" element="digit">
-			<bounds left="318" top="105" right="352" bottom="184" />
+			<bounds left="318" top="105" right="352" bottom="144" />
 		</bezel>
 		<bezel name="digit37" element="digit">
-			<bounds left="362" top="105" right="396" bottom="184" />
+			<bounds left="362" top="105" right="396" bottom="144" />
 		</bezel>
 		<bezel name="digit36" element="digit">
-			<bounds left="406" top="105" right="440" bottom="184" />
+			<bounds left="406" top="105" right="440" bottom="144" />
 		</bezel>
 		<bezel name="digit35" element="digit">
-			<bounds left="450" top="105" right="484" bottom="184" />
+			<bounds left="450" top="105" right="484" bottom="144" />
 		</bezel>
 		<bezel name="digit34" element="digit">
-			<bounds left="494" top="105" right="528" bottom="184" />
+			<bounds left="494" top="105" right="528" bottom="144" />
 		</bezel>
 		<bezel name="digit33" element="digit">
-			<bounds left="538" top="105" right="572" bottom="184" />
+			<bounds left="538" top="105" right="572" bottom="144" />
 		</bezel>
 		<bezel name="digit32" element="digit">
-			<bounds left="582" top="105" right="616" bottom="184" />
+			<bounds left="582" top="105" right="616" bottom="144" />
 		</bezel>
 		<bezel name="digit31" element="digit">
-			<bounds left="626" top="105" right="660" bottom="184" />
+			<bounds left="626" top="105" right="660" bottom="144" />
 		</bezel>
 		<bezel name="digit30" element="digit">
-			<bounds left="670" top="105" right="704" bottom="184" />
+			<bounds left="670" top="105" right="704" bottom="144" />
 		</bezel>
 	</view>
 </mamelayout>
