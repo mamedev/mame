@@ -51,19 +51,11 @@ Notes:
 #include "includes/homerun.h"
 
 
+/***************************************************************************
 
+  I/O / Memory
 
-static I8255A_INTERFACE( ppi8255_intf )
-{
-	// all ports are outputs
-	DEVCB_NULL,				/* Port A read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollhi_w),	/* Port A write */
-	DEVCB_NULL,				/* Port B read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrolly_w),	/* Port B write */
-	DEVCB_NULL,				/* Port C read */
-	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollx_w)	/* Port C write */
-};
-
+***************************************************************************/
 
 static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -73,6 +65,18 @@ static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x10) AM_WRITENOP // D7756C sample number
+	AM_RANGE(0x20, 0x20) AM_WRITENOP // D7756C control
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
+	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
+	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+ADDRESS_MAP_END
+
 
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 {
@@ -88,30 +92,11 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 }
 
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP // D7756C sample number
-	AM_RANGE(0x20, 0x20) AM_WRITENOP // D7756C control
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-ADDRESS_MAP_END
+/***************************************************************************
 
-static const ym2203_interface ym2203_config =
-{
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW"),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_HANDLER(homerun_banking_w)
-	},
-	DEVCB_NULL
-};
+  Inputs
 
+***************************************************************************/
 
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
@@ -220,6 +205,12 @@ static INPUT_PORTS_START( ganjaja )
 INPUT_PORTS_END
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
 static const gfx_layout gfxlayout =
 {
    8,8,
@@ -230,8 +221,6 @@ static const gfx_layout gfxlayout =
    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
    8*8*2
 };
-
-
 
 static const gfx_layout spritelayout =
 {
@@ -248,6 +237,31 @@ static GFXDECODE_START( homerun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
+
+
+static I8255A_INTERFACE( ppi8255_intf )
+{
+	// all ports are outputs
+	DEVCB_NULL,				/* Port A read */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollhi_w),	/* Port A write */
+	DEVCB_NULL,				/* Port B read */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrolly_w),	/* Port B write */
+	DEVCB_NULL,				/* Port C read */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollx_w)	/* Port C write */
+};
+
+static const ym2203_interface ym2203_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_INPUT_PORT("DSW"),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(homerun_banking_w)
+	},
+	DEVCB_NULL
+};
 
 
 static MACHINE_START( homerun )

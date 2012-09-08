@@ -262,7 +262,7 @@ static SCREEN_UPDATE_IND16( panicr)
 
 /***************************************************************************
 
-  I/O
+  I/O / Memory
 
 ***************************************************************************/
 
@@ -286,7 +286,6 @@ READ8_MEMBER(panicr_state::panicr_collision_r)
 
 	return data;
 }
-
 
 
 WRITE8_MEMBER(panicr_state::panicr_scrollx_lo_w)
