@@ -159,6 +159,7 @@ public:
 	UINT8 m_at_spkrdata;
 	UINT8 m_at_speaker_input;
 	int m_dma_channel;
+	bool m_cur_eop;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 	UINT16 m_dma_high_byte;
@@ -176,6 +177,8 @@ public:
 
 	DECLARE_DRIVER_INIT(atcga);
 	DECLARE_DRIVER_INIT(atvga);
+
+	void pc_set_dma_channel(int channel, int state);
 };
 
 

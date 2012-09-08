@@ -221,6 +221,8 @@ void southbridge_device::device_reset()
 	m_poll_delay = 4;
 	m_at_spkrdata = 0;
 	m_at_speaker_input = 0;
+	m_dma_channel = -1;
+	m_cur_eop = false;
 }
 
 
@@ -336,6 +338,8 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
 
 READ8_MEMBER(southbridge_device::pc_dma_read_byte)
 {
+	if(m_dma_channel == -1)
+		return 0xff;
 	UINT8 result;
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
@@ -346,6 +350,8 @@ READ8_MEMBER(southbridge_device::pc_dma_read_byte)
 
 WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
 {
+	if(m_dma_channel == -1)
+		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
 	space.write_byte(page_offset + offset, data);
@@ -354,6 +360,8 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
 
 READ8_MEMBER(southbridge_device::pc_dma_read_word)
 {
+	if(m_dma_channel == -1)
+		return 0xff;
 	UINT16 result;
 	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
 
@@ -366,6 +374,8 @@ READ8_MEMBER(southbridge_device::pc_dma_read_word)
 
 WRITE8_MEMBER(southbridge_device::pc_dma_write_word)
 {
+	if(m_dma_channel == -1)
+		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFF0000;
 
 	space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
@@ -389,16 +399,36 @@ WRITE8_MEMBER( southbridge_device::pc_dma8237_5_dack_w ){ m_isabus->dack_w(5, da
 WRITE8_MEMBER( southbridge_device::pc_dma8237_6_dack_w ){ m_isabus->dack_w(6, data); }
 WRITE8_MEMBER( southbridge_device::pc_dma8237_7_dack_w ){ m_isabus->dack_w(7, data); }
 
-WRITE_LINE_MEMBER( southbridge_device::at_dma8237_out_eop ) { m_isabus->eop_w(state == ASSERT_LINE ? 0 : 1 ); }
+WRITE_LINE_MEMBER( southbridge_device::at_dma8237_out_eop )
+{
+	m_cur_eop = state == ASSERT_LINE;
+	if(m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, ASSERT_LINE );
+}
 
-WRITE_LINE_MEMBER( southbridge_device::pc_dack0_w ) { if (!state) m_dma_channel = 0; }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack1_w ) { if (!state) m_dma_channel = 1; }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack2_w ) { if (!state) m_dma_channel = 2; }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack3_w ) { if (!state) m_dma_channel = 3; }
+void southbridge_device::pc_select_dma_channel(int channel, bool state)
+{
+	if(!state) {
+		m_dma_channel = channel;
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, ASSERT_LINE );
+
+	} else if(m_dma_channel == channel) {
+		m_dma_channel = -1;
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, CLEAR_LINE );
+	}
+}
+
+
+WRITE_LINE_MEMBER( southbridge_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
+WRITE_LINE_MEMBER( southbridge_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
+WRITE_LINE_MEMBER( southbridge_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
+WRITE_LINE_MEMBER( southbridge_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
 WRITE_LINE_MEMBER( southbridge_device::pc_dack4_w ) { i8237_hlda_w( m_dma8237_1, state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( southbridge_device::pc_dack5_w ) { if (!state) m_dma_channel = 5; }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack6_w ) { if (!state) m_dma_channel = 6; }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { if (!state) m_dma_channel = 7; }
+WRITE_LINE_MEMBER( southbridge_device::pc_dack5_w ) { pc_select_dma_channel(5, state); }
+WRITE_LINE_MEMBER( southbridge_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
+WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
 
 READ8_MEMBER( southbridge_device::at_portb_r )
 {

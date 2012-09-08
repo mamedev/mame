@@ -69,6 +69,8 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
 
 READ8_MEMBER( ibm5160_mb_device::pc_dma_read_byte )
 {
+	if(m_dma_channel == -1)
+		return 0xff;
 	address_space *spaceio = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
 	return spaceio->read_byte( page_offset + offset);
@@ -77,6 +79,8 @@ READ8_MEMBER( ibm5160_mb_device::pc_dma_read_byte )
 
 WRITE8_MEMBER( ibm5160_mb_device::pc_dma_write_byte )
 {
+	if(m_dma_channel == -1)
+		return;
 	address_space *spaceio = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
 
@@ -127,13 +131,29 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_0_dack_w )
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
 {
-	return m_isabus->eop_w(state == ASSERT_LINE ? 0 : 1 );
+	m_cur_eop = state == ASSERT_LINE;
+	if(m_dma_channel != -1 && m_cur_eop)
+		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack0_w ) { if (!state) m_dma_channel = 0; }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack1_w ) { if (!state) m_dma_channel = 1; }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack2_w ) { if (!state) m_dma_channel = 2; }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { if (!state) m_dma_channel = 3; }
+void ibm5160_mb_device::pc_select_dma_channel(int channel, bool state)
+{
+	if(!state) {
+		m_dma_channel = channel;
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, ASSERT_LINE );
+
+	} else if(m_dma_channel == channel) {
+		m_dma_channel = -1;
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, CLEAR_LINE );
+	}
+}
+
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
+WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
 
 I8237_INTERFACE( pc_dma8237_config )
 {
@@ -651,7 +671,8 @@ void ibm5160_mb_device::device_reset()
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
 	m_pc_input = 0;
-	m_dma_channel = 0;
+	m_dma_channel = -1;
+	m_cur_eop = false;
 	memset(m_dma_offset,0,sizeof(m_dma_offset));
 	m_ppi_portc_switch_high = 0;
 	m_ppi_speaker = 0;

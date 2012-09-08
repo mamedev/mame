@@ -163,6 +163,8 @@ WRITE_LINE_MEMBER( at_state::pc_dma_hrq_changed )
 
 READ8_MEMBER(at_state::pc_dma_read_byte)
 {
+	if(m_dma_channel == -1)
+		return 0xff;
 	UINT8 result;
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
@@ -173,6 +175,8 @@ READ8_MEMBER(at_state::pc_dma_read_byte)
 
 WRITE8_MEMBER(at_state::pc_dma_write_byte)
 {
+	if(m_dma_channel == -1)
+		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
 
 	space.write_byte(page_offset + offset, data);
@@ -181,6 +185,8 @@ WRITE8_MEMBER(at_state::pc_dma_write_byte)
 
 READ8_MEMBER(at_state::pc_dma_read_word)
 {
+	if(m_dma_channel == -1)
+		return 0xff;
 	UINT16 result;
 	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
@@ -193,6 +199,8 @@ READ8_MEMBER(at_state::pc_dma_read_word)
 
 WRITE8_MEMBER(at_state::pc_dma_write_word)
 {
+	if(m_dma_channel == -1)
+		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
 
 	space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
@@ -215,23 +223,35 @@ WRITE8_MEMBER( at_state::pc_dma8237_5_dack_w ){ m_isabus->dack16_w(5, m_dma_high
 WRITE8_MEMBER( at_state::pc_dma8237_6_dack_w ){ m_isabus->dack16_w(6, m_dma_high_byte | data); }
 WRITE8_MEMBER( at_state::pc_dma8237_7_dack_w ){ m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
-WRITE_LINE_MEMBER( at_state::at_dma8237_out_eop ) { m_isabus->eop_w(state == ASSERT_LINE ? 0 : 1 ); }
-
-static void set_dma_channel(device_t *device, int channel, int state)
+WRITE_LINE_MEMBER( at_state::at_dma8237_out_eop )
 {
-	at_state *st = device->machine().driver_data<at_state>();
-	if (!state)
-		st->m_dma_channel = channel;
+	m_cur_eop = state == ASSERT_LINE;
+	if(m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, ASSERT_LINE );
 }
 
-WRITE_LINE_MEMBER( at_state::pc_dack0_w ) { set_dma_channel(m_dma8237_1, 0, state); }
-WRITE_LINE_MEMBER( at_state::pc_dack1_w ) { set_dma_channel(m_dma8237_1, 1, state); }
-WRITE_LINE_MEMBER( at_state::pc_dack2_w ) { set_dma_channel(m_dma8237_1, 2, state); }
-WRITE_LINE_MEMBER( at_state::pc_dack3_w ) { set_dma_channel(m_dma8237_1, 3, state); }
+void at_state::pc_set_dma_channel(int channel, int state)
+{
+	if(!state) {
+		m_dma_channel = channel;
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, ASSERT_LINE );
+
+	} else if(m_dma_channel == channel) {
+		m_dma_channel = -1;
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, CLEAR_LINE );
+	}
+}
+
+WRITE_LINE_MEMBER( at_state::pc_dack0_w ) { pc_set_dma_channel(0, state); }
+WRITE_LINE_MEMBER( at_state::pc_dack1_w ) { pc_set_dma_channel(1, state); }
+WRITE_LINE_MEMBER( at_state::pc_dack2_w ) { pc_set_dma_channel(2, state); }
+WRITE_LINE_MEMBER( at_state::pc_dack3_w ) { pc_set_dma_channel(3, state); }
 WRITE_LINE_MEMBER( at_state::pc_dack4_w ) { m_dma8237_1->hack_w(state ? 0 : 1); } // it's inverted
-WRITE_LINE_MEMBER( at_state::pc_dack5_w ) { set_dma_channel(m_dma8237_2, 5, state); }
-WRITE_LINE_MEMBER( at_state::pc_dack6_w ) { set_dma_channel(m_dma8237_2, 6, state); }
-WRITE_LINE_MEMBER( at_state::pc_dack7_w ) { set_dma_channel(m_dma8237_2, 7, state); }
+WRITE_LINE_MEMBER( at_state::pc_dack5_w ) { pc_set_dma_channel(5, state); }
+WRITE_LINE_MEMBER( at_state::pc_dack6_w ) { pc_set_dma_channel(6, state); }
+WRITE_LINE_MEMBER( at_state::pc_dack7_w ) { pc_set_dma_channel(7, state); }
 
 I8237_INTERFACE( at_dma8237_1_config )
 {
@@ -343,4 +363,6 @@ MACHINE_RESET( at )
 	st->m_poll_delay = 4;
 	st->m_at_spkrdata = 0;
 	st->m_at_speaker_input = 0;
+	st->m_dma_channel = -1;
+	st->m_cur_eop = false;
 }

@@ -56,6 +56,7 @@ public:
 	UINT8 m_dma_offset[4];
 	UINT8 m_pc_spkrdata;
 	UINT8 m_pc_input;
+	bool m_cur_eop;
 
 	UINT8 m_nmi_enabled;
 
@@ -102,6 +103,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
 	const char *m_cputag;
+
+private:
+	void pc_select_dma_channel(int channel, bool state);
 };
 
 

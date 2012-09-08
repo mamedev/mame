@@ -350,7 +350,7 @@ inline void am9517a_device::end_of_process()
 	}
 
 	// signal end of process
-	set_eop(0);
+	set_eop(ASSERT_LINE);
 	set_hreq(0);
 
 	m_current_channel = -1;
@@ -454,7 +454,7 @@ void am9517a_device::device_reset()
 	m_last_channel = 3;
 
 	set_hreq(0);
-	set_eop(1);
+	set_eop(ASSERT_LINE);
 
 	set_dack();
 }
@@ -471,7 +471,7 @@ void am9517a_device::execute_run()
 		switch (m_state)
 		{
 		case STATE_SI:
-			set_eop(1);
+			set_eop(CLEAR_LINE);
 
 			if (!COMMAND_DISABLE)
 			{

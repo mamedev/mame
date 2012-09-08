@@ -127,7 +127,7 @@ void i8237_device::device_start()
 void i8237_device::device_reset()
 {
 	m_status = 0x0F;
-	m_eop = 1;
+	m_eop = ASSERT_LINE;
 	m_state = DMA8237_SI;
 	m_last_service_channel = 3;
     m_service_channel = 0;
@@ -269,10 +269,10 @@ void i8237_device::i8237_timerproc()
 	case DMA8237_SI:
 	{
 		/* Make sure EOP is high */
-		if ( !m_eop )
+		if ( m_eop == CLEAR_LINE )
 		{
-			m_eop = 1;
-			m_out_eop_func(m_eop ? ASSERT_LINE : CLEAR_LINE);
+			m_eop = ASSERT_LINE;
+			m_out_eop_func(m_eop);
 		}
 
 		/* Check if a new DMA request has been received. */
@@ -363,8 +363,8 @@ void i8237_device::i8237_timerproc()
 		/* Check if EOP output needs to be asserted  */
 		if ( m_status & ( 0x01 << m_service_channel ) )
 		{
-			m_eop = 0;
-			m_out_eop_func(m_eop ? ASSERT_LINE : CLEAR_LINE);
+			m_eop = CLEAR_LINE;
+			m_out_eop_func(m_eop);
 		}
 		break;
 
@@ -413,7 +413,7 @@ void i8237_device::i8237_timerproc()
 			{
 			case DMA8237_DEMAND_MODE:
 				/* Check for terminal count or EOP signal or DREQ begin de-asserted */
-				if ( ( m_status & ( 0x01 << channel ) ) || !m_eop || !( m_drq & ( 0x01 << channel ) ) )
+				if ( ( m_status & ( 0x01 << channel ) ) || m_eop == CLEAR_LINE || !( m_drq & ( 0x01 << channel ) ) )
 				{
 					m_hrq = 0;
 					m_hlda = 0;
@@ -435,7 +435,7 @@ void i8237_device::i8237_timerproc()
 
 			case DMA8237_BLOCK_MODE:
 				/* Check for terminal count or EOP signal */
-				if ( ( m_status & ( 0x01 << channel ) ) || !m_eop )
+				if ( ( m_status & ( 0x01 << channel ) ) || m_eop == CLEAR_LINE )
 				{
 					m_hrq = 0;
 					m_hlda = 0;
@@ -452,8 +452,8 @@ void i8237_device::i8237_timerproc()
 			/* Check if EOP output needs to be asserted */
 			if ( m_status & ( 0x01 << channel ) )
 			{
-				m_eop = 0;
-				m_out_eop_func(m_eop ? ASSERT_LINE : CLEAR_LINE);
+				m_eop = CLEAR_LINE;
+				m_out_eop_func(m_eop);
 			}
 		}
 

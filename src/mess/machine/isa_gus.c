@@ -1181,15 +1181,17 @@ void gf1_device::dack_w(int line,UINT8 data)
 
 void gf1_device::eop_w(int state)
 {
-	// end of transfer
-	m_dmatimer->reset();
-	//m_drq1(0);
-	if(m_dma_dram_ctrl & 0x20)
-	{
-		m_dma_dram_ctrl |= 0x40;
-		m_dma_irq_func(1);
+	if(state == ASSERT_LINE) {
+		// end of transfer
+		m_dmatimer->reset();
+		//m_drq1(0);
+		if(m_dma_dram_ctrl & 0x20)
+		{
+			m_dma_dram_ctrl |= 0x40;
+			m_dma_irq_func(1);
+		}
+		logerror("GUS: End of transfer. (%05x)\n",m_dma_current);
 	}
-	logerror("GUS: End of transfer. (%05x)\n",m_dma_current);
 }
 
 

@@ -173,7 +173,7 @@ public:
 
 	UINT8 dack_r(int line);
 	void dack_w(int line,UINT8 data);
-	void eop_w(int state);
+	void eop_w(int channels, int state);
 
 	void nmi();
 	void set_nmi_state(bool enabled) { m_nmi_enabled = enabled; }

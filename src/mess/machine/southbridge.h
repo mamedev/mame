@@ -132,6 +132,7 @@ protected:
 		UINT8 m_at_spkrdata;
 		UINT8 m_at_speaker_input;
 		int m_dma_channel;
+		bool m_cur_eop;
 		UINT8 m_dma_offset[2][4];
 		UINT8 m_at_pages[0x10];
 		UINT16 m_dma_high_byte;
@@ -142,6 +143,8 @@ protected:
 
 		UINT8 m_channel_check;
 		UINT8 m_nmi_enabled;
+
+		void pc_select_dma_channel(int channel, bool state);
 };
 
 #endif  /* __SOUTHBRIDGE_H__ */

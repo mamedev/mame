@@ -394,12 +394,10 @@ void isa8_device::dack_w(int line,UINT8 data)
 		return m_dma_device[line]->dack_w(line,data);
 }
 
-void isa8_device::eop_w(int state)
+void isa8_device::eop_w(int channel, int state)
 {
-	for (int i=0;i<8;i++) {
-		if (m_dma_eop[i]==TRUE && m_dma_device[i])
-			m_dma_device[i]->eop_w(state);
-	}
+	if (m_dma_eop[channel] && m_dma_device[channel])
+		m_dma_device[channel]->eop_w(state);
 }
 
 void isa8_device::nmi()
