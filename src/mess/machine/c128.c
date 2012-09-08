@@ -21,33 +21,33 @@
 #include "video/mos6566.h"
 #include "video/mc6845.h"
 
-#define MMU_PAGE1 ((((state->m_mmu[10]&0xf)<<8)|state->m_mmu[9])<<8)
-#define MMU_PAGE0 ((((state->m_mmu[8]&0xf)<<8)|state->m_mmu[7])<<8)
-#define MMU_VIC_ADDR ((state->m_mmu[6]&0xc0)<<10)
-#define MMU_RAM_RCR_ADDR ((state->m_mmu[6]&0x30)<<14)
-#define MMU_SIZE (c128_mmu_helper[state->m_mmu[6]&3])
-#define MMU_BOTTOM (state->m_mmu[6]&4)
-#define MMU_TOP (state->m_mmu[6]&8)
-#define MMU_CPU8502 (state->m_mmu[5]&1)	   /* else z80 */
+#define MMU_PAGE1 ((((m_mmu[10]&0xf)<<8)|m_mmu[9])<<8)
+#define MMU_PAGE0 ((((m_mmu[8]&0xf)<<8)|m_mmu[7])<<8)
+#define MMU_VIC_ADDR ((m_mmu[6]&0xc0)<<10)
+#define MMU_RAM_RCR_ADDR ((m_mmu[6]&0x30)<<14)
+#define MMU_SIZE (c128_mmu_helper[m_mmu[6]&3])
+#define MMU_BOTTOM (m_mmu[6]&4)
+#define MMU_TOP (m_mmu[6]&8)
+#define MMU_CPU8502 (m_mmu[5]&1)	   /* else z80 */
 /* fastio output (c128_mmu[5]&8) else input */
-#define MMU_FSDIR(s) ((s)->m_mmu[5]&0x08)
-#define MMU_GAME_IN (state->m_mmu[5]&0x10)
-#define MMU_EXROM_IN (state->m_mmu[5]&0x20)
-#define MMU_64MODE (state->m_mmu[5]&0x40)
-#define MMU_40_IN (state->m_mmu[5]&0x80)
+#define MMU_FSDIR (m_mmu[5]&0x08)
+#define MMU_GAME_IN (m_mmu[5]&0x10)
+#define MMU_EXROM_IN (m_mmu[5]&0x20)
+#define MMU_64MODE (m_mmu[5]&0x40)
+#define MMU_40_IN (m_mmu[5]&0x80)
 
-#define MMU_RAM_CR_ADDR ((state->m_mmu[0]&0xc0)<<10)
-#define MMU_RAM_LO (state->m_mmu[0]&2)	   /* else rom at 0x4000 */
-#define MMU_RAM_MID ((state->m_mmu[0]&0xc)==0xc)	/* 0x8000 - 0xbfff */
-#define MMU_ROM_MID ((state->m_mmu[0]&0xc)==0)
-#define MMU_EXTERNAL_ROM_MID ((state->m_mmu[0]&0xc)==8)
-#define MMU_INTERNAL_ROM_MID ((state->m_mmu[0]&0xc)==4)
+#define MMU_RAM_CR_ADDR ((m_mmu[0]&0xc0)<<10)
+#define MMU_RAM_LO (m_mmu[0]&2)	   /* else rom at 0x4000 */
+#define MMU_RAM_MID ((m_mmu[0]&0xc)==0xc)	/* 0x8000 - 0xbfff */
+#define MMU_ROM_MID ((m_mmu[0]&0xc)==0)
+#define MMU_EXTERNAL_ROM_MID ((m_mmu[0]&0xc)==8)
+#define MMU_INTERNAL_ROM_MID ((m_mmu[0]&0xc)==4)
 
-#define MMU_IO_ON (!(state->m_mmu[0]&1))   /* io window at 0xd000 */
-#define MMU_ROM_HI ((state->m_mmu[0]&0x30)==0)	/* rom at 0xc000 */
-#define MMU_EXTERNAL_ROM_HI ((state->m_mmu[0]&0x30)==0x20)
-#define MMU_INTERNAL_ROM_HI ((state->m_mmu[0]&0x30)==0x10)
-#define MMU_RAM_HI ((state->m_mmu[0]&0x30)==0x30)
+#define MMU_IO_ON (!(m_mmu[0]&1))   /* io window at 0xd000 */
+#define MMU_ROM_HI ((m_mmu[0]&0x30)==0)	/* rom at 0xc000 */
+#define MMU_EXTERNAL_ROM_HI ((m_mmu[0]&0x30)==0x20)
+#define MMU_INTERNAL_ROM_HI ((m_mmu[0]&0x30)==0x10)
+#define MMU_RAM_HI ((m_mmu[0]&0x30)==0x30)
 
 #define MMU_RAM_ADDR (MMU_RAM_RCR_ADDR|MMU_RAM_CR_ADDR)
 
@@ -88,25 +88,23 @@ static const int c128_mmu_helper[4] =
 
 
 
-static void c128_nmi( running_machine &machine )
+void c128_state::nmi()
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	device_t *cia_1 = machine.device("cia_1");
-	int cia1irq = mos6526_irq_r(cia_1);
+	int cia1irq = mos6526_irq_r(m_cia2);
 
-	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (m_nmilevel != (ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
 		if (1) // this was never valid, there is no active CPU during a timer firing!  cpu_getactivecpu() == 0)
 		{
 			/* z80 */
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || cia1irq);
 		}
 		else
 		{
-			cputag_set_input_line(machine, "m8502", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
+			m_subcpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || cia1irq);
 		}
 
-		state->m_nmilevel = (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
+		m_nmilevel = (ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
 }
 
@@ -126,160 +124,145 @@ static void c128_nmi( running_machine &machine )
  *  see machine/cbm.c
  */
 
-static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
+READ8_MEMBER( c128_state::cia1_pa_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(device->machine().device("cia_0"), 0);
+	UINT8 cia0portb = mos6526_pb_r(m_cia1, 0);
 
-	return cbm_common_cia0_port_a_r(device, cia0portb);
+	return cbm_common_cia0_port_a_r(m_cia1, cia0portb);
 }
 
-static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
+READ8_MEMBER( c128_state::cia1_pb_r )
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), 0);
-	device_t *vic2e = device->machine().device("vic2e");
-	vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(vic2e);
+	UINT8 cia0porta = mos6526_pa_r(m_cia1, 0);
+	//vic2e_device_interface *intf = dynamic_cast<vic2e_device_interface*>(&m_vic);
 
-	value &= cbm_common_cia0_port_b_r(device, cia0porta);
-
+	value &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
+/*
 	if (!intf->k0_r())
-		value &= state->m_keyline[0];
+		value &= m_keyline[0];
 	if (!intf->k1_r())
-		value &= state->m_keyline[1];
+		value &= m_keyline[1];
 	if (!intf->k2_r())
-		value &= state->m_keyline[2];
-
+		value &= m_keyline[2];
+*/
 	return value;
 }
 
-static WRITE8_DEVICE_HANDLER( c128_cia0_port_b_w )
+WRITE8_MEMBER( c128_state::cia1_pb_w )
 {
-	mos6566_device *vic2e = device->machine().device<mos6566_device>("vic2e");
-
-	vic2e->lp_w(BIT(data, 4));
+	m_vic->lp_w(BIT(data, 4));
 }
 
-static void c128_irq( running_machine &machine, int level )
+void c128_state::irq(int level)
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	if (level != state->m_old_level)
+	if (level != m_old_level)
 	{
-		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
+		DBG_LOG(machine(), 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
 
 		if (0) // && (cpu_getactivecpu() == 0))
 		{
-			cputag_set_input_line(machine, "maincpu", 0, level);
+			m_maincpu->set_input_line(0, level);
 		}
 		else
 		{
-			cputag_set_input_line(machine, "m8502", M6510_IRQ_LINE, level);
+			m_subcpu->set_input_line(M6510_IRQ_LINE, level);
 		}
 
-		state->m_old_level = level;
+		m_old_level = level;
 	}
 }
 
-static void c128_cia0_interrupt( device_t *device, int level )
+WRITE_LINE_MEMBER( c128_state::cia1_irq_w )
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
-	c128_irq(device->machine(), level || state->m_vicirq);
+	irq(state || m_vicirq);
 }
 
 WRITE_LINE_MEMBER( c128_state::vic_interrupt )
 {
-	device_t *cia_0 = machine().device("cia_0");
-#if 1
 	if (state  != m_vicirq)
 	{
-		c128_irq (machine(), state || mos6526_irq_r(cia_0));
+		irq(state || mos6526_irq_r(m_cia1));
 		m_vicirq = state;
 	}
-#endif
 }
 
-static void c128_iec_data_out_w(running_machine &machine)
+void c128_state::iec_data_out_w()
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	int data = !state->m_data_out;
+	int data = !m_data_out;
 
 	/* fast serial data */
-	if (MMU_FSDIR(state)) data &= state->m_sp1;
+	if (MMU_FSDIR) data &= m_sp1;
 
-	state->m_iec->data_w(data);
+	m_iec->data_w(data);
 }
 
-static void c128_iec_srq_out_w(running_machine &machine)
+void c128_state::iec_srq_out_w()
 {
-	c128_state *state = machine.driver_data<c128_state>();
 	int srq = 1;
 
 	/* fast serial clock */
-	if (MMU_FSDIR(state)) srq &= state->m_cnt1;
+	if (MMU_FSDIR) srq &= m_cnt1;
 
-	state->m_iec->srq_w(srq);
+	m_iec->srq_w(srq);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( cia0_cnt_w )
+WRITE_LINE_MEMBER( c128_state::cia1_cnt_w )
 {
-	c128_state *drvstate = device->machine().driver_data<c128_state>();
 	/* fast clock out */
-	drvstate->m_cnt1 = state;
-	c128_iec_srq_out_w(device->machine());
+	m_cnt1 = state;
+
+	iec_srq_out_w();
 }
 
-static WRITE_LINE_DEVICE_HANDLER( cia0_sp_w )
+WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
 {
-	c128_state *drvstate = device->machine().driver_data<c128_state>();
 	/* fast data out */
-	drvstate->m_sp1 = state;
-	c128_iec_data_out_w(device->machine());
+	m_sp1 = state;
+
+	iec_data_out_w();
 }
 
 const mos6526_interface c128_ntsc_cia0 =
 {
 	60,
-	DEVCB_LINE(c128_cia0_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_irq_w),
 	DEVCB_NULL,	/* pc_func */
-	DEVCB_LINE(cia0_cnt_w),
-	DEVCB_LINE(cia0_sp_w),
-	DEVCB_HANDLER(c128_cia0_port_a_r),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_cnt_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_sp_w),
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pa_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(c128_cia0_port_b_r),
-	DEVCB_HANDLER(c128_cia0_port_b_w)
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_w)
 };
 
 const mos6526_interface c128_pal_cia0 =
 {
 	50,
-	DEVCB_LINE(c128_cia0_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_irq_w),
 	DEVCB_NULL,	/* pc_func */
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_cnt_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_sp_w),
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pa_r),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(c128_cia0_port_a_r),
-	DEVCB_NULL,
-	DEVCB_HANDLER(c128_cia0_port_b_r),
-	DEVCB_HANDLER(c128_cia0_port_b_w)
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_w)
 };
 
-WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w )
+WRITE_LINE_MEMBER( c128_state::iec_srq_w )
 {
-	c128_state *drvstate = device->machine().driver_data<c128_state>();
-
-	if (!MMU_FSDIR(drvstate))
+	if (!MMU_FSDIR)
 	{
-		mos6526_flag_w(device, state);
-		mos6526_cnt_w(device, state);
+		mos6526_flag_w(m_cia1, state);
+		mos6526_cnt_w(m_cia1, state);
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w )
+WRITE_LINE_MEMBER( c128_state::iec_data_w )
 {
-	c128_state *drvstate = device->machine().driver_data<c128_state>();
-
-	if (!MMU_FSDIR(drvstate))
+	if (!MMU_FSDIR)
 	{
-		mos6526_sp_w(device, state);
+		mos6526_sp_w(m_cia1, state);
 	}
 }
 
@@ -306,50 +289,48 @@ WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w )
  * flag restore key or rs232 received data input
  * irq to nmi connected ?
  */
-static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
+READ8_MEMBER( c128_state::cia2_pa_r )
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
 	UINT8 value = 0xff;
 
-	if (!state->m_iec->clk_r())
+	if (!m_iec->clk_r())
 		value &= ~0x40;
 
-	if (!state->m_iec->data_r())
+	if (!m_iec->data_r())
 		value &= ~0x80;
 
 	return value;
 }
 
-static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
+WRITE8_MEMBER( c128_state::cia2_pa_w )
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
-	state->m_data_out = BIT(data, 5);
-	c128_iec_data_out_w(device->machine());
+	m_data_out = BIT(data, 5);
+	iec_data_out_w();
 
-	state->m_iec->clk_w(!BIT(data, 4));
+	m_iec->clk_w(!BIT(data, 4));
 
-	state->m_iec->atn_w(!BIT(data, 3));
+	m_iec->atn_w(!BIT(data, 3));
 
-	state->m_vicaddr = state->m_memory + helper[data & 0x03];
-	state->m_c128_vicaddr = state->m_memory + helper[data & 0x03] + state->m_va1617;
+	m_vicaddr = m_memory + helper[data & 0x03];
+	m_c128_vicaddr = m_memory + helper[data & 0x03] + m_va1617;
 }
 
-static void c128_cia1_interrupt( device_t *device, int level )
+WRITE_LINE_MEMBER( c128_state::cia2_irq_w )
 {
-	c128_nmi(device->machine());
+	nmi();
 }
 
 const mos6526_interface c128_ntsc_cia1 =
 {
 	60,
-	DEVCB_LINE(c128_cia1_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia2_irq_w),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(c128_cia1_port_a_r),
-	DEVCB_HANDLER(c128_cia1_port_a_w),
+	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -357,12 +338,12 @@ const mos6526_interface c128_ntsc_cia1 =
 const mos6526_interface c128_pal_cia1 =
 {
 	50,
-	DEVCB_LINE(c128_cia1_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia2_irq_w),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(c128_cia1_port_a_r),
-	DEVCB_HANDLER(c128_cia1_port_a_w),
+	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_r),
+	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -372,71 +353,64 @@ const mos6526_interface c128_pal_cia1 =
     Memory Handlers
 
 ***********************************************/
-static WRITE8_HANDLER( c128_dma8726_port_w )
+WRITE8_MEMBER( c128_state::dma8726_port_w )
 {
-	DBG_LOG(space->machine(), 1, "dma write", ("%.3x %.2x\n",offset,data));
+	DBG_LOG(machine(), 1, "dma write", ("%.3x %.2x\n",offset,data));
 }
 
-static READ8_HANDLER( c128_dma8726_port_r )
+READ8_MEMBER( c128_state::dma8726_port_r )
 {
-	DBG_LOG(space->machine(), 1, "dma read", ("%.3x\n",offset));
+	DBG_LOG(machine(), 1, "dma read", ("%.3x\n",offset));
 	return 0xff;
 }
 
-WRITE8_HANDLER( c128_write_d000 )
+WRITE8_MEMBER( c128_state::write_d000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	device_t *cia_0 = space->machine().device("cia_0");
-	device_t *cia_1 = space->machine().device("cia_1");
-	device_t *sid = space->machine().device("sid6581");
-	mos6566_device *vic2e = space->machine().device<mos6566_device>("vic2e");
-	mos8563_device *vdc8563 = space->machine().device<mos8563_device>("vdc8563");
+	UINT8 c64_port6510 = m6510_get_port(m_subcpu);
 
-	UINT8 c64_port6510 = m6510_get_port(space->machine().device<legacy_cpu_device>("m8502"));
-
-	if (!state->m_write_io)
+	if (!m_write_io)
 	{
-		if (offset + 0xd000 >= state->m_ram_top)
-			state->m_memory[0xd000 + offset] = data;
+		if (offset + 0xd000 >= m_ram_top)
+			m_memory[0xd000 + offset] = data;
 		else
-			state->m_ram[0xd000 + offset] = data;
+			m_ram[0xd000 + offset] = data;
 	}
 	else
 	{
 		switch ((offset&0xf00)>>8)
 		{
 		case 0:case 1: case 2: case 3:
-			vic2e->write(*space, offset & 0x3f, data);
+			m_vic->write(space, offset & 0x3f, data);
 			break;
 		case 4:
-			sid6581_w(sid, offset & 0x3f, data);
+			sid6581_w(m_sid, offset & 0x3f, data);
 			break;
 		case 5:
-			c128_mmu8722_port_w(space, offset & 0xff, data);
+			mmu8722_port_w(space, offset & 0xff, data);
 			break;
 		case 6: case 7:
 			if (offset & 0x01)
-				vdc8563->register_w(*space, 0, data);
+				m_vdc->register_w(space, 0, data);
 			else
-				vdc8563->address_w(*space, 0, data);
+				m_vdc->address_w(space, 0, data);
 			break;
 		case 8: case 9: case 0xa: case 0xb:
-		    if (state->m_c64mode)
-				state->m_colorram[(offset & 0x3ff)] = data | 0xf0;
+		    if (m_c64mode)
+				m_colorram[(offset & 0x3ff)] = data | 0xf0;
 		    else
-				state->m_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
+				m_colorram[(offset & 0x3ff)|((c64_port6510&3)<<10)] = data | 0xf0; // maybe all 8 bit connected!
 		    break;
 		case 0xc:
-			mos6526_w(cia_0, offset, data);
+			mos6526_w(m_cia1, offset, data);
 			break;
 		case 0xd:
-			mos6526_w(cia_1, offset, data);
+			mos6526_w(m_cia2, offset, data);
 			break;
 		case 0xf:
-			c128_dma8726_port_w(space, offset&0xff,data);
+			dma8726_port_w(space, offset&0xff,data);
 			break;
 		case 0xe:
-			DBG_LOG(space->machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
+			DBG_LOG(machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
 			break;
 		}
 	}
@@ -444,375 +418,364 @@ WRITE8_HANDLER( c128_write_d000 )
 
 
 
-static READ8_HANDLER( c128_read_io )
+READ8_MEMBER( c128_state::read_io )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	device_t *cia_0 = space->machine().device("cia_0");
-	device_t *cia_1 = space->machine().device("cia_1");
-	device_t *sid = space->machine().device("sid6581");
-	mos6566_device *vic2e = space->machine().device<mos6566_device>("vic2e");
-	mos8563_device *vdc8563 = space->machine().device<mos8563_device>("vdc8563");
-
 	if (offset < 0x400)
-		return vic2e->read(*space, offset & 0x3f);
+		return m_vic->read(space, offset & 0x3f);
 	else if (offset < 0x500)
-		return sid6581_r(sid, offset & 0xff);
+		return sid6581_r(m_sid, offset & 0xff);
 	else if (offset < 0x600)
-		return c128_mmu8722_port_r(space, offset & 0xff);
+		return mmu8722_port_r(space, offset & 0xff);
 	else if (offset < 0x800)
 			if (offset & 0x01)
-				return vdc8563->register_r(*space, 0);
+				return m_vdc->register_r(space, 0);
 			else
-				return vdc8563->status_r(*space, 0);
+				return m_vdc->status_r(space, 0);
 	else if (offset < 0xc00)
-		return state->m_colorram[offset & 0x3ff];
+		return m_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
 		{
-			cia_set_port_mask_value(cia_0, 0, state->ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return mos6526_r(cia_0, offset);
+			cia_set_port_mask_value(m_cia1, 0, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+			return mos6526_r(m_cia1, offset);
 		}
 	else if (offset == 0xc01)
 		{
-			cia_set_port_mask_value(cia_0, 1, space->machine().root_device().ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return mos6526_r(cia_0, offset);
+			cia_set_port_mask_value(m_cia1, 1, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			return mos6526_r(m_cia1, offset);
 		}
 	else if (offset < 0xd00)
-		return mos6526_r(cia_0, offset);
+		return mos6526_r(m_cia1, offset);
 	else if (offset < 0xe00)
-		return mos6526_r(cia_1, offset);
+		return mos6526_r(m_cia2, offset);
 	else if ((offset >= 0xf00) & (offset <= 0xfff))
-		return c128_dma8726_port_r(space, offset&0xff);
-	DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset));
+		return dma8726_port_r(space, offset&0xff);
+	DBG_LOG(machine(), 1, "io read", ("%.3x\n", offset));
 	return 0xff;
 }
 
-void c128_bankswitch_64( running_machine &machine, int reset )
+void c128_state::bankswitch_64(int reset)
 {
-	c128_state *state = machine.driver_data<c128_state>();
 	int data, loram, hiram, charen;
 
-	if (!state->m_c64mode)
+	if (!m_c64mode)
 		return;
 
-	data = m6510_get_port(machine.device<legacy_cpu_device>("m8502")) & 0x07;
-	if ((state->m_old_data == data) && (state->m_old_exrom == state->m_exrom) && (state->m_old_game == state->m_game) && !reset)
+	data = m6510_get_port(m_subcpu) & 0x07;
+	if ((m_old_data == data) && (m_old_exrom == m_exrom) && (m_old_game == m_game) && !reset)
 		return;
 
-	DBG_LOG(machine, 1, "bankswitch", ("%d\n", data & 7));
+	DBG_LOG(machine(), 1, "bankswitch", ("%d\n", data & 7));
 	loram = (data & 1) ? 1 : 0;
 	hiram = (data & 2) ? 1 : 0;
 	charen = (data & 4) ? 1 : 0;
 
-	if ((!state->m_game && state->m_exrom) || (loram && hiram && !state->m_exrom))
-		state->membank("bank8")->set_base(state->m_roml);
+	if ((!m_game && m_exrom) || (loram && hiram && !m_exrom))
+		membank("bank8")->set_base(m_roml);
 	else
-		state->membank("bank8")->set_base(state->m_memory + 0x8000);
+		membank("bank8")->set_base(m_memory + 0x8000);
 
-	if ((!state->m_game && state->m_exrom && hiram) || (!state->m_exrom))
-		state->membank("bank9")->set_base(state->m_romh);
+	if ((!m_game && m_exrom && hiram) || (!m_exrom))
+		membank("bank9")->set_base(m_romh);
 	else if (loram && hiram)
-		state->membank("bank9")->set_base(state->m_basic);
+		membank("bank9")->set_base(m_basic);
 	else
-		state->membank("bank9")->set_base(state->m_memory + 0xa000);
+		membank("bank9")->set_base(m_memory + 0xa000);
 
-	if ((!state->m_game && state->m_exrom) || (charen && (loram || hiram)))
+	if ((!m_game && m_exrom) || (charen && (loram || hiram)))
 	{
-		machine.device("m8502")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd000, 0xdfff, FUNC(c128_read_io));
-		state->m_write_io = 1;
+		m_subcpu->memory().space(AS_PROGRAM)->install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(c128_state::read_io), this));
+		m_write_io = 1;
 	}
 	else
 	{
-		machine.device("m8502")->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank5");
-		state->m_write_io = 0;
+		m_subcpu->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank5");
+		m_write_io = 0;
 		if ((!charen && (loram || hiram)))
-			state->membank("bank13")->set_base(state->m_chargen);
+			membank("bank13")->set_base(m_chargen);
 		else
-			state->membank("bank13")->set_base(state->m_memory + 0xd000);
+			membank("bank13")->set_base(m_memory + 0xd000);
 	}
 
-	if (!state->m_game && state->m_exrom)
+	if (!m_game && m_exrom)
 	{
-		state->membank("bank14")->set_base(state->m_romh);
-		state->membank("bank15")->set_base(state->m_romh+0x1f00);
-		state->membank("bank16")->set_base(state->m_romh+0x1f05);
+		membank("bank14")->set_base(m_romh);
+		membank("bank15")->set_base(m_romh+0x1f00);
+		membank("bank16")->set_base(m_romh+0x1f05);
 	}
 	else
 	{
 		if (hiram)
 		{
-			state->membank("bank14")->set_base(state->m_kernal);
-			state->membank("bank15")->set_base(state->m_kernal+0x1f00);
-			state->membank("bank16")->set_base(state->m_kernal+0x1f05);
+			membank("bank14")->set_base(m_kernal);
+			membank("bank15")->set_base(m_kernal+0x1f00);
+			membank("bank16")->set_base(m_kernal+0x1f05);
 		}
 		else
 		{
-			state->membank("bank14")->set_base(state->m_memory + 0xe000);
-			state->membank("bank15")->set_base(state->m_memory + 0xff00);
-			state->membank("bank16")->set_base(state->m_memory + 0xff05);
+			membank("bank14")->set_base(m_memory + 0xe000);
+			membank("bank15")->set_base(m_memory + 0xff00);
+			membank("bank16")->set_base(m_memory + 0xff05);
 		}
 	}
-	state->m_old_data = data;
-	state->m_old_exrom = state->m_exrom;
-	state->m_old_game =state->m_game;
+	m_old_data = data;
+	m_old_exrom = m_exrom;
+	m_old_game =m_game;
 }
 
 /* typical z80 configuration
    0x3f 0x3f 0x7f 0x3e 0x7e 0xb0 0x0b 0x00 0x00 0x01 0x00 */
-static void c128_bankswitch_z80( running_machine &machine )
+void c128_state::bankswitch_z80()
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	 state->m_ram = state->m_memory + MMU_RAM_ADDR;
-	 state->m_va1617 = MMU_VIC_ADDR;
+	 m_ram = m_memory + MMU_RAM_ADDR;
+	 m_va1617 = MMU_VIC_ADDR;
 #if 1
-	 state->membank("bank10")->set_base(state->m_z80);
-	 state->membank("bank11")->set_base(state->m_ram + 0x1000);
-	 if ( (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
-		 state->m_ram = NULL;
+	 membank("bank10")->set_base(m_z80);
+	 membank("bank11")->set_base(m_ram + 0x1000);
+	 if ( (( (ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
+		 m_ram = NULL;
 #else
 	 if (MMU_BOTTOM)
-		 state->m_ram_bottom = MMU_SIZE;
+		 m_ram_bottom = MMU_SIZE;
 	 else
-		 state->m_ram_bottom = 0;
+		 m_ram_bottom = 0;
 
 	 if (MMU_RAM_ADDR==0) { /* this is used in z80 mode for rom on/off switching !*/
-		 state->membank("bank10")->set_base(state->m_z80);
-		 state->membank("bank11")->set_base(state->m_z80 + 0x400);
+		 membank("bank10")->set_base(m_z80);
+		 membank("bank11")->set_base(m_z80 + 0x400);
 	 }
 	 else
 	 {
-		 state->membank("bank10")->set_base((state->m_ram_bottom > 0 ? state->m_memory : state->m_ram));
-		 state->membank("bank11")->set_base((state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
+		 membank("bank10")->set_base((m_ram_bottom > 0 ? m_memory : m_ram));
+		 membank("bank11")->set_base((m_ram_bottom > 0x400 ? m_memory : m_ram) + 0x400);
 	 }
 
-	 state->membank("bank1")->set_base((state->m_ram_bottom > 0 ? state->m_memory : state->m_ram));
-	 state->membank("bank2")->set_base((state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
+	 membank("bank1")->set_base((m_ram_bottom > 0 ? m_memory : m_ram));
+	 membank("bank2")->set_base((m_ram_bottom > 0x400 ? m_memory : m_ram) + 0x400);
 
-	 state->membank("bank3")->set_base((state->m_ram_bottom > 0x1000 ? state->m_memory : state->m_ram) + 0x1000);
-	 state->membank("bank4")->set_base((state->m_ram_bottom > 0x2000 ? state->m_memory : state->m_ram) + 0x2000);
-	 state->membank("bank5")->set_base(state->m_ram + 0x4000);
+	 membank("bank3")->set_base((m_ram_bottom > 0x1000 ? m_memory : m_ram) + 0x1000);
+	 membank("bank4")->set_base((m_ram_bottom > 0x2000 ? m_memory : m_ram) + 0x2000);
+	 membank("bank5")->set_base(m_ram + 0x4000);
 
 	 if (MMU_TOP)
-		 state->m_ram_top = 0x10000 - MMU_SIZE;
+		 m_ram_top = 0x10000 - MMU_SIZE;
 	 else
-		 state->m_ram_top = 0x10000;
+		 m_ram_top = 0x10000;
 
-	 if (state->m_ram_top > 0xc000)
-		state->membank("bank6")->set_base(state->m_ram + 0xc000);
+	 if (m_ram_top > 0xc000)
+		membank("bank6")->set_base(m_ram + 0xc000);
 	 else
-		state->membank("bank6")->set_base(state->m_memory + 0xc000);
+		membank("bank6")->set_base(m_memory + 0xc000);
 
-	 if (state->m_ram_top > 0xe000)
-		state->membank("bank7")->set_base(state->m_ram + 0xe000);
+	 if (m_ram_top > 0xe000)
+		membank("bank7")->set_base(m_ram + 0xe000);
 	 else
-		state->membank("bank7")->set_base(state->m_memory + 0xd000);
+		membank("bank7")->set_base(m_memory + 0xd000);
 
-	 if (state->m_ram_top > 0xf000)
-		state->membank("bank8")->set_base(state->m_ram + 0xf000);
+	 if (m_ram_top > 0xf000)
+		membank("bank8")->set_base(m_ram + 0xf000);
 	 else
-		state->membank("bank8")->set_base(state->m_memory + 0xe000);
+		membank("bank8")->set_base(m_memory + 0xe000);
 
-	 if (state->m_ram_top > 0xff05)
-		state->membank("bank9")->set_base(state->m_ram + 0xff05);
+	 if (m_ram_top > 0xff05)
+		membank("bank9")->set_base(m_ram + 0xff05);
 	 else
-		state->membank("bank9")->set_base(state->m_memory + 0xff05);
+		membank("bank9")->set_base(m_memory + 0xff05);
 
-	 if ( (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
-		  || (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
-		 state->m_ram = NULL;
+	 if ( (( (ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+		  || (( (ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
+		 m_ram = NULL;
 #endif
 }
 
-static void c128_bankswitch_128( running_machine &machine, int reset )
+void c128_state::bankswitch_128(int reset)
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	state->m_c64mode = MMU_64MODE;
-	if (state->m_c64mode)
+	m_c64mode = MMU_64MODE;
+	if (m_c64mode)
 	{
 		/* mmu works also in c64 mode, but this can wait */
-		state->m_ram = state->m_memory;
-		state->m_va1617 = 0;
-		state->m_ram_bottom = 0;
-		state->m_ram_top = 0x10000;
+		m_ram = m_memory;
+		m_va1617 = 0;
+		m_ram_bottom = 0;
+		m_ram_top = 0x10000;
 
-		state->membank("bank1")->set_base(state->m_memory);
-		state->membank("bank2")->set_base(state->m_memory + 0x100);
+		membank("bank1")->set_base(m_memory);
+		membank("bank2")->set_base(m_memory + 0x100);
 
-		state->membank("bank3")->set_base(state->m_memory + 0x200);
-		state->membank("bank4")->set_base(state->m_memory + 0x400);
-		state->membank("bank5")->set_base(state->m_memory + 0x1000);
-		state->membank("bank6")->set_base(state->m_memory + 0x2000);
+		membank("bank3")->set_base(m_memory + 0x200);
+		membank("bank4")->set_base(m_memory + 0x400);
+		membank("bank5")->set_base(m_memory + 0x1000);
+		membank("bank6")->set_base(m_memory + 0x2000);
 
-		state->membank("bank7")->set_base(state->m_memory + 0x4000);
+		membank("bank7")->set_base(m_memory + 0x4000);
 
-		state->membank("bank12")->set_base(state->m_memory + 0xc000);
+		membank("bank12")->set_base(m_memory + 0xc000);
 
-		c128_bankswitch_64(machine, reset);
+		bankswitch_64(reset);
 	}
 	else
 	{
-		state->m_ram = state->m_memory + MMU_RAM_ADDR;
-		state->m_va1617 = MMU_VIC_ADDR;
-		state->membank("bank1")->set_base(state->m_memory + state->m_mmu_page0);
-		state->membank("bank2")->set_base(state->m_memory + state->m_mmu_page1);
+		m_ram = m_memory + MMU_RAM_ADDR;
+		m_va1617 = MMU_VIC_ADDR;
+		membank("bank1")->set_base(m_memory + m_mmu_page0);
+		membank("bank2")->set_base(m_memory + m_mmu_page1);
 		if (MMU_BOTTOM)
 			{
-				state->m_ram_bottom = MMU_SIZE;
+				m_ram_bottom = MMU_SIZE;
 			}
 		else
-			state->m_ram_bottom = 0;
-		state->membank("bank3")->set_base((state->m_ram_bottom > 0x200 ? state->m_memory : state->m_ram) + 0x200);
-		state->membank("bank4")->set_base((state->m_ram_bottom > 0x400 ? state->m_memory : state->m_ram) + 0x400);
-		state->membank("bank5")->set_base((state->m_ram_bottom > 0x1000 ? state->m_memory : state->m_ram) + 0x1000);
-		state->membank("bank6")->set_base((state->m_ram_bottom > 0x2000 ? state->m_memory : state->m_ram) + 0x2000);
+			m_ram_bottom = 0;
+		membank("bank3")->set_base((m_ram_bottom > 0x200 ? m_memory : m_ram) + 0x200);
+		membank("bank4")->set_base((m_ram_bottom > 0x400 ? m_memory : m_ram) + 0x400);
+		membank("bank5")->set_base((m_ram_bottom > 0x1000 ? m_memory : m_ram) + 0x1000);
+		membank("bank6")->set_base((m_ram_bottom > 0x2000 ? m_memory : m_ram) + 0x2000);
 
 		if (MMU_RAM_LO)
 		{
-			state->membank("bank7")->set_base(state->m_ram + 0x4000);
+			membank("bank7")->set_base(m_ram + 0x4000);
 		}
 		else
 		{
-			state->membank("bank7")->set_base(state->m_c128_basic);
+			membank("bank7")->set_base(m_c128_basic);
 		}
 
 		if (MMU_RAM_MID)
 		{
-			state->membank("bank8")->set_base(state->m_ram + 0x8000);
-			state->membank("bank9")->set_base(state->m_ram + 0xa000);
+			membank("bank8")->set_base(m_ram + 0x8000);
+			membank("bank9")->set_base(m_ram + 0xa000);
 		}
 		else if (MMU_ROM_MID)
 		{
-			state->membank("bank8")->set_base(state->m_c128_basic + 0x4000);
-			state->membank("bank9")->set_base(state->m_c128_basic + 0x6000);
+			membank("bank8")->set_base(m_c128_basic + 0x4000);
+			membank("bank9")->set_base(m_c128_basic + 0x6000);
 		}
 		else if (MMU_INTERNAL_ROM_MID)
 		{
-			state->membank("bank8")->set_base(state->m_internal_function);
-			state->membank("bank9")->set_base(state->m_internal_function + 0x2000);
+			membank("bank8")->set_base(m_internal_function);
+			membank("bank9")->set_base(m_internal_function + 0x2000);
 		}
 		else
 		{
-			state->membank("bank8")->set_base(state->m_external_function);
-			state->membank("bank9")->set_base(state->m_external_function + 0x2000);
+			membank("bank8")->set_base(m_external_function);
+			membank("bank9")->set_base(m_external_function + 0x2000);
 		}
 
 		if (MMU_TOP)
 		{
-			state->m_ram_top = 0x10000 - MMU_SIZE;
+			m_ram_top = 0x10000 - MMU_SIZE;
 		}
 		else
-			state->m_ram_top = 0x10000;
+			m_ram_top = 0x10000;
 
-		machine.device("m8502")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xff00, 0xff04, FUNC(c128_mmu8722_ff00_r));
+		m_subcpu->memory().space(AS_PROGRAM)->install_read_handler(0xff00, 0xff04, read8_delegate(FUNC(c128_state::mmu8722_ff00_r), this));
 
 		if (MMU_IO_ON)
 		{
-			state->m_write_io = 1;
-			machine.device("m8502")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd000, 0xdfff, FUNC(c128_read_io));
+			m_write_io = 1;
+			m_subcpu->memory().space(AS_PROGRAM)->install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(c128_state::read_io), this));
 		}
 		else
 		{
-			state->m_write_io = 0;
-			machine.device("m8502")->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank13");
+			m_write_io = 0;
+			m_subcpu->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank13");
 		}
 
 
 		if (MMU_RAM_HI)
 		{
-			if (state->m_ram_top > 0xc000)
+			if (m_ram_top > 0xc000)
 			{
-				state->membank("bank12")->set_base(state->m_ram + 0xc000);
+				membank("bank12")->set_base(m_ram + 0xc000);
 			}
 			else
 			{
-				state->membank("bank12")->set_base(state->m_memory + 0xc000);
+				membank("bank12")->set_base(m_memory + 0xc000);
 			}
 			if (!MMU_IO_ON)
 			{
-				if (state->m_ram_top > 0xd000)
+				if (m_ram_top > 0xd000)
 				{
-					state->membank("bank13")->set_base(state->m_ram + 0xd000);
+					membank("bank13")->set_base(m_ram + 0xd000);
 				}
 				else
 				{
-					state->membank("bank13")->set_base(state->m_memory + 0xd000);
+					membank("bank13")->set_base(m_memory + 0xd000);
 				}
 			}
-			if (state->m_ram_top > 0xe000)
+			if (m_ram_top > 0xe000)
 			{
-				state->membank("bank14")->set_base(state->m_ram + 0xe000);
+				membank("bank14")->set_base(m_ram + 0xe000);
 			}
 			else
 			{
-				state->membank("bank14")->set_base(state->m_memory + 0xe000);
+				membank("bank14")->set_base(m_memory + 0xe000);
 			}
-			if (state->m_ram_top > 0xff05)
+			if (m_ram_top > 0xff05)
 			{
-				state->membank("bank16")->set_base(state->m_ram + 0xff05);
+				membank("bank16")->set_base(m_ram + 0xff05);
 			}
 			else
 			{
-				state->membank("bank16")->set_base(state->m_memory + 0xff05);
+				membank("bank16")->set_base(m_memory + 0xff05);
 			}
 		}
 		else if (MMU_ROM_HI)
 		{
-			state->membank("bank12")->set_base(state->m_editor);
+			membank("bank12")->set_base(m_editor);
 			if (!MMU_IO_ON) {
-				state->membank("bank13")->set_base(state->m_c128_chargen);
+				membank("bank13")->set_base(m_c128_chargen);
 			}
-			state->membank("bank14")->set_base(state->m_c128_kernal);
-			state->membank("bank16")->set_base(state->m_c128_kernal + 0x1f05);
+			membank("bank14")->set_base(m_c128_kernal);
+			membank("bank16")->set_base(m_c128_kernal + 0x1f05);
 		}
 		else if (MMU_INTERNAL_ROM_HI)
 		{
-			state->membank("bank12")->set_base(state->m_internal_function);
+			membank("bank12")->set_base(m_internal_function);
 			if (!MMU_IO_ON) {
-				state->membank("bank13")->set_base(state->m_internal_function + 0x1000);
+				membank("bank13")->set_base(m_internal_function + 0x1000);
 			}
-			state->membank("bank14")->set_base(state->m_internal_function + 0x2000);
-			state->membank("bank16")->set_base(state->m_internal_function + 0x3f05);
+			membank("bank14")->set_base(m_internal_function + 0x2000);
+			membank("bank16")->set_base(m_internal_function + 0x3f05);
 		}
 		else					   /*if (MMU_EXTERNAL_ROM_HI) */
 		{
-			state->membank("bank12")->set_base(state->m_external_function);
+			membank("bank12")->set_base(m_external_function);
 			if (!MMU_IO_ON) {
-				state->membank("bank13")->set_base(state->m_external_function + 0x1000);
+				membank("bank13")->set_base(m_external_function + 0x1000);
 			}
-			state->membank("bank14")->set_base(state->m_external_function + 0x2000);
-			state->membank("bank16")->set_base(state->m_external_function + 0x3f05);
+			membank("bank14")->set_base(m_external_function + 0x2000);
+			membank("bank16")->set_base(m_external_function + 0x3f05);
 		}
 
-		if ( (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
-				|| (( (machine.root_device().ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
-			state->m_ram = NULL;
+		if ( (( (ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
+				|| (( (ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
+			m_ram = NULL;
 	}
 }
 
 // 128u4
 // FIX-ME: are the bankswitch functions working in the expected way without the memory_set_context?
-static void c128_bankswitch( running_machine &machine, int reset )
+void c128_state::bankswitch(int reset)
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	if (state->m_mmu_cpu != MMU_CPU8502)
+	if (m_mmu_cpu != MMU_CPU8502)
 	{
 		if (!MMU_CPU8502)
 		{
 //          DBG_LOG(machine, 1, "switching to z80", ("active %d\n",cpu_getactivecpu()) );
 //          memory_set_context(machine, 0);
-			c128_bankswitch_z80(machine);
+			bankswitch_z80();
 //          memory_set_context(machine, 1);
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 //          DBG_LOG(machine, 1, "switching to m6502", ("active %d\n",cpu_getactivecpu()) );
 //          memory_set_context(machine, 1);
-			c128_bankswitch_128(machine, reset);
+			bankswitch_128(reset);
 //          memory_set_context(machine, 0);
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
-			cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 			/* NPW 19-Nov-2005 - In the C128, CPU #0 starts out and hands over
              * control to CPU #1.  CPU #1 seems to execute garbage from 0x0000
@@ -826,33 +789,31 @@ static void c128_bankswitch( running_machine &machine, int reset )
              * driver used to work with this behavior, so I am doing this hack
              * where I set CPU #1's PC to 0x1100 on reset.
              */
-			if (cpu_get_reg(machine.device("m8502"), STATE_GENPC) == 0x0000)
-				cpu_set_reg(machine.device("m8502"), STATE_GENPC, 0x1100);
+			if (cpu_get_reg(m_subcpu, STATE_GENPC) == 0x0000)
+				cpu_set_reg(m_subcpu, STATE_GENPC, 0x1100);
 		}
-		state->m_mmu_cpu = MMU_CPU8502;
+		m_mmu_cpu = MMU_CPU8502;
 		return;
 	}
 	if (!MMU_CPU8502)
-		c128_bankswitch_z80(machine);
+		bankswitch_z80();
 	else
-		c128_bankswitch_128(machine, reset);
+		bankswitch_128(reset);
 }
 
-static void c128_mmu8722_reset( running_machine &machine )
+void c128_state::mmu8722_reset()
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	memset(state->m_mmu, 0, sizeof (state->m_mmu));
-	state->m_mmu[5] |= 0x38;
-	state->m_mmu[10] = 1;
-	state->m_mmu_cpu = 0;
-	state->m_mmu_page0 = 0;
-	state->m_mmu_page1 = 0x0100;
-	c128_bankswitch (machine, 1);
+	memset(m_mmu, 0, sizeof (m_mmu));
+	m_mmu[5] |= 0x38;
+	m_mmu[10] = 1;
+	m_mmu_cpu = 0;
+	m_mmu_page0 = 0;
+	m_mmu_page1 = 0x0100;
+	bankswitch(1);
 }
 
-WRITE8_HANDLER( c128_mmu8722_port_w )
+WRITE8_MEMBER( c128_state::mmu8722_port_w )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
 	offset &= 0xf;
 	switch (offset)
 	{
@@ -862,27 +823,27 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	case 4:
 	case 8:
 	case 10:
-		state->m_mmu[offset] = data;
+		m_mmu[offset] = data;
 		break;
 	case 5:
-		state->m_mmu[offset] = data;
-		c128_bankswitch (space->machine(), 0);
-		c128_iec_srq_out_w(space->machine());
-		c128_iec_data_out_w(space->machine());
+		m_mmu[offset] = data;
+		bankswitch(0);
+		iec_srq_out_w();
+		iec_data_out_w();
 		break;
 	case 0:
 	case 6:
-		state->m_mmu[offset] = data;
-		c128_bankswitch (space->machine(), 0);
+		m_mmu[offset] = data;
+		bankswitch(0);
 		break;
 	case 7:
-		state->m_mmu[offset] = data;
-		state->m_mmu_page0=MMU_PAGE0;
+		m_mmu[offset] = data;
+		m_mmu_page0=MMU_PAGE0;
 		break;
 	case 9:
-		state->m_mmu[offset] = data;
-		state->m_mmu_page1=MMU_PAGE1;
-		c128_bankswitch (space->machine(), 0);
+		m_mmu[offset] = data;
+		m_mmu_page1=MMU_PAGE1;
+		bankswitch(0);
 		break;
 	case 0xb:
 		break;
@@ -894,30 +855,29 @@ WRITE8_HANDLER( c128_mmu8722_port_w )
 	}
 }
 
-READ8_HANDLER( c128_mmu8722_port_r )
+READ8_MEMBER( c128_state::mmu8722_port_r )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
 	int data;
 
 	offset &= 0x0f;
 	switch (offset)
 	{
 	case 5:
-		data = state->m_mmu[offset] | 6;
+		data = m_mmu[offset] | 6;
 		if ( /*disk enable signal */ 0)
 			data &= ~8;
-		if (!state->m_game)
+		if (!m_game)
 			data &= ~0x10;
-		if (!state->m_exrom)
+		if (!m_exrom)
 			data &= ~0x20;
-		if (space->machine().root_device().ioport("SPECIAL")->read() & 0x10)
+		if (ioport("SPECIAL")->read() & 0x10)
 			data &= ~0x80;
 		break;
 	case 0xb:
 		/* hinybble number of 64 kb memory blocks */
-		if ((space->machine().root_device().ioport("SPECIAL")->read() & 0x06) == 0x02)		// 256KB RAM
+		if ((ioport("SPECIAL")->read() & 0x06) == 0x02)		// 256KB RAM
 			data = 0x4f;
-		else if ((state->ioport("SPECIAL")->read() & 0x06) == 0x04)	//  1MB
+		else if ((ioport("SPECIAL")->read() & 0x06) == 0x04)	//  1MB
 			data = 0xf;
 		else
 			data = 0x2f;
@@ -929,107 +889,96 @@ READ8_HANDLER( c128_mmu8722_port_r )
 		data=0xff;
 		break;
 	default:
-		data=state->m_mmu[offset];
+		data=m_mmu[offset];
 	}
 	return data;
 }
 
-WRITE8_HANDLER( c128_mmu8722_ff00_w )
+WRITE8_MEMBER( c128_state::mmu8722_ff00_w )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
 	switch (offset)
 	{
 	case 0:
-		state->m_mmu[offset] = data;
-		c128_bankswitch (space->machine(), 0);
+		m_mmu[offset] = data;
+		bankswitch(0);
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
 #if 1
-		state->m_mmu[0]= state->m_mmu[offset];
+		m_mmu[0]= m_mmu[offset];
 #else
-		state->m_mmu[0]|= state->m_mmu[offset];
+		m_mmu[0]|= m_mmu[offset];
 #endif
-		c128_bankswitch (space->machine(), 0);
+		bankswitch(0);
 		break;
 	}
 }
 
- READ8_HANDLER( c128_mmu8722_ff00_r )
+READ8_MEMBER( c128_state::mmu8722_ff00_r )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	return state->m_mmu[offset];
+	return m_mmu[offset];
 }
 
-WRITE8_HANDLER( c128_write_0000 )
+WRITE8_MEMBER( c128_state::write_0000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (state->m_ram != NULL)
-		state->m_ram[0x0000 + offset] = data;
+	if (m_ram != NULL)
+		m_ram[0x0000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_1000 )
+WRITE8_MEMBER( c128_state::write_1000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (state->m_ram != NULL)
-		state->m_ram[0x1000 + offset] = data;
+	if (m_ram != NULL)
+		m_ram[0x1000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_4000 )
+WRITE8_MEMBER( c128_state::write_4000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (state->m_ram != NULL)
-		state->m_ram[0x4000 + offset] = data;
+	if (m_ram != NULL)
+		m_ram[0x4000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_8000 )
+WRITE8_MEMBER( c128_state::write_8000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (state->m_ram != NULL)
-		state->m_ram[0x8000 + offset] = data;
+	if (m_ram != NULL)
+		m_ram[0x8000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_a000 )
+WRITE8_MEMBER( c128_state::write_a000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (state->m_ram != NULL)
-		state->m_ram[0xa000 + offset] = data;
+	if (m_ram != NULL)
+		m_ram[0xa000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_c000 )
+WRITE8_MEMBER( c128_state::write_c000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (state->m_ram != NULL)
-		state->m_ram[0xc000 + offset] = data;
+	if (m_ram != NULL)
+		m_ram[0xc000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_e000 )
+WRITE8_MEMBER( c128_state::write_e000 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (offset + 0xe000 >= state->m_ram_top)
-		state->m_memory[0xe000 + offset] = data;
-	else if (state->m_ram != NULL)
-		state->m_ram[0xe000 + offset] = data;
+	if (offset + 0xe000 >= m_ram_top)
+		m_memory[0xe000 + offset] = data;
+	else if (m_ram != NULL)
+		m_ram[0xe000 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_ff00 )
+WRITE8_MEMBER( c128_state::write_ff00 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (!state->m_c64mode)
-		c128_mmu8722_ff00_w(space, offset, data);
-	else if (state->m_ram!=NULL)
-		state->m_memory[0xff00 + offset] = data;
+	if (!m_c64mode)
+		mmu8722_ff00_w(space, offset, data);
+	else if (m_ram!=NULL)
+		m_memory[0xff00 + offset] = data;
 }
 
-WRITE8_HANDLER( c128_write_ff05 )
+WRITE8_MEMBER( c128_state::write_ff05 )
 {
-	c128_state *state = space->machine().driver_data<c128_state>();
-	if (offset + 0xff05 >= state->m_ram_top)
-		state->m_memory[0xff05 + offset] = data;
-	else if (state->m_ram!=NULL)
-		state->m_ram[0xff05 + offset] = data;
+	if (offset + 0xff05 >= m_ram_top)
+		m_memory[0xff05 + offset] = data;
+	else if (m_ram!=NULL)
+		m_ram[0xff05 + offset] = data;
 }
 
 /*
@@ -1039,7 +988,7 @@ WRITE8_HANDLER( c128_write_ff05 )
  */
 READ8_MEMBER( c128_state::vic_dma_read )
 {
-	UINT8 c64_port6510 = m6510_get_port(machine().device<legacy_cpu_device>("m8502"));
+	UINT8 c64_port6510 = m6510_get_port(m_subcpu);
 
 	/* main memory configuration to include */
 	if (m_c64mode)
@@ -1061,7 +1010,7 @@ READ8_MEMBER( c128_state::vic_dma_read )
 
 READ8_MEMBER( c128_state::vic_dma_read_color )
 {
-	UINT8 c64_port6510 = m6510_get_port(machine().device<legacy_cpu_device>("m8502"));
+	UINT8 c64_port6510 = m6510_get_port(m_subcpu);
 
 	if (m_c64mode)
 		return m_colorram[offset & 0x3ff] & 0xf;
@@ -1076,44 +1025,29 @@ READ8_MEMBER( c128_state::vic_dma_read_color )
 */
 
 
-WRITE8_DEVICE_HANDLER(c128_m6510_port_write)
+WRITE8_MEMBER( c128_state::cpu_w )
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
+	m_cassette->write(BIT(data, 3));
 
-	if (state->m_tape_on)
-	{
-		device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	m_cassette->motor_w(BIT(data, 5));
 
-		if (!(data & 0x20))
-		{
-			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-			state->m_datasette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
-		}
-		else
-		{
-			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-			state->m_datasette_timer->reset();
-		}
-	}
+	bankswitch_64(0);
 
-	c128_bankswitch_64(device->machine(), 0);
-
-	state->m_memory[0x000] = device->memory().space(AS_PROGRAM)->read_byte(0);
-	state->m_memory[0x001] = device->memory().space(AS_PROGRAM)->read_byte(1);
+	m_memory[0x000] = m_subcpu->memory().space(AS_PROGRAM)->read_byte(0);
+	m_memory[0x001] = m_subcpu->memory().space(AS_PROGRAM)->read_byte(1);
 
 }
 
-READ8_DEVICE_HANDLER(c128_m6510_port_read)
+READ8_MEMBER( c128_state::cpu_r)
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
 	UINT8 data = 0x07;
 
-	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if (m_cassette->sense_r())
 		data &= ~0x10;
 	else
 		data |=  0x10;
 
-	if (state->ioport("SPECIAL")->read() & 0x20)		/* Check Caps Lock */
+	if (ioport("SPECIAL")->read() & 0x20)		/* Check Caps Lock */
 		data &= ~0x40;
 	else
 		data |=  0x40;
@@ -1121,71 +1055,45 @@ READ8_DEVICE_HANDLER(c128_m6510_port_read)
 	return data;
 }
 
-static void c128_common_driver_init( running_machine &machine )
-{
-	c128_state *state = machine.driver_data<c128_state>();
-	UINT8 *gfx=machine.root_device().memregion("gfx1")->base();
-	UINT8 *ram = state->memregion("maincpu")->base();
-	int i;
-
-	state->m_memory = ram;
-
-	state->m_c128_basic = ram + 0x100000;
-	state->m_basic = ram + 0x108000;
-	state->m_kernal = ram + 0x10a000;
-	state->m_editor = ram + 0x10c000;
-	state->m_z80 = ram + 0x10d000;
-	state->m_c128_kernal = ram + 0x10e000;
-	state->m_internal_function = ram + 0x110000;
-	state->m_external_function = ram + 0x118000;
-	state->m_chargen = ram + 0x120000;
-	state->m_c128_chargen = ram + 0x121000;
-	state->m_colorram = ram + 0x122000;
-	state->m_vdcram = ram + 0x122800;
-	state->m_c64_roml = auto_alloc_array(machine, UINT8, 0x2000);
-	state->m_c64_romh = auto_alloc_array(machine, UINT8, 0x2000);
-
-	state->m_tape_on = 1;
-	state->m_game = 1;
-	state->m_exrom = 1;
-	state->m_pal = 0;
-	state->m_c64mode = 0;
-	state->m_vicirq = 0;
-
-	state->m_monitor = -1;
-	state->m_cnt1 = 1;
-	state->m_sp1 = 1;
-	cbm_common_init();
-	state->m_keyline[0] = state->m_keyline[1] = state->m_keyline[2] = 0xff;
-
-	for (i = 0; i < 0x100; i++)
-		gfx[i] = i;
-
-	if (state->m_tape_on)
-		state->m_datasette_timer = machine.scheduler().timer_alloc(FUNC(c64_tape_timer));
-}
-
 DRIVER_INIT_MEMBER(c128_state,c128)
 {
-	//device_t *vic2e = machine().device("vic2e");
-	//device_t *vdc8563 = machine().device("vdc8563");
+	UINT8 *ram = memregion(Z80A_TAG)->base();
 
-	c128_common_driver_init(machine());
+	m_memory = ram;
 
-	//vic2_set_rastering(vic2e, 0);
-	//vdc8563_set_rastering(vdc8563, 1);
+	m_c128_basic = ram + 0x100000;
+	m_basic = ram + 0x108000;
+	m_kernal = ram + 0x10a000;
+	m_editor = ram + 0x10c000;
+	m_z80 = ram + 0x10d000;
+	m_c128_kernal = ram + 0x10e000;
+	m_internal_function = ram + 0x110000;
+	m_external_function = ram + 0x118000;
+	m_chargen = ram + 0x120000;
+	m_c128_chargen = ram + 0x121000;
+	m_colorram = ram + 0x122000;
+	m_vdcram = ram + 0x122800;
+	m_c64_roml = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_c64_romh = auto_alloc_array(machine(), UINT8, 0x2000);
+
+	m_game = 1;
+	m_exrom = 1;
+	m_pal = 0;
+	m_c64mode = 0;
+	m_vicirq = 0;
+
+	m_monitor = -1;
+	m_cnt1 = 1;
+	m_sp1 = 1;
+	cbm_common_init();
+	m_keyline[0] = m_keyline[1] = m_keyline[2] = 0xff;
 }
 
 DRIVER_INIT_MEMBER(c128_state,c128pal)
 {
-	//device_t *vic2e = machine().device("vic2e");
-	//device_t *vdc8563 = machine().device("vdc8563");
+	DRIVER_INIT_CALL( c128 );
 
-	c128_common_driver_init(machine());
 	m_pal = 1;
-
-	//vic2_set_rastering(vic2e, 1);
-	//vdc8563_set_rastering(vdc8563, 0);
 }
 
 DRIVER_INIT_MEMBER(c128_state,c128d)
@@ -1213,23 +1121,21 @@ DRIVER_INIT_MEMBER(c128_state,c128d81)
 	DRIVER_INIT_CALL( c128 );
 }
 
-MACHINE_START( c128 )
+void c128_state::machine_start()
 {
-	c128_state *state = machine.driver_data<c128_state>();
 // This was in MACHINE_START( c64 ), but never called
 // TO DO: find its correct use, when fixing c64 mode
-	if (state->m_c64mode)
-		c128_bankswitch_64(machine, 1);
+	if (m_c64mode)
+		bankswitch_64(1);
 }
 
-MACHINE_RESET( c128 )
+void c128_state::machine_reset()
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	state->m_c128_vicaddr = state->m_vicaddr = state->m_memory;
-	state->m_c64mode = 0;
-	c128_mmu8722_reset(machine);
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-	cputag_set_input_line(machine, "m8502", INPUT_LINE_HALT, ASSERT_LINE);
+	m_c128_vicaddr = m_vicaddr = m_memory;
+	m_c64mode = 0;
+	mmu8722_reset();
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -1241,7 +1147,7 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	//device_t *vic2e = device->machine().device("vic2e");
 	//device_t *vdc8563 = device->machine().device("vdc8563");
 
-	c128_nmi(device->machine());
+	state->nmi();
 
 	if ((device->machine().root_device().ioport("SPECIAL")->read() & 0x08) != state->m_monitor)
 	{
