@@ -104,14 +104,13 @@ public:
 	// C string conversion operators and helpers
 	operator const char *() const { return m_text; }
 	const char *cstr() const { return m_text; }
-	char *stringbuffer(int size) { ensure_room(size); return m_text; }
 
 	// buffer management
 	astring &reset() { return cpy(""); }
 	astring &expand(int length) { ensure_room(length); return *this; }
 
 	// length query
-	int len() const { return strlen(m_text); }
+	int len() const { return m_len; }
 
 	// copy helpers
 	astring &cpy(const char *src, int count);
