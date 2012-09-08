@@ -4403,6 +4403,7 @@ src/mame/layout/subroc3d.lay svneol=native#text/plain
 src/mame/layout/superchs.lay svneol=native#text/plain
 src/mame/layout/suprstar.lay svneol=native#text/plain
 src/mame/layout/tceptor2.lay svneol=native#text/plain
+src/mame/layout/techno.lay svneol=native#text/plain
 src/mame/layout/tenpindx.lay svneol=native#text/plain
 src/mame/layout/tinv2650.lay svneol=native#text/plain
 src/mame/layout/tisub.lay svneol=native#text/plain

@@ -2212,6 +2212,8 @@ $(DRIVERS)/tatsumi.o:	$(LAYOUT)/roundup5.lh
 
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
+$(DRIVERS)/techno.o:	$(LAYOUT)/techno.lh
+
 $(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh \
