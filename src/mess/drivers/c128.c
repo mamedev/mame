@@ -628,7 +628,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( common, c128_state )
+static MACHINE_CONFIG_START( ntsc, c128_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( c128_z80_mem)
@@ -672,15 +672,15 @@ static MACHINE_CONFIG_START( common, c128_state )
 	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128, common )
+static MACHINE_CONFIG_DERIVED( c128, ntsc )
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128d, common )
+static MACHINE_CONFIG_DERIVED( c128d, ntsc )
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128dcr, common )
+static MACHINE_CONFIG_DERIVED( c128dcr, ntsc )
 	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
 	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, c128dcr_iec_devices, "c1571cr", NULL)
@@ -689,7 +689,7 @@ static MACHINE_CONFIG_DERIVED( c128dcr, common )
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128d81, common )
+static MACHINE_CONFIG_DERIVED( c128d81, ntsc )
 	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
 	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, c128d81_iec_devices, "c1563", NULL)
@@ -698,7 +698,7 @@ static MACHINE_CONFIG_DERIVED( c128d81, common )
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c128pal, c128_state )
+static MACHINE_CONFIG_START( pal, c128_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( c128_z80_mem)
@@ -742,10 +742,15 @@ static MACHINE_CONFIG_START( c128pal, c128_state )
 	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128dpal, c128pal )
+static MACHINE_CONFIG_DERIVED( c128pal, pal )
+	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128dcrp, c128pal )
+static MACHINE_CONFIG_DERIVED( c128dpal, pal )
+	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( c128dcrp, pal )
 	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
 	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, c128dcr_iec_devices, "c1571cr", NULL)
