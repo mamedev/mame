@@ -10354,6 +10354,12 @@ void k001604_draw_front_layer( device_t *device, bitmap_rgb32 &bitmap, const rec
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
+	k001604->layer_8x8[0]->set_scrollx(-cliprect.min_x);
+	k001604->layer_8x8[0]->set_scrolly(-cliprect.min_y);
+
+	k001604->layer_8x8[1]->set_scrollx(-cliprect.min_x);
+	k001604->layer_8x8[1]->set_scrolly(-cliprect.min_y);
+
 	//k001604->layer_8x8[1]->draw(bitmap, cliprect, 0,0);
 	k001604->layer_8x8[0]->draw(bitmap, cliprect, 0,0);
 }
