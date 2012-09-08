@@ -1,8 +1,33 @@
+/*************************************************************************
+
+    Jaleco Moero Pro Yakyuu Homerun hardware
+
+*************************************************************************/
+
 #include "emu.h"
 #include "includes/homerun.h"
 
 
 #define half_screen 116
+
+WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
+{
+	// d0: scroll y high bit
+	// d1: scroll x high bit
+	// other bits: ?
+	m_scrolly = (m_scrolly & 0xff) | (data << 8 & 0x100);
+	m_scrollx = (m_scrollx & 0xff) | (data << 7 & 0x100);
+}
+
+WRITE8_MEMBER(homerun_state::homerun_scrolly_w)
+{
+	m_scrolly = (m_scrolly & 0xff00) | data;
+}
+
+WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
+{
+	m_scrollx = (m_scrollx & 0xff00) | data;
+}
 
 WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
@@ -86,8 +111,8 @@ SCREEN_UPDATE_IND16(homerun)
 	rectangle myclip = cliprect;
 
 	/* upper part */
-	state->m_tilemap->set_scrollx(0, state->m_xpc + ((state->m_xpa & 2) << 7) );
-	state->m_tilemap->set_scrolly(0, state->m_xpb + ((state->m_xpa & 1) << 8) );
+	state->m_tilemap->set_scrolly(0, state->m_scrolly);
+	state->m_tilemap->set_scrollx(0, state->m_scrollx);
 
 	myclip.max_y /= 2;
 	state->m_gfx_ctrl = state->m_gc_up;

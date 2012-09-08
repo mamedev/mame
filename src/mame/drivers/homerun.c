@@ -51,31 +51,17 @@ Notes:
 #include "includes/homerun.h"
 
 
-WRITE8_MEMBER(homerun_state::pa_w)
-{
-	m_xpa = data;
-}
-
-WRITE8_MEMBER(homerun_state::pb_w)
-{
-	m_xpb = data;
-}
-
-WRITE8_MEMBER(homerun_state::pc_w)
-{
-	m_xpc = data;
-}
 
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
 	// all ports are outputs
 	DEVCB_NULL,				/* Port A read */
-	DEVCB_DRIVER_MEMBER(homerun_state,pa_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollhi_w),	/* Port A write */
 	DEVCB_NULL,				/* Port B read */
-	DEVCB_DRIVER_MEMBER(homerun_state,pb_w),	/* Port B write */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrolly_w),	/* Port B write */
 	DEVCB_NULL,				/* Port C read */
-	DEVCB_DRIVER_MEMBER(homerun_state,pc_w)		/* Port C write */
+	DEVCB_DRIVER_MEMBER(homerun_state, homerun_scrollx_w)	/* Port C write */
 };
 
 
@@ -94,6 +80,13 @@ CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 
 	return ret;
 }
+
+CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
+{
+	// gives hopper error if not 0
+	return 0;
+}
+
 
 static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -122,11 +115,9 @@ static const ym2203_interface ym2203_config =
 
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state,homerun_40_r, NULL)
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_40_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // ?
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -140,20 +131,25 @@ static INPUT_PORTS_START( homerun )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DIPSW:1,2")
 	PORT_DIPSETTING(	0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DIPSW:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state,homerun_40_r, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_40_r, NULL)
 	PORT_BIT( 0xb7, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -167,22 +163,23 @@ static INPUT_PORTS_START( dynashot )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DIPSW:1,2")
 	PORT_DIPSETTING(	0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" ) // collisions? (not all bits)
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" ) // "
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" ) // "
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" ) // "
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" ) // "
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DIPSW:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-
-	PORT_DIPNAME( 0x7c, 0x7c, "Collisions ?" ) //not all bits
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x7c, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ganjaja )
@@ -197,7 +194,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_NAME("P1 Down / Paper")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right / Scissors")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) // unused?
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) // TODO: hopper status
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, NULL)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -206,10 +203,10 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DIPSW:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("DIPSW:1")
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DIPSW:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("DIPSW:2")
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
@@ -217,7 +214,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" ) // chance to win?
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" ) // "
-	PORT_DIPNAME( 0x80, 0x80, "Game" ) PORT_DIPLOCATION("DIPSW:8")
+	PORT_DIPNAME( 0x80, 0x80, "Game" )					PORT_DIPLOCATION("DIPSW:8")
 	PORT_DIPSETTING(	0x80, "Saisho wa Goo" )
 	PORT_DIPSETTING(	0x00, "Hop Step & Jump" )
 INPUT_PORTS_END
@@ -264,9 +261,8 @@ static MACHINE_START( homerun )
 	state->save_item(NAME(state->m_gfx_ctrl));
 	state->save_item(NAME(state->m_gc_up));
 	state->save_item(NAME(state->m_gc_down));
-	state->save_item(NAME(state->m_xpa));
-	state->save_item(NAME(state->m_xpb));
-	state->save_item(NAME(state->m_xpc));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_scrollx));
 }
 
 static MACHINE_RESET( homerun )
@@ -276,9 +272,8 @@ static MACHINE_RESET( homerun )
 	state->m_gfx_ctrl = 0;
 	state->m_gc_up = 0;
 	state->m_gc_down = 0;
-	state->m_xpa = 0;
-	state->m_xpb = 0;
-	state->m_xpc = 0;
+	state->m_scrolly = 0;
+	state->m_scrollx = 0;
 }
 
 static MACHINE_CONFIG_START( homerun, homerun_state )
