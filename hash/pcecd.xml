@@ -5170,22 +5170,22 @@
 	</software>
 
 	<software name="shinsetf">
-		<description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(Jpn)</description>
+		<description>Shinsetsu Shiawase Usagi f - Yuujou Yori mo Aiyoku (SCD)(Jpn)</description>
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<info name="release" value="19970910"/>
-		<info name="alt_title" value="真説しあわせうさぎf～友情より愛欲を～"/>
+		<info name="alt_title" value="真説しあわせうさぎf－友情よりも愛欲－"/>
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shinsetsu shiawase usagi f - yuujiyou yorimo aiyoku (scd)(jpn)" sha1="776c1708b359214a12974694c027343b1fefd524"/>
+				<disk name="shinsetsu shiawase usagi f - yuujou yori mo aiyoku (scd)(jpn)" sha1="776c1708b359214a12974694c027343b1fefd524"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="shinset2">
-		<description>Shinsetsu Shiawase Usagi II (SCD)(Jpn)</description>
+		<description>Shinsetsu Shiawase Usagi 2 - Kairaku e no Invitation (SCD)(Jpn)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -5194,7 +5194,7 @@
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="shinsetsu shiawase usagi ii (scd)(jpn)" sha1="2ece49b1291333a7460faa03fc6959c301f2d238"/>
+				<disk name="shinsetsu shiawase usagi 2 - kairaku e no invitation (scd)(jpn)" sha1="2ece49b1291333a7460faa03fc6959c301f2d238"/>
 			</diskarea>
 		</part>
 	</software>

@@ -18424,7 +18424,7 @@
 	</software>
 
 	<software name="kouchuom">
-		<description>Kouchu Ouja Mushiking (Jpn)</description>
+		<description>Kouchu Ouja Mushiking - Greatest Champion e no Michi (Jpn)</description>
 		<year>2005</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="AGB-BK6J-JPN"/>
@@ -18433,7 +18433,7 @@
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="33554432">
-				<rom name="kouchu ouja mushiking (japan).bin" size="33554432" crc="7ac9ffbf" sha1="af1908198aeb5e8e0f1d9d5c3ecdbefef6afc462" offset="000000" />
+				<rom name="kouchu ouja mushiking - greatest champion e no michi (japan).bin" size="33554432" crc="7ac9ffbf" sha1="af1908198aeb5e8e0f1d9d5c3ecdbefef6afc462" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

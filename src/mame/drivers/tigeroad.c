@@ -776,7 +776,7 @@ DRIVER_INIT_MEMBER(tigeroad_state,f1dream)
 
 
 GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, tigeroad_state, tigeroad, ROT0, "Capcom (Romstar license)", "Tiger Road (US)", 0 )
-GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad_state, tigeroad, ROT0, "Capcom", "Tora-he no Michi (Japan)", 0 )
+GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad_state, tigeroad, ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
 GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, tigeroad_state, tigeroad, ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */

@@ -2718,7 +2718,7 @@ Canceled games (possibly never got to the proto stage)
 	</software>
 
 	<software name="fifa98j" cloneof="fifa98">
-		<description>FIFA - Road to World Cup 98 - World Cup heno Michi (Jpn)</description>
+		<description>FIFA - Road to World Cup 98 - World Cup e no Michi (Jpn)</description>
 		<year>1998</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="NUS-N8IJ"/>
@@ -2726,7 +2726,7 @@ Canceled games (possibly never got to the proto stage)
 		<info name="alt_title" value="FIFA Road to WORLD CUP 98 ワールドカップへの道"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
-				<rom name="fifa - road to world cup 98 - world cup heno michi (japan).bin" size="12582912" crc="6ae6b8ed" sha1="83a86ce813e7dbb5c7d80b567f35fca7e742f8ba" offset="000000" />
+				<rom name="fifa - road to world cup 98 - world cup e no michi (japan).bin" size="12582912" crc="6ae6b8ed" sha1="83a86ce813e7dbb5c7d80b567f35fca7e742f8ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

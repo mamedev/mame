@@ -9091,7 +9091,7 @@
 	</software>
 
 	<software name="legend">
-		<description>Legend (Jpn)</description>
+		<description>Legend - Asu e no Tsubasa (Jpn)</description>
 		<year>1991</year>
 		<publisher>Quest</publisher>
 		<info name="serial" value="DMG-LGJ"/>
@@ -9099,7 +9099,7 @@
 		<info name="alt_title" value="レジェンド —明日への翼—"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="legend (japan).bin" size="131072" crc="fc20ebf0" sha1="7447b3faa1d15e80815cdace3c6c0691bc28aa90" offset="000000" />
+				<rom name="legend - asu e no tsubasa (japan).bin" size="131072" crc="fc20ebf0" sha1="7447b3faa1d15e80815cdace3c6c0691bc28aa90" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -1914,7 +1914,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="shogish2">
-		<description>Tanigawa Kouji no Shougi Shinan II - Meijin heno Michi</description>
+		<description>Tanigawa Kouji no Shougi Shinan II - Meijin e no Michi</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-SHO (L30V5912)"/>
@@ -1922,7 +1922,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="谷川浩司の将棋指南II ～名人への道～"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="tanigawa kouji no shougi shinan ii - meijin heno michi (japan).fds" size="131000" crc="6cad684c" sha1="3cfff39aaa5e4192ca40c747c8004abc80a7204a" offset="0" />
+				<rom name="tanigawa kouji no shougi shinan ii - meijin e no michi (japan).fds" size="131000" crc="6cad684c" sha1="3cfff39aaa5e4192ca40c747c8004abc80a7204a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2619,7 +2619,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="eggerln2">
-		<description>Eggerland - Souzouhe no Tabidachi</description>
+		<description>Eggerland - Souzou e no Tabidachi</description>
 		<year>1988</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-EGS"/>
@@ -2627,7 +2627,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<info name="alt_title" value="エッガーランド 創造への旅立ち"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
-				<rom name="eggerland - souzouhe no tabidachi (1988)(hal laboratory)[hal-egs].fds" size="131000" crc="acd50fe2" sha1="1f0d7d06aca8aebea10ebcaadc21bbea5f323650" offset="0" />
+				<rom name="eggerland - souzou e no tabidachi (1988)(hal laboratory)[hal-egs].fds" size="131000" crc="acd50fe2" sha1="1f0d7d06aca8aebea10ebcaadc21bbea5f323650" offset="0" />
 			</dataarea>
 		</part>
 	</software>

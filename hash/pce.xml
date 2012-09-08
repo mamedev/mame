@@ -2177,7 +2177,7 @@
 	</software>
 
 	<software name="maniacpw">
-		<description>Maniac Pro Wres - Asu Heno Tatakai</description>
+		<description>Maniac Pro Wres - Asu e no Tatakai</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC89025"/>
@@ -2185,7 +2185,7 @@
 		<info name="alt_title" value="マニアック プロレス 明日への闘い"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="maniac puroresu - asu heno tatakai (japan).pce" size="524288" crc="99f2865c" sha1="d02b38ec1b516f1324dab3499523a306f574f957" offset="000000" />
+				<rom name="maniac puroresu - asu e no tatakai (japan).pce" size="524288" crc="99f2865c" sha1="d02b38ec1b516f1324dab3499523a306f574f957" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3958,8 +3958,8 @@
 		</part>
 	</software>
 
-	<software name="toraheno">
-		<description>Tora Heno Michi</description>
+	<software name="toramich">
+		<description>Tora e no Michi</description>
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JC63004"/>
@@ -3967,7 +3967,7 @@
 		<info name="alt_title" value="虎への道"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="tora heno michi (japan).pce" size="393216" crc="82ae3b16" sha1="ea66f8c1be62e853b72f93a3a1e3b597356ae62f" offset="000000" />
+				<rom name="tora e no michi (japan).pce" size="393216" crc="82ae3b16" sha1="ea66f8c1be62e853b72f93a3a1e3b597356ae62f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

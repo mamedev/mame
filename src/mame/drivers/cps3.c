@@ -86,9 +86,9 @@ Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G 
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
 Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  ?           ?            971016*
 
-JoJo no Kimyouna Bouken                              1998  JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK000  CAP-JJK-140  981202
-JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-2   CAP-JJK-160  990108
-JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-3   CAP-JJK-161  990128
+JoJo no Kimyou na Bouken                             1998  JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK000  CAP-JJK-140  981202
+JoJo no Kimyou na Bouken                                   JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-2   CAP-JJK-160  990108
+JoJo no Kimyou na Bouken                                   JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-3   CAP-JJK-161  990128
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           981202
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990108
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990128
@@ -111,10 +111,10 @@ Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G 
 Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
 Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
 
-JoJo no Kimyouna Bouken: Miraie no Isan              1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0   CAP-JJM-110  990913
-JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-1   CAP-JJM-120  990927
-JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                           990913
-JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                           990927
+JoJo no Kimyou na Bouken: Mirai e no Isan            1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0   CAP-JJM-110  990913
+JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-1   CAP-JJM-120  990927
+JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990913
+JoJo no Kimyou na Bouken: Mirai e no Isan                  JJM99900F  CP300000G  JAPAN       X                                           990927
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
 JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990927
 
@@ -3287,7 +3287,7 @@ ROM_END
 
 /*****************************************************************************************
 
-    JoJo's Venture / JoJo no Kimyouna Bouken
+    JoJo's Venture / JoJo no Kimyou na Bouken
 
     XXXXXX 0
     JAPAN 1
@@ -3330,7 +3330,7 @@ ROM_END
 
 /*****************************************************************************************
 
-    JoJo's Bizarre Adventure / JoJo no Kimyouna Bouken: Miraie no Isan
+    JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan
 
     XXXXXX 0
     JAPAN 1
@@ -3385,21 +3385,21 @@ GAME( 1997, sfiii2,    0,        sfiii2,   cps3, cps3_state,      sfiii2,   ROT0
 GAME( 1997, sfiii2j,   sfiii2,   sfiii2,   cps3, cps3_state,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiii2n,   sfiii2,   sfiii2,   cps3, cps3_state,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-/* JoJo's Venture / JoJo no Kimyouna Bouken */
+/* JoJo's Venture / JoJo no Kimyou na Bouken */
 
 // 990128
 GAME( 1998, jojo,      0,        jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoj,     jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 990128)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoj,     jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, jojon,     jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 // 990108
 GAME( 1998, jojor1,    jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojojr1,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojojr1,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, jojonr1,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 // 981202
 GAME( 1998, jojor2,    jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojojr2,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 981202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojojr2,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, jojonr2,   jojo,     jojo,     cps3_jojo, cps3_state, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 /* Street Fighter III 3rd Strike: Fight for the Future */
@@ -3414,14 +3414,14 @@ GAME( 1999, sfiii3r1,  sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0
 GAME( 1999, sfiii3ur1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, sfiii3nr1, sfiii3,   sfiii3,   cps3, cps3_state,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-/* JoJo's Bizarre Adventure / JoJo no Kimyouna Bouken: Miraie no Isan */
+/* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
 // 990927
-GAME( 1999, jojoba,    0,        jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990927)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojoban,   jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990927, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoba,    0,        jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoban,   jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobane,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 // 990913
-GAME( 1999, jojobar1,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobar1,  jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )

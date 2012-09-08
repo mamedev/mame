@@ -84,7 +84,7 @@
       America Oudan Ultra Quiz (Japan) [T-6004G]                                            | (aouquiz)
       AMOK (Japan) [T-7637G]                                                                | (amokj)         playable?
       AnEarth Fantasy Stories: The First Volume (Japan) [T-27801G]                          | (anearth)
-      Angel Graffiti S: Anatahe no Profile (Japan) [T-7308G]                                | (angelgs)
+      Angel Graffiti S: Anata e no Profile (Japan) [T-7308G]                                | (angelgs)
       Angel Paradise Volume 1: Sakaki Yuko: Koi no Yokan in Hollywood (Japan) [T-2403G]     | (anglpar1)
       Angel Paradise Volume 2: Yoshino Kimika: Isshoni I-ta-I in Hawaii (Japan) [T-2405G]   | (anglpar2)
       Angelique Duet (Japan) [T-7662G]                                                      | (angduet)
@@ -2631,9 +2631,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Angel Graffiti S - Anatahe no Profile (Japan)... -->
+  <!-- Identifying Angel Graffiti S - Anata e no Profile (Japan)... -->
 	<software name="angelgs" supported="no">
-		<description>Angel Graffiti S - Anatahe no Profile (Jpn)</description>
+		<description>Angel Graffiti S - Anata e no Profile (Jpn)</description>
 		<year>1997</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="T-7308G"/>
@@ -2642,7 +2642,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="angel graffiti s - anatahe no profile (japan)" sha1="68d020971d89a2772c3ff45def77e5208f5e7465" />
+				<disk name="angel graffiti s - anata e no profile (japan)" sha1="68d020971d89a2772c3ff45def77e5208f5e7465" />
 			</diskarea>
 		</part>
 	</software>
@@ -8116,9 +8116,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Stakes Winner - GI Kanzen Seiha heno Michi (Japan)... -->
+  <!-- Identifying Stakes Winner - GI Kanzen Seiha e no Michi (Japan)... -->
 	<software name="stakeswi" supported="no">
-		<description>Stakes Winner - GI Kanzen Seiha heno Michi (Jpn)</description>
+		<description>Stakes Winner - GI Kanzen Seiha e no Michi (Jpn)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3107G"/>
@@ -8127,7 +8127,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="stakes winner - gi kanzen seiha heno michi (japan)" sha1="1190f03b857b71e01805fc070a0a0f511dc1e5da" />
+				<disk name="stakes winner - gi kanzen seiha e no michi (japan)" sha1="1190f03b857b71e01805fc070a0a0f511dc1e5da" />
 			</diskarea>
 		</part>
 	</software>
@@ -16661,9 +16661,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-  <!-- Identifying Druid - Yami-He no Tsuiseki Sha (T-7670G)... -->
+  <!-- Identifying Druid - Yami e no Tsuiseki Sha (T-7670G)... -->
 	<software name="druid" supported="no">
-		<description>Druid - Yami-He no Tsuiseki Sha (Jpn)</description>
+		<description>Druid - Yami e no Tsuiseki Sha (Jpn)</description>
 		<year>1998</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-7670G"/>
@@ -16672,7 +16672,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="druid - yami-he no tsuiseki sha (t-7670g)" sha1="4aca7e90ff9195b03193166802121d06d4d7b23e" />
+				<disk name="druid - yami e no tsuiseki sha (t-7670g)" sha1="4aca7e90ff9195b03193166802121d06d4d7b23e" />
 			</diskarea>
 		</part>
 	</software>
@@ -23443,7 +23443,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Ippatsu Gyakuten (J) (T029602G)... -->
 	<software name="gamblkng" supported="no">
-		<description>Ippatsu Gyakuten - Gambling King he no Michi (Jpn)</description>
+		<description>Ippatsu Gyakuten - Gambling King e no Michi (Jpn)</description>
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
 		<info name="serial" value="T-29602G"/>
@@ -25923,7 +25923,7 @@ Olympic Soccer (Fra) T-7904H-09
 
   <!-- Identifying Stakes Winner (J) (T-3107G)... -->
 	<software name="stakeswia" cloneof="stakeswi" supported="no">
-		<description>Stakes Winner - GI Kanzen Seiha heno Michi (Jpn, Alt)</description>
+		<description>Stakes Winner - GI Kanzen Seiha e no Michi (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="T-3107G"/>
