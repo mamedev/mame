@@ -512,39 +512,14 @@ static HD44780_INTERFACE( psion_4line_display )
 };
 
 /* basic configuration for 4 lines display */
-static MACHINE_CONFIG_START( psion_4lines, psion_state )
-	/* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",HD63701, 980000) // should be HD6303 at 0.98MHz
-
+static MACHINE_CONFIG_DERIVED( psion_4lines, psion_2lines )
     /* video hardware */
-    MCFG_SCREEN_ADD("screen", LCD)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
+    MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*20, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(psion)
-	MCFG_GFXDECODE(psion)
 
+	MCFG_DEVICE_REMOVE("hd44780")
 	MCFG_PSION_CUSTOM_LCDC_ADD("hd44780", psion_4line_display)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-
-	MCFG_NVRAM_HANDLER(psion)
-
-	MCFG_TIMER_ADD_PERIODIC("nmi_timer", nmi_timer, attotime::from_seconds(1))
-
-	/* Datapack */
-	MCFG_PSION_DATAPACK_ADD("pack1")
-	MCFG_PSION_DATAPACK_ADD("pack2")
-
-	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )

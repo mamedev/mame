@@ -14,6 +14,10 @@
 	MCFG_DEVICE_ADD( _tag, HD44780, 0 ) \
 	MCFG_DEVICE_CONFIG(_config)
 
+#define MCFG_HD44780_REPLACE( _tag , _config) \
+	MCFG_DEVICE_REPLACE( _tag, HD44780, 0 ) \
+	MCFG_DEVICE_CONFIG(_config)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

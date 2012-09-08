@@ -137,18 +137,11 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( basic52, basic52_state )
+static MACHINE_CONFIG_DERIVED( basic52, basic31 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8052, XTAL_11_0592MHz)
+	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-
-	MCFG_MACHINE_RESET(basic52)
-
-	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
-	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END
 
 /* ROM definition */

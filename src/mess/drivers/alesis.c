@@ -294,32 +294,21 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sr16, alesis_state )
+static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sr16_mem)
 	MCFG_CPU_IO_MAP(sr16_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*8, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*8-1, 0, 9*2-1)
 	MCFG_DEFAULT_LAYOUT(layout_sr16)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hr16_cassette_interface )
-
-	MCFG_HD44780_ADD("hd44780", sr16_display)
-
-	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL_12MHz/2)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_HD44780_REPLACE("hd44780", sr16_display)
 MACHINE_CONFIG_END
 
 /* ROM definition */
