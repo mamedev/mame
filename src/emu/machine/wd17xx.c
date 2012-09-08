@@ -1342,7 +1342,7 @@ WRITE_LINE_DEVICE_HANDLER( wd17xx_dden_w )
 
 	/* not supported on FD1771, FD1792, FD1794, FD1762 and FD1764 */
 	if (wd17xx_is_sd_only(device))
-		fatalerror("wd17xx_dden_w: double density input not supported on this model!");
+		fatalerror("wd17xx_dden_w: double density input not supported on this model!\n");
 	else if (!w->in_dden_func.isnull())
 		logerror("wd17xx_dden_w: write has no effect because a read handler is already defined!\n");
 	else

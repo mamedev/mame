@@ -84,7 +84,7 @@ UINT32 k033906_device::k033906_reg_r(int reg)
 		case 0x0f:		return m_reg[0x0f];			// interrupt_line, interrupt_pin, min_gnt, max_lat
 
 		default:
-			fatalerror("%s: k033906_reg_r: %08X", machine().describe_context(), reg);
+			fatalerror("%s: k033906_reg_r: %08X\n", machine().describe_context(), reg);
 	}
 	return 0;
 }
@@ -132,7 +132,7 @@ void k033906_device::k033906_reg_w(int reg, UINT32 data)
 			break;
 
 		default:
-			fatalerror("%s:K033906_w: %08X, %08X", machine().describe_context(), data, reg);
+			fatalerror("%s:K033906_w: %08X, %08X\n", machine().describe_context(), data, reg);
 	}
 }
 

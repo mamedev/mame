@@ -102,9 +102,9 @@ void x2212_device::nvram_default()
 	if (m_region != NULL)
 	{
 		if (m_region->bytes() != SIZE_DATA)
-			fatalerror("x2212 region '%s' wrong size (expected size = 0x100)", tag());
+			fatalerror("x2212 region '%s' wrong size (expected size = 0x100)\n", tag());
 		if (m_region->width() != 1)
-			fatalerror("x2212 region '%s' needs to be an 8-bit region", tag());
+			fatalerror("x2212 region '%s' needs to be an 8-bit region\n", tag());
 
 		for (int byte = 0; byte < SIZE_DATA; byte++)
 			m_e2prom->write_byte(byte, m_region->u8(byte));

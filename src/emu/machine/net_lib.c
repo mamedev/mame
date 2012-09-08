@@ -949,7 +949,7 @@ net_device_t *net_create_device_by_classname(const char *classname, netlist_setu
 			return (*p)->Create(setup, icname);
 		p++;
 	}
-	fatalerror("Class %s required for IC %s not found!", classname, icname);
+	fatalerror("Class %s required for IC %s not found!\n", classname, icname);
 }
 
 net_device_t *net_create_device_by_name(const char *name, netlist_setup_t *setup, const char *icname)
@@ -961,5 +961,5 @@ net_device_t *net_create_device_by_name(const char *name, netlist_setup_t *setup
 			return (*p)->Create(setup, icname);
 		p++;
 	}
-	fatalerror("Class %s required for IC %s not found!", name, icname);
+	fatalerror("Class %s required for IC %s not found!\n", name, icname);
 }

@@ -133,7 +133,7 @@ void palette_init(running_machine &machine)
 			return;
 
 		default:
-			fatalerror("Unsupported screen bitmap format!");
+			fatalerror("Unsupported screen bitmap format!\n");
 			break;
 	}
 

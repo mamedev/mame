@@ -251,11 +251,11 @@ void eeprom_device::nvram_default()
 	if (m_region != NULL)
 	{
 		if (m_region->bytes() != eeprom_bytes)
-			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", tag(), eeprom_bytes);
+			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag(), eeprom_bytes);
 		if (m_data_bits == 8 && m_region->width() != 1)
-			fatalerror("eeprom region '%s' needs to be an 8-bit region", tag());
+			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag());
 		if (m_data_bits == 16 && (m_region->width() != 2 || m_region->endianness() != ENDIANNESS_BIG))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region", tag());
+			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
 
 		for (offs_t offs = 0; offs < eeprom_length; offs++)
 			if (m_data_bits == 8)

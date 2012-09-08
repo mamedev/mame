@@ -114,9 +114,9 @@ void er2055_device::nvram_default()
 	if (m_region != NULL)
 	{
 		if (m_region->bytes() != SIZE_DATA)
-			fatalerror("er2055 region '%s' wrong size (expected size = 0x100)", tag());
+			fatalerror("er2055 region '%s' wrong size (expected size = 0x100)\n", tag());
 		if (m_region->width() != 1)
-			fatalerror("er2055 region '%s' needs to be an 8-bit region", tag());
+			fatalerror("er2055 region '%s' needs to be an 8-bit region\n", tag());
 
 		for (int byte = 0; byte < SIZE_DATA; byte++)
 			m_addrspace[0]->write_byte(byte, m_region->u8(byte));

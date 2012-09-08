@@ -403,7 +403,7 @@ UINT8 nscsi_full_device::scsi_get_data(int id, int pos)
 	case SBUF_SENSE:
 		return scsi_sense_buffer[pos];
 	default:
-		fatalerror("nscsi_full_device::scsi_get_data - unknown id");
+		fatalerror("nscsi_full_device::scsi_get_data - unknown id\n");
 		return 0; // shut up compiler
 	}
 }
@@ -418,7 +418,7 @@ void nscsi_full_device::scsi_put_data(int id, int pos, UINT8 data)
 		scsi_sense_buffer[pos] = data;
 		break;
 	default:
-		fatalerror("nscsi_full_device::scsi_put_data - unknown id");
+		fatalerror("nscsi_full_device::scsi_put_data - unknown id\n");
 	}
 }
 

@@ -194,7 +194,7 @@ void amiga_fdc::live_run(attotime limit)
 			}
 
 			if(cur_live.bit_counter > 8)
-				fatalerror("amiga_fdc::live_run - cur_live.bit_counter > 8");
+				fatalerror("amiga_fdc::live_run - cur_live.bit_counter > 8\n");
 
 			if(cur_live.bit_counter == 8) {
 				live_delay(RUNNING_SYNCPOINT);

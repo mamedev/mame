@@ -734,7 +734,7 @@ int scsibus_device::get_scsi_cmd_len(int cbyte)
 	if (group == 1 || group == 2) return 10;
 	if (group == 5) return 12;
 
-	fatalerror("scsibus: Unknown SCSI command group %d, command byte=%02X", group,cbyte);
+	fatalerror("scsibus: Unknown SCSI command group %d, command byte=%02X\n", group,cbyte);
 
 	return 6;
 }

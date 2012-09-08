@@ -684,7 +684,7 @@ void z80dma_device::write(UINT8 data)
 			switch (data)
 			{
 				case COMMAND_ENABLE_AFTER_RETI:
-					fatalerror("Z80DMA '%s' Unimplemented WR6 command %02x", tag(), data);
+					fatalerror("Z80DMA '%s' Unimplemented WR6 command %02x\n", tag(), data);
 					break;
 				case COMMAND_READ_STATUS_BYTE:
 					if (LOG) logerror("Z80DMA '%s' CMD Read status Byte\n", tag());
@@ -794,7 +794,7 @@ void z80dma_device::write(UINT8 data)
 		else if(data == 0x8e) //newtype on Sharp X1, unknown purpose
 			printf("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
 		else
-			fatalerror("Z80DMA '%s' Unknown base register %02x", tag(), data);
+			fatalerror("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
 		m_cur_follow = 0;
 	}
 	else

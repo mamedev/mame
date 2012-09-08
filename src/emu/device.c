@@ -456,7 +456,7 @@ void device_t::start()
 	{
 		logerror("Device '%s' did not register any state to save!\n", tag());
 		if ((machine().system().flags & GAME_SUPPORTS_SAVE) != 0)
-			fatalerror("Device '%s' did not register any state to save!", tag());
+			fatalerror("Device '%s' did not register any state to save!\n", tag());
 	}
 
 	// let the interfaces do their post-work

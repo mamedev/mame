@@ -259,7 +259,7 @@ private:
 			m_p++;
 			return;
 		}
-		fatalerror("Parser: expected '%c' found '%c'", ctocheck, *m_p);
+		fatalerror("Parser: expected '%c' found '%c'\n", ctocheck, *m_p);
 	}
 
 	double eval_param()
@@ -277,7 +277,7 @@ private:
 				f = i;
 		ret = strtod(s+strlen(macs[f]), &e);
 		if ((f>0) && (*e != ')'))
-			fatalerror("Parser: Error with parameter ...");
+			fatalerror("Parser: Error with parameter ...\n");
 		if (f>0)
 			e++;
 		m_p = e;
@@ -549,7 +549,7 @@ net_output_t &netlist_setup_t::find_output(const char *outname_in)
 		ret = find_output_exact(s);
 	}
 	if (ret == NULL)
-		fatalerror("output %s(%s) not found!", outname_in, outname);
+		fatalerror("output %s(%s) not found!\n", outname_in, outname);
 	VERBOSE_OUT(("Found input %s\n", outname));
 	return *ret;
 }
@@ -561,7 +561,7 @@ net_param_t &netlist_setup_t::find_param(const char *param_in)
 
 	ret = m_params.find(outname);
 	if (ret == NULL)
-		fatalerror("parameter %s(%s) not found!", param_in, outname);
+		fatalerror("parameter %s(%s) not found!\n", param_in, outname);
 	VERBOSE_OUT(("Found parameter %s\n", outname));
 	return *ret;
 }

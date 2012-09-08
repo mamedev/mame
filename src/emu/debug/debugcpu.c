@@ -299,7 +299,7 @@ void debug_cpu_source_script(running_machine &machine, const char *file)
 			if (machine.phase() == MACHINE_PHASE_RUNNING)
 				debug_console_printf(machine, "Cannot open command file '%s'\n", file);
 			else
-				fatalerror("Cannot open command file '%s'", file);
+				fatalerror("Cannot open command file '%s'\n", file);
 		}
 	}
 }
@@ -984,7 +984,7 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 			break;
 
 		default:
-			fatalerror("debug_read_opcode: unknown type = %d", space->data_width() / 8 * 10 + size);
+			fatalerror("debug_read_opcode: unknown type = %d\n", space->data_width() / 8 * 10 + size);
 			break;
 	}
 

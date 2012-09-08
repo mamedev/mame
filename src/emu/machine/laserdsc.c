@@ -846,7 +846,7 @@ void laserdisc_device::init_video()
 	m_videoenable = true;
 	m_videotex = machine().render().texture_alloc();
 	if (m_videotex == NULL)
-		fatalerror("Out of memory allocating video texture");
+		fatalerror("Out of memory allocating video texture\n");
 
 	// allocate overlay
 	m_overenable = overlay_configured();
@@ -871,7 +871,7 @@ void laserdisc_device::init_video()
 		// allocate overlay texture
 		m_overtex = machine().render().texture_alloc();
 		if (m_overtex == NULL)
-			fatalerror("Out of memory allocating overlay texture");
+			fatalerror("Out of memory allocating overlay texture\n");
 	}
 }
 

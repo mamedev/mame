@@ -16,7 +16,7 @@ UINT32 lsi53c810_device::FETCH()
 
 void lsi53c810_device::dmaop_invalid()
 {
-	fatalerror("LSI53C810: Invalid SCRIPTS DMA opcode %08X at %08X", dcmd, dsp);
+	fatalerror("LSI53C810: Invalid SCRIPTS DMA opcode %08X at %08X\n", dcmd, dsp);
 }
 
 void lsi53c810_device::dmaop_move_memory()
@@ -34,7 +34,7 @@ void lsi53c810_device::dmaop_move_memory()
 void lsi53c810_device::dmaop_interrupt()
 {
 	if(dcmd & 0x100000) {
-		fatalerror("LSI53C810: INTFLY opcode not implemented");
+		fatalerror("LSI53C810: INTFLY opcode not implemented\n");
 	}
 	dsps = FETCH();
 
@@ -83,7 +83,7 @@ void lsi53c810_device::dmaop_block_move()
 	if (scntl0 & 0x01)
 	{
 		/* target mode */
-		fatalerror("LSI53C810: dmaop_block_move not implemented in target mode");
+		fatalerror("LSI53C810: dmaop_block_move not implemented in target mode\n");
 	}
 	else
 	{
@@ -126,12 +126,12 @@ void lsi53c810_device::dmaop_wait_disconnect()
 	if (scntl0 & 0x01)
 	{
 		/* target mode */
-		fatalerror("LSI53C810: dmaop_wait_disconnect not implemented in target mode");
+		fatalerror("LSI53C810: dmaop_wait_disconnect not implemented in target mode\n");
 	}
 	else
 	{
 		/* initiator mode */
-		fatalerror("LSI53C810: dmaop_wait_disconnect not implemented");
+		fatalerror("LSI53C810: dmaop_wait_disconnect not implemented\n");
 	}
 }
 
@@ -144,12 +144,12 @@ void lsi53c810_device::dmaop_wait_reselect()
 	if (scntl0 & 0x01)
 	{
 		/* target mode */
-		fatalerror("LSI53C810: dmaop_wait_reselect not implemented in target mode");
+		fatalerror("LSI53C810: dmaop_wait_reselect not implemented in target mode\n");
 	}
 	else
 	{
 		/* initiator mode */
-		fatalerror("LSI53C810: dmaop_wait_reselect not implemented");
+		fatalerror("LSI53C810: dmaop_wait_reselect not implemented\n");
 	}
 }
 
@@ -213,17 +213,17 @@ void lsi53c810_device::dmaop_clear()
 
 void lsi53c810_device::dmaop_move_from_sfbr()
 {
-	fatalerror("LSI53C810: dmaop_move_from_sfbr not implemented in target mode");
+	fatalerror("LSI53C810: dmaop_move_from_sfbr not implemented in target mode\n");
 }
 
 void lsi53c810_device::dmaop_move_to_sfbr()
 {
-	fatalerror("LSI53C810: dmaop_move_to_sfbr not implemented");
+	fatalerror("LSI53C810: dmaop_move_to_sfbr not implemented\n");
 }
 
 void lsi53c810_device::dmaop_read_modify_write()
 {
-	fatalerror("LSI53C810: dmaop_read_modify_write not implemented");
+	fatalerror("LSI53C810: dmaop_read_modify_write not implemented\n");
 }
 
 int lsi53c810_device::scripts_compute_branch()
@@ -239,12 +239,12 @@ int lsi53c810_device::scripts_compute_branch()
 
 	if (dcmd & 0x00200000)
 	{
-		fatalerror("LSI53C810: jump with carry test not implemented");
+		fatalerror("LSI53C810: jump with carry test not implemented\n");
 	}
 
 	if (dcmd & 0x00100000)
 	{
-		fatalerror("LSI53C810: jump with interrupt on the fly not implemented");
+		fatalerror("LSI53C810: jump with interrupt on the fly not implemented\n");
 	}
 
 	// set desired result to take jump
@@ -357,12 +357,12 @@ void lsi53c810_device::dmaop_return()
 
 void lsi53c810_device::dmaop_store()
 {
-	fatalerror("LSI53C810: dmaop_store not implemented");
+	fatalerror("LSI53C810: dmaop_store not implemented\n");
 }
 
 void lsi53c810_device::dmaop_load()
 {
-	fatalerror("LSI53C810: dmaop_load not implemented");
+	fatalerror("LSI53C810: dmaop_load not implemented\n");
 }
 
 
@@ -468,7 +468,7 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 			return scratch_b[offset % 4];
 
 		default:
-			fatalerror("LSI53C810: reg_r: Unknown reg %02X", offset);
+			fatalerror("LSI53C810: reg_r: Unknown reg %02X\n", offset);
 	}
 
 	return 0;
@@ -604,7 +604,7 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 			break;
 
 		default:
-			fatalerror("LSI53C810: reg_w: Unknown reg %02X, %02X", offset, data);
+			fatalerror("LSI53C810: reg_w: Unknown reg %02X, %02X\n", offset, data);
 	}
 }
 
@@ -821,7 +821,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 				break;
 
 			default:
-				fatalerror("unknown op 0x%08X", op);
+				fatalerror("unknown op 0x%08X\n", op);
 				break;
 		}
 		result = 8;
@@ -848,7 +848,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 	}
 	else
 	{
-		fatalerror("unknown op 0x%08X", op);
+		fatalerror("unknown op 0x%08X\n", op);
 	}
 	return result;
 }
