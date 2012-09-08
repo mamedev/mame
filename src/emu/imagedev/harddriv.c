@@ -2,10 +2,6 @@
 
     Code to interface the image code with harddisk core.
 
-    We do not support diff files as it will involve some changes in
-    the image code.  Additionally, the need for diff files comes
-    from MAME's need for "canonical" hard drive images.
-
     Raphael Nabet 2003
 
     Update: 23-Feb-2004 - Unlike floppy disks, for which we support
@@ -16,6 +12,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "harddisk.h"
 #include "harddriv.h"
 
@@ -140,14 +137,14 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	err = m_self_chd.create(*image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
+	err = m_origchd.create(*image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
 		goto error;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = m_self_chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
-	m_self_chd.close();
+	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
+	m_origchd.close();
 
 	if (err != CHDERR_NONE)
 		goto error;
@@ -172,60 +169,102 @@ void harddisk_image_device::call_unload()
 		m_hard_disk_handle = NULL;
 	}
 
-	if (m_chd != NULL)
+	m_origchd.close();
+	m_diffchd.close();
+	m_chd = NULL;
+}
+
+/*-------------------------------------------------
+    open_disk_diff - open a DISK diff file
+-------------------------------------------------*/
+
+static chd_error open_disk_diff(emu_options &options, const char *name, chd_file &source, chd_file &diff_chd)
+{
+	astring fname(name, ".dif");
+
+	/* try to open the diff */
+	//printf("Opening differencing image file: %s\n", fname.cstr());
+	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
+	file_error filerr = diff_file.open(fname);
+	if (filerr == FILERR_NONE)
 	{
-		if (m_self_chd.opened())
-			m_self_chd.close();
-		m_chd = NULL;
+		astring fullpath(diff_file.fullpath());
+		diff_file.close();
+
+		//printf("Opening differencing image file: %s\n", fullpath.cstr());
+		return diff_chd.open(fullpath, true, &source);
 	}
+
+	/* didn't work; try creating it instead */
+	//printf("Creating differencing image: %s\n", fname.cstr());
+	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	filerr = diff_file.open(fname);
+	if (filerr == FILERR_NONE)
+	{
+		astring fullpath(diff_file.fullpath());
+		diff_file.close();
+
+		/* create the CHD */
+		//printf("Creating differencing image file: %s\n", fullpath.cstr());
+		chd_codec_type compression[4] = { CHD_CODEC_NONE };
+		chd_error err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
+		if (err != CHDERR_NONE)
+			return err;
+
+		return diff_chd.clone_all_metadata(source);
+	}
+
+	return CHDERR_FILE_NOT_FOUND;
 }
 
 int harddisk_image_device::internal_load_hd()
 {
-	chd_error		err = (chd_error)0;
-	int				is_writeable;
 	astring tempstring;
+	chd_error err = CHDERR_NONE;
+
+	m_chd = NULL;
 
 	/* open the CHD file */
 	if (software_entry() != NULL)
 	{
 		m_chd  = get_disk_handle(device().machine(), device().subtag(tempstring,"harddriv"));
-	} else {
-		do
-		{
-			is_writeable = !is_readonly();
-			err = m_self_chd.open(*image_core_file(), is_writeable);
-			if (err == CHDERR_NONE)
-				m_chd = &m_self_chd;
-
-			/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
-             * image read only and repeat */
-			if (err == CHDERR_FILE_NOT_WRITEABLE)
-				make_readonly();
-		}
-		while(!m_chd && is_writeable && (err == CHDERR_FILE_NOT_WRITEABLE));
 	}
-	if (!m_chd)
-		goto done;
-
-	/* open the hard disk file */
-	m_hard_disk_handle = hard_disk_open(m_chd);
-	if (!m_hard_disk_handle)
-		goto done;
-
-done:
-	if (err)
+	else
 	{
-		/* if we had an error, close out the CHD */
-		if (m_chd != NULL)
+		err = m_origchd.open(*image_core_file(), true);
+		if (err == CHDERR_NONE)
 		{
-			if (m_self_chd.opened())
-				m_self_chd.close();
-			m_chd = NULL;
+			m_chd = &m_origchd;
 		}
-		seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
+		else if (err == CHDERR_FILE_NOT_WRITEABLE)
+		{
+			err = m_origchd.open(*image_core_file(), false);
+			if (err == CHDERR_NONE)
+			{
+				err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);
+				if (err == CHDERR_NONE)
+				{
+					m_chd = &m_diffchd;
+				}
+			}
+		}
 	}
-	return err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
+
+	if (m_chd != NULL)
+	{
+		/* open the hard disk file */
+		m_hard_disk_handle = hard_disk_open(m_chd);
+		if (m_hard_disk_handle != NULL)
+			return IMAGE_INIT_PASS;
+	}
+
+	/* if we had an error, close out the CHD */
+	m_origchd.close();
+	m_diffchd.close();
+	m_chd = NULL;
+	seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
+
+	return IMAGE_INIT_FAIL;
 }
 
 /*************************************

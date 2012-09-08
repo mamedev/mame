@@ -1589,6 +1589,9 @@ void chd_file::parse_v5_header(UINT8 *rawheader, sha1_t &parentsha1)
 	m_compression[2] = be_read(&rawheader[24], 4);
 	m_compression[3] = be_read(&rawheader[28], 4);
 
+	if (compressed() && m_allow_writes)
+		throw CHDERR_FILE_NOT_WRITEABLE;
+
 	// describe the format
 	m_mapoffset_offset = 40;
 	m_metaoffset_offset = 48;

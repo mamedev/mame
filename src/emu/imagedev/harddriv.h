@@ -67,7 +67,8 @@ protected:
 	int internal_load_hd();
 
 	chd_file		*m_chd;
-	chd_file		m_self_chd;
+	chd_file		m_origchd;				/* handle to the original CHD */
+	chd_file		m_diffchd;				/* handle to the diff CHD */
 	hard_disk_file	*m_hard_disk_handle;
 
 	image_device_format m_format;
