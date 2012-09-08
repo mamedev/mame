@@ -95,7 +95,7 @@ private:
 
     direct_read_data *m_direct;
 
-    void halt_osc(int onum, int type, UINT32 *accumulator);
+    void halt_osc(int onum, int type, UINT32 *accumulator, int resshift);
 };
 
 

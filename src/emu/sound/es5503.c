@@ -32,6 +32,7 @@
   0.5 (RB) - more flexible wave memory hookup (incl. banking) and save state support.
   1.0 (RB) - properly respects the input clock
   2.0 (RB) - C++ conversion, more accurate oscillator IRQ timing
+  2.1 (RB) - Corrected phase when looping; synthLAB, Arkanoid, and Arkanoid II no longer go out of tune
 */
 
 #include "emu.h"
@@ -109,7 +110,7 @@ void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 // chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
-void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator)
+void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshift)
 {
 	ES5503Osc *pOsc = &oscillators[onum];
 	ES5503Osc *pPartner = &oscillators[onum^1];
@@ -120,10 +121,21 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator)
 	{
 		pOsc->control |= 1;
 	}
-	else
+	else    // preserve the relative phase of the oscillator when looping.  I think.
 	{
-		// reset the accumulator if not halting
-		*accumulator = 0;
+        UINT16 wtsize = pOsc->wtsize - 1;
+        UINT32 altram = (*accumulator) >> resshift;
+
+        if (altram > wtsize)
+        {
+            altram -= wtsize;
+        }
+        else
+        {
+            altram = 0;
+        }
+
+        *accumulator = altram << resshift;
 	}
 
 	// if swap mode, start the partner
@@ -175,8 +187,8 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 			for (snum = 0; snum < samples; snum++)
 			{
-				ramptr = (acc >> resshift) & sizemask;
 				altram = acc >> resshift;
+				ramptr = altram & sizemask;
 
 				acc += freq;
 
@@ -186,7 +198,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 				if (m_direct->read_raw_byte(ramptr + wtptr) == 0x00)
 				{
-					halt_osc(osc, 1, &acc);
+					halt_osc(osc, 1, &acc, resshift);
 				}
 				else
 				{
@@ -203,7 +215,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 					if (altram >= wtsize)
 					{
-						halt_osc(osc, 0, &acc);
+						halt_osc(osc, 0, &acc, resshift);
 					}
 				}
 
