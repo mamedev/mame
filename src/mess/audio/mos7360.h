@@ -50,7 +50,6 @@
 	MCFG_SCREEN_SIZE(336, 216) \
 	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos7360_device, screen_update) \
-	MCFG_PALETTE_LENGTH(128) \
 	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map)
@@ -125,7 +124,7 @@ public:
 
 	UINT8 bus_r();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// horrible crap code
 	WRITE_LINE_MEMBER( rom_switch_w );
@@ -161,7 +160,6 @@ protected:
 	inline UINT8 read_ram(offs_t offset);
 	inline UINT8 read_rom(offs_t offset);
 
-	void initialize_palette();
 	void draw_character(int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color);
 	void draw_character_multi(int ybegin, int yend, int ch, int yoff, int xoff);
 	void draw_bitmap(int ybegin, int yend, int ch, int yoff, int xoff);
@@ -182,7 +180,7 @@ protected:
 	UINT8 m_reg[0x20];
 	UINT8 m_last_data;
 
-	bitmap_ind16 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 
 	int m_rom;
 
