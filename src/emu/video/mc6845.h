@@ -21,6 +21,26 @@
 	MCFG_DEVICE_ADD(_tag, _variant, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
+#define MCFG_MOS8563_ADD(_tag, _screen_tag, _clock, _config, _map) \
+	MCFG_DEVICE_ADD(_tag, MOS8563, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(60) \
+	MCFG_SCREEN_SIZE(640, 200) \
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8563_device, screen_update)
+
+#define MCFG_MOS8568_ADD(_tag, _screen_tag, _clock, _config, _map) \
+	MCFG_DEVICE_ADD(_tag, MOS8568, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(60) \
+	MCFG_SCREEN_SIZE(640, 200) \
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8568_device, screen_update)
+
 
 class mc6845_device;
 
@@ -158,7 +178,6 @@ protected:
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-private:
 	bool m_supports_disp_start_addr_r;
 	bool m_supports_vert_sync_width;
 	bool m_supports_status_reg_d5;
@@ -358,6 +377,64 @@ protected:
 	virtual void device_reset();
 };
 
+class mos8563_device : public mc6845_device,
+					   public device_memory_interface
+{
+public:
+	mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	DECLARE_WRITE8_MEMBER( address_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_READ8_MEMBER( register_r );
+	DECLARE_WRITE8_MEMBER( register_w );
+
+	inline UINT8 read_videoram(offs_t offset);
+	inline void write_videoram(offs_t offset, UINT8 data);
+
+	void update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	const address_space_config		m_videoram_space_config;
+
+	UINT8 m_char_buffer[80];
+	UINT8 m_attr_buffer[80];
+
+	/* register file */
+	UINT16	m_attribute_addr;		/* 0x14/0x15 */
+	UINT8	m_horiz_char;			/* 0x16 */
+	UINT8	m_vert_char_disp;		/* 0x17 */
+	UINT8	m_vert_scroll;			/* 0x18 */
+	UINT8	m_horiz_scroll;			/* 0x19 */
+	UINT8	m_color;				/* 0x1a */
+	UINT8	m_row_addr_incr;		/* 0x1b */
+	UINT8	m_char_base_addr;		/* 0x1c */
+	UINT8	m_underline_ras;		/* 0x1d */
+	UINT8	m_word_count;			/* 0x1e */
+	UINT8	m_data;					/* 0x1f */
+	UINT16	m_block_addr;			/* 0x20/0x21 */
+	UINT16	m_de_begin;				/* 0x22/0x23 */
+	UINT8	m_dram_refresh;			/* 0x24 */
+	UINT8	m_sync_polarity;		/* 0x25 */
+};
+
+class mos8568_device : public mos8563_device
+{
+public:
+	mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+};
+
 
 extern const device_type MC6845;
 extern const device_type MC6845_1;
@@ -369,6 +446,9 @@ extern const device_type SY6545_1;
 extern const device_type SY6845E;
 extern const device_type HD6345;
 extern const device_type AMS40041;
+extern const device_type MOS8563;
+extern const device_type MOS8568;
+
 
 
 #endif

@@ -178,8 +178,8 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "machine/6526cia.h"
 
 #include "machine/cbmipt.h"
-#include "video/vic6567.h"
-#include "video/vdc8563.h"
+#include "video/mos6566.h"
+#include "video/mc6845.h"
 
 
 /* devices config */
@@ -251,10 +251,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c128_z80_io , AS_IO, 8, c128_state )
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE_LEGACY(c64_colorram_read, c64_colorram_write)
-	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE_LEGACY("vic2e", vic2_port_r, vic2_port_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2e", mos6566_device, read, write)
 	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE_LEGACY("sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE_LEGACY(c128_mmu8722_port_r, c128_mmu8722_port_w)
-	AM_RANGE(0xd600, 0xd7ff) AM_DEVREADWRITE_LEGACY("vdc8563", vdc8563_port_r, vdc8563_port_w)
+	//AM_RANGE(0xd600, 0xd7ff) AM_DEVREADWRITE_LEGACY("vdc8563", vdc8563_port_r, vdc8563_port_w)
+	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x1fe) AM_DEVREADWRITE("vdc8563", mos8563_device, status_r, address_w)
+	AM_RANGE(0xd601, 0xd601) AM_MIRROR(0x1fe) AM_DEVREADWRITE("vdc8563", mos8563_device, register_r, register_w)
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE_LEGACY("cia_0", mos6526_r, mos6526_w)
 	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE_LEGACY("cia_1", mos6526_r, mos6526_w)
 /*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE_LEGACY(dma_port_r, dma_port_w) */
@@ -501,140 +503,6 @@ static INPUT_PORTS_START( c128swe )
 	PORT_CONFSETTING( 0x20, "Swedish/Finnish" )
 INPUT_PORTS_END
 
-
-/*************************************
- *
- *  Graphics definitions
- *
- *************************************/
-
-static const unsigned char vic2_palette[] =
-{
-/* black, white, red, cyan */
-/* purple, green, blue, yellow */
-/* orange, brown, light red, dark gray, */
-/* medium gray, light green, light blue, light gray */
-/* taken from the vice emulator */
-	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
-	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
-	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
-	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
-};
-
-/* permutation for c64/vic6567 conversion to vdc8563
- 0 --> 0 black
- 1 --> 0xf white
- 2 --> 8 red
- 3 --> 7 cyan
- 4 --> 0xb violett
- 5 --> 4 green
- 6 --> 2 blue
- 7 --> 0xd yellow
- 8 --> 0xa orange
- 9 --> 0xc brown
- 0xa --> 9 light red
- 0xb --> 6 dark gray
- 0xc --> 1 gray
- 0xd --> 5 light green
- 0xe --> 3 light blue
- 0xf --> 0xf light gray
- */
-
-/* c128
- commodore assignment!?
- black gray orange yellow dardgrey vio red lgreen
- lred lgray brown blue white green cyan lblue
-*/
-const unsigned char vdc8563_palette[] =
-{
-#if 0
-	0x00, 0x00, 0x00, /* black */
-	0x70, 0x74, 0x6f, /* gray */
-	0x21, 0x1b, 0xae, /* blue */
-	0x5f, 0x53, 0xfe, /* light blue */
-	0x1f, 0xd2, 0x1e, /* green */
-	0x59, 0xfe, 0x59, /* light green */
-	0x42, 0x45, 0x40, /* dark gray */
-	0x30, 0xe6, 0xc6, /* cyan */
-	0xbe, 0x1a, 0x24, /* red */
-	0xfe, 0x4a, 0x57, /* light red */
-	0xb8, 0x41, 0x04, /* orange */
-	0xb4, 0x1a, 0xe2, /* purple */
-	0x6a, 0x33, 0x04, /* brown */
-	0xdf, 0xf6, 0x0a, /* yellow */
-	0xa4, 0xa7, 0xa2, /* light gray */
-	0xfd, 0xfe, 0xfc /* white */
-#else
-	/* vice */
-	0x00, 0x00, 0x00, /* black */
-	0x20, 0x20, 0x20, /* gray */
-	0x00, 0x00, 0x80, /* blue */
-	0x00, 0x00, 0xff, /* light blue */
-	0x00, 0x80, 0x00, /* green */
-	0x00, 0xff, 0x00, /* light green */
-	0x00, 0x80, 0x80, /* cyan */
-	0x00, 0xff, 0xff, /* light cyan */
-	0x80, 0x00, 0x00, /* red */
-	0xff, 0x00, 0x00, /* light red */
-	0x80, 0x00, 0x80, /* purble */
-	0xff, 0x00, 0xff, /* light purble */
-	0x80, 0x80, 0x00, /* brown */
-	0xff, 0xff, 0x00, /* yellow */
-	0xc0, 0xc0, 0xc0, /* light gray */
-	0xff, 0xff, 0xff  /* white */
-#endif
-};
-
-static PALETTE_INIT( c128 )
-{
-	int i;
-
-	for (i = 0; i < sizeof(vic2_palette) / 3; i++)
-	{
-		palette_set_color_rgb(machine, i, vic2_palette[i * 3], vic2_palette[i * 3 + 1], vic2_palette[i * 3 + 2]);
-	}
-
-	for (i = 0; i < sizeof(vdc8563_palette) / 3; i++)
-	{
-		palette_set_color_rgb(machine, i + sizeof(vic2_palette) / 3, vdc8563_palette[i * 3], vdc8563_palette[i * 3 + 1], vdc8563_palette[i * 3 + 2]);
-	}
-}
-
-static const gfx_layout c128_charlayout =
-{
-	8,16,
-	512,                                    /* 256 characters */
-	1,                      /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0,1,2,3,4,5,6,7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8
-	},
-	8*16
-};
-
-static const gfx_layout c128graphic_charlayout =
-{
-	8,1,
-	256,                                    /* 256 characters */
-	1,                      /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0,1,2,3,4,5,6,7 },
-	/* y offsets */
-	{ 0 },
-	8
-};
-
-static GFXDECODE_START( c128 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, c128_charlayout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, c128graphic_charlayout, 0, 0x100 )
-GFXDECODE_END
-
-
-
 /*************************************
  *
  *  Sound definitions
@@ -669,8 +537,8 @@ static M6510_INTERFACE( c128_m8502_interface )
 	DEVCB_NULL,					/* write_indexed_func */
 	DEVCB_HANDLER(c128_m6510_port_read),	/* port_read_func */
 	DEVCB_HANDLER(c128_m6510_port_write),	/* port_write_func */
-	0x00,
-	0x00
+	0x07,
+	0x20
 };
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
@@ -708,36 +576,50 @@ READ8_MEMBER( c128_state::vic_rdy_cb )
 	return ioport("CTRLSEL")->read() & 0x08;
 }
 
-static const vic2_interface c128_vic2_ntsc_intf = {
+static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, c128_state )
+	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_dma_read)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, c128_state )
+	AM_RANGE(0x000, 0x3ff) AM_READ(vic_dma_read_color)
+ADDRESS_MAP_END
+
+static MOS8564_INTERFACE( vic_intf )
+{
 	"screen",
 	"maincpu",
-	VIC8564,
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_interrupt),
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_x_cb),
 	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_y_cb),
 	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_interrupt),
 	DEVCB_DRIVER_MEMBER(c128_state, vic_rdy_cb)
 };
 
-static const vic2_interface c128_vic2_pal_intf = {
-	"screen",
-	"maincpu",
-	VIC8566,
-	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_interrupt),
-	DEVCB_DRIVER_MEMBER(c128_state, vic_rdy_cb)
+static MC6845_UPDATE_ROW( vdc_update_row )
+{
+    mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
+
+    mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+}
+
+static const mc6845_interface vdc_intf =
+{
+	"screen80",
+	8,
+	NULL,
+	vdc_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
 };
 
-static const vdc8563_interface c128_vdc8563_intf = {
-	"screen",
-	0
-};
+static ADDRESS_MAP_START( vdc_videoram_map, AS_0, 8, c128_state )
+	AM_RANGE(0x0000, 0xffff) AM_RAM
+ADDRESS_MAP_END
 
 /*************************************
 
@@ -764,19 +646,8 @@ static MACHINE_CONFIG_START( common, c128_state )
 	MCFG_MACHINE_RESET( c128 )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS * 2, VIC6567_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_STATIC( c128 )
-
-	MCFG_GFXDECODE( c128 )
-	MCFG_PALETTE_LENGTH((ARRAY_LENGTH(vic2_palette) + ARRAY_LENGTH(vdc8563_palette)) / 3 )
-	MCFG_PALETTE_INIT( c128 )
-
-	MCFG_VIC2_ADD("vic2e", c128_vic2_ntsc_intf)
-	MCFG_VDC8563_ADD("vdc8563", c128_vdc8563_intf)
+	MCFG_MOS8564_ADD("vic2e", "screen", VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8563_ADD("vdc8563", "screen80", 2000000, vdc_intf, vdc_videoram_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -827,59 +698,60 @@ static MACHINE_CONFIG_DERIVED( c128d81, common )
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128pal, c128 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( VIC6569_CLOCK)
-	MCFG_CPU_MODIFY("m8502")
-	MCFG_CPU_CLOCK( VIC6569_CLOCK)
+static MACHINE_CONFIG_START( c128pal, c128_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, VIC6569_CLOCK)
+	MCFG_CPU_PROGRAM_MAP( c128_z80_mem)
+	MCFG_CPU_IO_MAP( c128_z80_io)
+	MCFG_CPU_VBLANK_INT("screen", c128_frame_interrupt)
+	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
+
+	MCFG_CPU_ADD("m8502", M8502, VIC6569_CLOCK)
+	MCFG_CPU_PROGRAM_MAP( c128_mem)
 	MCFG_CPU_CONFIG( c128_m8502_interface )
+	MCFG_CPU_VBLANK_INT("screen", c128_frame_interrupt)
+	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS * 2, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+	MCFG_MACHINE_START( c128 )
+	MCFG_MACHINE_RESET( c128 )
 
-	MCFG_DEVICE_REMOVE("vic2e")
-	MCFG_VIC2_ADD("vic2e", c128_vic2_pal_intf)
+	/* video hardware */
+	MCFG_MOS8566_ADD("vic2e", "screen", VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8563_ADD("vdc8563", "screen80", 2000000, vdc_intf, vdc_videoram_map)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("sid6581", SID6581, VIC6569_CLOCK)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sid6581", SID6581, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(c128_sound_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
 
 	/* cia */
-	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c128_pal_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c128_pal_cia1)
+	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c128_ntsc_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c128_ntsc_cia1)
+
+	MCFG_FRAGMENT_ADD(c64_cartslot)
+	MCFG_SOFTWARE_LIST_ADD("c64_disk_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c128dpal, c128pal )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c128dcrp, c128dcr )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( VIC6569_CLOCK)
-	MCFG_CPU_MODIFY("m8502")
-	MCFG_CPU_CLOCK( VIC6569_CLOCK)
-	MCFG_CPU_CONFIG( c128_m8502_interface )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS * 2, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
-
-	MCFG_DEVICE_REMOVE("vic2e")
-	MCFG_VIC2_ADD("vic2e", c128_vic2_pal_intf)
-
-	/* sound hardware */
-	MCFG_SOUND_REPLACE("sid6581", SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(c128_sound_interface)
-
-	/* cia */
-	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c128_pal_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c128_pal_cia1)
+static MACHINE_CONFIG_DERIVED( c128dcrp, c128pal )
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, c128dcr_iec_devices, "c1571cr", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 

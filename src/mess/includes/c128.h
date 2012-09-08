@@ -27,7 +27,6 @@ public:
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
 	DECLARE_READ8_MEMBER( vic_dma_read );
-	DECLARE_READ8_MEMBER( vic_dma_read_ultimax );
 	DECLARE_READ8_MEMBER( vic_dma_read_color );
 	DECLARE_WRITE_LINE_MEMBER( vic_interrupt );
 	DECLARE_READ8_MEMBER( vic_rdy_cb );
@@ -92,13 +91,7 @@ extern MACHINE_START( c128 );
 extern MACHINE_RESET( c128 );
 extern INTERRUPT_GEN( c128_frame_interrupt );
 
-extern SCREEN_UPDATE_IND16( c128 );
-
 void c128_bankswitch_64(running_machine &machine, int reset);
-
-int c128_dma_read(running_machine &machine, int offset);
-int c128_dma_read_color(running_machine &machine, int offset);
-void c128_vic_interrupt(running_machine &machine, int level);
 
 extern READ8_DEVICE_HANDLER(c128_m6510_port_read);
 extern WRITE8_DEVICE_HANDLER(c128_m6510_port_write);

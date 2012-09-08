@@ -18,8 +18,8 @@
 #include "imagedev/cassette.h"
 #include "machine/6526cia.h"
 #include "sound/sid6581.h"
-#include "video/vic6567.h"
-#include "video/vdc8563.h"
+#include "video/mos6566.h"
+#include "video/mc6845.h"
 
 #define MMU_PAGE1 ((((state->m_mmu[10]&0xf)<<8)|state->m_mmu[9])<<8)
 #define MMU_PAGE0 ((((state->m_mmu[8]&0xf)<<8)|state->m_mmu[7])<<8)
@@ -135,27 +135,28 @@ static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 
 static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
 {
-	c128_state *state = device->machine().driver_data<c128_state>();
+//	c128_state *state = device->machine().driver_data<c128_state>();
 	UINT8 value = 0xff;
 	UINT8 cia0porta = mos6526_pa_r(device->machine().device("cia_0"), 0);
-	device_t *vic2e = device->machine().device("vic2e");
+	//device_t *vic2e = device->machine().device("vic2e");
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
-
-	if (!vic2e_k0_r(vic2e))
+/*
+	if (!vic2e->k0_r())
 		value &= state->m_keyline[0];
-	if (!vic2e_k1_r(vic2e))
+	if (!vic2e->k1_r())
 		value &= state->m_keyline[1];
-	if (!vic2e_k2_r(vic2e))
+	if (!vic2e->k2_r())
 		value &= state->m_keyline[2];
-
+*/
 	return value;
 }
 
 static WRITE8_DEVICE_HANDLER( c128_cia0_port_b_w )
 {
-	device_t *vic2e = device->machine().device("vic2e");
-	vic2_lightpen_write(vic2e, data & 0x10);
+	mos6566_device *vic2e = device->machine().device<mos6566_device>("vic2e");
+
+	vic2e->lp_w(BIT(data, 4));
 }
 
 static void c128_irq( running_machine &machine, int level )
@@ -387,8 +388,8 @@ WRITE8_HANDLER( c128_write_d000 )
 	device_t *cia_0 = space->machine().device("cia_0");
 	device_t *cia_1 = space->machine().device("cia_1");
 	device_t *sid = space->machine().device("sid6581");
-	device_t *vic2e = space->machine().device("vic2e");
-	device_t *vdc8563 = space->machine().device("vdc8563");
+	mos6566_device *vic2e = space->machine().device<mos6566_device>("vic2e");
+	mos8563_device *vdc8563 = space->machine().device<mos8563_device>("vdc8563");
 
 	UINT8 c64_port6510 = m6510_get_port(space->machine().device<legacy_cpu_device>("m8502"));
 
@@ -404,7 +405,7 @@ WRITE8_HANDLER( c128_write_d000 )
 		switch ((offset&0xf00)>>8)
 		{
 		case 0:case 1: case 2: case 3:
-			vic2_port_w(vic2e, offset & 0x3ff, data);
+			vic2e->write(*space, offset & 0x3f, data);
 			break;
 		case 4:
 			sid6581_w(sid, offset & 0x3f, data);
@@ -412,8 +413,11 @@ WRITE8_HANDLER( c128_write_d000 )
 		case 5:
 			c128_mmu8722_port_w(space, offset & 0xff, data);
 			break;
-		case 6:case 7:
-			vdc8563_port_w(vdc8563, offset & 0xff, data);
+		case 6: case 7:
+			if (offset & 0x01)
+				vdc8563->register_w(*space, 0, data);
+			else
+				vdc8563->address_w(*space, 0, data);
 			break;
 		case 8: case 9: case 0xa: case 0xb:
 		    if (state->m_c64mode)
@@ -445,17 +449,20 @@ static READ8_HANDLER( c128_read_io )
 	device_t *cia_0 = space->machine().device("cia_0");
 	device_t *cia_1 = space->machine().device("cia_1");
 	device_t *sid = space->machine().device("sid6581");
-	device_t *vic2e= space->machine().device("vic2e");
-	device_t *vdc8563 = space->machine().device("vdc8563");
+	mos6566_device *vic2e = space->machine().device<mos6566_device>("vic2e");
+	mos8563_device *vdc8563 = space->machine().device<mos8563_device>("vdc8563");
 
 	if (offset < 0x400)
-		return vic2_port_r(vic2e, offset & 0x3ff);
+		return vic2e->read(*space, offset & 0x3f);
 	else if (offset < 0x500)
 		return sid6581_r(sid, offset & 0xff);
 	else if (offset < 0x600)
 		return c128_mmu8722_port_r(space, offset & 0xff);
 	else if (offset < 0x800)
-		return vdc8563_port_r(vdc8563, offset & 0xff);
+			if (offset & 0x01)
+				return vdc8563->register_r(*space, 0);
+			else
+				return vdc8563->status_r(*space, 0);
 	else if (offset < 0xc00)
 		return state->m_colorram[offset & 0x3ff];
 	else if (offset == 0xc00)
@@ -1072,42 +1079,19 @@ WRITE8_DEVICE_HANDLER(c128_m6510_port_write)
 {
 	c128_state *state = device->machine().driver_data<c128_state>();
 
-	UINT8 direction = offset; // HACK ALERT!
-
-	/* if line is marked as input then keep current value */
-	data = (state->m_c64_port_data & ~direction) | (data & direction);
-
-	/* resistors make P0,P1,P2 go high when respective line is changed to input */
-	if (!(direction & 0x04))
-		data |= 0x04;
-
-	if (!(direction & 0x02))
-		data |= 0x02;
-
-	if (!(direction & 0x01))
-		data |= 0x01;
-
-	state->m_c64_port_data = data;
-
 	if (state->m_tape_on)
 	{
-		if (direction & 0x08)
-		{
-			device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-		}
+		device->machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
-		if (direction & 0x20)
+		if (!(data & 0x20))
 		{
-			if (!(data & 0x20))
-			{
-				device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-				state->m_datasette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
-			}
-			else
-			{
-				device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-				state->m_datasette_timer->reset();
-			}
+			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			state->m_datasette_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
+		}
+		else
+		{
+			device->machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+			state->m_datasette_timer->reset();
 		}
 	}
 
@@ -1121,7 +1105,7 @@ WRITE8_DEVICE_HANDLER(c128_m6510_port_write)
 READ8_DEVICE_HANDLER(c128_m6510_port_read)
 {
 	c128_state *state = device->machine().driver_data<c128_state>();
-	UINT8 data = state->m_c64_port_data;
+	UINT8 data = 0x07;
 
 	if ((device->machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
@@ -1182,25 +1166,25 @@ static void c128_common_driver_init( running_machine &machine )
 
 DRIVER_INIT_MEMBER(c128_state,c128)
 {
-	device_t *vic2e = machine().device("vic2e");
-	device_t *vdc8563 = machine().device("vdc8563");
+	//device_t *vic2e = machine().device("vic2e");
+	//device_t *vdc8563 = machine().device("vdc8563");
 
 	c128_common_driver_init(machine());
 
-	vic2_set_rastering(vic2e, 0);
-	vdc8563_set_rastering(vdc8563, 1);
+	//vic2_set_rastering(vic2e, 0);
+	//vdc8563_set_rastering(vdc8563, 1);
 }
 
 DRIVER_INIT_MEMBER(c128_state,c128pal)
 {
-	device_t *vic2e = machine().device("vic2e");
-	device_t *vdc8563 = machine().device("vdc8563");
+	//device_t *vic2e = machine().device("vic2e");
+	//device_t *vdc8563 = machine().device("vdc8563");
 
 	c128_common_driver_init(machine());
 	m_pal = 1;
 
-	vic2_set_rastering(vic2e, 1);
-	vdc8563_set_rastering(vdc8563, 0);
+	//vic2_set_rastering(vic2e, 1);
+	//vdc8563_set_rastering(vdc8563, 0);
 }
 
 DRIVER_INIT_MEMBER(c128_state,c128d)
@@ -1253,8 +1237,8 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	c128_state *state = device->machine().driver_data<c128_state>();
 	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
 	int i, value;
-	device_t *vic2e = device->machine().device("vic2e");
-	device_t *vdc8563 = device->machine().device("vdc8563");
+	//device_t *vic2e = device->machine().device("vic2e");
+	//device_t *vdc8563 = device->machine().device("vdc8563");
 
 	c128_nmi(device->machine());
 
@@ -1262,14 +1246,14 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	{
 		if (device->machine().root_device().ioport("SPECIAL")->read() & 0x08)
 		{
-			vic2_set_rastering(vic2e, 0);
-			vdc8563_set_rastering(vdc8563, 1);
+			//vic2_set_rastering(vic2e, 0);
+			//vdc8563_set_rastering(vdc8563, 1);
 			device->machine().primary_screen->set_visible_area(0, 655, 0, 215);
 		}
 		else
 		{
-			vic2_set_rastering(vic2e, 1);
-			vdc8563_set_rastering(vdc8563, 0);
+			//vic2_set_rastering(vic2e, 1);
+			//vdc8563_set_rastering(vdc8563, 0);
 			if (state->m_pal)
 				device->machine().primary_screen->set_visible_area(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
 			else
@@ -1294,14 +1278,4 @@ INTERRUPT_GEN( c128_frame_interrupt )
 		value &= ~device->machine().root_device().ioport(c128ports[i])->read();
 		state->m_keyline[i] = value;
 	}
-}
-
-SCREEN_UPDATE_IND16( c128 )
-{
-	device_t *vic2e = screen.machine().device("vic2e");
-	device_t *vdc8563 = screen.machine().device("vdc8563");
-
-	vdc8563_video_update(vdc8563, bitmap, cliprect);
-	vic2_video_update(vic2e, bitmap, cliprect);
-	return 0;
 }
