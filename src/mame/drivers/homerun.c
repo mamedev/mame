@@ -1,17 +1,46 @@
 /*
  Moero Pro Yakyuu Homerun - (c) 1988 Jaleco
  Dynamic Shooting - (c) 1988 Jaleco
+ Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump - (c) 1990 Jaleco
  Driver by Tomasz Slanina
 
  *weird* hardware - based on NES version
  (gfx bank changed in the middle of screen,
   sprites in NES format etc)
-
+  
 Todo :
  - voice ( unemulated D7756C )
  - controls/dips
- - better emulation of gfx bank switching
+ - better emulation of gfx bank switching (problematic in ganjaja)
  - is there 2 player mode ?
+
+-----------------------------------
+Moero Pro Yakyuu Homerun Kyousou
+Jaleco, 1988
+
+PCB Layout
+----------
+
+HR-8847
+-----------------------------------
+| YM2203    Z80B         6264     |
+|YM3014 DSW(8)     HOMERUN.43     |
+|    D7756C   6264                |
+|                                 |
+|J  640KhZ   HOMERUN.60           |
+|A 2018                           |
+|M      2018    2018          8255|
+|M          2018                  |
+|A                                |
+|                                 |
+|                                 |
+| HOMERUN.120                20MHz|
+-----------------------------------
+
+Notes:
+      Z80 clock: 5.000MHz
+          VSync: 60Hz
+          HSync: 15.21kHz
 
 */
 
@@ -40,6 +69,7 @@ WRITE8_MEMBER(homerun_state::pc_w)
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
+	// all ports are outputs
 	DEVCB_NULL,				/* Port A read */
 	DEVCB_DRIVER_MEMBER(homerun_state,pa_w),	/* Port A write */
 	DEVCB_NULL,				/* Port B read */
@@ -67,8 +97,8 @@ CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 
 static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP /* ?? */
-	AM_RANGE(0x20, 0x20) AM_WRITENOP /* ?? */
+	AM_RANGE(0x10, 0x10) AM_WRITENOP // D7756C sample number
+	AM_RANGE(0x20, 0x20) AM_WRITENOP // D7756C control
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
@@ -155,6 +185,43 @@ static INPUT_PORTS_START( dynashot )
 	PORT_DIPSETTING(	0x7c, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ganjaja )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x76, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_NAME("P1 Up / Rock")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_NAME("P1 Down / Paper")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right / Scissors")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) // unused?
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) // TODO: hopper status
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // bit masked with IN0 IPT_COIN1, maybe coin lockout?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DIPSW:1")
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DIPSW:2")
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIPSW:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIPSW:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIPSW:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIPSW:6" ) // chance to win?
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIPSW:7" ) // "
+	PORT_DIPNAME( 0x80, 0x80, "Game" ) PORT_DIPLOCATION("DIPSW:8")
+	PORT_DIPSETTING(	0x80, "Saisho wa Goo" )
+	PORT_DIPSETTING(	0x00, "Hop Step & Jump" )
+INPUT_PORTS_END
+
 
 static const gfx_layout gfxlayout =
 {
@@ -217,7 +284,7 @@ static MACHINE_RESET( homerun )
 static MACHINE_CONFIG_START( homerun, homerun_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
 	MCFG_CPU_PROGRAM_MAP(homerun_memmap)
 	MCFG_CPU_IO_MAP(homerun_iomap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -232,6 +299,7 @@ static MACHINE_CONFIG_START( homerun, homerun_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-25)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(homerun)
 
 	MCFG_GFXDECODE(homerun)
@@ -242,74 +310,67 @@ static MACHINE_CONFIG_START( homerun, homerun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 6000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_20MHz/8)
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ganjaja, homerun )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60) // ?
 MACHINE_CONFIG_END
 
 
-/*
-Moero Pro Yakyuu Homerun Kyousou
-Jaleco, 1988
-
-PCB Layout
-----------
-
-HR-8847
------------------------------------
-| YM2203    Z80B         6264     |
-|YM3014 DSW(8)     HOMERUN.43     |
-|    D7756C   6264                |
-|                                 |
-|J  640KhZ   HOMERUN.60           |
-|A 2018                           |
-|M      2018    2018          8255|
-|M          2018                  |
-|A                                |
-|                                 |
-|                                 |
-| HOMERUN.120                20MHz|
------------------------------------
-
-Notes:
-      Z80 clock: 5.000MHz
-          VSync: 60Hz
-          HSync: 15.21kHz
-*/
-
 ROM_START( homerun )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "homerun.43",        0x0000, 0x4000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
-	ROM_CONTINUE(        0x10000,0x1c000)
+	ROM_LOAD( "homerun.ic43",   0x00000, 0x04000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
+	ROM_CONTINUE(               0x10000, 0x1c000)
 
-	ROM_REGION( 0x010000, "gfx1", 0 )
-	ROM_LOAD( "homerun.60",  0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "homerun.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
-	ROM_LOAD( "homerun.120",  0x00000, 0x20000, CRC(52f0709b) SHA1(19e675bcccadb774f60ec5929fc1fb5cf0d3f617) )
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "homerun.ic120",  0x00000, 0x20000, CRC(52f0709b) SHA1(19e675bcccadb774f60ec5929fc1fb5cf0d3f617) )
 
-	ROM_REGION( 0x01000, "d7756c", 0 )
-	ROM_LOAD( "homerun.snd",  0x00000, 0x1000, NO_DUMP ) /* D7756C internal rom */
-
+	ROM_REGION( 0x08000, "d7756c", 0 )
+	ROM_LOAD( "upd7756c.ic98",  0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
 ROM_END
+
 
 ROM_START( dynashot )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.ic43",        0x0000, 0x4000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
-	ROM_CONTINUE(        0x10000,0x1c000)
+	ROM_LOAD( "1.ic43",         0x00000, 0x04000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
+	ROM_CONTINUE(               0x10000, 0x1c000)
 
-	ROM_REGION( 0x010000, "gfx1", 0 )
-	ROM_LOAD( "3.ic60",  0x00000, 0x10000, CRC(77d6a608) SHA1(a31ff343a5d4d6f20301c030ecc2e252149bcf9d) )
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.ic60",         0x00000, 0x10000, CRC(77d6a608) SHA1(a31ff343a5d4d6f20301c030ecc2e252149bcf9d) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
-	ROM_LOAD( "2.ic120",  0x00000, 0x20000, CRC(bedf7b98) SHA1(cb6c5fcaf8df5f5c7636c3c8f79b9dda78e30c2e) )
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(bedf7b98) SHA1(cb6c5fcaf8df5f5c7636c3c8f79b9dda78e30c2e) )
 
-	ROM_REGION( 0x01000, "d7756c", 0 )
-	ROM_LOAD( "dynashot.snd",  0x00000, 0x1000, NO_DUMP ) /* D7756C internal rom */
-
+	ROM_REGION( 0x08000, "d7756c", 0 )
+	ROM_LOAD( "upd7756c.ic98",  0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun, homerun, driver_device,  0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, homerun, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shooting",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+ROM_START( ganjaja )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",         0x00000, 0x04000, CRC(dad57543) SHA1(dbd8b5cee33756ee5e3c41bf84c0f7141d3466dc) )
+	ROM_CONTINUE(               0x10000, 0x1c000)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "ic60",           0x00000, 0x10000, CRC(855f6b28) SHA1(386411e88cf9bed54fe2073f0828d579cb1d04ee) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(e65d4d57) SHA1(2ec9e5bdaa94b808573313b6eca657d798004b53) )
+
+	ROM_REGION( 0x08000, "d7756c", 0 )
+	ROM_LOAD( "upd77p56c.ic98", 0x00000, 0x08000, NO_DUMP ) /* D77P56C OTP rom (One-Time Programmable, note the extra P) */
+ROM_END
+
+
+GAME( 1988, homerun,  0, homerun, homerun,  driver_device, 0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0, homerun, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shooting", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0, ganjaja, ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
