@@ -116,7 +116,7 @@ void msm6255_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		fatalerror("Interface not specified!");
+		fatalerror("Interface not specified!\n");
 	}
 }
 

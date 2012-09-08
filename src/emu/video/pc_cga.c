@@ -354,7 +354,7 @@ static VIDEO_START( pc_cga )
 			break;
 
 		default:
-			fatalerror("CGA: Bus width %d not supported", buswidth);
+			fatalerror("CGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
 	spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
@@ -396,7 +396,7 @@ static VIDEO_START( pc_cga32k )
 			break;
 
 		default:
-			fatalerror("CGA: Bus width %d not supported", buswidth);
+			fatalerror("CGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
 	spaceio->install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_cga8_r), FUNC(pc_cga8_w), mask );
@@ -1225,7 +1225,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 					break;
 
 				default:
-					fatalerror("CGA: Bus width %d not supported", buswidth);
+					fatalerror("CGA: Bus width %d not supported\n", buswidth);
 					break;
 			}
 			space_prg->install_legacy_readwrite_handler(0xb8000, 0xb9fff, FUNC(char_ram_r),FUNC(char_ram_w), mask );

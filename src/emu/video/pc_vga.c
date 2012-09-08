@@ -1988,9 +1988,9 @@ void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, cons
 		vga.svga_intf = *svga_intf;
 
 		if (vga.svga_intf.seq_regcount < 0x05)
-			fatalerror("Invalid SVGA sequencer register count");
+			fatalerror("Invalid SVGA sequencer register count\n");
 		if (vga.svga_intf.crtc_regcount < 0x19)
-			fatalerror("Invalid SVGA CRTC register count");
+			fatalerror("Invalid SVGA CRTC register count\n");
 	}
 	else
 	{
@@ -2035,7 +2035,7 @@ void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t m
 			break;
 
 		default:
-			fatalerror("VGA: Bus width %d not supported", buswidth);
+			fatalerror("VGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
 	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
@@ -2460,7 +2460,7 @@ void pc_svga_trident_io_init(running_machine &machine, address_space *mem_space,
 			break;
 
 		default:
-			fatalerror("VGA: Bus width %d not supported", buswidth);
+			fatalerror("VGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
 	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w), mask);
@@ -2723,7 +2723,7 @@ static void s3_define_video_mode(void)
 			case 0x03: svga.rgb15_en = 1; break;
 			case 0x05: svga.rgb16_en = 1; break;
 			case 0x0d: svga.rgb32_en = 1; break;
-			default: fatalerror("TODO: s3 video mode not implemented %02x",((s3.ext_misc_ctrl_2) >> 4)); break;
+			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
 	}
 	else
@@ -2937,7 +2937,7 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 				svga.bank_w = data & 0xf;
 				svga.bank_r = svga.bank_w;
 				if(data & 0x60)
-					fatalerror("TODO: s3 bank selects above 1M");
+					fatalerror("TODO: s3 bank selects above 1M\n");
 				break;
 			default:
 				logerror("S3: 3D4 index %02x write %02x\n",index,data);
@@ -4481,7 +4481,7 @@ void pc_vga_gamtor_io_init(running_machine &machine, address_space *mem_space, o
 			break;
 
 		default:
-			fatalerror("VGA: Bus width %d not supported", buswidth);
+			fatalerror("VGA: Bus width %d not supported\n", buswidth);
 			break;
 	}
 	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_gamtor_03b0_r), FUNC(vga_port_gamtor_03b0_w), mask);

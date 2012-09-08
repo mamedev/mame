@@ -321,7 +321,7 @@ void ui_menu_main::handle()
 			break;
 
 		default:
-			fatalerror("ui_menu_main::handle - unknown reference");
+			fatalerror("ui_menu_main::handle - unknown reference\n");
 		}
 	}
 }

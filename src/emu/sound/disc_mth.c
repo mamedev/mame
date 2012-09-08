@@ -1640,7 +1640,7 @@ DISCRETE_RESET(dst_transform)
 			default:
 				m_device->discrete_log("dst_transform_step - Invalid function type/variable passed: %s",(const char *)this->custom_data());
 				/* that is enough to fatalerror */
-				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)this->custom_data());
+				fatalerror("dst_transform_step - Invalid function type/variable passed: %s\n", (const char *)this->custom_data());
 				break;
 		}
 		p++;

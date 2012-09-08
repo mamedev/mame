@@ -491,7 +491,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			/* Fall through */
 			break;
 		default:
-			fatalerror("compute_res_net: Unknown amplifier type");
+			fatalerror("compute_res_net: Unknown amplifier type\n");
 	}
 
 	switch (di->options & RES_NET_VCC_MASK)
@@ -503,7 +503,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			/* Fall through */
 			break;
 		default:
-			fatalerror("compute_res_net: Unknown vcc type");
+			fatalerror("compute_res_net: Unknown vcc type\n");
 	}
 
 	switch (di->options & RES_NET_VBIAS_MASK)
@@ -521,7 +521,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			/* Fall through */
 			break;
 		default:
-			fatalerror("compute_res_net: Unknown vcc type");
+			fatalerror("compute_res_net: Unknown vcc type\n");
 	}
 
 	switch (di->options & RES_NET_VIN_MASK)
@@ -548,7 +548,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			/* Fall through */
 			break;
 		default:
-			fatalerror("compute_res_net: Unknown vin type");
+			fatalerror("compute_res_net: Unknown vin type\n");
 	}
 
 	/* Per channel options */
@@ -574,7 +574,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			/* Fall through */
 			break;
 		default:
-			fatalerror("compute_res_net: Unknown amplifier type");
+			fatalerror("compute_res_net: Unknown amplifier type\n");
 	}
 
 	switch (di->rgb[channel].options & RES_NET_VBIAS_MASK)
@@ -592,7 +592,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			/* Fall through */
 			break;
 		default:
-			fatalerror("compute_res_net: Unknown vcc type");
+			fatalerror("compute_res_net: Unknown vcc type\n");
 	}
 
 	/* Input impedances */

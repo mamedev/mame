@@ -537,7 +537,7 @@ static void update_pcm(YMF271Chip *chip, int slotnum, INT32 *mixp, int length)
 
 	if (slot->waveform != 7)
 	{
-		fatalerror("Waveform %d in update_pcm !!!", slot->waveform);
+		fatalerror("Waveform %d in update_pcm!!!\n", slot->waveform);
 	}
 
 	for (i = 0; i < length; i++)

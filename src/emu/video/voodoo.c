@@ -1448,7 +1448,7 @@ static void recompute_texture_params(tmu_state *t)
 
 	/* check for separate RGBA filtering */
 	if (TEXDETAIL_SEPARATE_RGBA_FILTER(t->reg[tDetail].u))
-		fatalerror("Separate RGBA filters!");
+		fatalerror("Separate RGBA filters!\n");
 }
 
 
@@ -1682,7 +1682,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 				case 2:		/* RET */
 					if (LOG_CMDFIFO) logerror("  RET $%06X\n", target);
-					fatalerror("RET in CMDFIFO!");
+					fatalerror("RET in CMDFIFO!\n");
 					break;
 
 				case 3:		/* JMP LOCAL FRAME BUFFER */
@@ -1692,13 +1692,13 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 				case 4:		/* JMP AGP */
 					if (LOG_CMDFIFO) logerror("  JMP AGP $%06X\n", target);
-					fatalerror("JMP AGP in CMDFIFO!");
+					fatalerror("JMP AGP in CMDFIFO!\n");
 					src = &fifobase[target / 4];
 					break;
 
 				default:
 					mame_printf_debug("INVALID JUMP COMMAND!\n");
-					fatalerror("  INVALID JUMP COMMAND");
+					fatalerror("  INVALID JUMP COMMAND\n");
 					break;
 			}
 			break;
@@ -2149,7 +2149,7 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 {
 	/* sanity check */
-	if (!v->pci.op_pending) fatalerror("FIFOs not empty, no op pending!");
+	if (!v->pci.op_pending) fatalerror("FIFOs not empty, no op pending!\n");
 
 	/* set the state and update statistics */
 	v->pci.stall_state = state;
@@ -2507,7 +2507,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		case userIntrCMD:
 			poly_wait(v->poly, v->regnames[regnum]);
-			//fatalerror("userIntrCMD");
+			//fatalerror("userIntrCMD\n");
 
 			v->reg[intrCtrl].u |= 0x1800;
 			v->reg[intrCtrl].u &= ~0x80000000;
@@ -2714,7 +2714,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 
 		case cmdFifoBump:
 			if (v->type == TYPE_VOODOO_2 && (chips & 1))
-				fatalerror("cmdFifoBump");
+				fatalerror("cmdFifoBump\n");
 			break;
 
 		case cmdFifoRdPtr:
@@ -2764,7 +2764,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 				else
 					rowpixels = (data & 0x3fff) >> 1;
 				if (v->fbi.rowpixels != rowpixels)
-					fatalerror("aux buffer stride differs from color buffer stride");
+					fatalerror("aux buffer stride differs from color buffer stride\n");
 			}
 			break;
 
@@ -3294,7 +3294,7 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 	t = &v->tmu[tmunum];
 
 	if (TEXLOD_TDIRECT_WRITE(t->reg[tLOD].u))
-		fatalerror("Texture direct write!");
+		fatalerror("Texture direct write!\n");
 
 	/* wait for any outstanding work to finish */
 	poly_wait(v->poly, "Texture write");
@@ -3413,7 +3413,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 		return;
 	in_flush = TRUE;
 
-	if (!v->pci.op_pending) fatalerror("flush_fifos called with no pending operation");
+	if (!v->pci.op_pending) fatalerror("flush_fifos called with no pending operation\n");
 
 	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:flush_fifos start -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
 		v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
@@ -3653,7 +3653,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		fifo_add(&v->pci.fifo, data);
 	}
 	else
-		fatalerror("PCI FIFO full");
+		fatalerror("PCI FIFO full\n");
 
 	/* handle flushing to the memory FIFO */
 	if (FBIINIT0_ENABLE_MEMORY_FIFO(v->reg[fbiInit0].u) &&
@@ -4527,7 +4527,7 @@ static WRITE32_DEVICE_HANDLER( banshee_agp_w )
 			break;
 
 		case cmdBump0:
-			fatalerror("cmdBump0");
+			fatalerror("cmdBump0\n");
 			break;
 
 		case cmdRdPtrL0:
@@ -4564,7 +4564,7 @@ static WRITE32_DEVICE_HANDLER( banshee_agp_w )
 			break;
 
 		case cmdBump1:
-			fatalerror("cmdBump1");
+			fatalerror("cmdBump1\n");
 			break;
 
 		case cmdRdPtrL1:
@@ -4895,7 +4895,7 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 			break;
 
 		default:
-			fatalerror("Unsupported voodoo card in voodoo_start!");
+			fatalerror("Unsupported voodoo card in voodoo_start!\n");
 			break;
 	}
 

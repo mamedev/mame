@@ -1863,11 +1863,11 @@ void address_space::prepare_map()
 			// find the region
 			memory_region *region = machine().root_device().memregion(fulltag);
 			if (region == NULL)
-				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
+				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 
 			// validate the region
 			if (entry->m_rgnoffs + (entry->m_byteend - entry->m_bytestart + 1) > region->bytes())
-				fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, region->bytes());
+				fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region, region->bytes());
 		}
 
 		// convert any region-relative entries to their memory pointers
@@ -2437,7 +2437,7 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 		if (bank.base() == NULL && manager().m_initialized)
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
-				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!");
+				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
 			memory_block &block = manager().m_blocklist.append(*global_alloc(memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
 			bank.set_base(block.data());
 		}
@@ -2466,7 +2466,7 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 		if (bank.base() == NULL && manager().m_initialized)
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
-				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!");
+				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
 			memory_block &block = manager().m_blocklist.append(*global_alloc(memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
 			bank.set_base(block.data());
 		}
@@ -3584,7 +3584,7 @@ UINT8 address_table::subtable_alloc()
 
 		// merge any subtables we can
 		if (!subtable_merge())
-			fatalerror("Ran out of subtables!");
+			fatalerror("Ran out of subtables!\n");
 	}
 }
 
@@ -3600,7 +3600,7 @@ void address_table::subtable_realloc(UINT8 subentry)
 
 	// sanity check
 	if (m_subtable[subindex].m_usecount <= 0)
-		fatalerror("Called subtable_realloc on a table with a usecount of 0");
+		fatalerror("Called subtable_realloc on a table with a usecount of 0\n");
 
 	// increment the usecount
 	m_subtable[subindex].m_usecount++;
@@ -3677,7 +3677,7 @@ void address_table::subtable_release(UINT8 subentry)
 
 	// sanity check
 	if (m_subtable[subindex].m_usecount <= 0)
-		fatalerror("Called subtable_release on a table with a usecount of 0");
+		fatalerror("Called subtable_release on a table with a usecount of 0\n");
 
 	// decrement the usecount and clear the checksum if we're at 0
 	// also unref the subhandlers

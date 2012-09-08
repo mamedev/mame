@@ -875,7 +875,7 @@ void h63484_device::process_fifo()
 				m_dn = m_pr[0]; // number of param words
 
 				//if(m_dn > 0x10 || m_dn == 0)
-				//  fatalerror("stop!");
+				//  fatalerror("stop!\n");
 			}
 
 			if(m_param_ptr == (1 + m_dn))
@@ -956,7 +956,7 @@ void h63484_device::process_fifo()
 
 		default:
 			printf("%04x\n",m_cr);
-			fatalerror("stop!");
+			fatalerror("stop!\n");
 			break;
 	}
 }

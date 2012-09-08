@@ -184,7 +184,7 @@ DISCRETE_RESET(dss_counter)
 
 
 	if (!m_is_7492 && (DSS_COUNTER__MAX < DSS_COUNTER__MIN))
-		fatalerror("MAX < MIN in NODE_%02d", this->index());
+		fatalerror("MAX < MIN in NODE_%02d\n", this->index());
 
 	m_out_type    = m_clock_type & DISC_OUT_MASK;
 	m_clock_type &= DISC_CLK_MASK;
@@ -1590,7 +1590,7 @@ DISCRETE_STEP(dss_inverter_osc)
 			vG2 = this->tf(vG3);
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", this->index());
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d\n", this->index());
 	}
 
 	clamped = 0;
@@ -1656,7 +1656,7 @@ DISCRETE_STEP(dss_inverter_osc)
 			diff = diff - diff * exp(-this->sample_time()/(mc_c * rMix));
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", this->index());
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d\n", this->index());
 	}
 
 	mc_v_cap   += diff;

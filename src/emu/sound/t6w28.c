@@ -347,7 +347,7 @@ static DEVICE_START( t6w28 )
 	t6w28_state *chip = get_safe_token(device);
 
 	if (t6w28_init(device,chip) != 0)
-		fatalerror("Error creating t6w28 chip");
+		fatalerror("Error creating t6w28 chip\n");
 	t6w28_set_gain(chip, 0);
 
 	/* values from sn76489a */

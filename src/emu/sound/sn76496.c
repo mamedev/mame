@@ -401,7 +401,7 @@ static void generic_start(device_t *device, int feedbackmask, int noisetap1, int
 	sn76496_state *chip = get_safe_token(device);
 
 	if (SN76496_init(device,chip,stereo) != 0)
-		fatalerror("Error creating SN76496 chip");
+		fatalerror("Error creating SN76496 chip\n");
 	SN76496_set_gain(chip, 0);
 
 	chip->FeedbackMask = feedbackmask;

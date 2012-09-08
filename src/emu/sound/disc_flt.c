@@ -1286,7 +1286,7 @@ DISCRETE_RESET(dst_sallen_key)
 		    q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
 		    break;
 		default:
-			fatalerror("Unknown sallen key filter type");
+			fatalerror("Unknown sallen key filter type\n");
 	}
 
 	calculate_filter2_coefficients(this, freq, 1.0 / q, DISC_FILTER_LOWPASS, m_fc);

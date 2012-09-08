@@ -250,11 +250,11 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 	// make sure it's a valid input
 	if (index >= m_input.count())
-		fatalerror("Fatal error: stream_set_input attempted to configure non-existant input %d (%d max)", index, m_input.count());
+		fatalerror("Fatal error: stream_set_input attempted to configure non-existant input %d (%d max)\n", index, m_input.count());
 
 	// make sure it's a valid output
 	if (input_stream != NULL && output_index >= input_stream->m_output.count())
-		fatalerror("Fatal error: stream_set_input attempted to use a non-existant output %d (%d max)", output_index, m_output.count());
+		fatalerror("Fatal error: stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, m_output.count());
 
 	// if this input is already wired, update the dependent info
 	stream_input &input = m_input[index];

@@ -1124,7 +1124,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 				end = snapstr.len();
 
 			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!");
+				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an astring
 			astring snapdevname;
