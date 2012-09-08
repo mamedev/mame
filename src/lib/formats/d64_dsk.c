@@ -16,7 +16,6 @@
 
 */
 
-#define LOG_FORMATS printf
 #define XTAL_16MHz      16000000
 #define XTAL_12MHz      12000000
 #include "g64_dsk.h"
