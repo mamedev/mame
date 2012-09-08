@@ -66,6 +66,13 @@ typedef struct
 	UINT32 ext_count;
 } DMA_REGS;
 
+typedef struct
+{
+	UINT32 addr;
+	UINT32 code;
+	UINT32 loop_type;
+} LADDR;
+
 typedef struct _SHARC_REGS SHARC_REGS;
 struct _SHARC_REGS
 {
@@ -84,7 +91,7 @@ struct _SHARC_REGS
 	UINT32 daddr;
 	UINT32 pcstk;
 	UINT32 pcstkp;
-	UINT32 laddr;
+	LADDR laddr;
 	UINT32 curlcntr;
 	UINT32 lcntr;
 
@@ -131,8 +138,6 @@ struct _SHARC_REGS
 	void (*opcode_handler)(SHARC_REGS *cpustate);
 	int icount;
 	UINT64 opcode;
-	UINT64 fetch_opcode;
-	UINT64 decode_opcode;
 
 	UINT32 nfaddr;
 
@@ -197,11 +202,6 @@ INLINE void CHANGE_PC(SHARC_REGS *cpustate, UINT32 newpc)
 	cpustate->daddr = newpc;
 	cpustate->faddr = newpc+1;
 	cpustate->nfaddr = newpc+2;
-
-	// next instruction to be executed
-	cpustate->decode_opcode = ROPCODE(cpustate->daddr);
-	// next instruction to be decoded
-	cpustate->fetch_opcode = ROPCODE(cpustate->faddr);
 }
 
 INLINE void CHANGE_PC_DELAYED(SHARC_REGS *cpustate, UINT32 newpc)
@@ -449,7 +449,9 @@ static CPU_INIT( sharc )
 	device->save_item(NAME(cpustate->daddr));
 	device->save_item(NAME(cpustate->pcstk));
 	device->save_item(NAME(cpustate->pcstkp));
-	device->save_item(NAME(cpustate->laddr));
+	device->save_item(NAME(cpustate->laddr.addr));
+	device->save_item(NAME(cpustate->laddr.code));
+	device->save_item(NAME(cpustate->laddr.loop_type));
 	device->save_item(NAME(cpustate->curlcntr));
 	device->save_item(NAME(cpustate->lcntr));
 
@@ -510,8 +512,6 @@ static CPU_INIT( sharc )
 	device->save_pointer(NAME(cpustate->internal_ram), 2 * 0x10000);
 
 	device->save_item(NAME(cpustate->opcode));
-	device->save_item(NAME(cpustate->fetch_opcode));
-	device->save_item(NAME(cpustate->decode_opcode));
 
 	device->save_item(NAME(cpustate->nfaddr));
 
@@ -600,9 +600,13 @@ static CPU_EXIT( sharc )
 
 static void sharc_set_irq_line(SHARC_REGS *cpustate, int irqline, int state)
 {
-	if (state)
+	if (state == ASSERT_LINE)
 	{
 		cpustate->irq_active |= 1 << (8-irqline);
+	}
+	else
+	{
+		cpustate->irq_active &= ~(1 << (8-irqline));
 	}
 }
 
@@ -696,15 +700,6 @@ static CPU_EXECUTE( sharc )
 		cpustate->idle = 0;
 	}
 
-	// fill the initial pipeline
-
-	// next executed instruction
-	cpustate->opcode = ROPCODE(cpustate->daddr);
-	cpustate->opcode_handler = sharc_op[(cpustate->opcode >> 39) & 0x1ff];
-
-	// next decoded instruction
-	cpustate->fetch_opcode = ROPCODE(cpustate->faddr);
-
 	while (cpustate->icount > 0 && !cpustate->idle)
 	{
 		cpustate->pc = cpustate->daddr;
@@ -716,21 +711,18 @@ static CPU_EXECUTE( sharc )
 		cpustate->astat_old_old = cpustate->astat_old;
 		cpustate->astat_old = cpustate->astat;
 
-		cpustate->decode_opcode = cpustate->fetch_opcode;
-
-		// fetch next instruction
-		cpustate->fetch_opcode = ROPCODE(cpustate->faddr);
+		cpustate->opcode = ROPCODE(cpustate->pc);
 
 		debugger_instruction_hook(device, cpustate->pc);
 
 		// handle looping
-		if (cpustate->pc == (cpustate->laddr & 0xffffff))
+		if (cpustate->pc == cpustate->laddr.addr)
 		{
-			switch (cpustate->laddr >> 30)
+			switch (cpustate->laddr.loop_type)
 			{
 				case 0:		// arithmetic condition-based
 				{
-					int condition = (cpustate->laddr >> 24) & 0x1f;
+					int condition = cpustate->laddr.code;
 
 					{
 						UINT32 looptop = TOP_PC(cpustate);
@@ -779,13 +771,8 @@ static CPU_EXECUTE( sharc )
 				}
 			}
 		}
-
-		// execute current instruction
-		cpustate->opcode_handler(cpustate);
-
-		// decode next instruction
-		cpustate->opcode = cpustate->decode_opcode;
-		cpustate->opcode_handler = sharc_op[(cpustate->opcode >> 39) & 0x1ff];
+		
+		sharc_op[(cpustate->opcode >> 39) & 0x1ff](cpustate);
 
 
 

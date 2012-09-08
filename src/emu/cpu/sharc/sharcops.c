@@ -1106,7 +1106,7 @@ INLINE UINT32 TOP_PC(SHARC_REGS *cpustate)
 	return cpustate->pcstack[cpustate->pcstkp];
 }
 
-INLINE void PUSH_LOOP(SHARC_REGS *cpustate, UINT32 pc, UINT32 count)
+INLINE void PUSH_LOOP(SHARC_REGS *cpustate, UINT32 addr, UINT32 code, UINT32 type, UINT32 count)
 {
 	cpustate->lstkp++;
 	if(cpustate->lstkp >= 6)
@@ -1124,9 +1124,12 @@ INLINE void PUSH_LOOP(SHARC_REGS *cpustate, UINT32 pc, UINT32 count)
 	}
 
 	cpustate->lcstack[cpustate->lstkp] = count;
-	cpustate->lastack[cpustate->lstkp] = pc;
+	cpustate->lastack[cpustate->lstkp] = (type << 30) | (code << 24) | addr;
 	cpustate->curlcntr = count;
-	cpustate->laddr = pc;
+
+	cpustate->laddr.addr = addr;
+	cpustate->laddr.code = code;
+	cpustate->laddr.loop_type = type;
 }
 
 INLINE void POP_LOOP(SHARC_REGS *cpustate)
@@ -1148,7 +1151,10 @@ INLINE void POP_LOOP(SHARC_REGS *cpustate)
 	}
 
 	cpustate->curlcntr = cpustate->lcstack[cpustate->lstkp];
-	cpustate->laddr = cpustate->lastack[cpustate->lstkp];
+
+	cpustate->laddr.addr = cpustate->lastack[cpustate->lstkp] & 0xffffff;
+	cpustate->laddr.code = (cpustate->lastack[cpustate->lstkp] >> 24) & 0x1f;
+	cpustate->laddr.loop_type = (cpustate->lastack[cpustate->lstkp] >> 30) & 0x3;
 }
 
 INLINE void PUSH_STATUS_STACK(SHARC_REGS *cpustate)
@@ -2391,7 +2397,7 @@ static void sharcop_do_until_counter_imm(SHARC_REGS *cpustate)
 	if (cpustate->lcntr > 0)
 	{
 		PUSH_PC(cpustate, cpustate->pc+1);
-		PUSH_LOOP(cpustate, address | (type << 30) | (cond << 24), cpustate->lcntr);
+		PUSH_LOOP(cpustate, address, cond, type, cpustate->lcntr);
 	}
 }
 
@@ -2425,7 +2431,7 @@ static void sharcop_do_until_counter_ureg(SHARC_REGS *cpustate)
 	if (cpustate->lcntr > 0)
 	{
 		PUSH_PC(cpustate, cpustate->pc+1);
-		PUSH_LOOP(cpustate, address | (type << 30) | (cond << 24), cpustate->lcntr);
+		PUSH_LOOP(cpustate, address, cond, type, cpustate->lcntr);
 	}
 }
 
@@ -2440,7 +2446,7 @@ static void sharcop_do_until(SHARC_REGS *cpustate)
 	UINT32 address = (cpustate->pc + offset);
 
 	PUSH_PC(cpustate, cpustate->pc+1);
-	PUSH_LOOP(cpustate, address | (cond << 24), 0);
+	PUSH_LOOP(cpustate, address, cond, 0, 0);
 }
 
 /*****************************************************************************/
@@ -2736,9 +2742,6 @@ static void sharcop_idle(SHARC_REGS *cpustate)
 	cpustate->daddr = cpustate->pc;
 	cpustate->faddr = cpustate->pc+1;
 	cpustate->nfaddr = cpustate->pc+2;
-
-	cpustate->decode_opcode = ROPCODE(cpustate->daddr);
-	cpustate->fetch_opcode = ROPCODE(cpustate->faddr);
 
 	cpustate->idle = 1;
 }
