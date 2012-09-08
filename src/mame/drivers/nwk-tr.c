@@ -461,6 +461,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 		else if (ACCESSING_BITS_16_23)
 		{
 			m_lanc2_ram[2] = (data >> 20) & 0xf;
+			m_lanc2_ram[3] = 0;
 		}
 		else if (ACCESSING_BITS_0_7)
 		{
@@ -623,7 +624,7 @@ static INPUT_PORTS_START( nwktr )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("ANALOG1")		// Steering
-	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_INVERT
 
 	PORT_START("ANALOG2")		// Acceleration pedal
 	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
