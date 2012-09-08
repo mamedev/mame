@@ -211,7 +211,7 @@ public:
 	friend bool operator>=(const netlist_time &left, const netlist_time &right);
 	friend bool operator<=(const netlist_time &left, const netlist_time &right);
 
-	inline netlist_time &operator=(const netlist_time right) { m_time = right.m_time; return *this; }
+	inline netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
 	inline netlist_time &operator+=(const netlist_time &right) { m_time += right.m_time; return *this; }
 
 	inline const INTERNALTYPE as_raw() const { return m_time; }
@@ -540,9 +540,9 @@ protected:
 	 */
 	ATTR_HOT inline const net_sig_t Q() const	{ return m_Q; 	}
 
-	ATTR_HOT inline void register_in_listPS(const netlist_time delay_ps);
+	ATTR_HOT inline void register_in_listPS(const netlist_time &delay_ps);
 
-	ATTR_HOT inline void set_Q_PS(const net_sig_t newQ, const netlist_time delay_ps)
+	ATTR_HOT inline void set_Q_PS(const net_sig_t newQ, const netlist_time &delay_ps)
 	{
 		if (newQ != m_new_Q)
 		{
@@ -550,13 +550,13 @@ protected:
 			register_in_listPS(delay_ps);
 		}
 	}
-	ATTR_HOT inline void set_Q_NoCheckPS(const net_sig_t val, const netlist_time delay_ps)
+	ATTR_HOT inline void set_Q_NoCheckPS(const net_sig_t val, const netlist_time &delay_ps)
 	{
 		m_new_Q = val;
 		register_in_listPS(delay_ps);
 	}
 
-	ATTR_HOT inline void set_Q_PS_Analog(const double newQ, const netlist_time delay_ps)
+	ATTR_HOT inline void set_Q_PS_Analog(const double newQ, const netlist_time &delay_ps)
 	{
 		if (newQ != m_new_Q_analog)
 		{
@@ -564,7 +564,7 @@ protected:
 			register_in_listPS(delay_ps);
 		}
 	}
-	ATTR_HOT inline void set_Q_NoCheckPS_Analog(const double val, const netlist_time delay_ps)
+	ATTR_HOT inline void set_Q_NoCheckPS_Analog(const double val, const netlist_time &delay_ps)
 	{
 		m_new_Q_analog = val;
 		register_in_listPS(delay_ps);
@@ -606,8 +606,8 @@ public:
 	ATTR_COLD void initial(const net_sig_t val) { m_Q = val; m_new_Q = val; m_last_Q = !val; }
 	ATTR_HOT inline void clear() 	{ set_Q_PS(0, netlist_time::zero); }
 	ATTR_HOT inline void set()   	{ set_Q_PS(1, netlist_time::zero); }
-	ATTR_HOT inline void setToPS(const UINT8 val, const netlist_time delay_ps) { set_Q_PS(val, delay_ps); }
-	ATTR_HOT inline void setToNoCheckPS(const UINT8 val, const netlist_time delay_ps) { set_Q_NoCheckPS(val, delay_ps); }
+	ATTR_HOT inline void setToPS(const UINT8 val, const netlist_time &delay_ps) { set_Q_PS(val, delay_ps); }
+	ATTR_HOT inline void setToNoCheckPS(const UINT8 val, const netlist_time &delay_ps) { set_Q_NoCheckPS(val, delay_ps); }
 	ATTR_COLD inline void set_levels(const double low, const double high)
 	{
 		m_low_V = low;
@@ -633,8 +633,8 @@ public:
 		: net_output_t(OUTPUT | SIGNAL_ANALOG) { }
 
 	ATTR_COLD void initial(double val) { m_Q_analog = val; m_new_Q_analog = val; }
-	ATTR_HOT inline void setToPS(const double val, const netlist_time delay_ps) { set_Q_PS_Analog(val,delay_ps); }
-	ATTR_HOT inline void setToNoCheckPS(const double val, const netlist_time delay_ps) { set_Q_NoCheckPS_Analog(val,delay_ps); }
+	ATTR_HOT inline void setToPS(const double val, const netlist_time &delay_ps) { set_Q_PS_Analog(val,delay_ps); }
+	ATTR_HOT inline void setToNoCheckPS(const double val, const netlist_time &delay_ps) { set_Q_NoCheckPS_Analog(val,delay_ps); }
 };
 
 // ----------------------------------------------------------------------------------------
@@ -902,7 +902,7 @@ public:
 
 	void set_clock_freq(UINT64 clockfreq);
 
-	ATTR_HOT inline void register_in_listPS1(net_output_t *out, const netlist_time attime)
+	ATTR_HOT inline void register_in_listPS1(net_output_t *out, const netlist_time &attime)
 	{
 		m_queue.push(queue_t::entry_t(attime, out));
 	}
@@ -1015,7 +1015,7 @@ ATTR_HOT inline void net_input_t::activate_lh()
 }
 
 
-ATTR_HOT inline void net_output_t::register_in_listPS(const netlist_time delay_ps)
+ATTR_HOT inline void net_output_t::register_in_listPS(const netlist_time &delay_ps)
 {
 	m_time = m_netlist->time() + delay_ps;
 	m_in_queue = 0;		/* not queued */
