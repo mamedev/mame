@@ -281,7 +281,10 @@ static SCREEN_UPDATE_RGB32( nwktr )
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	k001604_draw_front_layer(k001604, bitmap, screen.visible_area());
+	const rectangle visarea = screen.visible_area();
+	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);
+
+	k001604_draw_front_layer(k001604, bitmap, tilemap_rect);
 
 	draw_7segment_led(bitmap, 3, 3, state->m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, state->m_led_reg1);
