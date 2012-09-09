@@ -4,14 +4,19 @@
     Technoplay "2-2C 8008 LS" (68000 CPU)
     Schematic and PinMAME used as references
 
+ToDo:
+- Once game starts, nothing responds
+- No sound due to missing roms
+- Battery backup to be added
+
 ***********************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "techno.lh"
-// schematic says 8MHz but it goes too fast
-#define TECHNO_MAINCLK 4e6
+
+#define TECHNO_MAINCLK 8e6
 
 class techno_state : public driver_device
 {
@@ -32,10 +37,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sol1_w);
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	UINT16 m_digit_1;
-	UINT16 m_digit_2;
-	UINT16 m_segment_1;
-	UINT16 m_segment_2;
+	UINT16 m_digit;
 	UINT8 m_vector;
 protected:
 
@@ -46,8 +48,7 @@ protected:
 	virtual void machine_reset();
 private:
 	bool m_digwait;
-public:
-	DECLARE_DRIVER_INIT(techno);
+	UINT8 m_keyrow;
 };
 
 
@@ -76,31 +77,42 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {
-	m_segment_1 = BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
-	output_set_digit_value(m_digit_1, m_segment_1);
+	output_set_digit_value(m_digit, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
 WRITE16_MEMBER( techno_state::disp2_w )
 {
-	m_segment_2 = BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
-	output_set_digit_value(m_digit_1+30, m_segment_2);
+	output_set_digit_value(m_digit+30, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
 WRITE16_MEMBER( techno_state::sound_w )
 {
+/*
+d0..d7 : to sound board
+d8     : strobe to display board
+d9     : reset (unknown purpose)
+d10    : data clock to display board
+d11-d15: AUX outputs
+*/
+
+// this code derived from PinMAME
 	if (m_digwait)
-		m_digit_1 = (m_digit_1+1) % 16;
+		m_digit = (m_digit+1) % 16;
 
 	if (BIT(data, 10))
 	{
 		m_digwait = 1;
-		m_digit_1 = 0;
+		m_digit = 0;
 	}
 }
 
 // lamps & keymatrix
 WRITE16_MEMBER( techno_state::lamp1_w )
 {
+// Work out key row
+	for (int i = 8; i < 16; i++)
+		if (BIT(data, i))
+			m_keyrow = i-8;
 }
 
 // more lamps
@@ -126,7 +138,9 @@ WRITE16_MEMBER( techno_state::setout_w )
 // inputs
 READ16_MEMBER( techno_state::key_r )
 {
-	return 0;
+	char kbdrow[6];
+	sprintf(kbdrow,"X%X",m_keyrow);
+	return ioport(kbdrow)->read();
 }
 
 // unknown
@@ -138,10 +152,82 @@ READ16_MEMBER( techno_state::rtrg_r )
 // feedback from sound board, and some AUX inputs
 READ16_MEMBER( techno_state::sound_r )
 {
-	return 0xffff;
+	return 0;
 }
 
 static INPUT_PORTS_START( techno )
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Letter select+") PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test-") PORT_CODE(KEYCODE_F7)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Test+") PORT_CODE(KEYCODE_F8)
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top target right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Horizontal rail right")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Mini Post") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Letter select+") PORT_CODE(KEYCODE_F6)
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Inner Canal Left") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Exit Canal Right") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 3")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 4")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_X)
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Top Bumper") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bottom Bumper") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Top Right Kicker") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right Kicker") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Kicker") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Exit Canal Left") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Inner Canal Right") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix left target bottom") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left rollover") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Barrier 1 Target") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Barrier 2 Target") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Barrier 3 Target") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left Bumper") PORT_CODE(KEYCODE_H)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix right target top") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix right target middle-top") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinning Target") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fixed contact") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Special Target") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix left target top") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix left target centre") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target left") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 1 Bridge")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 2 Bridge")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 3 Bridge")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Ball 4 Bridge")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix right target middle-bottom") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix right target bottom") PORT_CODE(KEYCODE_V)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top target middle-right") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top target middle-left") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top target Left") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Horizontal Rail Left") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Chopper Exit") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Chopper Entry") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target right") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target middle") PORT_CODE(KEYCODE_EQUALS)
 INPUT_PORTS_END
 
 static INTERRUPT_GEN( techno_intgen )
@@ -158,10 +244,7 @@ static INTERRUPT_GEN( techno_intgen )
 void techno_state::machine_reset()
 {
 	m_vector = 0x88;
-}
-
-DRIVER_INIT_MEMBER(techno_state,techno)
-{
+	m_digit = 0;
 }
 
 static MACHINE_CONFIG_START( techno, techno_state )
@@ -185,4 +268,4 @@ ROM_START(xforce)
 	// 5 x 27256 roms are undumped
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, techno_state,  techno,  ROT0,  "Tecnoplay", "X Force", GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", GAME_MECHANICAL | GAME_NO_SOUND | GAME_IMPERFECT_KEYBOARD)
