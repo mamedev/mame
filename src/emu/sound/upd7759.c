@@ -594,7 +594,8 @@ static DEVICE_RESET( upd7759 )
 
 static void upd7759_postload(upd7759_state *chip)
 {
-	chip->rom = chip->rombase + chip->romoffset;
+	if (chip->rombase)
+		chip->rom = chip->rombase + chip->romoffset;
 }
 
 
@@ -654,8 +655,10 @@ static DEVICE_START( upd7759 )
 	/* compute the ROM base or allocate a timer */
 	chip->romoffset = 0;
 	chip->rom = chip->rombase = *device->region();
-	if (chip->rom == NULL)
+	if (chip->rombase == NULL)
 		chip->timer = device->machine().scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
+	else
+		assert((device->region()->bytes() & 0x1ffff) == 0);
 
 	/* set the DRQ callback */
 	chip->drqcallback = intf->drqcallback;
@@ -736,6 +739,7 @@ int upd7759_busy_r(device_t *device)
 void upd7759_set_bank_base(device_t *device, UINT32 base)
 {
 	upd7759_state *chip = get_safe_token(device);
+	assert(chip->rombase != NULL);
 	chip->rom = chip->rombase + base;
 	chip->romoffset = base;
 }
