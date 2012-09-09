@@ -820,7 +820,7 @@ void segas24_state::irq_timer_sync()
 		break;
 	}
 	case 2: {
-		fatalerror("egas24_state::irq_timer_sync - case 2");
+		fatalerror("egas24_state::irq_timer_sync - case 2\n");
 	}
 	case 3: {
 		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * TIMER_CLOCK);
@@ -851,7 +851,7 @@ void segas24_state::irq_timer_start(int old_tmode)
 		break;
 	}
 	case 2:
-		fatalerror("egas24_state::irq_timer_start - case 2");
+		fatalerror("egas24_state::irq_timer_start - case 2\n");
 		break;
 	case 3: {
 		int count = 0x1000 - irq_tval;

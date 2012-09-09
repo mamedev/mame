@@ -648,7 +648,7 @@ WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 	{
 		case 0x0000/2:
 			if(data & 0x80) //throw an error if the (unemulated) MMU is enabled
-				fatalerror("SCC68070: MMU enable bit active");
+				fatalerror("SCC68070: MMU enable bit active\n");
 			break;
 	}
 }

@@ -764,11 +764,11 @@ static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 
 			if (data & 0x20)
 			{
-				fatalerror("AD1847: Companded data not supported");
+				fatalerror("AD1847: Companded data not supported\n");
 			}
 			if ((data & 0x40) == 0)
 			{
-				fatalerror("AD1847: 8-bit data not supported");
+				fatalerror("AD1847: 8-bit data not supported\n");
 			}
 			break;
 		}

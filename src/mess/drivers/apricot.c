@@ -226,7 +226,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 	else
 	{
 		/* graphics mode */
-		fatalerror("Graphics mode not implemented!");
+		fatalerror("Graphics mode not implemented!\n");
 	}
 }
 

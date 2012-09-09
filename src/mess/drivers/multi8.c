@@ -608,7 +608,7 @@ WRITE8_MEMBER( multi8_state::portc_w )
 
 	if (data & 0x20 && data != 0xff)
 		printf("Work RAM bank selected!\n");
-//      fatalerror("Work RAM bank selected");
+//      fatalerror("Work RAM bank selected\n");
 }
 
 

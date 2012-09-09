@@ -773,7 +773,7 @@ static void z80_fifoout_push(address_space *space, UINT8 data)
 	}
 	if(state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(&space->device()));
+		fatalerror("Sound FIFOOUT overflow at %08X\n", cpu_get_pc(&space->device()));
 	}
 
 	state->m_fifoout_read_request = 1;
@@ -785,7 +785,7 @@ static UINT8 z80_fifoin_pop(address_space *space)
 	UINT8 r;
 	if (state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(&space->device()));
+		fatalerror("Sound FIFOIN underflow at %08X\n", cpu_get_pc(&space->device()));
 	}
 	r = state->m_fifoin_data[state->m_fifoin_rpos++];
 	if(state->m_fifoin_rpos == FIFO_SIZE)
@@ -811,7 +811,7 @@ static void z80_fifoin_push(address_space *space, UINT8 data)
 	}
 	if(state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(&space->device()));
+		fatalerror("Sound FIFOIN overflow at %08X\n", cpu_get_pc(&space->device()));
 	}
 
 	state->m_fifoin_read_request = 1;
@@ -1019,8 +1019,7 @@ READ32_MEMBER(seibuspi_state::soundrom_r)
 		}
 	}
 
-
-	fatalerror("soundrom_r: %08X, %08X", offset, mem_mask);
+	fatalerror("soundrom_r: %08X, %08X\n", offset, mem_mask);
 }
 
 /********************************************************************/

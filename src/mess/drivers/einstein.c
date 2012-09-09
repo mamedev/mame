@@ -499,7 +499,7 @@ static SCREEN_UPDATE_RGB32( einstein2 )
 	else if (&screen == einstein->m_crtc_screen)
 		einstein->m_mc6845->screen_update( screen, bitmap, cliprect);
 	else
-		fatalerror("Unknown screen '%s'", screen.tag());
+		fatalerror("Unknown screen '%s'\n", screen.tag());
 
 	return 0;
 }

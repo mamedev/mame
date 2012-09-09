@@ -581,7 +581,7 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 		m_csr[0] |= 0x10;
 
 		if (BIT(m_csr[0], 5) == 1)
-			fatalerror("68000 interrupt enable was set!");
+			fatalerror("68000 interrupt enable was set!\n");
 	}
 
 	data &= 0x3800;
@@ -615,7 +615,7 @@ WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
 		m_csr[1] |= 0x10;
 
 		if (BIT(m_csr[1], 5) == 1)
-			fatalerror("68000 interrupt enable was set!");
+			fatalerror("68000 interrupt enable was set!\n");
 	}
 
 	data &= 0x3800;
@@ -818,10 +818,10 @@ void load_ldafile(address_space *space, const UINT8 *file)
 		UINT16 addr;
 
 		if (READ_CHAR() != 0x01)
-			fatalerror("Bad .LDA file");
+			fatalerror("Bad .LDA file\n");
 
 		if (READ_CHAR() != 0x00)
-			fatalerror("Bad .LDA file");
+			fatalerror("Bad .LDA file\n");
 
 		len = READ_CHAR();
 		sum += len;
@@ -854,7 +854,7 @@ void load_ldafile(address_space *space, const UINT8 *file)
 		sum += READ_CHAR();
 
 		if (sum != 0)
-			fatalerror(".LDA checksum failure");
+			fatalerror(".LDA checksum failure\n");
 	}
 }
 
@@ -881,7 +881,7 @@ void load_hexfile(address_space *space, const UINT8 *file)
 
 		/* First character of each line should be a '%' */
 		if (file[i++] != '%')
-			fatalerror("Error on line %d - invalid line start character", line);
+			fatalerror("Error on line %d - invalid line start character\n", line);
 
 		/* Get the line length */
 		len = READ_HEX_CHAR() << 4;

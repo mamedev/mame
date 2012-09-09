@@ -452,7 +452,7 @@ static MACHINE_START( s2650 )
     else if (strcmp(game_name,"spclforc") == 0) state->m_protect_type = DK2650_SPCLFORC;
     else if (strcmp(game_name,"spcfrcii") == 0) state->m_protect_type = DK2650_SPCLFORC;
     else
-        fatalerror("Unknown game <%s> in S2650 start.", game_name);
+        fatalerror("Unknown game <%s> in S2650 start.\n", game_name);
 }
 
 static MACHINE_START( radarscp )

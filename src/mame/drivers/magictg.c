@@ -691,7 +691,7 @@ READ32_MEMBER( magictg_state::adsp_idma_data_r )
 	}
 	else
 	{
-		fatalerror("????");
+		fatalerror("????\n");
 		return 0;
 	}
 }
@@ -705,7 +705,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 		//mame_printf_debug("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
 	}
 	else
-		fatalerror("????");
+		fatalerror("????\n");
 }
 
 READ32_MEMBER( magictg_state::adsp_status_r )
@@ -791,7 +791,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 						}
 						else
 						{
-							fatalerror("Unsupported BDMA width");
+							fatalerror("Unsupported BDMA width\n");
 						}
 
 						--m_adsp_regs.bdma_word_count;

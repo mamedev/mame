@@ -2294,7 +2294,7 @@ READ32_MEMBER(gba_state::eeprom_r)
 			{
 				if (m_eeprom_addr >= sizeof( m_gba_eeprom))
 				{
-					fatalerror( "eeprom: invalid address (%x)", m_eeprom_addr);
+					fatalerror( "eeprom: invalid address (%x)\n", m_eeprom_addr);
 				}
 				m_eep_data = m_gba_eeprom[m_eeprom_addr];
 				//printf("EEPROM read @ %x = %x (%x)\n", m_eeprom_addr, m_eep_data, (m_eep_data & 0x80) ? 1 : 0);
@@ -2398,7 +2398,7 @@ WRITE32_MEMBER(gba_state::eeprom_w)
 				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(machine().device("maincpu")), m_eep_data, m_eeprom_addr );
 				if (m_eeprom_addr >= sizeof( m_gba_eeprom))
 				{
-					fatalerror( "eeprom: invalid address (%x)", m_eeprom_addr);
+					fatalerror( "eeprom: invalid address (%x)\n", m_eeprom_addr);
 				}
 				m_gba_eeprom[m_eeprom_addr] = m_eep_data;
 				m_eeprom_addr++;

@@ -212,12 +212,12 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 		logerror("%s: F3853 Interrupt Control %u\n", machine().describe_context(), m_int_enable);
 		interrupt_check();
 
-		if (m_int_enable == 0x03) fatalerror("F3853 Timer not supported!");
+		if (m_int_enable == 0x03) fatalerror("F3853 Timer not supported!\n");
 		break;
 
 	case 3:
 		// timer 8-bit polynomial counter
-		fatalerror("%s: F3853 Timer not supported!", machine().describe_context());
+		fatalerror("%s: F3853 Timer not supported!\n", machine().describe_context());
 		break;
 	}
 }

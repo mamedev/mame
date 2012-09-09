@@ -1055,7 +1055,7 @@ static void galileo_perform_dma(address_space *space, int which)
 		if (dstaddr >= 0x08000000 && dstaddr < 0x09000000)
 		{
 			if (bytesleft % 4 != 0)
-				fatalerror("Galileo DMA to voodoo: bytesleft = %d", bytesleft);
+				fatalerror("Galileo DMA to voodoo: bytesleft = %d\n", bytesleft);
 			srcinc *= 4;
 			dstinc *= 4;
 
@@ -1362,7 +1362,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 
 	/* shouldn't get here if the CPU is already stalled */
 	if (m_cpu_stalled_on_voodoo)
-		fatalerror("seattle_voodoo_w while CPU is stalled");
+		fatalerror("seattle_voodoo_w while CPU is stalled\n");
 
 	/* remember all the info about this access for later */
 	m_cpu_stalled_on_voodoo = TRUE;

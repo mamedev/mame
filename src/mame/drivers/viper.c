@@ -970,7 +970,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 				{
 					epic.eicr = data;
 					if (data & 0x08000000)
-						fatalerror("EPIC: serial interrupts mode not implemented");
+						fatalerror("EPIC: serial interrupts mode not implemented\n");
 					break;
 				}
 				case 0x10e0:			// Offset 0x410E0 - Spurious Vector Register
@@ -1448,7 +1448,7 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(device->machine().device("maincpu")));
+			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, cpu_get_pc(device->machine().device("maincpu")));
 	}
 	return 0;
 }
@@ -1518,7 +1518,7 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(device->machine().device("maincpu")));
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, cpu_get_pc(device->machine().device("maincpu")));
 	}
 }
 

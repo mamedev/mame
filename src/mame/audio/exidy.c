@@ -718,7 +718,7 @@ WRITE8_DEVICE_HANDLER( exidy_sh6840_w )
 
 			/* only support mode 0 and 2 */
 			if (((data >> 3) & 5) != 0)
-				fatalerror("exidy_sh6840_w - channel %d configured for mode %d", (sh6840_timer[1].cr & 0x01) ? 0 : 2, (data >> 3) & 7);
+				fatalerror("exidy_sh6840_w - channel %d configured for mode %d\n", (sh6840_timer[1].cr & 0x01) ? 0 : 2, (data >> 3) & 7);
 			break;
 
 		/* offset 1 writes to channel 1 control */
@@ -727,7 +727,7 @@ WRITE8_DEVICE_HANDLER( exidy_sh6840_w )
 
 			/* only support mode 0 and 2 */
 			if (((data >> 3) & 5) != 0)
-				fatalerror("exidy_sh6840_w - channel 1 configured for mode %d", (data >> 3) & 7);
+				fatalerror("exidy_sh6840_w - channel 1 configured for mode %d\n", (data >> 3) & 7);
 			break;
 
 		/* offsets 2/4/6 write to the common MSB latch */

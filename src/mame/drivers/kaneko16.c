@@ -2188,7 +2188,7 @@ static void kaneko16_expand_sample_banks(running_machine &machine, const char *r
 	UINT8 *src0;
 
 	if (machine.root_device().memregion(region)->bytes() < 0x40000 * 16)
-		fatalerror("gtmr SOUND1 region too small");
+		fatalerror("gtmr SOUND1 region too small\n");
 
 	/* bank 0 maps to itself, so we just leave it alone */
 	src0 = machine.root_device().memregion(region)->base();

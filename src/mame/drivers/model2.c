@@ -119,7 +119,7 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 		if (state->m_dsp_type == DSP_TYPE_TGP)
 			return 0;
 
-		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(device));
+		fatalerror("Copro FIFOIN underflow (at %08X)\n", cpu_get_pc(device));
 		return 0;
 	}
 
@@ -153,7 +153,7 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 	model2_state *state = device->machine().driver_data<model2_state>();
 	if (state->m_copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(device));
+		fatalerror("Copro FIFOIN overflow (at %08X)\n", cpu_get_pc(device));
 		return;
 	}
 
@@ -225,7 +225,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 	//if (state->m_copro_fifoout_wpos == state->m_copro_fifoout_rpos)
 	if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(device));
+		fatalerror("Copro FIFOOUT overflow (at %08X)\n", cpu_get_pc(device));
 		return;
 	}
 

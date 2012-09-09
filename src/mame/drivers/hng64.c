@@ -809,7 +809,7 @@ READ32_MEMBER(hng64_state::hng64_3d_1_r)
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
 {
-	fatalerror("WRITE32_HANDLER( hng64_3d_1_w )");
+	fatalerror("WRITE32_HANDLER( hng64_3d_1_w )\n");
 }
 #endif
 

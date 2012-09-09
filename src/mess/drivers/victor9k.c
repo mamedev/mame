@@ -80,7 +80,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 	if (BIT(ma, 13))
 	{
-		fatalerror("Graphics mode not supported!");
+		fatalerror("Graphics mode not supported!\n");
 	}
 	else
 	{
