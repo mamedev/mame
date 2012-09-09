@@ -10,6 +10,8 @@
 
 #define half_screen 116
 
+/**************************************************************************/
+
 WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
 {
 	// d0: scroll y high bit
@@ -68,6 +70,9 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
 }
 
+
+/**************************************************************************/
+
 TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 {
 	int tileno = (m_videoram[tile_index]) + ((m_videoram[tile_index + 0x1000] & 0x38) << 5) + ((m_gfx_ctrl & 1) << 11);
@@ -76,11 +81,13 @@ TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
 }
 
+
 VIDEO_START( homerun )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
 	state->m_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(homerun_state::get_homerun_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
+
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {

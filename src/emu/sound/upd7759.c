@@ -4,6 +4,13 @@
     by: Juergen Buchmueller, Mike Balfour, Howie Cohen,
         Olivier Galibert, and Aaron Giles
 
+    TODO:
+    - is there a doable method to dump the internal maskrom? :(
+    - low-level emulation
+    - watchdog? - according to uPD775x datasheet, the chip goes into standy mode
+      if CS/ST/RESET have not been accessed for more than 3 seconds
+    - convert to MAME modern device
+
 *************************************************************
 
     uPD7759 Description:
@@ -684,16 +691,18 @@ static DEVICE_START( upd7759 )
 		assert(device->type() == UPD7759); // other chips do not support slave mode
 		chip->timer = device->machine().scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
 		chip->rommask = 0;
+
+		/* set the DRQ callback */
+		chip->drqcallback = intf->drqcallback;
 	}
 	else
 	{
 		UINT32 romsize = device->region()->bytes();
 		if (romsize >= 0x20000) chip->rommask = 0x1ffff;
 		else chip->rommask = romsize - 1;
-	}
 
-	/* set the DRQ callback */
-	chip->drqcallback = intf->drqcallback;
+		chip->drqcallback = NULL;
+	}
 
 	/* assume /RESET and /START are both high */
 	chip->reset = 1;
