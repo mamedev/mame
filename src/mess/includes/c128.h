@@ -179,35 +179,9 @@ public:
 
 /*----------- defined in machine/c128.c -----------*/
 
-WRITE8_HANDLER(c128_mmu8722_port_w);
-READ8_HANDLER(c128_mmu8722_port_r);
-WRITE8_HANDLER(c128_mmu8722_ff00_w);
-READ8_HANDLER(c128_mmu8722_ff00_r);
-WRITE8_HANDLER(c128_write_0000);
-WRITE8_HANDLER(c128_write_1000);
-WRITE8_HANDLER(c128_write_4000);
-WRITE8_HANDLER(c128_write_8000);
-WRITE8_HANDLER(c128_write_a000);
-WRITE8_HANDLER(c128_write_c000);
-WRITE8_HANDLER(c128_write_d000);
-WRITE8_HANDLER(c128_write_e000);
-WRITE8_HANDLER(c128_write_ff00);
-WRITE8_HANDLER(c128_write_ff05);
-
-
-extern MACHINE_START( c128 );
-extern MACHINE_RESET( c128 );
 extern INTERRUPT_GEN( c128_frame_interrupt );
-
-void c128_bankswitch_64(running_machine &machine, int reset);
-
-extern READ8_DEVICE_HANDLER(c128_m6510_port_read);
-extern WRITE8_DEVICE_HANDLER(c128_m6510_port_write);
 
 extern const mos6526_interface c128_ntsc_cia0, c128_pal_cia0;
 extern const mos6526_interface c128_ntsc_cia1, c128_pal_cia1;
-
-WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w );
-WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w );
 
 #endif /* __C128_H__ */

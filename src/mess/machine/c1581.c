@@ -260,10 +260,18 @@ WRITE8_MEMBER( base_c1581_device::cia_pb_w )
 	m_atn_ack = BIT(data, 4);
 
 	// fast serial direction
-	m_fast_ser_dir = BIT(data, 5);
+	int fast_ser_dir = BIT(data, 5);
 
-	set_iec_data();
-	set_iec_srq();
+	if (m_fast_ser_dir != fast_ser_dir)
+	{
+		m_fast_ser_dir = fast_ser_dir;
+
+		set_iec_data();
+		set_iec_srq();
+
+		m_cia->cnt_w(m_fast_ser_dir || m_bus->srq_r());
+		m_cia->sp_w(m_fast_ser_dir || m_bus->data_r());
+	}
 }
 
 static MOS8520_INTERFACE( cia_intf )
@@ -458,10 +466,7 @@ void base_c1581_device::device_reset()
 
 void base_c1581_device::cbm_iec_srq(int state)
 {
-	if (!m_fast_ser_dir)
-	{
-		m_cia->cnt_w(state);
-	}
+	m_cia->cnt_w(m_fast_ser_dir || state);
 }
 
 
@@ -483,10 +488,7 @@ void base_c1581_device::cbm_iec_atn(int state)
 
 void base_c1581_device::cbm_iec_data(int state)
 {
-	if (!m_fast_ser_dir)
-	{
-		m_cia->sp_w(state);
-	}
+	m_cia->sp_w(m_fast_ser_dir || state);
 }
 
 

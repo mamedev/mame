@@ -251,19 +251,12 @@ const mos6526_interface c128_pal_cia0 =
 
 WRITE_LINE_MEMBER( c128_state::iec_srq_w )
 {
-	if (!MMU_FSDIR)
-	{
-		mos6526_flag_w(m_cia1, state);
-		mos6526_cnt_w(m_cia1, state);
-	}
+	mos6526_cnt_w(m_cia1, MMU_FSDIR || state);
 }
 
 WRITE_LINE_MEMBER( c128_state::iec_data_w )
 {
-	if (!MMU_FSDIR)
-	{
-		mos6526_sp_w(m_cia1, state);
-	}
+	mos6526_sp_w(m_cia1, MMU_FSDIR || state);
 }
 
 /*
@@ -830,6 +823,8 @@ WRITE8_MEMBER( c128_state::mmu8722_port_w )
 		bankswitch(0);
 		iec_srq_out_w();
 		iec_data_out_w();
+		mos6526_cnt_w(m_cia1, MMU_FSDIR || m_iec->srq_r());
+		mos6526_sp_w(m_cia1, MMU_FSDIR || m_iec->data_r());
 		break;
 	case 0:
 	case 6:
