@@ -652,6 +652,7 @@ static DEVICE_START( upd7759 )
 	chip->state = STATE_IDLE;
 
 	/* compute the ROM base or allocate a timer */
+	chip->romoffset = 0;
 	chip->rom = chip->rombase = *device->region();
 	if (chip->rom == NULL)
 		chip->timer = device->machine().scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
