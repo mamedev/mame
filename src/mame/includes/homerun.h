@@ -25,6 +25,7 @@ public:
 	int m_scrollx;
 	int m_scrolly;
 
+	DECLARE_WRITE8_MEMBER(homerun_d7756c_control_w);
 	DECLARE_WRITE8_MEMBER(homerun_videoram_w);
 	DECLARE_WRITE8_MEMBER(homerun_color_w);
 	DECLARE_WRITE8_MEMBER(homerun_scrollhi_w);

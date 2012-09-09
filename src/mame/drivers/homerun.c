@@ -48,6 +48,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
+#include "sound/upd7759.h"
 #include "includes/homerun.h"
 
 
@@ -56,6 +57,13 @@ Notes:
   I/O / Memory
 
 ***************************************************************************/
+
+WRITE8_MEMBER(homerun_state::homerun_d7756c_control_w)
+{
+	device_t *device = machine().device("d7756c");
+	upd7759_reset_w(device, ~data & 0x20);
+	upd7759_start_w(device, ~data & 0x10);
+}
 
 static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -68,8 +76,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP // D7756C sample number
-	AM_RANGE(0x20, 0x20) AM_WRITENOP // D7756C control
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("d7756c", upd7759_port_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_d7756c_control_w)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
@@ -238,6 +246,7 @@ static GFXDECODE_START( homerun )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
+/**************************************************************************/
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
@@ -263,6 +272,7 @@ static const ym2203_interface ym2203_config =
 	DEVCB_NULL
 };
 
+/**************************************************************************/
 
 static MACHINE_START( homerun )
 {
@@ -289,6 +299,8 @@ static MACHINE_RESET( homerun )
 	state->m_scrolly = 0;
 	state->m_scrollx = 0;
 }
+
+/**************************************************************************/
 
 static MACHINE_CONFIG_START( homerun, homerun_state )
 
@@ -322,6 +334,9 @@ static MACHINE_CONFIG_START( homerun, homerun_state )
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_20MHz/8)
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("d7756c", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ganjaja, homerun )
@@ -331,6 +346,9 @@ static MACHINE_CONFIG_DERIVED( ganjaja, homerun )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60) // ?
 MACHINE_CONFIG_END
 
+
+
+/**************************************************************************/
 
 ROM_START( homerun )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -343,8 +361,8 @@ ROM_START( homerun )
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "homerun.ic120",  0x00000, 0x20000, CRC(52f0709b) SHA1(19e675bcccadb774f60ec5929fc1fb5cf0d3f617) )
 
-	ROM_REGION( 0x08000, "d7756c", 0 )
-	ROM_LOAD( "upd7756c.ic98",  0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
+	ROM_REGION( 0x08000, "d7756c", ROMREGION_ERASE00 )
+	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
 ROM_END
 
 
@@ -359,8 +377,8 @@ ROM_START( dynashot )
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(bedf7b98) SHA1(cb6c5fcaf8df5f5c7636c3c8f79b9dda78e30c2e) )
 
-	ROM_REGION( 0x08000, "d7756c", 0 )
-	ROM_LOAD( "upd7756c.ic98",  0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
+	ROM_REGION( 0x08000, "d7756c", ROMREGION_ERASE00 )
+	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
 ROM_END
 
 
@@ -376,7 +394,7 @@ ROM_START( ganjaja )
 	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(e65d4d57) SHA1(2ec9e5bdaa94b808573313b6eca657d798004b53) )
 
 	ROM_REGION( 0x08000, "d7756c", 0 )
-	ROM_LOAD( "upd77p56c.ic98", 0x00000, 0x08000, NO_DUMP ) /* D77P56C OTP rom (One-Time Programmable, note the extra P) */
+	ROM_LOAD( "d77p56cr.ic98",  0x00000, 0x08000, CRC(06a234ac) SHA1(b4ceff3f9f78551cf4a085642e162e33b266f067) ) /* D77P56CR OTP rom (One-Time Programmable, note the extra P) */
 ROM_END
 
 
