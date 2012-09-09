@@ -189,6 +189,7 @@ struct _upd7759_state
 	UINT8 *		rom;						/* pointer to ROM data or NULL for slave mode */
 	UINT8 *		rombase;					/* pointer to ROM data or NULL for slave mode */
 	UINT32		romoffset;					/* ROM offset to make save/restore easier */
+	UINT32		rommask;					/* maximum address offset */
 };
 
 
@@ -342,6 +343,7 @@ static void advance_state(upd7759_state *chip)
 		case STATE_ADDR_LSB:
 			chip->offset |= (chip->rom ? chip->rom[chip->req_sample * 2 + 6] : chip->fifo_in) << chip->sample_offset_shift;
 			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: offset_lo = %02X, requesting dummy 2\n", (chip->offset >> chip->sample_offset_shift) & 0xff);
+			if (chip->offset > chip->rommask) logerror("upd7759 offset %X > rommask %X\n",chip->offset, chip->rommask);
 			chip->drq = 1;
 
 			/* 36 cycles later, we will latch this value and request another byte */
@@ -371,7 +373,7 @@ static void advance_state(upd7759_state *chip)
 				chip->repeat_count--;
 				chip->offset = chip->repeat_offset;
 			}
-			chip->block_header = chip->rom ? chip->rom[chip->offset++ & 0x1ffff] : chip->fifo_in;
+			chip->block_header = chip->rom ? chip->rom[chip->offset++ & chip->rommask] : chip->fifo_in;
 			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: header (@%05X) = %02X, requesting next byte\n", chip->offset, chip->block_header);
 			chip->drq = 1;
 
@@ -414,7 +416,7 @@ static void advance_state(upd7759_state *chip)
 		/* Nibble count state: latch the number of nibbles to play and request another byte */
 		/* The expected response will be the first data byte */
 		case STATE_NIBBLE_COUNT:
-			chip->nibbles_left = (chip->rom ? chip->rom[chip->offset++ & 0x1ffff] : chip->fifo_in) + 1;
+			chip->nibbles_left = (chip->rom ? chip->rom[chip->offset++ & chip->rommask] : chip->fifo_in) + 1;
 			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: nibble_count = %u, requesting next byte\n", (unsigned)chip->nibbles_left);
 			chip->drq = 1;
 
@@ -426,7 +428,7 @@ static void advance_state(upd7759_state *chip)
 		/* MSN state: latch the data for this pair of samples and request another byte */
 		/* The expected response will be the next sample data or another header */
 		case STATE_NIBBLE_MSN:
-			chip->adpcm_data = chip->rom ? chip->rom[chip->offset++ & 0x1ffff] : chip->fifo_in;
+			chip->adpcm_data = chip->rom ? chip->rom[chip->offset++ & chip->rommask] : chip->fifo_in;
 			update_adpcm(chip, chip->adpcm_data >> 4);
 			chip->drq = 1;
 
@@ -544,7 +546,7 @@ static TIMER_CALLBACK( upd7759_slave_update )
 	advance_state(chip);
 
 	/* if the DRQ changed, update it */
-	logerror("slave_update: DRQ %d->%d\n", olddrq, chip->drq);
+	logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, chip->drq);
 	if (olddrq != chip->drq && chip->drqcallback)
 		(*chip->drqcallback)(chip->device, chip->drq);
 
@@ -662,9 +664,16 @@ static DEVICE_START( upd7759 )
 	chip->romoffset = 0;
 	chip->rom = chip->rombase = *device->region();
 	if (chip->rombase == NULL)
+	{
 		chip->timer = device->machine().scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
+		chip->rommask = 0;
+	}
 	else
-		assert((device->region()->bytes() & 0x1ffff) == 0);
+	{
+		UINT32 romsize = device->region()->bytes();
+		if (romsize >= 0x20000) chip->rommask = 0x1ffff;
+		else chip->rommask = romsize - 1;
+	}
 
 	/* set the DRQ callback */
 	chip->drqcallback = intf->drqcallback;
