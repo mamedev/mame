@@ -21,7 +21,7 @@
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="HE93003"/>
 		<info name="release" value="19941216"/>
-		<info name="alt_title" value="藤子・F・不二雄の21エモン めざせ！ホテル王"/>
+		<info name="alt_title" value="藤子・F・不二雄の21エモン めざせ!ホテル王"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="21 emon - mezase hotel ou!! (japan).pce" size="524288" crc="73614660" sha1="de80a0d266916799ee5666815d9fd11602bdbdec" offset="000000" />
@@ -119,7 +119,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC63013"/>
 		<info name="release" value="19881222"/>
-		<info name="alt_title" value="あっぱれ！ゲートボール"/>
+		<info name="alt_title" value="あっぱれ!ゲートボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="appare gateball (japan).pce" size="262144" crc="2b54cba2" sha1="5efee117bb8fd24ccbc8ed68ae5d36cea960f37e" offset="000000" />
@@ -443,7 +443,7 @@
 		<publisher>Naxat</publisher>
 		<info name="serial" value="NX91005"/>
 		<info name="release" value="19911206"/>
-		<info name="alt_title" value="バブルガムクラッシュ！"/>
+		<info name="alt_title" value="バブルガムクラッシュ!"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="bubblegum crash! - knight sabers 2034 (japan).pce" size="524288" crc="0d766139" sha1="03d0638f27d35b28b7e5e7db16f823de0726c2c5" offset="000000" />
@@ -792,7 +792,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KM92004"/>
 		<info name="release" value="19920228"/>
-		<info name="alt_title" value="出たな！！ツインビー"/>
+		<info name="alt_title" value="出たな!!ツインビー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="detana!! twinbee (japan).pce" size="524288" crc="5cf59d80" sha1="e1d07a2f71c695b53755bade6fe81e46e4c4828c" offset="000000" />
@@ -929,7 +929,7 @@
 		<publisher>Masiya</publisher>
 		<info name="serial" value="NCS91003"/>
 		<info name="release" value="19910927"/>
-		<info name="alt_title" value="どらごんEGG！"/>
+		<info name="alt_title" value="どらごんEGG!"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dragon egg! (japan).pce" size="524288" crc="442405d5" sha1="56c69f24b542fea72cc753ddf0e4bb23974adbdf" offset="000000" />
@@ -1360,7 +1360,7 @@
 		<publisher>NCS</publisher>
 		<info name="serial" value="NCS89003"/>
 		<info name="release" value="19890328"/>
-		<info name="alt_title" value="がんばれ！ゴルフボーイズ"/>
+		<info name="alt_title" value="がんばれ!ゴルフボーイズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ganbare! golf boys (japan).pce" size="262144" crc="27a4d11a" sha1="69794e5af0d2ec1a5bf6122c64fd5bc43092ae04" offset="000000" />
@@ -1430,7 +1430,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TP03021"/>
 		<info name="release" value="19920313"/>
-		<info name="alt_title" value="極楽！中華大仙"/>
+		<info name="alt_title" value="極楽!中華大仙"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="gokuraku! chuuka taisen (japan).pce" size="393216" crc="e749a22c" sha1="b58e94e3e0c778e678c5d08c708ac4e37bedbbe3" offset="000000" />
@@ -1497,7 +1497,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TP03018"/>
 		<info name="release" value="19910809"/>
-		<info name="alt_title" value="はなたーかだか！？"/>
+		<info name="alt_title" value="はなたーかだか!?"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="hana taaka daka! (japan).pce" size="524288" crc="ba4d0dd4" sha1="664ccd11372b04739e388fb921ac507eb71986cd" offset="000000" />
@@ -1786,7 +1786,7 @@
 		<description>Kattobi! Takuhai Kun</description>
 		<year>1990</year>
 		<publisher>Tonkin House</publisher>
-		<info name="serial" value="カットビ！宅配くん"/>
+		<info name="serial" value="カットビ!宅配くん"/>
 		<info name="release" value="19901109"/>
 		<info name="alt_title" value="TON90004"/>
 		<part name="cart" interface="pce_cart">
@@ -2769,7 +2769,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KM92003"/>
 		<info name="release" value="19920221"/>
-		<info name="alt_title" value="パロディウスだ！ －神話からお笑いへ－"/>
+		<info name="alt_title" value="パロディウスだ! -神話からお笑いへ-"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="parodius da! - shinwa kara owarai he (japan).pce" size="1048576" crc="647718f9" sha1="5110dcc06efd1daaeb98305378d818519da88d28" offset="000000" />
@@ -4230,7 +4230,7 @@
 		<publisher>Masiya</publisher>
 		<info name="serial" value="NCS90005"/>
 		<info name="release" value="19901214"/>
-		<info name="alt_title" value="ワラビー！！ ウサギの国のカンガルーレース"/>
+		<info name="alt_title" value="ワラビー!! ウサギの国のカンガルーレース"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="wallaby!! - usagi no kuni no kangaroo race (japan).pce" size="393216" crc="0112d0c7" sha1="03ad5a8b2bb65eabebe73c1e2ca1e1846cc172bf" offset="000000" />

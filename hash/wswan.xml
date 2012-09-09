@@ -200,7 +200,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="SWJ-TAT001"/>
 		<info name="release" value="19990304"/>
-		<info name="alt_title" value="電車でGO！"/>
+		<info name="alt_title" value="電車でGO!"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-tat001.bin" size="4194304" crc="b62e5dd0" sha1="d3da0ae529c6f78162682141154a95879f288ca7" offset="000000" />
@@ -330,7 +330,7 @@
 		<publisher>Nihon Application</publisher>
 		<info name="serial" value="SWJ-NAP001"/>
 		<info name="release" value="19991028"/>
-		<info name="alt_title" value="えんがちょ！for ワンダースワン"/>
+		<info name="alt_title" value="えんがちょ! for ワンダースワン"/>
 		<!-- 1k EEPROM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -448,7 +448,7 @@
 		<publisher>Sammy</publisher>
 		<info name="serial" value="SWJ-SUM006"/>
 		<info name="release" value="20000113"/>
-		<info name="alt_title" value="五目並べ＆リバーシ 登龍門"/>
+		<info name="alt_title" value="五目並べ&amp;リバーシ 登龍門"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
@@ -607,7 +607,7 @@
 		<publisher>Kid</publisher>
 		<info name="serial" value="SWJ-KDX001"/>
 		<info name="release" value="19991202"/>
-		<info name="alt_title" value="キスより… ～シーサイドセレナーデ～"/>
+		<info name="alt_title" value="キスより... ～シーサイドセレナーデ～"/>
 		<!-- 64k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -765,7 +765,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN012"/>
 		<info name="release" value="19990805"/>
-		<info name="alt_title" value="名探偵コナン 魔術師の挑戦状！"/>
+		<info name="alt_title" value="名探偵コナン 魔術師の挑戦状!"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -780,7 +780,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN027"/>
 		<info name="release" value="20000727"/>
-		<info name="alt_title" value="名探偵コナン 西の名探偵 最大の危機！？"/>
+		<info name="alt_title" value="名探偵コナン 西の名探偵 最大の危機!?"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-ban027.bin" size="2097152" crc="e226863b" sha1="e5684789e81f9d739010db575022a12a448b5509" offset="000000" />
@@ -876,7 +876,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="SWJ-JLC002"/>
 		<info name="release" value="20000330"/>
-		<info name="alt_title" value="燃えろ！！プロ野球 ルーキーズ"/>
+		<info name="alt_title" value="燃えろ!!プロ野球 ルーキーズ"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-jlc002.bin" size="1048576" crc="eb995e86" sha1="e88e659cc04fc08a04b8c881f62fe086c5cdab06" offset="000000" />
@@ -904,7 +904,7 @@
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGT006"/>
 		<info name="release" value="20000323"/>
-		<info name="alt_title" value="メタコミセラピー ねぇ聞いて！"/>
+		<info name="alt_title" value="メタコミセラピー ねぇ聞いて!"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-kgt006.bin" size="2097152" crc="a3ead689" sha1="dc94e17a942acfdc1eb0c38d91bf72460a4bb8f9" offset="000000" />
@@ -978,7 +978,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN02B"/>
 		<info name="release" value="20000719"/>
-		<info name="alt_title" value="フロムテレビアニメーション ワンピース めざせ海賊王！"/>
+		<info name="alt_title" value="フロムテレビアニメーション ワンピース めざせ海賊王!"/>
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1037,7 +1037,7 @@
 		<publisher>MegaHouse</publisher>
 		<info name="serial" value="SWJ-MGH003"/>
 		<info name="release" value="20000629"/>
-		<info name="alt_title" value="レインボーアイランド パティーズ☆パーティ！"/>
+		<info name="alt_title" value="レインボーアイランド パティーズ☆パーティ!"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1067,7 +1067,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPR003"/>
 		<info name="release" value="20000330"/>
-		<info name="alt_title" value="スーパーロボット大戦 コンパクト2 第1部：地上激闘篇"/>
+		<info name="alt_title" value="スーパーロボット大戦 コンパクト2 第1部:地上激闘篇"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-bpr003.bin" size="4194304" crc="782877bc" sha1="e6911e5bb0a742ba299e05b20ee81f2faa4854a5" offset="000000" />
@@ -1081,7 +1081,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPR006"/>
 		<info name="release" value="20000914"/>
-		<info name="alt_title" value="スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇"/>
+		<info name="alt_title" value="スーパーロボット大戦 コンパクト2 第2部:宇宙激震篇"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1096,7 +1096,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SWJ-BPR007"/>
 		<info name="release" value="20010118"/>
-		<info name="alt_title" value="スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇"/>
+		<info name="alt_title" value="スーパーロボット大戦 コンパクト2 第3部:銀河決戦篇"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1154,7 +1154,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN013"/>
 		<info name="release" value="19991028"/>
-		<info name="alt_title" value="ロックマン＆フォルテ 未来からの挑戦者"/>
+		<info name="alt_title" value="ロックマン&amp;フォルテ 未来からの挑戦者"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1343,7 +1343,7 @@
 		<publisher>Coconuts Japan Entertainment</publisher>
 		<info name="serial" value="SWJ-CCJ002"/>
 		<info name="release" value="19990812"/>
-		<info name="alt_title" value="サッカーやろう！ チャレンジ・ザ・ワールド"/>
+		<info name="alt_title" value="サッカーやろう! チャレンジ・ザ・ワールド"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="swj-ccj002.bin" size="524288" crc="d7438e58" sha1="6eec04244f4d85807988a2331e7031d0c3549646" offset="000000" />
@@ -1585,7 +1585,7 @@
 		<publisher>Coconuts Japan Entertainment</publisher>
 		<info name="serial" value="SWJ-CCJ001"/>
 		<info name="release" value="19990401"/>
-		<info name="alt_title" value="海釣りに行こう！"/>
+		<info name="alt_title" value="海釣りに行こう!"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="swj-ccj001.bin" size="524288" crc="86b56511" sha1="4f739292d11a45490851eaf40c0a7081824ad75a" offset="000000" />

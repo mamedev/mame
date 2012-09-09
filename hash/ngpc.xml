@@ -53,7 +53,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="NeoP00830" />
 		<info name="release" value="20000316" />
-		<info name="alt_title" value="ビックリマン2000 ビバ！ポケットフェスチバァ！" />
+		<info name="alt_title" value="ビックリマン2000 ビバ!ポケットフェスチバァ!" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bikkuriman 2000 - viva! pocket festiva! (japan).bin" size="1048576" crc="7a2d7635" sha1="62898d43cfc9ace86a53520ecf62abc6b0c404f3" offset="000000" />
@@ -260,7 +260,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00600" />
 		<info name="release" value="19991021" />
-		<info name="alt_title" value="電車でGO！2 オン ネオジオポケット" />
+		<info name="alt_title" value="電車でGO!2 オン ネオジオポケット" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="densha de go! 2 on neo geo pocket (japan).bin" size="4194304" crc="d5ced9e9" sha1="cee5fa9dc0acfba95ee6bd802a0ff80d4ecacc79" offset="000000" />
@@ -423,7 +423,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00510" />
 		<info name="release" value="19991229" />
-		<info name="alt_title" value="ファーゼライ！" />
+		<info name="alt_title" value="ファーゼライ!" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="faselei! (japan).bin" size="2097152" crc="8f585838" sha1="04a65a7529098bfb2295ab4bc3782ea45ec116ee" offset="000000" />
@@ -651,7 +651,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00630" />
 		<info name="release" value="20000120" />
-		<info name="alt_title" value="めざせ！漢字王" />
+		<info name="alt_title" value="めざせ!漢字王" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mezase! kanji ou (japan).bin" size="2097152" crc="a52e1c82" sha1="030a59f990e96649001582be2d5acc9af18424fe" offset="000000" />
@@ -1303,7 +1303,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00290" />
 		<info name="release" value="19990319" />
-		<info name="alt_title" value="連結パズル つなげてポンッ！ Color" />
+		<info name="alt_title" value="連結パズル つなげてポンッ! Color" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="renketsu puzzle tsunagete pon! color (japan).bin" size="524288" crc="c3f3e83c" sha1="e8e903bc4baf5ab61726626af7c0d1a571db4a40" offset="000000" />
@@ -1318,7 +1318,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NeoP00940" />
 		<info name="release" value="20000726" />
-		<info name="alt_title" value="ロックマン バトル＆ファイターズ" />
+		<info name="alt_title" value="ロックマン バトル&amp;ファイターズ" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="rockman - battle &amp; fighters (japan).bin" size="2097152" crc="9c861e49" sha1="c0a6cdf9ba6c4e8f227ba52489f15f5053f0889c" offset="000000" />
@@ -1333,7 +1333,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00300" />
 		<info name="release" value="19990610 (JPN)" />
-		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ！2" />
+		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ!2" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="samurai shodown! 2 - pocket fighting series (world) (en,ja).bin" size="2097152" crc="4f7fb156" sha1="2ec4da369d3b91af15defa64429bd9daac7ee9b5" offset="000000" />
@@ -1455,7 +1455,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>Dyna</publisher>
 		<info name="serial" value="NeoP00780" />
 		<info name="release" value="19991216" />
-		<info name="alt_title" value="それいけ！！花札道" />
+		<info name="alt_title" value="それいけ!!花札道" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="soreike!! hanafuda doujou (japan).bin" size="524288" crc="05fa3eb0" sha1="f4a4264eaf1605086ccbc526f21da222aa6341bf" offset="000000" />
@@ -1598,7 +1598,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00490" />
 		<info name="release" value="19991111" />
-		<info name="alt_title" value="つなげてポンッ！2" />
+		<info name="alt_title" value="つなげてポンッ!2" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tsunagete pon! 2 (japan).bin" size="1048576" crc="129091bb" sha1="db030e02819d50315f15c00b93c3a46f1f89d126" offset="000000" />

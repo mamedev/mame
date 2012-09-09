@@ -40,7 +40,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1984</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198401xx"/>
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
@@ -62,7 +62,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198307xx"/>
-		<info name="alt_title" value="３Ｄゴルフシミュレーション"/>
+		<info name="alt_title" value="3Dゴルフシミュレーション"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="64126">
 				<rom name="3d golf simulation.t88" size="64126" crc="1e2d085c" sha1="4070737ede0f4eda0c0102468127cd0abf3725d9" offset="0" />
@@ -170,7 +170,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>ベルソフト (Bell Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
-		<info name="alt_title" value="ホーンテッドケイブ"/>
+		<info name="alt_title" value="ホーンテッドケイブ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="49431">
 				<rom name="haunted cave.cmt" size="49431" crc="de05ecf9" sha1="097ef1a5e33dcbffc8caf4f15773ff696aa0d1ec" offset="0" />
@@ -231,7 +231,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
-		<info name="alt_title" value="サイクロプスクラッシャー＆ウォーターマン"/>
+		<info name="alt_title" value="サイクロプスクラッシャー&amp;ウォーターマン"/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="7658">
 				<rom name="cyclops crusher.t88" size="7658" crc="1d8f5671" sha1="065682e65074e3ba35ec977a04112766b74c568e" offset="0" />
@@ -515,7 +515,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="holein1">
 		<description>Hole in One</description>
 		<year>1985</year>
-		<publisher>ＨＡＬ研究所 (HAL Kenkyuujo)</publisher>
+		<publisher>HAL研究所 (HAL Kenkyuujo)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="ホールインワン"/>
@@ -582,7 +582,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
-		<info name="alt_title" value="ジェルダ"/>
+		<info name="alt_title" value="ジェルダ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="39326">
 				<rom name="jelda.cmt" size="39326" crc="929e32ec" sha1="3e5ac57a209b90dce0a7415282643d071d90ccdf" offset="0" />
@@ -596,7 +596,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
-		<info name="alt_title" value="ジェルダ２"/>
+		<info name="alt_title" value="ジェルダ2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="76886">
 				<rom name="jelda 2.t88" size="76886" crc="c9d394b2" sha1="a5c2526b9425de781f7d65f333cbc5de39623df6" offset="0" />
@@ -610,7 +610,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
-		<info name="alt_title" value="ジェルダ２"/>
+		<info name="alt_title" value="ジェルダ2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="63227">
 				<rom name="jelda ii.cmt" size="63227" crc="bde37e2d" sha1="6b1048b5a3c1341afdd0fb7fc33d014103581aad" offset="0" />
@@ -792,7 +792,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<description>Moebius</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="メピウス"/>
+		<info name="alt_title" value="メピウス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="793">
 				<rom name="moebius.t88" size="793" crc="4c4ab8c4" sha1="e7b0145fb1e087778ff52598a8521f4ad98d0a8a" offset="0" />
@@ -855,7 +855,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
-		<info name="alt_title" value="ナッツ＆ミルク"/>
+		<info name="alt_title" value="ナッツ&amp;ミルク"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="26590">
 				<rom name="nuts &amp; milk.t88" size="26590" crc="864ceee5" sha1="1c02d3966e4a646d478b5e2cdb615747916554a7" offset="0" />
@@ -870,7 +870,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
 		<info name="alt_title" value="パックマン"/>
-		<info name="alt_title" value="パッグマン"/>
+		<info name="alt_title" value="パッグマン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25430">
 				<rom name="pacman.cmt" size="25430" crc="458ef928" sha1="4ca27b63d2dde02942f9b74dbee25a28469a99cf" offset="0" />
@@ -926,7 +926,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>大名マイコン学院 (Daimyo Micom Gakuen)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198311xx"/>
-		<info name="alt_title" value="ポイボスＰａｒｔ１ -脱出-"/>
+		<info name="alt_title" value="ポイボスPart1 -脱出-"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="32727">
 				<rom name="poibos.t88" size="32727" crc="e14bb4ce" sha1="93a33d391336b7e36db5a4a706ee18dec63eab69" offset="0" />
@@ -965,7 +965,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>マイコンシティー (Micom City)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198301xx"/>
-		<info name="alt_title" value="パズルアドベンチャー"/>
+		<info name="alt_title" value="パズルアドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19939">
 				<rom name="puzzle adventure.t88" size="19939" crc="df4a9f9a" sha1="6cdece913d5e2450b0fc17d6a8a2abf8fafbd8a2" offset="0" />
@@ -1001,7 +1001,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<description>Shougi Dojo 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="将棋道場２"/>
+		<info name="alt_title" value="将棋道場2"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="35748">
 				<rom name="shogi dojo 2.cmt" size="35748" crc="1fe187b2" sha1="23eb03c0bd6af75772bd3bff37734f1a05055b6f" offset="0" />
@@ -1058,7 +1058,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198410xx"/>
-		<info name="alt_title" value="スベースダイヤモンド"/>
+		<info name="alt_title" value="スベースダイヤモンド"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="56465">
 				<rom name="space diamond.cmt" size="56465" crc="f74d2162" sha1="43da0884f6b775942e66e220864ddf77b068ba0c" offset="0" />
@@ -1072,7 +1072,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198501xx"/>
-		<info name="alt_title" value="スパルタンＸ"/>
+		<info name="alt_title" value="スパルタンX"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="56269">
 				<rom name="spartan x.t88" size="56269" crc="20438372" sha1="0ae04f7cc6862451b7def8cc71b99394dd2feaa3" offset="0" />
@@ -1111,7 +1111,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198310xx"/>
-		<info name="alt_title" value="スターライトアドベンチャー"/>
+		<info name="alt_title" value="スターライトアドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="36281">
 				<rom name="starlight adventure.t88" size="36281" crc="73a93d80" sha1="739304386278be0125e3f6abecb7f227b03afdf3" offset="0" />
@@ -1123,7 +1123,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<description>Sugar Factory</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="シュガーファグトリー"/>
+		<info name="alt_title" value="シュガーファグトリー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="11443">
 				<rom name="sugar factory.cmt" size="11443" crc="21ca17b4" sha1="204f8988487b89abd90e37b8d0a4089c2091b27b" offset="0" />
@@ -1176,7 +1176,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198401xx"/>
-		<info name="alt_title" value="サンダーフォース"/>
+		<info name="alt_title" value="サンダーフォース"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="45784">
 				<rom name="thunder force.cmt" size="45784" crc="721192ad" sha1="66e68bea4ad394aec5237c27f3debba5b255582d" offset="0" />
@@ -1254,7 +1254,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="ゼノン"/>
+		<info name="alt_title" value="ゼノン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="37237">
 				<rom name="xenon.cmt" size="37237" crc="7ac5ab1c" sha1="4fdf68f89e0b4f6845592d34e405d1fa9764b877" offset="0" />
@@ -1282,7 +1282,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
-		<info name="alt_title" value="ゼクサス光速２０００光年"/>
+		<info name="alt_title" value="ゼクサス光速2000光年"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="30744">
 				<rom name="zexas.cmt" size="30744" crc="ee5b97eb" sha1="c5e0ca4dcce1fd600643089c76aebb2d0ffc3610" offset="0" />
@@ -1293,7 +1293,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	<software name="zold">
 		<description>Zold</description>
 		<year>1984</year>
-		<publisher>富士音響ＲＡＭ (Fuji Onkyo RAM)</publisher>
+		<publisher>富士音響RAM (Fuji Onkyo RAM)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<part name="cass" interface="pc8801_cass">

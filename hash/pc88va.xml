@@ -17,7 +17,7 @@
     * Go Kichi-kun 2 ~ 碁キチくん2, by GAM
     * Ultima V ~ ウルティマⅤ, by Pony Canyon
     * The Bard's Tale ~ ザ バーズテイル, by Pony Canyon
-    * The Bard's Tale 2 ~ ザ・バーズテイル２, by Pony Canyon
+    * The Bard's Tale 2 ~ ザ・バーズテイル2, by Pony Canyon
     * Battle ~ バトル, by GAM
     * Advanced Dungeons & Dragons: Hillsfar ~ AD&D ヒルズファー, by Pony Canyon
     * Balance of Power ~ バランスオブパワー, by ASCII
@@ -88,7 +88,7 @@ PC88VA doujin games (mostly undumped)
 		<description>88VA1 Tentou Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="88VA1 店頭デモ" />
+		<info name="alt_title" value="88VA1 店頭デモ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="88va1 tentou demo.d88" size="1331888" crc="a0d11833" sha1="0e99c7154c5e118e416daf7668db2a630634ab78" offset="0" />
@@ -292,7 +292,7 @@ PC88VA doujin games (mostly undumped)
 		<description>Might &amp; Magic Book 2</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<info name="alt_title" value="マイトアンドマジック２" />
+		<info name="alt_title" value="マイトアンドマジック2" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1296112">
@@ -542,7 +542,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="19881021"/>
-		<info name="alt_title" value="ソーサリアン追加シナリオ２ 戦国ソーサリアン"/>
+		<info name="alt_title" value="ソーサリアン追加シナリオ2 戦国ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (tsuika2)(nihon falcom).d88" size="761008" crc="93591936" sha1="af95aca8214ffaa81573914c9b1cc2c053b324c6" offset="0" />
@@ -555,7 +555,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="19881223"/>
-		<info name="alt_title" value="ソーサリアン追加シナリオ３ ピラミッドソーサリアン"/>
+		<info name="alt_title" value="ソーサリアン追加シナリオ3 ピラミッドソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="760608">
 				<rom name="sorcerian va (tsuika3)(nihon falcom).d88" size="760608" crc="87323c96" sha1="87cef8d3c1aa600be5c327feb49b2140d53c6316" offset="0" />
@@ -594,7 +594,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<info name="release" value="19891208"/>
-		<info name="alt_title" value="セレクテッドソーサリアン１"/>
+		<info name="alt_title" value="セレクテッドソーサリアン1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (selected1)(takeru_brother).d88" size="761008" crc="b1e06658" sha1="c5ee1cc25b58943b0632e27db8885bf737a95dc4" offset="0" />
@@ -607,7 +607,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<info name="release" value="19900210"/>
-		<info name="alt_title" value="セレクテッドソーサリアン２"/>
+		<info name="alt_title" value="セレクテッドソーサリアン2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (selected2)(takeru_brother).d88" size="761008" crc="5e80f8c8" sha1="4b1438280bdd9e71dfed1b9d7beed948a2c69816" offset="0" />
@@ -620,7 +620,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<info name="release" value="19900511"/>
-		<info name="alt_title" value="セレクテッドソーサリアン３"/>
+		<info name="alt_title" value="セレクテッドソーサリアン3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (selected3)(takeru_brother).d88" size="761008" crc="d881c9cf" sha1="418297a8a79b7fd4808490c57820202d327bc217" offset="0" />
@@ -633,7 +633,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<info name="release" value="19900613"/>
-        <info name="alt_title" value="セレクテッドソーサリアン４"/>
+        <info name="alt_title" value="セレクテッドソーサリアン4"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (selected4)(takeru_brother).d88" size="761008" crc="f4bb4c53" sha1="5e34d329427b2d350e90f287e2d28fd7ef16fa05" offset="0" />
@@ -646,7 +646,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<info name="release" value="19900726"/>
-		<info name="alt_title" value="セレクテッドソーサリアン５"/>
+		<info name="alt_title" value="セレクテッドソーサリアン5"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="761008">
 				<rom name="sorcerian va (selected5)(takeru_brother).d88" size="761008" crc="cc7b491a" sha1="720774039653a48325d7cd5e32dbfe536ff44016" offset="0" />
@@ -718,7 +718,6 @@ PC88VA doujin games (mostly undumped)
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="19901102"/>
-		<info name="alt_title" value="Ｘａｋ２"/>
 
 		<part name="flop1" interface="floppy_5_25" >
 			<dataarea name="flop" size="1281968">
@@ -1002,7 +1001,7 @@ PC88VA doujin games (mostly undumped)
 		<year>1990</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="release" value="199005xx"/>
-		<info name="alt_title" value="ランス２-反逆の少女たち-"/>
+		<info name="alt_title" value="ランス2-反逆の少女たち-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
 			<dataarea name="flop" size="1261568">

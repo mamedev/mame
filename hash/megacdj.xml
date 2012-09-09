@@ -98,7 +98,7 @@
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49054"/>
 		<info name="release" value="19930730"/>
-		<info name="alt_title" value="サイボーグ００９"/>
+		<info name="alt_title" value="サイボーグ009"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="cyborg 009 (japan)" sha1="19cdb90db8c92f6baafc188b83e8ea7a67adb6f1"/>
@@ -112,7 +112,7 @@
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66014"/>
 		<info name="release" value="19921127"/>
-		<info name="alt_title" value="電忍アレスタ　Ｎｏｂｕｎａｇａ　ａｎｄ　ｈｉｓ　Ｎｉｎｊａ　ｆｏｒｃｅ"/>
+		<info name="alt_title" value="電忍アレスタ Nobunaga and his Ninja force"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dennin aleste - nobunaga and his ninja force (japan)" sha1="3c8289dc95e288e1d2e720828cef2177543100f2"/>
@@ -196,7 +196,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6019"/>
 		<info name="release" value="19930806"/>
-		<info name="alt_title" value="江川卓のスーパーリーグＣＤ"/>
+		<info name="alt_title" value="江川卓のスーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="egawa suguru no super league cd (japan)" sha1="4062f8fbc43963cc9305e14530379989f9543a30"/>
@@ -210,7 +210,7 @@
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="T-71014"/>
 		<info name="release" value="19940318"/>
-		<info name="alt_title" value="Ｆ１サーカスＣＤ"/>
+		<info name="alt_title" value="F1サーカスCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="f1 circus cd (japan)" sha1="e13e963d3386cd38143334011b6a4c239a871bfa"/>
@@ -224,7 +224,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6013"/>
 		<info name="release" value="19930402"/>
-		<info name="alt_title" value="ファイナルファイトＣＤ"/>
+		<info name="alt_title" value="ファイナルファイトCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="final fight cd (japan)" sha1="a67ff6f71659ad6159ab220fa977ea9316ac9f3a"/>
@@ -238,7 +238,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45044"/>
 		<info name="release" value="19921225"/>
-		<info name="alt_title" value="ぎゅわんぶらあ自己中心派２ 激闘！　東京マージャンランド編"/>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 激闘! 東京マージャンランド編"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gambler jiko chuushinha 2 - gekitou! tokyo mahjongland hen (japan)" sha1="12cb45fafb9f63b41551150dc313eba51fa639c9"/>
@@ -252,7 +252,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6032"/>
 		<info name="release" value="19940318"/>
-		<info name="alt_title" value="ゲームのかんづめ ＶＯＬ.１"/>
+		<info name="alt_title" value="ゲームのかんづめ VOL.1"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="game no kandume vol.1 (japan)" sha1="88a441b47cc53a088de1b95cc624176895882478"/>
@@ -266,7 +266,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6033"/>
 		<info name="release" value="19940318"/>
-		<info name="alt_title" value="ゲームのかんづめ ＶＯＬ.２"/>
+		<info name="alt_title" value="ゲームのかんづめ VOL.2"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="game no kandume vol.2 (japan)" sha1="093b5a17ea088fe6714e4a095f5240cb6d918fcd"/>
@@ -294,7 +294,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6034"/>
 		<info name="release" value="19940423"/>
-		<info name="alt_title" value="ヘブンリー　シンフォニー　フォームラワン　ワールド　チャンピオンシップ　1993"/>
+		<info name="alt_title" value="ヘブンリー シンフォニー フォームラワン ワールド チャンピオンシップ 1993"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="heavenly symphony (japan)" sha1="0b2cbbb78603bd1b9110ffaa6035f89dbb78085a"/>
@@ -336,7 +336,7 @@
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60094"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="ジャガーＸＪ２２０"/>
+		<info name="alt_title" value="ジャガーXJ220"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="jaguar xj220 (japan) (en,ja)" sha1="ff48724c0c0c7cc4fd831cc8954497c8da8448cb"/>
@@ -364,7 +364,7 @@
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="T-141013"/>
 		<info name="release" value="19940513"/>
-		<info name="alt_title" value="仮面ライダーＺＯ"/>
+		<info name="alt_title" value="仮面ライダーZO"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="kamen rider zo (japan)" sha1="c5129e3a90f4456bd76fac0f460281da18f8003c"/>
@@ -406,7 +406,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
 		<info name="release" value="19941222"/>
-		<info name="alt_title" value="ルナ－エターナルブルー"/>
+		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (japan)" sha1="86472573584d0d94bfb8f13e0f08bc2401d110da"/>
@@ -420,7 +420,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
 		<info name="release" value="19920626"/>
-		<info name="alt_title" value="ルナ　ザ・シルバースター"/>
+		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (japan)" sha1="ec2bfebf47f6b894f8add0d78962a4e491e4e3ca"/>
@@ -483,7 +483,7 @@
 		<publisher>Takeru</publisher>
 		<info name="serial" value="T-77014"/>
 		<info name="release" value="19911214"/>
-		<info name="alt_title" value="ノスタルジア１９０７"/>
+		<info name="alt_title" value="ノスタルジア1907"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="nostalgia 1907 (japan)" sha1="c6718f18b5720b3c48abf9c8accdf6d7572e4a63"/>
@@ -525,7 +525,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6010"/>
 		<info name="release" value="19921030"/>
-		<info name="alt_title" value="プロ野球スーパーリーグＣＤ"/>
+		<info name="alt_title" value="プロ野球スーパーリーグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="pro yakyuu super league cd (japan)" sha1="87cf208ad060b8ef6ace3db18824152f45dc91b5"/>
@@ -609,7 +609,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6007"/>
 		<info name="release" value="19930723"/>
-		<info name="alt_title" value="聖魔伝説　３×３ＥＹＥＳ"/>
+		<info name="alt_title" value="聖魔伝説 3×3EYES"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="seima densetsu 3x3 eyes (japan)" sha1="8a850d7cf8db54c48adb8ae8f485143cd27df8c6"/>
@@ -665,7 +665,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6036"/>
 		<info name="release" value="19940722"/>
-		<info name="alt_title" value="シャイニング・フォースＣＤ"/>
+		<info name="alt_title" value="シャイニング・フォースCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="shining force cd (japan)" sha1="b6b05a27fddbb742149216961f6e9b917442b768"/>
@@ -707,7 +707,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6021"/>
 		<info name="release" value="19930923"/>
-		<info name="alt_title" value="ソニック・ザ・ヘッジホッグＣＤ"/>
+		<info name="alt_title" value="ソニック・ザ・ヘッジホッグCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic the hedgehog cd (japan)" sha1="5501a5b2b4d324558918f22f9dca0ef8080d0836"/>
@@ -763,7 +763,7 @@
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32084"/>
 		<info name="release" value="19921225"/>
-		<info name="alt_title" value="天舞メガＣＤスペシャル"/>
+		<info name="alt_title" value="天舞メガCDスペシャル"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tenbu mega cd special (japan)" sha1="e973a5a3d51455b394eecccd99c7b62d407c1a82"/>
@@ -791,7 +791,7 @@
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
-		<info name="alt_title" value="サンダーストームＦＸ"/>
+		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (japan)" sha1="8fa31b15432af06c7471b0ec63c5c9a11a00f2af"/>
@@ -847,7 +847,7 @@
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44014"/>
 		<info name="release" value="19931022"/>
-		<info name="alt_title" value="Ｖａｙ 流星の鎧"/>
+		<info name="alt_title" value="Vay 流星の鎧"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="vay - ryuusei no yoroi (japan)" sha1="6579a8763ae92f61e363b389f4bf1e4da9eb57e8"/>
@@ -962,7 +962,7 @@
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49064"/>
 		<info name="release" value="19930625"/>
-		<info name="alt_title" value="Ａランクサンダー 誕生編"/>
+		<info name="alt_title" value="Aランクサンダー 誕生編"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="a-rank thunder tanjouhen (1993)(riot)(ntsc)(jp)[!]" sha1="e143c4044521b8ade18161f8f2767145967e4041"/>
@@ -1278,7 +1278,7 @@
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-51014"/>
 		<info name="release" value="19930528"/>
-		<info name="alt_title" value="幻影都市 －ILLUSION CITY－"/>
+		<info name="alt_title" value="幻影都市 -ILLUSION CITY-"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="denei toshi - illusion city (1993)(micro cabin)(ntsc)(jp)[!][t-51014p-00066-r2m]" sha1="8035db298e1d4b5713443a07b1285377c5b59cab"/>
@@ -1399,7 +1399,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
 		<info name="release" value="19950224"/>
-		<info name="alt_title" value="エコー・ザ・ドルフィンＣＤ"/>
+		<info name="alt_title" value="エコー・ザ・ドルフィンCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 1 of 2)[!][ecco the dolphin]" sha1="efc86eeefd7c25dbd9f9301850db79212e53252e"/>
@@ -1413,7 +1413,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
 		<info name="release" value="19950224"/>
-		<info name="alt_title" value="エコー・ザ・ドルフィンＣＤ"/>
+		<info name="alt_title" value="エコー・ザ・ドルフィンCD"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ecco the dolphin cd (1995)(sega)(ntsc)(jp)(disc 2 of 2)[!][ecco the dolphin ii]" sha1="06100e6a07e30a7d075b99ffb4455f4ee069fc83"/>
@@ -1724,7 +1724,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
 		<info name="release" value="19941222"/>
-		<info name="alt_title" value="ルナ－エターナルブルー"/>
+		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[!][t-45074p-00271-r1m]" sha1="1aae24f5646879641f47273db530093648093699"/>
@@ -1739,7 +1739,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
 		<info name="release" value="19941222"/>
-		<info name="alt_title" value="ルナ－エターナルブルー"/>
+		<info name="alt_title" value="ルナ-エターナルブルー"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - eternal blue (1994)(game arts)(ntsc)(jp)[!][t-45074p-00271a-r1m]" sha1="dfe1a6c27af88d8202f5b77aaa81c6661ce8e05f"/>
@@ -1755,7 +1755,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
 		<info name="release" value="19920626"/>
-		<info name="alt_title" value="ルナ　ザ・シルバースター"/>
+		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[!][t-45014p-00017-r1m]" sha1="5edd3e7a2f928f830abc682375309e78c6b74b1e"/>
@@ -1770,7 +1770,7 @@
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
 		<info name="release" value="19920626"/>
-		<info name="alt_title" value="ルナ　ザ・シルバースター"/>
+		<info name="alt_title" value="ルナ ザ・シルバースター"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunar - the silver star (1992)(game arts)(ntsc)(jp)[!][t-45014p-00017-r2m]" sha1="ee5947838910555eedbe419705ecbda732ff641b"/>
@@ -1855,7 +1855,7 @@
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-81014"/>
 		<info name="release" value="19940603"/>
-		<info name="alt_title" value="モータルコンバット　完全版"/>
+		<info name="alt_title" value="モータルコンバット 完全版"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mortal kombat (1994)(acclaim)(ntsc)(jp)(en)[!]" sha1="f0f41dab302241fe7d6b78b10b133e1265e9fed0"/>
@@ -2016,7 +2016,7 @@
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-64024"/>
 		<info name="release" value="19930103"/>
-		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 ＡＹＡ"/>
+		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol.3 - aya (1993)(data west)(ntsc)(jp)[!]" sha1="0db9939af75a9c15079c93e0ed46790d1e67c43a"/>
@@ -2101,7 +2101,7 @@
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32124"/>
 		<info name="release" value="19921218"/>
-		<info name="alt_title" value="ロードブラスターＦＸ"/>
+		<info name="alt_title" value="ロードブラスターFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="road blaster fx (1992)(wolf team)(ntsc)(jp)(en)[!]" sha1="851df6a824f8c20984574f8fae781b347c3644ba"/>
@@ -2128,7 +2128,7 @@
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60044"/>
 		<info name="release" value="19930923"/>
-		<info name="alt_title" value="モンキー・アイランド ユーレイ海賊大騒動！"/>
+		<info name="alt_title" value="モンキー・アイランド ユーレイ海賊大騒動!"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="secret of monkey island, the - monkey island yurei - kaizoku oosoudou! (1993)(victor)(ntsc)(jp)[!]" sha1="66a95bf6f661e60fc2b00a2fa679ae1f7559d471"/>
@@ -2416,7 +2416,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
-		<info name="alt_title" value="サンダーストームＦＸ"/>
+		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[!][t32064p-00022-r1m]" sha1="ffbb3832ad9873afa1e5d257e2f93fb3d07ca3e3"/>
@@ -2431,7 +2431,7 @@
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
-		<info name="alt_title" value="サンダーストームＦＸ"/>
+		<info name="alt_title" value="サンダーストームFX"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thunder storm fx (1992)(wolf team)(ntsc)(jp)(en)[!][t32064p-00022-r2m]" sha1="992cb2f5fd2209dd959b351c5d2f7cc548981dc7"/>

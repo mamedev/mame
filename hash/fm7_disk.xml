@@ -63,7 +63,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="archon">
 		<description>Archon</description>
 		<year>1988</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="アーコン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -303,9 +303,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="gamblerj">
 	<!-- Keys listed in readme are as follows:
-キー操作/ リターン：チー　F1:リーチ　F2:ポン　F3:カン F4:和了　F10:九種九牌
-　　　　　F5:指導機能ON/OFF　F6:サウンドON/OFF　F7:オープンモード　F8:オートモード
-　　　　　ESC(XM7:半角/全角):ポーズ・点数表示　HOME:捨て牌指導	-->
+キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
+     F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
+     ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導	-->
 		<description>Gambler Jikochuushinha</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -527,7 +527,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Lagrange L-2 - Escape from the Space Colony</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
-		<info name="alt_title" value="ラグランジュＬ-２"/>
+		<info name="alt_title" value="ラグランジュＬ-2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="388016">
 				<rom name="lagrange_l2.d77" size="388016" crc="a66cd680" sha1="685f09c7db483e8654ca9dfc03a05d21dec2964b" offset="0" />
@@ -588,7 +588,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Tougoku no Shisha - Mahoutsukai no Imoko II</description>
 		<year>1986</year>
 		<publisher>年帝国ソフト (Teikoku Soft)</publisher>
-		<info name="alt_title" value="東国の使者 - 魔法使いの妹子２"/>
+		<info name="alt_title" value="東国の使者 - 魔法使いの妹子2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="deshi2_a.d77" size="348848" crc="75a053f8" sha1="6b6bf840f4cca2bd88c23164a9ab65c0bbfbd3f6" offset="0" />
@@ -642,7 +642,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Bishoujo Shashinkan - Moving School</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
-		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>
+		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="school.d77" size="348848" crc="bde764c2" sha1="60db1b5a944b099cb1a5121f72477f3979647a90" offset="0" />
@@ -655,7 +655,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<info name="release" value="198609xx"/>
-		<info name="alt_title" value="夢幻の心臓２"/>
+		<info name="alt_title" value="夢幻の心臓2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program" />
 			<dataarea name="flop" size="353200">
@@ -861,7 +861,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="release" value="198402xx"/>
-		<info name="alt_title" value="倉庫番２"/>
+		<info name="alt_title" value="倉庫番2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349888">
 				<rom name="sokoban2.d77" size="349888" crc="ea4b0035" sha1="565b0b894a763fe897da2d1e4934721081aa4b67" offset="0" />
@@ -900,7 +900,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="serial" value="FUNW13028"/>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="太陽の神殿 アステカ２"/>
+		<info name="alt_title" value="太陽の神殿 アステカ2"/>
 		<!--combined image-->
 		<!--rom name="taiyou no sinden (1986)(falcom)(jp).d77" size="885648" crc="d2b18da0" sha1="910d01bea97b459d040ca7d0d8793fbb6c0840df" offset="000000" /-->
 
@@ -1004,7 +1004,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Ultima II - The Revenge of the Enchantress</description>
 		<year>1985</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
-		<info name="alt_title" value="ウルティマ２"/>
+		<info name="alt_title" value="ウルティマ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program" />
 			<dataarea name="flop" size="344496">
@@ -1140,7 +1140,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>エニックス (Enix)</publisher>
 		<info name="serial" value="E-G173"/>
 		<info name="release" value="198606xx"/>
-		<info name="alt_title" value="ウイングマン２ キータクラーの復活"/>
+		<info name="alt_title" value="ウイングマン2 キータクラーの復活"/>
 		<!--combined image-->
 		<!--rom name="wing man2 (1986)(enix)(jp).d77" size="762176" crc="52499427" sha1="4954a23fbb73919d550561ef5a190b77a659736f" offset="000000" /-->
 
@@ -1162,7 +1162,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198306xx"/>
-		<info name="alt_title" value="ウィザード＆プリンセス"/>
+		<info name="alt_title" value="ウィザード&amp;プリンセス"/>
 		<!--combined image-->
 		<!--rom name="wizard and the princess (1983)(star craft)(jp).d77" size="693344" crc="42b14827" sha1="c25836e75c585b017387941d1b77650a38e73346" offset="000000" /-->
 
@@ -1197,7 +1197,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="ウィザードリィ２"/>
+		<info name="alt_title" value="ウィザードリィ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="wizardry #2.d77" size="348848" crc="5a0bdbb4" sha1="ba839a15aa7c272f316f2b8153b7ed0020db3a7b" offset="0" />
@@ -1210,7 +1210,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198706xx"/>
-		<info name="alt_title" value="ウィザードリィ３"/>
+		<info name="alt_title" value="ウィザードリィ3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="wizardry #3.d77" size="348848" crc="64f53163" sha1="9eb779dc7bfe09b49ca69a5589a6358e0738ff84" offset="0" />
@@ -1271,7 +1271,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="198611xx"/>
-		<info name="alt_title" value="ザナドゥ シナリオ２"/>
+		<info name="alt_title" value="ザナドゥ シナリオ2"/>
 		<info name="usage" value="Needs Xanadu to work"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
@@ -1547,21 +1547,21 @@ systems, for the moment they stay here!
 	<software name="5in1">
 <!-- From the readme 5in1.txt (it's not explained how to launch the 5th game...):
 
-タイトル：メイガス
-メーカー：ソフトプロ          機  種 ：FM-7
-ジャンル：TBL               備  考 ：RUN"MAGUS"で起動
-　　　　　
-タイトル：リザード
-メーカー：マイクロキャビン      機  種 ：FM-7
-ジャンル：RPG                備  考 ：RUN"LIZARD"で起動
+タイトル:メイガス
+メーカー:ソフトプロ          機  種 :FM-7
+ジャンル:TBL               備  考 :RUN"MAGUS"で起動
+     
+タイトル:リザード
+メーカー:マイクロキャビン      機  種 :FM-7
+ジャンル:RPG                備  考 :RUN"LIZARD"で起動
 
-タイトル：BLUE FOX
-メーカー：ENIX               機  種 ：FM-7
-ジャンル：STG                備  考 ：RUN"BLUE.FOX"で起動
+タイトル:BLUE FOX
+メーカー:ENIX               機  種 :FM-7
+ジャンル:STG                備  考 :RUN"BLUE.FOX"で起動
 
-タイトル：ナイザー
-メーカー：電波新聞社           機  種 ：FM-7
-ジャンル：ACT                備  考 ：RUN"ナイザー"で起動
+タイトル:ナイザー
+メーカー:電波新聞社           機  種 :FM-7
+ジャンル:ACT                備  考 :RUN"ナイザー"で起動
 
  -->
 		<description>ナイザー メイガス ビデオ君 BlueFox Lizard</description>

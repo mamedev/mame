@@ -121,7 +121,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NUS-NTWJ"/>
 		<info name="release" value="19971219"/>
-		<info name="alt_title" value="64で発見！！たまごっち みんなでたまごっちワールド"/>
+		<info name="alt_title" value="64で発見!!たまごっち みんなでたまごっちワールド"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="64 de hakken!! tamagotchi - minna de tamagotchi world (japan).bin" size="12582912" crc="c6400938" sha1="538ae3f3354c3fb96926d759e81cf64b827f2782" offset="000000" />
@@ -589,7 +589,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Taito Corporation</publisher>
 		<info name="serial" value="NUS-NBJJ"/>
 		<info name="release" value="19981224"/>
-		<info name="alt_title" value="爆笑人生64 めざせ！リゾート王"/>
+		<info name="alt_title" value="爆笑人生64 めざせ!リゾート王"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="bakushou jinsei 64 - mezase! resort ou (japan).bin" size="12582912" crc="5fd42464" sha1="353b62279f67634030cc66f43c4b82e516a6af28" offset="000000" />
@@ -1073,7 +1073,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NBDJ"/>
 		<info name="release" value="19980430"/>
-		<info name="alt_title" value="ボンバーマンヒーローミリアン王女を救え！"/>
+		<info name="alt_title" value="ボンバーマンヒーローミリアン王女を救え!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="bomberman hero - mirian oujo wo sukue! (japan).bin" size="12582912" crc="f3a50116" sha1="c143fca315277496e0558c93701494a225ba4a37" offset="000000" />
@@ -2137,7 +2137,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Epoch</publisher>
 		<info name="serial" value="NUS-N3DJ"/>
 		<info name="release" value="20000728"/>
-		<info name="alt_title" value="ドラえもん3 のび太の町SOS！"/>
+		<info name="alt_title" value="ドラえもん3 のび太の町SOS!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="doraemon 3 - nobita no machi sos! (japan).bin" size="16777216" crc="0b3ad913" sha1="a567aa96860525963f9dafa256036c0df5f66909" offset="000000" />
@@ -2949,7 +2949,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSIJ"/>
 		<info name="release" value="20000927"/>
-		<info name="alt_title" value="不思議のダンジョン 風来のシレン2 鬼襲来！シレン城！"/>
+		<info name="alt_title" value="不思議のダンジョン 風来のシレン2 鬼襲来!シレン城!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="fushigi no dungeon fuurai no shiren 2 - oni shuurai! shiren jou! (japan).bin" size="33554432" crc="af0a22ef" sha1="a50ef01ec653ed48a2b857fe2834d815cbd8e972" offset="000000" />
@@ -3016,7 +3016,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-N3HJ (RZ035-J1)"/>
 		<info name="release" value="20000713"/>
-		<info name="alt_title" value="がんばれ！ニッポン！オリンピック2000"/>
+		<info name="alt_title" value="がんばれ!ニッポン!オリンピック2000"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="ganbare! nippon! olympics 2000 (japan).bin" size="12582912" crc="1c7e5d6e" sha1="ff7721bea55f0447e5eb84f5583bbb67de1348d3" offset="000000" />
@@ -3066,7 +3066,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NUS-NGLJ"/>
 		<info name="release" value="19981204"/>
-		<info name="alt_title" value="ゲッターラブ！！"/>
+		<info name="alt_title" value="ゲッターラブ!!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="getter love!! cho renai party game (japan).bin" size="12582912" crc="bbd2ae37" sha1="17507afa02aec34fe3af3077ef60a4a990626160" offset="000000" />
@@ -3808,7 +3808,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NIBJ"/>
 		<info name="release" value="20000331"/>
-		<info name="alt_title" value="糸井重里のバス釣りNo.1 決定版！"/>
+		<info name="alt_title" value="糸井重里のバス釣りNo.1 決定版!"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="itoi shigesato no bass tsuri no. 1 kettei ban! (japan).bin" size="16777216" crc="5e9c3e4b" sha1="e9581337df0f93638ddaf328f84bfe92e5764474" offset="000000" />
@@ -4413,7 +4413,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="NUS-N64J"/>
 		<info name="release" value="19981023"/>
-		<info name="alt_title" value="キラッと解決！ 64探偵団"/>
+		<info name="alt_title" value="キラッと解決! 64探偵団"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="kiratto kaiketsu! 64 tanteidan (japan).bin" size="12582912" crc="9fc8a30c" sha1="c6b8349a834853501397225e29d2a7decedd07f1" offset="000000" />
@@ -6287,7 +6287,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NALJ"/>
 		<info name="release" value="19990115"/>
-		<info name="alt_title" value="ニンテンドウオールスター！ 大乱闘スマッシュブラザーズ"/>
+		<info name="alt_title" value="ニンテンドウオールスター! 大乱闘スマッシュブラザーズ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="nintendo all-star! dairantou smash brothers (japan).bin" size="16777216" crc="a2d1d0d1" sha1="42e5bab5d8c3b3ca3582e142094b50ecc7fea5e6" offset="000000" />
@@ -8489,7 +8489,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NRSJ"/>
 		<info name="release" value="19990827"/>
-		<info name="alt_title" value="スター・ウォーズ ［出撃！ローグ中隊］"/>
+		<info name="alt_title" value="スター・ウォーズ [出撃!ローグ中隊]"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="star wars - shutsugeki! rogue chuutai (japan).bin" size="16777216" crc="de90ade4" sha1="184a06d1967921e5bc9451d1337a529754b55c50" offset="000000" />
@@ -8860,7 +8860,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Konami</publisher>
 		<info name="serial" value="NUS-NPZJ (RZ022-J1)"/>
 		<info name="release" value="19980326"/>
-		<info name="alt_title" value="進め！対戦ぱずるだま 闘魂！まるたま町"/>
+		<info name="alt_title" value="進め!対戦ぱずるだま 闘魂!まるたま町"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="susume! taisen puzzle dama - toukon! marutama chou (japan).bin" size="8388608" crc="dc83bcd3" sha1="abd8ecdbfc3676488c4cb961439f13ef8dc7c0c7" offset="000000" />
@@ -10706,7 +10706,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Enix</publisher>
 		<info name="serial" value="NUS-NTMJ"/>
 		<info name="release" value="19970627"/>
-		<info name="alt_title" value="ゆけゆけ！！トラブルメーカーズ"/>
+		<info name="alt_title" value="ゆけゆけ!!トラブルメーカーズ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="yuke yuke!! trouble makers (japan).bin" size="8388608" crc="f8bb860c" sha1="6807ebe5f95c30baee18f5da6c170396d6b8764e" offset="000000" />

@@ -916,7 +916,7 @@ Undumped Pirates:
 		<publisher>Omega Micott</publisher>
 		<info name="serial" value="CGB-BOAJ-JPN"/>
 		<info name="release" value="20020329"/>
-		<info name="alt_title" value="あざらし戦隊イナズマ 〜どきどき大作戦！？〜"/>
+		<info name="alt_title" value="あざらし戦隊イナズマ 〜どきどき大作戦!?〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="azarashi sentai inazuma - dokidoki daisakusen! (japan).bin" size="1048576" crc="98f63bd4" sha1="f4278b01f445562d17a9a2fd8dd5c9bc9d32008e" offset="000000" />
@@ -1062,7 +1062,7 @@ Undumped Pirates:
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-A4RJ-JPN"/>
 		<info name="release" value="20000324"/>
-		<info name="alt_title" value="爆球連発！！スーパービーダマン 激誕！ライジングヴァルキリー！！"/>
+		<info name="alt_title" value="爆球連発!!スーパービーダマン 激誕!ライジングヴァルキリー!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bakukyuu renpatsu!! super b-daman - gekitan! rising valkyrie!! (japan).bin" size="1048576" crc="5c95d5a2" sha1="952933a658f0b4182619e7184f49aa4a47fc5f84" offset="000000" />
@@ -1955,7 +1955,7 @@ Undumped Pirates:
 		<publisher>Global A</publisher>
 		<info name="serial" value="CGB-BDVJ-JPN"/>
 		<info name="release" value="20020418"/>
-		<info name="alt_title" value="冒険！ドンドコ島"/>
+		<info name="alt_title" value="冒険!ドンドコ島"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="bouken! dondoko-tou (japan).bin" size="2097152" crc="5fe759c7" sha1="c054abfea01a3ceb7b20b27e7ea937abe5157834" offset="000000" />
@@ -2603,7 +2603,7 @@ Undumped Pirates:
 		<publisher>Epoch</publisher>
 		<info name="serial" value="CGB-BCNJ-JPN"/>
 		<info name="release" value="20010810"/>
-		<info name="alt_title" value="ちびまる子ちゃん ご町内 みんなでゲームだよ！"/>
+		<info name="alt_title" value="ちびまる子ちゃん ご町内 みんなでゲームだよ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="chibi maruko-chan - go chounai minna de game dayo! (japan).bin" size="1048576" crc="20faa0d1" sha1="31a0e557b36382f260a8297226e14737217c9763" offset="000000" />
@@ -2926,7 +2926,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BSKJ-JPN (RK204-J1)"/>
 		<info name="release" value="20000323"/>
-		<info name="alt_title" value="サイボーグクロちゃん 〜デビル復活！！〜"/>
+		<info name="alt_title" value="サイボーグクロちゃん 〜デビル復活!!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="cyborg kuro-chan - devil fukkatsu (japan).bin" size="1048576" crc="392d630f" sha1="b544d1a49128bc5ab3664ced872d2d1dcc51b667" offset="000000" />
@@ -2956,7 +2956,7 @@ Undumped Pirates:
 		<publisher>Video System</publisher>
 		<info name="serial" value="CGB-BDOJ-JPN"/>
 		<info name="release" value="20001208"/>
-		<info name="alt_title" value="だぁ！だぁ！だぁ！ とつぜん★カードでバトルで占いで！？"/>
+		<info name="alt_title" value="だぁ!だぁ!だぁ! とつぜん★カードでバトルで占いで!?"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="daa! daa! daa! - totsuzen card de battle de uranai de! (japan).bin" size="1048576" crc="f41bb392" sha1="b716720f25ec84fa51181125494a009345d0b20f" offset="000000" />
@@ -3157,7 +3157,7 @@ Undumped Pirates:
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-BFBJ-JPN"/>
 		<info name="release" value="19991224"/>
-		<info name="alt_title" value="踊る天才ペット！ダンシングファービー"/>
+		<info name="alt_title" value="踊る天才ペット!ダンシングファービー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="dancing furby (japan).bin" size="1048576" crc="3263f692" sha1="f3f7e37d64eef74d65456bae490e0a0b25897ac0" offset="000000" />
@@ -3549,7 +3549,7 @@ Undumped Pirates:
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="DMG-BDKJ-JPN"/>
 		<info name="release" value="20000714"/>
-		<info name="alt_title" value="ドカポン？！ ミレニアムクエスト"/>
+		<info name="alt_title" value="ドカポン?! ミレニアムクエスト"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="dokapon! - millennium quest (japan).bin" size="2097152" crc="4fe9e966" sha1="2ac27b1f9b8821fcf1cb4bf347156e29dcde689c" offset="000000" />
@@ -3564,7 +3564,7 @@ Undumped Pirates:
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-BP6J-JPN"/>
 		<info name="release" value="20011026"/>
-		<info name="alt_title" value="Doki x Dokiさせて！！"/>
+		<info name="alt_title" value="Doki x Dokiさせて!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="doki x doki sasete!! (japan).bin" size="2097152" crc="19a73f60" sha1="d2d424bdd151222aa8316db1fd1df2cafcb3a15d" offset="000000" />
@@ -3594,7 +3594,7 @@ Undumped Pirates:
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BUDJ-JPN"/>
 		<info name="release" value="20001201"/>
-		<info name="alt_title" value="ドナルドダック デイジーを救え！"/>
+		<info name="alt_title" value="ドナルドダック デイジーを救え!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="donald duck - daisy o sukue! (japan).bin" size="4194304" crc="333c124c" sha1="46ecfe890cb225563bcd45f8607962840b5fd587" offset="000000" />
@@ -3674,7 +3674,7 @@ Undumped Pirates:
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AD3J-JPN"/>
 		<info name="release" value="20000128"/>
-		<info name="alt_title" value="ドンキーコングGB ディンキーコング＆ディクシーコング"/>
+		<info name="alt_title" value="ドンキーコングGB ディンキーコング&amp;ディクシーコング"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="donkey kong gb - dinky kong &amp; dixie kong (japan).bin" size="1048576" crc="28d7e8d3" sha1="55b133b739a5472d477336647cb9ec97b7fa85a2" offset="000000" />
@@ -3888,7 +3888,7 @@ Undumped Pirates:
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="CGB-BDFJ-JPN"/>
 		<info name="release" value="20020221"/>
-		<info name="alt_title" value="Dr.リンにきいてみて！ 恋のリン風水！"/>
+		<info name="alt_title" value="Dr.リンにきいてみて! 恋のリン風水!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="dr. rin ni kiitemite! - koi no rin fuusui (japan).bin" size="2097152" crc="ec168a61" sha1="7810ea39edd661d2a9e95f57c9847d7e5a172ff6" offset="000000" />
@@ -4049,7 +4049,7 @@ Undumped Pirates:
 		<publisher>Enix</publisher>
 		<info name="serial" value="CGB-BD3J-JPN"/>
 		<info name="release" value="20001208"/>
-		<info name="alt_title" value="ドラゴンクエストIII そして伝説へ…"/>
+		<info name="alt_title" value="ドラゴンクエストIII そして伝説へ..."/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="dragon quest iii - soshite densetsu he... (japan).bin" size="4194304" crc="21078c16" sha1="1f30968a5ebd32643acd32351e78e68cfffb8ae9" offset="000000" />
@@ -5037,7 +5037,7 @@ Undumped Pirates:
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BZOJ-JPN"/>
 		<info name="release" value="20020628"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 幻のグランドライン冒険記！"/>
+		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 幻のグランドライン冒険記!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="from tv animation one piece - maboroshi no grand line boukenki! (japan).bin" size="4194304" crc="a7317bb8" sha1="7fa5fbb94390876dee807216c2097cdb42510efe" offset="000000" />
@@ -5052,7 +5052,7 @@ Undumped Pirates:
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BLUJ-JPN"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生！"/>
+		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou! (japan) (rev. a).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b" offset="000000" />
@@ -5067,7 +5067,7 @@ Undumped Pirates:
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BLUJ-JPN"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生！"/>
+		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou! (japan).bin" size="4194304" crc="c693aa37" sha1="459f1ae41f6c5c6464745a23ea42bbba5385a83b" offset="000000" />
@@ -5351,7 +5351,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BEKJ-JPN (RK234-J1)"/>
 		<info name="release" value="20001221"/>
-		<info name="alt_title" value="がんばれゴエモン 星空士ダイナマイッツあらわる！！"/>
+		<info name="alt_title" value="がんばれゴエモン 星空士ダイナマイッツあらわる!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ganbare goemon - hoshizorashi dynamites arawaru!! (japan).bin" size="1048576" crc="2ea8d9d4" sha1="fc44dd6ac4a91ab32dc7096a364406433b48b7d8" offset="000000" />
@@ -5366,7 +5366,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AEFJ-JPN (RK192-J1)"/>
 		<info name="release" value="19991216"/>
-		<info name="alt_title" value="がんばれゴエモン もののけ道中飛び出せ鍋奉行！"/>
+		<info name="alt_title" value="がんばれゴエモン もののけ道中飛び出せ鍋奉行!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="ganbare goemon - mononoke douchuu tobisuise nabebugyou! (japan).bin" size="2097152" crc="73311cfa" sha1="4bc3928f3528a2c566b09613e538253dd128864c" offset="000000" />
@@ -5396,7 +5396,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-B3HJ-JPN (RK208-J1)"/>
 		<info name="release" value="20000713"/>
-		<info name="alt_title" value="がんばれ！ニッポン！オリンピック2000"/>
+		<info name="alt_title" value="がんばれ!ニッポン!オリンピック2000"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ganbare! nippon! olympic 2000 (japan).bin" size="1048576" crc="ffd919a7" sha1="5abaac9c4cb3d06e20fcb4c9985a6c4b52e62871" offset="000000" />
@@ -5451,7 +5451,7 @@ Undumped Pirates:
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="CGB-BDJJ-JPN"/>
 		<info name="release" value="20011012"/>
-		<info name="alt_title" value="激走！ダンガンレーサー 音速バスター"/>
+		<info name="alt_title" value="激走!ダンガンレーサー 音速バスター"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="gekisou dangun racer - onsoku buster dangun dan (japan).bin" size="2097152" crc="06fccefc" sha1="0b9c99a614d31cc0cb4047deeee6de76b64a5f8b" offset="000000" />
@@ -5726,7 +5726,7 @@ Undumped Pirates:
 		<publisher>KID</publisher>
 		<info name="serial" value="DMG-AAGJ-JPN"/>
 		<info name="release" value="19991029"/>
-		<info name="alt_title" value="ゴルフだいすき！"/>
+		<info name="alt_title" value="ゴルフだいすき!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="golf daisuki! (japan).bin" size="2097152" crc="80444a86" sha1="d245a267b1b1d056e0f5af4ba732c66c8deadde2" offset="000000" />
@@ -6097,7 +6097,7 @@ Undumped Pirates:
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="CGB-B8MJ-JPN"/>
 		<info name="release" value="20020809"/>
-		<info name="alt_title" value="ハムスター物語GB＋マジハームの魔法少女"/>
+		<info name="alt_title" value="ハムスター物語GB+マジハームの魔法少女"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="hamster monogatari gb + magi ham mahou no shoujo (japan).bin" size="4194304" crc="abd59939" sha1="b3300b1df2cd6a42f112624d5eb2803d45eb3054" offset="000000" />
@@ -6851,7 +6851,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AHDJ-JPN (RK183-J1)"/>
 		<info name="release" value="19990701"/>
-		<info name="alt_title" value="ハイパーオリンピックシリーズ トラック＆フィールドGB"/>
+		<info name="alt_title" value="ハイパーオリンピックシリーズ トラック&amp;フィールドGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="hyper olympic series - track &amp; field gb (japan).bin" size="1048576" crc="77f76ebc" sha1="6dabafe260b53e61a810cbae2f14287adafffd8e" offset="000000" />
@@ -7218,7 +7218,7 @@ Undumped Pirates:
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-ACJJ-JPN"/>
 		<info name="release" value="19990423"/>
-		<info name="alt_title" value="人生ゲーム 友達たくさんつくろうよ！"/>
+		<info name="alt_title" value="人生ゲーム 友達たくさんつくろうよ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="jinsei game - tomodachi takusan tsukurou yo! (japan).bin" size="1048576" crc="c8d46e99" sha1="d2c4ae3808d9a24cbd4c6c8e43184ca0ef2d8373" offset="000000" />
@@ -7263,7 +7263,7 @@ Undumped Pirates:
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-A55J-JPN"/>
 		<info name="release" value="19991217"/>
-		<info name="alt_title" value="女流雀士に挑戦GB 〜私達に挑戦してネ！〜"/>
+		<info name="alt_title" value="女流雀士に挑戦GB 〜私達に挑戦してネ!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="joryuu janshi ni chousen gb - watashi-tachi ni chousen shitene (japan).bin" size="1048576" crc="9fa5cdb5" sha1="a332817b9561dcab7d1f3dc0cf300e1656b253c3" offset="000000" />
@@ -7359,7 +7359,7 @@ Undumped Pirates:
 		<publisher>Dazz</publisher>
 		<info name="serial" value="DMG-BDTJ-JPN"/>
 		<info name="release" value="20000811"/>
-		<info name="alt_title" value="海底伝説！！ トレジャーワールド"/>
+		<info name="alt_title" value="海底伝説!! トレジャーワールド"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="kaitei densetsu!! treasure world (japan).bin" size="1048576" crc="4c7258d9" sha1="fe1cba586c0ff61628e52890b5ac40d1b7c4cbee" offset="000000" />
@@ -7493,7 +7493,7 @@ Undumped Pirates:
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-BOOJ-JPN"/>
 		<info name="release" value="20000801"/>
-		<info name="alt_title" value="カラムー町は大さわぎ！おかわりっ！"/>
+		<info name="alt_title" value="カラムー町は大さわぎ!おかわりっ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="karamuchou wa oosawagi! - okawari! (japan) (np).bin" size="1048576" crc="6c568e06" sha1="9217169dc3f42562d71a7edabc3b42e36ec8304b" offset="000000" />
@@ -7508,7 +7508,7 @@ Undumped Pirates:
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AOPJ-JPN"/>
 		<info name="release" value="19981211"/>
-		<info name="alt_title" value="カラムー町は大さわぎ！ 〜ポリンキーズとおかしな仲間たち〜"/>
+		<info name="alt_title" value="カラムー町は大さわぎ! 〜ポリンキーズとおかしな仲間たち〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="karamuchou wa oosawagi! - polinkies to okashina nakama-tachi (japan).bin" size="1048576" crc="dd948071" sha1="cb6079dc290ace0daafdd40353e4477e4a37c8f7" offset="000000" />
@@ -7635,7 +7635,7 @@ Undumped Pirates:
 		<publisher>Hector</publisher>
 		<info name="serial" value="DMG-ASCJ-JPN"/>
 		<info name="release" value="20000428"/>
-		<info name="alt_title" value="競馬場へ行こう！ワイド"/>
+		<info name="alt_title" value="競馬場へ行こう!ワイド"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="keibajou e ikou! wide (japan).bin" size="1048576" crc="710286ea" sha1="120c3888f7206ac8b06cea5e9b81dbcd87109ebf" offset="000000" />
@@ -7764,7 +7764,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-A5KJ-JPN (RK197-J1)"/>
 		<info name="release" value="19991125"/>
-		<info name="alt_title" value="筋肉番付GB 〜挑戦者はキミだ！〜"/>
+		<info name="alt_title" value="筋肉番付GB 〜挑戦者はキミだ!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="kinniku banzuke gb - chousensha wa kimida! (japan).bin" size="1048576" crc="e2e4328b" sha1="75d7e35fea257d8da4c1efcdd6ebdca020c648a6" offset="000000" />
@@ -7779,7 +7779,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-B6KJ-JPN (RK213-J1)"/>
 		<info name="release" value="20000810"/>
-		<info name="alt_title" value="筋肉番付GB2 〜目指せ!マッスルチャンピオン！〜"/>
+		<info name="alt_title" value="筋肉番付GB2 〜目指せ!マッスルチャンピオン!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="kinniku banzuke gb2 - mezase! muscle champion (japan).bin" size="2097152" crc="42de9092" sha1="5ea803b820ff865a4470d7f82b36da6b82f3caec" offset="000000" />
@@ -7794,7 +7794,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-B7KJ-JPN (RK233-J1)"/>
 		<info name="release" value="20010222"/>
-		<info name="alt_title" value="筋肉番付GB3 〜新世紀サバイバル列伝！〜"/>
+		<info name="alt_title" value="筋肉番付GB3 〜新世紀サバイバル列伝!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="kinniku banzuke gb3 - shinseiki survival retsuden! (japan).bin" size="4194304" crc="e2f6253e" sha1="2e5d5adcdbedf45c6ebda0f90ccfa787a24c24d0" offset="000000" />
@@ -8735,7 +8735,7 @@ Undumped Pirates:
 		<publisher>Syscom</publisher>
 		<info name="serial" value="CGB-ALMJ-JPN"/>
 		<info name="release" value="20011214"/>
-		<info name="alt_title" value="ルーニー・テューンズコレクターマーシャンクエスト！"/>
+		<info name="alt_title" value="ルーニー・テューンズコレクターマーシャンクエスト!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="looney tunes collector - martian quest! (japan).bin" size="2097152" crc="bc46a2d2" sha1="450e43cf2d9cfa18856b3f3312e2194f132dbb1b" offset="000000" />
@@ -8999,7 +8999,7 @@ Undumped Pirates:
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="DMG-ARCJ-JPN"/>
 		<info name="release" value="19990611"/>
-		<info name="alt_title" value="ルーカのぱずるで大冒険！"/>
+		<info name="alt_title" value="ルーカのぱずるで大冒険!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="luca no puzzle de daibouken! (japan).bin" size="524288" crc="3aebfad8" sha1="3c06fe05909ad632b761c6a1c00bc69da81aa358" offset="000000" />
@@ -9129,7 +9129,7 @@ Undumped Pirates:
 		<publisher>Epoch</publisher>
 		<info name="serial" value="CGB-BM7J-JPN"/>
 		<info name="release" value="20000317"/>
-		<info name="alt_title" value="マクロス7 −銀河のハートを奮わせろ！！−"/>
+		<info name="alt_title" value="マクロス7 −銀河のハートを奮わせろ!!−"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="macross 7 - ginga no heart o furuwasero!! (japan).bin" size="2097152" crc="2b7abba4" sha1="88746c361cfbdac49e5d72807b396a6667c42229" offset="000000" />
@@ -10225,7 +10225,7 @@ Undumped Pirates:
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="CGB-BYKJ-JPN"/>
 		<info name="release" value="20011213"/>
-		<info name="alt_title" value="ミニー＆フレンズ 夢の国をさがして"/>
+		<info name="alt_title" value="ミニー&amp;フレンズ 夢の国をさがして"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="minnie &amp; friends - yume no kuni o sagashite (japan).bin" size="2097152" crc="d47ae577" sha1="146f336d16d165590d09f41f44ba52a81816a033" offset="000000" />
@@ -10307,7 +10307,7 @@ Undumped Pirates:
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BGOJ-JPN"/>
 		<info name="release" value="20010511"/>
-		<info name="alt_title" value="モバイルゴルフ＋モバイルアダプタGBセット"/>
+		<info name="alt_title" value="モバイルゴルフ+モバイルアダプタGBセット"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mobile golf (japan).bin" size="4194304" crc="35fc5b32" sha1="fde414fc9efef2c30d1a9e0a2ed35ad2efc0edee" offset="000000" />
@@ -10951,7 +10951,7 @@ Undumped Pirates:
 		<publisher>MTO</publisher>
 		<info name="serial" value="CGB-B3CJ-JPN"/>
 		<info name="release" value="20020405"/>
-		<info name="alt_title" value="なかよしクッキングシリーズ(5) こむぎちゃんのケーキをつくろう！"/>
+		<info name="alt_title" value="なかよしクッキングシリーズ(5) こむぎちゃんのケーキをつくろう!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="nakayoshi cooking series 5 - cake o tsukurou (japan).bin" size="4194304" crc="c04539f8" sha1="f1b845d5508da37f3600437609d8cc8743799918" offset="000000" />
@@ -11039,7 +11039,7 @@ Undumped Pirates:
 		<publisher>Natsume</publisher>
 		<info name="serial" value="CGB-BNYJ-JPN"/>
 		<info name="release" value="20010701"/>
-		<info name="alt_title" value="波乗り野郎！"/>
+		<info name="alt_title" value="波乗り野郎!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="naminori yarou! (japan) (np).bin" size="1048576" crc="ac5e477d" sha1="d305a76307bf05f4d31d395785784ba317a9689f" offset="000000" />
@@ -11444,7 +11444,7 @@ Undumped Pirates:
 		<publisher>Prime System</publisher>
 		<info name="serial" value="CGB-BNPJ-JPN"/>
 		<info name="release" value="20010810"/>
-		<info name="alt_title" value="ニセモン パズルdaモン！ フェロモン救出大作戦！"/>
+		<info name="alt_title" value="ニセモン パズルdaモン! フェロモン救出大作戦!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="nisemon puzzle da mon! - feromon kyuushutsu daisakusen! (japan).bin" size="2097152" crc="2f7d62f3" sha1="8d60e4af5504fe68277e1da162e6352d8438900e" offset="000000" />
@@ -11579,7 +11579,7 @@ Undumped Pirates:
 		<publisher>Epoch</publisher>
 		<info name="serial" value="DMG-AOSJ-JPN"/>
 		<info name="release" value="19990312"/>
-		<info name="alt_title" value="おはスタ やまちゃん＆レイモンド"/>
+		<info name="alt_title" value="おはスタ やまちゃん&amp;レイモンド"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ohasuta yama-chan &amp; raymond (japan).bin" size="262144" crc="840ef32f" sha1="373166bc65dd9b6c5734add30a8d278986fc9c98" offset="000000" />
@@ -11608,7 +11608,7 @@ Undumped Pirates:
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-BOJJ-JPN"/>
 		<info name="release" value="20000630"/>
-		<info name="alt_title" value="おじゃる丸 〜満願神社の縁日でおじゃる！〜"/>
+		<info name="alt_title" value="おじゃる丸 〜満願神社の縁日でおじゃる!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ojarumaru - mangan jinja no ennichi de ojaru! (japan).bin" size="1048576" crc="d86507c9" sha1="f17175f7744f97ad4f9943c5dadd4776ad85e5cb" offset="000000" />
@@ -11885,7 +11885,7 @@ Undumped Pirates:
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="CGB-B22J-JPN"/>
 		<info name="release" value="20001202"/>
-		<info name="alt_title" value="Piaキャロットへようこそ！！2.2"/>
+		<info name="alt_title" value="Piaキャロットへようこそ!!2.2"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="pia carrot e youkoso!! 2.2 (japan).bin" size="4194304" crc="2267360b" sha1="e18cd437c52ca37c6c13ba71e0bd50f1b517a8d6" offset="000000" />
@@ -12642,7 +12642,7 @@ Undumped Pirates:
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BP7J-JPN"/>
 		<info name="release" value="20010328"/>
-		<info name="alt_title" value="ポケモンカードGB2 GR団参上！"/>
+		<info name="alt_title" value="ポケモンカードGB2 GR団参上!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pokemon card gb2 - gr dan sanjou! (japan).bin" size="2097152" crc="6c933a14" sha1="a7e12bcc5f514e3aad8de570fd511aab0a308822" offset="000000" />
@@ -13461,7 +13461,7 @@ Undumped Pirates:
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="DMG-BKUJ-JPN"/>
 		<info name="release" value="20000929"/>
-		<info name="alt_title" value="パズルデショーブヨ！ ウータマちゃん"/>
+		<info name="alt_title" value="パズルデショーブヨ! ウータマちゃん"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="puzzle de shoubuyo! wootama-chan (japan).bin" size="1048576" crc="73ed3042" sha1="2c8630324767675e7f3da67e3a3071c73174a47d" offset="000000" />
@@ -14585,7 +14585,7 @@ Undumped Pirates:
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="CGB-BRJJ-JPN"/>
 		<info name="release" value="20000728"/>
-		<info name="alt_title" value="サクラ大戦GB 激・花組入隊！"/>
+		<info name="alt_title" value="サクラ大戦GB 激・花組入隊!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="sakura taisen gb - geki hana kumi nyuutai! (japan).bin" size="4194304" crc="ef503d50" sha1="4e30a9b06b5048449057376c8f37b3f687fabd18" offset="000000" />
@@ -15278,7 +15278,7 @@ Undumped Pirates:
 		<publisher>Tamsoft</publisher>
 		<info name="serial" value="CGB-BS2J-JPN"/>
 		<info name="release" value="20001123"/>
-		<info name="alt_title" value="それいけ！アンパンマン 5つの塔の王様"/>
+		<info name="alt_title" value="それいけ!アンパンマン 5つの塔の王様"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="soreike! anpanman - 5-tsu no tou no ousama (japan).bin" size="1048576" crc="c9a25b0c" sha1="e3e4d1e2d1fe6d0683db9d17356080542e1a6905" offset="000000" />
@@ -15293,7 +15293,7 @@ Undumped Pirates:
 		<publisher>Tamsoft</publisher>
 		<info name="serial" value="DMG-AANJ-JPN"/>
 		<info name="release" value="19991203"/>
-		<info name="alt_title" value="それいけ！！アンパンマン 不思議なにこにこアルバム"/>
+		<info name="alt_title" value="それいけ!!アンパンマン 不思議なにこにこアルバム"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="soreike! anpanman - fushigi na nikoniko album (japan).bin" size="1048576" crc="a80eeead" sha1="fe75b7b7a904ce76130d65b67d24e291ba3c2693" offset="000000" />
@@ -16141,7 +16141,7 @@ Undumped Pirates:
 		<publisher>Epoch</publisher>
 		<info name="serial" value="DMG-BMKJ-JPN"/>
 		<info name="release" value="20000317"/>
-		<info name="alt_title" value="シルバニアメロディー 森のなかまと踊りましょ！"/>
+		<info name="alt_title" value="シルバニアメロディー 森のなかまと踊りましょ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="sylvanian melodies - mori no nakama to odori mashi! (japan).bin" size="1048576" crc="6dd8ac91" sha1="55230e865958f7301076a4354b6b8b083a494bae" offset="000000" />
@@ -17101,7 +17101,7 @@ Undumped Pirates:
 		<publisher>J-WIng</publisher>
 		<info name="serial" value="DMG-APHJ-JPN"/>
 		<info name="release" value="20000310"/>
-		<info name="alt_title" value="突撃！パッパラ隊"/>
+		<info name="alt_title" value="突撃!パッパラ隊"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="totsugeki! papparatai (japan).bin" size="4194304" crc="0aeae8fb" sha1="4c98beab325cd058445102c85d30b3724325f2ce" offset="000000" />
@@ -17212,7 +17212,7 @@ Undumped Pirates:
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AHHJ-JPN"/>
 		<info name="release" value="20000221"/>
-		<info name="alt_title" value="トレード＆バトル カードヒーロー"/>
+		<info name="alt_title" value="トレード&amp;バトル カードヒーロー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="trade &amp; battle card hero (japan).bin" size="2097152" crc="b18cba2a" sha1="9787a4583899720ff80a9e478ca096ba5df38fb3" offset="000000" />
@@ -17309,7 +17309,7 @@ Undumped Pirates:
 		<publisher>ASCII</publisher>
 		<info name="serial" value="CGB-BAFJ-JPN"/>
 		<info name="release" value="20010719"/>
-		<info name="alt_title" value="つりいこっ！！"/>
+		<info name="alt_title" value="つりいこっ!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tsuriiko!! (japan).bin" size="2097152" crc="6f2cbd1d" sha1="b14cc1e8aca284517d964a909736da6b4540de85" offset="000000" />
@@ -17402,7 +17402,7 @@ Undumped Pirates:
 		<publisher>Kemco</publisher>
 		<info name="serial" value="CGB-BTWJ-JPN"/>
 		<info name="release" value="20000811"/>
-		<info name="alt_title" value="トゥイティー世界一周 80匹の猫をさがせ！"/>
+		<info name="alt_title" value="トゥイティー世界一周 80匹の猫をさがせ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tweety sekaiisshuu - 80 hiki no neko o sagase! (japan).bin" size="1048576" crc="147f427a" sha1="cf04dac11119c9be4ca6e247e33b935bd0cdc62d" offset="000000" />
@@ -18173,7 +18173,7 @@ Undumped Pirates:
 		<publisher>Konami</publisher>
 		<info name="serial" value="CGB-BWRJ-JPN (RK225-J1)"/>
 		<info name="release" value="20010315"/>
-		<info name="alt_title" value="ウッディウッドペッカーのゴー！ゴー！レーシング"/>
+		<info name="alt_title" value="ウッディウッドペッカーのゴー!ゴー!レーシング"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="woody woodpecker no go! go! racing (japan).bin" size="1048576" crc="f59daa99" sha1="42d841bdead319aa43d6bc09d88b4c32b4304ced" offset="000000" />
@@ -18748,7 +18748,7 @@ Undumped Pirates:
 		<publisher>Success</publisher>
 		<info name="serial" value="CGB-BJFJ-JPN"/>
 		<info name="release" value="20010907"/>
-		<info name="alt_title" value="全日本少年サッカー大会 めざせ日本一！"/>
+		<info name="alt_title" value="全日本少年サッカー大会 めざせ日本一!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="zen-nihon shounen soccer taikai - mezase nihon ichi! (japan).bin" size="2097152" crc="efad8b34" sha1="bffe5fdb803f0872d1c0de9d152eb626c5b36147" offset="000000" />

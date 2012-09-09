@@ -21,7 +21,7 @@
 		<publisher>Varie</publisher>
 		<info name="serial" value="DMG-WQJ"/>
 		<info name="release" value="19940805"/>
-		<info name="alt_title" value="3丁目のタマ タマ＆フレンズ 3丁目お化けパニック！！"/>
+		<info name="alt_title" value="3丁目のタマ タマ&amp;フレンズ 3丁目お化けパニック!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="3 choume no tama - tama and friends - 3 choume obake panic!! (japan).bin" size="131072" crc="b61cd120" sha1="0982bcc82deb9c4db08e602a22a2bb4f31e7e6ae" offset="000000" />
@@ -716,7 +716,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ASHJ-JPN"/>
 		<info name="release" value="19950407"/>
-		<info name="alt_title" value="蒼き伝説シュート！"/>
+		<info name="alt_title" value="蒼き伝説シュート!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="aoki densetsu shoot! (japan).bin" size="262144" crc="08727760" sha1="95574e1eef5fbebde6f068091bc7298000ea2397" offset="000000" />
@@ -1656,7 +1656,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-NQJ"/>
 		<info name="release" value="19930716"/>
-		<info name="alt_title" value="びっくり熱血新記録！ どこでも金メダル"/>
+		<info name="alt_title" value="びっくり熱血新記録! どこでも金メダル"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="bikkuri nekketsu shinkiroku! - dokodemo kin medal (japan).bin" size="262144" crc="86d11d10" sha1="baecee2dfd915a41363fef736f81853822d5dfcd" offset="000000" />
@@ -2104,7 +2104,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="DMG-PUJ"/>
 		<info name="release" value="19900420"/>
-		<info name="alt_title" value="冒険！パズルロード"/>
+		<info name="alt_title" value="冒険!パズルロード"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="bouken! puzzle road (japan).bin" size="32768" crc="9f0f3606" sha1="16d54de69814e1c9aae67a59bb0dcd2a1216395b" offset="000000" />
@@ -2623,7 +2623,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="DMG-HHJ (CGB-03)"/>
 		<info name="release" value="19901221"/>
-		<info name="alt_title" value="カプコンクイズ ハテナ？の大冒険"/>
+		<info name="alt_title" value="カプコンクイズ ハテナ?の大冒険"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="capcom quiz - hatena no daibouken (japan).bin" size="262144" crc="8042afc5" sha1="168583ea18e02647f0b35f9bd0365e37bec076cc" offset="000000" />
@@ -2995,7 +2995,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-CMJ"/>
 		<info name="release" value="19901207"/>
-		<info name="alt_title" value="ちびまる子ちゃん おこづかい大作戦！"/>
+		<info name="alt_title" value="ちびまる子ちゃん おこづかい大作戦!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="chibi maruko-chan - okozukai daisakusen! (japan).bin" size="65536" crc="eab175ff" sha1="1b6838b9711ecbc6c09606da53d53309593103b2" offset="000000" />
@@ -3038,7 +3038,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-C4J"/>
 		<info name="release" value="19920807"/>
-		<info name="alt_title" value="ちびまる子ちゃん4 〜これが日本だよ！王子さま〜"/>
+		<info name="alt_title" value="ちびまる子ちゃん4 〜これが日本だよ!王子さま〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="chibi maruko-chan 4 - kore ga nihon dayo! ouji-sama (japan).bin" size="131072" crc="e55138be" sha1="a4b268924e2fb500b8b13461a9cb20aec648a52f" offset="000000" />
@@ -4003,7 +4003,7 @@
 		<publisher>Epoch</publisher>
 		<info name="serial" value="DMG-DEJ"/>
 		<info name="release" value="19910301"/>
-		<info name="alt_title" value="ドラえもん 対決ひみつ道具！！"/>
+		<info name="alt_title" value="ドラえもん 対決ひみつ道具!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="doraemon (japan).bin" size="131072" crc="a42524a3" sha1="5e89e34a2cec89e0aba4e12d18d96671151730ec" offset="000000" />
@@ -5412,7 +5412,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-PSJ"/>
 		<info name="release" value="19901109"/>
-		<info name="alt_title" value="不思議なブロビー 〜プリンセス・ブロブを救え！〜"/>
+		<info name="alt_title" value="不思議なブロビー 〜プリンセス・ブロブを救え!〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="fushigi na blobby - princess blob o sukue! (japan).bin" size="65536" crc="3d0bac10" sha1="fcd6ac8a0ad6eb1f5d9e00c877747521541204de" offset="000000" />
@@ -5442,7 +5442,7 @@
 		<publisher>Namco</publisher>
 		<info name="serial" value="DMG-AGCJ-JPN"/>
 		<info name="release" value="19950714"/>
-		<info name="alt_title" value="ギャラガ＆ギャラクシアン"/>
+		<info name="alt_title" value="ギャラガ&amp;ギャラクシアン"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="galaga &amp; galaxian (japan).bin" size="131072" crc="532036d5" sha1="2d67a97b4737b24ea0eff7a7c798b7d77e6a0724" offset="000000" />
@@ -5604,7 +5604,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ATAJ-JPN"/>
 		<info name="release" value="19970627"/>
-		<info name="alt_title" value="ゲームで発見！！たまごっち"/>
+		<info name="alt_title" value="ゲームで発見!!たまごっち"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="game de hakken!! tamagotchi (japan).bin" size="524288" crc="efc0f266" sha1="5aea023fd373643e55c7276b79a2d042302c3329" offset="000000" />
@@ -5619,7 +5619,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AOMJ-JPN"/>
 		<info name="release" value="19980115"/>
-		<info name="alt_title" value="ゲームで発見！！たまごっち オスっちとメスっち"/>
+		<info name="alt_title" value="ゲームで発見!!たまごっち オスっちとメスっち"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="game de hakken!! tamagotchi - osutchi to mesutchi (japan).bin" size="524288" crc="9694d69d" sha1="e61f7faad888e5a1c56ffe66fa3c0330b5ee459b" offset="000000" />
@@ -5634,7 +5634,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AT3J-JPN"/>
 		<info name="release" value="19971017"/>
-		<info name="alt_title" value="ゲームで発見！！たまごっち2"/>
+		<info name="alt_title" value="ゲームで発見!!たまごっち2"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="game de hakken!! tamagotchi 2 (japan).bin" size="524288" crc="19889c43" sha1="ade11f43f6957c75cde8575e7cba11de9e53e0ea" offset="000000" />
@@ -5704,7 +5704,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="DMG-YMJ (IG-05)"/>
 		<info name="release" value="19910711"/>
-		<info name="alt_title" value="元祖！！ヤンチャ丸"/>
+		<info name="alt_title" value="元祖!!ヤンチャ丸"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="ganso!! yancha maru (japan).bin" size="65536" crc="004443e6" sha1="76be351eac00749553c942b6f8002e65d8a35986" offset="000000" />
@@ -5797,7 +5797,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-R9J"/>
 		<info name="release" value="19940422"/>
-		<info name="alt_title" value="GB原人ランド ビバ！ちっくん王国"/>
+		<info name="alt_title" value="GB原人ランド ビバ!ちっくん王国"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gb genjin land - viva! chikkun oukoku (japan).bin" size="262144" crc="b08bb116" sha1="6c7b6268e28281ae06fb621bf3cbbcbadc8e30e8" offset="000000" />
@@ -5811,7 +5811,7 @@
 		<publisher>Sammy</publisher>
 		<info name="serial" value="DMG-IPJ"/>
 		<info name="release" value="19940729"/>
-		<info name="alt_title" value="GBパチスロ必勝法！Jr."/>
+		<info name="alt_title" value="GBパチスロ必勝法!Jr."/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="gb pachi-slot hisshouhou! jr (japan).bin" size="131072" crc="a2e210e9" sha1="7636799f5a57d22cf579bb687be5bb9fedddd0ca" offset="000000" />
@@ -5850,7 +5850,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-AKTJ-JPN"/>
 		<info name="release" value="19961213"/>
-		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪創造主現る！"/>
+		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪創造主現る!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gegege no kitarou - youkai souzoushu arawaru! (japan).bin" size="262144" crc="28e507b0" sha1="fa52c8f0bb31e25be829c7d4f52a7f4db1d5ef5b" offset="000000" />
@@ -5988,7 +5988,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="DMG-GIJ"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="GIキング！ 三匹の予想屋"/>
+		<info name="alt_title" value="GIキング! 三匹の予想屋"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="gi king! - sanbiki no yosouya (japan).bin" size="65536" crc="150bc291" sha1="de6109b643a97e7a96e55a6becfd7e61dfdc915e" offset="000000" />
@@ -6002,7 +6002,7 @@
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="DMG-GGA"/>
 		<info name="release" value="19901214"/>
-		<info name="alt_title" value="カード＆パズル コレクション 銀河"/>
+		<info name="alt_title" value="カード&amp;パズル コレクション 銀河"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="ginga (japan) (en,ja).bin" size="65536" crc="87d0637b" sha1="14f4f14caee081dceadb9d31ae26fd8968c432ea" offset="000000" />
@@ -6044,7 +6044,7 @@
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AJHJ-JPN"/>
 		<info name="release" value="19980710"/>
-		<info name="alt_title" value="ゴー！ゴー！ ヒッチハイク"/>
+		<info name="alt_title" value="ゴー!ゴー! ヒッチハイク"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="go! go! hitchhike (japan).bin" size="524288" crc="845735de" sha1="6a35bc2967f25fda0626b7a00a2cacfec9c53278" offset="000000" />
@@ -6058,7 +6058,7 @@
 		<publisher>Copya Systems</publisher>
 		<info name="serial" value="DMG-GTA"/>
 		<info name="release" value="19901130"/>
-		<info name="alt_title" value="ゴー！ゴー！タンク"/>
+		<info name="alt_title" value="ゴー!ゴー!タンク"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="go! go! tank (japan).bin" size="65536" crc="30ae39b6" sha1="6a60d5b550355e634ba54d8bd83b51ca55d6874b" offset="000000" />
@@ -6876,7 +6876,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-PPJ"/>
 		<info name="release" value="19900112"/>
-		<info name="alt_title" value="ヒーロー集合！！ ピンボールパーティ"/>
+		<info name="alt_title" value="ヒーロー集合!! ピンボールパーティ"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="hero shuugou!! pinball party (japan).bin" size="65536" crc="740552ed" sha1="c4f0428455c6a4772c2db7bab0132dca169e22c7" offset="000000" />
@@ -7494,7 +7494,7 @@
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="DMG-BHJ"/>
 		<info name="release" value="19910517"/>
-		<info name="alt_title" value="一発逆転！ DX馬券王"/>
+		<info name="alt_title" value="一発逆転! DX馬券王"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="ippatsu gyakuten! dx bakenou (japan).bin" size="65536" crc="8f3e7f95" sha1="991efd117dcb30ddf111bb4f6e46bdda1c811417" offset="000000" />
@@ -7574,7 +7574,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ACAJ-JPN"/>
 		<info name="release" value="19980626"/>
-		<info name="alt_title" value="つでも！にゃんとワンダフル"/>
+		<info name="alt_title" value="つでも!にゃんとワンダフル"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="itsudemo! nyan to wonderful (japan).bin" size="262144" crc="1c4d3665" sha1="a48d6b68d82b98e775c00366da544402d7c7ac0e" offset="000000" />
@@ -8185,7 +8185,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="DMG-R6J"/>
 		<info name="release" value="19930820"/>
-		<info name="alt_title" value="仮面ライダーSD 走れ！マイティライダーズ"/>
+		<info name="alt_title" value="仮面ライダーSD 走れ!マイティライダーズ"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="kamen rider sd - hashire! mighty riders (japan).bin" size="131072" crc="71c804b3" sha1="03269715c9398659fa685830a6359caa3ffa3bbf" offset="000000" />
@@ -8481,7 +8481,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="DMG-KTJ"/>
 		<info name="release" value="19911214"/>
-		<info name="alt_title" value="きんぎょ注意報！ わぴこのわくわくスタンプラリー！"/>
+		<info name="alt_title" value="きんぎょ注意報! わぴこのわくわくスタンプラリー!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="kingyo chuuihou! - wapiko no wakuwaku stamp rally! (japan).bin" size="131072" crc="e69a6f0a" sha1="baf5c1019c9a3752543036dca0925d370aa20d45" offset="000000" />
@@ -8495,7 +8495,7 @@
 		<publisher>B-AI</publisher>
 		<info name="serial" value="DMG-KJJ"/>
 		<info name="release" value="19921127"/>
-		<info name="alt_title" value="きんぎょ注意報！2 ぎょぴちゃんをさがせ！"/>
+		<info name="alt_title" value="きんぎょ注意報!2 ぎょぴちゃんをさがせ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="kingyo chuuihou! 2 - gyopi-chan o sagase! (japan).bin" size="131072" crc="f3ccadc3" sha1="0674abafb9de841d658d249d06a499c14484f72c" offset="000000" />
@@ -8673,7 +8673,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="DMG-QGJ (IG-09)"/>
 		<info name="release" value="19921218"/>
-		<info name="alt_title" value="木づちだクイズだ源さんだ！"/>
+		<info name="alt_title" value="木づちだクイズだ源さんだ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kizuchida quiz da gen-san da! (japan).bin" size="262144" crc="74a52399" sha1="0729da81a62a1c30e34f5c3157de16fc014c52fe" offset="000000" />
@@ -8769,7 +8769,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AJJJ-JPN (RK141-J1)"/>
 		<info name="release" value="19971211"/>
-		<info name="alt_title" value="コナミGBコレクションVol.2 ツインビーだ！！, がんばれゴエモン, モトクロスマニアックス, ガッタンゴットン"/>
+		<info name="alt_title" value="コナミGBコレクションVol.2 ツインビーだ!!, がんばれゴエモン, モトクロスマニアックス, ガッタンゴットン"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="konami gb collection vol.2 (japan).bin" size="524288" crc="c3b318cd" sha1="5753310cb9fbe44efc2b27ce488cd069ef243199" offset="000000" />
@@ -8799,7 +8799,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AJLJ-JPN (RK143-J1)"/>
 		<info name="release" value="19980319"/>
-		<info name="alt_title" value="コナミGBコレクションVol.4 パロディウスだ！, クォース, コナミックスポーツ, フロッガー"/>
+		<info name="alt_title" value="コナミGBコレクションVol.4 パロディウスだ!, クォース, コナミックスポーツ, フロッガー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="konami gb collection vol.4 (japan).bin" size="524288" crc="3a43ea33" sha1="c33ba418386b34b466b5dd28159ea76ca2db12f8" offset="000000" />
@@ -8967,7 +8967,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-AKPJ-JPN"/>
 		<info name="release" value="19960322"/>
-		<info name="alt_title" value="クマのプー太郎 宝さがしだ大入りゲームバトル！"/>
+		<info name="alt_title" value="クマのプー太郎 宝さがしだ大入りゲームバトル!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kuma no puutarou - takara sagashi da ooiri game battle! (japan).bin" size="262144" crc="f01d0b87" sha1="b986ce8e1a6a4a1b22e0db5bf03b8b028cce9057" offset="000000" />
@@ -8993,7 +8993,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-JXJ"/>
 		<info name="release" value="19931222"/>
-		<info name="alt_title" value="ダウンタウンスペシャル くにおくんの時代劇だよ全員集合！"/>
+		<info name="alt_title" value="ダウンタウンスペシャル くにおくんの時代劇だよ全員集合!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kunio-kun no jidaigeki dayo zenin shuugou! (japan).bin" size="262144" crc="229e9113" sha1="97ff2392f126b195ac8a1700a9a91aa364549dfd" offset="000000" />
@@ -9096,7 +9096,7 @@
 		<publisher>Quest</publisher>
 		<info name="serial" value="DMG-LGJ"/>
 		<info name="release" value="19910531"/>
-		<info name="alt_title" value="レジェンド —明日への翼—"/>
+		<info name="alt_title" value="レジェンド -明日への翼-"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="legend - asu e no tsubasa (japan).bin" size="131072" crc="fc20ebf0" sha1="7447b3faa1d15e80815cdace3c6c0691bc28aa90" offset="000000" />
@@ -9655,7 +9655,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-MFJ"/>
 		<info name="release" value="19920710"/>
-		<info name="alt_title" value="まじかる☆タルるートくん2 ライバーゾーンパニック！！"/>
+		<info name="alt_title" value="まじかる☆タルるートくん2 ライバーゾーンパニック!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="magical taruruuto-kun 2 - raibaa zone panic!! (japan).bin" size="131072" crc="0aad5217" sha1="3be6c6b8cec80a0fe0f6edbbe40496f4d077c750" offset="000000" />
@@ -10600,7 +10600,7 @@
 		<publisher>ASCII</publisher>
 		<info name="serial" value="DMG-AM4J-JPN"/>
 		<info name="release" value="19970523"/>
-		<info name="alt_title" value="ミニ四駆GB レッツ＆ゴー"/>
+		<info name="alt_title" value="ミニ四駆GB レッツ&amp;ゴー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="miniyonku gb let's &amp; go!! (japan).bin" size="524288" crc="fc0c180b" sha1="a51dc3ea1961297a3056e0326c8a153f496dae8a" offset="000000" />
@@ -10670,7 +10670,7 @@
 		<publisher>Athena</publisher>
 		<info name="serial" value="DMG-EPJ"/>
 		<info name="release" value="19940415"/>
-		<info name="alt_title" value="もぐらでポン！"/>
+		<info name="alt_title" value="もぐらでポン!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="mogura de pon! (japan).bin" size="32768" crc="e1e3629f" sha1="3c6586f3d591cee7415ed76d92355a27ad42e1e3" offset="000000" />
@@ -11025,7 +11025,7 @@
 		<publisher>Starfish</publisher>
 		<info name="serial" value="DMG-AK2J-JPN"/>
 		<info name="release" value="19980910"/>
-		<info name="alt_title" value="モータルコンバット＆モータルコンバットII"/>
+		<info name="alt_title" value="モータルコンバット&amp;モータルコンバットII"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mortal kombat i &amp; ii (japan).bin" size="1048576" crc="b1a8dfd0" sha1="cf6ca53e1df526c73bab62743085257119865107" offset="000000" />
@@ -11652,7 +11652,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-NDJ"/>
 		<info name="release" value="19911108"/>
-		<info name="alt_title" value="熱血高校ドッジボール部 〜強敵！闘球戦士の巻〜"/>
+		<info name="alt_title" value="熱血高校ドッジボール部 〜強敵!闘球戦士の巻〜"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="nekketsu koukou dodge ball-bu (japan).bin" size="131072" crc="7eaf671a" sha1="4ad83d6edc948cae10221b7aaf8fd8b999d4b489" offset="000000" />
@@ -11681,7 +11681,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-VXJ"/>
 		<info name="release" value="19940729"/>
-		<info name="alt_title" value="熱血！ビーチバレーだよ くにおくん"/>
+		<info name="alt_title" value="熱血!ビーチバレーだよ くにおくん"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="nekketsu! beach volley dayo kunio-kun (japan).bin" size="262144" crc="abfb84df" sha1="d3ad43c40c21d9825b4879dbf28ca58835da658a" offset="000000" />
@@ -11775,7 +11775,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-X3J"/>
 		<info name="release" value="19940729"/>
-		<info name="alt_title" value="熱闘 餓狼伝説2 —あらたなるたたかい—"/>
+		<info name="alt_title" value="熱闘 餓狼伝説2 -あらたなるたたかい-"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="nettou garou densetsu 2 (japan).bin" size="524288" crc="aa98687f" sha1="74b1e1b53235eb356ae1ef4bce940873a96bd076" offset="000000" />
@@ -12342,7 +12342,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-OJJ"/>
 		<info name="release" value="19900928"/>
-		<info name="alt_title" value="おいらじゃじゃ丸！ 世界大冒険"/>
+		<info name="alt_title" value="おいらじゃじゃ丸! 世界大冒険"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="oira jajamaru! sekai daibouken (japan).bin" size="131072" crc="2d08d27f" sha1="5e13eeb635b41589689fc1b495ee077125b7e8c1" offset="000000" />
@@ -12452,7 +12452,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-PNJ"/>
 		<info name="release" value="19900808"/>
-		<info name="alt_title" value="おさわがせ！ペンギンBOY"/>
+		<info name="alt_title" value="おさわがせ!ペンギンBOY"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="osawagase! penguin boy (japan).bin" size="65536" crc="54913227" sha1="1cdcf9810e98ba04378b2d6b555654722cb0acf6" offset="000000" />
@@ -13015,7 +13015,7 @@
 		<publisher>Epoch</publisher>
 		<info name="serial" value="DMG-KBJ"/>
 		<info name="release" value="19920502"/>
-		<info name="alt_title" value="パネルの忍者ケサマル —サラ姫お助け申す！の巻—"/>
+		<info name="alt_title" value="パネルの忍者ケサマル -サラ姫お助け申す!の巻-"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="panel no ninja kesamaru (japan).bin" size="65536" crc="12caa1ca" sha1="67f8dea045bc2d01c00936a66cd4b56b10fa0f39" offset="000000" />
@@ -13103,7 +13103,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-PVJ"/>
 		<info name="release" value="19910405"/>
-		<info name="alt_title" value="パロディウスだ！"/>
+		<info name="alt_title" value="パロディウスだ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="parodius da! (japan).bin" size="262144" crc="1791e952" sha1="cfe0c6619a28ddd535214c8f8c446081c0ed8194" offset="000000" />
@@ -14018,7 +14018,7 @@
 		<publisher>Toho</publisher>
 		<info name="serial" value="DMG-N7J"/>
 		<info name="release" value="19940805"/>
-		<info name="alt_title" value="ポコニャン！ 夢の大冒険"/>
+		<info name="alt_title" value="ポコニャン! 夢の大冒険"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="pokonyan! - yume no daibouken (japan).bin" size="262144" crc="61c34232" sha1="c5706e26f1cc591cd1fe762ace097df868703480" offset="000000" />
@@ -14690,7 +14690,7 @@
 		<publisher>Athena</publisher>
 		<info name="serial" value="DMG-AJJ"/>
 		<info name="release" value="19921218"/>
-		<info name="alt_title" value="クイズ日本昔話 アテナのハテナ？"/>
+		<info name="alt_title" value="クイズ日本昔話 アテナのハテナ?"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="quiz nihon mukashibanashi - athena no hatena (japan).bin" size="262144" crc="471c237b" sha1="c91507aa0e17580e8cf8f1901f328432c12ce2dd" offset="000000" />
@@ -14704,7 +14704,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="DMG-QSJ"/>
 		<info name="release" value="19920807"/>
-		<info name="alt_title" value="クイズ世界は SHOW by ショーバイ！！"/>
+		<info name="alt_title" value="クイズ世界は SHOW by ショーバイ!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="quiz sekai wa show by shoubai!! (japan).bin" size="262144" crc="d8c33dcd" sha1="5e0004d7c87e49b3ed9e72cb292a967faad6ea6c" offset="000000" />
@@ -14898,7 +14898,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-ROJ"/>
 		<info name="release" value="19930806"/>
-		<info name="alt_title" value="らんま1/2 格劇問答！！"/>
+		<info name="alt_title" value="らんま1/2 格劇問答!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ranma 1-2 - kakugeki mondou!! (japan).bin" size="262144" crc="613e657a" sha1="57fd028fd44d6096967a3c80afd9e17c38c2513e" offset="000000" />
@@ -14982,7 +14982,7 @@
 		<publisher>Altron</publisher>
 		<info name="serial" value="DMG-HFA"/>
 		<info name="release" value="19920428"/>
-		<info name="alt_title" value="レッド・オクトーバーを追え！"/>
+		<info name="alt_title" value="レッド・オクトーバーを追え!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="red october o oe! (japan).bin" size="131072" crc="c2e7be35" sha1="48d5f02a126c32423569065f31d2c5695e39fd2f" offset="000000" />
@@ -15297,7 +15297,7 @@
 		<publisher>Hori</publisher>
 		<info name="serial" value="DMG-HOJ"/>
 		<info name="release" value="19940701"/>
-		<info name="alt_title" value="ろっくん！もんすたぁ！！"/>
+		<info name="alt_title" value="ろっくん!もんすたぁ!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="rock'n! monster!! (japan).bin" size="524288" crc="630299c1" sha1="338070ed1ced15eaca02198ab32b9e82a92f77ee" offset="000000" />
@@ -15588,7 +15588,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="DMG-OMJ"/>
 		<info name="release" value="19900804"/>
-		<info name="alt_title" value="魁！！男塾 冥凰島決戦"/>
+		<info name="alt_title" value="魁!!男塾 冥凰島決戦"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sakigake!! otoko juku - meioutou kessen (japan).bin" size="131072" crc="2f0f7f63" sha1="c731f8be269d74748ae54fe5ce5faea89a825e0f" offset="000000" />
@@ -15889,7 +15889,7 @@
 		<publisher>Square</publisher>
 		<info name="serial" value="DMG-FFJ"/>
 		<info name="release" value="19910628"/>
-		<info name="alt_title" value="聖剣伝説 —ファイナルファンタジー外伝—"/>
+		<info name="alt_title" value="聖剣伝説 -ファイナルファンタジー外伝-"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="seiken densetsu (japan).bin" size="262144" crc="d771c1b6" sha1="998a5e6df52dff24ae686e287eed06f125940194" offset="000000" />
@@ -15918,7 +15918,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ASLJ-JPN"/>
 		<info name="release" value="19980501"/>
-		<info name="alt_title" value="セレクション1&amp;2 選ばれし者＆暗黒の封印"/>
+		<info name="alt_title" value="セレクション1&amp;2 選ばれし者&amp;暗黒の封印"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="selection i &amp; ii (japan).bin" size="524288" crc="a6027919" sha1="58c0c524b07018beb2d9178de53fe2f6cbb6670f" offset="000000" />
@@ -16162,7 +16162,7 @@
 		<publisher>Vap</publisher>
 		<info name="serial" value="DMG-TGJ"/>
 		<info name="release" value="19920124"/>
-		<info name="alt_title" value="しっぽでブン！"/>
+		<info name="alt_title" value="しっぽでブン!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="shippo de bun (japan).bin" size="65536" crc="56410442" sha1="71e605d62c80bd2905a5ed3ce6cc1590638f2f2f" offset="000000" />
@@ -16176,7 +16176,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-IRJ"/>
 		<info name="release" value="19940311"/>
-		<info name="alt_title" value="疾風！アイアンリーガー"/>
+		<info name="alt_title" value="疾風!アイアンリーガー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="shippuu! iron leaguer (japan).bin" size="131072" crc="8e3c7e15" sha1="2555e4b9426ff90efd431d46be5371d3e0a6dabf" offset="000000" />
@@ -16672,7 +16672,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-G6J"/>
 		<info name="release" value="19940429"/>
-		<info name="alt_title" value="それゆけ！スピーディーゴンザレス"/>
+		<info name="alt_title" value="それゆけ!スピーディーゴンザレス"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="soreyuke! speedy gonzales (japan).bin" size="262144" crc="b2e6a1c5" sha1="306b85bec28fa6e4a47f9ccaa5384afd8547c7ea" offset="000000" />
@@ -16686,7 +16686,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ABJJ-JPN"/>
 		<info name="release" value="19970718"/>
-		<info name="alt_title" value="それゆけ！！キッド"/>
+		<info name="alt_title" value="それゆけ!!キッド"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="soreyuke!! kid (japan).bin" size="131072" crc="2a4a2d2b" sha1="b3b46d61c49a22145ce57b881d355b86d5c5ecc1" offset="000000" />
@@ -17557,7 +17557,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-CHJ"/>
 		<info name="release" value="19911129"/>
-		<info name="alt_title" value="スーパーチャイニーズランド2 —宇宙大冒険—"/>
+		<info name="alt_title" value="スーパーチャイニーズランド2 -宇宙大冒険-"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="super chinese land 2 (japan).bin" size="262144" crc="88508483" sha1="7f355e4a02fbefa3f539fa95f089c8a48508a937" offset="000000" />
@@ -18089,7 +18089,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="DMG-HVJ"/>
 		<info name="release" value="19940527"/>
-		<info name="alt_title" value="太陽の天使マーロー お花畑は大パニック！"/>
+		<info name="alt_title" value="太陽の天使マーロー お花畑は大パニック!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="taiyou no tenshi marlowe - ohanabatake wa dai-panic (japan).bin" size="262144" crc="1132c6bb" sha1="3b9f13100a797623d1700ccfeff0b31da52f5dc3" offset="000000" />
@@ -18428,7 +18428,7 @@
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="DMG-ASJ"/>
 		<info name="release" value="19891227"/>
-		<info name="alt_title" value="てけてけ！アスミッくんワールド"/>
+		<info name="alt_title" value="てけてけ!アスミッくんワールド"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="teke! teke! asmik-kun world (japan).bin" size="65536" crc="a817450d" sha1="389cc31472b87ec70e3ea6487f8ad9198887bb89" offset="000000" />
@@ -18456,7 +18456,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-IBJ"/>
 		<info name="release" value="19930730"/>
-		<info name="alt_title" value="鉄球ファイト！ ザ・グレイトバトル外伝"/>
+		<info name="alt_title" value="鉄球ファイト! ザ・グレイトバトル外伝"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="tekkyu fight! - the great battle gaiden (japan).bin" size="131072" crc="b8da8eb5" sha1="06a6ab3ba59286772f915053cfcd6e1e873358b1" offset="000000" />
@@ -19020,7 +19020,7 @@
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="DMG-TPJ"/>
 		<info name="release" value="19910108"/>
-		<info name="alt_title" value="突撃！ポンコツタンク"/>
+		<info name="alt_title" value="突撃!ポンコツタンク"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="totsugeki! ponkotsu tank (japan).bin" size="131072" crc="9b5b7bff" sha1="2baabb0b3e846e31188388e43ef822a03c777ead" offset="000000" />
@@ -19035,7 +19035,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ALKJ-JPN"/>
 		<info name="release" value="19940922"/>
-		<info name="alt_title" value="とっても！ラッキーマン ラッキークッキーみんな大好きー！！"/>
+		<info name="alt_title" value="とっても!ラッキーマン ラッキークッキーみんな大好きー!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="tottemo! luckyman (japan).bin" size="262144" crc="8f9e28ad" sha1="25e5e07b4945145f2681f0c991583335826c4f82" offset="000000" />
@@ -19433,7 +19433,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-TDJ"/>
 		<info name="release" value="19901012"/>
-		<info name="alt_title" value="ツインビーだ！！"/>
+		<info name="alt_title" value="ツインビーだ!!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="twinbee da!! (japan).bin" size="131072" crc="017fd6f5" sha1="8f1c54d2116118ba085b384a01ea0c410ad2deac" offset="000000" />
@@ -19582,7 +19582,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DMG-ULJ"/>
 		<info name="release" value="19900526"/>
-		<info name="alt_title" value="ウルトラマン倶楽部 敵怪獣ヲ発見セヨ！"/>
+		<info name="alt_title" value="ウルトラマン倶楽部 敵怪獣ヲ発見セヨ!"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="ultraman club - tekikaijuu o hakken seyo! (japan).bin" size="65536" crc="91eda860" sha1="298b912dd8cddc078b60b75718eca25870142a18" offset="000000" />
@@ -19693,7 +19693,7 @@
 		<publisher>Yanoman</publisher>
 		<info name="serial" value="DMG-UYJ"/>
 		<info name="release" value="19920703"/>
-		<info name="alt_title" value="うる星やつら −ミス友引を捜せ！−"/>
+		<info name="alt_title" value="うる星やつら −ミス友引を捜せ!−"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="urusei yatsura - miss tomobiki o saguse! (japan).bin" size="262144" crc="56800c6b" sha1="f7ac15b9b38027ae473120748e9686c985a40e87" offset="000000" />

@@ -183,7 +183,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-GGB"/>
 		<info name="release" value="19890623"/>
-		<info name="alt_title" value="ビッグチャレンジ！ゴー！ゴー！ボーリング"/>
+		<info name="alt_title" value="ビッグチャレンジ!ゴー!ゴー!ボーリング"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="big challenge! go! go! bowling (japan).fds" size="131000" crc="a1ce4038" sha1="c0c93462e460423ba85a7eda9638bacaaf7a62fb" offset="0" />
@@ -197,7 +197,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-GNF"/>
 		<info name="release" value="19890328"/>
-		<info name="alt_title" value="ビッグチャレンジ！ガンファイター"/>
+		<info name="alt_title" value="ビッグチャレンジ!ガンファイター"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="big challenge! gun fighter (japan).fds" size="131000" crc="d9836fb3" sha1="63b51007f60be5e789127a9e4a4505c1de3e64b3" offset="0" />
@@ -212,7 +212,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-CJS"/>
 		<info name="release" value="19880810"/>
-		<info name="alt_title" value="ビッグチャレンジ！ 柔道選手権"/>
+		<info name="alt_title" value="ビッグチャレンジ! 柔道選手権"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="big challenge! juudou senshuken (japan).fds" size="131000" crc="16c8cdd5" sha1="9293c072d53f1c52175627a1848afc8613713fbf" offset="0" />
@@ -1412,7 +1412,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Konami</publisher>
 		<info name="serial" value="KDS-TIN"/>
 		<info name="release" value="19861121"/>
-		<info name="alt_title" value="もえろツインビー シナモン博士を救え！"/>
+		<info name="alt_title" value="もえろツインビー シナモン博士を救え!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="moero twinbee - cinnamon hakase wo sukue! (japan).fds" size="131000" crc="13205221" sha1="75e31801df1f10d6e4e14c43e90b99367ed18ebf" offset="0" />
@@ -1538,7 +1538,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSD-NSP"/>
 		<info name="release" value="19871218"/>
-		<info name="alt_title" value="謎のマガジンディスク ナゾラーランド ナゾラーランド スペシャル！！ 「クイズ王を探せ！」"/>
+		<info name="alt_title" value="謎のマガジンディスク ナゾラーランド ナゾラーランド スペシャル!! 「クイズ王を探せ!」"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="nazoraa land zoukan gou - quiz ou wo sagase! (japan) (nazo magazine disk) [b].fds" size="131000" crc="f449fc6c" sha1="03156138d89492f269f1f9cacd8f52f01d93c2b3" status="baddump" offset="0" />
@@ -1580,7 +1580,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-PTL"/>
 		<info name="release" value="19890124"/>
-		<info name="alt_title" value="機動警察パトレイバー 第2小隊出動せよ！"/>
+		<info name="alt_title" value="機動警察パトレイバー 第2小隊出動せよ!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="patlabor the mobile police - dai 2 shoutai shutsudou seyo! (japan) [b].fds" size="131000" crc="1eb0ce56" sha1="5db5e943132d74515fe1dbc51f7df10c91b7808c" status="baddump" offset="0" />
@@ -1959,7 +1959,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-TT1, FMC-TT2"/>
 		<info name="release" value="19910726"/>
-		<info name="alt_title" value="タイムツイスト 歴史のかたすみで… (前編 &amp; 後編)"/>
+		<info name="alt_title" value="タイムツイスト 歴史のかたすみで... (前編 &amp; 後編)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="time twist - rekishi no katasumi de (japan).fds" size="262000" crc="e88e2399" sha1="ff01d150d86ba00b2e96197d682f0d715a374ee5" offset="0" />
@@ -2001,7 +2001,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-UL2"/>
 		<info name="release" value="19871218"/>
-		<info name="alt_title" value="ウルトラマン2 出撃科特隊！！"/>
+		<info name="alt_title" value="ウルトラマン2 出撃科特隊!!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="ultraman 2 - shutsugeki katoku tai (japan).fds" size="131000" crc="8f7f0352" sha1="6d1b890d3ae55541c7cef6bf1df31a39fbb398b0" offset="0" />
@@ -2426,7 +2426,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-DFS"/>
 		<info name="release" value="19881021"/>
-		<info name="alt_title" value="ビッグチャレンジ！ドッグファイト スピリット"/>
+		<info name="alt_title" value="ビッグチャレンジ!ドッグファイト スピリット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="big challenge! dogfight spirit (1988)(jaleco)[jfd-dfs].fds" size="131000" crc="4c4440bb" sha1="ea3bbfb7007b47ba89ac2f57ed96806bba874c8f" offset="0" />
@@ -3352,7 +3352,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Pack-In Video</publisher>
 		<info name="serial" value="PAC-KTD"/>
 		<info name="release" value="19891020"/>
-		<info name="alt_title" value="かっとび！童児"/>
+		<info name="alt_title" value="かっとび!童児"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="kattobi! warabe ko (1989)(pack-in-video)[pac-ktd].fds" size="131000" crc="477c9410" sha1="e93fff62ce47eb9e5c36de5bbcb0d8671ffd4be4" offset="0" />
@@ -3690,7 +3690,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-GRK"/>
 		<info name="release" value="19880729"/>
-		<info name="alt_title" value="らじかるぼんばー！！ 地雷くん"/>
+		<info name="alt_title" value="らじかるぼんばー!! 地雷くん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="radical bomber!! jirai kun (1988)(jaleco)[jfd-grk].fds" size="131000" crc="e9b2edc9" sha1="9979ac4dc613ed5f67973542b1d5ea996e1c47c1" offset="0" />
@@ -3872,7 +3872,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-UTM"/>
 		<info name="release" value="19890223"/>
-		<info name="alt_title" value="タマ＆フレンズ 3丁目大冒険"/>
+		<info name="alt_title" value="タマ&amp;フレンズ 3丁目大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="tama &amp; friends - 3 choume dai bouken (1989)(bandai).fds" size="131000" crc="fcf52fb7" sha1="93b83f58a1202df85b4ad9255b5d529a24cf5875" offset="0" />
@@ -3886,7 +3886,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-UTM"/>
 		<info name="release" value="19890223"/>
-		<info name="alt_title" value="タマ＆フレンズ 3丁目大冒険"/>
+		<info name="alt_title" value="タマ&amp;フレンズ 3丁目大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="tama &amp; friends - 3 choume dai bouken (1989)(bandai)[a].fds" size="131000" crc="e8bc04a2" sha1="63ed0e4bb01aa97dbc8a18e9263760f617f7f0a1" offset="0" />

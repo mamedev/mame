@@ -971,7 +971,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<description>Space Squadron</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
-		<info name="alt_title" value="Escadrille de L'Espace, L’Escadron de L’Espace" />
+		<info name="alt_title" value="Escadrille de L'Espace, L'Escadron de L'Espace" />
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="spcesqdn.bin" size="4096" crc="caa5f449" sha1="e76efb5f2707f67775d09d2d1547a4af0254b7b1" offset="0000" />

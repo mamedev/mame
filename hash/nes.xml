@@ -37,7 +37,7 @@
 		<publisher>Jingukan</publisher>
 		<info name="serial" value="IPC-J1-01"/>
 		<info name="release" value="19881210"/>
-		<info name="alt_title" value="神宮館’８９電脳九星占い"/>
+		<info name="alt_title" value="神宮館'89電脳九星占い"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -56,7 +56,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-02"/>
 		<info name="release" value="19850830"/>
-		<info name="alt_title" value="１０ヤードファイト"/>
+		<info name="alt_title" value="10ヤードファイト"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-NROM-128" />
 			<feature name="mirroring" value="horizontal" />
@@ -76,7 +76,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-02"/>
 		<info name="release" value="19850830"/>
-		<info name="alt_title" value="１０ヤードファイト"/>
+		<info name="alt_title" value="10ヤードファイト"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-NROM-128" />
 			<feature name="mirroring" value="horizontal" />
@@ -173,7 +173,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="STE-20"/>
 		<info name="release" value="19900808"/>
-		<info name="alt_title" value="２０１０ストリートファイター"/>
+		<info name="alt_title" value="2010ストリートファイター"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -211,7 +211,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-FJ"/>
 		<info name="release" value="19841102"/>
-		<info name="alt_title" value="４人打ち麻雀"/>
+		<info name="alt_title" value="4人打ち麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -231,7 +231,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-FJ"/>
 		<info name="release" value="19841102"/>
-		<info name="alt_title" value="４人打ち麻雀"/>
+		<info name="alt_title" value="4人打ち麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -322,7 +322,7 @@
 		<publisher>Sammy</publisher>
 		<info name="serial" value="SAC-YA"/>
 		<info name="release" value="19921225"/>
-		<info name="alt_title" value="嗚呼！野球人生一直線"/>
+		<info name="alt_title" value="嗚呼!野球人生一直線"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TGROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -791,7 +791,7 @@
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-QL"/>
 		<info name="release" value="19901226"/>
-		<info name="alt_title" value="アドベンチャーズ オブ ロロ２"/>
+		<info name="alt_title" value="アドベンチャーズ オブ ロロ2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -1168,7 +1168,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-AKUMA"/>
 		<info name="release" value="19900224"/>
-		<info name="alt_title" value="悪魔くん　魔界の罠"/>
+		<info name="alt_title" value="悪魔くん 魔界の罠"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-FCG-2" />
 			<dataarea name="prg" size="131072">
@@ -1815,7 +1815,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-ANII-5900 (16)"/>
 		<info name="release" value="19880308"/>
-		<info name="alt_title" value="アルカノイドII リベンジ オブ ＤＯＨ"/>
+		<info name="alt_title" value="アルカノイドII リベンジ オブ DOH"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-74*161/161/32" />
 			<dataarea name="prg" size="65536">
@@ -2187,7 +2187,7 @@
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-BW"/>
 		<info name="release" value="19860603"/>
-		<info name="alt_title" value="Ｂ‐ワイング"/>
+		<info name="alt_title" value="B‐ワイング"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -2372,7 +2372,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-IA"/>
 		<info name="release" value="19901229"/>
-		<info name="alt_title" value="爆笑！愛の劇場"/>
+		<info name="alt_title" value="爆笑!愛の劇場"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -2391,7 +2391,7 @@
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PAC-8M"/>
 		<info name="release" value="19900914"/>
-		<info name="alt_title" value="爆笑！スターものまね四天王"/>
+		<info name="alt_title" value="爆笑!スターものまね四天王"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -2410,7 +2410,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-BZG-5900 (23)"/>
 		<info name="release" value="19890317"/>
-		<info name="alt_title" value="爆笑！！人生劇場"/>
+		<info name="alt_title" value="爆笑!!人生劇場"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-TC0190FMC" />
 			<dataarea name="prg" size="262144">
@@ -2428,7 +2428,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-BJ2-5900 (35)"/>
 		<info name="release" value="19910322"/>
-		<info name="alt_title" value="爆笑！！人生劇場２"/>
+		<info name="alt_title" value="爆笑!!人生劇場2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-TC0190FMC" /> <!-- also found with TAITO-X1-005 pcb -->
 			<dataarea name="prg" size="131072">
@@ -2446,7 +2446,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-BJIII-6400 (40)"/>
 		<info name="release" value="19911220"/>
-		<info name="alt_title" value="爆笑！人生劇場３"/>
+		<info name="alt_title" value="爆笑!人生劇場3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-TC0190FMC+PAL16R4" />
 			<dataarea name="prg" size="262144">
@@ -3224,7 +3224,7 @@
 		<publisher>Use</publisher>
 		<info name="serial" value="USE-BC"/>
 		<info name="release" value="19870722"/>
-		<info name="alt_title" value="バツ＆テリー 魔境の鉄人レース"/>
+		<info name="alt_title" value="バツ&amp;テリー 魔境の鉄人レース"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -3673,7 +3673,7 @@
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-36"/>
 		<info name="release" value="19901213"/>
-		<info name="alt_title" value="ベストプレープロ野球'９０"/>
+		<info name="alt_title" value="ベストプレープロ野球'90"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -3949,7 +3949,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="TJC-NK"/>
 		<info name="release" value="19920626"/>
-		<info name="alt_title" value="びっくり熱血新記録！はるかなる金メダル"/>
+		<info name="alt_title" value="びっくり熱血新記録! はるかなる金メダル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -3968,7 +3968,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-V3"/>
 		<info name="release" value="19900727"/>
-		<info name="alt_title" value="ビックリマンワールド　激闘聖戦士"/>
+		<info name="alt_title" value="ビックリマンワールド 激闘聖戦士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -4069,7 +4069,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-14"/>
 		<info name="release" value="19870922"/>
-		<info name="alt_title" value="バイオ戦士DAN　インクリーザーとの闘い"/>
+		<info name="alt_title" value="バイオ戦士DAN インクリーザーとの闘い"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-14" />
 			<feature name="mirroring" value="vertical" />
@@ -4349,7 +4349,7 @@
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-94"/>
 		<info name="release" value="19901019"/>
-		<info name="alt_title" value="ブラッディ ウォーリアーズ　シャンゴーの逆襲"/>
+		<info name="alt_title" value="ブラッディ ウォーリアーズ シャンゴーの逆襲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -5179,7 +5179,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-1N"/>
 		<info name="release" value="19920605"/>
-		<info name="alt_title" value="ＣＡＰＣＯＭバルセロナ’９２"/>
+		<info name="alt_title" value="CAPCOMバルセロナ'92"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -5278,7 +5278,7 @@
 		<publisher>CBS / Sony Group</publisher>
 		<info name="serial" value="CBS-ED"/>
 		<info name="release" value="19890825"/>
-		<info name="alt_title" value="キャプテン ＥＤえど"/>
+		<info name="alt_title" value="キャプテン EDえど"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -5422,7 +5422,7 @@
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="TCF-T6"/>
 		<info name="release" value="19900720"/>
-		<info name="alt_title" value="キャプテン翼Ⅱ　スーパーストライカー"/>
+		<info name="alt_title" value="キャプテン翼Ⅱ スーパーストライカー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -6213,7 +6213,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="TEC-MF"/>
 		<info name="release" value="19880617"/>
-		<info name="alt_title" value="超惑星戦記　メタファイト"/>
+		<info name="alt_title" value="超惑星戦記 メタファイト"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -6387,7 +6387,7 @@
 		<publisher>Toho</publisher>
 		<info name="serial" value="THF-TU"/>
 		<info name="release" value="19870314"/>
-		<info name="alt_title" value="タッチ　ミステリー・オブトライアングル"/>
+		<info name="alt_title" value="タッチ ミステリー・オブトライアングル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -6740,7 +6740,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC826"/>
 		<info name="release" value="19880209"/>
-		<info name="alt_title" value="コントラ　魂斗羅"/>
+		<info name="alt_title" value="コントラ 魂斗羅"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A1" />
@@ -7125,7 +7125,7 @@
 		<publisher>Tonkin House</publisher>
 		<info name="serial" value="TKS-G7"/>
 		<info name="release" value="19881217"/>
-		<info name="alt_title" value="サイクルレース ロードマン ～激走!! 日本一周４０００ｋｍ～"/>
+		<info name="alt_title" value="サイクルレース ロードマン ～激走!! 日本一周4000km～"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -7185,7 +7185,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-N9"/>
 		<info name="release" value="19911219"/>
-		<info name="alt_title" value="第２次スーパーロボット大戦"/>
+		<info name="alt_title" value="第2次スーパーロボット大戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -7637,7 +7637,7 @@
 		<publisher>Asmik</publisher>
 		<info name="serial" value="ASM-4D"/>
 		<info name="release" value="19900406"/>
-		<info name="alt_title" value="ディープダンジョンⅣ　黒の妖術師"/>
+		<info name="alt_title" value="ディープダンジョンⅣ 黒の妖術師"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -7732,7 +7732,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-DG"/>
 		<info name="release" value="19881122"/>
-		<info name="alt_title" value="ディジャブ　悪魔は本当にやって来た"/>
+		<info name="alt_title" value="ディジャブ 悪魔は本当にやって来た"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -8134,7 +8134,7 @@
 		<publisher>Vap</publisher>
 		<info name="serial" value="VAP-VO"/>
 		<info name="release" value="19910809"/>
-		<info name="alt_title" value="ドキ！ドキ！遊園地 クレイジーランド"/>
+		<info name="alt_title" value="ドキ!ドキ!遊園地 クレイジーランド"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -8195,7 +8195,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-DDII-5900 (41)"/>
 		<info name="release" value="19920131"/>
-		<info name="alt_title" value="ドンドコドン２"/>
+		<info name="alt_title" value="ドンドコドン2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-TC0190FMC+PAL16R4" />
 			<dataarea name="prg" size="131072">
@@ -8291,7 +8291,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-DT, NES-DT-USA, NES-DT-GBR"/>
 		<info name="release" value="19840704 (JPN), 198606xx (USA), 1987? (EUR)"/>
-		<info name="alt_title" value="ドンキーコング３"/>
+		<info name="alt_title" value="ドンキーコング3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SROM" /> <!-- also found with HVC-NROM-128, NES-NROM-128 pcb -->
 			<feature name="mirroring" value="vertical" />
@@ -8329,7 +8329,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-JR, NES-JR-USA, NES-JR-EEC"/>
 		<info name="release" value="19830715 (JPN), 198606xx (USA), 19870615? (Eur)"/>
-		<info name="alt_title" value="ドンキーコングＪｒ"/>
+		<info name="alt_title" value="ドンキーコングJr"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-HROM" /> <!-- also found with HVC-NROM-128, HVC-RROM, NES-NROM-128 pcb -->
 			<feature name="mirroring" value="vertical" />
@@ -8349,7 +8349,7 @@
 		<publisher>Sharp</publisher>
 		<info name="serial" value="HVC-SL"/>
 		<info name="release" value="1983"/>
-		<info name="alt_title" value="ドンキーコングＪＲ ／ ＪＲの算数レッスン"/>
+		<info name="alt_title" value="ドンキーコングJR / JRの算数レッスン"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
 			<feature name="mirroring" value="horizontal" />
@@ -8388,7 +8388,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-CA"/>
 		<info name="release" value="19831212"/>
-		<info name="alt_title" value="ドンキーコングＪｒの算数遊び"/>
+		<info name="alt_title" value="ドンキーコングJrの算数遊び"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -8466,7 +8466,7 @@
 		<publisher>Epoch</publisher>
 		<info name="serial" value="EPO-E5"/>
 		<info name="release" value="19900914"/>
-		<info name="alt_title" value="ドラえもん　ギガゾンビの逆襲"/>
+		<info name="alt_title" value="ドラえもん ギガゾンビの逆襲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -8822,7 +8822,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="TJC-J6"/>
 		<info name="release" value="19910726"/>
-		<info name="alt_title" value="ダウンタウンスペシャル くにおくんの時代劇だよ全員集合！"/>
+		<info name="alt_title" value="ダウンタウンスペシャル くにおくんの時代劇だよ全員集合!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -8972,7 +8972,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DB3"/>
 		<info name="release" value="19891027"/>
-		<info name="alt_title" value="ドラゴンボール３　悟空伝"/>
+		<info name="alt_title" value="ドラゴンボール3 悟空伝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-FCG-2" />
 			<dataarea name="prg" size="131072">
@@ -9008,7 +9008,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DBZ2"/>
 		<info name="release" value="19910810"/>
-		<info name="alt_title" value="ドラゴンボールＺII　激神フリーザ！！"/>
+		<info name="alt_title" value="ドラゴンボールZII 激神フリーザ!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
@@ -9026,7 +9026,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DBZ2"/>
 		<info name="release" value="19910810"/>
-		<info name="alt_title" value="ドラゴンボールＺII　激神フリーザ！！"/>
+		<info name="alt_title" value="ドラゴンボールZII 激神フリーザ!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
@@ -9044,7 +9044,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DBZ3"/>
 		<info name="release" value="19920807"/>
-		<info name="alt_title" value="ドラゴンボールＺIII 烈戦人造人間"/>
+		<info name="alt_title" value="ドラゴンボールZIII 烈戦人造人間"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
@@ -9062,7 +9062,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DBZ"/>
 		<info name="release" value="19901027"/>
-		<info name="alt_title" value="ドラゴンボールＺ 強襲！サイヤ人"/>
+		<info name="alt_title" value="ドラゴンボールZ 強襲!サイヤ人"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C01" />
 			<dataarea name="prg" size="262144">
@@ -9080,7 +9080,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DB2"/>
 		<info name="release" value="19880812"/>
-		<info name="alt_title" value="ドラゴンボール　大魔王復活"/>
+		<info name="alt_title" value="ドラゴンボール 大魔王復活"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-FCG-1" />
 			<dataarea name="prg" size="131072">
@@ -9135,7 +9135,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-DBII-5200"/>
 		<info name="release" value="19890427"/>
-		<info name="alt_title" value="ドラゴンバスターⅡ　闇の封印"/>
+		<info name="alt_title" value="ドラゴンバスターⅡ 闇の封印"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3416" />
 			<feature name="mirroring" value="vertical" />
@@ -9596,7 +9596,7 @@
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-OF (R68V5941)"/>
 		<info name="release" value="19920221"/>
-		<info name="alt_title" value="ＡＤ＆Ｄ ドラゴンオブフレイム"/>
+		<info name="alt_title" value="AD&amp;D ドラゴンオブフレイム"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -9886,7 +9886,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NAT-DM"/>
 		<info name="release" value="19891110"/>
-		<info name="alt_title" value="ダンジョン＆マジック ソード オブ エレメント"/>
+		<info name="alt_title" value="ダンジョン&amp;マジック ソード オブ エレメント"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -10046,7 +10046,7 @@
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-EG"/>
 		<info name="release" value="19880809"/>
-		<info name="alt_title" value="エッガーランド　迷宮の復活"/>
+		<info name="alt_title" value="エッガーランド 迷宮の復活"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -10293,7 +10293,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC861"/>
 		<info name="release" value="19920626"/>
-		<info name="alt_title" value="エスパードリーム２ 新たなる戦い"/>
+		<info name="alt_title" value="エスパードリーム2 新たなる戦い"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-6" />
 			<feature name="vrc6-pin9" value="PRG A0" />
@@ -10400,7 +10400,7 @@
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="GTS-EE"/>
 		<info name="release" value="19851121"/>
-		<info name="alt_title" value="エグゼド　エグゼス"/>
+		<info name="alt_title" value="エグゼド エグゼス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
@@ -10658,7 +10658,7 @@
 		<publisher>Nihon Bussan</publisher>
 		<info name="serial" value="NBF-7F (11)"/>
 		<info name="release" value="19920207"/>
-		<info name="alt_title" value="Ｆ－１サーカス"/>
+		<info name="alt_title" value="F-1サーカス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -10680,7 +10680,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-FR"/>
 		<info name="release" value="19841102"/>
-		<info name="alt_title" value="Ｆ１レース"/>
+		<info name="alt_title" value="F1レース"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-RROM" /> <!-- also found with HVC-NROM-128 pcb -->
 			<feature name="mirroring" value="vertical" />
@@ -10700,7 +10700,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-FJ2"/>
 		<info name="release" value="19911202"/>
-		<info name="alt_title" value="ファミコンジャンプⅡ 最強の７人"/>
+		<info name="alt_title" value="ファミコンジャンプⅡ 最強の7人"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-JUMP2" />
 			<feature name="mirroring" value="vertical" />
@@ -10893,7 +10893,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-VT"/>
 		<info name="release" value="19850221"/>
-		<info name="alt_title" value="ファミリーベーシックＶ３"/>
+		<info name="alt_title" value="ファミリーベーシックV3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
@@ -10954,7 +10954,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FC91-7800"/>
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="ファミリーサーキット’９１"/>
+		<info name="alt_title" value="ファミリーサーキット'91"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-340" />
 			<feature name="mirroring" value="vertical" />
@@ -11092,7 +11092,7 @@
 		<publisher>Athena</publisher>
 		<info name="serial" value="ATH-FQ"/>
 		<info name="release" value="19881116"/>
-		<info name="alt_title" value="ファミリークイズ ４人はライバル"/>
+		<info name="alt_title" value="ファミリークイズ 4人はライバル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -11314,7 +11314,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FS89-4900"/>
 		<info name="release" value="19890728"/>
-		<info name="alt_title" value="ファミスタ’８９　開幕版！！"/>
+		<info name="alt_title" value="ファミスタ'89 開幕版!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3416" />
 			<feature name="mirroring" value="vertical" />
@@ -11333,7 +11333,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-F90-5800"/>
 		<info name="release" value="19891219"/>
-		<info name="alt_title" value="ファミスタ’９０"/>
+		<info name="alt_title" value="ファミスタ'90"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-163" />
 			<dataarea name="prg" size="131072">
@@ -11354,7 +11354,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-F91-4900"/>
 		<info name="release" value="19901221"/>
-		<info name="alt_title" value="ファミスタ’９１"/>
+		<info name="alt_title" value="ファミスタ'91"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-175" />
 			<feature name="mirroring" value="vertical" />
@@ -11376,7 +11376,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-F92-5000"/>
 		<info name="release" value="19911220"/>
-		<info name="alt_title" value="ファミスタ’９２"/>
+		<info name="alt_title" value="ファミスタ'92"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-340" />
 			<feature name="mirroring" value="vertical" />
@@ -11398,7 +11398,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-F93-4900"/>
 		<info name="release" value="19921222"/>
-		<info name="alt_title" value="ファミスタ’９３"/>
+		<info name="alt_title" value="ファミスタ'93"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-340" />
 			<feature name="mirroring" value="vertical" />
@@ -11420,7 +11420,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-F94-3900"/>
 		<info name="release" value="19931201"/>
-		<info name="alt_title" value="ファミスタ’９４"/>
+		<info name="alt_title" value="ファミスタ'94"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-340" />
 			<feature name="mirroring" value="vertical" />
@@ -12031,7 +12031,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-VX"/>
 		<info name="release" value="19900420"/>
-		<info name="alt_title" value="ファイアーエムブレム　暗黒竜と光の剣"/>
+		<info name="alt_title" value="ファイアーエムブレム 暗黒竜と光の剣"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-FKROM" />
 			<dataarea name="prg" size="262144">
@@ -12358,7 +12358,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-02"/>
 		<info name="release" value="19850404"/>
-		<info name="alt_title" value="フォーメーションＺ"/>
+		<info name="alt_title" value="フォーメーションZ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-02" />
 			<feature name="mirroring" value="horizontal" />
@@ -12378,7 +12378,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-02"/>
 		<info name="release" value="19850404"/>
-		<info name="alt_title" value="フォーメーションＺ"/>
+		<info name="alt_title" value="フォーメーションZ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-01" />
 			<feature name="mirroring" value="horizontal" />
@@ -12784,7 +12784,7 @@
 		<publisher>Asmik</publisher>
 		<info name="serial" value="ASM-2J"/>
 		<info name="release" value="19901207"/>
-		<info name="alt_title" value="ぎゅわんぶらあ自己中心派２"/>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -12806,7 +12806,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC833"/>
 		<info name="release" value="19890104"/>
-		<info name="alt_title" value="がんばれゴエモン２"/>
+		<info name="alt_title" value="がんばれゴエモン2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A1" />
@@ -12834,7 +12834,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC857"/>
 		<info name="release" value="19920103"/>
-		<info name="alt_title" value="がんばれゴエモン外伝２ 天下の財宝"/>
+		<info name="alt_title" value="がんばれゴエモン外伝2 天下の財宝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
 			<feature name="vrc4-pin3" value="PRG A7" />
@@ -12888,7 +12888,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC815"/>
 		<info name="release" value="19860730"/>
-		<info name="alt_title" value="がんばれゴエモン！からくり道中"/>
+		<info name="alt_title" value="がんばれゴエモン!からくり道中"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-1" />
 			<dataarea name="prg" size="131072">
@@ -13070,7 +13070,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-ONI2"/>
 		<info name="release" value="19871222"/>
-		<info name="alt_title" value="ゲゲゲの鬼太郎２ 妖怪軍団の挑戦"/>
+		<info name="alt_title" value="ゲゲゲの鬼太郎2 妖怪軍団の挑戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<dataarea name="prg" size="131072">
@@ -13467,7 +13467,7 @@
 		<publisher>Party Room 21</publisher>
 		<info name="serial" value="YZW-QP"/>
 		<info name="release" value="19920828"/>
-		<info name="alt_title" value="ギミア・ぶれいく 史上最強のクイズ王決定戦２"/>
+		<info name="alt_title" value="ギミア・ぶれいく 史上最強のクイズ王決定戦2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="peripheral" value="partytap" />
@@ -13486,7 +13486,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-GMK-6200"/>
 		<info name="release" value="19920131"/>
-		<info name="alt_title" value="ギミック！"/>
+		<info name="alt_title" value="ギミック!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-5B" />
 			<dataarea name="prg" size="262144">
@@ -13504,7 +13504,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-GE"/>
 		<info name="release" value="19881221"/>
-		<info name="alt_title" value="銀河英雄伝説　わが征くは星の大海"/>
+		<info name="alt_title" value="銀河英雄伝説 わが征くは星の大海"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -13841,7 +13841,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-G3"/>
 		<info name="release" value="19880326"/>
-		<info name="alt_title" value="ゴルゴ13　第一章 神々の黄昏"/>
+		<info name="alt_title" value="ゴルゴ13 第一章 神々の黄昏"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -13860,7 +13860,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-M4"/>
 		<info name="release" value="19900727"/>
-		<info name="alt_title" value="ゴルゴ13　第二章　イカロスの謎"/>
+		<info name="alt_title" value="ゴルゴ13 第二章 イカロスの謎"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -13935,7 +13935,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC818"/>
 		<info name="release" value="19870318"/>
-		<info name="alt_title" value="グーニーズ２ フラッテリー最後の挑戦"/>
+		<info name="alt_title" value="グーニーズ2 フラッテリー最後の挑戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -14244,7 +14244,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-GRM-6500"/>
 		<info name="release" value="19901214"/>
-		<info name="alt_title" value="グレムリン２ 新種誕生"/>
+		<info name="alt_title" value="グレムリン2 新種誕生"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-FME-7" />
 			<dataarea name="prg" size="131072">
@@ -14873,7 +14873,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-HH"/>
 		<info name="release" value="19870716"/>
-		<info name="alt_title" value="ヘクター８７"/>
+		<info name="alt_title" value="ヘクター87"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -14936,7 +14936,7 @@
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-HE"/>
 		<info name="release" value="19870612"/>
-		<info name="alt_title" value="ヘラクレスの栄光　闘人魔境伝"/>
+		<info name="alt_title" value="ヘラクレスの栄光 闘人魔境伝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -15011,7 +15011,7 @@
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-LQ (R68V5929)"/>
 		<info name="release" value="19910308"/>
-		<info name="alt_title" value="ＡＤ＆Ｄ ヒーロー オブ ランス"/>
+		<info name="alt_title" value="AD&amp;D ヒーロー オブ ランス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -15152,7 +15152,7 @@
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QQ (R78V5936)"/>
 		<info name="release" value="19910321"/>
-		<info name="alt_title" value="ＡＤ＆Ｄ ヒルズファー"/>
+		<info name="alt_title" value="AD&amp;D ヒルズファー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -15195,7 +15195,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="TFC-PK"/>
 		<info name="release" value="19920417"/>
-		<info name="alt_title" value="ひらけ！ポンキッキ"/>
+		<info name="alt_title" value="ひらけ!ポンキッキ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SEROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -15233,7 +15233,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="CBF-3H"/>
 		<info name="release" value="19900706"/>
-		<info name="alt_title" value="飛龍の拳Ⅲ　五人の龍戦士"/>
+		<info name="alt_title" value="飛龍の拳Ⅲ 五人の龍戦士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -15469,7 +15469,7 @@
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-K3"/>
 		<info name="release" value="19891019"/>
-		<info name="alt_title" value="北斗の拳３ 新世紀創造 凄拳列伝"/>
+		<info name="alt_title" value="北斗の拳3 新世紀創造 凄拳列伝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -15491,7 +15491,7 @@
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-97"/>
 		<info name="release" value="19910329"/>
-		<info name="alt_title" value="北斗の拳４ 七星覇拳伝 北斗神拳の彼方へ"/>
+		<info name="alt_title" value="北斗の拳4 七星覇拳伝 北斗神拳の彼方へ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -15648,7 +15648,7 @@
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-YP"/>
 		<info name="release" value="19900724"/>
-		<info name="alt_title" value="ホームランナイター’９０ ザ・ペナントリーグ"/>
+		<info name="alt_title" value="ホームランナイター'90 ザ・ペナントリーグ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -15708,7 +15708,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-DD2-6800"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="炎の闘球児 ドッジ弾平２"/>
+		<info name="alt_title" value="炎の闘球児 ドッジ弾平2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-FME-7" />
 			<dataarea name="prg" size="262144">
@@ -16029,7 +16029,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-HL3-6900"/>
 		<info name="release" value="19890217"/>
-		<info name="alt_title" value="ハイドライド３ 闇からの訪問者"/>
+		<info name="alt_title" value="ハイドライド3 闇からの訪問者"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-163" />
 			<dataarea name="prg" size="262144">
@@ -16069,7 +16069,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-HV"/>
 		<info name="release" value="19920425"/>
-		<info name="alt_title" value="ひょっこりひょうたん島　なぞのかいぞくせん"/>
+		<info name="alt_title" value="ひょっこりひょうたん島 なぞのかいぞくせん"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -16292,7 +16292,7 @@
 		<publisher>Hect</publisher>
 		<info name="serial" value="HCT-9A/011"/>
 		<info name="release" value="19910705"/>
-		<info name="alt_title" value="囲碁指南 ’９１"/>
+		<info name="alt_title" value="囲碁指南 '91"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -16779,7 +16779,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-IS-5900 (33)"/>
 		<info name="release" value="19900921"/>
-		<info name="alt_title" value="インセクターＸ"/>
+		<info name="alt_title" value="インセクターX"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-TC0190FMC" />
 			<dataarea name="prg" size="131072">
@@ -17017,7 +17017,7 @@
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-JJ"/>
 		<info name="release" value="19871207"/>
-		<info name="alt_title" value="ジェイ ジェイ とびだせ大作戦パート２"/>
+		<info name="alt_title" value="ジェイ ジェイ とびだせ大作戦パート2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -17037,7 +17037,7 @@
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="HVC-W3"/>
 		<info name="release" value="19940527"/>
-		<info name="alt_title" value="Ｊリーグウイニングゴール"/>
+		<info name="alt_title" value="Jリーグウイニングゴール"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -17707,7 +17707,7 @@
 		<publisher>Taito / Disco</publisher>
 		<info name="serial" value="DTF-5J (38)"/>
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="ＪＵＪＵ伝説"/>
+		<info name="alt_title" value="JUJU伝説"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -17949,7 +17949,7 @@
 		<publisher>SOFEL</publisher>
 		<info name="serial" value="SFL-NS"/>
 		<info name="release" value="19890526"/>
-		<info name="alt_title" value="帰って来た！軍人将棋なんやそれ!?"/>
+		<info name="alt_title" value="帰って来た!軍人将棋なんやそれ!?"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -18070,7 +18070,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-22"/>
 		<info name="release" value="19910830"/>
-		<info name="alt_title" value="快傑ヤンチャ丸２ からくりランド"/>
+		<info name="alt_title" value="快傑ヤンチャ丸2 からくりランド"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-G101" />
 			<dataarea name="prg" size="131072">
@@ -18088,7 +18088,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-28"/>
 		<info name="release" value="19930330"/>
-		<info name="alt_title" value="快傑ヤンチャ丸３ 対決！ゾウリンゲン"/>
+		<info name="alt_title" value="快傑ヤンチャ丸3 対決!ゾウリンゲン"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-H3001" />
 			<dataarea name="prg" size="131072">
@@ -18163,7 +18163,7 @@
 		<publisher>Angel</publisher>
 		<info name="serial" value="ANG-KA"/>
 		<info name="release" value="19930122"/>
-		<info name="alt_title" value="仮面ライダーＳＤ グランショッカーの野望"/>
+		<info name="alt_title" value="仮面ライダーSD グランショッカーの野望"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -18394,7 +18394,7 @@
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-SY"/>
 		<info name="release" value="19931201"/>
-		<info name="alt_title" value="けろっぴとけろりーぬのスプラッシュボム！"/>
+		<info name="alt_title" value="けろっぴとけろりーぬのスプラッシュボム!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SFROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -18620,7 +18620,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-ZG"/>
 		<info name="release" value="19860828"/>
-		<info name="alt_title" value="機動戦士Ｚガンダム ホットスクランブル"/>
+		<info name="alt_title" value="機動戦士Zガンダム ホットスクランブル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-GNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -18639,7 +18639,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC816"/>
 		<info name="release" value="19861218"/>
-		<info name="alt_title" value="キングコング２　怒りのメガトンパンチ"/>
+		<info name="alt_title" value="キングコング2 怒りのメガトンパンチ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-1" />
 			<dataarea name="prg" size="131072">
@@ -18826,7 +18826,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KIN"/>
 		<info name="release" value="19851108"/>
-		<info name="alt_title" value="キン肉マン　マッスルタッグマッチ"/>
+		<info name="alt_title" value="キン肉マン マッスルタッグマッチ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -18846,7 +18846,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KIN"/>
 		<info name="release" value="19851108"/>
-		<info name="alt_title" value="キン肉マン　マッスルタッグマッチ"/>
+		<info name="alt_title" value="キン肉マン マッスルタッグマッチ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -19336,7 +19336,7 @@
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QW (R68V5932)"/>
 		<info name="release" value="19900821"/>
-		<info name="alt_title" value="孔雀王２"/>
+		<info name="alt_title" value="孔雀王2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -19432,7 +19432,7 @@
 		<publisher>Nihon Bussan</publisher>
 		<info name="serial" value="NBF-R7 (09)"/>
 		<info name="release" value="19900420"/>
-		<info name="alt_title" value="黒鉄ヒロシの予想大好き！勝馬伝説"/>
+		<info name="alt_title" value="黒鉄ヒロシの予想大好き!勝馬伝説"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -19473,7 +19473,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KR-5500 (12)"/>
 		<info name="release" value="19870925"/>
-		<info name="alt_title" value="キョンシーズ２"/>
+		<info name="alt_title" value="キョンシーズ2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-X1-005" />
 			<feature name="x1-pin17" value="CHR A17" />
@@ -19496,7 +19496,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KR-5500 (12)"/>
 		<info name="release" value="19870925"/>
-		<info name="alt_title" value="キョンシーズ２"/>
+		<info name="alt_title" value="キョンシーズ2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-X1-005" />
 			<feature name="x1-pin17" value="CHR A17" /> <!-- unconfirmed, based on the use of mapper 80 -->
@@ -20303,7 +20303,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-3U"/>
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="リトルマーメイド －人魚姫－"/>
+		<info name="alt_title" value="リトルマーメイド -人魚姫-"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -20653,7 +20653,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-LP-3900"/>
 		<info name="release" value="19871106"/>
-		<info name="alt_title" value="ルパン三世　パンドラの遺産"/>
+		<info name="alt_title" value="ルパン三世 パンドラの遺産"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3416" />
 			<feature name="mirroring" value="vertical" />
@@ -20974,7 +20974,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-MT2"/>
 		<info name="release" value="19920619"/>
-		<info name="alt_title" value="まじかるタルるートくん２ まほうだいぼうけん"/>
+		<info name="alt_title" value="まじかるタルるートくん2 まほうだいぼうけん"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C01" />
 			<dataarea name="prg" size="131072">
@@ -20992,7 +20992,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-MT"/>
 		<info name="release" value="19910321"/>
-		<info name="alt_title" value="まじかるタルるートくん ファンタジックワールド！！"/>
+		<info name="alt_title" value="まじかるタルるートくん ファンタジックワールド!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C01" />
 			<dataarea name="prg" size="131072">
@@ -21010,7 +21010,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-MT"/>
 		<info name="release" value="19910321"/>
-		<info name="alt_title" value="まじかるタルるートくん ファンタジックワールド！！"/>
+		<info name="alt_title" value="まじかるタルるートくん ファンタジックワールド!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C01" />
 			<dataarea name="prg" size="131072">
@@ -21171,7 +21171,7 @@
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NAT-3R"/>
 		<info name="release" value="19910125"/>
-		<info name="alt_title" value="ドラ！ドラ！ドラ！"/>
+		<info name="alt_title" value="ドラ!ドラ!ドラ!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -21885,7 +21885,7 @@
 		<publisher>Imagineering</publisher>
 		<info name="serial" value="IMA-K2"/>
 		<info name="release" value="19890331"/>
-		<info name="alt_title" value="松本亨の株式必勝学２"/>
+		<info name="alt_title" value="松本亨の株式必勝学2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<dataarea name="prg" size="262144">
@@ -22216,7 +22216,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FMT-7800"/>
 		<info name="release" value="19900406"/>
-		<info name="alt_title" value="女神転生Ⅱ　デジタルデビル物語"/>
+		<info name="alt_title" value="女神転生Ⅱ デジタルデビル物語"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-163" />
 			<dataarea name="prg" size="262144">
@@ -22277,7 +22277,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-KM"/>
 		<info name="release" value="19861113"/>
-		<info name="alt_title" value="迷宮組曲　ミロンの大冒険"/>
+		<info name="alt_title" value="迷宮組曲 ミロンの大冒険"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -22296,7 +22296,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-DAI3"/>
 		<info name="release" value="19890808"/>
-		<info name="alt_title" value="名門！第三野球部"/>
+		<info name="alt_title" value="名門!第三野球部"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-FCG-1" />
 			<dataarea name="prg" size="131072">
@@ -22314,7 +22314,7 @@
 		<publisher>Asmik</publisher>
 		<info name="serial" value="ASM-T1"/>
 		<info name="release" value="19891201"/>
-		<info name="alt_title" value="名門！多古西応援団"/>
+		<info name="alt_title" value="名門!多古西応援団"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TSROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -22618,7 +22618,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-41"/>
 		<info name="release" value="19930305"/>
-		<info name="alt_title" value="めざせ！トッププロ グリーンに賭ける夢"/>
+		<info name="alt_title" value="めざせ!トッププロ グリーンに賭ける夢"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-40" />
 			<dataarea name="prg" size="262144">
@@ -22657,7 +22657,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KTB-MD"/>
 		<info name="release" value="19920930"/>
-		<info name="alt_title" value="ミッキーマウスⅢ　夢ふうせん"/>
+		<info name="alt_title" value="ミッキーマウスⅢ 夢ふうせん"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TSROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -22969,7 +22969,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-PT, NES-PT-(CAN/USA)"/>
 		<info name="release" value="19871121(JPN), 198710xx (USA)"/>
-		<info name="alt_title" value="マイクタイソン・パンチアウト！！"/>
+		<info name="alt_title" value="マイクタイソン・パンチアウト!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-PEEOROM" />
 			<dataarea name="prg" size="131072">
@@ -23181,7 +23181,7 @@
 		<publisher>King Records</publisher>
 		<info name="serial" value="KIN-GM"/>
 		<info name="release" value="19870807"/>
-		<info name="alt_title" value="ミラクルロピット ～２１００年の冒険～"/>
+		<info name="alt_title" value="ミラクルロピット ～2100年の冒険～"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -23355,7 +23355,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-29"/>
 		<info name="release" value="19900727"/>
-		<info name="alt_title" value="燃えプロ！’９０感動編"/>
+		<info name="alt_title" value="燃えプロ!'90感動編"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-29" />
 			<dataarea name="prg" size="262144">
@@ -23376,7 +23376,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-33"/>
 		<info name="release" value="19911122"/>
-		<info name="alt_title" value="燃えプロ！最強編"/>
+		<info name="alt_title" value="燃えプロ!最強編"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-29" />
 			<dataarea name="prg" size="262144">
@@ -23397,7 +23397,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-20"/>
 		<info name="release" value="19881122"/>
-		<info name="alt_title" value="燃えろ！！ ジュニアバスケット"/>
+		<info name="alt_title" value="燃えろ!! ジュニアバスケット"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-20" />
 			<dataarea name="prg" size="131072">
@@ -23415,7 +23415,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-28"/>
 		<info name="release" value="19900629"/>
-		<info name="alt_title" value="燃えろ！！ 柔道うぉり・ーず"/>
+		<info name="alt_title" value="燃えろ!! 柔道うぉり・ーず"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-17" />
 			<feature name="mirroring" value="vertical" />
@@ -23434,7 +23434,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-17"/>
 		<info name="release" value="19880415"/>
-		<info name="alt_title" value="燃えろ！！プロテニス"/>
+		<info name="alt_title" value="燃えろ!!プロテニス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-17" />
 			<feature name="mirroring" value="vertical" />
@@ -23456,7 +23456,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-13"/>
 		<info name="release" value="19870626"/>
-		<info name="alt_title" value="燃えろ！！プロ野球"/>
+		<info name="alt_title" value="燃えろ!!プロ野球"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-13" />
 			<feature name="mirroring" value="vertical" />
@@ -23478,7 +23478,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-13"/>
 		<info name="release" value="19870626"/>
-		<info name="alt_title" value="燃えろ！！プロ野球"/>
+		<info name="alt_title" value="燃えろ!!プロ野球"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-13" />
 			<feature name="mirroring" value="vertical" />
@@ -23500,7 +23500,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-13"/>
 		<info name="release" value="19870626"/>
-		<info name="alt_title" value="燃えろ！！プロ野球"/>
+		<info name="alt_title" value="燃えろ!!プロ野球"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-13" />
 			<feature name="mirroring" value="vertical" />
@@ -23522,7 +23522,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-13"/>
 		<info name="release" value="19870626"/>
-		<info name="alt_title" value="燃えろ！！プロ野球"/>
+		<info name="alt_title" value="燃えろ!!プロ野球"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-13" />
 			<feature name="mirroring" value="vertical" />
@@ -23544,7 +23544,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-19"/>
 		<info name="release" value="19880810"/>
-		<info name="alt_title" value="燃えろ！！ プロ野球’８８ 決定版"/>
+		<info name="alt_title" value="燃えろ!! プロ野球'88 決定版"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-19" />
 			<feature name="mirroring" value="vertical" />
@@ -23604,7 +23604,7 @@
 		<publisher>Sofel</publisher>
 		<info name="serial" value="SFL-ZM"/>
 		<info name="release" value="19891220"/>
-		<info name="alt_title" value="ザ・マネーゲーム２ 兜町の奇跡"/>
+		<info name="alt_title" value="ザ・マネーゲーム2 兜町の奇跡"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -23733,7 +23733,7 @@
 		<publisher>Sofel</publisher>
 		<info name="serial" value="SFL-7N"/>
 		<info name="release" value="19911220"/>
-		<info name="alt_title" value="モンスターメーカー ７つの秘宝"/>
+		<info name="alt_title" value="モンスターメーカー 7つの秘宝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B3" />
@@ -23813,7 +23813,6 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-MX"/>
 		<info name="release" value="19890727"/>
-		<info name="alt_title" value="ＭＯＴＨＥＲ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -24047,7 +24046,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-63"/>
 		<info name="release" value="19910803"/>
-		<info name="alt_title" value="マイライフマイラブ　ぼくの夢わたしの願い"/>
+		<info name="alt_title" value="マイライフマイラブ ぼくの夢わたしの願い"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -24195,7 +24194,7 @@
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-NN"/>
 		<info name="release" value="19861121"/>
-		<info name="alt_title" value="長靴をはいた猫 世界一周８０日大冒険"/>
+		<info name="alt_title" value="長靴をはいた猫 世界一周80日大冒険"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -24214,7 +24213,7 @@
 		<publisher>Varie</publisher>
 		<info name="serial" value="VRE-F1"/>
 		<info name="release" value="19881209"/>
-		<info name="alt_title" value="中島悟　Ｆ－１ヒーロー"/>
+		<info name="alt_title" value="中島悟 F-1ヒーロー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -24294,7 +24293,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-SI"/>
 		<info name="release" value="19870327"/>
-		<info name="alt_title" value="南国指令！！スパイＶＳスパイ"/>
+		<info name="alt_title" value="南国指令!!スパイVSスパイ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -24314,7 +24313,7 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-NTB-5900"/>
 		<info name="release" value="19901026"/>
-		<info name="alt_title" value="なんてったって！！ベースボール"/>
+		<info name="alt_title" value="なんてったって!!ベースボール"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-DCS" />
 			<dataarea name="prg" size="131072">
@@ -24491,7 +24490,7 @@
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-QD"/>
 		<info name="release" value="19901226"/>
-		<info name="alt_title" value="ＮＥＷ ゴーストバスターズⅡ"/>
+		<info name="alt_title" value="NEW ゴーストバスターズⅡ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -24662,7 +24661,7 @@
 		<publisher>Kyugo Boueki</publisher>
 		<info name="serial" value="KYG-NX"/>
 		<info name="release" value="19891117"/>
-		<info name="alt_title" value="忍者ＣＯＰ サイゾウ"/>
+		<info name="alt_title" value="忍者COP サイゾウ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -24753,7 +24752,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-NH"/>
 		<info name="release" value="19860305"/>
-		<info name="alt_title" value="忍者ハットリ君　忍者は修行でござるの巻"/>
+		<info name="alt_title" value="忍者ハットリ君 忍者は修行でござるの巻"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
 			<feature name="mirroring" value="vertical" />
@@ -24847,7 +24846,7 @@
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="TCF-NW"/>
 		<info name="release" value="19900406"/>
-		<info name="alt_title" value="忍者龍剣伝Ⅱ　暗黒の邪神剣"/>
+		<info name="alt_title" value="忍者龍剣伝Ⅱ 暗黒の邪神剣"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -24866,7 +24865,7 @@
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="TCF-3N"/>
 		<info name="release" value="19910621"/>
-		<info name="alt_title" value="忍者龍剣伝Ⅲ　黄泉の方船"/>
+		<info name="alt_title" value="忍者龍剣伝Ⅲ 黄泉の方船"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -24885,7 +24884,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-03"/>
 		<info name="release" value="19850510"/>
-		<info name="alt_title" value="忍者くん　魔城の冒険"/>
+		<info name="alt_title" value="忍者くん 魔城の冒険"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-03" />
 			<feature name="mirroring" value="horizontal" />
@@ -24905,7 +24904,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-03"/>
 		<info name="release" value="19850510"/>
-		<info name="alt_title" value="忍者くん　魔城の冒険"/>
+		<info name="alt_title" value="忍者くん 魔城の冒険"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-03" />
 			<dataarea name="prg" size="32768">
@@ -24924,7 +24923,7 @@
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-34"/>
 		<info name="release" value="19900808"/>
-		<info name="alt_title" value="忍者らホイ！"/>
+		<info name="alt_title" value="忍者らホイ!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SUROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -25156,7 +25155,7 @@
 		<publisher>Koei</publisher>
 		<info name="serial" value="KOE-NZ"/>
 		<info name="release" value="19880318"/>
-		<info name="alt_title" value="信長の野望　全国版"/>
+		<info name="alt_title" value="信長の野望 全国版"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SOROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -25273,7 +25272,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-N5"/>
 		<info name="release" value="19900921"/>
-		<info name="alt_title" value="ノース＆サウスわくわく南北戦争"/>
+		<info name="alt_title" value="ノース&amp;サウスわくわく南北戦争"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -25295,7 +25294,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-NM"/>
 		<info name="release" value="19840728"/>
-		<info name="alt_title" value="ナッツ＆ミルク"/>
+		<info name="alt_title" value="ナッツ&amp;ミルク"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-128" />
 			<feature name="mirroring" value="horizontal" />
@@ -25356,7 +25355,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NMK-JT"/>
 		<info name="release" value="19890929"/>
-		<info name="alt_title" value="落っことしパズルとんじゃん！？"/>
+		<info name="alt_title" value="落っことしパズルとんじゃん!?"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -25700,7 +25699,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-25"/>
 		<info name="release" value="19911220"/>
-		<info name="alt_title" value="パーマン２ 秘密結社マドー団をたおせ！"/>
+		<info name="alt_title" value="パーマン2 秘密結社マドー団をたおせ!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-G101" />
 			<dataarea name="prg" size="262144">
@@ -25886,7 +25885,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-PG"/>
 		<info name="release" value="19930917"/>
-		<info name="alt_title" value="パチスロアドベンチャー２ そろっ太くんのパチスロ探偵団"/>
+		<info name="alt_title" value="パチスロアドベンチャー2 そろっ太くんのパチスロ探偵団"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -25905,7 +25904,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="HVC-PI"/>
 		<info name="release" value="19940513"/>
-		<info name="alt_title" value="パチスロアドベンチャー３ ビタオシー７見参！"/>
+		<info name="alt_title" value="パチスロアドベンチャー3 ビタオシー7見参!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -25943,7 +25942,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-82"/>
 		<info name="release" value="19920710"/>
-		<info name="alt_title" value="パチンコ大作戦２"/>
+		<info name="alt_title" value="パチンコ大作戦2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -25962,7 +25961,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-P2"/>
 		<info name="release" value="19890130"/>
-		<info name="alt_title" value="パチ夫くん２"/>
+		<info name="alt_title" value="パチ夫くん2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -25981,7 +25980,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-P3"/>
 		<info name="release" value="19901026"/>
-		<info name="alt_title" value="パチ夫くん３ 帰ってきたパチ夫くん"/>
+		<info name="alt_title" value="パチ夫くん3 帰ってきたパチ夫くん"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -26003,7 +26002,7 @@
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-84"/>
 		<info name="release" value="19911122"/>
-		<info name="alt_title" value="パチ夫くん４"/>
+		<info name="alt_title" value="パチ夫くん4"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TNROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -26282,7 +26281,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC849"/>
 		<info name="release" value="19901130"/>
-		<info name="alt_title" value="パロディウスだ！"/>
+		<info name="alt_title" value="パロディウスだ!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
 			<feature name="vrc4-pin3" value="PRG A3" />
@@ -26324,7 +26323,7 @@
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-03"/>
 		<info name="release" value="19851225"/>
-		<info name="alt_title" value="ぺんぎんくんＷＡＲＳ"/>
+		<info name="alt_title" value="ぺんぎんくんWARS"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
 			<feature name="mirroring" value="horizontal" />
@@ -26759,7 +26758,7 @@
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QA (R98V5938)"/>
 		<info name="release" value="19910628"/>
-		<info name="alt_title" value="ＡＤ＆Ｄ プール オブ レイディアンス"/>
+		<info name="alt_title" value="AD&amp;D プール オブ レイディアンス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -27245,7 +27244,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FS87-3900"/>
 		<info name="release" value="19871222"/>
-		<info name="alt_title" value="プロ野球 ファミリースタジアム’８７"/>
+		<info name="alt_title" value="プロ野球 ファミリースタジアム'87"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3413" />
 			<feature name="mirroring" value="vertical" />
@@ -27264,7 +27263,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-FS88-4900"/>
 		<info name="release" value="19881220"/>
-		<info name="alt_title" value="プロ野球ファミリースタジアム’８８"/>
+		<info name="alt_title" value="プロ野球ファミリースタジアム'88"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-3416" />
 			<feature name="mirroring" value="vertical" />
@@ -27283,7 +27282,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-PV"/>
 		<info name="release" value="19881224"/>
-		<info name="alt_title" value="プロ野球？殺人事件！"/>
+		<info name="alt_title" value="プロ野球?殺人事件!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -28715,7 +28714,7 @@
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-2C"/>
 		<info name="release" value="19910402"/>
-		<info name="alt_title" value="ロボコップ２"/>
+		<info name="alt_title" value="ロボコップ2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -28951,7 +28950,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-XR"/>
 		<info name="release" value="19881224"/>
-		<info name="alt_title" value="ロックマン２ Ｄｒ．ワイリーの謎"/>
+		<info name="alt_title" value="ロックマン2 Dr.ワイリーの謎"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -28970,7 +28969,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-XU"/>
 		<info name="release" value="19900928"/>
-		<info name="alt_title" value="ロックマン３ Ｄｒ．ワイリーの最後！？"/>
+		<info name="alt_title" value="ロックマン3 Dr.ワイリーの最後!?"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -28989,7 +28988,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-4V"/>
 		<info name="release" value="19911206"/>
-		<info name="alt_title" value="ロックマン４ 新たなる野望！！"/>
+		<info name="alt_title" value="ロックマン4 新たなる野望!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TGROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29008,7 +29007,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-5V"/>
 		<info name="release" value="19921204"/>
-		<info name="alt_title" value="ロックマン５ ブルースの罠！？"/>
+		<info name="alt_title" value="ロックマン5 ブルースの罠!?"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -29027,7 +29026,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-6V"/>
 		<info name="release" value="19931105"/>
-		<info name="alt_title" value="ロックマン６ 史上最大の戦い！！"/>
+		<info name="alt_title" value="ロックマン6 史上最大の戦い!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TGROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -29520,7 +29519,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-X3"/>
 		<info name="release" value="19900420"/>
-		<info name="alt_title" value="ＳＤバトル大相撲"/>
+		<info name="alt_title" value="SDバトル大相撲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29539,7 +29538,7 @@
 		<publisher>Shinsei</publisher>
 		<info name="serial" value="SHI-2G"/>
 		<info name="release" value="19890625"/>
-		<info name="alt_title" value="ＳＤガンダム ガチャポン戦士２ カプセル戦記"/>
+		<info name="alt_title" value="SDガンダム ガチャポン戦士2 カプセル戦記"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29561,7 +29560,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-3G"/>
 		<info name="release" value="19901222"/>
-		<info name="alt_title" value="ＳＤガンダム ガチャポン戦士３ 英雄戦記"/>
+		<info name="alt_title" value="SDガンダム ガチャポン戦士3 英雄戦記"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29583,7 +29582,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-45"/>
 		<info name="release" value="19911221"/>
-		<info name="alt_title" value="ＳＤガンダム ガチャポン戦士４ ニュータイプストーリー"/>
+		<info name="alt_title" value="SDガンダム ガチャポン戦士4 ニュータイプストーリー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29605,7 +29604,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-P5"/>
 		<info name="release" value="19921222"/>
-		<info name="alt_title" value="ＳＤガンダム ガチャポン戦士５ バトル オブ ユニバーサル センチュリー"/>
+		<info name="alt_title" value="SDガンダム ガチャポン戦士5 バトル オブ ユニバーサル センチュリー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -29627,7 +29626,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KGD"/>
 		<info name="release" value="19900811"/>
-		<info name="alt_title" value="ＳＤガンダム外伝 ナイトガンダム物語"/>
+		<info name="alt_title" value="SDガンダム外伝 ナイトガンダム物語"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C01" />
 			<dataarea name="prg" size="262144">
@@ -29645,7 +29644,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KGD"/>
 		<info name="release" value="19900811"/>
-		<info name="alt_title" value="ＳＤガンダム外伝 ナイトガンダム物語"/>
+		<info name="alt_title" value="SDガンダム外伝 ナイトガンダム物語"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C01" />
 			<dataarea name="prg" size="262144">
@@ -29663,7 +29662,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KGD2"/>
 		<info name="release" value="19911012"/>
-		<info name="alt_title" value="ＳＤガンダム外伝 ナイトガンダム物語２ 光の騎士"/>
+		<info name="alt_title" value="SDガンダム外伝 ナイトガンダム物語2 光の騎士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
@@ -29681,7 +29680,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-KGD3"/>
 		<info name="release" value="19921023"/>
-		<info name="alt_title" value="ＳＤガンダム外伝　ナイトガンダム物語３　～伝説の騎士団～"/>
+		<info name="alt_title" value="SDガンダム外伝 ナイトガンダム物語3 ～伝説の騎士団～"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
@@ -29699,7 +29698,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-X5"/>
 		<info name="release" value="19900707"/>
-		<info name="alt_title" value="ＳＤヒーロー総決戦 倒せ！悪の軍団"/>
+		<info name="alt_title" value="SDヒーロー総決戦 倒せ!悪の軍団"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29718,7 +29717,7 @@
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-SKB-6400 (39)"/>
 		<info name="release" value="19910802"/>
-		<info name="alt_title" value="ＳＤ刑事ブレイダー"/>
+		<info name="alt_title" value="SD刑事ブレイダー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-X1-017" />
 			<dataarea name="prg" size="131072">
@@ -29739,7 +29738,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="BAP-X6"/>
 		<info name="release" value="19900908"/>
-		<info name="alt_title" value="ＳＤ戦国武将列伝 烈火のごとく天下を盗れ！"/>
+		<info name="alt_title" value="SD戦国武将列伝 烈火のごとく天下を盗れ!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -29779,7 +29778,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-SEIYA"/>
 		<info name="release" value="19870810"/>
-		<info name="alt_title" value="聖闘士星矢　黄金伝説"/>
+		<info name="alt_title" value="聖闘士星矢 黄金伝説"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -29798,7 +29797,7 @@
 		<publisher>Shinsei</publisher>
 		<info name="serial" value="SHI-OK"/>
 		<info name="release" value="19880530"/>
-		<info name="alt_title" value="聖闘士星矢　黄金伝説　完結編"/>
+		<info name="alt_title" value="聖闘士星矢 黄金伝説 完結編"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<dataarea name="prg" size="131072">
@@ -29835,7 +29834,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-31"/>
 		<info name="release" value="19901207"/>
-		<info name="alt_title" value="西遊記ワールド2　天上界の魔神"/>
+		<info name="alt_title" value="西遊記ワールド2 天上界の魔神"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-24" />
 			<dataarea name="prg" size="131072">
@@ -29853,7 +29852,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-SAKI"/>
 		<info name="release" value="19890303"/>
-		<info name="alt_title" value="魁！男塾 疾風一号生"/>
+		<info name="alt_title" value="魁!男塾 疾風一号生"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-FCG-1" />
 			<dataarea name="prg" size="131072">
@@ -30078,7 +30077,7 @@
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-ST-6900"/>
 		<info name="release" value="19880729"/>
-		<info name="alt_title" value="三國志　中原の覇者"/>
+		<info name="alt_title" value="三國志 中原の覇者"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NAMCOT-163" />
 			<dataarea name="prg" size="131072">
@@ -30140,7 +30139,7 @@
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-SQ"/>
 		<info name="release" value="19930114"/>
-		<info name="alt_title" value="サンリオカーニバル２"/>
+		<info name="alt_title" value="サンリオカーニバル2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -30178,7 +30177,7 @@
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-S2"/>
 		<info name="release" value="19860425"/>
-		<info name="alt_title" value="けいさんゲーム 算数２年"/>
+		<info name="alt_title" value="けいさんゲーム 算数2年"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -30199,7 +30198,7 @@
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-S3"/>
 		<info name="release" value="19860425"/>
-		<info name="alt_title" value="けいさんゲーム 算数３年"/>
+		<info name="alt_title" value="けいさんゲーム 算数3年"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -30220,7 +30219,7 @@
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-S4"/>
 		<info name="release" value="19861030"/>
-		<info name="alt_title" value="けいさんゲーム 算数４年"/>
+		<info name="alt_title" value="けいさんゲーム 算数4年"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -30447,7 +30446,7 @@
 		<publisher>CBS / Sony Group</publisher>
 		<info name="serial" value="CBS-SA"/>
 		<info name="release" value="19861225"/>
-		<info name="alt_title" value="聖飢魔Ⅱ　悪魔の逆襲"/>
+		<info name="alt_title" value="聖飢魔Ⅱ 悪魔の逆襲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -30968,7 +30967,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-YT"/>
 		<info name="release" value="19910628"/>
-		<info name="alt_title" value="新４人打ちマージャン 役満天国"/>
+		<info name="alt_title" value="新4人打ちマージャン 役満天国"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-EKROM" />
 			<dataarea name="prg" size="262144">
@@ -31011,7 +31010,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-23"/>
 		<info name="release" value="19890713"/>
-		<info name="alt_title" value="新・燃えろ！！プロ野球"/>
+		<info name="alt_title" value="新・燃えろ!!プロ野球"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-23" />
 			<dataarea name="prg" size="262144">
@@ -32116,7 +32115,7 @@
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="TCF-SZ"/>
 		<info name="release" value="19920124"/>
-		<info name="alt_title" value="ソロモンの鍵２　クールミン島救出作戦"/>
+		<info name="alt_title" value="ソロモンの鍵2 クールミン島救出作戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -32228,7 +32227,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-OZ"/>
 		<info name="release" value="19920320"/>
-		<info name="alt_title" value="それいけ！アンパンマン みんなでハイキング"/>
+		<info name="alt_title" value="それいけ!アンパンマン みんなでハイキング"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -32323,7 +32322,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-SX"/>
 		<info name="release" value="19850621"/>
-		<info name="alt_title" value="スパルタンＸ"/>
+		<info name="alt_title" value="スパルタンX"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-NROM-256" />
 			<feature name="mirroring" value="vertical" />
@@ -32342,7 +32341,7 @@
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-23"/>
 		<info name="release" value="19910927"/>
-		<info name="alt_title" value="スパルタンＸ２"/>
+		<info name="alt_title" value="スパルタンX2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-H3001" />
 			<dataarea name="prg" size="131072">
@@ -32570,7 +32569,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-SP"/>
 		<info name="release" value="19860426"/>
-		<info name="alt_title" value="スパイＶＳスパイ"/>
+		<info name="alt_title" value="スパイVSスパイ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -33198,7 +33197,7 @@
 		<publisher>KAC</publisher>
 		<info name="serial" value="KAC-3E"/>
 		<info name="release" value="19900727"/>
-		<info name="alt_title" value="ＳＴＥＤ 遺跡惑星の野望"/>
+		<info name="alt_title" value="STED 遺跡惑星の野望"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -33347,7 +33346,7 @@
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="TJC-Q7"/>
 		<info name="release" value="19910628"/>
-		<info name="alt_title" value="すごろクエスト　ダイスの戦士たち"/>
+		<info name="alt_title" value="すごろクエスト ダイスの戦士たち"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -33545,7 +33544,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="CBF-C2"/>
 		<info name="release" value="19890526"/>
-		<info name="alt_title" value="スーパーチャイニーズ２ ドラゴンキッド"/>
+		<info name="alt_title" value="スーパーチャイニーズ2 ドラゴンキッド"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -33865,7 +33864,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-UM"/>
 		<info name="release" value="19881023"/>
-		<info name="alt_title" value="スーパーマリオブラザーズ３"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TSROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -33887,7 +33886,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-UM"/>
 		<info name="release" value="19881023"/>
-		<info name="alt_title" value="スーパーマリオブラザーズ３"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -33985,7 +33984,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-MT"/>
 		<info name="release" value="19920914"/>
-		<info name="alt_title" value="スーパーマリオＵＳＡ"/>
+		<info name="alt_title" value="スーパーマリオUSA"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TSROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -34732,7 +34731,7 @@
 		<publisher>Taito / Disco</publisher>
 		<info name="serial" value="DTF-H9 (28)"/>
 		<info name="release" value="19891208"/>
-		<info name="alt_title" value="タイトーチェイスＨ．Ｑ．"/>
+		<info name="alt_title" value="タイトーチェイスH.Q."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TL1ROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -34774,7 +34773,7 @@
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-G5"/>
 		<info name="release" value="19880803"/>
-		<info name="alt_title" value="太陽の神殿 アステカ２"/>
+		<info name="alt_title" value="太陽の神殿 アステカ2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SGROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -34907,7 +34906,7 @@
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="GAM-23 (05)"/>
 		<info name="release" value="19890821"/>
-		<info name="alt_title" value="武田信玄２"/>
+		<info name="alt_title" value="武田信玄2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -35070,7 +35069,7 @@
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-J4"/>
 		<info name="release" value="19900928"/>
-		<info name="alt_title" value="探偵神宮寺三郎　時の過ぎゆくままに"/>
+		<info name="alt_title" value="探偵神宮寺三郎 時の過ぎゆくままに"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -35089,7 +35088,7 @@
 		<publisher>Vap</publisher>
 		<info name="serial" value="VAP-BY"/>
 		<info name="release" value="19891201"/>
-		<info name="alt_title" value="究極の世紀末ロープレ　道"/>
+		<info name="alt_title" value="究極の世紀末ロープレ 道"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -35145,7 +35144,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="TFC-TF"/>
 		<info name="release" value="19861205"/>
-		<info name="alt_title" value="戦え！超ロボット生命体 トランスフォーマー コンボイの謎"/>
+		<info name="alt_title" value="戦え!超ロボット生命体 トランスフォーマー コンボイの謎"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -35164,7 +35163,7 @@
 		<publisher>Shinsei</publisher>
 		<info name="serial" value="SHI-RN"/>
 		<info name="release" value="19880810"/>
-		<info name="alt_title" value="闘将！！拉麺男 炸裂超人一○二芸"/>
+		<info name="alt_title" value="闘将!!拉麺男 炸裂超人一○二芸"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -35560,7 +35559,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC853"/>
 		<info name="release" value="19901207"/>
-		<info name="alt_title" value="チイーネーソ　ミュータント　ニンジャ　タートルス"/>
+		<info name="alt_title" value="チイーネーソ ミュータント ニンジャ タートルス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
 			<feature name="vrc4-pin3" value="PRG A2" />
@@ -35606,7 +35605,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC863"/>
 		<info name="release" value="19911213"/>
-		<info name="alt_title" value="チイーネーソ　ミュータント　ニンジャ　タートルス　ザマンハッタンプロジェクト"/>
+		<info name="alt_title" value="チイーネーソ ミュータント ニンジャ タートルス ザマンハッタンプロジェクト"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
 			<feature name="vrc4-pin3" value="PRG A2" />
@@ -35719,7 +35718,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2V"/>
 		<info name="release" value="19910405"/>
-		<info name="alt_title" value="天地を喰らうII　諸葛孔明伝"/>
+		<info name="alt_title" value="天地を喰らうII 諸葛孔明伝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TNROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -36025,7 +36024,7 @@
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-52"/>
 		<info name="release" value="19911213"/>
-		<info name="alt_title" value="テトリス２＋ボンブリス"/>
+		<info name="alt_title" value="テトリス2+ボンブリス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -36457,7 +36456,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RV051"/>
 		<info name="release" value="19921127"/>
-		<info name="alt_title" value="タイニートゥーンアドベンチャー2　モンタナランドへようこそ"/>
+		<info name="alt_title" value="タイニートゥーンアドベンチャー2 モンタナランドへようこそ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-7" />
 			<feature name="vrc7-pin17" value="PRG A3" />
@@ -37394,7 +37393,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-34"/>
 		<info name="release" value="19911213"/>
-		<info name="alt_title" value="つるピカハゲ丸 めざせ！つるセコの証"/>
+		<info name="alt_title" value="つるピカハゲ丸 めざせ!つるセコの証"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-24" />
 			<dataarea name="prg" size="131072">
@@ -37488,7 +37487,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC841"/>
 		<info name="release" value="19890929"/>
-		<info name="alt_title" value="ツインビー3　ポコポコ大魔王"/>
+		<info name="alt_title" value="ツインビー3 ポコポコ大魔王"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-2" />
 			<feature name="vrc2-pin3" value="PRG A0" />
@@ -37549,7 +37548,7 @@
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="serial" value="HAL-UI"/>
 		<info name="release" value="19900907"/>
-		<info name="alt_title" value="宇宙警備隊ＳＤＦ"/>
+		<info name="alt_title" value="宇宙警備隊SDF"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-ELROM" />
 			<dataarea name="prg" size="131072">
@@ -37671,7 +37670,7 @@
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-US (R59V5922)"/>
 		<info name="release" value="19890920"/>
-		<info name="alt_title" value="ウルティマ　聖者への道"/>
+		<info name="alt_title" value="ウルティマ 聖者への道"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -37801,7 +37800,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-UU"/>
 		<info name="release" value="19900407"/>
-		<info name="alt_title" value="ウルトラマン倶楽部２ 帰ってきたウルトラマン倶楽部"/>
+		<info name="alt_title" value="ウルトラマン倶楽部2 帰ってきたウルトラマン倶楽部"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -37820,7 +37819,7 @@
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-3I"/>
 		<info name="release" value="19911229"/>
-		<info name="alt_title" value="ウルトラマン倶楽部３ またまた出撃!!ウルトラ兄弟"/>
+		<info name="alt_title" value="ウルトラマン倶楽部3 またまた出撃!!ウルトラ兄弟"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -37842,7 +37841,7 @@
 		<publisher>Angel</publisher>
 		<info name="serial" value="ANG-UA"/>
 		<info name="release" value="19921225"/>
-		<info name="alt_title" value="ウルトラマン倶楽部 怪獣大決戦！！"/>
+		<info name="alt_title" value="ウルトラマン倶楽部 怪獣大決戦!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -37998,7 +37997,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-10"/>
 		<info name="release" value="19861023"/>
-		<info name="alt_title" value="うる星やつら　ラムのウェディングベル"/>
+		<info name="alt_title" value="うる星やつら ラムのウェディングベル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-10" />
 			<feature name="mirroring" value="vertical" />
@@ -38017,7 +38016,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-40"/>
 		<info name="release" value="19930306"/>
-		<info name="alt_title" value="ＵＳＡアイスホッケーinＦＣ"/>
+		<info name="alt_title" value="USAアイスホッケーinFC"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-37" />
 			<dataarea name="prg" size="131072">
@@ -38540,7 +38539,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC850"/>
 		<info name="release" value="19910105"/>
-		<info name="alt_title" value="ワイワイワールド２ ＳＯＳ！！パセリ城"/>
+		<info name="alt_title" value="ワイワイワールド2 SOS!!パセリ城"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
 			<feature name="vrc4-pin3" value="PRG A2" />
@@ -39081,7 +39080,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-BE"/>
 		<info name="release" value="19930115"/>
-		<info name="alt_title" value="ワイリー＆ライトのロックボード ザッツパラダイス"/>
+		<info name="alt_title" value="ワイリー&amp;ライトのロックボード ザッツパラダイス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TGROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -39247,7 +39246,7 @@
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-13"/>
 		<info name="release" value="19890221"/>
-		<info name="alt_title" value="ウィザードリィII　リルガミンの遺産"/>
+		<info name="alt_title" value="ウィザードリィII リルガミンの遺産"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3A" />
@@ -40104,7 +40103,7 @@
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<info name="serial" value="VFR-Q8 (12)"/>
 		<info name="release" value="19910927"/>
-		<info name="alt_title" value="イースⅢ　ワンダラーズフロムイース"/>
+		<info name="alt_title" value="イースⅢ ワンダラーズフロムイース"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TKSROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -40325,7 +40324,7 @@
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-Z2"/>
 		<info name="release" value="19890127"/>
-		<info name="alt_title" value="ゾイド2　ゼネバスの逆襲"/>
+		<info name="alt_title" value="ゾイド2 ゼネバスの逆襲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1A" />
@@ -40347,7 +40346,7 @@
 		<publisher>Toemiland</publisher>
 		<info name="serial" value="TFS-ZD"/>
 		<info name="release" value="19870905"/>
-		<info name="alt_title" value="ゾイド　中央大陸の戦い"/>
+		<info name="alt_title" value="ゾイド 中央大陸の戦い"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -40366,7 +40365,7 @@
 		<publisher>Tomy</publisher>
 		<info name="serial" value="TOM-ZF"/>
 		<info name="release" value="19901221"/>
-		<info name="alt_title" value="ゾイド　黙示録"/>
+		<info name="alt_title" value="ゾイド 黙示録"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -40681,7 +40680,7 @@ We should eventually add it to MESS as a separate driver with a NES CPU and a GB
 		<description>My Computer TV C1 (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sharp</publisher>
-		<info name="alt_title" value="マイコンピュータテレビＣ１"/>
+		<info name="alt_title" value="マイコンピュータテレビC1"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="chr" size="8192">
@@ -40769,19 +40768,19 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="1999">
-		<description>1999 - Hore, Mitakotoka! Seikimatsu (Jpn)</description>
+		<description>1999 - Hore, Mita Koto ka! Seikimatsu (Jpn)</description>
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-CS"/>
 		<info name="release" value="19920918"/>
-		<info name="alt_title" value="１９９９ ほれ見たことか！世紀末"/>
+		<info name="alt_title" value="1999 ほれ見たことか!世紀末"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="1999 - hore, mitakotoka! seikimatsu (japan).chr" size="131072" crc="04ba2be3" sha1="f4b2fdb71db5553d8ed530496c7d03a80e1cf41d" offset="00000" status="baddump" />
+				<rom name="1999 - hore, mita koto ka! seikimatsu (japan).chr" size="131072" crc="04ba2be3" sha1="f4b2fdb71db5553d8ed530496c7d03a80e1cf41d" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="1999 - hore, mitakotoka! seikimatsu (japan).prg" size="262144" crc="3c5ae54b" sha1="1a25132dac9c14d8e25b7984342869911b5c18ac" offset="00000" status="baddump" />
+				<rom name="1999 - hore, mita koto ka! seikimatsu (japan).prg" size="262144" crc="3c5ae54b" sha1="1a25132dac9c14d8e25b7984342869911b5c18ac" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -40792,7 +40791,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PHF-IX (R78V10005)"/>
 		<info name="release" value="19910821"/>
-		<info name="alt_title" value="Ａ列車で行こう"/>
+		<info name="alt_title" value="A列車で行こう"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="16384">
@@ -40846,7 +40845,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PAC-99"/>
 		<info name="release" value="19920807"/>
-		<info name="alt_title" value="エイセスアイアンイーグル３"/>
+		<info name="alt_title" value="エイセスアイアンイーグル3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="262144">
@@ -40909,7 +40908,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-27"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="愛先生のＯ・ＳＨＩ・Ｅ・ＴＥわたしの星"/>
+		<info name="alt_title" value="愛先生のO・SHI・E・TEわたしの星"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="IREM-G101" />
 			<dataarea name="chr" size="131072">
@@ -41397,7 +41396,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-BB-5900 (47)"/>
 		<info name="release" value="19930305"/>
-		<info name="alt_title" value="バブルボブル２"/>
+		<info name="alt_title" value="バブルボブル2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="TAITO-TC0190FMC+PAL16R4" />
 			<dataarea name="chr" size="131072">
@@ -41716,7 +41715,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2D"/>
 		<info name="release" value="19931210"/>
-		<info name="alt_title" value="チップとデールの大作戦２"/>
+		<info name="alt_title" value="チップとデールの大作戦2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -42002,7 +42001,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-DBZ"/>
 		<info name="release" value="19921229"/>
-		<info name="alt_title" value="データック ドラゴンボールＺ 激闘天下一武道会"/>
+		<info name="alt_title" value="データック ドラゴンボールZ 激闘天下一武道会"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-DATACH" />
 			<dataarea name="prg" size="262144">
@@ -42020,7 +42019,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-STP"/>
 		<info name="release" value="19940422"/>
-		<info name="alt_title" value="データック Ｊリーグスーパートッププレイヤーズ"/>
+		<info name="alt_title" value="データック Jリーグスーパートッププレイヤーズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-DATACH" />
 			<dataarea name="prg" size="262144">
@@ -42038,7 +42037,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-SDGW"/>
 		<info name="release" value="19930423"/>
-		<info name="alt_title" value="データック ＳＤガンダム ガンダムウォーズ"/>
+		<info name="alt_title" value="データック SDガンダム ガンダムウォーズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-DATACH" />
 			<dataarea name="prg" size="262144">
@@ -42056,7 +42055,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-UCSF"/>
 		<info name="release" value="19930423"/>
-		<info name="alt_title" value="データック ウルトラマン倶楽部 スポ根ファイト！"/>
+		<info name="alt_title" value="データック ウルトラマン倶楽部 スポ根ファイト!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-DATACH" />
 			<dataarea name="prg" size="262144">
@@ -42141,7 +42140,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-B6"/>
 		<info name="release" value="19890127"/>
-		<info name="alt_title" value="電撃ビッグバン！"/>
+		<info name="alt_title" value="電撃ビッグバン!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -42195,7 +42194,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-JR"/>
 		<info name="release" value="19830715"/>
-		<info name="alt_title" value="ドンキーコングＪｒ"/>
+		<info name="alt_title" value="ドンキーコングJr"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -42419,7 +42418,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-DW"/>
 		<info name="release" value="19930423"/>
-		<info name="alt_title" value="ダックテイルズ２"/>
+		<info name="alt_title" value="ダックテイルズ2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -42554,7 +42553,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Konami</publisher>
 		<info name="serial" value="KDS-FE"/>
 		<info name="release" value="19930129"/>
-		<info name="alt_title" value="Ｆ－１センセーション"/>
+		<info name="alt_title" value="F-1センセーション"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -42710,7 +42709,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-10"/>
 		<info name="release" value="19890131"/>
-		<info name="alt_title" value="来来キョンシーズ　ベビーキョンシーのあみだ大冒険"/>
+		<info name="alt_title" value="来来キョンシーズ ベビーキョンシーのあみだ大冒険"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -42748,7 +42747,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="HFC-F3"/>
 		<info name="release" value="19930730"/>
-		<info name="alt_title" value="ＦＣ原人"/>
+		<info name="alt_title" value="FC原人"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -43007,7 +43006,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-38"/>
 		<info name="release" value="19920925"/>
-		<info name="alt_title" value="ゴール！！"/>
+		<info name="alt_title" value="ゴール!!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-38" /> <!-- Board type to be confirmed (but the game runs on Mapper 18 hw) -->
 			<feature name="mirroring" value="horizontal" />
@@ -43333,7 +43332,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-S6"/>
 		<info name="release" value="19891219"/>
-		<info name="alt_title" value="Ｉ ＬＯＶＥ ソフトボール"/>
+		<info name="alt_title" value="I LOVE ソフトボール"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -43369,7 +43368,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-53/015"/>
 		<info name="release" value="19920310"/>
-		<info name="alt_title" value="囲碁指南 ’９２"/>
+		<info name="alt_title" value="囲碁指南 '92"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
@@ -43387,7 +43386,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-IF/018"/>
 		<info name="release" value="19921127"/>
-		<info name="alt_title" value="囲碁指南 ’９３"/>
+		<info name="alt_title" value="囲碁指南 '93"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
@@ -43405,7 +43404,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-IR/020"/>
 		<info name="release" value="19931217"/>
-		<info name="alt_title" value="囲碁指南 ’９４"/>
+		<info name="alt_title" value="囲碁指南 '94"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="32768">
@@ -43493,7 +43492,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-JS"/>
 		<info name="release" value="19930619"/>
-		<info name="alt_title" value="Ｊリーグファイティングサッカー"/>
+		<info name="alt_title" value="Jリーグファイティングサッカー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -43768,7 +43767,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-KK"/>
 		<info name="release" value="19930219"/>
-		<info name="alt_title" value="けろけろけろっぴの大冒険２ ドーナツ池はおおさわぎ！"/>
+		<info name="alt_title" value="けろけろけろっぴの大冒険2 ドーナツ池はおおさわぎ!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -44065,7 +44064,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Toshiba EMI</publisher>
 		<info name="serial" value="TFS-MG"/>
 		<info name="release" value="19871225"/>
-		<info name="alt_title" value="グナム危機一髪危機一発 エンパイアシティ１９３１"/>
+		<info name="alt_title" value="グナム危機一髪危機一発 エンパイアシティ1931"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -44257,7 +44256,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Towa Chiki</publisher>
 		<info name="serial" value="TCC-KL"/>
 		<info name="release" value="19880501"/>
-		<info name="alt_title" value="名探偵ホームズ　霧のロンドン殺人事件"/>
+		<info name="alt_title" value="名探偵ホームズ 霧のロンドン殺人事件"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="prg" size="262144">
@@ -44493,7 +44492,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC813"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="もえろツインビー シナモン博士を救え！"/>
+		<info name="alt_title" value="もえろツインビー シナモン博士を救え!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -44512,7 +44511,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-21"/>
 		<info name="release" value="19881223"/>
-		<info name="alt_title" value="燃えろ！！ プロサッカー"/>
+		<info name="alt_title" value="燃えろ!! プロサッカー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-21" /> <!-- Board type to be confirmed (but the game runs on Mapper 92 hw) -->
 			<feature name="mirroring" value="vertical" />
@@ -44551,7 +44550,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Toho</publisher>
 		<info name="serial" value="THF-M7"/>
 		<info name="release" value="19890808"/>
-		<info name="alt_title" value="燃える！お兄さん"/>
+		<info name="alt_title" value="燃える!お兄さん"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
@@ -44642,7 +44641,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="TDF-NN"/>
 		<info name="release" value="19861121"/>
-		<info name="alt_title" value="長靴をはいた猫 世界一周８０日大冒険"/>
+		<info name="alt_title" value="長靴をはいた猫 世界一周80日大冒険"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -44661,7 +44660,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Varie</publisher>
 		<info name="serial" value="VAR-4E"/>
 		<info name="release" value="19910927"/>
-		<info name="alt_title" value="中島悟　Ｆ－１ヒーロー２"/>
+		<info name="alt_title" value="中島悟 F-1ヒーロー2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -44716,7 +44715,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Technos</publisher>
 		<info name="serial" value="TJC-BR"/>
 		<info name="release" value="19931217"/>
-		<info name="alt_title" value="熱血！すとりーとバスケット　がんばれ  ダンクヒーローズ"/>
+		<info name="alt_title" value="熱血!すとりーとバスケット がんばれ  ダンクヒーローズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -44867,7 +44866,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Koei</publisher>
 		<info name="serial" value="KOE-NZ"/>
 		<info name="release" value="19880318"/>
-		<info name="alt_title" value="信長の野望　全国版"/>
+		<info name="alt_title" value="信長の野望 全国版"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SOROM" />
 			<dataarea name="prg" size="262144">
@@ -44891,7 +44890,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-OEKA2"/>
 		<info name="release" value="19910326"/>
-		<info name="alt_title" value="おえかキッズ　アンパンマンのひらがなだいすき"/>
+		<info name="alt_title" value="おえかキッズ アンパンマンのひらがなだいすき"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-OEKAKIDS" />
 			<dataarea name="prg" size="131072">
@@ -44980,7 +44979,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CDS-PE"/>
 		<info name="release" value="19930611"/>
-		<info name="alt_title" value="パチ夫くん５ Jrの挑戦"/>
+		<info name="alt_title" value="パチ夫くん5 Jrの挑戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -45523,7 +45522,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-S1"/>
 		<info name="release" value="19860401"/>
-		<info name="alt_title" value="けいさんゲーム 算数１年"/>
+		<info name="alt_title" value="けいさんゲーム 算数1年"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -45576,7 +45575,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-S5"/>
 		<info name="release" value="19861001"/>
-		<info name="alt_title" value="けいさんゲーム 算数５・６年"/>
+		<info name="alt_title" value="けいさんゲーム 算数5・6年"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -45674,7 +45673,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-I9/014"/>
 		<info name="release" value="19920125"/>
-		<info name="alt_title" value="将棋名鑑’９２"/>
+		<info name="alt_title" value="将棋名鑑'92"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="262144">
@@ -45692,7 +45691,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hector</publisher>
 		<info name="serial" value="HCT-IJ/019"/>
 		<info name="release" value="19921204"/>
-		<info name="alt_title" value="将棋名鑑’９３"/>
+		<info name="alt_title" value="将棋名鑑'93"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="262144">
@@ -46019,7 +46018,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Naxat</publisher>
 		<info name="serial" value="NAX-RE"/>
 		<info name="release" value="19920717"/>
-		<info name="alt_title" value="サマーカーニバル’９２烈火"/>
+		<info name="alt_title" value="サマーカーニバル'92烈火"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -46422,7 +46421,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2V"/>
 		<info name="release" value="19910405"/>
-		<info name="alt_title" value="天地を喰らうII　諸葛孔明伝"/>
+		<info name="alt_title" value="天地を喰らうII 諸葛孔明伝"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-TNROM" />
 			<dataarea name="prg" size="524288">
@@ -46443,7 +46442,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PAC-TJ"/>
 		<info name="release" value="19920626"/>
-		<info name="alt_title" value="ターミネーター２"/>
+		<info name="alt_title" value="ターミネーター2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -46513,7 +46512,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-52"/>
 		<info name="release" value="19911213"/>
-		<info name="alt_title" value="テトリス２＋ボンブリス"/>
+		<info name="alt_title" value="テトリス2+ボンブリス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SNROM" />
 			<dataarea name="prg" size="131072">
@@ -46600,7 +46599,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Konami</publisher>
 		<info name="serial" value="KDS-OG"/>
 		<info name="release" value="19891205"/>
-		<info name="alt_title" value="トップガン　デュアルファイターズ"/>
+		<info name="alt_title" value="トップガン デュアルファイターズ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -46634,7 +46633,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-M5"/>
 		<info name="release" value="19881202"/>
-		<info name="alt_title" value="突然！マッチョマン"/>
+		<info name="alt_title" value="突然!マッチョマン"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -46668,7 +46667,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<info name="serial" value="VFR-Y1 (04)"/>
 		<info name="release" value="19880317"/>
-		<info name="alt_title" value="釣りキチ三平　ブルーマーリン編"/>
+		<info name="alt_title" value="釣りキチ三平 ブルーマーリン編"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -46977,7 +46976,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="GAM-W9 (11)"/>
 		<info name="release" value="19920327"/>
-		<info name="alt_title" value="ＷＷＦレッスルマニアチャレンジ"/>
+		<info name="alt_title" value="WWFレッスルマニアチャレンジ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -47062,7 +47061,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="19910531"/>
-		<info name="alt_title" value="なんてったって！！ ベースボール 子ガメカセット '91開幕編"/>
+		<info name="alt_title" value="なんてったって!! ベースボール 子ガメカセット '91開幕編"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-DCS" />
 			<dataarea name="chr" size="131072">
@@ -47082,7 +47081,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="19910228"/>
-		<info name="alt_title" value="なんてったって！！ベースボール 子ガメカセット OBオールスター編"/>
+		<info name="alt_title" value="なんてったって!!ベースボール 子ガメカセット OBオールスター編"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SUNSOFT-DCS" />
 			<dataarea name="chr" size="131072">
@@ -49312,7 +49311,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="chikbik">
-		<!-- Alt. Title: 三国志－赤壁之战 ? ~ SanGuoZhi - ChiBi Zhi Zhan ?  -->
+		<!-- Alt. Title: 三国志-赤壁之战 ? ~ SanGuoZhi - ChiBi Zhi Zhan ?  -->
 		<description>Chik Bik Ji Jin - Saam Gwok Ji (Asia)</description>
 		<year>19??</year>
 		<publisher>NTDEC</publisher>
@@ -49333,7 +49332,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>199?</year>
 		<publisher>Asder</publisher>
 		<info name="serial" value="CN-21"/>
-		<info name="alt_title" value="三国志－群雄争霸"/>
+		<info name="alt_title" value="三国志-群雄争霸"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NTDEC-112" />
 			<dataarea name="chr" size="262144">
@@ -49401,7 +49400,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>199?</year>
 		<publisher>NTDEC</publisher>
 		<info name="serial" value="CN-29"/>
-		<info name="alt_title" value="黄帝－涿鹿之战"/>
+		<info name="alt_title" value="黄帝-涿鹿之战"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NTDEC-112" />
 			<dataarea name="chr" size="262144">
@@ -51165,7 +51164,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ012"/>
-		<info name="alt_title" value="超级机器人大战Ａ ~ Super Robot Wars A"/>
+		<info name="alt_title" value="超级机器人大战A ~ Super Robot Wars A"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -51448,7 +51447,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="NJ033"/>
-		<info name="alt_title" value="真侍魂－武士道列传"/>
+		<info name="alt_title" value="真侍魂-武士道列传"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -52430,7 +52429,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-05"/>
-		<info name="alt_title" value="ＡＶ花名札倶楽部"/>
+		<info name="alt_title" value="AV花名札倶楽部"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HES" />
 			<dataarea name="chr" size="65536">
@@ -52484,7 +52483,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-06"/>
-		<info name="alt_title" value="ＡＶパチスロ"/>
+		<info name="alt_title" value="AVパチスロ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<dataarea name="chr" size="65536">

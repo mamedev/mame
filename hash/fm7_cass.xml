@@ -136,7 +136,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1985</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="serial" value="FUBP-13001"/>
 		<info name="release" value="198503xx"/>
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
@@ -602,7 +602,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>1986?</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="serial" value="FUBP-13004"/>
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="ザ・ファイヤークリスタル"/>
@@ -649,7 +649,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>FM-7 Demo</description>
 		<year>19??</year>
 		<publisher>富士通 (Fujitsu)</publisher>
-		<info name="alt_title" value="ＦＭ-7デモ"/>
+		<info name="alt_title" value="FM-7デモ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2162424">
 				<rom name="demo.t77" size="2162424" crc="b3308220" sha1="0d997aafbe880cc588b56384a1b1364d434d120a" offset="0" />
@@ -661,7 +661,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>FM Ongen Demo</description>
 		<year>19??</year>
 		<publisher>富士通 (Fujitsu)</publisher>
-		<info name="alt_title" value="ＦＭ音源デモ"/>
+		<info name="alt_title" value="FM音源デモ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="14937776">
 				<rom name="fm.t77" size="14937776" crc="7ee3790a" sha1="19353756c375acd03f0dbe0078eb8ce703d33144" offset="0" />
@@ -942,12 +942,12 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="kaguya">
-		<description>Ohi! Kaguya Hime - Koromo Koromo no Waka re</description>
+		<description>Ooi! Kaguya Hime - Kinuginu no Wakare</description>
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="serial" value="K40M5047"/>
 		<info name="release" value="198311xx"/>
-		<info name="alt_title" value="おーい！かぐや姫　- 衣衣 のわかれ"/>
+		<info name="alt_title" value="おーい!かぐや姫 - 衣衣 のわかれ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2274254">
 				<rom name="ooikagu.t77" size="2274254" crc="9f0057ff" sha1="da5947960734ef53cd3b5332e971ad14be680f62" offset="0" />
@@ -956,7 +956,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="kaito">
-		<description>Kareina Kaitou</description>
+		<description>Karei Naru Kaitou</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="serial" value="LA-1035"/>
@@ -1197,7 +1197,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>バンダイ (Bandai)</publisher>
 		<info name="serial" value="BF7-406"/>
-		<info name="alt_title" value="マジンガーＺ"/>
+		<info name="alt_title" value="マジンガーZ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3789260">
 				<rom name="majin.t77" size="3789260" crc="3aa0b3da" sha1="f28e2d3c0eb564c55114e43cc8bd393d499c3454" offset="0" />
@@ -1561,7 +1561,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="serial" value="DP-3301162"/>
-		<info name="alt_title" value="ラリーＸ"/>
+		<info name="alt_title" value="ラリーX"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1260288">
 				<rom name="rally x.t77" size="1260288" crc="1204cf6b" sha1="dd66cddb9e69250c208bb4184818a231c4f94328" offset="0" />
@@ -1574,7 +1574,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="serial" value="DP-3301162"/>
-		<info name="alt_title" value="ラリーＸ"/>
+		<info name="alt_title" value="ラリーX"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="122012">
 				<rom name="rally-x.t77" size="122012" crc="06b08db8" sha1="a6d96dfdf3c55f5325149b50f95e42347f00f664" offset="0" />
@@ -1719,7 +1719,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="release" value="198402xx"/>
-		<info name="alt_title" value="倉庫番２"/>
+		<info name="alt_title" value="倉庫番2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1161332">
 				<rom name="sokoban.t77" size="1161332" crc="40d4f9ea" sha1="d962a6b54099160c059b4ee11efeb9e3002ea89d" offset="0" />
@@ -1803,7 +1803,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1983</year>
 		<publisher>ブレーンコンピュータ (Brain Computer)</publisher>
 		<info name="serial" value="CS-1001"/>
-		<info name="alt_title" value="スペース２０３０"/>
+		<info name="alt_title" value="スペース2030"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3992296">
 				<rom name="sp2030.t77" size="3992296" crc="94bdc1c7" sha1="ef01b0cb28cd31ab01f2ec0a4725b1cdb4b0a52f" offset="0" />
@@ -2047,7 +2047,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>VIP - Simplified Language</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="簡易言語ＶＩＰ"/>
+		<info name="alt_title" value="簡易言語VIP"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1030788">
 				<rom name="vip.t77" size="1030788" crc="cff9cb8a" sha1="986e705617f0401a506b310715366b89cda61de4" offset="0" />
@@ -2275,7 +2275,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Black Jack &amp; Bonus</description>
 		<year>1981?</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ブラックジャック＆ボーナス"/> <!-- Marked ブラックジャック＆ボーナス 6 in the pack I found -->
+		<info name="alt_title" value="ブラックジャック&amp;ボーナス"/> <!-- Marked ブラックジャック＆ボーナス 6 in the pack I found -->
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="448498">
 				<rom name="bjbonus.t77" size="448498" crc="90bd16b0" sha1="95b5a8c8a9259063017d409e1d3c5bb2826ac898" offset="0"/>
@@ -2311,7 +2311,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>FM-8 Program Library No. 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ＦＭ−８プログラムライブラリＮＯ．3"/>
+		<info name="alt_title" value="FM−8プログラムライブラリNO.3"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3453092">
 				<rom name="fm-8 program library 3.t77" size="3453092" crc="bb5bc9eb" sha1="85c75f9c8d243a9b94fcabcb50fbd581bb5d4ae9" offset="0"/>
@@ -2323,7 +2323,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>FM-8 Program Library No. 4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ＦＭ−８プログラムライブラリＮＯ．4"/>
+		<info name="alt_title" value="FM−8プログラムライブラリNO.4"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3230932">
 				<rom name="fm-8 program library 4.t77" size="3230932" crc="2b2c73c1" sha1="02e6fadf819d7b5337b590c670106b379ff95030" offset="0"/>

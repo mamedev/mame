@@ -40,7 +40,7 @@
 		<publisher>E3Staff</publisher>
 		<info name="serial" value="SWJ-HTRC01"/>
 		<info name="release" value="20011025"/>
-		<info name="alt_title" value="マリー＆エリー ～ふたりのアトリエ～"/>
+		<info name="alt_title" value="マリー&amp;エリー ～ふたりのアトリエ～"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-htrc01.bin" size="4194304" crc="b18cdc0d" sha1="99d9d7f951ae589059f34e76aea7489ae4cd79f1" offset="000000" />
@@ -85,7 +85,7 @@
 		<publisher>WiZ</publisher>
 		<info name="serial" value="SWJ-WIZC01"/>
 		<info name="release" value="20020810"/>
-		<info name="alt_title" value="激闘！ クラッシュギア ターボギアチャンピオンリーグ"/>
+		<info name="alt_title" value="激闘! クラッシュギア ターボギアチャンピオンリーグ"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-wizc01.bin" size="4194304" crc="8a8b827c" sha1="1bc1e831b9e2aefc59f2cac5f19f7d22be574fc1" offset="000000" />
@@ -556,7 +556,7 @@
 		<publisher>Square</publisher>
 		<info name="serial" value="SWJ-SQRC06"/>
 		<info name="release" value="20020214"/>
-		<info name="alt_title" value="はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ…！！"/>
+		<info name="alt_title" value="はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ...!!"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-sqrc06.bin" size="4194304" crc="31e09bed" sha1="2e3f221d6965f53b29586d2019ee81dec6d1ac30" offset="000000" />
@@ -733,7 +733,7 @@
 		<publisher>Tom Create</publisher>
 		<info name="serial" value="SWJ-TMCC01"/>
 		<info name="release" value="20010614"/>
-		<info name="alt_title" value="くるパラ！"/>
+		<info name="alt_title" value="くるパラ!"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-tmcc01.bin" size="2097152" crc="274719f5" sha1="9942d1b7d1c00126b9891e560e6a3e264f8fdc2e" offset="000000" />
@@ -1052,7 +1052,7 @@
 		<publisher>Square</publisher>
 		<info name="serial" value="SWJ-SQRC07"/>
 		<info name="release" value="20011220"/>
-		<info name="alt_title" value="ロマンシング　サ・ガ"/>
+		<info name="alt_title" value="ロマンシング サ・ガ"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-sqrc07.bin" size="4194304" crc="9c98d97d" sha1="06fcc9aad3ae478db6eed27621af4f56a6488a67" offset="000000" />

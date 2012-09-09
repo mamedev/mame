@@ -960,7 +960,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="20060126"/>
 		<info name="release" value="AGB-BW3J-JPN"/>
-		<info name="alt_title" value="ダブルパック ソニックアドバンス＆チューチューロケット！"/>
+		<info name="alt_title" value="ダブルパック ソニックアドバンス&amp;チューチューロケット!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="16777216">
@@ -989,7 +989,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="20060126"/>
 		<info name="release" value="AGB-BW4J-JPN"/>
-		<info name="alt_title" value="ダブルパック ソニックバトル＆ソニックアドバンス"/>
+		<info name="alt_title" value="ダブルパック ソニックバトル&amp;ソニックアドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="33554432">
@@ -1018,7 +1018,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="AGB-BW6J-JPN"/>
 		<info name="release" value="20060126"/>
-		<info name="alt_title" value="ダブルパック ソニックピンボールパーティ＆ソニックバトル"/>
+		<info name="alt_title" value="ダブルパック ソニックピンボールパーティ&amp;ソニックバトル"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="33554432">
@@ -1460,7 +1460,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BFVJ-JPN"/>
 		<info name="release" value="20040812"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(1) めざせデビュー！ファッションデザイナーものがたり ＋ かわいいペットゲームギャラリー2"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(1) めざせデビュー!ファッションデザイナーものがたり + かわいいペットゲームギャラリー2"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -1475,7 +1475,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BOPJ-JPN"/>
 		<info name="release" value="20041022"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(2) おしゃれプリンセス4 + スウィートライフ＋恋愛占い大作戦！"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(2) おしゃれプリンセス4 + スウィートライフ+恋愛占い大作戦!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -1490,7 +1490,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BQMJ-JPN"/>
 		<info name="release" value="20041210"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(3) 昆虫モンスター 王者決定戦 ＋ スーパーチャイニーズラビリンス"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(3) 昆虫モンスター 王者決定戦 + スーパーチャイニーズラビリンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -1505,7 +1505,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BHFJ-JPN"/>
 		<info name="release" value="20041210"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(4) ハムハムモンスターEX ハムスター物語RPG ＋ ハムスター物語 魔法の迷宮1.2.3"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(4) ハムハムモンスターEX ハムスター物語RPG + ハムスター物語 魔法の迷宮1.2.3"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -1520,7 +1520,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BMWJ-JPN"/>
 		<info name="release" value="20041210"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(5) 魔法の国のケーキ屋さん物語 ＋ わんわん名探偵EX"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(5) 魔法の国のケーキ屋さん物語 + わんわん名探偵EX"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -1535,7 +1535,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BWNJ-JPN"/>
 		<info name="release" value="20041210"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(6) 仔犬といっしょ2スペシャル ＋ わんにゃんアイドル学園"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(6) 仔犬といっしょ2スペシャル + わんにゃんアイドル学園"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -1550,7 +1550,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-B2PJ-JPN"/>
 		<info name="release" value="20041217"/>
-		<info name="alt_title" value="２つあそべるうれしいツインシリーズ(7) ツインパズル きせかえわんこEX ＋ ニャーとチューのレインボーマジック2"/>
+		<info name="alt_title" value="2つあそべるうれしいツインシリーズ(7) ツインパズル きせかえわんこEX + ニャーとチューのレインボーマジック2"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -1661,7 +1661,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-BZPJ-JPN"/>
 		<info name="release" value="20050913"/>
-		<info name="alt_title" value="ドクターマリオ ＆ パネルでポン"/>
+		<info name="alt_title" value="ドクターマリオ &amp; パネルでポン"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -2403,7 +2403,7 @@
 		<publisher>Aruze</publisher>
 		<info name="serial" value="AGB-BABJ	"/>
 		<info name="release" value="20041126"/>
-		<info name="alt_title" value="アレックボードンアドベンチャー タワー＆シャフト アドバンス"/>
+		<info name="alt_title" value="アレックボードンアドベンチャー タワー&amp;シャフト アドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -2620,7 +2620,7 @@
 		<publisher>MTO</publisher>
 		<info name="serial" value="AGB-AFNJ-JPN"/>
 		<info name="release" value="20030418"/>
-		<info name="alt_title" value="めざせ！学園のファッションリーダー エンジェル コレクション"/>
+		<info name="alt_title" value="めざせ!学園のファッションリーダー エンジェル コレクション"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -2704,7 +2704,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BAYJ-JPN (RK384-J1)"/>
 		<info name="release" value="20051222"/>
-		<info name="alt_title" value="アニマル横町 どき☆どき 救出大作戦！の巻"/>
+		<info name="alt_title" value="アニマル横町 どき☆どき 救出大作戦!の巻"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -2719,7 +2719,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BAXJ-JPN (RK393-J1)"/>
 		<info name="release" value="20060518"/>
-		<info name="alt_title" value="アニマル横町 どき☆どき進級試験！の巻"/>
+		<info name="alt_title" value="アニマル横町 どき☆どき進級試験!の巻"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -2922,7 +2922,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BAMJ-JPN (RK346-J1)"/>
 		<info name="release" value="20031204"/>
-		<info name="alt_title" value="あしたのジョー まっ赤に燃え上がれ！"/>
+		<info name="alt_title" value="あしたのジョー まっ赤に燃え上がれ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -3173,7 +3173,7 @@
 		<publisher>Atlus</publisher>
 		<info name="serial" value="AGB-BBMJ-JPN"/>
 		<info name="release" value="20050805"/>
-		<info name="alt_title" value="B-伝説！バトルビーダマン ファイヤースピリッツ！"/>
+		<info name="alt_title" value="B-伝説!バトルビーダマン ファイヤースピリッツ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -3188,7 +3188,7 @@
 		<publisher>Atlus</publisher>
 		<info name="serial" value="AGB-BDXJ-JPN"/>
 		<info name="release" value="20050805"/>
-		<info name="alt_title" value="B-伝説！バトルビーダマン 燃えろ！ビー魂！！"/>
+		<info name="alt_title" value="B-伝説!バトルビーダマン 燃えろ!ビー魂!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -3411,7 +3411,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="AGB-AHEJ-JPN"/>
 		<info name="release" value="20011206"/>
-		<info name="alt_title" value="爆転シュート ベイブレード 激闘！最強ブレーダー"/>
+		<info name="alt_title" value="爆転シュート ベイブレード 激闘!最強ブレーダー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -3426,7 +3426,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="AGB-A3EJ-JPN"/>
 		<info name="release" value="20021206"/>
-		<info name="alt_title" value="爆転シュート ベイブレード2002 激戦！チームバトル！！黄龍の章 −ダイチ編−"/>
+		<info name="alt_title" value="爆転シュート ベイブレード2002 激戦!チームバトル!!黄龍の章 −ダイチ編−"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -3441,7 +3441,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="AGB-A3WJ-JPN"/>
 		<info name="release" value="20021206"/>
-		<info name="alt_title" value="爆転シュート ベイブレード2002 激戦！チームバトル！！青龍の章 −タカオ編−"/>
+		<info name="alt_title" value="爆転シュート ベイブレード2002 激戦!チームバトル!!青龍の章 −タカオ編−"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -3456,7 +3456,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="AGB-AB8J-JPN"/>
 		<info name="release" value="20020627"/>
-		<info name="alt_title" value="爆転シュート ベイブレード2002 いくぜ！爆闘！超磁力バトル！！"/>
+		<info name="alt_title" value="爆転シュート ベイブレード2002 いくぜ!爆闘!超磁力バトル!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -3807,7 +3807,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AZBJ-JPN (RK320-J1)"/>
 		<info name="release" value="20021205"/>
-		<info name="alt_title" value="バス釣りしようぜ！ トーナメントは戦略だ！"/>
+		<info name="alt_title" value="バス釣りしようぜ! トーナメントは戦略だ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -4079,7 +4079,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AH5J-JPN (RK288-J1)"/>
 		<info name="release" value="20021031"/>
-		<info name="alt_title" value="ビーストシューター めざせ闘獣王！"/>
+		<info name="alt_title" value="ビーストシューター めざせ闘獣王!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -4644,7 +4644,7 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="AGB-BOBJ-JPN"/>
 		<info name="release" value="20030807"/>
-		<info name="alt_title" value="ボボボーボ・ボーボボ マジで！！？真拳勝負"/>
+		<info name="alt_title" value="ボボボーボ・ボーボボ マジで!!?真拳勝負"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -6506,7 +6506,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="AGB-ACRJ-JPN"/>
 		<info name="release" value="20010321"/>
-		<info name="alt_title" value="チューチューロケット！"/>
+		<info name="alt_title" value="チューチューロケット!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="4194304">
@@ -7010,7 +7010,7 @@
 		<publisher>Vivendi Universal</publisher>
 		<info name="serial" value="AGB-BKDJ-JPN"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="クラッシュ・バンディクー アドバンス わくわく友ダチ大作戦！"/>
+		<info name="alt_title" value="クラッシュ・バンディクー アドバンス わくわく友ダチ大作戦!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -7025,7 +7025,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AC8J-JPN (RK345-J1)"/>
 		<info name="release" value="20031204"/>
-		<info name="alt_title" value="クラッシュ・バンディクー アドバンス2 ぐるぐるさいみん大パニック！？"/>
+		<info name="alt_title" value="クラッシュ・バンディクー アドバンス2 ぐるぐるさいみん大パニック!?"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -7040,7 +7040,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BCNJ-JPN (RK351-J1)"/>
 		<info name="release" value="20040826"/>
-		<info name="alt_title" value="クラッシュ・バンディクー 爆走！ニトロカート"/>
+		<info name="alt_title" value="クラッシュ・バンディクー 爆走!ニトロカート"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -7146,7 +7146,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BKCJ-JPN"/>
 		<info name="release" value="20040416"/>
-		<info name="alt_title" value="クレヨンしんちゃん 嵐を呼ぶ シネマランドの大冒険！"/>
+		<info name="alt_title" value="クレヨンしんちゃん 嵐を呼ぶ シネマランドの大冒険!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -7161,7 +7161,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BC2J-JPN"/>
 		<info name="release" value="20060323"/>
-		<info name="alt_title" value="クレヨンしんちゃん 伝説を呼ぶオマケの都 ショックガーン！"/>
+		<info name="alt_title" value="クレヨンしんちゃん 伝説を呼ぶオマケの都 ショックガーン!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="33554432">
@@ -7289,7 +7289,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A6CJ-JPN (RK286-J1)"/>
 		<info name="release" value="20021017"/>
-		<info name="alt_title" value="コロッケ！夢のバンカーサバイバル！"/>
+		<info name="alt_title" value="コロッケ!夢のバンカーサバイバル!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -7304,7 +7304,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BK2J-JPN (RK328-J1)"/>
 		<info name="release" value="20030717"/>
-		<info name="alt_title" value="コロッケ！2 闇のバンクとバン女王"/>
+		<info name="alt_title" value="コロッケ!2 闇のバンクとバン女王"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -7319,7 +7319,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-B3KJ-JPN (RK344-J1)"/>
 		<info name="release" value="20031211"/>
-		<info name="alt_title" value="コロッケ！3 グラニュー王国の謎"/>
+		<info name="alt_title" value="コロッケ!3 グラニュー王国の謎"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -7334,7 +7334,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BK4J-JPN (RK359-J1)"/>
 		<info name="release" value="20040722"/>
-		<info name="alt_title" value="コロッケ！4 バンクの森の守護神"/>
+		<info name="alt_title" value="コロッケ!4 バンクの森の守護神"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -7349,7 +7349,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BK5J-JPN (RK368-J1)"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="コロッケ！Great 時空の冒険者"/>
+		<info name="alt_title" value="コロッケ!Great 時空の冒険者"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -7620,7 +7620,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="AGB-BDNJ-JPN"/>
 		<info name="release" value="20040922"/>
-		<info name="alt_title" value="ダンドー!! 飛ばせ！勝利のスマイルショット！！"/>
+		<info name="alt_title" value="ダンドー!! 飛ばせ!勝利のスマイルショット!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -8288,7 +8288,7 @@
 		<publisher>Broccoli</publisher>
 		<info name="serial" value="AGB-BDKJ-JPN"/>
 		<info name="release" value="20040715"/>
-		<info name="alt_title" value="でじこミュニケーション2 打倒！ブラックゲマゲマ団"/>
+		<info name="alt_title" value="でじこミュニケーション2 打倒!ブラックゲマゲマ団"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -8504,7 +8504,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A2AJ-JPN (RK310-J1)"/>
 		<info name="release" value="20021219"/>
-		<info name="alt_title" value="ディズニースポーツ：バスケットボール"/>
+		<info name="alt_title" value="ディズニースポーツ:バスケットボール"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -8545,7 +8545,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A3DJ-JPN (RK300-J1)"/>
 		<info name="release" value="20021105"/>
-		<info name="alt_title" value="ディズニースポーツ：アメリカンフットボール"/>
+		<info name="alt_title" value="ディズニースポーツ:アメリカンフットボール"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -8573,7 +8573,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AOMJ-JPN (RK325-J1)"/>
 		<info name="release" value="20030213"/>
-		<info name="alt_title" value="ディズニースポーツ：モトクロス"/>
+		<info name="alt_title" value="ディズニースポーツ:モトクロス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -8614,7 +8614,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A4DJ-JPN (RK299-J1)"/>
 		<info name="release" value="20020725"/>
-		<info name="alt_title" value="ディズニースポーツ：スケートボーディング"/>
+		<info name="alt_title" value="ディズニースポーツ:スケートボーディング"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -8655,7 +8655,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A5DJ-JPN (RK311-J1)"/>
 		<info name="release" value="20030116"/>
-		<info name="alt_title" value="ディズニースポーツ：スノーボーディング"/>
+		<info name="alt_title" value="ディズニースポーツ:スノーボーディング"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -8696,7 +8696,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A6DJ-JPN (RK298-J1)"/>
 		<info name="release" value="20020718"/>
-		<info name="alt_title" value="ディズニースポーツ：サッカー"/>
+		<info name="alt_title" value="ディズニースポーツ:サッカー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -8930,7 +8930,7 @@
 		<publisher>Asmik Ace</publisher>
 		<info name="serial" value="AGB-ADQJ-JPN"/>
 		<info name="release" value="20010803"/>
-		<info name="alt_title" value="ドカポンQ モンスターハンター！"/>
+		<info name="alt_title" value="ドカポンQ モンスターハンター!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -9043,7 +9043,7 @@
 		<publisher>Aruze</publisher>
 		<info name="serial" value="AGB-BDAJ-JPN"/>
 		<info name="release" value="20040729"/>
-		<info name="alt_title" value="ドンちゃんパズル 花火でドーン！アドバンス"/>
+		<info name="alt_title" value="ドンちゃんパズル 花火でドーン!アドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -9249,7 +9249,7 @@
 		<publisher>Epoch</publisher>
 		<info name="serial" value="AGB-ADRJ-JPN"/>
 		<info name="release" value="20010427"/>
-		<info name="alt_title" value="ドラえもん 緑の惑星ドキドキ大救出！"/>
+		<info name="alt_title" value="ドラえもん 緑の惑星ドキドキ大救出!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -10349,7 +10349,7 @@
 		<publisher>Kemco</publisher>
 		<info name="serial" value="AGB-AEMJ-JPN"/>
 		<info name="release" value="20020927"/>
-		<info name="alt_title" value="エッグマニア つかんで！まわして！どっすんぱず〜る"/>
+		<info name="alt_title" value="エッグマニア つかんで!まわして!どっすんぱず〜る"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="egg mania - tsukande! mawashite! dossun puzzle!! (japan).bin" size="4194304" crc="4beab3ac" sha1="d175d957d8babe6d2f9b2fb785304fd6e89c94ce" offset="000000" />
@@ -10363,7 +10363,7 @@
 		<publisher>SIMS</publisher>
 		<info name="serial" value="AGB-AEKJ-JPN"/>
 		<info name="release" value="20030103"/>
-		<info name="alt_title" value="エレミックス！"/>
+		<info name="alt_title" value="エレミックス!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -11379,7 +11379,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-FGGJ-JPN"/>
 		<info name="release" value="20040521"/>
-		<info name="alt_title" value="ファミコンミニ20 がんばれゴエモン！からくり道中"/>
+		<info name="alt_title" value="ファミコンミニ20 がんばれゴエモン!からくり道中"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -12104,7 +12104,7 @@
 		<publisher>Spike</publisher>
 		<info name="serial" value="AGB-AFWJ-JPN"/>
 		<info name="release" value="20020718"/>
-		<info name="alt_title" value="ファイナルファイヤープロレスリング 夢の団体運営！"/>
+		<info name="alt_title" value="ファイナルファイヤープロレスリング 夢の団体運営!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="16777216">
@@ -12766,7 +12766,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-AUSJ-JPN"/>
 		<info name="release" value="20030328"/>
-		<info name="alt_title" value="テレビアニメ ワンピース めざせ！キング オブ ベリー"/>
+		<info name="alt_title" value="テレビアニメ ワンピース めざせ!キング オブ ベリー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="8388608">
@@ -12871,7 +12871,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="AGB-BFPJ-JPN"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="ふたりはプリキュア ありえな〜い！夢の国は大迷宮"/>
+		<info name="alt_title" value="ふたりはプリキュア ありえな〜い!夢の国は大迷宮"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -12886,7 +12886,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="AGB-BFMJ-JPN"/>
 		<info name="release" value="20050728"/>
-		<info name="alt_title" value="ふたりはプリキュア マックスハート - マジ？マジ？！ファイト de IN じゃない"/>
+		<info name="alt_title" value="ふたりはプリキュア マックスハート - マジ?マジ?!ファイト de IN じゃない"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -12901,7 +12901,7 @@
 		<publisher>Smilesoft</publisher>
 		<info name="serial" value="AGB-ABIJ-JPN"/>
 		<info name="release" value="20020726"/>
-		<info name="alt_title" value="ガチャステ！ダイナデバイス ブルー"/>
+		<info name="alt_title" value="ガチャステ!ダイナデバイス ブルー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="8388608">
@@ -12916,7 +12916,7 @@
 		<publisher>Smilesoft</publisher>
 		<info name="serial" value="AGB-AAIJ-JPN"/>
 		<info name="release" value="20020726"/>
-		<info name="alt_title" value="ガチャステ！ダイナデバイス レッド"/>
+		<info name="alt_title" value="ガチャステ!ダイナデバイス レッド"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="8388608">
@@ -12931,7 +12931,7 @@
 		<publisher>Rocket Company</publisher>
 		<info name="serial" value="AGB-A4XJ-JPN"/>
 		<info name="release" value="20031205"/>
-		<info name="alt_title" value="ガチャステ！ダイナデバイス2 ドラゴン"/>
+		<info name="alt_title" value="ガチャステ!ダイナデバイス2 ドラゴン"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -12946,7 +12946,7 @@
 		<publisher>Rocket Company</publisher>
 		<info name="serial" value="AGB-A4WJ-JPN"/>
 		<info name="release" value="20031205"/>
-		<info name="alt_title" value="ガチャステ！ダイナデバイス2 フェニックス"/>
+		<info name="alt_title" value="ガチャステ!ダイナデバイス2 フェニックス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -13017,7 +13017,7 @@
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="AGB-AYSJ-JPN"/>
 		<info name="release" value="20011207"/>
-		<info name="alt_title" value="学校をつくろう！！アドバンス"/>
+		<info name="alt_title" value="学校をつくろう!!アドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -13587,7 +13587,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="AGB-BG8J-JPN"/>
 		<info name="release" value="20050127"/>
-		<info name="alt_title" value="がんばれ！ ドッジファイターズ"/>
+		<info name="alt_title" value="がんばれ! ドッジファイターズ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -13665,7 +13665,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BGKJ-JPN (RK329-J1)"/>
 		<info name="release" value="20031211"/>
-		<info name="alt_title" value="ゲゲゲの鬼太郎 危機一髪！ 妖怪列島"/>
+		<info name="alt_title" value="ゲゲゲの鬼太郎 危機一髪! 妖怪列島"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -13719,7 +13719,7 @@
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="AGB-ACBJ-JPN"/>
 		<info name="release" value="20011130"/>
-		<info name="alt_title" value="激闘！カーバトラーGO !!"/>
+		<info name="alt_title" value="激闘!カーバトラーGO !!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -13747,7 +13747,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BGJJ-JPN (RK375-J1)"/>
 		<info name="release" value="20041223"/>
-		<info name="alt_title" value="幻星神ジャスティライザー 装着！地球の戦士たち"/>
+		<info name="alt_title" value="幻星神ジャスティライザー 装着!地球の戦士たち"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="16777216">
@@ -13791,7 +13791,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BGIJ-JPN (RK364-J1)"/>
 		<info name="release" value="20040722"/>
-		<info name="alt_title" value="Get Ride! アムドライバー 閃光のヒーロー誕生！"/>
+		<info name="alt_title" value="Get Ride! アムドライバー 閃光のヒーロー誕生!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="16777216">
@@ -13806,7 +13806,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BGPJ-JPN (RK366-J1)"/>
 		<info name="release" value="20041216"/>
-		<info name="alt_title" value="Get Ride! アムドライバー出撃！バトルパーティー"/>
+		<info name="alt_title" value="Get Ride! アムドライバー出撃!バトルパーティー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -13836,7 +13836,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BGFJ-JPN (RK332-J1)"/>
 		<info name="release" value="20030904"/>
-		<info name="alt_title" value="ゲットバッカーズ 奪還屋 邪眼封印！"/>
+		<info name="alt_title" value="ゲットバッカーズ 奪還屋 邪眼封印!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -13866,7 +13866,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A8GJ-JPN (RK315-J1)"/>
 		<info name="release" value="20030320"/>
-		<info name="alt_title" value="ゲットバッカーズ 奪還屋 メトロポリス奪還作戦！"/>
+		<info name="alt_title" value="ゲットバッカーズ 奪還屋 メトロポリス奪還作戦!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="8388608">
@@ -13984,7 +13984,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AGNJ-JPN (RK268-J1)"/>
 		<info name="release" value="20020228"/>
-		<info name="alt_title" value="ゴエモン ニューエイジ出動！"/>
+		<info name="alt_title" value="ゴエモン ニューエイジ出動!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -15019,7 +15019,7 @@
 		<publisher>Sunrise Interactive</publisher>
 		<info name="serial" value="AGB-AHQJ-JPN"/>
 		<info name="release" value="20020705"/>
-		<info name="alt_title" value="ハロボッツ ロボヒーローバトリング！！"/>
+		<info name="alt_title" value="ハロボッツ ロボヒーローバトリング!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -15325,7 +15325,7 @@
 		<publisher>TDK Core</publisher>
 		<info name="serial" value="AGB-BHDJ-JPN"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="ハロー！アイドルデビュー キッズアイドル育成ゲーム"/>
+		<info name="alt_title" value="ハロー!アイドルデビュー キッズアイドル育成ゲーム"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -15414,7 +15414,7 @@
 		<publisher>D3 Publisher</publisher>
 		<info name="serial" value="AGB-BHHJ-JPN"/>
 		<info name="release" value="20051222"/>
-		<info name="alt_title" value="ハイ！ハイ！パフィー★アミユミ 史上最大のワールドツアー！"/>
+		<info name="alt_title" value="ハイ!ハイ!パフィー★アミユミ 史上最大のワールドツアー!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -16030,7 +16030,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A8NJ-JPN (RK319-J1)"/>
 		<info name="release" value="20030424"/>
-		<info name="alt_title" value="ハンター×ハンター みんな友だち大作戦！！"/>
+		<info name="alt_title" value="ハンター×ハンター みんな友だち大作戦!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -16383,7 +16383,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="AGB-AIYJ-JPN"/>
 		<info name="release" value="20030123"/>
-		<info name="alt_title" value="犬夜叉 奈落の罠！ 迷いの森の招待状"/>
+		<info name="alt_title" value="犬夜叉 奈落の罠! 迷いの森の招待状"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -16471,7 +16471,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AIEJ-JPN (RK284-J1)"/>
 		<info name="release" value="20020328"/>
-		<info name="alt_title" value="一石八鳥 これ1本で8種類！"/>
+		<info name="alt_title" value="一石八鳥 これ1本で8種類!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -16529,7 +16529,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="AGB-AC2J-JPN"/>
 		<info name="release" value="20020905"/>
-		<info name="alt_title" value="Jリーグ プロサッカークラブをつくろう！アドバンス"/>
+		<info name="alt_title" value="Jリーグ プロサッカークラブをつくろう!アドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -16761,7 +16761,7 @@
 		<publisher>Sammy</publisher>
 		<info name="serial" value="AGB-AJUJ-JPN"/>
 		<info name="release" value="20020322"/>
-		<info name="alt_title" value="実戦パチスロ必勝法！ 獣王アドバンス"/>
+		<info name="alt_title" value="実戦パチスロ必勝法! 獣王アドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="4194304">
@@ -16892,7 +16892,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AJ3J-JPN (RK255-J1)"/>
 		<info name="release" value="20010809"/>
-		<info name="alt_title" value="ジュラシックパークIII 恐竜にあいにいこう！"/>
+		<info name="alt_title" value="ジュラシックパークIII 恐竜にあいにいこう!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -17111,7 +17111,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="AGB-BKOJ-JPN"/>
 		<info name="release" value="20040715"/>
-		<info name="alt_title" value="かいけつゾロリとまほうのゆうえんち お姫様をすくえ！"/>
+		<info name="alt_title" value="かいけつゾロリとまほうのゆうえんち お姫様をすくえ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -17382,7 +17382,7 @@
 		<publisher>Sunrise Interactive</publisher>
 		<info name="serial" value="AGB-BKJJ-JPN"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="ケロロ軍曹 対決！ 激走ケロンプリ大作戦であります！！"/>
+		<info name="alt_title" value="ケロロ軍曹 対決! 激走ケロンプリ大作戦であります!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -17397,7 +17397,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BG2J-JPN (RK370-J1)"/>
 		<info name="release" value="20050421"/>
-		<info name="alt_title" value="傑作選！ がんばれゴエモン1・2 ゆき姫とマッギネス"/>
+		<info name="alt_title" value="傑作選! がんばれゴエモン1・2 ゆき姫とマッギネス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -17839,7 +17839,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AK5J-JPN (RK272-J1)"/>
 		<info name="release" value="20011206"/>
-		<info name="alt_title" value="筋肉番付 〜決めろ！奇跡の完全制覇〜"/>
+		<info name="alt_title" value="筋肉番付 〜決めろ!奇跡の完全制覇〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -17854,7 +17854,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AK4J-JPN (RK250-J1)"/>
 		<info name="release" value="20010726"/>
-		<info name="alt_title" value="筋肉番付 金剛くんの大冒険！"/>
+		<info name="alt_title" value="筋肉番付 金剛くんの大冒険!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -18098,7 +18098,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-BI2J-JPN"/>
 		<info name="release" value="20040402"/>
-		<info name="alt_title" value="仔犬といっしょ！2 〜あ・い・じ・ょ・う ものがたり〜"/>
+		<info name="alt_title" value="仔犬といっしょ!2 〜あ・い・じ・ょ・う ものがたり〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -18324,7 +18324,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BKBJ-JPN"/>
 		<info name="release" value="20040716"/>
-		<info name="alt_title" value="金色のガッシュベル！！魔界のブックマーク"/>
+		<info name="alt_title" value="金色のガッシュベル!!魔界のブックマーク"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -18339,7 +18339,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-A4GJ-JPN"/>
 		<info name="release" value="20031212"/>
-		<info name="alt_title" value="金色のガッシュベル！！ うなれ！友情の電撃"/>
+		<info name="alt_title" value="金色のガッシュベル!! うなれ!友情の電撃"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -18354,7 +18354,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BGYJ-JPN"/>
 		<info name="release" value="20041222"/>
-		<info name="alt_title" value="金色のガッシュベル！！ うなれ！友情の電撃2"/>
+		<info name="alt_title" value="金色のガッシュベル!! うなれ!友情の電撃2"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -18369,7 +18369,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BKEJ-JPN"/>
 		<info name="release" value="20050728"/>
-		<info name="alt_title" value="金色のガッシュベル！！ ザ・カードバトル"/>
+		<info name="alt_title" value="金色のガッシュベル!! ザ・カードバトル"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -18384,7 +18384,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BUDJ-JPN"/>
 		<info name="release" value="20051124"/>
-		<info name="alt_title" value="金色のガッシュベル！！ 友情の電撃 ドリームタッグトーナメント"/>
+		<info name="alt_title" value="金色のガッシュベル!! 友情の電撃 ドリームタッグトーナメント"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -18399,7 +18399,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-KHPJ-JPN"/>
 		<info name="release" value="20020308"/>
-		<info name="alt_title" value="コロコロパズル ハッピィパネッチュ！"/>
+		<info name="alt_title" value="コロコロパズル ハッピィパネッチュ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -18733,7 +18733,7 @@
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="AGB-AUTJ-JPN"/>
 		<info name="release" value="20021206"/>
-		<info name="alt_title" value="ララクロフト トゥームレイダー：プロフェシー"/>
+		<info name="alt_title" value="ララクロフト トゥームレイダー:プロフェシー"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="lara croft tomb raider - the prophecy (japan).bin" size="8388608" crc="7799e1da" sha1="87c98185d2641f71589076e74227f666b2c5c2e0" offset="000000" />
@@ -19240,7 +19240,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="AGB-BRPJ-JPN"/>
 		<info name="release" value="20040212"/>
-		<info name="alt_title" value="リリパット王国 〜リリモニといっしょプニ！〜"/>
+		<info name="alt_title" value="リリパット王国 〜リリモニといっしょプニ!〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -20186,7 +20186,7 @@
 		<publisher>Marvelous Interactive</publisher>
 		<info name="serial" value="AGB-BNGJ-JPN"/>
 		<info name="release" value="20050609"/>
-		<info name="alt_title" value="魔法先生ネギま！ プライベートレッスン sだめですぅ 図書館島"/>
+		<info name="alt_title" value="魔法先生ネギま! プライベートレッスン sだめですぅ 図書館島"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -20201,7 +20201,7 @@
 		<publisher>Marvelous Interactive</publisher>
 		<info name="serial" value="AGB-BNMJ-JPN"/>
 		<info name="release" value="20060323"/>
-		<info name="alt_title" value="魔法先生ネギま！プライベートレッスン2 お邪魔しますうパラサイトでチュ〜"/>
+		<info name="alt_title" value="魔法先生ネギま!プライベートレッスン2 お邪魔しますうパラサイトでチュ〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -20311,7 +20311,7 @@
 		<publisher>TDK Core</publisher>
 		<info name="serial" value="AGB-ACOJ-JPN"/>
 		<info name="release" value="20021220"/>
-		<info name="alt_title" value="まんが家デビュー物語 あこがれ！まんが家育成ゲーム"/>
+		<info name="alt_title" value="まんが家デビュー物語 あこがれ!まんが家育成ゲーム"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -20326,7 +20326,7 @@
 		<publisher>TDK Core</publisher>
 		<info name="serial" value="AGB-ACOJ-JPN"/>
 		<info name="release" value="20021220"/>
-		<info name="alt_title" value="まんが家デビュー物語 あこがれ！まんが家育成ゲーム"/>
+		<info name="alt_title" value="まんが家デビュー物語 あこがれ!まんが家育成ゲーム"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -20390,7 +20390,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-ANSJ-JPN"/>
 		<info name="release" value="20030124"/>
-		<info name="alt_title" value="マリー、エリー＆アニスのアトリエ 〜そよ風からの伝言〜"/>
+		<info name="alt_title" value="マリー、エリー&amp;アニスのアトリエ 〜そよ風からの伝言〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -20443,7 +20443,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-A88J-JPN"/>
 		<info name="release" value="20031121"/>
-		<info name="alt_title" value="マリオ＆ルイージRPG"/>
+		<info name="alt_title" value="マリオ&amp;ルイージRPG"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -21809,7 +21809,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-B3MJ-JPN (RK353-J1)"/>
 		<info name="release" value="20040318"/>
-		<info name="alt_title" value="マーメイドメロディーぴちぴちピッチ ぴちぴちっとライブスタート！"/>
+		<info name="alt_title" value="マーメイドメロディーぴちぴちピッチ ぴちぴちっとライブスタート!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="33554432">
@@ -21991,7 +21991,7 @@
 		<publisher>Tasuke</publisher>
 		<info name="serial" value="AGB-BMKJ-JPN"/>
 		<info name="release" value="20050301"/>
-		<info name="alt_title" value="めざせ！甲子園"/>
+		<info name="alt_title" value="めざせ!甲子園"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
 			<dataarea name="rom" size="8388608">
@@ -22207,7 +22207,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AOHJ-JPN (RK316-J1)"/>
 		<info name="release" value="20021212"/>
-		<info name="alt_title" value="ミニモニ。おねがい☆お星さま！"/>
+		<info name="alt_title" value="ミニモニ。おねがい☆お星さま!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -22431,7 +22431,7 @@
 		<publisher>Atlus</publisher>
 		<info name="serial" value="AGB-B3IJ-JPN"/>
 		<info name="release" value="20051103"/>
-		<info name="alt_title" value="みらくる！ぱんぞう 7つの星の宇宙海賊"/>
+		<info name="alt_title" value="みらくる!ぱんぞう 7つの星の宇宙海賊"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -22535,7 +22535,7 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="AGB-BJCJ-JPN"/>
 		<info name="release" value="20041028"/>
-		<info name="alt_title" value="燃えろ！！ジャレココレクション"/>
+		<info name="alt_title" value="燃えろ!!ジャレココレクション"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM" />
 			<dataarea name="rom" size="4194304">
@@ -22550,7 +22550,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="AGB-BM2J-JPN"/>
 		<info name="release" value="20050630"/>
-		<info name="alt_title" value="桃太郎電鉄G ゴールドデッキを作れ！"/>
+		<info name="alt_title" value="桃太郎電鉄G ゴールドデッキを作れ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -23554,7 +23554,7 @@
 		<publisher>MTO</publisher>
 		<info name="serial" value="AGB-BKIJ-JPN"/>
 		<info name="release" value="20030711"/>
-		<info name="alt_title" value="なかよしペットアドバンスシリーズ(4) かわいい仔犬ミニ わんこと遊ぼう！！ 小型犬"/>
+		<info name="alt_title" value="なかよしペットアドバンスシリーズ(4) かわいい仔犬ミニ わんこと遊ぼう!! 小型犬"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -23729,7 +23729,7 @@
 		<publisher>Tomy</publisher>
 		<info name="serial" value="AGB-A7AJ-JPN"/>
 		<info name="release" value="20030501"/>
-		<info name="alt_title" value="NARUTO-ナルト- 忍術全開！最強忍者 大結集"/>
+		<info name="alt_title" value="NARUTO-ナルト- 忍術全開!最強忍者 大結集"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -24194,7 +24194,7 @@
 		<publisher>MTO</publisher>
 		<info name="serial" value="AGB-BIKJ-JPN"/>
 		<info name="release" value="20041028"/>
-		<info name="alt_title" value="お茶犬くるりん 〜ほんわかパズルで「ほっ」としよ？〜"/>
+		<info name="alt_title" value="お茶犬くるりん 〜ほんわかパズルで「ほっ」としよ?〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="4194304">
@@ -24308,7 +24308,7 @@
 		<publisher>Takara</publisher>
 		<info name="serial" value="AGB-AOKJ-JPN"/>
 		<info name="release" value="20011130"/>
-		<info name="alt_title" value="億万長者ゲーム のっとり大作戦！"/>
+		<info name="alt_title" value="億万長者ゲーム のっとり大作戦!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="4194304">
@@ -24336,7 +24336,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="AGB-BIPJ-JPN"/>
 		<info name="release" value="20050428"/>
-		<info name="alt_title" value="ワンピース ドラゴンドリーム！"/>
+		<info name="alt_title" value="ワンピース ドラゴンドリーム!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="16777216">
@@ -25175,7 +25175,7 @@
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="AGB-BP3J-JPN"/>
 		<info name="release" value="20040423"/>
-		<info name="alt_title" value="Piaキャロットへようこそ！！3.3"/>
+		<info name="alt_title" value="Piaキャロットへようこそ!!3.3"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -25370,7 +25370,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="AGB-AP6J-JPN"/>
 		<info name="release" value="20020718"/>
-		<info name="alt_title" value="ピノビィー＆フィービィー"/>
+		<info name="alt_title" value="ピノビィー&amp;フィービィー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -26962,7 +26962,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="AGB-ALMJ-JPN"/>
 		<info name="release" value="20020808"/>
-		<info name="alt_title" value="プロ野球チームをつくろう！アドバンス"/>
+		<info name="alt_title" value="プロ野球チームをつくろう!アドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -27020,7 +27020,7 @@
 		<publisher>Marvelous Interactive</publisher>
 		<info name="serial" value="AGB-B3PJ-JPN"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="ぷくぷく天然かいらんばん ようこそ！イリュージョンランドへ"/>
+		<info name="alt_title" value="ぷくぷく天然かいらんばん ようこそ!イリュージョンランドへ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -27126,7 +27126,7 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="AGB-AEHJ-JPN"/>
 		<info name="release" value="20030328"/>
-		<info name="alt_title" value="パズル＆探偵コレクション"/>
+		<info name="alt_title" value="パズル&amp;探偵コレクション"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -27141,7 +27141,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BPBJ-JPN (RK354-J1)"/>
 		<info name="release" value="20040429"/>
-		<info name="alt_title" value="ピューと吹く！ジャガー ビョ〜と出る！メガネくん"/>
+		<info name="alt_title" value="ピューと吹く!ジャガー ビョ〜と出る!メガネくん"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -28075,7 +28075,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="AGB-AFCJ-JPN"/>
 		<info name="release" value="20020810"/>
-		<info name="alt_title" value="ロックマン＆フォルテ"/>
+		<info name="alt_title" value="ロックマン&amp;フォルテ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -28659,7 +28659,7 @@
 		<publisher>PCCW Japan</publisher>
 		<info name="serial" value="AGB-A57J-JPN"/>
 		<info name="release" value="20021115"/>
-		<info name="alt_title" value="スキャンハンター 千年怪魚を追え！"/>
+		<info name="alt_title" value="スキャンハンター 千年怪魚を追え!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -29616,7 +29616,7 @@
 		<publisher>Atlus</publisher>
 		<info name="serial" value="AGB-A8ZJ-JPN"/>
 		<info name="release" value="20030725"/>
-		<info name="alt_title" value="真・女神転生 デビルチルドレン パズルdeコール！"/>
+		<info name="alt_title" value="真・女神転生 デビルチルドレン パズルdeコール!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -30404,7 +30404,7 @@
 		<publisher>Nippon Telenet</publisher>
 		<info name="serial" value="AGB-ATBJ-JPN"/>
 		<info name="release" value="20020426"/>
-		<info name="alt_title" value="スロット！プロ2 アドバンス - GO GO ジャグラー＆Newタイリョウ"/>
+		<info name="alt_title" value="スロット!プロ2 アドバンス - GO GO ジャグラー&amp;Newタイリョウ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -30419,7 +30419,7 @@
 		<publisher>Nippon Telenet</publisher>
 		<info name="serial" value="AGB-ASFJ-JPN"/>
 		<info name="release" value="20011228"/>
-		<info name="alt_title" value="スロット！プロ アドバンス - 宝船＆大江戸桜吹雪2"/>
+		<info name="alt_title" value="スロット!プロ アドバンス - 宝船&amp;大江戸桜吹雪2"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -31607,7 +31607,7 @@
 		<publisher>Vivendi Universal</publisher>
 		<info name="serial" value="AGB-BS8J-JPN"/>
 		<info name="release" value="20041209"/>
-		<info name="alt_title" value="スパイロ アドバンス わくわく友ダチ大作戦！"/>
+		<info name="alt_title" value="スパイロ アドバンス わくわく友ダチ大作戦!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="16777216">
@@ -33016,7 +33016,7 @@
 		<publisher>Capcom</publisher>
 		<info name="serial" value="AGB-AXRJ-JPN"/>
 		<info name="release" value="20010713"/>
-		<info name="alt_title" value="スーパーストリートファイターII X　リバイバル"/>
+		<info name="alt_title" value="スーパーストリートファイターII X リバイバル"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -33185,7 +33185,7 @@
 		<publisher>Epoch</publisher>
 		<info name="serial" value="AGB-BSFJ-JPN"/>
 		<info name="release" value="20041202"/>
-		<info name="alt_title" value="シルバニアファミリー ファッションデザイナーになりたい！ くるみリスの女の子"/>
+		<info name="alt_title" value="シルバニアファミリー ファッションデザイナーになりたい! くるみリスの女の子"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -33258,7 +33258,7 @@
 		<publisher>Jorudan</publisher>
 		<info name="serial" value="AGB-BU6J-JPN"/>
 		<info name="release" value="20040305"/>
-		<info name="alt_title" value="対決！ ウルトラヒーロー"/>
+		<info name="alt_title" value="対決! ウルトラヒーロー"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -33488,7 +33488,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BTIJ-JPN (RK349-J1)"/>
 		<info name="release" value="20040304"/>
-		<info name="alt_title" value="探偵学園Q 究極トリックに挑め！"/>
+		<info name="alt_title" value="探偵学園Q 究極トリックに挑め!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -33503,7 +33503,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BTQJ-JPN (RK333-J1)"/>
 		<info name="release" value="20030918"/>
-		<info name="alt_title" value="探偵学園Q 名探偵はキミだ！"/>
+		<info name="alt_title" value="探偵学園Q 名探偵はキミだ!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -33725,7 +33725,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AVAJ-JPN (RK295-J1)"/>
 		<info name="release" value="20021212"/>
-		<info name="alt_title" value="テニスの王子様 エイム アット ザ ビクトリー！"/>
+		<info name="alt_title" value="テニスの王子様 エイム アット ザ ビクトリー!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="16777216">
@@ -34229,7 +34229,7 @@
 		<publisher>MTO</publisher>
 		<info name="serial" value="AGB-AF7J-JPN"/>
 		<info name="release" value="20020719"/>
-		<info name="alt_title" value="ときめき夢シリーズ(1) お花屋さんになろう！"/>
+		<info name="alt_title" value="ときめき夢シリーズ(1) お花屋さんになろう!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -35357,7 +35357,7 @@
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="AGB-BUHJ-JPN"/>
 		<info name="release" value="20060302"/>
-		<info name="alt_title" value="うえきの法則 神器炸裂！能力者バトル"/>
+		<info name="alt_title" value="うえきの法則 神器炸裂!能力者バトル"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -35852,7 +35852,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BMYJ-JPN (RK339-J1)"/>
 		<info name="release" value="20031211"/>
-		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン！ 8人の時の妖精"/>
+		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン! 8人の時の妖精"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -35867,7 +35867,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BMIJ-JPN (RK381-J1)"/>
 		<info name="release" value="20050908"/>
-		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン！ どきどきメモリアルパニック"/>
+		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン! どきどきメモリアルパニック"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="33554432">
@@ -35882,7 +35882,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BWPJ-JPN (RK371-J1)"/>
 		<info name="release" value="20041216"/>
-		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン！ 謎のカギと真実のトビラ"/>
+		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン! 謎のカギと真実のトビラ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -35897,7 +35897,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-AWKJ-JPN (RK322-J1)"/>
 		<info name="release" value="20021219"/>
-		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン！ 〜黄金マラカスの伝説〜"/>
+		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン! 〜黄金マラカスの伝説〜"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="4194304">
@@ -35912,7 +35912,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BMPJ-JPN (RK336-J1)"/>
 		<info name="release" value="20030911"/>
-		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン！ 対戦まほうだま"/>
+		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン! 対戦まほうだま"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -35927,7 +35927,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BWFJ-JPN (RK360-J1)"/>
 		<info name="release" value="20040715"/>
-		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン！ 夢のカケラ"/>
+		<info name="alt_title" value="わがまま☆フェアリー ミルモでポン! 夢のカケラ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -36007,7 +36007,7 @@
 		<publisher>MTO</publisher>
 		<info name="serial" value="AGB-BWKJ-JPN"/>
 		<info name="release" value="20040625"/>
-		<info name="alt_title" value="ワンコでくるりん！ ワンクル"/>
+		<info name="alt_title" value="ワンコでくるりん! ワンクル"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />
 			<dataarea name="rom" size="8388608">
@@ -36144,7 +36144,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-A73J-JPN (RK318-J1)"/>
 		<info name="release" value="20030227"/>
-		<info name="alt_title" value="ホイッスル！ 第37回東京都中学校総合体育サッカー大会"/>
+		<info name="alt_title" value="ホイッスル! 第37回東京都中学校総合体育サッカー大会"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">
@@ -37504,7 +37504,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BYGJ-JPN (RK377-J1)"/>
 		<info name="release" value="20051013"/>
-		<info name="alt_title" value="遊戯王デュエルモンスターズGX めざせデュエルキング！"/>
+		<info name="alt_title" value="遊戯王デュエルモンスターズGX めざせデュエルキング!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="33554432">
@@ -37633,7 +37633,7 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-AZLJ-JPN"/>
 		<info name="release" value="20030314"/>
-		<info name="alt_title" value="ゼルダの伝説 神々のトライフォース＆4つの剣"/>
+		<info name="alt_title" value="ゼルダの伝説 神々のトライフォース&amp;4つの剣"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-64K" />
 			<dataarea name="rom" size="8388608">
@@ -37663,7 +37663,7 @@
 		<publisher>Success</publisher>
 		<info name="serial" value="AGB-A2ZJ-JPN"/>
 		<info name="release" value="20021227"/>
-		<info name="alt_title" value="全日本 少年サッカー大会2 めざせ日本一！"/>
+		<info name="alt_title" value="全日本 少年サッカー大会2 めざせ日本一!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH" />
 			<dataarea name="rom" size="8388608">
@@ -37723,7 +37723,7 @@
 		<publisher>Kids Station</publisher>
 		<info name="serial" value="AGB-BZGJ-JPN"/>
 		<info name="release" value="20040318"/>
-		<info name="alt_title" value="絶体絶命でんぢゃらすじーさん 泣きの1回 絶対服従ばいおれんす校長ワガハイが1番えらいんじゃい！！"/>
+		<info name="alt_title" value="絶体絶命でんぢゃらすじーさん 泣きの1回 絶対服従ばいおれんす校長ワガハイが1番えらいんじゃい!!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="8388608">

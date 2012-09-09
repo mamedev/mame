@@ -133,7 +133,7 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="KMCD3005"/>
 		<info name="release" value="19931029"/>
-		<info name="alt_title" value="悪魔城ドラキュラX　血の輪廻"/>
+		<info name="alt_title" value="悪魔城ドラキュラX 血の輪廻"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -165,7 +165,7 @@
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1045"/>
 		<info name="release" value="19950224"/>
-		<info name="alt_title" value="姐（あねさん）"/>
+		<info name="alt_title" value="姐(あねさん)"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -210,7 +210,7 @@
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1049"/>
 		<info name="release" value="19950728"/>
-		<info name="alt_title" value="あすか120%　マキシマ　BURNING　Fest. MAXIMA"/>
+		<info name="alt_title" value="あすか120% マキシマ BURNING Fest. MAXIMA"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -737,7 +737,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD4032"/>
 		<info name="release" value="19940520"/>
-		<info name="alt_title" value="超英雄伝説　ダイナスティックヒーロー"/>
+		<info name="alt_title" value="超英雄伝説 ダイナスティックヒーロー"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -833,7 +833,7 @@
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="TJCD2029"/>
 		<info name="release" value="19920925"/>
-		<info name="alt_title" value="コズミックファンタジー３　冒険少年レイ"/>
+		<info name="alt_title" value="コズミックファンタジー3 冒険少年レイ"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -992,7 +992,7 @@
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="HECD5024"/>
 		<info name="release" value="19990603"/>
-		<info name="alt_title" value="デッド・オブ・ザ・ブレイン１＆２"/>
+		<info name="alt_title" value="デッド・オブ・ザ・ブレイン1&amp;2"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -1245,7 +1245,7 @@
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1035"/>
 		<info name="release" value="19940722"/>
-		<info name="alt_title" value="ドラゴンナイト３"/>
+		<info name="alt_title" value="ドラゴンナイト3"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -1421,7 +1421,7 @@
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="TJCD1014"/>
 		<info name="release" value="19910329"/>
-		<info name="alt_title" value="エグザイル　時の狭間に"/>
+		<info name="alt_title" value="エグザイル 時の狭間に"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -1690,7 +1690,7 @@
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="MCCD4005"/>
 		<info name="release" value="19940330"/>
-		<info name="alt_title" value="フレイCD　-サーク外伝-"/>
+		<info name="alt_title" value="フレイCD -サーク外伝-"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -2470,7 +2470,7 @@
 		<publisher>Atlus</publisher>
 		<info name="serial" value="ATCD1002"/>
 		<info name="release" value="19920228"/>
-		<info name="alt_title" value="雀偵物語2　宇宙探偵ディバン　出動編"/>
+		<info name="alt_title" value="雀偵物語2 宇宙探偵ディバン 出動編"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3065,7 +3065,7 @@
 		<publisher>NCS</publisher>
 		<info name="serial" value="NSCD2014"/>
 		<info name="release" value="19921204"/>
-		<info name="alt_title" value="超時空要塞マクロス —永遠のラヴソング—"/>
+		<info name="alt_title" value="超時空要塞マクロス -永遠のラヴソング-"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3522,7 +3522,7 @@
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1026"/>
 		<info name="release" value="19940330"/>
-		<info name="alt_title" value="モンスターメーカー　-闇の龍騎士-"/>
+		<info name="alt_title" value="モンスターメーカー -闇の龍騎士-"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3602,7 +3602,7 @@
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="MCCD3004"/>
 		<info name="release" value="19930723"/>
-		<info name="alt_title" value="ミスティック　フォーミュラ"/>
+		<info name="alt_title" value="ミスティック フォーミュラ"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3618,7 +3618,7 @@
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD1005"/>
 		<info name="release" value="19911220"/>
-		<info name="alt_title" value="熱血高校ドッジボール部　CDサッカー編"/>
+		<info name="alt_title" value="熱血高校ドッジボール部 CDサッカー編"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4692,7 +4692,7 @@
 		<publisher>Victor Musical Industries</publisher>
 		<info name="serial" value="JCCD9504"/>
 		<info name="release" value="19900406"/>
-		<info name="alt_title" value="ロムロム カラオケ VOL4 ちょいと おとな！？"/>
+		<info name="alt_title" value="ロムロム カラオケ VOL4 ちょいと おとな!?"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4801,7 +4801,7 @@
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD0002"/>
 		<info name="release" value="19910329"/>
-		<info name="alt_title" value="三国志 英傑天下に臨む／監修：横山光輝"/>
+		<info name="alt_title" value="三国志 英傑天下に臨む/監修:横山光輝"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -5175,7 +5175,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<info name="release" value="19970910"/>
-		<info name="alt_title" value="真説しあわせうさぎf－友情よりも愛欲－"/>
+		<info name="alt_title" value="真説しあわせうさぎf-友情よりも愛欲-"/>
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -5508,7 +5508,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD2024"/>
 		<info name="release" value="19920424"/>
-		<info name="alt_title" value="ＳＴＡＲパロジャー"/>
+		<info name="alt_title" value="STARパロジャー"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -5796,7 +5796,7 @@
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD2016"/>
 		<info name="release" value="19941218"/>
-		<info name="alt_title" value="スーパーリアル麻雀スペシャル　ミキ・カスミ・ショウコの思い出"/>
+		<info name="alt_title" value="スーパーリアル麻雀スペシャル ミキ・カスミ・ショウコの思い出"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -5969,7 +5969,7 @@
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1048"/>
 		<info name="release" value="19950526"/>
-		<info name="alt_title" value="天地無用！魎皇鬼"/>
+		<info name="alt_title" value="天地無用!魎皇鬼"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6065,7 +6065,7 @@
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD1022"/>
 		<info name="release" value="19920326"/>
-		<info name="alt_title" value="天外魔境２卍ＭＡＲＵ"/>
+		<info name="alt_title" value="天外魔境2卍MARU"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6241,7 +6241,7 @@
 		<publisher>Right Stuff</publisher>
 		<info name="serial" value="RSCD-4005"/>
 		<info name="release" value="19950929"/>
-		<info name="alt_title" value="ザ　ティーベィー　ショー"/>
+		<info name="alt_title" value="ザ ティーベィー ショー"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6343,7 +6343,7 @@
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="RHCD2003"/>
 		<info name="release" value="19920625"/>
-		<info name="alt_title" value="トップをねらえ！Vol.1"/>
+		<info name="alt_title" value="トップをねらえ!Vol.1"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6359,7 +6359,7 @@
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="RHCD3005"/>
 		<info name="release" value="19930326"/>
-		<info name="alt_title" value="トップをねらえ！Vol.2"/>
+		<info name="alt_title" value="トップをねらえ!Vol.2"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6418,87 +6418,87 @@
 	</software>
 
 	<software name="ultrago2">
-		<description>Ultrabox II Go (CD)(Jpn)</description>
+		<description>Ultrabox II Gou (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD0602"/>
 		<info name="release" value="19900928"/>
-		<info name="alt_title" value="ウルトラＢＯＸ 2号"/>
+		<info name="alt_title" value="ウルトラBOX 2号"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultrabox ii go (cd)(jpn)" sha1="5d80e4b3b4002dacd06edbbddce55d4ae20b8e16"/>
+				<disk name="ultrabox ii gou (cd)(jpn)" sha1="5d80e4b3b4002dacd06edbbddce55d4ae20b8e16"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ultrago3">
-		<description>Ultrabox III Go (CD)(Jpn)</description>
+		<description>Ultrabox III Gou (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD0603"/>
 		<info name="release" value="19901228"/>
-		<info name="alt_title" value="ウルトラＢＯＸ 3号"/>
+		<info name="alt_title" value="ウルトラBOX 3号"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultrabox iii go (cd)(jpn)" sha1="78bd5964241f33db1326716bb3465863230a635d"/>
+				<disk name="ultrabox iii gou (cd)(jpn)" sha1="78bd5964241f33db1326716bb3465863230a635d"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ultrago4">
-		<description>Ultrabox IV Go (CD)(Jpn)</description>
+		<description>Ultrabox IV Gou (CD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD1604"/>
 		<info name="release" value="19910524"/>
-		<info name="alt_title" value="ウルトラＢＯＸ 4号"/>
+		<info name="alt_title" value="ウルトラBOX 4号"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultrabox iv go (cd)(jpn)" sha1="1f2483c94812980831a62fdf6fd3da60ceffd61f"/>
+				<disk name="ultrabox iv gou (cd)(jpn)" sha1="1f2483c94812980831a62fdf6fd3da60ceffd61f"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ultrago5">
-		<description>Ultrabox V Go (CD)(Jpn)</description>
+		<description>Ultrabox V Gou (CD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD1605"/>
 		<info name="release" value="19910927"/>
-		<info name="alt_title" value="ウルトラＢＯＸ 5号"/>
+		<info name="alt_title" value="ウルトラBOX 5号"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultrabox v go (cd)(jpn)" sha1="c899628cad207b4333ca1419f0aa355274e4831d"/>
+				<disk name="ultrabox v gou (cd)(jpn)" sha1="c899628cad207b4333ca1419f0aa355274e4831d"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ultrago6">
-		<description>Ultrabox VI Go (CD)(Jpn)</description>
+		<description>Ultrabox VI Gou (CD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD2606"/>
 		<info name="release" value="19920131"/>
-		<info name="alt_title" value="ウルトラＢＯＸ 6号"/>
+		<info name="alt_title" value="ウルトラBOX 6号"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultrabox vi go (cd)(jpn)" sha1="019918bfa9fbb50ec386846f42a13d94a81dc2bb"/>
+				<disk name="ultrabox vi gou (cd)(jpn)" sha1="019918bfa9fbb50ec386846f42a13d94a81dc2bb"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ultrasgo">
-		<description>Ultrabox Sohkan Go (CD)(Jpn)</description>
+		<description>Ultrabox Sohkan Gou (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="JCCD0601"/>
@@ -6508,7 +6508,7 @@
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="ultrabox sohkan go (cd)(jpn)" sha1="42f490a1eec3d7200d89b0063e40b9e49a7d5a7c"/>
+				<disk name="ultrabox sohkan gou (cd)(jpn)" sha1="42f490a1eec3d7200d89b0063e40b9e49a7d5a7c"/>
 			</diskarea>
 		</part>
 	</software>

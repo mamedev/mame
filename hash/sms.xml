@@ -1503,7 +1503,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1369, 7012"/>
 		<info name="release" value="19881001 (JPN)"/>
-		<info name="alt_title" value="双截龍（ダブルドラゴン）" />
+		<info name="alt_title" value="双截龍(ダブルドラゴン)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (world).bin" size="262144" crc="a55d89f3" sha1="cad5532af94ed75c0ada8820a83fa04d22f7bef5" offset="000000" />
@@ -2914,7 +2914,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1309"/>
 		<info name="release" value="19861215"/>
-		<info name="alt_title" value="ハイスクール！奇面組" />
+		<info name="alt_title" value="ハイスクール!奇面組" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="high school! kimengumi (japan).bin" size="131072" crc="9eb1aa4f" sha1="d3c0aeeacccef77c45ab4219c7d6d8ed04d467cb" offset="000000" />
@@ -2979,7 +2979,7 @@
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1354"/>
 		<info name="release" value="19880402"/>
-		<info name="alt_title" value="星をさがして…" />
+		<info name="alt_title" value="星をさがして..." />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="hoshi wo sagasite... (japan).bin" size="262144" crc="955a009e" sha1="f9ce8b80d8671db6ab38ba5b7ce46324a65ebc3d" offset="000000" />
@@ -5221,7 +5221,7 @@
 		<publisher>Salio</publisher>
 		<info name="serial" value="002"/>
 		<info name="release" value="19880417"/>
-		<info name="alt_title" value="ソロモンの鍵 －王女リヒタの涙－" />
+		<info name="alt_title" value="ソロモンの鍵 -王女リヒタの涙-" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="solomon no kagi - oujo rihita no namida (japan).bin" size="131072" crc="11645549" sha1="875f35d0775609776ec75ea2a8fa2297643e906c" offset="000000" />

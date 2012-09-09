@@ -886,7 +886,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Nobunaga no Yabou - Sengoku Gun'yuu Den</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
-		<info name="alt_title" value="信長の野望　戦国群雄伝" />
+		<info name="alt_title" value="信長の野望 戦国群雄伝" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1262,7 +1262,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Moero! Nettou Yakyuu'88</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
-		<info name="alt_title" value="燃えろ！！熱闘野球’８８" />
+		<info name="alt_title" value="燃えろ!!熱闘野球'88" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="JX-16" />
 			<feature name="mapper" value="LZ93A13" />

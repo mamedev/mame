@@ -548,10 +548,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="probbfan">
 <!-- Keys listed in readme:
-キー操作/ 1P/ テンキー：方向　"_"キー:Aボタン　"："キー：Bボタン
-　　　　　2P/ Rキー：↑　Vキー：↓　Gキー：→　Dキー：←
-　　　　　F1～F5：各種コマンド
-　　　　　操作の要領は基本的にファミスタ準拠 -->
+キー操作/ 1P/ テンキー:方向 "_"キー:Aボタン ":"キー:Bボタン
+     2P/ Rキー:↑ Vキー:↓ Gキー:→ Dキー:←
+     F1～F5:各種コマンド
+     操作の要領は基本的にファミスタ準拠 -->
 		<description>Pro Yakyu Fan</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -716,7 +716,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="tetris">
 		<description>Tetris</description>
 		<year>1988</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="テトリス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -729,7 +729,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="tetrisa" cloneof="tetris">
 		<description>Tetris (Alt)</description>
 		<year>1988</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="テトリス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -805,7 +805,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>エニックス (Enix)</publisher>
 		<info name="serial" value="E-G203"/>
 		<info name="release" value="198710xx"/>
-		<info name="alt_title" value="ワールドゴルフ２"/>
+		<info name="alt_title" value="ワールドゴルフ2"/>
 		<!--combined image-->
 		<!--rom name="world golf ii (1987)(enix)(jp).d77" size="697696" crc="a9693ac3" sha1="038a711add7c9e4c5120ead813e4d83391647e40" offset="0"/-->
 
@@ -882,7 +882,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="serial" value="FVNW19002"/>
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="イース２"/>
+		<info name="alt_title" value="イース2"/>
 		<!--combined image-->
 		<!--rom name="ys 2 (1988)(falcom).d77" size="1895520" crc="95862e02" sha1="6eb7ccb810d3d24dc01602a94fdd7fba43b553e6" offset="0"/-->
 
@@ -939,7 +939,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Team AB" />
-		<info name="alt_title" value="旅人の楽譜２"/>
+		<info name="alt_title" value="旅人の楽譜2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />

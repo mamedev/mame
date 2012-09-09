@@ -52,7 +52,7 @@
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1985</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692656">
@@ -95,7 +95,7 @@
 	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>198?</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692656">

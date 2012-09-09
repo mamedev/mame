@@ -78,7 +78,7 @@ Known undumped pirates
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Thunderbolt II - 雷電伝説II
   * Magic 7 Block - 百変七巧板
-  * Chinese Battle Chess (?) - 戦　棊
+  * Chinese Battle Chess (?) - 戦 棊
   * Bomboy (by Gamtek)
   * 16 Tile Mahjong II (by Gamtek)
 
@@ -1141,7 +1141,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4023 (JPN)"/>
 		<info name="release" value="19900113 (JPN)"/>
-		<info name="alt_title" value="ズーム！"/>
+		<info name="alt_title" value="ズーム!"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12807 T05" />
@@ -1436,7 +1436,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<description>13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
-		<info name="alt_title" value="十三張麻將　98’美少女篇"/>
+		<info name="alt_title" value="十三張麻將 98'美少女篇"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="655360">
 				<rom name="13 mahjong 98 (unl).bin" size="655360" crc="68b372f6" sha1="af19eb952bff78178ae3d31ed48b3fc5c7010dea" offset="000000" loadflag="load16_word_swap" />
@@ -1647,7 +1647,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5505"/>
 		<info name="release" value="19910617"/>
-		<info name="alt_title" value="アドバンスド大戦略 －ドイツ電撃作戦－"/>
+		<info name="alt_title" value="アドバンスド大戦略 -ドイツ電撃作戦-"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
@@ -5293,7 +5293,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4108"/>
 		<info name="release" value="19931015"/>
-		<info name="alt_title" value="コラムスIII 対決！コラムスワールド"/>
+		<info name="alt_title" value="コラムスIII 対決!コラムスワールド"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="columns iii - taiketsu! columns world (jpn, kor).bin" size="524288" crc="cd07462f" sha1="2e850c2b737098b9926ac0fc9b8b2116fc5aa48a" offset="000000" loadflag="load16_word_swap" />
@@ -7946,7 +7946,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="EM20029"/>
 		<info name="release" value="19940527"/>
-		<info name="alt_title" value="F-117ステルスオペレーション：ナイトストーム"/>
+		<info name="alt_title" value="F-117ステルスオペレーション:ナイトストーム"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="f-117 stealth - operation night storm (jpn).bin" size="2097152" crc="ea6e421a" sha1="ded62d63676664c5b9e8a38e36ce1d2659d1c8d6" offset="000000" loadflag="load16_word_swap" />
@@ -8226,7 +8226,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-146023"/>
 		<info name="release" value="19940624"/>
-		<info name="alt_title" value="餓狼伝説2 —新たなる闘い—"/>
+		<info name="alt_title" value="餓狼伝説2 -新たなる闘い-"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="mpr-16704+mpr-16710.bin" size="3145728" crc="2af4427f" sha1="08eadaf6177d884b8e1fb66c5949850f10c5d77c" offset="000000" loadflag="load16_word_swap" />
@@ -8564,7 +8564,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Toaplan</publisher>
 		<info name="serial" value="T-40013"/>
 		<info name="release" value="19901102"/>
-		<info name="alt_title" value="鮫！鮫！鮫！"/>
+		<info name="alt_title" value="鮫!鮫!鮫!"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13301.bin" size="524288" crc="77bbd841" sha1="b0d2552c5aae75dbe2d63600c0dbd64868c2f2c5" offset="000000" loadflag="load16_word_swap" />
@@ -9910,7 +9910,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4075"/>
 		<info name="release" value="19920807"/>
-		<info name="alt_title" value="ひょっこりひょうたん島 大統領をめざせ！"/>
+		<info name="alt_title" value="ひょっこりひょうたん島 大統領をめざせ!"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="hyokkori hyoutanjima - daitouryou o mezase! (jpn).bin" size="524288" crc="72253bdb" sha1="32a73559f84dbab5460bfd1e266acfc8f4391ae4" offset="000000" loadflag="load16_word_swap" />
@@ -11106,7 +11106,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Ma-Ba</publisher>
 		<info name="serial" value="T-16013"/>
 		<info name="release" value="19921023"/>
-		<info name="alt_title" value="機動警察パトレイバー 98式起動せよ！"/>
+		<info name="alt_title" value="機動警察パトレイバー 98式起動せよ!"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
@@ -12116,7 +12116,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4041"/>
 		<info name="release" value="19901215"/>
-		<info name="alt_title" value="まじかるハットのぶっとびターボ！大冒険"/>
+		<info name="alt_title" value="まじかるハットのぶっとびターボ!大冒険"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="magical hat no buttobi turbo! daibouken (jpn).bin" size="524288" crc="e43e853d" sha1="1a741125a80ba9207c74a32e5b21dbb347c3c34a" offset="000000" loadflag="load16_word_swap" />
@@ -12158,7 +12158,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>NCS</publisher>
 		<info name="serial" value="T-25053"/>
 		<info name="release" value="19910322"/>
-		<info name="alt_title" value="魔物ハンター妖子 －第7の警鐘－"/>
+		<info name="alt_title" value="魔物ハンター妖子 -第7の警鐘-"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mamono hunter youko - dai 7 no keishou (jpn).bin" size="524288" crc="10bb359b" sha1="5c8c600ca7468871b0ef301fd82a1909aa8b3b10" offset="000000" loadflag="load16_word_swap" />
@@ -15145,7 +15145,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4522"/>
 		<info name="release" value="19910406"/>
-		<info name="alt_title" value="日刊スポーツ プロ野球ＶＡＮ"/>
+		<info name="alt_title" value="日刊スポーツ プロ野球VAN"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="524288">
@@ -18100,7 +18100,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="EM20008"/>
 		<info name="release" value="19930429"/>
-		<info name="alt_title" value="ゾウ！ゾウ！ゾウ！ レスキュー大作戦"/>
+		<info name="alt_title" value="ゾウ!ゾウ!ゾウ! レスキュー大作戦"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="zou! zou! zou! rescue daisakusen (jpn).bin" size="524288" crc="1a761e67" sha1="0cf2e2a7f00fb3d7a1a6424152693138ece586f1" offset="000000" loadflag="load16_word_swap" />
@@ -18878,7 +18878,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5506"/>
 		<info name="release" value="19910329"/>
-		<info name="alt_title" value="シャイニング＆ザ・ダクネス"/>
+		<info name="alt_title" value="シャイニング&amp;ザ・ダクネス"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<dataarea name="rom" size="1048576">
@@ -19143,7 +19143,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133023"/>
 		<info name="release" value="19950428"/>
-		<info name="alt_title" value="テレビアニメ・スラムダンク強豪真っ向対決！"/>
+		<info name="alt_title" value="テレビアニメ・スラムダンク強豪真っ向対決!"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="from tv animation slam dunk - kyougou makkou taiketsu! (jpn).bin" size="2097152" crc="cdf5678f" sha1="7161a12c2a477cff8e29fa51403eea12c03180c7" offset="000000" loadflag="load16_word_swap" />
@@ -19350,7 +19350,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4124 (JPN)"/>
 		<info name="release" value="19941018 (JPN)"/>
-		<info name="alt_title" value="ソニック＆ナックルズ"/>
+		<info name="alt_title" value="ソニック&amp;ナックルズ"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="sonic &amp; knuckles (world).bin" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="000000" loadflag="load16_word_swap" />
@@ -20187,7 +20187,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81256-50"/>
 		<info name="release" value="19950526 (JPN)"/>
-		<info name="alt_title" value="スパイダーマン＆ベノム カーネイジの逆襲"/>
+		<info name="alt_title" value="スパイダーマン&amp;ベノム カーネイジの逆襲"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="spider-man and venom - maximum carnage (world).bin" size="2097152" crc="8fa0b6e6" sha1="43624536cbebd65232abe4af042c0fa4b0d9e3b7" offset="000000" loadflag="load16_word_swap" />
@@ -22784,7 +22784,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4066 (JPN)"/>
 		<info name="release" value="19920313 (JPN)"/>
-		<info name="alt_title" value="トージャム＆アール"/>
+		<info name="alt_title" value="トージャム&amp;アール"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14236a.bin" size="1048576" crc="7a588f4b" sha1="85e8d0a4fac591b25b77c35680ac4175976f251b" offset="000000" loadflag="load16_word_swap" />
@@ -22798,7 +22798,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4066 (JPN)"/>
 		<info name="release" value="19920313 (JPN)"/>
-		<info name="alt_title" value="トージャム＆アール"/>
+		<info name="alt_title" value="トージャム&amp;アール"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="toe jam &amp; earl (world).bin" size="1048576" crc="d1b36786" sha1="7f82d8b57fff88bdca5d8aff85b01e231dc1239a" offset="000000" loadflag="load16_word_swap" />
@@ -25033,7 +25033,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4080"/>
 		<info name="release" value="19921218"/>
-		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー＆ドナルド - ふしぎなマジックボックス"/>
+		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="world of illusion - fushigi na magic box (jpn).bin" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="000000" loadflag="load16_word_swap" />
@@ -25045,7 +25045,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>World of Illusion - Fushigi na Magic Box (Jpn, Prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー＆ドナルド - ふしぎなマジックボックス"/>
+		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="world of illusion - fushigi na magic box (jpn) (beta).bin" size="1048576" crc="577f680f" sha1="c3d721dc3d6660156f28728d729a2c0d4bb23fdf" offset="000000" loadflag="load16_word_swap" />

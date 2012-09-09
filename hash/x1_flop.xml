@@ -96,7 +96,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="198802xx"/>
-		<info name="alt_title" value="第４のユニット"/>
+		<info name="alt_title" value="第4のユニット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="4th unit, the (19xx)(data west)(jp)(disk 1 of 2).2d" size="327680" crc="885edcf7" sha1="d6a536bd4fb8553dbe9c0467cbfe1d70e2fff342" offset="0" />
@@ -115,7 +115,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>アートディンク (Artdink)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="Ａ列車で行こう"/>
+		<info name="alt_title" value="A列車で行こう"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="a-train.d88" size="348848" crc="d5743f56" sha1="2674e2faa7873385d2e097ee8f50b9b9a8471336" offset="0" />
@@ -304,7 +304,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1985</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -416,7 +416,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="crimson">
 		<description>Crimson</description>
 		<year>1988</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="クリムゾン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -439,7 +439,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="crimsona" cloneof="crimson">
 		<description>Crimson (Alt Disk 1)</description>
 		<year>1988</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="クリムゾン"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -526,7 +526,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198703xx"/>
-		<info name="alt_title" value="ディーヴァ"/>
+		<info name="alt_title" value="ディーヴァ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="daiva1.d88" size="348848" crc="9a4c6b41" sha1="e57e772e89dbafce891c6f14dbb4747eb9ade59a" offset="0" />
@@ -544,7 +544,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198703xx"/>
-		<info name="alt_title" value="ディーヴァ"/>
+		<info name="alt_title" value="ディーヴァ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348304">
 				<rom name="daivaa1.d88" size="348304" crc="dfe64250" sha1="e3e2bc53ad128bfd42b41184d0fa616335328fcd" offset="0"/>
@@ -575,7 +575,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>ブローダーバンドジャパン (Brøderbund Japan)</publisher>
 		<info name="release" value="198809xx"/>
-		<info name="alt_title" value="ディアプロ"/>
+		<info name="alt_title" value="ディアプロ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="diablo.d88" size="348848" crc="7c2da151" sha1="94c4c1c8940614f17d9e37f60f09d4b33f735ee0" offset="0" />
@@ -829,7 +829,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<info name="release" value="198711xx"/>
-		<info name="alt_title" value="ぎゅわんぶらあ自己中心派２"/>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
                 <rom name="gyajiko2.d88" size="348848" crc="81a7c4eb" sha1="71c15c75f46810ac8159b4784a4500c54e85b198" offset="0" />
@@ -842,7 +842,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="198606xx"/>
-		<info name="alt_title" value="ガンマ５"/>
+		<info name="alt_title" value="ガンマ5"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="gamma5.2d" size="327680" crc="23c1ba19" sha1="4040b902c7657598eb4ccb9e01f3ccd031f75ac9" offset="0" />
@@ -1044,7 +1044,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ハイドライド"/>
+		<info name="alt_title" value="ハイドライド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353472">
 				<rom name="hydlide.d88" size="353472" crc="1591a945" sha1="8a8fd86ea9e49f47efea4751ff84c84494177c68" offset="0" />
@@ -1057,7 +1057,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ハイドライド"/>
+		<info name="alt_title" value="ハイドライド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353472">
 				<rom name="hydlidea.d88" size="353472" crc="95eeee72" sha1="d17f75b97126e28692fdd7ed0cfc4eee52097539" offset="0" />
@@ -1070,7 +1070,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198512xx"/>
-		<info name="alt_title" value="ハイドライド２"/>
+		<info name="alt_title" value="ハイドライド2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hydlide2.d88" size="348848" crc="e5127048" sha1="6e9b8ad2b6ef674d5a03a5f2bd1ccd238765a3ca" offset="0" />
@@ -1088,7 +1088,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198512xx"/>
-		<info name="alt_title" value="ハイドライド２"/>
+		<info name="alt_title" value="ハイドライド2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="game.d88" size="348848" crc="aba63500" sha1="7ec04863fb6b7659348e0f3bbeccfe2d35db169b" offset="0" />
@@ -1106,7 +1106,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198512xx"/>
-		<info name="alt_title" value="ハイドライド２"/>
+		<info name="alt_title" value="ハイドライド2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hydlide2.d88" size="348848" crc="e5127048" sha1="6e9b8ad2b6ef674d5a03a5f2bd1ccd238765a3ca" offset="0" />
@@ -1124,7 +1124,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="ハイドライド３"/>
+		<info name="alt_title" value="ハイドライド3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="hydlid3a.d88" size="392368" crc="9fe31b0f" sha1="b075776790b10c8d1e3c3f7c8d45f4004dd4af49" offset="0" />
@@ -1147,7 +1147,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="ハイドライド３"/>
+		<info name="alt_title" value="ハイドライド3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="hydlid3aa.d88" size="392368" crc="8a54c5a2" sha1="b56d1952dd81dec1ac110b98ed87dd3cb4434261" offset="0" />
@@ -1171,7 +1171,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="ハイドライド３"/>
+		<info name="alt_title" value="ハイドライド3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="hydlide 3 - space memories, the (19xx)(-)(disk 1 of 4).d88" size="392368" crc="9fe31b0f" sha1="b075776790b10c8d1e3c3f7c8d45f4004dd4af49" offset="0" />
@@ -1223,7 +1223,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- Turbo only -->
-		<info name="alt_title" value="ジーザス =店頭DEMO="/>
+		<info name="alt_title" value="ジーザス =店頭DEMO="/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="367888">
 				<rom name="jesus-1.d88" size="367888" crc="e3d420c0" sha1="8b38eb3a8240c31fcef0550307ab21d7540cf06a" offset="0" />
@@ -1340,7 +1340,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ラグランジュＬ-２"/>
+		<info name="alt_title" value="ラグランジュＬ-2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349120">
 				<rom name="zzz-unk-lagrange.d88" size="349120" crc="d0cda086" sha1="edf6e03b7a241939ca44ecc4bc51b6f97fb245a1" offset="0" />
@@ -1376,7 +1376,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198703xx"/>
-		<info name="alt_title" value="ラスベガス"/>
+		<info name="alt_title" value="ラスベガス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lasveg1.d88" size="348848" crc="8274e66a" sha1="103fff2aba73d430f26ec77582cdd13e15423799" offset="0" />
@@ -1399,7 +1399,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Gray)</publisher>
 		<info name="release" value="198808xx"/>
-		<info name="alt_title" value="ラストハルマゲドン"/>
+		<info name="alt_title" value="ラストハルマゲドン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="425392">
 				<rom name="diska.d88" size="425392" crc="6c238b5c" sha1="932b71419f859553a28ad2dd0f924bb97349dd49" offset="0" />
@@ -1521,7 +1521,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="mule">
 		<description>M.U.L.E.</description>
 		<year>1988</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="ミュール"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1534,7 +1534,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="mulea" cloneof="mule">
 		<description>M.U.L.E. (Alt)</description>
 		<year>1988</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="ミュール"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1569,7 +1569,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>NCS</publisher>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="メイドゥム"/>
+		<info name="alt_title" value="メイドゥム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="maidum (19xx)(ncs)(disk 1 of 2).2d" size="327680" crc="6a03bfba" sha1="09bdd81f8f42e6e0515ff11ce33878afd84149e0" offset="0" />
@@ -1587,7 +1587,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>NCS</publisher>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="メイドゥム"/>
+		<info name="alt_title" value="メイドゥム"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="maidum (19xx)(ncs)(disk 1 of 2)[a].2d" size="327680" crc="91b9c287" sha1="405ff1c3acd474ddb49122e4f71af7fd7076f4ce" offset="0" />
@@ -1656,7 +1656,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>徳間コミュニケーションズ (Tokuma Communications)</publisher>
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
+		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
                 <rom name="disk1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab" offset="0" />
@@ -1673,7 +1673,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="makaifuk">
 		<description>Makai Fukkatsu</description>
 		<year>1987</year>
-		<publisher>ソフトスタジオＷＩＮＧ (Soft Studio Wing)</publisher>
+		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="魔界復活"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1773,7 +1773,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198801xx"/>
-		<info name="alt_title" value="マイト＆マジック"/>
+		<info name="alt_title" value="マイト&amp;マジック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="m&amp;m_a.2d" size="327680" crc="4e1e46b4" sha1="b26ba11132ed87dd0c7892192fad30fefe2a95c8" offset="0" />
@@ -1813,7 +1813,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<info name="release" value="198604xx"/>
-		<info name="alt_title" value="夢幻の心臓２"/>
+		<info name="alt_title" value="夢幻の心臓2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mugen2_p.2d" size="327680" crc="630cf8ba" sha1="5e7621f481a27fe3c4cb74e9273c9a54805ab7e7" offset="0" />
@@ -1964,7 +1964,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<info name="release" value="198508xx"/>
-		<info name="alt_title" value="オービット３"/>
+		<info name="alt_title" value="オービット3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350384">
 				<rom name="orbit3.d88" size="350384" crc="8f8c40f2" sha1="a56132052912c5ef56f0d2e0e5489d49b07bdbcc" offset="0" />
@@ -1977,7 +1977,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>ストラットフォードC.C.C. (Stratford)</publisher>
 		<info name="release" value="198606xx"/>
-		<info name="alt_title" value="アウトロイド"/>
+		<info name="alt_title" value="アウトロイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="outroyd.d88" size="348848" crc="34c7df8c" sha1="c54103e3e3df00ee6417b80fe1d8f3ae4dd64b82" offset="0" />
@@ -1990,7 +1990,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>ストラットフォードC.C.C. (Stratford)</publisher>
 		<info name="release" value="198606xx"/>
-		<info name="alt_title" value="アウトロイド"/>
+		<info name="alt_title" value="アウトロイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="outroyda.d88" size="348848" crc="5037a384" sha1="2446acfe701129a8d3f81d48f81ad5c08307fb20" offset="0"/>
@@ -2156,7 +2156,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="ロボレス２００１"/>
+		<info name="alt_title" value="ロボレス2001"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="732704">
 				<rom name="robowres.d88" size="732704" crc="201b3048" sha1="b5cf3ece345e8b84941169da886fb09f4afebf86" offset="0" />
@@ -2196,7 +2196,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>光栄 (Koei)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="199006xx"/>
-		<info name="alt_title" value="三国志２"/>
+		<info name="alt_title" value="三国志2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380864">
 				<rom name="sangokushi_2 a.d88" size="380864" crc="9cd180a5" sha1="b39099e442fe77547ffe0a9c3cd7ba801e9a797e" offset="0" />
@@ -2220,7 +2220,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>光栄 (Koei)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="199006xx"/>
-		<info name="alt_title" value="三国志２"/>
+		<info name="alt_title" value="三国志2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380864">
 				<rom name="sangokushi_2 turbo a.d88" size="380864" crc="1aa46e57" sha1="1e2290a465aaa713b7d94e9e6ea51cfef033750f" offset="0" />
@@ -2385,7 +2385,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="silvergh">
 		<description>Silver Ghost</description>
 		<year>1988</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="シルバーゴースト"/>
@@ -2477,7 +2477,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="gilgasor" cloneof="sorcer">
 		<description>Gilgamesh Sorcerian</description>
 		<year>1990</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19901016"/>
 		<info name="alt_title" value="ギルガメッシュソーサリアン"/>
@@ -2496,7 +2496,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sorcerexp4" cloneof="sorcer">
 		<description>Sorcerian New Scenario Vol.1 - Uchuu Kara no Homonsha</description>
 		<year>1989</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19890825"/>
 		<info name="alt_title" value="ソーサリアン NEWシナリオ Vol.1 宇宙からの訪問者"/>
@@ -2532,7 +2532,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19881021"/>
-		<info name="alt_title" value="ソーサリアン追加シナリオ２ 戦国ソーサリアン"/>
+		<info name="alt_title" value="ソーサリアン追加シナリオ2 戦国ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="sorcerian (scenario sengoku 1).d88" size="415840" crc="e172a575" sha1="f4a2d29440f5c59b1da5831a9436a8562b6bdc9e" offset="0" />
@@ -2552,7 +2552,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19891223"/>
-		<info name="alt_title" value="ソーサリアン追加シナリオ３ ピラミッドソーサリアン"/>
+		<info name="alt_title" value="ソーサリアン追加シナリオ3 ピラミッドソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="sorcerian pyramid1.d88" size="415840" crc="456eb3e4" sha1="f9426a7593e1b54b3e6068c2ef225984090659dc" offset="0" />
@@ -2568,10 +2568,10 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sorcersel1" cloneof="sorcer">
 		<description>Selected Sorcerian 1</description>
 		<year>1989</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19891208"/>
-		<info name="alt_title" value="セレクテッドソーサリアン１"/>
+		<info name="alt_title" value="セレクテッドソーサリアン1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="selected sorcerian s1.d88" size="415840" crc="dd4aaee5" sha1="be4b32768b41ae7079130c0f157efde49e5c2e00" offset="0" />
@@ -2587,10 +2587,10 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sorcersel2" cloneof="sorcer">
 		<description>Selected Sorcerian 2</description>
 		<year>1990</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19900210"/>
-		<info name="alt_title" value="セレクテッドソーサリアン２"/>
+		<info name="alt_title" value="セレクテッドソーサリアン2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="selected sorcerian s2.d88" size="415840" crc="8f69ae0d" sha1="642bd40af3882ae395a454d43392dd41efd78ac9" offset="0" />
@@ -2606,10 +2606,10 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sorcersel3" cloneof="sorcer">
 		<description>Selected Sorcerian 3</description>
 		<year>1990</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19900511"/>
-		<info name="alt_title" value="セレクテッドソーサリアン３"/>
+		<info name="alt_title" value="セレクテッドソーサリアン3"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="selected sorcerian s3.d88" size="415840" crc="53f2b6ab" sha1="36cbba04bdf7ff7311d19aee49f999d5918aa3b6" offset="0" />
@@ -2625,10 +2625,10 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sorcersel4" cloneof="sorcer">
 		<description>Selected Sorcerian 4</description>
 		<year>1990</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19900613"/>
-		<info name="alt_title" value="セレクテッドソーサリアン４"/>
+		<info name="alt_title" value="セレクテッドソーサリアン4"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="selected sorcerian s4.d88" size="415840" crc="f85f03c0" sha1="d88b138b0223d33d6610853b500bb8048e7d29d0" offset="0" />
@@ -2644,10 +2644,10 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sorcersel5" cloneof="sorcer">
 		<description>Selected Sorcerian 5</description>
 		<year>1990</year>
-		<publisher>ブラザー工業 (Brothers Kougyo)</publisher>
+		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="19900731"/>
-		<info name="alt_title" value="セレクテッドソーサリアン５"/>
+		<info name="alt_title" value="セレクテッドソーサリアン5"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="selected sorcerian s5.d88" size="415840" crc="1ca45702" sha1="c315ebc3fc6a652ffd73677006ae9ec0005adb81" offset="0" />
@@ -2753,7 +2753,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>HOT・B</publisher>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="スパイＶＳスパイ"/>
+		<info name="alt_title" value="スパイVSスパイ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="366256">
 				<rom name="spyvsspy.d88" size="366256" crc="dd6b65ae" sha1="0fa80da5767b985be9b202c6a21f1005806c847f" offset="0" />
@@ -2767,7 +2767,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198806xx"/>
-		<info name="alt_title" value="スタークルーザー"/>
+		<info name="alt_title" value="スタークルーザー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="star cruiser_a.d88" size="415840" crc="4f14d512" sha1="9ec80df7e152d86f38da50a461cf0e44bbffc525" offset="0" />
@@ -2889,7 +2889,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="太陽の神殿 アステカ２"/>
+		<info name="alt_title" value="太陽の神殿 アステカ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="disk1.d88" size="415840" crc="57353bdb" sha1="567ed54b51b7e97465fa3f419bc1910c9ad7a219" offset="0" />
@@ -2913,7 +2913,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>データウエスト (Data West)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198508xx"/>
-		<info name="alt_title" value="探検隊　第２弾　魔境アマゾンの奥地に黄金伝説を見た！"/>
+		<info name="alt_title" value="探検隊 第2弾 魔境アマゾンの奥地に黄金伝説を見た!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="tankentai 2 - makyo amazon disk1.2d" size="327680" crc="0898c771" sha1="da338bbe824525110e2572632efac18ebd912f52" offset="0" />
@@ -2930,7 +2930,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="tetris">
 		<description>Tetris</description>
 		<year>1988</year>
-		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="テトリス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -2958,7 +2958,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198612xx"/>
-		<info name="alt_title" value="サンダーボール"/>
+		<info name="alt_title" value="サンダーボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="thndrbal.2d" size="327680" crc="b59a446c" sha1="e71b1eba1125ebceb475b1884b56b18f3df91298" offset="0" />
@@ -3072,7 +3072,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="トランプ狂"/>
+		<info name="alt_title" value="トランプ狂"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="trumpkyo.2d" size="327680" crc="9dae7bd0" sha1="8413c08a9f39a6b8c817b91da5461438d56cc9aa" offset="0" />
@@ -3085,7 +3085,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="release" value="198710xx"/>
-		<info name="alt_title" value="ウルティマ４"/>
+		<info name="alt_title" value="ウルティマ4"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="359248">
 				<rom name="ultim41.d88" size="359248" crc="ddc8a174" sha1="0df3eb964e92944c12835d4d6f81e7c8466614a2" offset="0" />
@@ -3113,7 +3113,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="release" value="198710xx"/>
-		<info name="alt_title" value="ウルティマ４"/>
+		<info name="alt_title" value="ウルティマ4"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ultima4_a.d88" size="348848" crc="22800fee" sha1="2b123ff38df56801482bdc785655137892b411ac" offset="0" />
@@ -3211,7 +3211,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>スクウェア (Square)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198510xx"/>
-		<info name="alt_title" value="ウィル -デス・トラップ２-"/>
+		<info name="alt_title" value="ウィル -デス・トラップ2-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350432">
 				<rom name="will 2.d88" size="350432" crc="b5def050" sha1="00d52f469e2831a08ef7a56e1bfe7a2f01a9f60f" offset="0" />
@@ -3237,7 +3237,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="ウイングマン２ キータクラーの復活"/>
+		<info name="alt_title" value="ウイングマン2 キータクラーの復活"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="wingman_2a.2d" size="327680" crc="33b40f6c" sha1="151398381fa5999a55e1ddea9987251ec9319f72" offset="0" />
@@ -3268,7 +3268,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198701xx"/>
-		<info name="alt_title" value="ウィザードリィ２"/>
+		<info name="alt_title" value="ウィザードリィ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380048">
 				<rom name="wiz2.d88" size="380048" crc="ca77dfd2" sha1="c80e5f6306a820da69cdee243ed5d31ea85e6d50" offset="0" />
@@ -3281,7 +3281,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1989</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198902xx"/>
-		<info name="alt_title" value="ウィザードリィ４"/>
+		<info name="alt_title" value="ウィザードリィ4"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380048">
 				<rom name="wiz4_a.d88" size="380048" crc="3a56199c" sha1="1a1247cbb5ce78a3f74d4423109cb48c0d165f39" offset="0" />
@@ -3349,7 +3349,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>エニックス (Enix)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198803xx"/>
-		<info name="alt_title" value="ワールドゴルフ２"/>
+		<info name="alt_title" value="ワールドゴルフ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="wg2_a.d88" size="348848" crc="ca6a24cb" sha1="00f4ea939f51adab6cfb480aaff50dd96be1134e" offset="0" />
@@ -3390,7 +3390,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="198611xx"/>
-		<info name="alt_title" value="ザナドゥ シナリオ２"/>
+		<info name="alt_title" value="ザナドゥ シナリオ2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="xanadu-a(opm)_magickai.d88" size="415840" crc="68698e73" sha1="53bff37252461c30f23b3f00aa1e4fe12b36c42d" offset="0" />
@@ -3447,7 +3447,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- Turbo only -->
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="イース２"/>
+		<info name="alt_title" value="イース2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="ys2_p.d88" size="415840" crc="9cd578d2" sha1="5099b8860580de76ac224d4fc11b7e42aeae340c" offset="0" />
@@ -3529,7 +3529,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Bastard Special</description>
 		<year>1988?</year>
 		<publisher>ザインソフト (Xain Soft)</publisher>
-		<info name="alt_title" value="バスタードスペシャル"/>
+		<info name="alt_title" value="バスタードスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="bastard sp.d88" size="348848" crc="63c7fe77" sha1="b3de0bfc6aa1079d5079907ebfbd44455f9a2df5" offset="0" />
@@ -3585,7 +3585,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Dezeni Land</description>
 		<year>1983?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="デゼニランド"/>
+		<info name="alt_title" value="デゼニランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="284752">
 				<rom name="dezeni land.d88" size="284752" crc="2502df21" sha1="454a351d00907bc439e7bf600355083bce582539" offset="0" />
@@ -3593,12 +3593,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-<!-- This displays "デゼニランド" at loading time, but title screen is different... what is this?? -->
+<!-- This displays "デゼニランド" at loading time, but title screen is different... what is this?? -->
 	<software name="dezenia" cloneof="dezeni">
 		<description>Dezeni Land (?)</description>
 		<year>1983?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="デゼニランド"/>
+		<info name="alt_title" value="デゼニランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="284752">
 				<rom name="dezeni_l.d88" size="284752" crc="0d3a751e" sha1="8db16b328eca8eaffd631aa08a85212b198c6a4f" offset="0" />
@@ -3642,7 +3642,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Dione</description>
 		<year>1987?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="ディオーネ"/>
+		<info name="alt_title" value="ディオーネ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="dione-1.d88" size="348848" crc="bb7a6bb2" sha1="02b561da7bb493b40e280c611f6775cb012785fa" offset="0" />
@@ -3672,7 +3672,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Faeries Residence</description>
 		<year>1986?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="フェアリーズレジデンス"/>
+		<info name="alt_title" value="フェアリーズレジデンス"/>
 		<info name="usage" value="Runs in HuBASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3729,7 +3729,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Galaxian X-1</description>
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="alt_title" value="ギャラクシアン"/>
+		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="galaxian x-1 (19xx)(namco).2d" size="327680" crc="0d2f49dc" sha1="7529a5483f526ee9318d4eeb08850f8cd39f3c77" offset="0" />
@@ -3753,7 +3753,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Hyper Olympics '84</description>
 		<year>1984?</year>
 		<publisher>デービーソフト (dB-Soft)?</publisher>
-		<info name="alt_title" value="ハイパーオリンピック '84"/>
+		<info name="alt_title" value="ハイパーオリンピック '84"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="hyper olympic 84.2d" size="327680" crc="a4b2f2f5" sha1="064ed54ce40487f07d805ce04b7007e8cb4088b1" offset="0" />
@@ -3798,7 +3798,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Knither - Demon Crystal II</description>
 		<year>1987?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="alt_title" value="ナイザー　=デーモンクリスタルⅡ="/>
+		<info name="alt_title" value="ナイザー =デーモンクリスタルⅡ="/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="knither.2d" size="327680" crc="c64e3046" sha1="9a26bd5b299f6890a847a9d04ced8e686ab26a94" offset="0" />
@@ -3810,7 +3810,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Labyrinth</description>
 		<year>1986?</year>
 		<publisher>パックインビデオ (Pack-in Video)</publisher>
-		<info name="alt_title" value="ラビリンス"/>
+		<info name="alt_title" value="ラビリンス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="labyrintha.d88" size="348848" crc="7e56f2d1" sha1="199a6a7fe3bf6689069a979cf111133f0c7dfb67" offset="0" />
@@ -3827,7 +3827,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Lizard</description>
 		<year>1984?</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
-		<info name="alt_title" value="リザード"/>
+		<info name="alt_title" value="リザード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346032">
 				<rom name="lizard.d88" size="346032" crc="e0df6f30" sha1="eb4875b56604ba1a6300576de606676cd382aaf1" offset="0" />
@@ -3839,7 +3839,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Love Chaser</description>
 		<year>1987?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="ラブチェイサー"/>
+		<info name="alt_title" value="ラブチェイサー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lovec_1.d88" size="348848" crc="cafd770e" sha1="20cccd3a493a05fbc2966fa950239483d46e6149" offset="0" />
@@ -3856,7 +3856,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Love Chaser (Alt)</description>
 		<year>1987?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="ラブチェイサー"/>
+		<info name="alt_title" value="ラブチェイサー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="loveca_1.d88" size="348848" crc="17b20908" sha1="a1aa3f1e506923aae8d8a67fc12600fcbe8d7d21" offset="0" />
@@ -3873,7 +3873,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Marvelous</description>
 		<year>1986?</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="マーベラス"/>
+		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="marvelous.2d" size="327680" crc="af21a06c" sha1="db9f47962dc93b736c5f3b081becb6def989e14d" offset="0" />
@@ -3885,7 +3885,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Marvelous (Alt)</description>
 		<year>1986?</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="マーベラス"/>
+		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="merveros.2d" size="327680" crc="3e5447af" sha1="b27f428183e59d22cc81256f794d5d9d2a782b3d" offset="0" />
@@ -3897,7 +3897,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Marvelous (Alt 2)</description>
 		<year>1986?</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="マーベラス"/>
+		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="merveros_alt.2d" size="327680" crc="c93d71ec" sha1="27a695d2a039d604aff3a2f37ac6c83be4ef6cd5" offset="0" />
@@ -3909,7 +3909,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Ganbare! Miki-chan</description>
 		<year>1986?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="がんばれ！美樹ちゃん"/>
+		<info name="alt_title" value="がんばれ!美樹ちゃん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mikichan.2d" size="327680" crc="06965b19" sha1="b33c79c4444f53419beb5db300ef536d1df9d432" offset="0" />
@@ -3943,7 +3943,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Punch Ball Mario Bros.</description>
 		<year>1984?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="パンチボールマリオ"/>
+		<info name="alt_title" value="パンチボールマリオ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="panch.d88" size="348848" crc="bf089114" sha1="330399d0c1f1caad98fc445b3768a217a7572559" offset="0" />
@@ -3955,7 +3955,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Pop Lemon</description>
 		<year>1986?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="ポップレモン"/>
+		<info name="alt_title" value="ポップレモン"/>
 		<info name="usage" value="Runs in HuBASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3973,7 +3973,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Portopia Renzoku Satsujin Jiken</description>
 		<year>1983?</year>
 		<publisher>エニックス (Enix)</publisher>
-		<info name="alt_title" value="ポートピア連続殺人事件"/>
+		<info name="alt_title" value="ポートピア連続殺人事件"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zzz-unk-portpia.2d" size="327680" crc="6699bf3d" sha1="5be59558474e4f8709949821cdf8495dd66ed7b3" offset="0" />
@@ -4151,7 +4151,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Xevious</description>
 		<year>19??</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="alt_title" value="ゼビウス"/>
+		<info name="alt_title" value="ゼビウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344768">
 				<rom name="xevious (19xx)(namco).d88" size="344768" crc="dc93900d" sha1="f81545b62068d8eb91f209caf5a57df252b930c2" offset="0" />
@@ -4163,7 +4163,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Xevious (Alt)</description>
 		<year>19??</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="alt_title" value="ゼビウス"/>
+		<info name="alt_title" value="ゼビウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="xevious.2d" size="327680" crc="ae2009bf" sha1="85ac12e13b493d3d4e146eaa213ed8ce1e113fa1" offset="0" />
@@ -4201,7 +4201,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Zeta Dai 5 Go</description>
 		<year>1987?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="ゼータ 第５号"/>
+		<info name="alt_title" value="ゼータ 第5号"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zeta 5 (19xx)(championsoft)(jp)(disk 1 of 2).2d" size="327680" crc="4e6f66f4" sha1="0b2c0e708ebd9df2d24e6ade3694ed3e0882746b" offset="0" />
@@ -4229,7 +4229,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Dokkin Minako Sensei</description>
 		<year>1988?</year>
 		<publisher>テクトハウス (Tect House)</publisher>
-		<info name="alt_title" value="ドッキン美奈子先生！"/>
+		<info name="alt_title" value="ドッキン美奈子先生!"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="minako (disk a).2d" size="327680" crc="847ffb04" sha1="56dc77544b700da9ad61c3b5259fbebde95d02a4" offset="0" />
@@ -4259,7 +4259,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Namco Video Game Music Library vol.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ナムコ　ビデオゲームミュージックライブラリ Vol.1"/>
+		<info name="alt_title" value="ナムコ ビデオゲームミュージックライブラリ Vol.1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="video game music disk a.2d" size="327680" crc="6017899c" sha1="e2bcfbf554d4be7f5e7c24ede1e596c243c1f78b" offset="0" />
@@ -4294,7 +4294,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="sayaka">
 		<description>Yumeshojo Sayaka</description>
 		<year>1988?</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>パスカル2 (Pascal2)</publisher>
 		<info name="alt_title" value="夢少女さやか"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -4394,7 +4394,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Albatross Meimon Course 2 - Jun Classic</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="アルバトロス 名門２ ジュンクラシック"/>
+		<info name="alt_title" value="アルバトロス 名門2 ジュンクラシック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="albatross_jun_1.d88" size="348848" crc="e1327e6a" sha1="5c1d90e54e82f8e8096285d2a484218ddc4865af" offset="0" />
@@ -4575,7 +4575,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>The Dome</description>
 		<year>1988</year>
 		<publisher>システムサコム (System Sacom)</publisher>
-		<info name="alt_title" value="ドーム"/>
+		<info name="alt_title" value="ドーム"/>
 		<!-- Turbo only -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
@@ -4716,7 +4716,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<description>Hotdog</description>
 		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
-		<info name="alt_title" value="ホットドッグ"/>
+		<info name="alt_title" value="ホットドッグ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hotdog.d88" size="348848" crc="544c507b" sha1="49f6bb0581c79f6c5336085eadad9ec05887acb9" offset="0" />
@@ -4878,7 +4878,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="melonsod" supported="no">
 		<description>Melon Soda</description>
 		<year>1987</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>パスカル2 (Pascal2)</publisher>
 		<!-- Turbo only -->
 		<info name="alt_title" value="メロンソーダ"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -5459,7 +5459,7 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 		<description>Jet Turbo Terminal (v1.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="Jetターボ ターミナルVer1.1"/>
+		<info name="alt_title" value="Jetターボ ターミナルVer1.1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="379264">
 				<rom name="jet turbo terminal ver1.1.d88" size="379264" crc="7a423e74" sha1="68103847d1ddd1fce7af915038103ce0502b47aa" offset="0" />
@@ -5493,7 +5493,7 @@ CDOSというMS-DOSと同様なコマンドライン作動させることが出�
 		<description>Graphic Tool</description>
 		<year>19??</year>
 		<publisher>シャープ (Sharp) ~ Zeit</publisher>
-		<info name="alt_title" value="グラフィックツール"/>
+		<info name="alt_title" value="グラフィックツール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="graphic tool.d88" size="1089776" crc="97817d8a" sha1="3a5dbdc20584d2a7b25803ffc308e89ee0ff5f42" offset="0" />
@@ -5617,13 +5617,13 @@ systems, for the moment they stay here!
 
 	<software name="game6">
 <!-- From GAME6.txt:
-　　　 ウォーロイド（ASCII）
-　　　 テニス（任天堂のあれ）
-　　　 マイナー２０４９（COMPTIQ）
-　　　 ドアドア（ENIX）
-　　　 デーモンクリスタル（電波新聞）
-　　　 コスモ・トラベラー（APOLO TECHNICA）
-　　　 ボンバーマンはないです(^^；
+    ウォーロイド(ASCII)
+    テニス(任天堂のあれ)
+    マイナー2049(COMPTIQ)
+    ドアドア(ENIX)
+    デーモンクリスタル(電波新聞)
+    コスモ・トラベラー(APOLO TECHNICA)
+    ボンバーマンはないです(^^；
 [i.e. Bomberman is not included even if listed in the menu (probably it did
 not fit the disk)]
 -->
@@ -5663,7 +5663,7 @@ not fit the disk)]
 8. ちゃっくんぽっぷ
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-　起動してください。
+ 起動してください。
 -->
 		<description>Game 02</description>
 		<year>19??</year>
@@ -5678,12 +5678,12 @@ not fit the disk)]
 	<software name="game03">
 <!-- From GAME1-25_List.txt:
 1. 妖怪探偵ちまちま
-4. 妖怪探偵ちまちま（敵キャラ西洋版)
+4. 妖怪探偵ちまちま(敵キャラ西洋版)
 7. YELLOW CAB
 8. Building Hopper
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-　起動してください。
+ 起動してください。
 -->
 		<description>Game 03</description>
 		<year>19??</year>
@@ -5716,14 +5716,14 @@ not fit the disk)]
 
 	<software name="game05">
 <!-- From GAME1-25_List.txt:
-1. ？
+1. ?
 2. EGGY
 3. プラズマライン
 4. グッツン
 5. Mr.Pac!
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-　起動してください。
+ 起動してください。
 -->
 		<description>Game 05</description>
 		<year>19??</year>
@@ -5815,7 +5815,7 @@ not fit the disk)]
 3. エレベーターアクション
 4. ちゃっくんぽっぷ
 5. モールモール
-6. ウルトラ４人マージャン
+6. ウルトラ4人マージャン
 -->
 		<description>Game 10</description>
 		<year>19??</year>
@@ -5830,11 +5830,11 @@ not fit the disk)]
 	<software name="game11">
 <!-- From GAME1-25_List.txt:
 1. SPRING BUG
-2. JUPITER ROAD (同人ソフト？)
+2. JUPITER ROAD (同人ソフト?)
 3. 明るい農園
 4. GANG MAN
 5. GUNMAN
-6. スーパーゴルフ２
+6. スーパーゴルフ2
 7. 始皇帝
 8. Minami Aoyama Adventure
 -->
@@ -5850,9 +5850,9 @@ not fit the disk)]
 
 	<software name="game12">
 <!-- From GAME1-25_List.txt:
-1. 暴龍ゴジラ 〜大都市壊滅！！〜
+1. 暴龍ゴジラ 〜大都市壊滅!!〜
 2. PERSEUS
-3. フォーメーションＺ
+3. フォーメーションZ
 4. オービットⅢ
 5. 舞臓魔(BU U MA)
 -->
@@ -5868,12 +5868,12 @@ not fit the disk)]
 
 	<software name="game13">
 <!-- From GAME1-25_List.txt:
-1. ＮＥＷボコスカウォーズ
-2. 宇宙ＤＥ婚約大作戦
+1. NEWボコスカウォーズ
+2. 宇宙DE婚約大作戦
 3. 忍者 影
 4. アイスクライマー
 5. エキサイトバイク
-6. ラリーＸ
+6. ラリーX
 -->
 		<description>Game 13</description>
 		<year>19??</year>
@@ -5908,7 +5908,7 @@ not fit the disk)]
 	<software name="game15">
 <!-- From GAME1-25_List.txt:
 1. アメリカントラック
-2. アメリカントラック(コピー失敗版？動かない)
+2. アメリカントラック(コピー失敗版?動かない)
 3. トリトーン
 4. ザ・ブラックオニキス
 5. ファンタジアン
@@ -5925,13 +5925,13 @@ not fit the disk)]
 
 	<software name="game16">
 <!-- From GAME1-25_List.txt:
-1. ハイパーオリンピック'８４ No.1
-3. ハイパーオリンピック'８４ No.2
+1. ハイパーオリンピック'84 No.1
+3. ハイパーオリンピック'84 No.2
 5. スターライトアドベンチャー
 6. スターライトアドベンチャーⅡ
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-　起動してください。
+ 起動してください。
 -->
 		<description>Game 16</description>
 		<year>19??</year>
@@ -5948,11 +5948,11 @@ not fit the disk)]
 1. ゴーストタウン
 3. POLAR STAR Ⅱ
 4. マッピー
-5. マッピー ＮＥＷバージョン
+5. マッピー NEWバージョン
 7. キャノンボール
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-　起動してください。
+ 起動してください。
 -->
 		<description>Game 17</description>
 		<year>19??</year>
@@ -5975,7 +5975,7 @@ MB-GAME Disk Utility No.2
 5. ボンバーマン
 6. タイムトンネル
 7. コックピット
-8. Vegetable (同人ソフト？)
+8. Vegetable (同人ソフト?)
 -->
 		<description>Game 18</description>
 		<year>19??</year>
@@ -6067,23 +6067,23 @@ COSMO TRAVELER    APOLLO TECHNICA SOFT
 Super Burger      ???
 Vegetable         ???
 Zombi Panic       ???
-キナサイ！        ???
+キナサイ!           ???
 JUPITER ROAD      ???
 STAR WORLD 2      ???
 
 From GAME1-25_List.txt:
 01. サンダーフォース  (Techno soft)
 02. マッピー          (namco / Dempa)
-03. Space Burger      (同人ソフト？)
-04. Vegetable         (同人ソフト？)
-05. Zombi Panic       (同人ソフト？) (動かない)
+03. Space Burger      (同人ソフト?)
+04. Vegetable         (同人ソフト?)
+05. Zombi Panic       (同人ソフト?) (動かない)
 06. ICE BLOCK         (dB-SOFT)
 07. COSMO TRAVELER    (APOLLO TECHNICA SOFT)
-08. キナサイ！        (同人ソフト？)
-0A. JUPITER ROAD      (同人ソフト？)
+08. キナサイ!           (同人ソフト?)
+0A. JUPITER ROAD      (同人ソフト?)
 0B. GURU GURU         (Hudson Soft)
 0C. MJ-05             (Hudson Soft)
-0D. STAR WORLD 2      (同人ソフト？) (動かない)
+0D. STAR WORLD 2      (同人ソフト?) (動かない)
 -->
 		<description>X1GM Pack 2</description>
 		<year>19??</year>
@@ -6098,13 +6098,13 @@ From GAME1-25_List.txt:
 <!-- This also appears as GAME_23 in the 01->25 Game Packs set -->
 	<software name="x1gmpk3">
 <!-- From X1GM_PK3.txt:
-７並べ                     (TSUKUMO)
-ウルトラ４人マージャン     (TSUKUMO)
+7並べ                     (TSUKUMO)
+ウルトラ4人マージャン     (TSUKUMO)
 野球拳                     (TSUKUMO)
 
 From GAME1-25_List.txt:
-1. ウルトラ４人マージャン     (TSUKUMO)
-2. ７並べ                     (TSUKUMO)
+1. ウルトラ4人マージャン     (TSUKUMO)
+2. 7並べ                     (TSUKUMO)
 3. 野球拳                     (TSUKUMO)
 -->
 		<description>X1GM Pack 3</description>

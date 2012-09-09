@@ -83,7 +83,7 @@ Undumped carts:
 		<year>1981</year>
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPA-106"/>
-		<info name="alt_title" value="ワープ＆ワープ"/>
+		<info name="alt_title" value="ワープ&amp;ワープ"/>
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="warpwarp.bin" size="8192" crc="2a0d4ad9" sha1="f9ffca3a1d85b116dd92f118f9ea940bf2449db5" offset="0000" />
@@ -109,7 +109,7 @@ Undumped carts:
 		<year>1982</year>
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPA-109"/>
-		<info name="alt_title" value="パチンコＵＦＯ"/>
+		<info name="alt_title" value="パチンコUFO"/>
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
