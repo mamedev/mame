@@ -391,6 +391,13 @@ static const vic2_interface p500_vic2_intf = {
 	DEVCB_DRIVER_MEMBER(cbmb_state, vic_rdy_cb)
 };
 
+static const sid6581_interface sid_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 /*************************************
  *
  *  Machine driver
@@ -461,6 +468,7 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sid6581", SID6581, 1000000)
+	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* quickload */
@@ -535,6 +543,7 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sid6581", SID6581, 1000000)
+	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
