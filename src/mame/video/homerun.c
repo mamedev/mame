@@ -53,8 +53,21 @@ WRITE8_MEMBER(homerun_state::homerun_videoram_w)
 
 WRITE8_MEMBER(homerun_state::homerun_color_w)
 {
+	/* from PCB photo:
+	    bit 7:  470 ohm resistor \
+	    bit 6:  220 ohm resistor -  --> 470 ohm resistor  --> blue
+	    bit 5:  470 ohm resistor \
+	    bit 4:  220 ohm resistor -  --> 470 ohm resistor  --> green
+	    bit 3:  1  kohm resistor /
+	    bit 2:  470 ohm resistor \
+	    bit 1:  220 ohm resistor -  --> 470 ohm resistor  --> red
+	    bit 0:  1  kohm resistor /
+	*/
+
+	// let's implement it the old fashioned way until it's found out how exactly the resnet is hooked up
 	int r, g, b;
 	int bit0, bit1, bit2;
+
 	bit0 = (data >> 0) & 0x01;
 	bit1 = (data >> 1) & 0x01;
 	bit2 = (data >> 2) & 0x01;
@@ -67,6 +80,7 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	bit1 = (data >> 6) & 0x01;
 	bit2 = (data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
 }
 
