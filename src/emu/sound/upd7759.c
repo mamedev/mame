@@ -1,12 +1,12 @@
 /************************************************************
 
-    NEC UPD7759 ADPCM Speech Processor
+    NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor
     by: Juergen Buchmueller, Mike Balfour, Howie Cohen,
         Olivier Galibert, and Aaron Giles
 
 *************************************************************
 
-    Description:
+    uPD7759 Description:
 
     The UPD7759 is a speech processing LSI that utilizes ADPCM to produce
     speech or other sampled sounds.  It can directly address up to 1Mbit
@@ -94,6 +94,22 @@
     The first command is always 0xFF.  A second 0xFF marks the end of the
     sample and the engine stops.  OTOH, there is a 0x00 at the end too.
     Go figure.
+
+*************************************************************
+
+    The other chip models don't support slave mode, and have an internal ROM.
+    Other than that, they are thought to be nearly identical to uPD7759.
+    
+    55C    18-pin DIP   96 Kbit ROM
+    55G    24-pin SOP   96 Kbit ROM
+    56C    18-pin DIP  256 Kbit ROM
+    56G    24-pin SOP  256 Kbit ROM
+    P56CR  20-pin DIP  256 Kbit ROM (OTP)
+    P56G   24-pin SOP  256 Kbit ROM (OTP)
+    57C    18-pin DIP  512 Kbit ROM
+    57G    24-pin SOP  512 Kbit ROM
+    58C    18-pin DIP    1 Mbit ROM
+    58G    24-pin SOP    1 Mbit ROM
 
 *************************************************************/
 
@@ -665,6 +681,7 @@ static DEVICE_START( upd7759 )
 	chip->rom = chip->rombase = *device->region();
 	if (chip->rombase == NULL)
 	{
+		assert(device->type() == UPD7759); // other chips do not support slave mode
 		chip->timer = device->machine().scheduler().timer_alloc(FUNC(upd7759_slave_update), chip);
 		chip->rommask = 0;
 	}

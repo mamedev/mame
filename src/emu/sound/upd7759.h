@@ -5,10 +5,13 @@
 
 #include "devlegcy.h"
 
+/* NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor */
+
 /* There are two modes for the uPD7759, selected through the !MD pin.
    This is the mode select input.  High is stand alone, low is slave.
    We're making the assumption that nobody switches modes through
-   software. */
+   software.
+*/
 
 #define UPD7759_STANDARD_CLOCK		XTAL_640kHz
 
