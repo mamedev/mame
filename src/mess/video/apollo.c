@@ -113,7 +113,7 @@ struct _screen_data {
 INLINE screen_data_t *get_safe_token(device_t *device) {
 	assert(device != NULL);
 	assert(device->type() == APOLLO_MONO15I || device->type() == APOLLO_MONO19I );
-	return (screen_data_t *)downcast<apollo_mono15i_device *>(device)->token();
+	return (screen_data_t *)downcast<apollo_mono_device *>(device)->token();
 }
 
 /***************************************************************************
