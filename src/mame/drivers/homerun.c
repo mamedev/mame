@@ -1,6 +1,6 @@
 /*
- Moero Pro Yakyuu Homerun - (c) 1988 Jaleco
- Dynamic Shooting - (c) 1988 Jaleco
+ Moero!! Pro Yakyuu Homerun Kyousou - (c) 1988 Jaleco
+ Dynamic Shoot Kyousou - (c) 1988 Jaleco
  Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump - (c) 1990 Jaleco
  Driver by Tomasz Slanina
 
@@ -15,7 +15,7 @@ Todo :
  - is there 2 player mode ?
 
 -----------------------------------
-Moero Pro Yakyuu Homerun Kyousou
+Moero!! Pro Yakyuu Homerun Kyousou
 Jaleco, 1988
 
 PCB Layout
@@ -27,7 +27,7 @@ HR-8847
 |YM3014 DSW(8)     HOMERUN.43     |
 |    D7756C   6264                |
 |                                 |
-|J  640KhZ   HOMERUN.60           |
+|J  640KHz   HOMERUN.60           |
 |A 2018                           |
 |M      2018    2018          8255|
 |M          2018                  |
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
+	AM_RANGE(0xb000, 0xb0ff) AM_RAM_WRITE(homerun_color_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -406,6 +406,6 @@ ROM_START( ganjaja )
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun, homerun,  driver_device, 0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, homerun, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shooting", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, homerun,  0, homerun, homerun,  driver_device, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0, homerun, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1990, ganjaja,  0, ganjaja, ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
