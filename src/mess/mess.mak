@@ -913,6 +913,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/cbmipt.o	\
 	$(MESS_MACHINE)/64h156.o	\
 	$(MESS_MACHINE)/petcass.o	\
+	$(MESS_MACHINE)/mos8722.o	\
 	$(MESS_MACHINE)/c2n.o		\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
