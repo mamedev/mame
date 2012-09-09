@@ -1771,7 +1771,7 @@ Sound: M6295 (on daughterboard)
 ROMs:(all ROMs are on daughterboard)
 1.1 - Programs (TMS 27C020)
 3.3 /
-(actual label is "Cawaii 1 Ver1.1" & "Cawaii 3 Ver1.1")
+(actual label is "Cawaii 1 Ver 1.0" & "Cawaii 3 Ver 1.0")
 MR97006-01.2 (42pin mask ROM, read as 16M, byte mode)
 IC6 is not populated.
 IC2 and IC5 have a 0-ohm resistor wired to pin32 (A20 on a 32MBit ROM)

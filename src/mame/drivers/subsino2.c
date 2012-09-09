@@ -898,6 +898,11 @@ static TIMER_DEVICE_CALLBACK( h8_timer_irq )
 
 WRITE16_MEMBER(subsino2_state::bishjan_sel_w)
 {
+	/*
+		sound writes in service mode:
+		01 88 04 00 (coin in)
+		02 89 04 0v (v = voice = 0..3)
+	*/
 	if (ACCESSING_BITS_8_15)
 		m_bishjan_sel = data >> 8;
 }
@@ -1475,7 +1480,7 @@ static INPUT_PORTS_START( bishjan )
 
 	PORT_START("SYSTEM") // IN A
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN		)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE		) PORT_IMPULSE(1)	// service mode
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE		)	PORT_IMPULSE(1)	// service mode (press twice for inputs)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_SPECIAL		)	// hopper sensor
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1		)	// stats
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2		)	// pay out? "hopper empty"
