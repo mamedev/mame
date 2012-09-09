@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "techno.lh"
+// schematic says 8MHz but it goes too fast
+#define TECHNO_MAINCLK 4e6
 
 class techno_state : public driver_device
 {
@@ -19,8 +21,16 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_READ16_MEMBER(key_r);
+	DECLARE_READ16_MEMBER(rtrg_r);
+	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(disp1_w);
 	DECLARE_WRITE16_MEMBER(disp2_w);
+	DECLARE_WRITE16_MEMBER(lamp1_w);
+	DECLARE_WRITE16_MEMBER(lamp2_w);
+	DECLARE_WRITE16_MEMBER(setout_w);
+	DECLARE_WRITE16_MEMBER(sol1_w);
+	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	UINT16 m_digit_1;
 	UINT16 m_digit_2;
@@ -44,16 +54,16 @@ public:
 static ADDRESS_MAP_START( techno_map, AS_PROGRAM, 16, techno_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x05fff) AM_RAM // battery backed-up
+	AM_RANGE(0x04000, 0x04fff) AM_RAM // battery backed-up
 	AM_RANGE(0x06000, 0x0ffff) AM_ROM
-	//AM_RANGE(0x14000, 0x147ff) AM_READWRITE(key_r,lamp1_w)
-	//AM_RANGE(0x14800, 0x14fff) AM_READWRITE(sound_r,lamp2_w)
-	//AM_RANGE(0x15000, 0x157ff) AM_READWRITE(rtrg_r,sol1_w)
-	//AM_RANGE(0x15800, 0x15fff) AM_WRITE(sol2_w)
+	AM_RANGE(0x14000, 0x147ff) AM_READWRITE(key_r,lamp1_w)
+	AM_RANGE(0x14800, 0x14fff) AM_READWRITE(sound_r,lamp2_w)
+	AM_RANGE(0x15000, 0x157ff) AM_READWRITE(rtrg_r,sol1_w)
+	AM_RANGE(0x15800, 0x15fff) AM_READNOP AM_WRITE(sol2_w) // reads from 15800, but shown as not connected
 	AM_RANGE(0x16000, 0x167ff) AM_WRITE(sound_w)
 	AM_RANGE(0x16800, 0x16fff) AM_WRITE(disp1_w)
 	AM_RANGE(0x17000, 0x177ff) AM_WRITE(disp2_w)
-	//AM_RANGE(0x17800, 0x17fff) AM_WRITE(setout_w)
+	AM_RANGE(0x17800, 0x17fff) AM_WRITE(setout_w)
 ADDRESS_MAP_END
 
 //static ADDRESS_MAP_START( techno_sub_map, AS_IO, 8, techno_state )
@@ -66,13 +76,13 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {
-	m_segment_1 = data;
+	m_segment_1 = BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
 	output_set_digit_value(m_digit_1, m_segment_1);
 }
 
 WRITE16_MEMBER( techno_state::disp2_w )
 {
-	m_segment_2 = data;
+	m_segment_2 = BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
 	output_set_digit_value(m_digit_1+30, m_segment_2);
 }
 
@@ -88,6 +98,49 @@ WRITE16_MEMBER( techno_state::sound_w )
 	}
 }
 
+// lamps & keymatrix
+WRITE16_MEMBER( techno_state::lamp1_w )
+{
+}
+
+// more lamps
+WRITE16_MEMBER( techno_state::lamp2_w )
+{
+}
+
+// solenoids
+WRITE16_MEMBER( techno_state::sol1_w )
+{
+}
+
+// more solenoids
+WRITE16_MEMBER( techno_state::sol2_w )
+{
+}
+
+// unknown
+WRITE16_MEMBER( techno_state::setout_w )
+{
+}
+
+// inputs
+READ16_MEMBER( techno_state::key_r )
+{
+	return 0;
+}
+
+// unknown
+READ16_MEMBER( techno_state::rtrg_r )
+{
+	return 0xffff;
+}
+
+// feedback from sound board, and some AUX inputs
+READ16_MEMBER( techno_state::sound_r )
+{
+	return 0xffff;
+}
+
 static INPUT_PORTS_START( techno )
 INPUT_PORTS_END
 
@@ -98,8 +151,8 @@ static INTERRUPT_GEN( techno_intgen )
 	if ((state->m_vector & 7) == 7)
 		state->m_vector = (state->m_vector ^ 0x10) & 0x97;
 	state->m_vector++;
+	// core doesn't support clearing of irq via hardware
 	generic_pulse_irq_line_and_vector(device, 1, state->m_vector, 1);
-	//device_set_input_line_and_vector(device, 1, ASSERT_LINE, state->m_vector);
 }
 
 void techno_state::machine_reset()
@@ -113,9 +166,9 @@ DRIVER_INIT_MEMBER(techno_state,techno)
 
 static MACHINE_CONFIG_START( techno, techno_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, TECHNO_MAINCLK)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
-	MCFG_CPU_PERIODIC_INT(techno_intgen, 8000000/256) // 31250Hz
+	MCFG_CPU_PERIODIC_INT(techno_intgen, TECHNO_MAINCLK/256) // 31250Hz
 	//MCFG_CPU_ADD("cpu2", TMS7000, 4000000)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
