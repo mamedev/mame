@@ -86,12 +86,8 @@ public:
     DECLARE_WRITE8_MEMBER( write );
 
     DECLARE_READ_LINE_MEMBER( fsdir_r );
-    DECLARE_READ_LINE_MEMBER( ms0_r );
-    DECLARE_READ_LINE_MEMBER( ms1_r );
-    DECLARE_READ_LINE_MEMBER( ms2_r );
-    DECLARE_READ_LINE_MEMBER( ms3_r );
 
-    offs_t ta_r(offs_t offset, int aec);
+    offs_t ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3);
 
 protected:
     // device-level overrides

@@ -158,7 +158,14 @@ void mos8722_device::device_reset()
 
 READ8_MEMBER( mos8722_device::read )
 {
-	return 0;
+	UINT8 data = 0;
+
+	if (!MCR_C64)
+	{
+
+	}
+
+	return data;
 }
 
 
@@ -168,6 +175,10 @@ READ8_MEMBER( mos8722_device::read )
 
 WRITE8_MEMBER( mos8722_device::write )
 {
+	if (!MCR_C64)
+	{
+
+	}
 }
 
 
@@ -177,47 +188,7 @@ WRITE8_MEMBER( mos8722_device::write )
 
 READ_LINE_MEMBER( mos8722_device::fsdir_r )
 {
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  ms0_r - memory status 0 read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mos8722_device::ms0_r )
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  ms1_r - memory status 1 read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mos8722_device::ms1_r )
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  ms2_r - memory status 2 read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mos8722_device::ms2_r )
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  ms3_r - memory status 3 read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mos8722_device::ms3_r )
-{
-	return 1;
+	return MCR_FSDIR;
 }
 
 
@@ -225,7 +196,20 @@ READ_LINE_MEMBER( mos8722_device::ms3_r )
 //  ta_r - translated address read
 //-------------------------------------------------
 
-offs_t mos8722_device::ta_r(offs_t offset, int aec)
+offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3)
 {
-	return offset;
+	offs_t ta = offset;
+
+	if (aec)
+	{
+		if (MCR_C64)
+		{
+			*ms0 = 1;
+			*ms1 = 1;
+		}
+
+		*ms3 = !MCR_C64;
+	}
+
+	return ta;
 }
