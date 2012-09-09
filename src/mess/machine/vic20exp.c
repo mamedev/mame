@@ -357,23 +357,6 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 	}
 }
 
-
-//-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
-
-UINT32 vic20_expansion_slot_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bool value = false;
-
-	if (m_cart != NULL)
-	{
-		value = m_cart->vic20_screen_update(screen, bitmap, cliprect);
-	}
-
-	return value;
-}
-
 WRITE_LINE_MEMBER( vic20_expansion_slot_device::port_res_w ) { if (m_cart != NULL) m_cart->vic20_res_w(state); }
 
 WRITE_LINE_MEMBER( vic20_expansion_slot_device::irq_w ) { m_out_irq_func(state); }

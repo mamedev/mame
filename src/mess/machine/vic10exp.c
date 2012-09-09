@@ -279,23 +279,6 @@ const char * vic10_expansion_slot_device::get_default_card_software(const machin
 
 
 //-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
-
-UINT32 vic10_expansion_slot_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bool value = false;
-
-	if (m_cart != NULL)
-	{
-		value = m_cart->vic10_screen_update(screen, bitmap, cliprect);
-	}
-
-	return value;
-}
-
-
-//-------------------------------------------------
 //  cd_r - cartridge data read
 //-------------------------------------------------
 

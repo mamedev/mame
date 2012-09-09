@@ -602,16 +602,6 @@ void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, i
 
 
 //-------------------------------------------------
-//  plus4_screen_update - screen update
-//-------------------------------------------------
-
-UINT32 c1551_device::plus4_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_exp->screen_update(screen, bitmap, cliprect);
-}
-
-
-//-------------------------------------------------
 //  plus4_breset_w - buffered reset write
 //-------------------------------------------------
 

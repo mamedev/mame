@@ -347,23 +347,6 @@ void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 
 
 //-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
-
-UINT32 plus4_expansion_slot_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bool value = false;
-
-	if (m_cart != NULL)
-	{
-		value = m_cart->plus4_screen_update(screen, bitmap, cliprect);
-	}
-
-	return value;
-}
-
-
-//-------------------------------------------------
 //  breset_w - buffered reset write
 //-------------------------------------------------
 

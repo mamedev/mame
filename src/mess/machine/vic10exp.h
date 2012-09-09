@@ -167,7 +167,6 @@ protected:
 	virtual void vic10_p0_w(int state) { };
 	virtual void vic10_sp_w(int state) { };
 	virtual void vic10_cnt_w(int state) { };
-	virtual UINT32 vic10_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void vic10_res_w(int state) { };
 
 	vic10_expansion_slot_device *m_slot;

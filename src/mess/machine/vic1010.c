@@ -136,23 +136,6 @@ void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data,
 
 
 //-------------------------------------------------
-//  vic20_screen_update - screen update
-//-------------------------------------------------
-
-UINT32 vic1010_device::vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT32 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->screen_update(screen, bitmap, cliprect);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
 //  vic20_res_w - reset write
 //-------------------------------------------------
 
