@@ -223,9 +223,8 @@ static SCREEN_UPDATE_RGB32( cb264 )
 			break;
 
 		default:
-			fatalerror("cb264: unknown video mode %d", card->m_cb264_mode);
+			fatalerror("cb264: unknown video mode %d\n", card->m_cb264_mode);
 			break;
-
 	}
 
 	return 0;

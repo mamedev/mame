@@ -97,7 +97,7 @@ static void (*const gba_draw_scanline_modes[8][3])(running_machine &machine, gba
 
 static void invalid_gba_draw_function(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux)
 {
-	fatalerror( "Invalid screen mode (6 or 7)!" );
+	fatalerror( "Invalid screen mode (6 or 7)!\n" );
 }
 
 static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)

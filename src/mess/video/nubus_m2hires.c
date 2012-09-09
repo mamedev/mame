@@ -223,9 +223,8 @@ static SCREEN_UPDATE_RGB32( m2hires )
 			break;
 
 		default:
-			fatalerror("m2hires: unknown video mode %d", card->m_mode);
+			fatalerror("m2hires: unknown video mode %d\n", card->m_mode);
 			break;
-
 	}
 	return 0;
 }

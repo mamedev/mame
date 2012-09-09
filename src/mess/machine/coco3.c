@@ -173,7 +173,7 @@ UINT32 coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else
 	{
-		fatalerror("Called screen_update() with invalid tag '%s'", screen.tag());
+		fatalerror("Called screen_update() with invalid tag '%s'\n", screen.tag());
 	}
 	return result;
 }

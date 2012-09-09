@@ -265,7 +265,7 @@ const char *mc6847_friend_device::scanline_zone_string(scanline_zone zone)
 		case SCANLINE_ZONE_VBLANK:			result = "SCANLINE_ZONE_VBLANK";		break;
 		case SCANLINE_ZONE_FRAME_END:		result = "SCANLINE_ZONE_FRAME_END";		break;
 		default:
-			fatalerror("Should not get here");
+			fatalerror("Should not get here\n");
 			break;
 	}
 	return result;
@@ -514,7 +514,7 @@ void mc6847_base_device::setup_fixed_mode(struct devcb_read_line callback, UINT8
 	{
 		// for reasons of performance, we currently only support DEVCB_NULL,
 		// DEVCB_LINE_GND and DEVCB_LINE_VCC
-		emu_fatalerror("mc6847 does not support this callback type for mode bits");
+		emu_fatalerror("mc6847 does not support this callback type for mode bits\n");
 	}
 }
 
@@ -652,7 +652,7 @@ void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 s
 
 			default:
 				/* should not get here */
-				fatalerror("should not get here");
+				fatalerror("should not get here\n");
 				break;
 		}
 	}
@@ -699,7 +699,7 @@ ATTR_FORCE_INLINE mc6847_base_device::pixel_t mc6847_base_device::border_value(U
 			result = palette[7];
 			break;
 		default:
-			fatalerror("Should not get here");
+			fatalerror("Should not get here\n");
 			break;
 	}
 	return result;

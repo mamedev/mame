@@ -176,7 +176,7 @@ private:
 			case 0x06:	x_division = 1;	break;
 			case 0x07:	x_division = 1;	break;
 			default:
-				fatalerror("Should not get here");
+				fatalerror("Should not get here\n");
 				return;
 		}
 
@@ -204,7 +204,7 @@ private:
 			case 0x06:	y_division = 1;		break;
 			case 0x07:	y_division = 1;		break;
 			default:
-				fatalerror("Should not get here");
+				fatalerror("Should not get here\n");
 				return;
 		}
 

@@ -664,7 +664,7 @@ WRITE8_HANDLER(bebox_80000480_w)
 
 READ8_HANDLER(bebox_80000480_r)
 {
-	fatalerror("NYI");
+	fatalerror("NYI\n");
 }
 
 

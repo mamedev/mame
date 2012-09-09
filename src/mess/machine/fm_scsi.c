@@ -112,7 +112,7 @@ int fmscsi_device::get_scsi_cmd_len(UINT8 cbyte)
 	if (group == 1 || group == 2) return 10;
 	if (group == 5) return 12;
 
-	fatalerror("fmscsi: Unknown SCSI command group %d", group);
+	fatalerror("fmscsi: Unknown SCSI command group %d\n", group);
 
 	return 6;
 }

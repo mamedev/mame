@@ -163,7 +163,7 @@ static const char *line_value_string(cococart_line_value value)
 			s = "Q";
 			break;
 		default:
-			fatalerror("Invalid value");
+			fatalerror("Invalid value\n");
 			break;
 	}
 	return s;

@@ -1252,7 +1252,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			{
 				auto_free(image.device().machine(), temp_prg);
 				auto_free(image.device().machine(), temp_chr);
-				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted");
+				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted\n");
 			}
 
 			if (!prg_start)
@@ -1341,9 +1341,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		// validate the xml fields
 		if (!prg_size)
-			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted");
+			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted\n");
 		if (prg_size < 0x8000)
-			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
+			fatalerror("PRG entry is too small! Please check if the xml list got corrupted\n");
 
 		// Allocate class pointers for PRG/VROM/VRAM/WRAM and copy data there from the temp copies
 		state->m_prg = auto_alloc_array(image.device().machine(), UINT8, prg_size);

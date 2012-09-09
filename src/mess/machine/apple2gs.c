@@ -179,7 +179,7 @@ static void process_clock(running_machine &machine)
 						break;
 
 					default:
-						//fatalerror("NYI");
+						//fatalerror("NYI\n");
 						break;
 				}
 			}
@@ -226,7 +226,7 @@ static void process_clock(running_machine &machine)
 			break;
 
 		default:
-			//fatalerror("NYI");
+			//fatalerror("NYI\n");
 			break;
 	}
 }
@@ -468,7 +468,7 @@ static void adb_do_command(apple2gs_state *state)
             break;
 
 		default:
-			fatalerror("ADB command 0x%02x unimplemented", state->m_adb_command);
+			fatalerror("ADB command 0x%02x unimplemented\n", state->m_adb_command);
 			break;
 	}
 	state->m_adb_kmstatus |= 0x20;
@@ -593,7 +593,7 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
                     break;
 
 				default:
-					fatalerror("ADB command 0x%02x unimplemented", data);
+					fatalerror("ADB command 0x%02x unimplemented\n", data);
 					break;
 
 			}

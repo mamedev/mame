@@ -88,21 +88,21 @@ static void cirrus_update_8bpp(running_machine &machine, bitmap_rgb32 &bitmap, c
 
 static void cirrus_update_16bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	fatalerror("NYI");
+	fatalerror("NYI\n");
 }
 
 
 
 static void cirrus_update_24bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	fatalerror("NYI");
+	fatalerror("NYI\n");
 }
 
 
 
 static void cirrus_update_32bpp(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	fatalerror("NYI");
+	fatalerror("NYI\n");
 }
 
 

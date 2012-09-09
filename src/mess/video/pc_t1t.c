@@ -944,7 +944,7 @@ static VIDEO_START( pc_t1t )
 			break;
 
 		default:
-			fatalerror("T1T: Bus width %d not supported", buswidth);
+			fatalerror("T1T: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -969,7 +969,7 @@ static VIDEO_START( pc_pcjr )
 			break;
 
 		default:
-			fatalerror("PCJR: Bus width %d not supported", buswidth);
+			fatalerror("PCJR: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }

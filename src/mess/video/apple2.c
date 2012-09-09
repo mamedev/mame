@@ -288,7 +288,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 					break;
 
 				default:
-					fatalerror("Invalid column count");
+					fatalerror("Invalid column count\n");
 					break;
 			}
 		}
@@ -334,7 +334,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 					break;
 
 				default:
-					fatalerror("Invalid column count");
+					fatalerror("Invalid column count\n");
 					break;
 			}
 		}

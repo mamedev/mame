@@ -93,7 +93,7 @@ static attotime interrupt_period_table(int val)
 		case 5:	return attotime::from_seconds(10);
 		case 6:	return attotime::from_seconds(30);
 		case 7:	return attotime::from_seconds(60);
-		default: fatalerror("out of range");
+		default: fatalerror("out of range\n");
 	}
 };
 

@@ -459,7 +459,7 @@ int nes_get_mmc_id( running_machine &machine, int mapper )
 	const nes_mmc *mmc = nes_mapper_lookup(mapper);
 
 	if (mmc == NULL)
-		fatalerror("Unimplemented Mapper %d", mapper);
+		fatalerror("Unimplemented Mapper %d\n", mapper);
 
 	return mmc->pcb_id;
 }

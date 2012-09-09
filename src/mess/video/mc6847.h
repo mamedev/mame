@@ -423,7 +423,7 @@ protected:
 
 				default:
 					/* should not get here */
-					fatalerror("Should not get here");
+					fatalerror("Should not get here\n");
 					break;
 			}
 		}

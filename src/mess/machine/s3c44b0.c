@@ -377,7 +377,7 @@ static void s3c44b0_lcd_configure( device_t *device)
 		case S3C44B0_PNRMODE_STN_04_SS : width = ((hozval + 1) * 4); break;
 		case S3C44B0_PNRMODE_STN_04_DS : width = ((hozval + 1) * 4); break;
 		case S3C44B0_PNRMODE_STN_08_SS : width = ((hozval + 1) * 8); break;
-		default : fatalerror( "invalid display mode (%d)", dismode); break;
+		default : fatalerror( "invalid display mode (%d)\n", dismode); break;
 	}
 	height = lineval + 1;
 	lcd->framerate = framerate;
@@ -862,7 +862,7 @@ static TIMER_CALLBACK( s3c44b0_pwm_timer_exp )
 	verboselog( machine, 2, "PWM %d timer callback\n", ch);
 	if (BITS( s3c44b0->pwm.regs.tcfg1, 27, 24) == (ch + 1))
 	{
-		fatalerror( "s3c44b0_dma_request_pwm( device);");
+		fatalerror( "s3c44b0_dma_request_pwm( device)\n");
 	}
 	else
 	{

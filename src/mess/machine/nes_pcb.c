@@ -1852,7 +1852,7 @@ static void mmc5_ppu_mirror( running_machine &machine, int page, int src )
 			set_nt_page(machine, page, MMC5FILL, 0, 0);
 			break;
 		default:
-			fatalerror("This should never happen");
+			fatalerror("This should never happen\n");
 			break;
 	}
 }

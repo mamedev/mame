@@ -597,7 +597,7 @@ void diskonchip_g3_device::sec_2_write_1036(UINT8 data)
 		{
 			UINT32 block, page, plane;
 			block = (m_data_1036 >> 7);
-			if (block >= m_blocks) fatalerror( "DOCG3: invalid block (%d)", block);
+			if (block >= m_blocks) fatalerror( "DOCG3: invalid block (%d)\n", block);
 			plane = (m_data_1036 >> 6) & 1;
 			page = (m_data_1036 >> 0) & 0x3F;
 			verboselog( machine(), 5, "flash address %d - %06X (plane %d block %04X page %04X)\n", m_address_count, m_data_1036, plane, block, page);

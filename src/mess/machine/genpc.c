@@ -580,7 +580,7 @@ void ibm5160_mb_device::install_device(device_t *dev, offs_t start, offs_t end, 
 			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
 			break;
 		default:
-			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -597,7 +597,7 @@ void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t
 			m_maincpu->memory().space(AS_IO)->install_legacy_write_handler(*dev, start, end, mask, mirror, whandler, whandler_name, 0xffff);
 			break;
 		default:
-			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -614,7 +614,7 @@ void ibm5160_mb_device::install_device(offs_t start, offs_t end, offs_t mask, of
 			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
 			break;
 		default:
-			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -641,7 +641,7 @@ void ibm5160_mb_device::device_start()
 			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(0x0060, 0x0063, 0, 0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi8255), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi8255), 0xffff);
 			break;
 		default:
-			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported", buswidth);
+			fatalerror("IBM5160_MOTHERBOARD: Bus width %d not supported\n", buswidth);
 			break;
 	}
 

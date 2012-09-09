@@ -226,9 +226,8 @@ static SCREEN_UPDATE_RGB32( spec8s3 )
 			break;
 
 		default:
-			fatalerror("spec8s3: unknown video mode %d", card->m_mode);
+			fatalerror("spec8s3: unknown video mode %d\n", card->m_mode);
 			break;
-
 	}
 	return 0;
 }

@@ -707,7 +707,7 @@ VIDEO_START( pc_aga )
 			break;
 
 		default:
-			fatalerror("AGA:  Bus width %d not supported", buswidth);
+			fatalerror("AGA:  Bus width %d not supported\n", buswidth);
 			break;
 	}
 
@@ -738,7 +738,7 @@ VIDEO_START( pc200 )
 			break;
 
 		default:
-			fatalerror("AGA:  Bus width %d not supported", buswidth);
+			fatalerror("AGA:  Bus width %d not supported\n", buswidth);
 			break;
 	}
 	memset( &aga, 0, sizeof( aga ) );

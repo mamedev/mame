@@ -235,9 +235,8 @@ static SCREEN_UPDATE_RGB32( specpdq )
 			break;
 
 		default:
-			fatalerror("specpdq: unknown video mode %d", card->m_mode);
+			fatalerror("specpdq: unknown video mode %d\n", card->m_mode);
 			break;
-
 	}
 	return 0;
 }

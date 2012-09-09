@@ -396,10 +396,10 @@ INLINE void chr_sanity_check( running_machine &machine, int source )
 	nes_state *state = machine.driver_data<nes_state>();
 
 	if (source == CHRRAM && state->m_vram == NULL)
-		fatalerror("CHRRAM bankswitch with no VRAM");
+		fatalerror("CHRRAM bankswitch with no VRAM\n");
 
 	if (source == CHRROM && state->m_vrom == NULL)
-		fatalerror("CHRROM bankswitch with no VROM");
+		fatalerror("CHRROM bankswitch with no VROM\n");
 }
 
 static void chr8( running_machine &machine, int bank, int source )

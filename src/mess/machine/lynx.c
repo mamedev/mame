@@ -1502,7 +1502,7 @@ static UINT32 lynx_time_factor(int val)
 		case 4: return 62500;
 		case 5: return 31250;
 		case 6: return 15625;
-		default: fatalerror("invalid value");
+		default: fatalerror("invalid value\n");
 	}
 }
 

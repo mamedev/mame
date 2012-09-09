@@ -210,9 +210,8 @@ static SCREEN_UPDATE_RGB32( wsportrait )
 			break;
 
 		default:
-			fatalerror("wsportrait: unknown video mode %d", card->m_mode);
+			fatalerror("wsportrait: unknown video mode %d\n", card->m_mode);
 			break;
-
 	}
 	return 0;
 }

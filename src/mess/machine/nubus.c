@@ -152,7 +152,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
-			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -170,7 +170,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
-			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -188,7 +188,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
-			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -206,7 +206,7 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 			m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(start, end, rhandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
-			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
@@ -224,7 +224,7 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 			m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(start, end, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
-			fatalerror("NUBUS: Bus width %d not supported", buswidth);
+			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }

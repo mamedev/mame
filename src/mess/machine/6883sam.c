@@ -407,7 +407,7 @@ void sam6883_device::horizontal_sync(void)
 			break;
 
 		default:
-			fatalerror("Should not get here");
+			fatalerror("Should not get here\n");
 			return;
 	}
 }

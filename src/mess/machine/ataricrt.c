@@ -492,7 +492,7 @@ static int a800_check_cart_type(device_image_interface &image)
 	}
 
 	if ((strcmp(image.device().tag(),":cart2") == 0) && (type != A800_RIGHT_8K))
-		fatalerror("You cannot load this image '%s' in the right slot", image.filename());
+		fatalerror("You cannot load this image '%s' in the right slot\n", image.filename());
 
 	return type;
 }
