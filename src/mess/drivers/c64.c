@@ -373,26 +373,6 @@ INPUT_PORTS_END
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-static const unsigned char c64_palette[] =
-{
-// black, white, red, cyan
-// purple, green, blue, yellow
-// orange, brown, light red, dark gray,
-// medium gray, light green, light blue, light gray
-// taken from the vice emulator
-	0x00, 0x00, 0x00,  0xfd, 0xfe, 0xfc,  0xbe, 0x1a, 0x24,  0x30, 0xe6, 0xc6,
-	0xb4, 0x1a, 0xe2,  0x1f, 0xd2, 0x1e,  0x21, 0x1b, 0xae,  0xdf, 0xf6, 0x0a,
-	0xb8, 0x41, 0x04,  0x6a, 0x33, 0x04,  0xfe, 0x4a, 0x57,  0x42, 0x45, 0x40,
-	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
-};
-
-static PALETTE_INIT( pet64 )
-{
-	int i;
-	for (i = 0; i < 16; i++)
-		palette_set_color_rgb(machine, i, 0, c64_palette[i * 3 + 1], 0);
-}
-
 static INTERRUPT_GEN( c64_frame_interrupt )
 {
 	c64_state *state = device->machine().driver_data<c64_state>();
@@ -1058,7 +1038,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pet64, ntsc )
-	MCFG_PALETTE_INIT( pet64 )
+	// TODO monochrome green palette
 MACHINE_CONFIG_END
 
 
@@ -1515,8 +1495,8 @@ COMP( 1982,	c64n,	0,  	0,		ntsc,		c64, 	driver_device,		0,		"Commodore Business 
 COMP( 1982,	c64j,	c64n,	0,		ntsc,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						GAME_SUPPORTS_SAVE )
 COMP( 1982,	c64p,	c64n,	0,		pal,		c64, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						GAME_SUPPORTS_SAVE )
 COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw, 	driver_device,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
-COMP( 1983, pet64,	c64n,	0,  	pet64,  	c64, 	driver_device, 		0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					GAME_SUPPORTS_SAVE )
-COMP( 1983, edu64,  c64n,	0,  	pet64,  	c64, 	driver_device, 		0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						GAME_SUPPORTS_SAVE )
+COMP( 1983, pet64,	c64n,	0,  	pet64,  	c64, 	driver_device, 		0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
+COMP( 1983, edu64,  c64n,	0,  	pet64,  	c64, 	driver_device, 		0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
 COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64, 	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				GAME_SUPPORTS_SAVE )
 COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64, 	driver_device,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				GAME_SUPPORTS_SAVE )
 COMP( 1984, vip64,	c64n,	0,		pal_sx,		c64sw, 	driver_device,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					GAME_SUPPORTS_SAVE )
