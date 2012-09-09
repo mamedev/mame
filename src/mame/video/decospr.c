@@ -207,7 +207,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 	//printf("cliprect %04x, %04x\n", cliprect.min_y, cliprect.max_y);
 
 	if (m_sprite_bitmap.valid() && m_pricallback)
-		fatalerror("m_sprite_bitmap && m_pricallback is invalid");
+		fatalerror("m_sprite_bitmap && m_pricallback is invalid\n");
 
 	if (m_sprite_bitmap.valid())
 		m_sprite_bitmap.fill(0, cliprect);
@@ -565,7 +565,7 @@ void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask, UINT8 alpha)
 {
 	if (!m_sprite_bitmap.valid())
-		fatalerror("decospr_device::inefficient_copy_sprite_bitmap with no m_sprite_bitmap");
+		fatalerror("decospr_device::inefficient_copy_sprite_bitmap with no m_sprite_bitmap\n");
 
 	int y, x;
 	const pen_t *paldata = machine().pens;

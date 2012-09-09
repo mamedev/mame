@@ -378,7 +378,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 	/* append the data to our buffer */
 	m_polydata_buffer[m_polydata_count++] = data;
 	if (m_polydata_count >= MAX_POLYDATA)
-		fatalerror("Out of polygon buffer &space!");
+		fatalerror("Out of polygon buffer &space!\n");
 
 	/* if we've accumulated a completed poly set of data, queue it */
 	if (!machine().video().skip_this_frame())

@@ -1042,7 +1042,7 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 			break;
 
 		default:
-			fatalerror("Invalid tilemap index specified in segaic16_tilemap_init");
+			fatalerror("Invalid tilemap index specified in segaic16_tilemap_init\n");
 	}
 
 	/* determine the parameters of the tilemaps */
@@ -1085,7 +1085,7 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 			break;
 
 		default:
-			fatalerror("Invalid tilemap type specified in segaic16_tilemap_init");
+			fatalerror("Invalid tilemap type specified in segaic16_tilemap_init\n");
 	}
 
 	/* create the tilemap for the text layer */
@@ -1798,7 +1798,7 @@ void segaic16_road_init(running_machine &machine, int which, int type, int color
 			break;
 
 		default:
-			fatalerror("Invalid road index specified in segaic16_road_init");
+			fatalerror("Invalid road index specified in segaic16_road_init\n");
 	}
 
 	/* determine the parameters of the road */
@@ -1818,7 +1818,7 @@ void segaic16_road_init(running_machine &machine, int which, int type, int color
 			break;
 
 		default:
-			fatalerror("Invalid road system specified in segaic16_road_init");
+			fatalerror("Invalid road system specified in segaic16_road_init\n");
 	}
 }
 
@@ -1903,7 +1903,7 @@ void segaic16_rotate_init(running_machine &machine, int which, int type, int col
 			break;
 
 		default:
-			fatalerror("Invalid rotate index specified in segaic16_rotate_init");
+			fatalerror("Invalid rotate index specified in segaic16_rotate_init\n");
 	}
 
 	/* determine the parameters of the rotate */
@@ -1914,7 +1914,7 @@ void segaic16_rotate_init(running_machine &machine, int which, int type, int col
 			break;
 
 		default:
-			fatalerror("Invalid rotate system specified in segaic16_rotate_init");
+			fatalerror("Invalid rotate system specified in segaic16_rotate_init\n");
 	}
 
 	/* allocate a buffer for swapping */

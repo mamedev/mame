@@ -1330,7 +1330,7 @@ void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		break;
 
 	default:
-		fatalerror("Unsupported layout");
+		fatalerror("Unsupported layout\n");
 	}
 
 	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
@@ -2111,7 +2111,7 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 			break;
 
 		default:
-			fatalerror("Unsupported bpp");
+			fatalerror("Unsupported bpp\n");
 	}
 
 	machine.gfx[gfx_index]->set_granularity(16); /* override */

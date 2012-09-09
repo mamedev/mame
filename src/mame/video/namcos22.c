@@ -1153,7 +1153,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, st
 					break;
 
 				default:
-					fatalerror("invalid node->type");
+					fatalerror("invalid node->type\n");
 					break;
 				}
 				FreeSceneNode( node );
@@ -2324,7 +2324,7 @@ BlitQuads( running_machine &machine, bitmap_rgb32 &bitmap, INT32 addr, float m[4
 	int finish = addr + chunkLength;
 
 	if( chunkLength>0x100 )
-		fatalerror( "bad packet length" );
+		fatalerror( "bad packet length\n" );
 
 	while( addr<finish )
 	{

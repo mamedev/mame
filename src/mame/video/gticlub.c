@@ -105,7 +105,7 @@ static UINT32 K001006_r(running_machine &machine, int chip, int offset, UINT32 m
 			}
 			default:
 			{
-				fatalerror("K001006_r chip %d, unknown device %02X", chip, K001006_device_sel[chip]);
+				fatalerror("K001006_r chip %d, unknown device %02X\n", chip, K001006_device_sel[chip]);
 			}
 		}
 	}

@@ -1443,7 +1443,7 @@ void galaxold_init_stars(running_machine &machine, int colors_offset)
 
 	if (total_stars != STAR_COUNT)
 	{
-		fatalerror("total_stars = %d, STAR_COUNT = %d",total_stars,STAR_COUNT);
+		fatalerror("total_stars = %d, STAR_COUNT = %d\n",total_stars,STAR_COUNT);
 	}
 }
 

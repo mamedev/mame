@@ -747,7 +747,7 @@ static void real3d_upload_texture(running_machine &machine, UINT32 header, UINT3
 		case 0x80:		/* Gamma-table ? */
 			break;
 		default:
-			fatalerror("Unknown texture type: %02X: ", header >> 24);
+			fatalerror("Unknown texture type: %02X\n", header >> 24);
 			break;
 	}
 }
@@ -940,7 +940,7 @@ static void push_matrix_stack(model3_state *state)
 {
 	state->m_matrix_stack_ptr++;
 	if (state->m_matrix_stack_ptr >= MATRIX_STACK_SIZE)
-		fatalerror("push_matrix_stack: matrix stack overflow");
+		fatalerror("push_matrix_stack: matrix stack overflow\n");
 
 	memcpy( &state->m_matrix_stack[state->m_matrix_stack_ptr], &state->m_matrix_stack[state->m_matrix_stack_ptr-1], sizeof(MATRIX));
 }
@@ -949,7 +949,7 @@ static void pop_matrix_stack(model3_state *state)
 {
 	state->m_matrix_stack_ptr--;
 	if (state->m_matrix_stack_ptr < 0)
-		fatalerror("pop_matrix_stack: matrix stack underflow");
+		fatalerror("pop_matrix_stack: matrix stack underflow\n");
 }
 
 static void multiply_matrix_stack(model3_state *state, MATRIX matrix)
@@ -1338,14 +1338,14 @@ static UINT32 *get_memory_pointer(model3_state *state, UINT32 address)
 	if (address & 0x800000)
 	{
 		if (address >= 0x840000) {
-			fatalerror("get_memory_pointer: invalid display list memory address %08X", address);
+			fatalerror("get_memory_pointer: invalid display list memory address %08X\n", address);
 		}
 		return &state->m_display_list_ram[address & 0x7fffff];
 	}
 	else
 	{
 		if (address >= 0x100000) {
-			fatalerror("get_memory_pointer: invalid node ram address %08X", address);
+			fatalerror("get_memory_pointer: invalid node ram address %08X\n", address);
 		}
 		return &state->m_culling_ram[address];
 	}

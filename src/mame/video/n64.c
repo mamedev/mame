@@ -3031,7 +3031,7 @@ void n64_rdp::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 
 	if (tl != th)
 	{
-		fatalerror("Load tlut: tl=%d, th=%d",tl,th);
+		fatalerror("Load tlut: tl=%d, th=%d\n",tl,th);
 	}
 
 	int count = (sh >> 2) - (sl >> 2) + 1;
@@ -3043,7 +3043,7 @@ void n64_rdp::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 		{
 			if (tile[tilenum].tmem < 256)
 			{
-				fatalerror("rdp_load_tlut: loading tlut into low half at %d qwords",tile[tilenum].tmem);
+				fatalerror("rdp_load_tlut: loading tlut into low half at %d qwords\n",tile[tilenum].tmem);
 			}
 			UINT32 srcstart = (MiscState.TIAddress + (tl >> 2) * (MiscState.TIWidth << 1) + (sl >> 1)) >> 1;
 			UINT16 *dst = GetTMEM16();
@@ -3095,7 +3095,7 @@ void n64_rdp::CmdLoadBlock(UINT32 w1, UINT32 w2)
 
 	if (sh < sl)
 	{
-		fatalerror("load_block: sh < sl");
+		fatalerror("load_block: sh < sl\n");
 	}
 
 	INT32 width = (sh - sl) + 1;

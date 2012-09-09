@@ -1172,7 +1172,7 @@ static void konami_shuffle_16(UINT16 *buf,int len)
 
 	if (len == 2) return;
 
-	if (len % 4) fatalerror("shuffle() - not modulo 4");   /* must not happen */
+	if (len % 4) fatalerror("shuffle() - not modulo 4\n");   /* must not happen */
 
 	len /= 2;
 
@@ -1194,7 +1194,7 @@ static void konami_shuffle_8(UINT8 *buf,int len)
 
 	if (len == 2) return;
 
-	if (len % 4) fatalerror("shuffle() - not modulo 4");	/* must not happen */
+	if (len % 4) fatalerror("shuffle() - not modulo 4\n");	/* must not happen */
 
 	len /= 2;
 
@@ -2820,7 +2820,7 @@ void k052109_device::device_start()
 		break;
 
 	default:
-		fatalerror("Unsupported plane_order");
+		fatalerror("Unsupported plane_order\n");
 	}
 
 	/* deinterleave the graphics, if needed */
@@ -3383,7 +3383,7 @@ static DEVICE_START( k051960 )
 		break;
 
 	default:
-		fatalerror("Unknown plane_order");
+		fatalerror("Unknown plane_order\n");
 	}
 
 	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
@@ -4221,7 +4221,7 @@ static DEVICE_START( k05324x )
 		break;
 
 	default:
-		fatalerror("Unsupported plane_order");
+		fatalerror("Unsupported plane_order\n");
 	}
 
 	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
@@ -5099,7 +5099,7 @@ static DEVICE_START( k053247 )
 		break;
 
 	default:
-		fatalerror("Unsupported plane_order");
+		fatalerror("Unsupported plane_order\n");
 	}
 
 	if (VERBOSE)
@@ -5236,7 +5236,7 @@ static DEVICE_START( k055673 )
 		break;
 
 	default:
-		fatalerror("Unsupported layout");
+		fatalerror("Unsupported layout\n");
 	}
 
 	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
@@ -5648,7 +5648,7 @@ void k051316_device::device_start()
 		break;
 
 	default:
-		fatalerror("Unsupported bpp");
+		fatalerror("Unsupported bpp\n");
 	}
 
 	k051316->memory_region = intf->gfx_memory_region;
@@ -8339,7 +8339,7 @@ void k056832_device::device_start()
 			break;
 
 		default:
-			fatalerror("Unsupported bpp");
+			fatalerror("Unsupported bpp\n");
 	}
 
 	machine().gfx[intf->gfx_num]->set_granularity(16); /* override */
@@ -9038,7 +9038,7 @@ READ32_DEVICE_HANDLER( k001006_r )
 			}
 			default:
 			{
-				fatalerror("k001006_r, unknown device %02X", k001006->device_sel);
+				fatalerror("k001006_r, unknown device %02X\n", k001006->device_sel);
 			}
 		}
 	}

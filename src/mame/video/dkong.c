@@ -954,7 +954,7 @@ VIDEO_START( dkong )
 
 			break;
 		default:
-			fatalerror("Invalid hardware type in dkong_video_start");
+			fatalerror("Invalid hardware type in dkong_video_start\n");
 	}
 }
 
@@ -981,7 +981,7 @@ SCREEN_UPDATE_IND16( dkong )
 			radarscp_draw_background(screen.machine(), state, bitmap, cliprect);
 			break;
 		default:
-			fatalerror("Invalid hardware type in dkong_video_update");
+			fatalerror("Invalid hardware type in dkong_video_update\n");
 	}
 	return 0;
 }

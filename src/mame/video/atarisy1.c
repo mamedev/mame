@@ -674,7 +674,7 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 		break;
 
 	default:
-		fatalerror("Unsupported bpp");
+		fatalerror("Unsupported bpp\n");
 	}
 
 	/* set the color information */

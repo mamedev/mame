@@ -163,7 +163,7 @@ static attotime prescale(int val)
         case 6: return attotime::from_nsec(25000);
         case 7: return attotime::from_nsec(50000);
         default:
-            fatalerror("out of range");
+            fatalerror("out of range\n");
     }
 }
 #endif

@@ -187,7 +187,7 @@ static VIDEO_START( snk_3bpp_shadow )
 	int i;
 
 	if(!(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
-		fatalerror("driver should use VIDEO_HAS_SHADOWS");
+		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 5; i++) state->m_drawmode_table[i] = DRAWMODE_SOURCE;
@@ -204,7 +204,7 @@ static VIDEO_START( snk_4bpp_shadow )
 	int i;
 
 	if(!(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
-		fatalerror("driver should use VIDEO_HAS_SHADOWS");
+		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 13; i++) state->m_drawmode_table[i] = DRAWMODE_SOURCE;

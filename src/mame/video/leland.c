@@ -112,7 +112,7 @@ WRITE8_MEMBER(leland_state::leland_scroll_w)
 			break;
 
 		default:
-			fatalerror("Unexpected leland_gfx_port_w");
+			fatalerror("Unexpected leland_gfx_port_w\n");
 			break;
 	}
 }
