@@ -580,7 +580,7 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	}
 
 	/* adjust banking */
-	if (machine().root_device().memregion("romboard")->base())
+	if (memregion("romboard")->base())
 	{
 		membank("mainsndbank")->set_entry((data >> 1) & 7);
 		membank("dspsndbank")->set_entry((data >> 1) & 7);
@@ -632,13 +632,13 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 
 READ32_MEMBER(jaguar_state::dspctrl_r)
 {
-	return jaguardsp_ctrl_r(machine().device("dsp"), offset);
+	return jaguardsp_ctrl_r(m_dsp, offset);
 }
 
 
 WRITE32_MEMBER(jaguar_state::dspctrl_w)
 {
-	jaguardsp_ctrl_w(machine().device("dsp"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(m_dsp, offset, data, mem_mask);
 }
 
 
@@ -754,7 +754,7 @@ WRITE32_MEMBER(jaguar_state::latch_w)
 	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(&space.device()), data);
 
 	/* adjust banking */
-	if (machine().root_device().memregion("romboard")->base())
+	if (memregion("romboard")->base())
 	{
 		if (m_is_r3000)
 			membank("maingfxbank")->set_entry(data & 1);
@@ -1856,7 +1856,7 @@ ROM_START( jaguar )
 	ROM_LOAD16_WORD( "jagboot.rom", 0xe00000, 0x020000, CRC(fb731aaa) SHA1(f8991b0c385f4e5002fa2a7e2f5e61e8c5213356) )
 	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 ROM_END
 
@@ -1868,7 +1868,7 @@ ROM_START( jaguarcd )
 	ROMX_LOAD( "jagdevcd.bin", 0xe00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_BIOS(2) )
 	ROM_CART_LOAD("cart", 0x800000, 0x600000, ROM_NOMIRROR)
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 ROM_END
 
@@ -1882,13 +1882,13 @@ ROM_END
 /* There is known to exist an Area 51 set with "136105-000x Q" labels - currently not dumped */
 
 ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "136105-0002c.3p", 0x00001, 0x80000, CRC(e9c9f4bd) SHA1(7c6c50372d45dca8929767241b092339f3bab4d2) )
 	ROM_LOAD32_BYTE( "136105-0001c.3m", 0x00002, 0x80000, CRC(6f135a81) SHA1(2d9660f240b14481e8c46bc98713e9dc12035063) )
 	ROM_LOAD32_BYTE( "136105-0000c.3k", 0x00003, 0x80000, CRC(94f50c14) SHA1(a54552e3ac5c4f481ba4f2fc7d724534576fe76c) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -1896,13 +1896,13 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1
 ROM_END
 
 ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003a.3h", 0x00000, 0x80000, CRC(116d37e6) SHA1(5d36cae792dd349faa77cd2d8018722a28ee55c1) ) /* Usually found with "orange" labels */
 	ROM_LOAD32_BYTE( "136105-0002a.3p", 0x00001, 0x80000, CRC(eb10f539) SHA1(dadc4be5a442dd4bd17385033056555e528ed994) )
 	ROM_LOAD32_BYTE( "136105-0001a.3m", 0x00002, 0x80000, CRC(c6d8322b) SHA1(90cf848a4195c51b505653cc2c74a3b9e3c851b8) )
 	ROM_LOAD32_BYTE( "136105-0000a.3k", 0x00003, 0x80000, CRC(729eb1b7) SHA1(21864b4281b1ad17b2903e3aa294e4be74161e80) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -1910,13 +1910,13 @@ ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1
 ROM_END
 
 ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "a51_2-c.hh", 0x00000, 0x80000, CRC(13af6a1e) SHA1(69da54ed6886e825156bbcc256e8d7abd4dc1ff8) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "a51_2-c.hl", 0x00001, 0x80000, CRC(8ab6649b) SHA1(9b4945bc04f8a73161638a2c5fa2fd84c6fd31b4) )
 	ROM_LOAD32_BYTE( "a51_2-c.lh", 0x00002, 0x80000, CRC(a6524f73) SHA1(ae377a6803a4f7d1bbcc111725af121a3e82317d) )
 	ROM_LOAD32_BYTE( "a51_2-c.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -1924,13 +1924,13 @@ ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 *
 ROM_END
 
 ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "maxf_105.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
 	ROM_LOAD32_BYTE( "maxf_105.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) )
 	ROM_LOAD32_BYTE( "maxf_105.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
 	ROM_LOAD32_BYTE( "maxf_105.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -1939,13 +1939,13 @@ ROM_END
 
 
 ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "maxf_102.hh", 0x00000, 0x80000, CRC(8ff7009d) SHA1(da22eae298a6e0e36f503fa091ac3913423dcd0f) ) /* Usually found with "yellow" labels */
 	ROM_LOAD32_BYTE( "maxf_102.hl", 0x00001, 0x80000, CRC(96c2cc1d) SHA1(b332b8c042b92c736131c478cefac1c3c2d2673b) )
 	ROM_LOAD32_BYTE( "maxf_102.lh", 0x00002, 0x80000, CRC(459ffba5) SHA1(adb40db6904e84c17f32ac6518fd2e994da7883f) )
 	ROM_LOAD32_BYTE( "maxf_102.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -1954,13 +1954,13 @@ ROM_END
 
 
 ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "mf_ng_hh.21v", 0x00000, 0x80000, CRC(08791c02) SHA1(9befbff3201c7d345109b26c296fd8548dbfc95b) )
 	ROM_LOAD32_BYTE( "mf_ng_hl.17v", 0x00001, 0x80000, CRC(52cf482c) SHA1(ff98b3f04987acef82a97a2ad35a9085fa84e6d5) )
 	ROM_LOAD32_BYTE( "mf_ng_lh.21y", 0x00002, 0x80000, CRC(ab4ee992) SHA1(69f0fe111d3f5f31151d2922579e5073e484b1e1) )
 	ROM_LOAD32_BYTE( "mf_ng_ll.17y", 0x00003, 0x80000, CRC(674aab43) SHA1(f79d790538756d1100b7e4ffed192a62a031a2cb) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION( 0x800, "user2", 0 ) /* 28C16 style eeprom, currently loaded but not used */
@@ -1972,13 +1972,13 @@ ROM_END
 
 
 ROM_START( area51mx )	/* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date: Apr 22, 1998 */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 ) /* 2MB for 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "area51mx.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) )
 	ROM_LOAD32_BYTE( "area51mx.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) )
 	ROM_LOAD32_BYTE( "area51mx.3m", 0x00002, 0x80000, CRC(d800ac17) SHA1(3d515c8608d8101ee9227116175b3c3f1fe22e0c) )
 	ROM_LOAD32_BYTE( "area51mx.3k", 0x00003, 0x80000, CRC(0e78f308) SHA1(adc4c8e441eb8fe525d0a6220eb3a2a8791a7289) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -1987,13 +1987,13 @@ ROM_END
 
 
 ROM_START( a51mxr3k ) /* R3000 based, Labeled as "R3K Max/A51 Kit Ver 1.0" */
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "a51mxr3k.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) )
 	ROM_LOAD32_BYTE( "a51mxr3k.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) )
 	ROM_LOAD32_BYTE( "a51mxr3k.lh", 0x00002, 0x80000, CRC(d7d94dac) SHA1(2060a74715f36a0d7f5dd0855eda48ad1f20f095) )
 	ROM_LOAD32_BYTE( "a51mxr3k.ll", 0x00003, 0x80000, CRC(ece9e5ae) SHA1(7e44402726f5afa6d1670b27aa43ad13d21c4ad9) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -2002,13 +2002,13 @@ ROM_END
 
 
 ROM_START( vcircle )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(7276f5f5) SHA1(716287e370a4f300b1743103f8031afc82de38ca) )
 	ROM_LOAD32_BYTE( "hl", 0x00001, 0x80000, CRC(146060a1) SHA1(f291989f1f0ef228757f1990fb14da5ff8f3cf8d) )
 	ROM_LOAD32_BYTE( "lh", 0x00002, 0x80000, CRC(be4b2ef6) SHA1(4332b3036e9cb12685e914d085d9a63aa856f0be) )
 	ROM_LOAD32_BYTE( "ll", 0x00003, 0x80000, CRC(ba8753eb) SHA1(0322e0e37d814a38d08ba191b1a97fb1a55fe461) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "drive_0" )
@@ -2025,13 +2025,13 @@ ROM_END
 
 
 ROM_START( fishfren )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(2ef79767) SHA1(abcea584f2cbd71b05f9d7e61f40ca9da6799215) )
 	ROM_LOAD32_BYTE( "hl", 0x00001, 0x80000, CRC(7eefd4a2) SHA1(181be04836704098082fd78cacc68ffa70e77892) )
 	ROM_LOAD32_BYTE( "lh", 0x00002, 0x80000, CRC(bbe9ed15) SHA1(889af29afe6d984b39105aa238400392a5dfb2c5) )
 	ROM_LOAD32_BYTE( "ll", 0x00003, 0x80000, CRC(d70d0f2c) SHA1(2689cbe56ae3d491348b241528b0fe345fa8484c) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2055,13 +2055,13 @@ ROM_START( fishfren )
 ROM_END
 
 ROM_START( freezeat )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog_eng.hh",          0x000000, 0x040000, CRC(f7cffafd) SHA1(62369de4cf0a5abab86f6bcf9621028b9e171ec3) )
 	ROM_LOAD32_BYTE( "prog_eng.hl",          0x000001, 0x040000, CRC(17150705) SHA1(c5a32d334bffb58a816920cc1251a21acc5a6f92) )
 	ROM_LOAD32_BYTE( "prog_eng.lh",          0x000002, 0x040000, CRC(12a903bf) SHA1(41f5949d7ed2081917af8411f92666b754564b37) )
 	ROM_LOAD32_BYTE( "prog_eng.ll",          0x000003, 0x040000, CRC(cf69f971) SHA1(132b06f5fb49801fff7e5deb7aa71b44d5b1c6ca) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2084,13 +2084,13 @@ ROM_START( freezeat )
 ROM_END
 
 ROM_START( freezeatjp )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog_jpn.hh",          0x000000, 0x040000, CRC(989302bf) SHA1(232927ec0a52b8bb587a3c206af8e1c6cde67860) )
 	ROM_LOAD32_BYTE( "prog_jpn.hl",          0x000001, 0x040000, CRC(6262b760) SHA1(12ca749f5cdc6db7d19f88a21f5f955b80206784) )
 	ROM_LOAD32_BYTE( "prog_jpn.lh",          0x000002, 0x040000, CRC(c6a12b0c) SHA1(971242b5b09e15164e7c335e684b5043510c6462) )
 	ROM_LOAD32_BYTE( "prog_jpn.ll",          0x000003, 0x040000, CRC(241ea755) SHA1(0db3cfbe577fc78387528390ebb14dbb7a09c97d) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2113,13 +2113,13 @@ ROM_START( freezeatjp )
 ROM_END
 
 ROM_START( freezeat2 )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__961018).hh",  0x000000, 0x040000, CRC(a8aefa52) SHA1(ba95da93035520de4b15245f68217c59dfb69dbd) )
 	ROM_LOAD32_BYTE( "prog(__961018).hl",  0x000001, 0x040000, CRC(152dd641) SHA1(52fa260baf1979ed8f15f8abcbbeebd8e595d0e4) )
 	ROM_LOAD32_BYTE( "prog(__961018).lh",  0x000002, 0x040000, CRC(416d26ed) SHA1(11cf3b88415a8a5d0bb8e1df08603a85202186ef) )
 	ROM_LOAD32_BYTE( "prog(__961018).ll",  0x000003, 0x040000, CRC(d6a5dbc8) SHA1(0e2176c35cbc59b2a5283366210409d0e930bac7) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2142,13 +2142,13 @@ ROM_START( freezeat2 )
 ROM_END
 
 ROM_START( freezeat3 )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__961007).hh",  0x000000, 0x040000, CRC(863942e6) SHA1(c7429c8a5c86ff93c64950e201cffca83dd7b7b0) )
 	ROM_LOAD32_BYTE( "prog(__961007).hl",  0x000001, 0x040000, CRC(2acc18ef) SHA1(ead02566f7641b1d1066bd2e257b695e5c7e8437) )
 	ROM_LOAD32_BYTE( "prog(__961007).lh",  0x000002, 0x040000, CRC(948cf20c) SHA1(86c757aa3c849ef5ba94ed4d5dbf10e833dab6bd) )
 	ROM_LOAD32_BYTE( "prog(__961007).ll",  0x000003, 0x040000, CRC(5f44969e) SHA1(32345d7c56a3a890e71f8c71f25414d442b60af8) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2171,13 +2171,13 @@ ROM_START( freezeat3 )
 ROM_END
 
 ROM_START( freezeat4 )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__961003).hh",  0x000000, 0x040000, CRC(80336f5e) SHA1(9946e8eebec2cd68db059f40f535ea212f41913d) )
 	ROM_LOAD32_BYTE( "prog(__961003).hl",  0x000001, 0x040000, CRC(55125520) SHA1(13be4fbf32bcd94a2ea97fd690bd1dfdff146d33) )
 	ROM_LOAD32_BYTE( "prog(__961003).lh",  0x000002, 0x040000, CRC(9d99c794) SHA1(f443f05a5979db66d61ef4174f0369a1cf4b7793) )
 	ROM_LOAD32_BYTE( "prog(__961003).ll",  0x000003, 0x040000, CRC(e03700e0) SHA1(24d41750f02ee7e8fb379e517751b661400aa521) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2200,13 +2200,13 @@ ROM_START( freezeat4 )
 ROM_END
 
 ROM_START( freezeat5 )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__960920).hh",  0x000000, 0x040000, CRC(95c4fc64) SHA1(cd00efe7f760ef1e4cdc4bc8a3b368427cb15d8a) )
 	ROM_LOAD32_BYTE( "prog(__960920).hl",  0x000001, 0x040000, CRC(ffb9cb71) SHA1(35d6a5440d63bc5b94c4447645365039169da368) )
 	ROM_LOAD32_BYTE( "prog(__960920).lh",  0x000002, 0x040000, CRC(3ddacd80) SHA1(79f9650531847eefd83908b6ea1e8362688b377c) )
 	ROM_LOAD32_BYTE( "prog(__960920).ll",  0x000003, 0x040000, CRC(95ebefb0) SHA1(b88b12adabd7b0902c3a78919bcec8d9a2b04168) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */
@@ -2229,13 +2229,13 @@ ROM_START( freezeat5 )
 ROM_END
 
 ROM_START( freezeat6 )
-	ROM_REGION32_BE( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "prog(__960907).hh",  0x000000, 0x040000, CRC(120711fe) SHA1(387e3cc8a1a9ea7d65c528387891d09ed9889fe3) )
 	ROM_LOAD32_BYTE( "prog(__960907).hl",  0x000001, 0x040000, CRC(18dd292a) SHA1(00e79851140716985f43594142c97e510a06b24a) )
 	ROM_LOAD32_BYTE( "prog(__960907).lh",  0x000002, 0x040000, CRC(ce387e72) SHA1(021a274da0b828550a47c3778e1059d4e759693a) )
 	ROM_LOAD32_BYTE( "prog(__960907).ll",  0x000003, 0x040000, CRC(9b307b7c) SHA1(71b696802fe7c867525d2626351dcfacedabd696) )
 
-	ROM_REGION( 0x1000, "waverom", 0 )
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	ROM_REGION32_BE( 0x1000000, "romboard", 0 )	/* 16MB for 64-bit ROM data */

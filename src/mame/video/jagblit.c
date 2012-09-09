@@ -202,18 +202,6 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 		return;
 	}
 
-	// ignore nonsensical blits
-	if (outer_count > 2000 || inner_count > 2000)
-	{
-		if (LOG_BAD_BLITS)
-		{
-		logerror("%s:Blit!\n", machine().describe_context());
-		logerror("  inner_count = %08X\n", inner_count);
-		logerror("  outer_count = %08X\n", inner_count);
-		}
-		return;
-	}
-
 	/* determine actual xadd/yadd for A1 */
 	a1_yadd <<= 16;
 	if (A1FIXED & 0x00100000)
