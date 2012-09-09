@@ -22514,6 +22514,34 @@ Alternate board (XL-1)
 
 <!-- Verified prototypes -->
 
+	<software name="aokidenp" cloneof="aokiden">
+		<description>Aoki Densetsu Shoot! (Jpn, Prototype)</description>
+		<year>1994</year>
+		<publisher>KSS</publisher>
+		<info name="alt_title" value="蒼き伝説シュート！" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" />
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<dataarea name="rom" size="1572864">
+				<rom name="shoot 1 kss.u1" size="524288" crc="71306e06" sha1="253ec028d68a85209dc3e5846a2a2f5b582fed7b" offset="0x000000" />
+				<rom name="shoot 2 kss.u2" size="524288" crc="d07e1be3" sha1="7a58acb027ca15c1054e58f43156c2d99f62d16c" offset="0x080000" />
+				<rom name="shoot 3 kss.u3" size="524288" crc="380ed94f" sha1="8607ce31748ae73b9aa7aacda80c843622c61a79" offset="0x100000" />
+			</dataarea>
+			<!-- memory capacity to be confirmed -->
+			<dataarea name="sram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="apoclyp2">
 		<!-- Simon Nicol -->
 		<!-- Notes: this prototype wasn't obtained by dumping a cartridge -->
@@ -23760,7 +23788,7 @@ Alternate board (XL-1)
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="no shell" />
 			<dataarea name="rom" size="524288">
-				<rom name="u1" size="524288" crc="c739d55d" sha1="b0771c2e3c19869f29677f356c4f0592cdf427d6" offset="0x000000" />
+				<rom name="rpm 08-14-91 0563.u1" size="524288" crc="c739d55d" sha1="b0771c2e3c19869f29677f356c4f0592cdf427d6" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>

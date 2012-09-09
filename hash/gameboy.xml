@@ -8048,7 +8048,7 @@
 		<description>Jurassic Park (Euro)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-JQ-(NOE/UKV)"/>
+		<info name="serial" value="DMG-JQ-(NOE/UKV/FAH)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="jurassic park (europe) (en,fr,de,es,it).bin" size="262144" crc="2c8ad255" sha1="efbc825bae50c0498e56b53e9d02f00c400ff6d9" offset="000000" />
@@ -9280,7 +9280,7 @@
 		<description>Lethal Weapon (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-LT-USA"/>
+		<info name="serial" value="DMG-LT-USA, DMG-LT-FAH"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="lethal weapon (usa).bin" size="131072" crc="1f8d207c" sha1="8b4621471b376a6262fbed70c1191416ab3be915" offset="000000" />
@@ -9475,6 +9475,7 @@
 		<description>Le Mond Perdu - Jurassic Park (Fra)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="DMG-ALWF-FRA"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mond perdu, le - jurassic park (france).bin" size="524288" crc="fb22d72e" sha1="589efa9ef5a6ce38200a137083f856f75d75a8c6" offset="000000" />

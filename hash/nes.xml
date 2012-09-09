@@ -56517,7 +56517,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="tetrisa">
+	<software name="tetrisa" cloneof="tetrist">
 		<description>Tetris (Asia)</description>
 		<year>1992</year>
 		<publisher>Pyramid Game Card?</publisher>

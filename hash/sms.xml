@@ -588,7 +588,7 @@
 		</part>
 	</software>
 
-	<software name="astrow">
+	<software name="astropit">
 		<description>Astro Warrior &amp; Pit Pot (Euro)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
@@ -600,7 +600,7 @@
 		</part>
 	</software>
 
-	<software name="astrowju" cloneof="astrow">
+	<software name="astrow">
 		<description>Astro Warrior (Jpn, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -2222,7 +2222,7 @@
 		</part>
 	</software>
 
-	<software name="fushigi" cloneof="astrow">
+	<software name="pitpot">
 		<description>Fushigi no Oshiro Pit Pot (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -2235,7 +2235,7 @@
 		</part>
 	</software>
 
-	<software name="fushigi1" cloneof="astrow">
+	<software name="pitpot1" cloneof="pitpot">
 		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
