@@ -17782,10 +17782,10 @@
 	</software>
 
 	<software name="superoff">
-		<description>Super Off Road (USA)</description>
+		<description>Super Off Road (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Tradewest</publisher>
-		<info name="serial" value="DMG-OR-USA"/>
+		<info name="serial" value="DMG-OR-USA, DMG-OR-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super off road (usa).bin" size="131072" crc="3e2810be" sha1="acde7750bcf99d7bb76b895534fda43ece222dfa" offset="000000" />

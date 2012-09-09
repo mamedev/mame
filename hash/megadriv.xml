@@ -5372,7 +5372,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software-->
 
 	<software name="comixup01" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950712)</description>
+		<description>Comix Zone (Euro, Prototype, 19950712)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5383,7 +5383,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup08" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950601-B)</description>
+		<description>Comix Zone (USA, Prototype, 19950601-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5394,7 +5394,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup07" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950601-C)</description>
+		<description>Comix Zone (USA, Prototype, 19950601-C)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5405,7 +5405,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup06" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950601-D)</description>
+		<description>Comix Zone (USA, Prototype, 19950601-D)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5416,7 +5416,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup05" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950601)</description>
+		<description>Comix Zone (USA, Prototype, 19950601)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5427,7 +5427,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup04" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950602-B)</description>
+		<description>Comix Zone (USA, Prototype, 19950602-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5438,7 +5438,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup03" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950602)</description>
+		<description>Comix Zone (USA, Prototype, 19950602)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5449,7 +5449,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="comixup02" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950603)</description>
+		<description>Comix Zone (USA, Prototype, 19950603)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">

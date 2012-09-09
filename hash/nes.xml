@@ -46331,7 +46331,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tatakaba1" cloneof="trojan">
+	<software name="tatakaba1" cloneof="trojan" supported="partial">
 		<description>Tatakai no Banka (Jpn)</description>
 		<year>1986</year>
 		<publisher>Capcom</publisher>
@@ -46340,7 +46340,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value=""/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
-			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="tatakai no banka (japan).prg" size="131072" crc="be95b219" sha1="563786be12f4c37c774fe1cab41f362606211277" offset="00000" status="baddump" />
 			</dataarea>
@@ -48387,7 +48386,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="tai16mj">
 		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw)</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-001"/>
 		<info name="alt_title" value="台灣麻將"/>
@@ -48403,9 +48402,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tai16mjb" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt 2)</description>
-		<year>19??</year>
+	<software name="tai16mja" cloneof="tai16mj">
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt)</description>
+		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SA-0036" />
@@ -48419,10 +48418,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tai16mja" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
+	<software name="tai16mjb" cloneof="tai16mj">
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Pirate?)</description>
+		<year>1989</year>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -48962,7 +48961,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="tai16mj2">
 		<description>Taiwan Mahjong 2 (Tw)</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-025"/>
 		<info name="alt_title" value="台湾麻将二代"/>
@@ -58322,7 +58321,7 @@ All musics were removed in this game.
 	<software name="tdwmj">
 		<description>Tui Do Woo Ma Jeung (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KAISER-KS7058" />
 			<feature name="mirroring" value="vertical" />

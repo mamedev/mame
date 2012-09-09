@@ -13,13 +13,11 @@ Undumped:
 - Army Men - Air Combat  CGB-BATP-EUR
 - Bionic Command CGB-AV4P-AUS
 - Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
-- Championship Motocross 2001 featuring Ricky Carmichael CGB-BCMP-EUR
 - Daffy Duck - Fowl Play DMG-AD7P-UKV
 - Dexter's Laboratory - Robot Rampage CGB-BROP-EUR
 - Dragon Warrior Monsters DMG-AWQP-UKV
 - Elmo's 123s DMG-AE3P-EUR
 - Elmo's ABCs DMG-AEAP-EUR
-- Hands of Time CGB-BWCP-EUR
 - Heroes of Might and Magic CGB-AUHP-EUR/EUU
 - Hot Wheels - Stunt Track Driver DMG-AHEP-EUR
 - Joust &amp; Defender DMG-AAOP-EUR
@@ -34,7 +32,6 @@ Undumped:
 - MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
 - NBA Jam 2001 CGB-BJAP-EUR
 - NHL 2000 DMG-ANRP-EUR
-- Power Rangers - Time Force CGB-B4TP-EUR
 - Pro Pool CGB-BPLP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
 - Road Rash CGB-BRRP-EUR
@@ -47,7 +44,6 @@ Undumped:
 - Spider-Man 2 - The Sinister Six CGB-B2SP-EUR
 - TOCA Touring Car Championship CGB-BTCP-EUR
 - Tony Hawk's Pro Skater 2 CGB-BTGP-EUR
-- Tony Hawk's Pro Skater 3 CGB-B3TE-EUR
 - Toy Story Racer CGB-BTBP-EUR? [unclear pic]
 - Yoda Stories DMG-AYDP-EUR
 - WWF Attitude CGB-AWTP-AUS
@@ -2509,10 +2505,10 @@ Undumped Pirates:
 
 	<software name="motox2k1">
 		<!-- Notes: GBC only -->
-		<description>Championship Motocross 2001 featuring Ricky Carmichael (USA)</description>
+		<description>Championship Motocross 2001 featuring Ricky Carmichael (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="CGB-BCME-USA"/>
+		<info name="serial" value="CGB-BCME-USA, CGB-BCMP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="championship motocross 2001 featuring ricky carmichael (usa).bin" size="1048576" crc="cbb336ed" sha1="3712801102df2b17d1deb75fbe7fda0c1a596db0" offset="000000" />
@@ -6257,10 +6253,10 @@ Undumped Pirates:
 
 	<software name="handtime">
 		<!-- Notes: GBC only -->
-		<description>Hands of Time (USA)</description>
+		<description>Hands of Time (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="CGB-BWCE-USA"/>
+		<info name="serial" value="CGB-BWCE-USA, CGB-BWCP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="hands of time (usa) (en,fr,de,es,it,nl).bin" size="1048576" crc="f519f4c3" sha1="ae07e529f1c98432f37fa674ee4de6305807a92b" offset="000000" />
@@ -12994,10 +12990,10 @@ Undumped Pirates:
 
 	<software name="prtf">
 		<!-- Notes: GBC only -->
-		<description>Power Rangers - Time Force (USA)</description>
+		<description>Power Rangers - Time Force (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="CGB-B4TE-USA"/>
+		<info name="serial" value="CGB-B4TE-USA, CGB-B4TP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="power rangers - time force (usa).bin" size="1048576" crc="17e51443" sha1="9c383013c5ec0e1f2c33b95d66cd93a3d0743928" offset="000000" />
@@ -16927,10 +16923,10 @@ Undumped Pirates:
 
 	<software name="thps3">
 		<!-- Notes: GBC only -->
-		<description>Tony Hawk's Pro Skater 3 (USA)</description>
+		<description>Tony Hawk's Pro Skater 3 (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CGB-B3TE-USA"/>
+		<info name="serial" value="CGB-B3TE-USA, CGB-B3TP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tony hawk's pro skater 3 (usa).bin" size="1048576" crc="fd5290a1" sha1="bd210707df413d97eaa1d5b050f3a1b859c30c5e" offset="000000" />

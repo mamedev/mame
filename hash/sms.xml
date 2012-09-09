@@ -1013,7 +1013,7 @@
 		</part>
 	</software>
 
-	<software name="cso">
+	<software name="cso" supported="no">
 		<description>C_So! (Kor)</description>
 		<year>198?</year>
 		<publisher>Joy Soft</publisher>
@@ -1875,7 +1875,7 @@
 		</part>
 	</software>
 
-	<software name="excdizzy">
+	<software name="excdizzy" supported="no">
 		<description>The Excellent Dizzy Collection (Euro, USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
