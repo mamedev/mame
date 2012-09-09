@@ -149,6 +149,9 @@ struct _upd7759_state
 	device_t *device;
 	sound_stream *channel;					/* stream channel for playback */
 
+	/* chip configuration */
+	UINT8		sample_offset_shift;		/* header sample address shift (access data > 0xffff) */
+	
 	/* internal clock to output sample rate mapping */
 	UINT32		pos;						/* current output sample position */
 	UINT32		step;						/* step value per output sample */
@@ -325,8 +328,8 @@ static void advance_state(upd7759_state *chip)
 		/* Address MSB state: latch the MSB of the sample address and issue a request for the fourth byte */
 		/* The expected response will be the LSB of the sample address */
 		case STATE_ADDR_MSB:
-			chip->offset = (chip->rom ? chip->rom[chip->req_sample * 2 + 5] : chip->fifo_in) << 9;
-			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: offset_hi = %02X, requesting offset_lo\n", chip->offset >> 9);
+			chip->offset = (chip->rom ? chip->rom[chip->req_sample * 2 + 5] : chip->fifo_in) << (8 + chip->sample_offset_shift);
+			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: offset_hi = %02X, requesting offset_lo\n", chip->offset >> (8 + chip->sample_offset_shift));
 			chip->drq = 1;
 
 			/* 44 cycles later, we will latch this value and request another byte */
@@ -337,8 +340,8 @@ static void advance_state(upd7759_state *chip)
 		/* Address LSB state: latch the LSB of the sample address and issue a request for the fifth byte */
 		/* The expected response will be just a dummy */
 		case STATE_ADDR_LSB:
-			chip->offset |= (chip->rom ? chip->rom[chip->req_sample * 2 + 6] : chip->fifo_in) << 1;
-			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: offset_lo = %02X, requesting dummy 2\n", (chip->offset >> 1) & 0xff);
+			chip->offset |= (chip->rom ? chip->rom[chip->req_sample * 2 + 6] : chip->fifo_in) << chip->sample_offset_shift;
+			if (DEBUG_STATES) DEBUG_METHOD("UPD7759: offset_lo = %02X, requesting dummy 2\n", (chip->offset >> chip->sample_offset_shift) & 0xff);
 			chip->drq = 1;
 
 			/* 36 cycles later, we will latch this value and request another byte */
@@ -640,6 +643,9 @@ static DEVICE_START( upd7759 )
 
 	chip->device = device;
 
+	/* chip configuration */
+	chip->sample_offset_shift = (device->type() == UPD7759) ? 1 : 0;
+	
 	/* allocate a stream channel */
 	chip->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/4, chip, upd7759_update);
 
@@ -752,6 +758,12 @@ upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, d
 {
 	m_token = global_alloc_array_clear(UINT8, sizeof(upd7759_state));
 }
+upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
+{
+	m_token = global_alloc_array_clear(UINT8, sizeof(upd7759_state));
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -792,3 +804,19 @@ void upd7759_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 
+const device_type UPD7756 = &device_creator<upd7756_device>;
+
+upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: upd7759_device(mconfig, UPD7756, "UPD7756", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void upd7756_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+}
