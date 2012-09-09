@@ -211,6 +211,209 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
  * 0x0000-0xedff ram (dram bank 1?)
  * 0xe000-0xffff ram as bank 0
  */
+
+void c128_state::bankswitch_pla(offs_t offset, int ba, int rw, int aec, int z80io, int ma5, int ma4, int ms3, int ms2, int ms1, int ms0,
+		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb)
+{
+	//int game = m_exp->game_r(offset, ba, rw, m_hiram);
+	//int exrom = m_exp->exrom_r(offset, ba, rw, m_hiram);
+	//int vicfix = 0;
+	//int _128_256 = 1;
+}
+
+UINT8 c128_state::read_memory(offs_t offset, int ba, int aec, int z80io)
+{
+	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1;
+	//offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3);
+	int cas, gwe, rom1, rom2, rom3, rom4, charom, colorram, vic, from1, romh, roml, dwe, ioacc, clrbank, iocs, casenb;
+	//int io1 = 1, io2 = 1;
+
+	bankswitch_pla(offset, ba, rw, aec, z80io, 0, 0, ms3, ms2, ms1, ms0,
+		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, &from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+
+	UINT8 data = 0xff;
+
+	if (ba)
+	{
+		data = m_vic->bus_r();
+	}
+
+	if (!cas)
+	{
+
+	}
+	else if (!rom1)
+	{
+
+	}
+	else if (!rom2)
+	{
+
+	}
+	else if (!rom3)
+	{
+
+	}
+	else if (!rom4)
+	{
+
+	}
+	else if (!charom)
+	{
+
+	}
+	else if (!colorram)
+	{
+
+	}
+	else if (!vic)
+	{
+
+	}
+	else if (!from1)
+	{
+
+	}
+	else if (!iocs)
+	{
+		switch (offset)
+		{
+		case 0: // SID
+			break;
+
+		case 2: // CS8563
+			break;
+
+		case 4: // CIA1
+			break;
+
+		case 5: // CIA2
+			break;
+
+		case 6: // I/O1
+			break;
+
+		case 7: // I/O2
+			break;
+		}
+	}
+
+	return data;//m_exp->cd_r(space, offset, data, ba, roml, romh, io1, io2);
+}
+
+void c128_state::write_memory(offs_t offset, UINT8 data, int ba, int aec, int z80io)
+{
+	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1;
+	//offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3);
+	int cas, gwe, rom1, rom2, rom3, rom4, charom, colorram, vic, from1, romh, roml, dwe, ioacc, clrbank, iocs, casenb;
+	//int io1 = 1, io2 = 1;
+
+	bankswitch_pla(offset, ba, rw, aec, z80io, 0, 0, ms3, ms2, ms1, ms0,
+		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, &from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+
+	if (!cas)
+	{
+
+	}
+	else if (!gwe)
+	{
+
+	}
+	else if (!rom1)
+	{
+
+	}
+	else if (!rom2)
+	{
+
+	}
+	else if (!rom3)
+	{
+
+	}
+	else if (!rom4)
+	{
+
+	}
+	else if (!charom)
+	{
+
+	}
+	else if (!colorram)
+	{
+
+	}
+	else if (!vic)
+	{
+
+	}
+	else if (!from1)
+	{
+
+	}
+	else if (!dwe)
+	{
+
+	}
+	else if (!iocs)
+	{
+
+	}
+
+	//m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);
+}
+
+READ8_MEMBER( c128_state::z80_r )
+{
+	int ba = 1, aec = 1, z80io = 1;
+
+	return read_memory(offset, ba, aec, z80io);
+}
+
+WRITE8_MEMBER( c128_state::z80_w )
+{
+	int ba = 1, aec = 1, z80io = 1;
+	
+	write_memory(offset, data, ba, aec, z80io);
+}
+
+READ8_MEMBER( c128_state::z80_io_r )
+{
+	int ba = 1, aec = 1, z80io = 0;
+	
+	return read_memory(offset, ba, aec, z80io);
+}
+
+WRITE8_MEMBER( c128_state::z80_io_w )
+{
+	int ba = 1, aec = 1, z80io = 0;
+	
+	write_memory(offset, data, ba, aec, z80io);
+}
+
+READ8_MEMBER( c128_state::read )
+{
+	int ba = 1, aec = 1, z80io = 1;
+	
+	return read_memory(offset, ba, aec, z80io);
+}
+
+WRITE8_MEMBER( c128_state::write )
+{
+	int ba = 1, aec = 1, z80io = 1;
+	
+	write_memory(offset, data, ba, aec, z80io);
+}
+
+READ8_MEMBER( c128_state::vic_videoram_r )
+{
+	int ba = 0, aec = 0, z80io = 1;
+	
+	return read_memory(offset, ba, aec, z80io);
+}
+
+
+
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
@@ -541,6 +744,45 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
+//  MOS8722_INTERFACE( mmu_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
+{
+
+}
+
+WRITE_LINE_MEMBER( c128_state::mmu_fsdir_w )
+{
+	
+}
+
+READ_LINE_MEMBER( c128_state::mmu_game_r )
+{
+	return 1;
+}
+
+READ_LINE_MEMBER( c128_state::mmu_exrom_r )
+{
+	return 1;
+}
+
+READ_LINE_MEMBER( c128_state::mmu_sense40_r )
+{
+	return 1;
+}
+
+static MOS8722_INTERFACE( mmu_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, mmu_z80en_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, mmu_fsdir_w),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, mmu_game_r),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, mmu_exrom_r),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, mmu_sense40_r)
+};
+
+
+//-------------------------------------------------
 //  MOS8564_INTERFACE( vic_intf )
 //-------------------------------------------------
 
@@ -686,6 +928,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
 
 	/* video hardware */
+	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
 	MCFG_MOS8564_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, 2000000, vdc_intf, vdc_videoram_map)
 
@@ -777,6 +1020,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
 
 	/* video hardware */
+	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
 	MCFG_MOS8566_ADD(MOS8566_TAG, SCREEN_VIC_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, 2000000, vdc_intf, vdc_videoram_map)
 

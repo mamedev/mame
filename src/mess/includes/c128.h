@@ -22,6 +22,7 @@
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
+#include "machine/mos8722.h"
 #include "machine/petcass.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
@@ -55,6 +56,7 @@ public:
 		: legacy_c64_state(mconfig, type, tag),
 		  m_maincpu(*this, Z80A_TAG),
 		  m_subcpu(*this, M8502_TAG),
+		  m_mmu(*this, MOS8722_TAG),
 		  m_vdc(*this, MOS8563_TAG),
 		  m_vic(*this, MOS8564_TAG),
 		  m_sid(*this, MOS6581_TAG),
@@ -71,6 +73,7 @@ public:
 
 	required_device<legacy_cpu_device> m_maincpu;
 	required_device<legacy_cpu_device> m_subcpu;
+	required_device<mos8722_device> m_mmu;
 	required_device<mos8563_device> m_vdc;
 	required_device<mos6566_device> m_vic;
 	required_device<sid6581_device> m_sid;
@@ -86,6 +89,19 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
+
+	void bankswitch_pla(offs_t offset, int ba, int rw, int aec, int z80io, int ma5, int ma4, int ms3, int ms2, int ms1, int ms0,
+		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb);
+	UINT8 read_memory(offs_t offset, int ba, int aec, int z80io);
+	void write_memory(offs_t offset, UINT8 data, int ba, int aec, int z80io);
+
+	DECLARE_READ8_MEMBER( z80_r );
+	DECLARE_WRITE8_MEMBER( z80_w );
+	DECLARE_READ8_MEMBER( z80_io_r );
+	DECLARE_WRITE8_MEMBER( z80_io_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( vic_videoram_r );
 
 	DECLARE_READ8_MEMBER( read_io );
 	DECLARE_READ8_MEMBER( mmu8722_port_r );
@@ -104,6 +120,12 @@ public:
 	DECLARE_WRITE8_MEMBER( write_e000 );
 	DECLARE_WRITE8_MEMBER( write_ff00 );
 	DECLARE_WRITE8_MEMBER( write_ff05 );
+
+	DECLARE_WRITE_LINE_MEMBER( mmu_z80en_w );
+	DECLARE_WRITE_LINE_MEMBER( mmu_fsdir_w );
+	DECLARE_READ_LINE_MEMBER( mmu_game_r );
+	DECLARE_READ_LINE_MEMBER( mmu_exrom_r );
+	DECLARE_READ_LINE_MEMBER( mmu_sense40_r );
 
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
@@ -151,7 +173,7 @@ public:
 	UINT8 *m_internal_function;
 	UINT8 *m_external_function;
 	UINT8 *m_vdcram;
-	UINT8 m_mmu[0x0b];
+	UINT8 m_mmu_reg[0x0b];
 	int m_mmu_cpu;
 	int m_mmu_page0;
 	int m_mmu_page1;
@@ -167,6 +189,7 @@ public:
 	int m_data_out;
 	int m_va1617;
 	int m_nmilevel;
+	int m_z80en;
 	DECLARE_DRIVER_INIT(c128pal);
 	DECLARE_DRIVER_INIT(c128dcrp);
 	DECLARE_DRIVER_INIT(c128dcr);

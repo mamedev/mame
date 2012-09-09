@@ -21,33 +21,33 @@
 #include "video/mos6566.h"
 #include "video/mc6845.h"
 
-#define MMU_PAGE1 ((((m_mmu[10]&0xf)<<8)|m_mmu[9])<<8)
-#define MMU_PAGE0 ((((m_mmu[8]&0xf)<<8)|m_mmu[7])<<8)
-#define MMU_VIC_ADDR ((m_mmu[6]&0xc0)<<10)
-#define MMU_RAM_RCR_ADDR ((m_mmu[6]&0x30)<<14)
-#define MMU_SIZE (c128_mmu_helper[m_mmu[6]&3])
-#define MMU_BOTTOM (m_mmu[6]&4)
-#define MMU_TOP (m_mmu[6]&8)
-#define MMU_CPU8502 (m_mmu[5]&1)	   /* else z80 */
+#define MMU_PAGE1 ((((m_mmu_reg[10]&0xf)<<8)|m_mmu_reg[9])<<8)
+#define MMU_PAGE0 ((((m_mmu_reg[8]&0xf)<<8)|m_mmu_reg[7])<<8)
+#define MMU_VIC_ADDR ((m_mmu_reg[6]&0xc0)<<10)
+#define MMU_RAM_RCR_ADDR ((m_mmu_reg[6]&0x30)<<14)
+#define MMU_SIZE (c128_mmu_helper[m_mmu_reg[6]&3])
+#define MMU_BOTTOM (m_mmu_reg[6]&4)
+#define MMU_TOP (m_mmu_reg[6]&8)
+#define MMU_CPU8502 (m_mmu_reg[5]&1)	   /* else z80 */
 /* fastio output (c128_mmu[5]&8) else input */
-#define MMU_FSDIR (m_mmu[5]&0x08)
-#define MMU_GAME_IN (m_mmu[5]&0x10)
-#define MMU_EXROM_IN (m_mmu[5]&0x20)
-#define MMU_64MODE (m_mmu[5]&0x40)
-#define MMU_40_IN (m_mmu[5]&0x80)
+#define MMU_FSDIR (m_mmu_reg[5]&0x08)
+#define MMU_GAME_IN (m_mmu_reg[5]&0x10)
+#define MMU_EXROM_IN (m_mmu_reg[5]&0x20)
+#define MMU_64MODE (m_mmu_reg[5]&0x40)
+#define MMU_40_IN (m_mmu_reg[5]&0x80)
 
-#define MMU_RAM_CR_ADDR ((m_mmu[0]&0xc0)<<10)
-#define MMU_RAM_LO (m_mmu[0]&2)	   /* else rom at 0x4000 */
-#define MMU_RAM_MID ((m_mmu[0]&0xc)==0xc)	/* 0x8000 - 0xbfff */
-#define MMU_ROM_MID ((m_mmu[0]&0xc)==0)
-#define MMU_EXTERNAL_ROM_MID ((m_mmu[0]&0xc)==8)
-#define MMU_INTERNAL_ROM_MID ((m_mmu[0]&0xc)==4)
+#define MMU_RAM_CR_ADDR ((m_mmu_reg[0]&0xc0)<<10)
+#define MMU_RAM_LO (m_mmu_reg[0]&2)	   /* else rom at 0x4000 */
+#define MMU_RAM_MID ((m_mmu_reg[0]&0xc)==0xc)	/* 0x8000 - 0xbfff */
+#define MMU_ROM_MID ((m_mmu_reg[0]&0xc)==0)
+#define MMU_EXTERNAL_ROM_MID ((m_mmu_reg[0]&0xc)==8)
+#define MMU_INTERNAL_ROM_MID ((m_mmu_reg[0]&0xc)==4)
 
-#define MMU_IO_ON (!(m_mmu[0]&1))   /* io window at 0xd000 */
-#define MMU_ROM_HI ((m_mmu[0]&0x30)==0)	/* rom at 0xc000 */
-#define MMU_EXTERNAL_ROM_HI ((m_mmu[0]&0x30)==0x20)
-#define MMU_INTERNAL_ROM_HI ((m_mmu[0]&0x30)==0x10)
-#define MMU_RAM_HI ((m_mmu[0]&0x30)==0x30)
+#define MMU_IO_ON (!(m_mmu_reg[0]&1))   /* io window at 0xd000 */
+#define MMU_ROM_HI ((m_mmu_reg[0]&0x30)==0)	/* rom at 0xc000 */
+#define MMU_EXTERNAL_ROM_HI ((m_mmu_reg[0]&0x30)==0x20)
+#define MMU_INTERNAL_ROM_HI ((m_mmu_reg[0]&0x30)==0x10)
+#define MMU_RAM_HI ((m_mmu_reg[0]&0x30)==0x30)
 
 #define MMU_RAM_ADDR (MMU_RAM_RCR_ADDR|MMU_RAM_CR_ADDR)
 
@@ -796,9 +796,9 @@ void c128_state::bankswitch(int reset)
 
 void c128_state::mmu8722_reset()
 {
-	memset(m_mmu, 0, sizeof (m_mmu));
-	m_mmu[5] |= 0x38;
-	m_mmu[10] = 1;
+	memset(m_mmu_reg, 0, sizeof (m_mmu_reg));
+	m_mmu_reg[5] |= 0x38;
+	m_mmu_reg[10] = 1;
 	m_mmu_cpu = 0;
 	m_mmu_page0 = 0;
 	m_mmu_page1 = 0x0100;
@@ -816,10 +816,10 @@ WRITE8_MEMBER( c128_state::mmu8722_port_w )
 	case 4:
 	case 8:
 	case 10:
-		m_mmu[offset] = data;
+		m_mmu_reg[offset] = data;
 		break;
 	case 5:
-		m_mmu[offset] = data;
+		m_mmu_reg[offset] = data;
 		bankswitch(0);
 		iec_srq_out_w();
 		iec_data_out_w();
@@ -828,15 +828,15 @@ WRITE8_MEMBER( c128_state::mmu8722_port_w )
 		break;
 	case 0:
 	case 6:
-		m_mmu[offset] = data;
+		m_mmu_reg[offset] = data;
 		bankswitch(0);
 		break;
 	case 7:
-		m_mmu[offset] = data;
+		m_mmu_reg[offset] = data;
 		m_mmu_page0=MMU_PAGE0;
 		break;
 	case 9:
-		m_mmu[offset] = data;
+		m_mmu_reg[offset] = data;
 		m_mmu_page1=MMU_PAGE1;
 		bankswitch(0);
 		break;
@@ -858,7 +858,7 @@ READ8_MEMBER( c128_state::mmu8722_port_r )
 	switch (offset)
 	{
 	case 5:
-		data = m_mmu[offset] | 6;
+		data = m_mmu_reg[offset] | 6;
 		if ( /*disk enable signal */ 0)
 			data &= ~8;
 		if (!m_game)
@@ -884,7 +884,7 @@ READ8_MEMBER( c128_state::mmu8722_port_r )
 		data=0xff;
 		break;
 	default:
-		data=m_mmu[offset];
+		data=m_mmu_reg[offset];
 	}
 	return data;
 }
@@ -894,7 +894,7 @@ WRITE8_MEMBER( c128_state::mmu8722_ff00_w )
 	switch (offset)
 	{
 	case 0:
-		m_mmu[offset] = data;
+		m_mmu_reg[offset] = data;
 		bankswitch(0);
 		break;
 	case 1:
@@ -902,9 +902,9 @@ WRITE8_MEMBER( c128_state::mmu8722_ff00_w )
 	case 3:
 	case 4:
 #if 1
-		m_mmu[0]= m_mmu[offset];
+		m_mmu_reg[0]= m_mmu_reg[offset];
 #else
-		m_mmu[0]|= m_mmu[offset];
+		m_mmu_reg[0]|= m_mmu_reg[offset];
 #endif
 		bankswitch(0);
 		break;
@@ -913,7 +913,7 @@ WRITE8_MEMBER( c128_state::mmu8722_ff00_w )
 
 READ8_MEMBER( c128_state::mmu8722_ff00_r )
 {
-	return m_mmu[offset];
+	return m_mmu_reg[offset];
 }
 
 WRITE8_MEMBER( c128_state::write_0000 )
