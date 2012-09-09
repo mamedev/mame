@@ -1082,7 +1082,6 @@ DRIVER_INIT_MEMBER(c128_state,c128)
 	m_c64mode = 0;
 	m_vicirq = 0;
 
-	m_monitor = -1;
 	m_cnt1 = 1;
 	m_sp1 = 1;
 	cbm_common_init();
@@ -1148,27 +1147,6 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	//device_t *vdc8563 = device->machine().device("vdc8563");
 
 	state->nmi();
-
-	if ((device->machine().root_device().ioport("SPECIAL")->read() & 0x08) != state->m_monitor)
-	{
-		if (device->machine().root_device().ioport("SPECIAL")->read() & 0x08)
-		{
-			//vic2_set_rastering(vic2e, 0);
-			//vdc8563_set_rastering(vdc8563, 1);
-			device->machine().primary_screen->set_visible_area(0, 655, 0, 215);
-		}
-		else
-		{
-			//vic2_set_rastering(vic2e, 1);
-			//vdc8563_set_rastering(vdc8563, 0);
-			if (state->m_pal)
-				device->machine().primary_screen->set_visible_area(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
-			else
-				device->machine().primary_screen->set_visible_area(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
-		}
-		state->m_monitor = device->machine().root_device().ioport("SPECIAL")->read() & 0x08;
-	}
-
 
 	/* common keys input ports */
 	cbm_common_interrupt(device);

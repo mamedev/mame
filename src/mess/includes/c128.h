@@ -166,7 +166,6 @@ public:
 	int m_sp1;
 	int m_data_out;
 	int m_va1617;
-	int m_monitor;
 	int m_nmilevel;
 	DECLARE_DRIVER_INIT(c128pal);
 	DECLARE_DRIVER_INIT(c128dcrp);
