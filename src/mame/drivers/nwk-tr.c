@@ -281,7 +281,7 @@ static SCREEN_UPDATE_RGB32( nwktr )
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	const rectangle visarea = screen.visible_area();
+	const rectangle &visarea = screen.visible_area();
 	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);
 
 	k001604_draw_front_layer(k001604, bitmap, tilemap_rect);
@@ -480,7 +480,9 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 	{
 		// TODO: check if these should be transferred via PPC DMA.
 
-		if (mame_stricmp(machine().system().name, "thrilld") == 0)
+		if (mame_stricmp(machine().system().name, "thrilld") == 0 ||
+			mame_stricmp(machine().system().name, "thrilldb") == 0 ||
+			mame_stricmp(machine().system().name, "thrilldae") == 0)
 		{
 			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;		// G*71
 			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;		// 3
