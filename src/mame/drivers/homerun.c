@@ -49,6 +49,7 @@ Notes:
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
+#include "sound/samples.h"
 #include "includes/homerun.h"
 
 
@@ -69,6 +70,19 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 		upd7759_reset_w(m_d7756, ~data & 0x20);
 		upd7759_start_w(m_d7756, ~data & 0x10);
 	}
+	if (m_samples != NULL)
+	{
+		// play MAME sample if a dump of the internal rom does not exist
+		if (data & 0x20 & ~m_control)
+			m_samples->stop(0);
+
+		if (~data & 0x10 & m_control)
+		{
+			samples_iterator iter(*m_samples);
+			if (m_sample < iter.count())
+				m_samples->start(0, m_sample);
+		}
+	}
 
 	// other bits: ?
 	m_control = data;
@@ -76,6 +90,8 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 
 WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 {
+	m_sample = data;
+
 	if (m_d7756 != NULL)
 		upd7759_port_w(m_d7756, 0, data);
 }
@@ -109,6 +125,11 @@ CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 }
 
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
+{
+	return m_samples->playing(0) ? 0 : 1;
+}
+
+CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_d7756_busy_r)
 {
 	return upd7759_busy_r(m_d7756);
 }
@@ -203,7 +224,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, NULL)
 	PORT_BIT( 0x76, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -243,6 +264,38 @@ INPUT_PORTS_END
   Machine Config
 
 ***************************************************************************/
+
+// homerun samples, note that this is the complete rom contents
+// not all samples are used in this game
+static const char *const homerun_sample_names[] =
+{
+	"*homerun",
+	"00", // strike
+	"01", // ball
+	"02", // time (ask for time out)
+	"03", // out
+	"04", // safe
+	"05", // foul
+	"06", // yah (field player catching a fast ball)
+	"07", // batter out (batter out after 3 strikes)
+	"08", // play ball
+	"09", // ball four
+	"10", // home run
+	"11", // new pitcher (choosing new pitcher in time out)
+	"12", // ouch (batter gets hit by pitcher)
+	"13", // aho (be called a fool by supervisor)
+	"14", // bat hits ball
+	"15", // crowd cheers
+    0
+};
+
+static const samples_interface homerun_samples_interface =
+{
+	1,
+	homerun_sample_names
+};
+
+/**************************************************************************/
 
 static const gfx_layout gfxlayout =
 {
@@ -308,6 +361,7 @@ static MACHINE_START( homerun )
 	state->membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_control));
+	state->save_item(NAME(state->m_sample));
 	state->save_item(NAME(state->m_gfx_ctrl));
 	state->save_item(NAME(state->m_gc_up));
 	state->save_item(NAME(state->m_gc_down));
@@ -320,6 +374,7 @@ static MACHINE_RESET( homerun )
 	homerun_state *state = machine.driver_data<homerun_state>();
 
 	state->m_control = 0;
+	state->m_sample = 0;
 	state->m_gfx_ctrl = 0;
 	state->m_gc_up = 0;
 	state->m_gc_down = 0;
@@ -368,13 +423,20 @@ static MACHINE_CONFIG_DERIVED( homerun, dynashot )
 	/* sound hardware */
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	MCFG_SAMPLES_ADD("samples", homerun_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ganjaja, homerun )
+static MACHINE_CONFIG_DERIVED( ganjaja, dynashot )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60) // ?
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
