@@ -205,7 +205,7 @@ INLINE es5506_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ES5505 || device->type() == ES5506);
-	return (es5506_state *)downcast<es5505_device *>(device)->token();
+	return (es5506_state *)downcast<es5506_device *>(device)->token();
 }
 
 
