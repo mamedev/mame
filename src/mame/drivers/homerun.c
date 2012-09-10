@@ -4,15 +4,19 @@
  Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump - (c) 1990 Jaleco
  Driver by Tomasz Slanina
 
+ They're gambling games (seems to be aimed at kids), with a little skill involved.
+ ganjaja has a coin hopper, I don't know how the other games reward the player.
+
  *weird* hardware - based on NES version
  (gfx bank changed in the middle of screen,
   sprites in NES format etc)
-  
+ 
+ homerun and ganjaja use an extra soundchip for playing voice/samples
+ 
 Todo :
  - dump homerun sample rom
  - improve controls/dips
  - better emulation of gfx bank switching (problematic in ganjaja)
- - is there 2 player mode ?
 
 -----------------------------------
 Moero!! Pro Yakyuu Homerun Kyousou
@@ -425,7 +429,7 @@ static MACHINE_CONFIG_DERIVED( homerun, dynashot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_SAMPLES_ADD("samples", homerun_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ganjaja, dynashot )
