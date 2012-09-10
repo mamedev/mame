@@ -2679,7 +2679,7 @@ static void HC11OP(rol_indy)(hc11_state *cpustate)
 /* RORA             0x46 */
 static void HC11OP(rora)(hc11_state *cpustate)
 {
-	UINT16 r = ((REG_A & 0x7f) >> 1) | ((cpustate->ccr & CC_C) ? 0x80 : 0);
+	UINT16 r = ((REG_A & 0xfe) >> 1) | ((cpustate->ccr & CC_C) ? 0x80 : 0);
 	CLEAR_NZVC(cpustate);
 	cpustate->ccr |= (REG_A & 1) ? CC_C : 0;
 	REG_A = (UINT8)(r);
@@ -2698,7 +2698,7 @@ static void HC11OP(rora)(hc11_state *cpustate)
 /* RORB             0x56 */
 static void HC11OP(rorb)(hc11_state *cpustate)
 {
-	UINT16 r = ((REG_B & 0x7f) >> 1) | ((cpustate->ccr & CC_C) ? 0x80 : 0);
+	UINT16 r = ((REG_B & 0xfe) >> 1) | ((cpustate->ccr & CC_C) ? 0x80 : 0);
 	CLEAR_NZVC(cpustate);
 	cpustate->ccr |= (REG_B & 1) ? CC_C : 0;
 	REG_B = (UINT8)(r);
