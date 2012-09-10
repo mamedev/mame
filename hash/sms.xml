@@ -2836,7 +2836,7 @@
 		</part>
 	</software>
 
-	<software name="hangonaw" cloneof="hangon">
+	<software name="hangonaw">
 		<description>Hang-On &amp; Astro Warrior (USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -2861,7 +2861,7 @@
 		</part>
 	</software>
 
-	<software name="hangonsh" cloneof="hangon">
+	<software name="hangonsh">
 		<description>Hang-On &amp; Safari Hunt (USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -2873,7 +2873,7 @@
 		</part>
 	</software>
 
-	<software name="hangonshp" cloneof="hangon">
+	<software name="hangonshp" cloneof="hangonsh">
 		<description>Hang-On &amp; Safari Hunt (USA, Prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -6041,7 +6041,7 @@
 		</part>
 	</software>
 
-	<software name="tomjerry">
+	<software name="tomjerry" cloneof="tomjermv">
 		<description>Tom &amp; Jerry (Prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>

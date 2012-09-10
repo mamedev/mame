@@ -7,7 +7,6 @@ To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
 
 Undumped:
-- 10-Pin Bowling CGB-AXPP-UKV
 - 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
 - Army Men 2 CGB-BA2P-EUU
 - Army Men - Air Combat  CGB-BATP-EUR
@@ -21,7 +20,6 @@ Undumped:
 - Heroes of Might and Magic CGB-AUHP-EUR/EUU
 - Hot Wheels - Stunt Track Driver DMG-AHEP-EUR
 - Joust &amp; Defender DMG-AAOP-EUR
-- Klax CGB-ALXP-EUR
 - The Lion King - Simba's Mighty Adventure CGB-BLKP-UKV
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
@@ -32,7 +30,6 @@ Undumped:
 - MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
 - NBA Jam 2001 CGB-BJAP-EUR
 - NHL 2000 DMG-ANRP-EUR
-- Pro Pool CGB-BPLP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
 - Road Rash CGB-BRRP-EUR
 - Rocket Power - Gettin' Air CGB-BRUP-EUR
@@ -79,6 +76,19 @@ Undumped Pirates:
 	</software>
 
 	<software name="10pinb">
+		<!-- Notes: GBC only -->
+		<description>10-Pin Bowling (Euro)</description>
+		<year>1999</year>
+		<publisher>Majesco</publisher>
+		<info name="serial" value="CGB-AXPP-UKV"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="10-pinbowlaxpp.bin" size="1048576" crc="5449cac0" sha1="90d78bf2f51eed998002d8733d6e223b6478f487" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10pinbu" cloneof="10pinb">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>10-Pin Bowling (USA)</description>
 		<year>1999</year>
@@ -7875,10 +7885,10 @@ Undumped Pirates:
 
 	<software name="klax">
 		<!-- Notes: GBC only -->
-		<description>Klax (USA)</description>
+		<description>Klax (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="CGB-ALXE-USA"/>
+		<info name="serial" value="CGB-ALXE-USA, CGB-ALXP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="klax (usa).bin" size="1048576" crc="7181cbd0" sha1="23b5601748bda8e0dba69e589fa2b6d2d79781b3" offset="000000" />
@@ -13319,6 +13329,19 @@ Undumped Pirates:
 	</software>
 
 	<software name="propool">
+		<!-- Notes: GBC only -->
+		<description>Pro Pool (Euro)</description>
+		<year>2002</year>
+		<publisher>Codemasters</publisher>
+		<info name="serial" value="CGB-BPLP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="propoolbplp.bin" size="1048576" crc="21a4da64" sha1="575c02f73a0bdc357289073f053d8a3969927880" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="propoolu" cloneof="propool">
 		<!-- Notes: GBC only -->
 		<description>Pro Pool (USA)</description>
 		<year>2002</year>

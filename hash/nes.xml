@@ -11208,7 +11208,7 @@
 		</part>
 	</software>
 
-	<software name="train4jr">
+	<software name="train4jr" supported="partial">
 		<description>Family Trainer 4 - Jogging Race (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -11228,7 +11228,7 @@
 		</part>
 	</software>
 
-	<software name="train5md">
+	<software name="train5md" supported="partial">
 		<description>Family Trainer 5 - Meiro Daisakusen (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -11248,7 +11248,7 @@
 		</part>
 	</software>
 
-	<software name="train7d" cloneof="steamg">
+	<software name="train7d" cloneof="steamg" supported="partial">
 		<description>Family Trainer 7 - Daiundoukai (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -11268,7 +11268,7 @@
 		</part>
 	</software>
 
-	<software name="train8ft">
+	<software name="train8ft" supported="partial">
 		<description>Family Trainer 8 - Totsugeki! Fuuun Takeshi-Jou (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -11289,7 +11289,7 @@
 	</software>
 
 	<software name="train9f2" supported="partial">
-		<description>Family Trainer 9 - Totsugeki! Fuun Takeshijou 2 (Jpn)</description>
+		<description>Family Trainer 9 - Totsugeki! Fuun Takeshi-Jou 2 (Jpn)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-09"/>
@@ -36587,7 +36587,7 @@
 		</part>
 	</software>
 
-	<software name="toearthu" cloneof="toearth">
+	<software name="toearthu" cloneof="toearth" supported="partial">
 		<description>To The Earth (USA)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -36606,7 +36606,7 @@
 		</part>
 	</software>
 
-	<software name="toearth">
+	<software name="toearth" supported="partial">
 		<description>To The Earth (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -37365,7 +37365,7 @@
 		</part>
 	</software>
 
-	<software name="tsuppwar">
+	<software name="tsuppwar" supported="partial">
 		<description>Tsuppari Wars (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sammy</publisher>
@@ -37527,9 +37527,9 @@
 		</part>
 	</software>
 
-	<software name="uforcepg">
-		<description>U-Force Power Games (USA, Prototype)</description>
-		<year>19??</year>
+	<software name="uforcepg" supported="partial">
+		<description>U-force Power Games (USA, Prototype)</description>
+		<year>1990</year>
 		<publisher>Brøderbund</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-GNROM" />
@@ -38011,7 +38011,7 @@
 	</software>
 
 	<software name="usaiceh" cloneof="prohocky">
-		<description>USA Ice Hockey In FC (Jpn)</description>
+		<description>USA Ice Hockey in FC (Jpn)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-40"/>
@@ -38112,7 +38112,7 @@
 		<publisher>American Video Entertainment</publisher>
 		<info name="serial" value="AVE-VB"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="AVE-MB-91" />
+			<feature name="pcb" value="NES-CNROM" /> <!-- This should be AVE-MB-91 -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="2388-pgm" size="32768" crc="552f1143" sha1="f16caf18b4c888cb4d1e495ac5481417f95466e6" offset="00000" />
@@ -38341,7 +38341,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmnu" cloneof="wrestlmn">
+	<software name="wrestlmnu" cloneof="wrestlmn" supported="no">
 		<description>WWF WrestleMania (USA)</description>
 		<year>1989</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -38365,7 +38365,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmn">
+	<software name="wrestlmn" supported="no">
 		<description>WWF WrestleMania (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -40596,8 +40596,8 @@
 		</part>
 	</software>
 
-	<software name="uforcet">
-		<description>U-Force Test (USA)</description>
+	<software name="uforcet" supported="partial">
+		<description>U-force Test (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -42687,7 +42687,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="trai10rkp" cloneof="trai10rk">
+	<software name="trai10rkp" cloneof="trai10rk" supported="partial">
 		<description>Family Trainer 10 - Rairai Kyonsees (Jpn, Prototype)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -42703,7 +42703,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="trai10rk">
+	<software name="trai10rk" supported="partial">
 		<description>Family Trainer 10 - Rairai Kyonsees (Jpn)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -42722,7 +42722,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="train6mp" cloneof="streetcp">
+	<software name="train6mp" cloneof="streetcp" supported="partial">
 		<description>Family Trainer 6 - Manhattan Police (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -44487,7 +44487,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="moetwinb" cloneof="stinger">
-		<description>Moero Twinbee - Cinnamon Hakase O Sukue! (Jpn)</description>
+		<description>Moero TwinBee - Cinnamon Hakase O Sukue! (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC813"/>
@@ -46700,7 +46700,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="twinbee3p" cloneof="twinbee3">
-		<description>Twinbee 3 - Poko Poko Dai Maou (Jpn, Prototype)</description>
+		<description>TwinBee 3 - Poko Poko Dai Maou (Jpn, Prototype)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46971,7 +46971,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="wrestlmcj" cloneof="wrestlmc">
-		<description>WWF Wrestlemania Challenge (Jpn)</description>
+		<description>WWF WrestleMania Challenge (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="GAM-W9 (11)"/>
@@ -47632,7 +47632,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="twineagha" cloneof="twineagh">
-		<description>Twin Eagle - Shuang Ying (Tw, FC cart)</description>
+		<description>Shuang Ying (Tw, FC cart)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-006"/>
@@ -49676,7 +49676,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="waixngz2a" cloneof="waixngz2">
 		<description>Wai Xing Zhan Shi 2 (Chi, Simplified, Hacked)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-PS2" />
 			<dataarea name="prg" size="1048576">
@@ -49956,7 +49956,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zjshiji" supported="partial">
+	<software name="zjshiji" supported="no">
 		<description>Zheng Jiu Shi Ji (Chi)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -49973,7 +49973,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zjshiji1" cloneof="zjshiji" supported="partial">
+	<software name="zjshiji1" cloneof="zjshiji" supported="no">
 		<description>Zheng Jiu Shi Ji (Chi, Decrypted WXN)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -49990,7 +49990,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="gmzs" cloneof="zjshiji" supported="partial">
+	<software name="gmzs" cloneof="zjshiji" supported="no">
 		<description>Guang Ming Zhi Shen (Chi)</description>
 		<year>199?</year>
 		<publisher>CoolBoy</publisher>
@@ -50082,7 +50082,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1042"/>
 		<info name="alt_title" value="争霸世纪"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" /> <!-- Header says mapper 4 but there are tons of unmapped read/writes -->
+			<feature name="pcb" value="WAIXING-H" />
 			<dataarea name="chr" size="262144">
 				<rom name="[es-1042] zheng ba shiji (c) (wxn decrypted).chr" size="262144" crc="7dcfbcd3" sha1="e9317993a143c68ae33cd93e0fe6426fbeb68316" offset="00000" status="baddump" />
 			</dataarea>
@@ -50206,7 +50206,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ylqxz" cloneof="youling">
+	<software name="ylqxz" cloneof="youling" supported="partial">
 		<!-- Notes: AKA Heroes Legend -->
 		<description>Ying Lie Qun Xia Zhuan (Chi)</description>
 		<year>19??</year>
@@ -50261,7 +50261,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="snyx" cloneof="youling">
+	<software name="snyx">
 		<!-- Notes: AKA Young Chivalry -->
 		<description>Shao Nian You Xia (Chi)</description>
 		<year>19??</year>
@@ -50341,7 +50341,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1061"/>
 		<info name="alt_title" value="真假猴王"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb" value="WAIXING-H" />
 			<dataarea name="chr" size="262144">
 				<rom name="[es-1061] zheng jia hou wang (c).chr" size="262144" crc="08b22421" sha1="80151879c672e1872e6d48d063e6f6939dcf6622" offset="00000" status="baddump" />
 			</dataarea>
@@ -50757,7 +50757,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- FIXME: which board should use this game?? -->
-	<software name="xiyouji">
+	<software name="xiyouji" supported="no">
 		<description>Xi You Ji Hou Zhuan (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -51879,7 +51879,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- [NJ067] 霍元甲 ~ Huo Yuan Jia -->
 
-	<software name="xunqinji">
+	<software name="xunqinji" supported="partial">
 		<description>Xun Qin Ji (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -52351,7 +52351,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="yuefei" supported="partial">
+	<software name="yuefei" supported="no">
 		<description>Yuefei Chuan (Asia, Hacked)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
@@ -53358,13 +53358,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="yinhesd" cloneof="ffant" supported="no">
+	<software name="yinhesd" cloneof="ffant">
 		<description>Yin He Shi Dai (Chi, Decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="银河时代"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb" value="WAIXING-H" />
 			<dataarea name="prg" size="524288">
 				<rom name="yin he shi dai (as) [decrypted].prg" size="524288" crc="40e9255a" sha1="7421dbf5e9adf6ebf74cf2685ab32c1cbc3201f7" offset="00000" status="baddump" />
 			</dataarea>
@@ -56660,7 +56660,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<year>1991</year>
 		<publisher>American Video Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="AVE-MB-91" />
+			<feature name="pcb" value="NES-CNROM" /> <!-- This should be AVE-MB-91 -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="venice beach volleyball (proto).prg" size="32768" crc="6f37e993" sha1="cb939fa2aa0cdad4e711bad4528cff091cc1d30e" offset="00000" status="baddump" />
@@ -56802,7 +56802,8 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
-	<software name="xinghzs">
+<!-- How is this related to the Waixing title?? -->
+	<software name="xinghzs" cloneof="waixngzs">
 		<description>Xing He Zhan Shi (Chi)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -56819,13 +56820,14 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
-	<software name="xingjizb" supported="no">
+<!-- How is this related to the Waixing title?? -->
+	<software name="xingjizb" cloneof="waixngzs" supported="partial">
 		<description>Xing Ji Zheng Ba (Chi)</description>
-		<year>19??</year>
+		<year>1996</year>
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="星际争霸 (Starcraft?)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="WAIXING-SGZLZ" />
+			<feature name="pcb" value="HENGGEDIANZI" />
 			<dataarea name="prg" size="524288">
 				<rom name="xing ji zheng ba (china) (unl).prg" size="524288" crc="b5e83c9a" sha1="3c72706af5998133ec6be703994c10466a094eab" offset="00000" status="baddump" />
 			</dataarea>
@@ -56836,7 +56838,8 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
-	<software name="xingzhan">
+<!-- How is this related to the Waixing title?? -->
+	<software name="xingzhan" cloneof="waixngz2">
 		<description>Xing Zhan Qing Yuan (Chi)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -56870,7 +56873,7 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
-	<software name="youling">
+	<software name="youling" supported="partial">
 		<description>You Ling Xing Dong (Chi)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -58351,8 +58354,8 @@ All musics were removed in this game.
 
 	<software name="waixngzs1" cloneof="waixngzs">
 		<description>Wai Xing Zhan Shi (Chi, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Waixing</publisher>
 		<info name="alt_title" value="外星战士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-ZS" />
@@ -58367,8 +58370,8 @@ All musics were removed in this game.
 
 	<software name="waixngzs">
 		<description>Wai Xing Zhan Shi (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Waixing</publisher>
 		<info name="alt_title" value="外星战士"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-ZS" />
@@ -58397,9 +58400,9 @@ All musics were removed in this game.
 	</software>
 
 	<software name="xiaomalia" cloneof="xiaomali">
-		<description>Xiao Ma Li (Chi, Fixed?)</description>
+		<description>Xiao Ma Li (Chi, Pirate?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<dataarea name="chr" size="8192">
@@ -58414,7 +58417,7 @@ All musics were removed in this game.
 	<software name="xiaomali">
 		<description>Xiao Ma Li (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Nei-Hu</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-22211-C" />
 			<dataarea name="chr" size="8192">
@@ -58427,7 +58430,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="zgwsa" cloneof="zgws">
+	<software name="zgwsa" cloneof="zgws" supported="partial">
 		<description>Zhan Guo Wu Shuang (Chi, Fixed)</description>
 		<year>19??</year>
 		<publisher>BenSheng</publisher>
@@ -58882,7 +58885,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="twinbfds" supported="no">
-		<description>Twinbee (Asia, FDS conversion)</description>
+		<description>TwinBee (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -65400,6 +65403,9 @@ We include them here as reference if they should coincide with later revisions o
 			<dataarea name="prg" size="131072">
 				<rom name="zelda ii - the adventure of link (2002)(nintendo)(en)[h][ripped from gamecube].prg" size="131072" crc="7c07ba13" sha1="28939769ff00677103e646dcb0ea6bd2d74a77e3" offset="00000" status="baddump" />
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -65647,10 +65653,11 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="zhanguoq">
+<!-- How is this related to the Bensheng title? -->
+	<software name="zhanguoq" cloneof="zgws">
 		<description>Zhan Guo Qun Xiong Zhuan (Asia, Decrypted SmyNES)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<info name="alt_title" value="战国群雄传"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -66947,7 +66954,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk3a">
+	<software name="umk3a" supported="no">
 		<description>Ultimate Mortal Kombat 3 (Asia, 14 Characters)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -70636,10 +70643,10 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="uforcepg1" cloneof="uforcepg">
-		<description>Uforce Power Games (USA, Prototype Alt, Bad Dump)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="uforcepg1" cloneof="uforcepg" supported="partial">
+		<description>U-force Power Games (USA, Prototype Alt, Hacked)</description>
+		<year>1990</year>
+		<publisher>Brøderbund</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-GNROM" />
 			<dataarea name="chr" size="32768">
