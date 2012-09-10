@@ -9,7 +9,7 @@
   sprites in NES format etc)
   
 Todo :
- - dump remaining sample roms
+ - dump homerun sample rom
  - improve controls/dips
  - better emulation of gfx bank switching (problematic in ganjaja)
  - is there 2 player mode ?
@@ -58,14 +58,26 @@ Notes:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(homerun_state::homerun_d7756c_control_w)
+WRITE8_MEMBER(homerun_state::homerun_control_w)
 {
-	// d4: start pin
-	// d5: reset pin(?)
-	// other bits: unused?
-	device_t *device = machine().device("d7756c");
-	upd7759_reset_w(device, ~data & 0x20);
-	upd7759_start_w(device, ~data & 0x10);
+	// d0, d1: somehow related to port $40?
+
+	// d4: d7756 start pin
+	// d5: d7756 reset pin(?)
+	if (m_d7756 != NULL)
+	{
+		upd7759_reset_w(m_d7756, ~data & 0x20);
+		upd7759_start_w(m_d7756, ~data & 0x10);
+	}
+
+	// other bits: ?
+	m_control = data;
+}
+
+WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
+{
+	if (m_d7756 != NULL)
+		upd7759_port_w(m_d7756, 0, data);
 }
 
 static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
@@ -79,8 +91,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("d7756c", upd7759_port_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_d7756c_control_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(homerun_d7756_sample_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_control_w)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
@@ -94,6 +106,11 @@ CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 	UINT8 ret = (machine().primary_screen->vpos() > 116) ? 1 : 0;
 
 	return ret;
+}
+
+CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
+{
+	return upd7759_busy_r(m_d7756);
 }
 
 CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
@@ -113,7 +130,7 @@ static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_40_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, NULL)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -186,7 +203,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, NULL)
 	PORT_BIT( 0x76, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -290,6 +307,7 @@ static MACHINE_START( homerun )
 	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
 	state->membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
 
+	state->save_item(NAME(state->m_control));
 	state->save_item(NAME(state->m_gfx_ctrl));
 	state->save_item(NAME(state->m_gc_up));
 	state->save_item(NAME(state->m_gc_down));
@@ -301,6 +319,7 @@ static MACHINE_RESET( homerun )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
 
+	state->m_control = 0;
 	state->m_gfx_ctrl = 0;
 	state->m_gc_up = 0;
 	state->m_gc_down = 0;
@@ -310,7 +329,7 @@ static MACHINE_RESET( homerun )
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( homerun, homerun_state )
+static MACHINE_CONFIG_START( dynashot, homerun_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
@@ -342,8 +361,12 @@ static MACHINE_CONFIG_START( homerun, homerun_state )
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_20MHz/8)
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-	MCFG_SOUND_ADD("d7756c", UPD7756, UPD7759_STANDARD_CLOCK)
+static MACHINE_CONFIG_DERIVED( homerun, dynashot )
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -369,8 +392,8 @@ ROM_START( homerun )
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "homerun.ic120",  0x00000, 0x20000, CRC(52f0709b) SHA1(19e675bcccadb774f60ec5929fc1fb5cf0d3f617) )
 
-	ROM_REGION( 0x08000, "d7756c", ROMREGION_ERASE00 )
-	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
+	ROM_REGION( 0x08000, "d7756", ROMREGION_ERASE00 )
+	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom - very likely the same rom as [Moero!! Pro Yakyuu (Black/Red)] on Famicom, and [Moero!! Nettou Yakyuu '88] on MSX2 */
 ROM_END
 
 
@@ -384,9 +407,6 @@ ROM_START( dynashot )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(bedf7b98) SHA1(cb6c5fcaf8df5f5c7636c3c8f79b9dda78e30c2e) )
-
-	ROM_REGION( 0x08000, "d7756c", ROMREGION_ERASE00 )
-	ROM_LOAD( "d7756c.ic98",    0x00000, 0x08000, NO_DUMP ) /* D7756C built-in rom */
 ROM_END
 
 
@@ -401,11 +421,11 @@ ROM_START( ganjaja )
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "2.ic120",        0x00000, 0x20000, CRC(e65d4d57) SHA1(2ec9e5bdaa94b808573313b6eca657d798004b53) )
 
-	ROM_REGION( 0x08000, "d7756c", 0 )
+	ROM_REGION( 0x08000, "d7756", 0 )
 	ROM_LOAD( "d77p56cr.ic98",  0x00000, 0x08000, CRC(06a234ac) SHA1(b4ceff3f9f78551cf4a085642e162e33b266f067) ) /* D77P56CR OTP rom (One-Time Programmable, note the extra P) */
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun, homerun,  driver_device, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, homerun, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0, ganjaja, ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, homerun,  0, homerun,  homerun,  driver_device, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0, dynashot, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
