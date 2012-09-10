@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "machine/isa.h"
 #include "sound/dac.h"
+#include "machine/pc_joy.h"
 
 #define SIXTEENBIT	0x01
 #define STEREO		0x02
@@ -48,6 +49,7 @@ struct sb8_dsp_state
 	bool adpcm_new_ref;
 	UINT8 adpcm_ref;
 	UINT8 adpcm_step;
+	UINT8 adpcm_count;
 };
 
 // ======================> sb8_device (parent)
@@ -61,6 +63,7 @@ public:
 
         required_device<dac_device> m_dacl;
         required_device<dac_device> m_dacr;
+	required_device<pc_joy_device> m_joy;
 
         void process_fifo(UINT8 cmd);
         void queue(UINT8 data);
@@ -75,11 +78,8 @@ public:
         DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
         DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
         DECLARE_WRITE8_MEMBER(dsp_cmd_w);
-        DECLARE_READ8_MEMBER(joy_port_r);
-        DECLARE_WRITE8_MEMBER(joy_port_w);
 		DECLARE_READ8_MEMBER(mixer_r);
 		DECLARE_WRITE8_MEMBER(mixer_w);
-		virtual ioport_constructor device_input_ports() const;
 
 protected:
         // device-level overrides
@@ -94,7 +94,6 @@ protected:
 
         struct sb8_dsp_state m_dsp;
         UINT8 m_dack_out;
-        attotime m_joy_time;
 		UINT8 m_mixer_index;
 
         emu_timer *m_timer;

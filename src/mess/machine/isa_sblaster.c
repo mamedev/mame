@@ -38,26 +38,6 @@
 #define ym3812_StdClock XTAL_3_579545MHz
 #define ymf262_StdClock XTAL_14_31818MHz
 
-static INPUT_PORTS_START( sblaster )
-	PORT_START("pc_joy")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW,	 IPT_UNUSED ) // x/y ad stick to digital converters
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,   IPT_BUTTON1) PORT_NAME("SB: Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,   IPT_BUTTON2) PORT_NAME("SB: Joystick Button 2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,   IPT_BUTTON3) PORT_NAME("SB: Joystick Button 3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,   IPT_BUTTON4) PORT_NAME("SB: Joystick Button 4")
-
-	PORT_START("pc_joy_1")
-	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-	PORT_START("pc_joy_2")
-	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-INPUT_PORTS_END
-
-ioport_constructor sb_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( sblaster );
-}
-
 static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
@@ -79,13 +59,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1,  1, -1, -1, -1  /* Fx */
 };
 
-static const int protection_magic[4][9] =
-{
-    {  1, -2, -4,  8, -16,  32,  64, -128, -106 },
-    { -1,  2, -4,  8,  16, -32,  64, -128,  165 },
-    { -1,  2,  4, -8,  16, -32, -64,  128, -151 },
-    {  1, -2,  4, -8, -16,  32, -64,  128,  90 }
-};
+static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
 
 static const ym3812_interface pc_ym3812_interface =
 {
@@ -114,6 +88,8 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
@@ -128,6 +104,8 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
@@ -142,6 +120,8 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+
+	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
@@ -354,6 +334,7 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.adpcm_new_ref = true;
 				m_dsp.adpcm_step = 0;
 			case 0x16:  // 2-bit ADPCM
+				m_dsp.adpcm_count = 0;
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 				m_dsp.dma_transferred = 0;
 				m_dsp.dma_autoinit = 0;
@@ -395,6 +376,7 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.adpcm_new_ref = true;
 				m_dsp.adpcm_step = 0;
 			case 0x74:  // 4-bit ADPCM
+				m_dsp.adpcm_count = 0;
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 				m_dsp.dma_transferred = 0;
 				m_dsp.dma_autoinit = 0;
@@ -408,6 +390,7 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.adpcm_new_ref = true;
 				m_dsp.adpcm_step = 0;
 			case 0x76:  // 2.6-bit ADPCM
+				m_dsp.adpcm_count = 0;
 				m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 				m_dsp.dma_transferred = 0;
 				m_dsp.dma_autoinit = 0;
@@ -448,17 +431,10 @@ void sb_device::process_fifo(UINT8 cmd)
 				break;
 
             case 0xe2: // DSP protection
-                for (int i = 0; i < 8; i++)
-                {
-                    if ((m_dsp.fifo[1] >> i) & 0x01)
-                    {
-                        m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][i];
-                    }
-                }
-
-                m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][8];
-                m_dsp.prot_count++;
-
+                m_dsp.prot_value += protection_magic[m_dsp.prot_count++] ^ m_dsp.fifo[1];
+                m_dsp.prot_count &= 3;
+				m_dsp.adc_transferred = 0;
+				m_dsp.adc_length = 1;
                 m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
                 drq_w(1);
                 break;
@@ -487,6 +463,7 @@ void sb_device::process_fifo(UINT8 cmd)
 						case 0x1f:  // 2-bit autoinit ADPCM w/new reference
 							m_dsp.adpcm_new_ref = true;
 							m_dsp.adpcm_step = 0;
+							m_dsp.adpcm_count = 0;
 							m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 							m_dsp.dma_transferred = 0;
 							m_dsp.dma_autoinit = 1;
@@ -498,6 +475,7 @@ void sb_device::process_fifo(UINT8 cmd)
 						case 0x7d:  // 4-bit autoinit ADPCM w/new reference
 							m_dsp.adpcm_new_ref = true;
 							m_dsp.adpcm_step = 0;
+							m_dsp.adpcm_count = 0;
 							m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 							m_dsp.dma_transferred = 0;
 							m_dsp.dma_autoinit = 1;
@@ -509,6 +487,7 @@ void sb_device::process_fifo(UINT8 cmd)
 						case 0x7f:  // 2.6-bit autoinit ADPCM w/new reference
 							m_dsp.adpcm_new_ref = true;
 							m_dsp.adpcm_step = 0;
+							m_dsp.adpcm_count = 0;
 							m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 							m_dsp.dma_transferred = 0;
 							m_dsp.dma_autoinit = 1;
@@ -640,9 +619,45 @@ WRITE8_MEMBER(sb_device::dsp_cmd_w)
 
 void sb_device::adpcm_decode(UINT8 sample, int size)
 {
-	int sign = (sample & (1 << (size - 1))) ? -1: 1;
-	int shift = (size == 2) ? 2 : 0;
-	INT16 dec_sample = m_dsp.adpcm_ref + sign * (sample << (m_dsp.adpcm_step + shift));
+	const UINT8 adpcm_2_table[] =  {0, 1, 1, 3, 2, 6, 4, 12, 8, 24, 16, 48};
+	const UINT8 step_2_table[] =   {0, 2, 0, 4, 2, 6, 4,  8, 6, 10,  8, 10};
+
+	const UINT8 adpcm_3_table[] =  {0,  1,  2,  3,  1,  3,  5,  7,
+									2,  6, 10, 14,  4, 12, 20, 28,
+									8, 24, 40, 56};
+	const UINT8 step_3_table[] =   {0,  0,  0,  4,  0,  4,  4,  8,
+									4,  8,  8, 12,  8, 12, 12, 16,
+									12, 16, 16, 16};
+
+	const UINT8 adpcm_4_table[] =  {0,  1,  2,  3,  4,  5,  6,  7,
+									1,  3,  5,  7,  9, 11, 13, 15,
+									2,  6, 10, 14, 18, 22, 26, 30,
+									4, 12, 20, 28, 36, 44, 52, 60};
+	const UINT8 step_4_table[]  =  {0,  0,  0,  0,  0,  8,  8,  8,
+									0,  8,  8,  8,  8, 16, 16, 16,
+									8, 16, 16, 16, 16, 24, 24, 24,
+									16, 24, 24, 24, 24, 24, 24, 24};
+
+	INT16 dec_sample = m_dsp.adpcm_ref;
+	UINT8 index;
+	switch(size)
+	{
+		case 2:
+			index = (sample & 1) | m_dsp.adpcm_step;
+			dec_sample += ((sample & 2)?-1:1) * adpcm_2_table[index];
+			m_dsp.adpcm_step = step_2_table[index];
+			break;
+		case 3:
+			index = (sample & 3) | m_dsp.adpcm_step;
+			dec_sample += ((sample & 4)?-1:1) * adpcm_3_table[index];
+			m_dsp.adpcm_step = step_3_table[index];
+			break;
+		case 4:
+			index = (sample & 7) | m_dsp.adpcm_step;
+			dec_sample += ((sample & 8)?-1:1) * adpcm_4_table[index];
+			m_dsp.adpcm_step = step_4_table[index];
+			break;
+	}
 
 	if(dec_sample > 255)
 		dec_sample = 255;
@@ -651,39 +666,6 @@ void sb_device::adpcm_decode(UINT8 sample, int size)
 	m_dsp.adpcm_ref = dec_sample;
 	m_dacl->write_unsigned8(m_dsp.adpcm_ref);
 	m_dacr->write_unsigned8(m_dsp.adpcm_ref);
-	sample &= (1 << (size - 1)) - 1;
-	if(sample >= ((size << 1) - 3))
-	{
-		if(m_dsp.adpcm_step < 3)
-			m_dsp.adpcm_step++;
-	}
-	else if(!sample && m_dsp.adpcm_step)
-		m_dsp.adpcm_step--;
-}
-
-READ8_MEMBER ( sb_device::joy_port_r )
-{
-	UINT8 data = 0;
-	int delta;
-	attotime new_time = machine().time();
-
-	{
-		data = ioport("pc_joy")->read() | 0x0f;
-
-		{
-			delta = ((new_time - m_joy_time) * 256 * 1000).seconds;
-
-			if (ioport("pc_joy_1")->read() < delta) data &= ~0x01;
-			if (ioport("pc_joy_2")->read() < delta) data &= ~0x02;
-		}
-	}
-
-	return data;
-}
-
-WRITE8_MEMBER ( sb_device::joy_port_w )
-{
-	m_joy_time = machine().time();
 }
 
 READ8_MEMBER( sb16_device::mpu401_r )
@@ -804,7 +786,8 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
     device_t(mconfig, type, name, tag, owner, clock),
     m_dacl(*this, "sbdacl"),
-    m_dacr(*this, "sbdacr")
+    m_dacr(*this, "sbdacr"),
+	m_joy(*this, "joy")
 {
 }
 
@@ -845,7 +828,7 @@ isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, 
 
 void sb8_device::device_start()
 {
-	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(sb_device::joy_port_r), this), write8_delegate(FUNC(sb_device::joy_port_w), this));
+	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
 	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
@@ -888,7 +871,7 @@ void isa8_sblaster1_5_device::device_start()
 
 void sb16_device::device_start()
 {
-	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(sb_device::joy_port_r), this), write8_delegate(FUNC(sb_device::joy_port_w), this));
+	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
 	m_isa->install_device(                   0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb_device::mixer_r), this), write8_delegate(FUNC(sb_device::mixer_w), this));
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
@@ -926,7 +909,7 @@ void sb_device::device_reset()
     m_dsp.fifo_r_ptr = 0;
     m_dsp.wbuf_status = 0;
     m_dsp.rbuf_status = 0;
-	m_dsp.frequency = 22050; //?
+	m_dsp.frequency = 8000; // per stereo-fx 
 	m_dsp.irq_active = 0;
 	m_mixer_index = 0;
 }
@@ -1130,11 +1113,24 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
 				break;
 			}
-			lsample = m_dsp.data[m_dsp.d_rptr++];
-			adpcm_decode(lsample >> 6, 2);
-			adpcm_decode((lsample >> 4) & 3, 2);
-			adpcm_decode((lsample >> 2) & 3, 2);
-			adpcm_decode(lsample & 3, 2);
+			lsample = m_dsp.data[m_dsp.d_rptr];
+			switch(m_dsp.adpcm_count++)
+			{
+				case 0:
+					adpcm_decode(lsample >> 6, 2);
+					break;
+				case 1:
+					adpcm_decode((lsample >> 4) & 3, 2);
+					break;
+				case 2:
+					adpcm_decode((lsample >> 2) & 3, 2);
+					break;
+				case 3:
+					adpcm_decode(lsample & 3, 2);
+					m_dsp.data[m_dsp.d_rptr++] = 0x80;
+					m_dsp.adpcm_count = 0;
+					break;
+			}
 			break;
 		case ADPCM3:
 			if(m_dsp.adpcm_new_ref)
@@ -1145,10 +1141,21 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
 				break;
 			}	
-			lsample = m_dsp.data[m_dsp.d_rptr++];
-			adpcm_decode(lsample >> 5, 3);
-			adpcm_decode((lsample >> 2) & 7, 3);
-			adpcm_decode(lsample & 3, 2);
+			lsample = m_dsp.data[m_dsp.d_rptr];
+			switch(m_dsp.adpcm_count++)
+			{
+				case 0:
+					adpcm_decode(lsample >> 5, 3);
+					break;
+				case 1:
+					adpcm_decode((lsample >> 2) & 7, 3);
+					break;
+				case 2:
+					adpcm_decode(((lsample & 2) << 1) | (lsample & 1), 3);
+					m_dsp.data[m_dsp.d_rptr++] = 0x80;
+					m_dsp.adpcm_count = 0;
+					break;
+			}
 			break;
 		case ADPCM4:
 			if(m_dsp.adpcm_new_ref)
@@ -1159,9 +1166,18 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 				m_dacl->write_unsigned8(m_dsp.adpcm_ref);
 				break;
 			}	
-			lsample = m_dsp.data[m_dsp.d_rptr++];
-			adpcm_decode(lsample >> 4, 4);
-			adpcm_decode(lsample & 15, 4);
+			lsample = m_dsp.data[m_dsp.d_rptr];
+			switch(m_dsp.adpcm_count++)
+			{
+				case 0:
+					adpcm_decode(lsample >> 4, 4);
+					break;
+				case 1:
+					adpcm_decode(lsample & 15, 4);
+					m_dsp.data[m_dsp.d_rptr++] = 0x80;
+					m_dsp.adpcm_count = 0;
+					break;
+			}
 			break;
 		default:
 			logerror("SB: unimplemented sample type %x\n", m_dsp.flags);

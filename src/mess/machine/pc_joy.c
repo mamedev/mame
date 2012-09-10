@@ -89,3 +89,14 @@ INPUT_PORTS_START( pc_joystick )
 	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+const device_type PC_JOY = &device_creator<pc_joy_device>;
+
+pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC_JOY, "PC joystick", tag, owner, clock)
+{
+}
+
+ioport_constructor pc_joy_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pc_joystick );
+}
