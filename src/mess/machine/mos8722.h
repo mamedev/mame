@@ -102,7 +102,7 @@ private:
 	devcb_resolved_read_line	m_in_exrom_func;
 	devcb_resolved_read_line	m_in_sense40_func;
 
-	UINT8 m_reg[10];
+	UINT8 m_reg[12];
 
 	bool m_p0l_written;
 	bool m_p1l_written;
