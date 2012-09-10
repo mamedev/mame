@@ -60,7 +60,7 @@ READ8_MEMBER( vic10_state::read )
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
-		data = sid6581_r(m_sid, offset & 0x1f);
+		data = m_sid->read(space, offset & 0x1f);
 	}
 	else if (offset >= 0xd800 && offset < 0xdc00)
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER( vic10_state::write )
 	}
 	else if (offset >= 0xd400 && offset < 0xd800)
 	{
-		sid6581_w(m_sid, offset & 0x1f, data);
+		m_sid->write(space, offset & 0x1f, data);
 	}
 	else if (offset >= 0xd800 && offset < 0xdc00)
 	{
@@ -458,7 +458,6 @@ WRITE8_MEMBER( vic10_state::cia_pb_w )
 
 static const mos6526_interface cia_intf =
 {
-	10,
 	DEVCB_DRIVER_LINE_MEMBER(vic10_state, cia_irq_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, sp_w),
@@ -630,7 +629,7 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6566_CLOCK, cia_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6566_CLOCK, 60, cia_intf)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
 	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, expansion_intf, vic10_expansion_cards, NULL, NULL)
 

@@ -30,10 +30,6 @@ struct _sid6581_interface
 	devcb_read8 in_poty_cb;
 };
 
-
-READ8_DEVICE_HANDLER  ( sid6581_r );
-WRITE8_DEVICE_HANDLER ( sid6581_w );
-
 class sid6581_device : public device_t,
                                   public device_sound_interface
 {
@@ -44,6 +40,10 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

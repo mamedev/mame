@@ -223,22 +223,8 @@ WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
 	iec_data_out_w();
 }
 
-const mos6526_interface c128_ntsc_cia0 =
+const mos6526_interface c128_cia1_intf =
 {
-	60,
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_irq_w),
-	DEVCB_NULL,	/* pc_func */
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_cnt_w),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_sp_w),
-	DEVCB_DRIVER_MEMBER(c128_state, cia1_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_r),
-	DEVCB_DRIVER_MEMBER(c128_state, cia1_pb_w)
-};
-
-const mos6526_interface c128_pal_cia0 =
-{
-	50,
 	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_irq_w),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia1_cnt_w),
@@ -315,22 +301,8 @@ WRITE_LINE_MEMBER( c128_state::cia2_irq_w )
 	nmi();
 }
 
-const mos6526_interface c128_ntsc_cia1 =
+const mos6526_interface c128_cia2_intf =
 {
-	60,
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia2_irq_w),
-	DEVCB_NULL,	/* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_r),
-	DEVCB_DRIVER_MEMBER(c128_state, cia2_pa_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-const mos6526_interface c128_pal_cia1 =
-{
-	50,
 	DEVCB_DRIVER_LINE_MEMBER(c128_state, cia2_irq_w),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -366,7 +338,7 @@ WRITE8_MEMBER( c128_state::write_d000 )
 		if (offset + 0xd000 >= m_ram_top)
 			m_memory[0xd000 + offset] = data;
 		else
-			m_ram[0xd000 + offset] = data;
+			m_ram_ptr[0xd000 + offset] = data;
 	}
 	else
 	{
@@ -376,7 +348,7 @@ WRITE8_MEMBER( c128_state::write_d000 )
 			m_vic->write(space, offset & 0x3f, data);
 			break;
 		case 4:
-			sid6581_w(m_sid, offset & 0x3f, data);
+			m_sid->write(space, offset & 0x3f, data);
 			break;
 		case 5:
 			mmu8722_port_w(space, offset & 0xff, data);
@@ -416,7 +388,7 @@ READ8_MEMBER( c128_state::read_io )
 	if (offset < 0x400)
 		return m_vic->read(space, offset & 0x3f);
 	else if (offset < 0x500)
-		return sid6581_r(m_sid, offset & 0xff);
+		return m_sid->read(space, offset & 0xff);
 	else if (offset < 0x600)
 		return mmu8722_port_r(space, offset & 0xff);
 	else if (offset < 0x800)
@@ -519,14 +491,14 @@ void c128_state::bankswitch_64(int reset)
    0x3f 0x3f 0x7f 0x3e 0x7e 0xb0 0x0b 0x00 0x00 0x01 0x00 */
 void c128_state::bankswitch_z80()
 {
-	 m_ram = m_memory + MMU_RAM_ADDR;
+	 m_ram_ptr = m_memory + MMU_RAM_ADDR;
 	 m_va1617 = MMU_VIC_ADDR;
 #if 1
 	 membank("bank10")->set_base(m_z80);
-	 membank("bank11")->set_base(m_ram + 0x1000);
+	 membank("bank11")->set_base(m_ram_ptr + 0x1000);
 	 if ( (( (ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 		  || (( (ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
-		 m_ram = NULL;
+		 m_ram_ptr = NULL;
 #else
 	 if (MMU_BOTTOM)
 		 m_ram_bottom = MMU_SIZE;
@@ -587,7 +559,7 @@ void c128_state::bankswitch_128(int reset)
 	if (m_c64mode)
 	{
 		/* mmu works also in c64 mode, but this can wait */
-		m_ram = m_memory;
+		m_ram_ptr = m_memory;
 		m_va1617 = 0;
 		m_ram_bottom = 0;
 		m_ram_top = 0x10000;
@@ -608,7 +580,7 @@ void c128_state::bankswitch_128(int reset)
 	}
 	else
 	{
-		m_ram = m_memory + MMU_RAM_ADDR;
+		m_ram_ptr = m_memory + MMU_RAM_ADDR;
 		m_va1617 = MMU_VIC_ADDR;
 		membank("bank1")->set_base(m_memory + m_mmu_page0);
 		membank("bank2")->set_base(m_memory + m_mmu_page1);
@@ -618,14 +590,14 @@ void c128_state::bankswitch_128(int reset)
 			}
 		else
 			m_ram_bottom = 0;
-		membank("bank3")->set_base((m_ram_bottom > 0x200 ? m_memory : m_ram) + 0x200);
-		membank("bank4")->set_base((m_ram_bottom > 0x400 ? m_memory : m_ram) + 0x400);
-		membank("bank5")->set_base((m_ram_bottom > 0x1000 ? m_memory : m_ram) + 0x1000);
-		membank("bank6")->set_base((m_ram_bottom > 0x2000 ? m_memory : m_ram) + 0x2000);
+		membank("bank3")->set_base((m_ram_bottom > 0x200 ? m_memory : m_ram_ptr) + 0x200);
+		membank("bank4")->set_base((m_ram_bottom > 0x400 ? m_memory : m_ram_ptr) + 0x400);
+		membank("bank5")->set_base((m_ram_bottom > 0x1000 ? m_memory : m_ram_ptr) + 0x1000);
+		membank("bank6")->set_base((m_ram_bottom > 0x2000 ? m_memory : m_ram_ptr) + 0x2000);
 
 		if (MMU_RAM_LO)
 		{
-			membank("bank7")->set_base(m_ram + 0x4000);
+			membank("bank7")->set_base(m_ram_ptr + 0x4000);
 		}
 		else
 		{
@@ -634,8 +606,8 @@ void c128_state::bankswitch_128(int reset)
 
 		if (MMU_RAM_MID)
 		{
-			membank("bank8")->set_base(m_ram + 0x8000);
-			membank("bank9")->set_base(m_ram + 0xa000);
+			membank("bank8")->set_base(m_ram_ptr + 0x8000);
+			membank("bank9")->set_base(m_ram_ptr + 0xa000);
 		}
 		else if (MMU_ROM_MID)
 		{
@@ -678,7 +650,7 @@ void c128_state::bankswitch_128(int reset)
 		{
 			if (m_ram_top > 0xc000)
 			{
-				membank("bank12")->set_base(m_ram + 0xc000);
+				membank("bank12")->set_base(m_ram_ptr + 0xc000);
 			}
 			else
 			{
@@ -688,7 +660,7 @@ void c128_state::bankswitch_128(int reset)
 			{
 				if (m_ram_top > 0xd000)
 				{
-					membank("bank13")->set_base(m_ram + 0xd000);
+					membank("bank13")->set_base(m_ram_ptr + 0xd000);
 				}
 				else
 				{
@@ -697,7 +669,7 @@ void c128_state::bankswitch_128(int reset)
 			}
 			if (m_ram_top > 0xe000)
 			{
-				membank("bank14")->set_base(m_ram + 0xe000);
+				membank("bank14")->set_base(m_ram_ptr + 0xe000);
 			}
 			else
 			{
@@ -705,7 +677,7 @@ void c128_state::bankswitch_128(int reset)
 			}
 			if (m_ram_top > 0xff05)
 			{
-				membank("bank16")->set_base(m_ram + 0xff05);
+				membank("bank16")->set_base(m_ram_ptr + 0xff05);
 			}
 			else
 			{
@@ -742,7 +714,7 @@ void c128_state::bankswitch_128(int reset)
 
 		if ( (( (ioport("SPECIAL")->read() & 0x06) == 0x02 ) && (MMU_RAM_ADDR >= 0x40000))
 				|| (( (ioport("SPECIAL")->read() & 0x06) == 0x00) && (MMU_RAM_ADDR >= 0x20000)) )
-			m_ram = NULL;
+			m_ram_ptr = NULL;
 	}
 }
 
@@ -918,53 +890,53 @@ READ8_MEMBER( c128_state::mmu8722_ff00_r )
 
 WRITE8_MEMBER( c128_state::write_0000 )
 {
-	if (m_ram != NULL)
-		m_ram[0x0000 + offset] = data;
+	if (m_ram_ptr != NULL)
+		m_ram_ptr[0x0000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_1000 )
 {
-	if (m_ram != NULL)
-		m_ram[0x1000 + offset] = data;
+	if (m_ram_ptr != NULL)
+		m_ram_ptr[0x1000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_4000 )
 {
-	if (m_ram != NULL)
-		m_ram[0x4000 + offset] = data;
+	if (m_ram_ptr != NULL)
+		m_ram_ptr[0x4000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_8000 )
 {
-	if (m_ram != NULL)
-		m_ram[0x8000 + offset] = data;
+	if (m_ram_ptr != NULL)
+		m_ram_ptr[0x8000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_a000 )
 {
-	if (m_ram != NULL)
-		m_ram[0xa000 + offset] = data;
+	if (m_ram_ptr != NULL)
+		m_ram_ptr[0xa000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_c000 )
 {
-	if (m_ram != NULL)
-		m_ram[0xc000 + offset] = data;
+	if (m_ram_ptr != NULL)
+		m_ram_ptr[0xc000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_e000 )
 {
 	if (offset + 0xe000 >= m_ram_top)
 		m_memory[0xe000 + offset] = data;
-	else if (m_ram != NULL)
-		m_ram[0xe000 + offset] = data;
+	else if (m_ram_ptr != NULL)
+		m_ram_ptr[0xe000 + offset] = data;
 }
 
 WRITE8_MEMBER( c128_state::write_ff00 )
 {
 	if (!m_c64mode)
 		mmu8722_ff00_w(space, offset, data);
-	else if (m_ram!=NULL)
+	else if (m_ram_ptr!=NULL)
 		m_memory[0xff00 + offset] = data;
 }
 
@@ -972,8 +944,8 @@ WRITE8_MEMBER( c128_state::write_ff05 )
 {
 	if (offset + 0xff05 >= m_ram_top)
 		m_memory[0xff05 + offset] = data;
-	else if (m_ram!=NULL)
-		m_ram[0xff05 + offset] = data;
+	else if (m_ram_ptr!=NULL)
+		m_ram_ptr[0xff05 + offset] = data;
 }
 
 /*

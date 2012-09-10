@@ -337,8 +337,8 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MCFG_MOS6526R1_ADD("cia_0", 3500000, c65_ntsc_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", 3500000, c65_ntsc_cia1)
+	MCFG_MOS6526R1_ADD("cia_0", 3500000, 60, c65_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", 3500000, 60, c65_cia1)
 
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, NULL)
@@ -371,8 +371,8 @@ static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 	/* cia */
 	MCFG_DEVICE_REMOVE("cia_0")
 	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_MOS6526R1_ADD("cia_0", 3500000, c65_pal_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", 3500000, c65_pal_cia1)
+	MCFG_MOS6526R1_ADD("cia_0", 3500000, 50, c65_cia0)
+	MCFG_MOS6526R1_ADD("cia_1", 3500000, 50, c65_cia1)
 MACHINE_CONFIG_END
 
 

@@ -395,6 +395,7 @@ public:
 	inline void write_videoram(offs_t offset, UINT8 data);
 
 	void update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	static MC6845_UPDATE_ROW( vdc_update_row );
 
 protected:
 	// device-level overrides

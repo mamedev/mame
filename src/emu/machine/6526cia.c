@@ -53,6 +53,7 @@
 const device_type MOS6526R1 = &device_creator<mos6526r1_device>;
 const device_type MOS6526R2 = &device_creator<mos6526r2_device>;
 const device_type MOS8520 = &device_creator<mos8520_device>;
+const device_type MOS5710 = &device_creator<mos5710_device>;
 
 
 
@@ -88,6 +89,17 @@ mos6526r2_device::mos6526r2_device(const machine_config &mconfig, const char *ta
 
 mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock) { }
+
+mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : mos6526_device(mconfig, MOS5710, "MOS5710", tag, owner, clock) { }
+
+
+void mos6526_device::static_set_tod_clock(device_t &device, int tod_clock)
+{
+	mos6526_device &cia = dynamic_cast<mos6526_device &>(device);
+
+	cia.m_tod_clock = tod_clock;
+}
 
 
 //-------------------------------------------------
@@ -152,7 +164,6 @@ void mos6526_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		m_tod_clock = 0;
     	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
     	memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
     	memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
@@ -200,10 +211,10 @@ void mos6526_device::device_start()
 		timer->m_irq = 0x01 << t;
 	}
 
-	/* setup TOD timer, if appropriate */
-	if (m_tod_clock != 0)
+	if (m_tod_clock > 0)
 	{
-		machine().scheduler().timer_pulse(attotime::from_hz(m_tod_clock), FUNC(clock_tod_callback), 0, (void *)this);
+		m_tod_timer = timer_alloc(TIMER_TOD);
+		m_tod_timer->adjust(attotime::from_hz(m_tod_clock), 0, attotime::from_hz(m_tod_clock));
 	}
 
 	/* state save support */
@@ -253,6 +264,10 @@ void mos6526_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_PC:
 		m_out_pc_func(1);
+		break;
+
+	case TIMER_TOD:
+		clock_tod();
 		break;
 	}
 }
@@ -506,17 +521,6 @@ void mos6526_device::clock_tod()
 
 
 /*-------------------------------------------------
-    clock_tod_callback
--------------------------------------------------*/
-
-TIMER_CALLBACK( mos6526_device::clock_tod_callback )
-{
-    mos6526_device *cia = reinterpret_cast<mos6526_device *>(ptr);
-	cia->clock_tod();
-}
-
-
-/*-------------------------------------------------
     cnt_w
 -------------------------------------------------*/
 
@@ -575,6 +579,16 @@ void mos6526_device::flag_w(UINT8 state)
 	}
 
 	m_flag = state;
+}
+
+READ8_MEMBER( mos6526_device::read )
+{
+	return reg_r(offset);
+}
+
+WRITE8_MEMBER( mos6526_device::write )
+{
+	reg_w(offset, data);
 }
 
 /*-------------------------------------------------

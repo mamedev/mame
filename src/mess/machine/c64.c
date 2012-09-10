@@ -129,7 +129,6 @@ WRITE_LINE_MEMBER( legacy_c64_state::c64_vic_interrupt )
 
 const mos6526_interface c64_ntsc_cia0 =
 {
-	10, /* 1/10 second */
 	DEVCB_LINE(c64_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -142,7 +141,6 @@ const mos6526_interface c64_ntsc_cia0 =
 
 const mos6526_interface c64_pal_cia0 =
 {
-	10, /* 1/10 second */
 	DEVCB_LINE(c64_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -210,7 +208,6 @@ static void c64_cia1_interrupt( device_t *device, int level )
 
 const mos6526_interface c64_ntsc_cia1 =
 {
-	10, /* 1/10 second */
 	DEVCB_LINE(c64_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -223,7 +220,6 @@ const mos6526_interface c64_ntsc_cia1 =
 
 const mos6526_interface c64_pal_cia1 =
 {
-	10, /* 1/10 second */
 	DEVCB_LINE(c64_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -255,14 +251,14 @@ WRITE8_HANDLER( c64_write_io )
 	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	device_t *cia_0 = space->machine().device("cia_0");
 	device_t *cia_1 = space->machine().device("cia_1");
-	device_t *sid = space->machine().device("sid6581");
+	sid6581_device *sid = space->machine().device<sid6581_device>("sid6581");
 	device_t *vic2 = space->machine().device("vic2");
 
 	state->m_io_mirror[offset] = data;
 	if (offset < 0x400)
 		vic2_port_w(vic2, offset & 0x3ff, data);
 	else if (offset < 0x800)
-		sid6581_w(sid, offset & 0x3ff, data);
+		sid->write(*space, offset & 0x3ff, data);
 	else if (offset < 0xc00)
 		state->m_colorram[offset & 0x3ff] = data | 0xf0;
 	else if (offset < 0xd00)
@@ -294,14 +290,14 @@ READ8_HANDLER( c64_read_io )
 	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	device_t *cia_0 = space->machine().device("cia_0");
 	device_t *cia_1 = space->machine().device("cia_1");
-	device_t *sid = space->machine().device("sid6581");
+	sid6581_device *sid = space->machine().device<sid6581_device>("sid6581");
 	device_t *vic2 = space->machine().device("vic2");
 
 	if (offset < 0x400)
 		return vic2_port_r(vic2, offset & 0x3ff);
 
 	else if (offset < 0x800)
-		return sid6581_r(sid, offset & 0x3ff);
+		return sid->read(*space, offset & 0x3ff);
 
 	else if (offset < 0xc00)
 		return state->m_colorram[offset & 0x3ff];

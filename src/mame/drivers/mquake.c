@@ -315,7 +315,6 @@ static MACHINE_RESET(mquake)
 
 static const mos6526_interface cia_0_intf =
 {
-	0,													/* tod_clock */
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -328,7 +327,6 @@ static const mos6526_interface cia_0_intf =
 
 static const mos6526_interface cia_1_intf =
 {
-	0,													/* tod_clock */
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -380,8 +378,8 @@ static MACHINE_CONFIG_START( mquake, amiga_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cia */
-	MCFG_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
-	MCFG_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
+	MCFG_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_0_intf)
+	MCFG_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_1_intf)
 
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)

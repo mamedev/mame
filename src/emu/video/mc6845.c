@@ -1169,6 +1169,8 @@ void mos8563_device::device_start()
 	m_supports_status_reg_d7 = true;
 	m_update_ready_bit = 1;
 
+	m_update_row = vdc_update_row;
+
 	save_item(NAME(m_char_buffer));
 	save_item(NAME(m_attr_buffer));
 	save_item(NAME(m_attribute_addr));
@@ -1423,4 +1425,11 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			}
 		}
 	}
+}
+
+MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
+{
+    mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
+
+    mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 }

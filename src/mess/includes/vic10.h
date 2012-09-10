@@ -40,7 +40,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6566_device> m_vic;
-	required_device<device_t> m_sid;
+	required_device<sid6581_device> m_sid;
 	required_device<mos6526_device> m_cia;
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;

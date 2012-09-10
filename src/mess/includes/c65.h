@@ -85,7 +85,7 @@ void c65_bankswitch_interface(running_machine &machine, int value);
 MACHINE_START( c65 );
 INTERRUPT_GEN( c65_frame_interrupt );
 
-extern const mos6526_interface c65_ntsc_cia0, c65_pal_cia0;
-extern const mos6526_interface c65_ntsc_cia1, c65_pal_cia1;
+extern const mos6526_interface c65_cia0;
+extern const mos6526_interface c65_cia1;
 
 #endif /* C65_H_ */

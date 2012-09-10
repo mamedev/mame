@@ -51,7 +51,7 @@ protected:
 	virtual void plus4_breset_w(int state);
 
 private:
-	required_device<device_t> m_sid;
+	required_device<sid6581_device> m_sid;
 	required_device<vcs_control_port_device> m_joy;
 };
 

@@ -141,7 +141,7 @@ UINT8 plus4_sid_cartridge_device::plus4_cd_r(address_space &space, offs_t offset
 {
 	if ((offset >= 0xfe80 && offset < 0xfea0) || (offset >= 0xfd40 && offset < 0xfd60))
 	{
-		data = sid6581_r(m_sid, offset & 0x1f);
+		data = m_sid->read(space, offset & 0x1f);
 	}
 	else if (offset >= 0xfd80 && offset < 0xfd90)
 	{
@@ -160,7 +160,7 @@ void plus4_sid_cartridge_device::plus4_cd_w(address_space &space, offs_t offset,
 {
 	if ((offset >= 0xfe80 && offset < 0xfea0) || (offset >= 0xfd40 && offset < 0xfd60))
 	{
-		sid6581_w(m_sid, offset & 0x1f, data);
+		m_sid->write(space, offset & 0x1f, data);
 	}
 }
 

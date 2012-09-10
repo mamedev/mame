@@ -408,10 +408,6 @@ INPUT_PORTS_START( c128_special )
 	PORT_CONFNAME( 0x10, 0x10, "40 80 Display (switch) (active after a rebooting)")
 	PORT_CONFSETTING(	0x00, "40 Columns (DIN/TV)")
 	PORT_CONFSETTING(	0x10, "80 Columns (RGBI)")
-	PORT_CONFNAME( 0x06, 0x00, "Main Memory / MMU Version")
-	PORT_CONFSETTING(	0x00, "128 KByte" )
-	PORT_CONFSETTING(	0x02, "256 KByte" )
-	PORT_CONFSETTING(	0x04, "1024 KByte" )
 INPUT_PORTS_END
 
 

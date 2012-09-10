@@ -63,12 +63,18 @@ public:
 		  m_cia1(*this, MOS6526_1_TAG),
 		  m_cia2(*this, MOS6526_2_TAG),
 		  //m_iec(*this, CBM_IEC_TAG),
-		  //m_joy1(*this, CONTROL1_TAG),
-		  //m_joy2(*this, CONTROL2_TAG),
-		  //m_exp(*this, C128_EXPANSION_SLOT_TAG),
-		  //m_user(*this, C128_USER_PORT_TAG),
-		  //m_ram(*this, RAM_TAG),
-		  m_cassette(*this, PET_DATASSETTE_PORT_TAG)
+		  m_joy1(*this, CONTROL1_TAG),
+		  m_joy2(*this, CONTROL2_TAG),
+		  m_exp(*this, C64_EXPANSION_SLOT_TAG),
+		  m_user(*this, C64_USER_PORT_TAG),
+		  m_ram(*this, RAM_TAG),
+		  m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		  m_rom1(NULL),
+		  m_rom2(NULL),
+		  m_rom3(NULL),
+		  m_rom4(NULL),
+		  m_from(NULL),
+		  m_charom(NULL)
 	{ }
 
 	required_device<legacy_cpu_device> m_maincpu;
@@ -80,20 +86,20 @@ public:
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	//required_device<cbm_iec_device> m_iec;
-	//required_device<vcs_control_port_device> m_joy1;
-	//required_device<vcs_control_port_device> m_joy2;
-	//required_device<c64_expansion_slot_device> m_exp;
-	//required_device<c64_user_port_device> m_user;
-	//required_device<ram_device> m_ram;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
+	required_device<c64_expansion_slot_device> m_exp;
+	required_device<c64_user_port_device> m_user;
+	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	void bankswitch_pla(offs_t offset, int ba, int rw, int aec, int z80io, int ma5, int ma4, int ms3, int ms2, int ms1, int ms0,
+	void bankswitch_pla(offs_t offset, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
 		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb);
-	UINT8 read_memory(offs_t offset, int ba, int aec, int z80io);
-	void write_memory(offs_t offset, UINT8 data, int ba, int aec, int z80io);
+	UINT8 read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
+	void write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io);
 
 	DECLARE_READ8_MEMBER( z80_r );
 	DECLARE_WRITE8_MEMBER( z80_w );
@@ -165,6 +171,14 @@ public:
 	void bankswitch(int reset);
 	void mmu8722_reset();
 
+	const UINT8 *m_rom1;
+	const UINT8 *m_rom2;
+	const UINT8 *m_rom3;
+	const UINT8 *m_rom4;
+	const UINT8 *m_from;
+	const UINT8 *m_charom;
+	UINT8 *m_color_ram;
+
 	UINT8 *m_c128_basic;
 	UINT8 *m_c128_kernal;
 	UINT8 *m_c128_chargen;
@@ -181,7 +195,7 @@ public:
 	int m_write_io;
 	int m_ram_bottom;
 	int m_ram_top;
-	UINT8 *m_ram;
+	UINT8 *m_ram_ptr;
 	UINT8 m_c64_port_data;
 	UINT8 m_keyline[3];
 	int m_cnt1;
@@ -204,7 +218,6 @@ public:
 
 extern INTERRUPT_GEN( c128_frame_interrupt );
 
-extern const mos6526_interface c128_ntsc_cia0, c128_pal_cia0;
-extern const mos6526_interface c128_ntsc_cia1, c128_pal_cia1;
+extern const mos6526_interface c128_cia1_intf, c128_cia2_intf;
 
 #endif /* __C128_H__ */

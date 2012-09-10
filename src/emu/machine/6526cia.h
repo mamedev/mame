@@ -43,23 +43,37 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6526R1_ADD(_tag, _clock, _config) \
+#define MCFG_MOS6526R1_ADD(_tag, _clock, _tod_clock, _config) \
 	MCFG_DEVICE_ADD(_tag, MOS6526R1, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config) \
+	mos6526_device::static_set_tod_clock(*device, _tod_clock);
 
-#define MCFG_MOS6526R2_ADD(_tag, _clock, _config) \
+#define MCFG_MOS6526R2_ADD(_tag, _clock, _tod_clock, _config) \
 	MCFG_DEVICE_ADD(_tag, MOS6526R2, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config) \
+	mos6526_device::static_set_tod_clock(*device, _tod_clock);
 
-#define MCFG_MOS8520_ADD(_tag, _clock, _config) \
+#define MCFG_MOS8520_ADD(_tag, _clock, _tod_clock, _config) \
 	MCFG_DEVICE_ADD(_tag, MOS8520, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config) \
+	mos6526_device::static_set_tod_clock(*device, _tod_clock);
+
+#define MCFG_MOS5710_ADD(_tag, _clock, _tod_clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS5710, _clock) \
+	MCFG_DEVICE_CONFIG(_config) \
+	mos6526_device::static_set_tod_clock(*device, _tod_clock);
+
 
 #define MOS6526_INTERFACE(name) \
 	const mos6526_interface (name)=
 
 #define MOS8520_INTERFACE(name) \
 	const mos6526_interface (name)=
+
+#define MOS5710_INTERFACE(name) \
+	const mos6526_interface (name)=
+
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -70,8 +84,6 @@
 
 struct mos6526_interface
 {
-	int m_tod_clock;
-
 	devcb_write_line	m_out_irq_cb;
 	devcb_write_line	m_out_pc_cb;
 	devcb_write_line	m_out_cnt_cb;
@@ -91,13 +103,17 @@ struct mos6526_interface
 class mos6526_device :  public device_t,
                         public mos6526_interface
 {
-    friend class dart_channel;
-
 protected:
     // construction/destruction
     mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 public:
+	// inline configuration
+	static void static_set_tod_clock(device_t &device, int tod_clock);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	
 	UINT8 reg_r(UINT8 offset);
 	void reg_w(UINT8 offset, UINT8 data);
 
@@ -138,7 +154,11 @@ protected:
 	static TIMER_CALLBACK( clock_tod_callback );
 
 private:
-	static const device_timer_id TIMER_PC = 0;
+	enum
+	{
+		TIMER_PC,
+		TIMER_TOD
+	};
 
     inline attotime cycles_to_time(int c);
 	void update_pc();
@@ -185,6 +205,7 @@ private:
 	cia_timer		m_timer[2];
 
 	/* Time Of the Day clock (TOD) */
+	int				m_tod_clock;
 	UINT32			m_tod;
 	UINT32			m_tod_latch;
 	UINT8			m_tod_latched;
@@ -206,6 +227,7 @@ private:
 	UINT8			m_serial;
 
 	emu_timer *m_pc_timer;
+	emu_timer *m_tod_timer;
 };
 
 class mos6526r1_device : public mos6526_device
@@ -226,11 +248,18 @@ public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class mos5710_device : public mos6526_device
+{
+public:
+	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 // device type definition
 extern const device_type MOS6526R1;
 extern const device_type MOS6526R2;
 extern const device_type MOS8520;
+extern const device_type MOS5710;
 
 
 

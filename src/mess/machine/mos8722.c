@@ -55,7 +55,7 @@ enum
 #define CR_ROM_LO		BIT(m_reg[CR], 1)
 #define CR_ROM_MID		((m_reg[CR] >> 2) & 0x03)
 #define CR_ROM_HI		((m_reg[CR] >> 4) & 0x03)
-#define CR_A16			BIT(m_reg[CR], 6)
+#define CR_RAM			((m_reg[CR] >> 6) & 0x03)
 
 
 // mode configuration register
@@ -68,17 +68,29 @@ enum
 
 
 // RAM configuration register
+static const offs_t RCR_BOTTOM_ADDRESS[4] = { 0x0400, 0x1000, 0x0400, 0x1000 };
+static const offs_t RCR_TOP_ADDRESS[4] = 	{ 0xf000, 0xf000, 0xe000, 0xc000 };
+
 enum
 {
-	RCR_STATUS_NO = 0,
-	RCR_STATUS_BOTTOM,
-	RCR_STATUS_TOP,
-	RCR_STATUS_BOTH
+	RCR_SHARE_1K = 0,
+	RCR_SHARE_4K,
+	RCR_SHARE_8K,
+	RCR_SHARE_16K
 };
 
 #define RCR_SHARE		(m_reg[RCR] & 0x03)
-#define RCR_STATUS		((m_reg[RCR] >> 2) & 0x03)
-#define RCR_A16			BIT(m_reg[RCR], 6)
+#define RCR_BOTTOM		BIT(m_reg[RCR], 2)
+#define RCR_TOP			BIT(m_reg[RCR], 3)
+#define RCR_VA16		BIT(m_reg[RCR], 6)
+
+
+// page 0 pointer register
+#define P0H_A16			BIT(m_reg[P0H], 0)
+
+
+// page 1 pointer register
+#define P1H_A16			BIT(m_reg[P1H], 0)
 
 
 
@@ -149,6 +161,13 @@ void mos8722_device::device_start()
 
 void mos8722_device::device_reset()
 {
+	for (int i = 0; i < 12; i++)
+	{
+		m_reg[i] = 0;
+	}
+
+	m_p0l_written = false;
+	m_p1l_written = false;
 }
 
 
@@ -156,13 +175,35 @@ void mos8722_device::device_reset()
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( mos8722_device::read )
+UINT8 mos8722_device::read(offs_t offset, UINT8 data)
 {
-	UINT8 data = 0;
-
 	if (!MCR_C64)
 	{
+		if (!CR_IO && offset >= 0xd500 && offset < 0xd50c)
+		{
+			switch (offset & 0x0f)
+			{
+			case MCR:
+				data = m_reg[MCR] & 0x49;
 
+				data |= m_in_game_func() << 4;
+				data |= m_in_exrom_func() << 5;
+				data |= m_in_sense40_func() << 7;
+				break;
+
+			case VR:
+				data = 0x20;
+				break;
+
+			default:
+				data = m_reg[offset & 0x0f];
+				break;
+			}
+		}
+		else if (offset == 0xff00)
+		{
+			return m_reg[CR];
+		}
 	}
 
 	return data;
@@ -177,7 +218,47 @@ WRITE8_MEMBER( mos8722_device::write )
 {
 	if (!MCR_C64)
 	{
+		if (!CR_IO && offset >= 0xd500 && offset < 0xd50c)
+		{
+			m_reg[offset & 0x0f] = data;
 
+			switch (offset & 0x0f)
+			{
+			case MCR:
+				m_out_z80en_func(MCR_8500);
+				m_out_fsdir_func(MCR_FSDIR);
+				break;
+
+			case P0L:
+				m_p0l_written = true;
+				break;
+
+			case P0H:
+				m_p0l_written = false;
+				break;
+
+			case P1L:
+				m_p1l_written = true;
+				break;
+
+			case P1H:
+				m_p1l_written = false;
+				break;
+			}
+		}
+		else if (offset >= 0xff00 && offset < 0xff05)
+		{
+			switch (offset & 0x0f)
+			{
+			case CR:
+				m_reg[CR] = data;
+				break;
+
+			default:
+				m_reg[CR] = m_reg[offset & 0x0f];
+				break;
+			}
+		}
 	}
 }
 
@@ -196,20 +277,97 @@ READ_LINE_MEMBER( mos8722_device::fsdir_r )
 //  ta_r - translated address read
 //-------------------------------------------------
 
-offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3)
+offs_t mos8722_device::ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3, int *cas0, int *cas1)
 {
 	offs_t ta = offset;
 
-	if (aec)
+	if (!MCR_C64)
 	{
-		if (MCR_C64)
+		*ms0 = 1;
+		*ms1 = 1;
+		*ms2 = CR_IO;
+
+		if (offset < 0x1000 && !MCR_8500)
 		{
-			*ms0 = 1;
-			*ms1 = 1;
+			ta = 0xd000 | (offset & 0xfff);
+
+			*ms0 = 0;
+			*ms1 = 0;
+		}
+		else if (offset >= 0x4000 && offset < 0x8000)
+		{
+			*ms0 = CR_ROM_LO;
+			*ms1 = CR_ROM_LO;
+		}
+		else if (offset >= 0x8000 && offset < 0xc000)
+		{
+			*ms0 = BIT(CR_ROM_MID, 0);
+			*ms1 = BIT(CR_ROM_MID, 1);
+		}
+		else if (offset >= 0xc000)
+		{
+			*ms0 = BIT(CR_ROM_HI, 0);
+			*ms1 = BIT(CR_ROM_HI, 1);
 		}
 
-		*ms3 = !MCR_C64;
+		if (*ms0 == 1 && *ms1 == 1)
+		{
+			if (aec)
+			{
+				*cas0 = BIT(CR_RAM, 0);
+				*cas1 = BIT(CR_RAM, 1);
+
+				if (offset < 0x0100)
+				{
+					if (m_p0l_written && m_reg[P0L])
+					{
+						ta = (m_reg[P0L] << 8) | (offset & 0xff);
+
+						*cas0 = P0H_A16 ? 1 : 0;
+						*cas1 = P0H_A16 ? 0 : 1;
+					}
+				}
+				else if (offset < 0x0200)
+				{
+					if (m_p1l_written && m_reg[P1L])
+					{
+						ta = (m_reg[P1L] << 8) | (offset & 0xff);
+
+						*cas0 = P1H_A16 ? 1 : 0;
+						*cas1 = P1H_A16 ? 0 : 1;
+					}
+				}
+				
+				if ((RCR_BOTTOM && offset < RCR_BOTTOM_ADDRESS[RCR_SHARE]) ||
+					(RCR_TOP && offset >= RCR_TOP_ADDRESS[RCR_SHARE]))
+				{
+					*cas0 = 0;
+					*cas1 = 1;
+				}
+			}
+			else
+			{
+				*cas0 = RCR_VA16 ? 1 : 0;
+				*cas1 = RCR_VA16 ? 0 : 1;
+			}
+		}
+		else
+		{
+			*cas0 = 1;
+			*cas1 = 1;
+		}
 	}
+	else
+	{
+		*ms0 = 1;
+		*ms1 = 1;
+		*ms2 = 1;
+
+		*cas0 = 0;
+		*cas1 = 1;
+	}
+
+	*ms3 = !MCR_C64;
 
 	return ta;
 }

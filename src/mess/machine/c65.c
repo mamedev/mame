@@ -130,22 +130,8 @@ void c65_vic_interrupt( running_machine &machine, int level )
 #endif
 }
 
-const mos6526_interface c65_ntsc_cia0 =
+const mos6526_interface c65_cia0 =
 {
-	60,
-	DEVCB_LINE(c65_cia0_interrupt),
-	DEVCB_NULL,	/* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(c65_cia0_port_a_r),
-	DEVCB_NULL,
-	DEVCB_HANDLER(c65_cia0_port_b_r),
-	DEVCB_HANDLER(c65_cia0_port_b_w)
-};
-
-const mos6526_interface c65_pal_cia0 =
-{
-	50,
 	DEVCB_LINE(c65_cia0_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -210,22 +196,8 @@ static WRITE_LINE_DEVICE_HANDLER( c65_cia1_interrupt )
 	c65_nmi(device->machine());
 }
 
-const mos6526_interface c65_ntsc_cia1 =
+const mos6526_interface c65_cia1 =
 {
-	60,
-	DEVCB_LINE(c65_cia1_interrupt),
-	DEVCB_NULL,	/* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_HANDLER(c65_cia1_port_a_r),
-	DEVCB_HANDLER(c65_cia1_port_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-const mos6526_interface c65_pal_cia1 =
-{
-	50,
 	DEVCB_LINE(c65_cia1_interrupt),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
@@ -674,8 +646,8 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 
 static WRITE8_HANDLER( c65_write_io )
 {
-	device_t *sid_0 = space->machine().device("sid_r");
-	device_t *sid_1 = space->machine().device("sid_l");
+	sid6581_device *sid_0 = space->machine().device<sid6581_device>("sid_r");
+	sid6581_device *sid_1 = space->machine().device<sid6581_device>("sid_l");
 	device_t *vic3 = space->machine().device("vic3");
 
 	switch (offset & 0xf00)
@@ -698,9 +670,9 @@ static WRITE8_HANDLER( c65_write_io )
 		break;
 	case 0x400:
 		if (offset<0x420) /* maybe 0x20 */
-			sid6581_w(sid_0, offset & 0x3f, data);
+			sid_0->write(*space, offset & 0x3f, data);
 		else if (offset<0x440)
-			sid6581_w(sid_1, offset & 0x3f, data);
+			sid_1->write(*space, offset & 0x3f, data);
 		else
 			DBG_LOG(space->machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
@@ -738,8 +710,8 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 
 static READ8_HANDLER( c65_read_io )
 {
-	device_t *sid_0 = space->machine().device("sid_r");
-	device_t *sid_1 = space->machine().device("sid_l");
+	sid6581_device *sid_0 = space->machine().device<sid6581_device>("sid_r");
+	sid6581_device *sid_1 = space->machine().device<sid6581_device>("sid_l");
 	device_t *vic3 = space->machine().device("vic3");
 
 	switch (offset & 0xf00)
@@ -763,9 +735,9 @@ static READ8_HANDLER( c65_read_io )
 		break;
 	case 0x400:
 		if (offset < 0x420)
-			return sid6581_r(sid_0, offset & 0x3f);
+			return sid_0->read(*space, offset & 0x3f);
 		if (offset < 0x440)
-			return sid6581_r(sid_1, offset & 0x3f);
+			return sid_1->read(*space, offset & 0x3f);
 		DBG_LOG(space->machine(), 1, "io read", ("%.3x\n", offset));
 		break;
 	case 0x500:

@@ -82,12 +82,12 @@ public:
     // construction/destruction
     mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-    DECLARE_READ8_MEMBER( read );
+    UINT8 read(offs_t offset, UINT8 data);
     DECLARE_WRITE8_MEMBER( write );
 
     DECLARE_READ_LINE_MEMBER( fsdir_r );
 
-    offs_t ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3);
+    offs_t ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3, int *cas0, int *cas1);
 
 protected:
     // device-level overrides
@@ -103,6 +103,9 @@ private:
 	devcb_resolved_read_line	m_in_sense40_func;
 
 	UINT8 m_reg[10];
+
+	bool m_p0l_written;
+	bool m_p1l_written;
 };
 
 

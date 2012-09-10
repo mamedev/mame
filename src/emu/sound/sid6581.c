@@ -73,15 +73,15 @@ static DEVICE_START( sid8580 )
 
 
 
-READ8_DEVICE_HANDLER  ( sid6581_r )
+READ8_MEMBER( sid6581_device::read )
 {
-	return sid6581_port_r(device->machine(), get_sid(device), offset);
+	return sid6581_port_r(machine(), get_sid(this), offset);
 }
 
 
-WRITE8_DEVICE_HANDLER ( sid6581_w )
+WRITE8_MEMBER( sid6581_device::write )
 {
-	sid6581_port_w(get_sid(device), offset, data);
+	sid6581_port_w(get_sid(this), offset, data);
 }
 
 const device_type SID6581 = &device_creator<sid6581_device>;

@@ -124,7 +124,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 			break;
 
 		case 1: // SID
-			data = sid6581_r(m_sid, offset & 0x1f);
+			data = m_sid->read(space, offset & 0x1f);
 			break;
 
 		case 2: // COLOR
@@ -140,11 +140,11 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 				else
 					cia_set_port_mask_value(m_cia1, 0, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 
-				data = mos6526_r(m_cia1, offset & 0x0f);
+				data = m_cia1->read(space, offset & 0x0f);
 				break;
 
 			case 1: // CIA2
-				data = mos6526_r(m_cia2, offset & 0x0f);
+				data = m_cia2->read(space, offset & 0x0f);
 				break;
 
 			case 2: // I/O1
@@ -211,7 +211,7 @@ WRITE8_MEMBER( c64_state::write )
 			break;
 
 		case 1: // SID
-			sid6581_w(m_sid, offset & 0x1f, data);
+			m_sid->write(space, offset & 0x1f, data);
 			break;
 
 		case 2: // COLOR
@@ -222,11 +222,11 @@ WRITE8_MEMBER( c64_state::write )
 			switch ((offset >> 8) & 0x03)
 			{
 			case 0: // CIA1
-				mos6526_w(m_cia1, offset & 0x0f, data);
+				m_cia1->write(space, offset & 0x0f, data);
 				break;
 
 			case 1: // CIA2
-				mos6526_w(m_cia2, offset & 0x0f, data);
+				m_cia2->write(space, offset & 0x0f, data);
 				break;
 
 			case 2: // I/O1
@@ -422,7 +422,7 @@ static MOS6567_INTERFACE( vic_intf )
 
 
 //-------------------------------------------------
-//  sid6581_interface sid_intf
+//  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( c64_state::sid_potx_r )
@@ -539,7 +539,6 @@ WRITE8_MEMBER( c64_state::cia1_pb_w )
 
 static const mos6526_interface cia1_intf =
 {
-	10,
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, cia1_irq_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, sp1_w),
@@ -623,7 +622,6 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 
 static const mos6526_interface cia2_intf =
 {
-	10,
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, cia2_irq_w),
 	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pc2_w),
 	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, sp2_w),
@@ -1009,8 +1007,8 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
@@ -1108,8 +1106,8 @@ static MACHINE_CONFIG_START( pal, c64_state )
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
@@ -1185,8 +1183,8 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
 	MCFG_CBM_IEC_BUS_ADD(iec_intf)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)

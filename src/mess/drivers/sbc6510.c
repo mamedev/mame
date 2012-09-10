@@ -249,7 +249,6 @@ WRITE8_MEMBER( sbc6510_state::key_w )
 
 const mos6526_interface cia_intf =
 {
-	10,		// time-of-day clock 1/10 second - no idea about this
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE), // irq
 	DEVCB_NULL,	// pc (timer related) not connected
 	DEVCB_NULL,	// cnt (serial related) not connected
@@ -277,7 +276,7 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_SOUND_CONFIG(sbc6510_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_MOS6526R1_ADD("cia6526", XTAL_1MHz, cia_intf)
+	MCFG_MOS6526R1_ADD("cia6526", XTAL_1MHz, 50, cia_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

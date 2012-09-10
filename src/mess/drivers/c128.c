@@ -169,6 +169,19 @@ It would be also possible to dump the BIOS in monitor, but it would be preferabl
 to use an EEPROM reader, in order to obtain a dump of the whole content.
 */
 
+/*
+
+	TODO:
+
+	- connect to PLA
+	- clean up ROMs
+	- wire up function ROM softlist
+	- remove banking code from machine/c128.h
+	- inherit from c64_state and use common members from there
+	- clean up inputs
+	- fix fast serial
+
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -212,8 +225,9 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
  * 0xe000-0xffff ram as bank 0
  */
 
-void c128_state::bankswitch_pla(offs_t offset, int ba, int rw, int aec, int z80io, int ma5, int ma4, int ms3, int ms2, int ms1, int ms0,
-		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb)
+void c128_state::bankswitch_pla(offs_t offset, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
+		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic,
+		int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb)
 {
 	//int game = m_exp->game_r(offset, ba, rw, m_hiram);
 	//int exrom = m_exp->exrom_r(offset, ba, rw, m_hiram);
@@ -221,15 +235,18 @@ void c128_state::bankswitch_pla(offs_t offset, int ba, int rw, int aec, int z80i
 	//int _128_256 = 1;
 }
 
-UINT8 c128_state::read_memory(offs_t offset, int ba, int aec, int z80io)
+UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
-	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1;
-	//offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3);
-	int cas, gwe, rom1, rom2, rom3, rom4, charom, colorram, vic, from1, romh, roml, dwe, ioacc, clrbank, iocs, casenb;
-	//int io1 = 1, io2 = 1;
+	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
+	int cas = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
+		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
+	int io1 = 1, io2 = 1;
 
-	bankswitch_pla(offset, ba, rw, aec, z80io, 0, 0, ms3, ms2, ms1, ms0,
-		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, &from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+
+	bankswitch_pla(offset, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
+		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
+		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
 
 	UINT8 data = 0xff;
 
@@ -238,178 +255,233 @@ UINT8 c128_state::read_memory(offs_t offset, int ba, int aec, int z80io)
 		data = m_vic->bus_r();
 	}
 
-	if (!cas)
+	if (!casenb)
 	{
-
+		if (!cas0)
+		{
+			data = m_ram->pointer()[(ta & 0xff00) | (offset & 0xff)];
+		}
+		else if (!cas1)
+		{
+			data = m_ram->pointer()[0x10000 | (ta & 0xff00) | (offset & 0xff)];
+		}
 	}
 	else if (!rom1)
 	{
-
+		if (m_rom3)
+		{
+			data = m_rom1[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
+		}
+		else
+		{
+			data = m_rom1[(ms3 << 14) | ((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
+		}
 	}
-	else if (!rom2)
+	else if (!rom2 && m_rom3)
 	{
-
+		data = m_rom2[offset & 0x3fff];
 	}
 	else if (!rom3)
 	{
-
+		if (m_rom3)
+		{
+			data = m_rom3[offset & 0x3fff];
+		}
+		else
+		{
+			data = m_rom2[(BIT(offset, 15) << 14) | (offset & 0x3fff)];
+		}
 	}
-	else if (!rom4)
+	else if (!rom4 && m_rom3)
 	{
-
+		data = m_rom4[(ta & 0x1000) | (offset & 0x2fff)];
 	}
 	else if (!charom)
 	{
-
+		data = m_charom[(ms3 << 12) | (ta & 0xf00) | (offset & 0xff)];
 	}
 	else if (!colorram)
 	{
-
+		data = m_color_ram[(clrbank << 10) | (ta & 0x300) | (offset & 0xff)] & 0x0f;
 	}
 	else if (!vic)
 	{
-
+		data = m_vic->read(space, offset & 0x3f);
 	}
 	else if (!from1)
 	{
-
+		data = m_from[offset & 0x7fff];
 	}
-	else if (!iocs)
+	else if (!iocs && BIT(offset, 10))
 	{
-		switch (offset)
+		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
 		{
 		case 0: // SID
+			data = m_sid->read(space, offset & 0x1f);
 			break;
 
 		case 2: // CS8563
+			if BIT(offset, 0)
+			{
+				data = m_vdc->register_r(space, 0);
+			}
+			else
+			{
+				data = m_vdc->status_r(space, 0);
+			}
 			break;
 
 		case 4: // CIA1
+			data = m_cia1->read(space, offset & 0x0f);
 			break;
 
 		case 5: // CIA2
+			data = m_cia2->read(space, offset & 0x0f);
 			break;
 
 		case 6: // I/O1
+			io1 = 0;
 			break;
 
 		case 7: // I/O2
+			io2 = 0;
 			break;
 		}
 	}
 
-	return data;//m_exp->cd_r(space, offset, data, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(space, ta, data, ba, roml, romh, io1, io2);
+
+	return m_mmu->read(offset, data);
 }
 
-void c128_state::write_memory(offs_t offset, UINT8 data, int ba, int aec, int z80io)
+void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io)
 {
-	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1;
-	//offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3);
-	int cas, gwe, rom1, rom2, rom3, rom4, charom, colorram, vic, from1, romh, roml, dwe, ioacc, clrbank, iocs, casenb;
-	//int io1 = 1, io2 = 1;
+	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
+	int cas = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
+		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
+	int io1 = 1, io2 = 1;
 
-	bankswitch_pla(offset, ba, rw, aec, z80io, 0, 0, ms3, ms2, ms1, ms0,
-		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, &from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 
-	if (!cas)
+	bankswitch_pla(offset, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
+		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
+		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
+
+	if (!casenb && !dwe)
 	{
-
+		if (!cas0)
+		{
+			m_ram->pointer()[(ta & 0xff00) | (offset & 0xff)] = data;
+		}
+		else if (!cas1)
+		{
+			m_ram->pointer()[0x10000 | (ta & 0xff00) | (offset & 0xff)] = data;
+		}
 	}
-	else if (!gwe)
+	else if (!colorram && !gwe)
 	{
-
-	}
-	else if (!rom1)
-	{
-
-	}
-	else if (!rom2)
-	{
-
-	}
-	else if (!rom3)
-	{
-
-	}
-	else if (!rom4)
-	{
-
-	}
-	else if (!charom)
-	{
-
-	}
-	else if (!colorram)
-	{
-
+		m_color_ram[(clrbank << 10) | (ta & 0x300) | (offset & 0xff)] = data | 0xf0;
 	}
 	else if (!vic)
 	{
-
+		m_vic->write(space, offset & 0x3f, data);
 	}
-	else if (!from1)
+	else if (!iocs && BIT(offset, 10))
 	{
+		switch ((BIT(offset, 11) << 2) | ((offset >> 8) & 0x03))
+		{
+		case 0: // SID
+			m_sid->write(space, offset & 0x1f, data);
+			break;
 
+		case 2: // CS8563
+			if BIT(offset, 0)
+			{
+				m_vdc->register_w(space, 0, data);
+			}
+			else
+			{
+				m_vdc->address_w(space, 0, data);
+			}
+			break;
+
+		case 4: // CIA1
+			m_cia1->write(space, offset & 0x0f, data);
+			break;
+
+		case 5: // CIA2
+			m_cia2->write(space, offset & 0x0f, data);
+			break;
+
+		case 6: // I/O1
+			io1 = 0;
+			break;
+
+		case 7: // I/O2
+			io2 = 0;
+			break;
+		}
 	}
-	else if (!dwe)
-	{
 
-	}
-	else if (!iocs)
-	{
+	m_exp->cd_w(space, ta, data, ba, roml, romh, io1, io2);
 
-	}
-
-	//m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);
+	m_mmu->write(space, offset, data);
 }
 
 READ8_MEMBER( c128_state::z80_r )
 {
 	int ba = 1, aec = 1, z80io = 1;
+	offs_t vma = 0;
 
-	return read_memory(offset, ba, aec, z80io);
+	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::z80_w )
 {
 	int ba = 1, aec = 1, z80io = 1;
+	offs_t vma = 0;
 	
-	write_memory(offset, data, ba, aec, z80io);
+	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
 READ8_MEMBER( c128_state::z80_io_r )
 {
 	int ba = 1, aec = 1, z80io = 0;
+	offs_t vma = 0;
 	
-	return read_memory(offset, ba, aec, z80io);
+	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::z80_io_w )
 {
 	int ba = 1, aec = 1, z80io = 0;
+	offs_t vma = 0;
 	
-	write_memory(offset, data, ba, aec, z80io);
+	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
 READ8_MEMBER( c128_state::read )
 {
 	int ba = 1, aec = 1, z80io = 1;
+	offs_t vma = 0;
 	
-	return read_memory(offset, ba, aec, z80io);
+	return read_memory(space, vma, offset, ba, aec, z80io);
 }
 
 WRITE8_MEMBER( c128_state::write )
 {
 	int ba = 1, aec = 1, z80io = 1;
+	offs_t vma = 0;
 	
-	write_memory(offset, data, ba, aec, z80io);
+	write_memory(space, offset, vma, data, ba, aec, z80io);
 }
 
 READ8_MEMBER( c128_state::vic_videoram_r )
 {
 	int ba = 0, aec = 0, z80io = 1;
+	offs_t vma = 0;
 	
-	return read_memory(offset, ba, aec, z80io);
+	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
 
@@ -436,9 +508,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_io, AS_IO, 8, c128_state )
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE_LEGACY(c64_colorram_read, c64_colorram_write)
 	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE(MOS8564_TAG, mos6566_device, read, write)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE_LEGACY(MOS6581_TAG, sid6581_r, sid6581_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE(MOS6581_TAG, sid6581_device, read, write)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(mmu8722_port_r, mmu8722_port_w)
-	//AM_RANGE(0xd600, 0xd7ff) AM_DEVREADWRITE_LEGACY(MOS8563_TAG, vdc8563_port_r, vdc8563_port_w)
 	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x1fe) AM_DEVREADWRITE(MOS8563_TAG, mos8563_device, status_r, address_w)
 	AM_RANGE(0xd601, 0xd601) AM_MIRROR(0x1fe) AM_DEVREADWRITE(MOS8563_TAG, mos8563_device, register_r, register_w)
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE_LEGACY(MOS6526_1_TAG, mos6526_r, mos6526_w)
@@ -749,12 +820,20 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
 {
-
+	if (state)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( c128_state::mmu_fsdir_w )
 {
-	
 }
 
 READ_LINE_MEMBER( c128_state::mmu_game_r )
@@ -823,19 +902,12 @@ static MOS8564_INTERFACE( vic_intf )
 //  mc6845_interface vdc_intf
 //-------------------------------------------------
 
-static MC6845_UPDATE_ROW( vdc_update_row )
-{
-    mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
-
-    mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
-}
-
 static const mc6845_interface vdc_intf =
 {
 	SCREEN_VDC_TAG,
 	8,
 	NULL,
-	vdc_update_row,
+	NULL,
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -846,20 +918,40 @@ static const mc6845_interface vdc_intf =
 
 
 //-------------------------------------------------
-//  sid6581_interface sid_intf
+//  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
 READ8_MEMBER( c128_state::sid_potx_r )
 {
-	return c64_paddle_read(m_sid, 0);
+	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
+	
+	int sela = BIT(cia1_pa, 6);
+	int selb = BIT(cia1_pa, 7);
+
+	UINT8 data = 0;
+
+	if (sela) data = m_joy1->pot_x_r();
+	if (selb) data = m_joy2->pot_x_r();
+
+	return data;
 }
 
 READ8_MEMBER( c128_state::sid_poty_r )
 {
-	return c64_paddle_read(m_sid, 1);
+	UINT8 cia1_pa = mos6526_pa_r(m_cia1, 0);
+	
+	int sela = BIT(cia1_pa, 6);
+	int selb = BIT(cia1_pa, 7);
+
+	UINT8 data = 0;
+
+	if (sela) data = m_joy1->pot_y_r();
+	if (selb) data = m_joy2->pot_y_r();
+
+	return data;
 }
 
-static const sid6581_interface sid_intf =
+static MOS6581_INTERFACE( sid_intf )
 {
 	DEVCB_DRIVER_MEMBER(c128_state, sid_potx_r),
 	DEVCB_DRIVER_MEMBER(c128_state, sid_poty_r)
@@ -879,6 +971,7 @@ static M6510_INTERFACE( cpu_intf )
 	0x07,
 	0x20
 };
+
 
 //-------------------------------------------------
 //  CBM_IEC_INTERFACE( cbm_iec_intf )
@@ -904,6 +997,35 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 };
 
 
+//-------------------------------------------------
+//  C64_EXPANSION_INTERFACE( expansion_intf )
+//-------------------------------------------------
+
+static C64_EXPANSION_INTERFACE( expansion_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  C64_USER_PORT_INTERFACE( user_intf )
+//-------------------------------------------------
+
+static C64_USER_PORT_INTERFACE( user_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -914,25 +1036,24 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( ntsc, c128_state )
-	/* basic machine hardware */
+	// basic hardware
 	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( z80_mem)
 	MCFG_CPU_IO_MAP( z80_io)
 	MCFG_CPU_VBLANK_INT(SCREEN_VIC_TAG, c128_frame_interrupt)
-	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
+	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
 	MCFG_CPU_ADD(M8502_TAG, M8502, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( m8502_mem)
 	MCFG_CPU_CONFIG( cpu_intf )
 	MCFG_CPU_VBLANK_INT(SCREEN_VIC_TAG, c128_frame_interrupt)
-	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
+	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
-	/* video hardware */
-	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
+	// video hardware
+	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, VIC6567_CLOCK*2, vdc_intf, vdc_videoram_map)
 	MCFG_MOS8564_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, 2000000, vdc_intf, vdc_videoram_map)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6567_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
@@ -940,19 +1061,34 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* quickload */
+	// devices
+	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, c128_cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, c128_cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-
-	/* cassette */
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
-	/* cia */
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, c128_ntsc_cia0)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, c128_ntsc_cia1)
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c128", "c128_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c128", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("disk_list_c64", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("disk_list_c128", "c128_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list_c128", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("from_list", "c128_rom")
+	MCFG_SOFTWARE_LIST_FILTER("from_list", "NTSC")
 
-	MCFG_FRAGMENT_ADD(c64_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("c64_disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 
@@ -1006,25 +1142,24 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( pal, c128_state )
-	/* basic machine hardware */
+	// basic hardware
 	MCFG_CPU_ADD(Z80A_TAG, Z80, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( z80_mem)
-	MCFG_CPU_IO_MAP( z80_io)
+	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_CPU_VBLANK_INT(SCREEN_VIC_TAG, c128_frame_interrupt)
-	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
+	MCFG_QUANTUM_PERFECT_CPU(Z80A_TAG)
 
 	MCFG_CPU_ADD(M8502_TAG, M8502, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( m8502_mem)
 	MCFG_CPU_CONFIG( cpu_intf )
 	MCFG_CPU_VBLANK_INT(SCREEN_VIC_TAG, c128_frame_interrupt)
-	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
+	MCFG_QUANTUM_PERFECT_CPU(M8502_TAG)
 
-	/* video hardware */
-	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
-	MCFG_MOS8566_ADD(MOS8566_TAG, SCREEN_VIC_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
-	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, 2000000, vdc_intf, vdc_videoram_map)
+	// video hardware
+	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, VIC6569_CLOCK*2, vdc_intf, vdc_videoram_map)
+	MCFG_MOS8564_ADD(MOS8564_TAG, SCREEN_VIC_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
@@ -1032,19 +1167,34 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* quickload */
+	// devices
+	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, c128_cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, c128_cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-
-	/* cassette */
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
-	/* cia */
-	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, c128_ntsc_cia0)
-	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, c128_ntsc_cia1)
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c128", "c128_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c128", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("disk_list_c64", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list_c64", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("disk_list_c128", "c128_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list_c128", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("from_list", "c128_rom")
+	MCFG_SOFTWARE_LIST_FILTER("from_list", "PAL")
 
-	MCFG_FRAGMENT_ADD(c64_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("c64_disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_ADD("c128_disk_list", "c128_flop")
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 

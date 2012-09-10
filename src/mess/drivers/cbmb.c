@@ -137,7 +137,7 @@ static ADDRESS_MAP_START(cbmb_mem , AS_PROGRAM, 8, cbmb_state )
 	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE_LEGACY("sid6581", sid6581_r, sid6581_w)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_device, read, write)
 	/* db00 coprocessor */
 	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE_LEGACY("cia", mos6526_r, mos6526_w)
 	/* dd00 acia */
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START(p500_mem , AS_PROGRAM, 8, cbmb_state )
 	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_SHARE("colorram")		/* colorram */
 	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE("vic6567", mos6566_device, read, write)
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE_LEGACY("sid6581", sid6581_r, sid6581_w)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_device, read, write)
 	/* db00 coprocessor */
 	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE_LEGACY("cia", mos6526_r, mos6526_w)
 	/* dd00 acia */
@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbmb, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MCFG_MOS6526R1_ADD("cia", 7833600, cbmb_cia)
+	MCFG_MOS6526R1_ADD("cia", 7833600, 60, cbmb_cia)
 
 	/* tpi */
 	MCFG_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)
@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MCFG_MOS6526R1_ADD("cia", VIC6567_CLOCK, cbmb_cia)
+	MCFG_MOS6526R1_ADD("cia", VIC6567_CLOCK, 60, cbmb_cia)
 
 	/* tpi */
 	MCFG_TPI6525_ADD("tpi6525_0", cbmb_tpi_0_intf)

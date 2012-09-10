@@ -259,7 +259,6 @@ WRITE_LINE_DEVICE_HANDLER( cbmb_irq )
 
 const mos6526_interface cbmb_cia =
 {
-	60,
 	DEVCB_DEVICE_LINE("tpi6525_0", tpi6525_i2_w),
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
