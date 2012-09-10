@@ -2633,7 +2633,7 @@ static MACHINE_CONFIG_DERIVED( aw_base, naomi_aw_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aw_map)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", "maincpu", naomi_g1_irq)
+	MCFG_AW_ROM_BOARD_ADD("rom_board", ":rom_key", "maincpu", naomi_g1_irq)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( aw1c, aw_base )
@@ -7861,6 +7861,23 @@ ROM_START( rumblef2 )
 	ROM_LOAD( "ax3401f01.bin", 0, 4, CRC(952919a1) SHA1(d343fdbbd1d8b651401133f21facc1584bb66c04) )
 ROM_END
 
+ROM_START( claychal )
+	AW_BIOS
+
+	ROM_REGION( 0x8000100, "rom_board", ROMREGION_ERASE)
+    ROM_LOAD( "u3.bin",       0x0000000, 0x1000100, CRC(5bb65194) SHA1(5fa8c38e6aadf5d999e260da24b001c0c7805d48) ) 
+    ROM_LOAD( "u1.bin",       0x1000000, 0x1000100, CRC(526fc1af) SHA1(dd8a37fa73a9ef193b6f4fb962345bdfc4854b5d) ) 
+    ROM_LOAD( "u4.bin",       0x2000000, 0x1000100, CRC(55f4e762) SHA1(a11f7d69458e647dd2b8d86c98a54f309b1f1bbc) ) 
+    ROM_LOAD( "u2.bin",       0x3000000, 0x1000100, CRC(c40dae68) SHA1(29ec47c76373eeaa686684f10907d551de7d9c59) ) 
+    ROM_LOAD( "u15.bin",      0x4000000, 0x1000100, CRC(b82dcb0a) SHA1(36dc89a388ac0c7e0a0e72428c8149cbda12805a) ) 
+    ROM_LOAD( "u17.bin",      0x5000000, 0x1000100, CRC(2f973eb4) SHA1(45409b5517cda119315f198892224889ac3a0f53) ) 
+    ROM_LOAD( "u14.bin",      0x6000000, 0x1000100, CRC(2e7d966f) SHA1(3304fd0c5140a13f6fe2ea9aaa74d7885e1505e1) ) 
+    ROM_LOAD( "u16.bin",      0x7000000, 0x1000100, CRC(14f8ca87) SHA1(778c048da9434ffda600e35ad5aca29e02cc98c0) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )
+    ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) ) 
+ROM_END
+
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -8167,3 +8184,4 @@ GAME( 2005, kofnwj,   kofnw,    aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sam
 GAME( 2005, xtrmhunt, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sammy",                           "Extreme Hunting", GAME_FLAGS )
 GAME( 2006, mslug6,   awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega / SNK Playmore",             "Metal Slug 6", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, xtrmhnt2, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega",                            "Extreme Hunting 2", GAME_FLAGS )
+GAME( 2008, claychal, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega",                            "Sega Clay Challenge", GAME_FLAGS )
