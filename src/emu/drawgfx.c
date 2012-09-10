@@ -250,8 +250,8 @@ gfx_element::gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UI
 	  m_char_modulo(0),
 	  m_srcdata(base),
 	  m_dirtyseq(1),
-	  m_gfxdata(NULL),
-	  m_layout_is_raw(false),
+	  m_gfxdata(base),
+	  m_layout_is_raw(true),
 	  m_layout_planes(0),
 	  m_layout_charincrement(0),
 	  m_machine(machine)

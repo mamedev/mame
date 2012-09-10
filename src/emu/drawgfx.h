@@ -156,7 +156,7 @@ public:
 	const UINT8 *get_data(UINT32 code)
 	{
 		assert(code < elements());
-		if (m_dirty[code]) decode(code); 
+		if (code < m_dirty.count() && m_dirty[code]) decode(code); 
 		return m_gfxdata + code * m_char_modulo + m_starty * m_line_modulo + m_startx;
 	}
 	
