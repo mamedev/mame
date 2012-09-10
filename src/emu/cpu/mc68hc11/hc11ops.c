@@ -645,6 +645,27 @@ static void HC11OP(aslb)(hc11_state *cpustate)
 	CYCLES(cpustate, 2);
 }
 
+/* ASL EXT             0x78 */
+static void HC11OP(asl_ext)(hc11_state *cpustate)
+{
+	UINT16 adr = FETCH16(cpustate);
+	UINT8 i = READ8(cpustate, adr);
+	UINT16 r = i << 1;
+	CLEAR_NZVC(cpustate);
+	SET_C8(r);
+	WRITE8(cpustate, adr, r);
+	SET_N8(r);
+	SET_Z8(r);
+
+	if (((cpustate->ccr & CC_N) && (cpustate->ccr & CC_C) == 0) ||
+		((cpustate->ccr & CC_N) == 0 && (cpustate->ccr & CC_C)))
+	{
+		cpustate->ccr |= CC_V;
+	}
+
+	CYCLES(cpustate, 6);
+}
+
 /* BITA IMM         0x85 */
 static void HC11OP(bita_imm)(hc11_state *cpustate)
 {
@@ -773,6 +794,19 @@ static void HC11OP(bcc)(hc11_state *cpustate)
 		SET_PC(cpustate, cpustate->ppc + rel + 2);
 	}
 	CYCLES(cpustate, 3);
+}
+
+/* BCLR DIR       0x15 */
+static void HC11OP(bclr_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT8 mask = FETCH(cpustate);
+	UINT8 r = READ8(cpustate, d) & ~mask;
+	WRITE8(cpustate, d, r);
+	CLEAR_NZV(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	CYCLES(cpustate, 6);
 }
 
 /* BCLR INDX       0x1d */
@@ -965,6 +999,19 @@ static void HC11OP(brn)(hc11_state *cpustate)
 	/* with this opcode the branch condition is always false. */
 	SET_PC(cpustate, cpustate->ppc + 2);
 	CYCLES(cpustate, 3);
+}
+
+/* BSET DIR       0x14 */
+static void HC11OP(bset_dir)(hc11_state *cpustate)
+{
+	UINT8 d = FETCH(cpustate);
+	UINT8 mask = FETCH(cpustate);
+	UINT8 r = READ8(cpustate, d) | mask;
+	WRITE8(cpustate, d, r);
+	CLEAR_NZV(cpustate);
+	SET_N8(r);
+	SET_Z8(r);
+	CYCLES(cpustate, 6);
 }
 
 /* BSET INDX       0x1c */
