@@ -2971,7 +2971,9 @@ TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing )
 
 		vdp->vdp_handle_scanline_callback(timer.machine(), param);
 
-		timer.machine().primary_screen->update_partial(timer.machine().primary_screen->vpos()-1);
+		int vpos = timer.machine().primary_screen->vpos();
+		if (vpos > 0)
+			timer.machine().primary_screen->update_partial(vpos-1);
 	}
 }
 
