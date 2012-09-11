@@ -544,7 +544,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
 			break;
 
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", cpu_get_pc(&space.device()), offset);
+			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", space.device().safe_pc(), offset);
 			break;
 	}
 	return result;
@@ -616,7 +616,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 
 		// no other writes known
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", cpu_get_pc(&space.device()), offset, data);
+			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", space.device().safe_pc(), offset, data);
 			break;
 	}
 }
@@ -1097,13 +1097,13 @@ WRITE8_MEMBER( simutrek_special_device::i8748_port2_w )
 	{
 		int direction = (data & 0x08) ? 1 : -1;
 		if (LOG_SIMUTREK)
-			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", screen().vpos(), cpu_get_pc(&space.device()));
+			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", screen().vpos(), space.device().safe_pc());
 		advance_slider(direction);
 	}
 
 	// bit $04 controls who owns the JUMP TRG command
 	if (LOG_SIMUTREK && ((data ^ prev) & 0x04))
-		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", screen().vpos(), (data >> 2) & 1, cpu_get_pc(&space.device()));
+		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", screen().vpos(), (data >> 2) & 1, space.device().safe_pc());
 	m_controlnext = (~data >> 2) & 1;
 
 	// bits $03 control something (status?)

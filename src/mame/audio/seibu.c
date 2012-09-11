@@ -383,7 +383,7 @@ static WRITE8_HANDLER( seibu_pending_w )
 
 READ16_HANDLER( seibu_main_word_r )
 {
-	//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(&space->device()),offset);
+	//logerror("%06x: seibu_main_word_r(%x)\n",space->device().safe_pc(),offset);
 	switch (offset)
 	{
 		case 2:
@@ -392,14 +392,14 @@ READ16_HANDLER( seibu_main_word_r )
 		case 5:
 			return main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(&space->device()),offset);
+			//logerror("%06x: seibu_main_word_r(%x)\n",space->device().safe_pc(),offset);
 			return 0xffff;
 	}
 }
 
 WRITE16_HANDLER( seibu_main_word_w )
 {
-	//printf("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(&space->device()),offset,data);
+	//printf("%06x: seibu_main_word_w(%x,%02x)\n",space->device().safe_pc(),offset,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -418,7 +418,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub_pending = 1;
 				break;
 			default:
-				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(&space->device()),offset,data);
+				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",space->device().safe_pc(),offset,data);
 				break;
 		}
 	}

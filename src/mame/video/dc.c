@@ -1014,7 +1014,7 @@ READ64_HANDLER( pvr_ta_r )
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, state->pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, state->pvrta_regs[reg], offset, reg, mem_mask, space->device().safe_pc());
 	#endif
 	return (UINT64)state->pvrta_regs[reg] << shift;
 }
@@ -2739,7 +2739,7 @@ READ32_HANDLER( elan_regs_r )
 		case 0x78/4: // IRQ MASK
 			return 0;
 		default:
-			printf("%08x %08x\n",cpu_get_pc(&space->device()),offset*4);
+			printf("%08x %08x\n",space->device().safe_pc(),offset*4);
 			break;
 	}
 
@@ -2751,7 +2751,7 @@ WRITE32_HANDLER( elan_regs_w )
 	switch(offset)
 	{
 		default:
-			printf("%08x %08x %08x W\n",cpu_get_pc(&space->device()),offset*4,data);
+			printf("%08x %08x %08x W\n",space->device().safe_pc(),offset*4,data);
 			break;
 	}
 }

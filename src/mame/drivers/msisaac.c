@@ -145,7 +145,7 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(&space.device()), m_mcu_val);
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", space.device().safe_pc(), m_mcu_val);
 			return m_mcu_val;
 	}
 #endif
@@ -166,7 +166,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 	buggychl_mcu_w(offset,data);
 #else
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x", cpu_get_pc(&space.device()), data);
+	//  popmessage("PC = %04x %02x", space.device().safe_pc(), data);
 	m_mcu_val = data;
 #endif
 }

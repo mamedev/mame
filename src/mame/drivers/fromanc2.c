@@ -63,7 +63,7 @@ READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 	case 0x04:	ret = ioport("KEY2")->read(); break;
 	case 0x08:	ret = ioport("KEY3")->read(); break;
 	default:	ret = 0xffff;
-			logerror("PC:%08X unknown %02X\n", cpu_get_pc(&space.device()), m_portselect);
+			logerror("PC:%08X unknown %02X\n", space.device().safe_pc(), m_portselect);
 			break;
 	}
 

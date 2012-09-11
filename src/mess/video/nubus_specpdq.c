@@ -291,7 +291,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			break;
 
 		case 0x120000:	// DAC address
-//          printf("%08x to DAC control (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
 			m_clutoffs = ((data>>8)&0xff)^0xff;
 			break;
 
@@ -300,7 +300,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 			if (m_count == 3)
 			{
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
+//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
 				palette_set_color(space.machine(), m_clutoffs, MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]));
 				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
@@ -386,40 +386,40 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 		// blitter control
 		case 0x182006:
-//          printf("%08x (%d) to blitter ctrl 1 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 1 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
 			break;
 
 		case 0x182008:
-//          printf("%08x (%d) to blitter ctrl 2 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 2 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
 			m_patofsx = (data ^ 0xffffffff) & 7;
 			m_patofsy = ((data ^ 0xffffffff)>>3) & 7;
 			break;
 
 		case 0x18200e:
-//          printf("%08x (%d) to blitter ctrl 3 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 3 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
 			m_width = data ^ 0xffffffff;
 			break;
 
 		case 0x18200b:
-//          printf("%08x (%d) to blitter ctrl 4 (PC=%x)\n", data^0xffffffff, data^0xffffffff, cpu_get_pc(&space.device()));
+//          printf("%08x (%d) to blitter ctrl 4 (PC=%x)\n", data^0xffffffff, data^0xffffffff, space.device().safe_pc());
 			m_height = (data ^ 0xffffffff) & 0xffff;
 			break;
 
 		case 0x18200a:
 			data ^= 0xffffffff;
-//          printf("%08x to blitter ctrl 5 (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to blitter ctrl 5 (PC=%x)\n", data, space.device().safe_pc());
 			m_vram_src = data>>2;
 			break;
 
 		case 0x182009:
 			data ^= 0xffffffff;
-//          printf("%08x to blitter ctrl 6 (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to blitter ctrl 6 (PC=%x)\n", data, space.device().safe_pc());
 			m_vram_addr = data>>2;
 			break;
 
 		case 0x182007:
 			data ^= 0xffffffff;
-//          printf("%08x to blitter ctrl 7 (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          printf("%08x to blitter ctrl 7 (PC=%x)\n", data, space.device().safe_pc());
 
 			// fill rectangle
 			if (data == 2)
@@ -460,14 +460,14 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			break;
 
 		default:
-//          printf("specpdq_w: %08x @ %x (mask %08x  PC=%x)\n", data^0xffffffff, offset, mem_mask, cpu_get_pc(&space.device()));
+//          printf("specpdq_w: %08x @ %x (mask %08x  PC=%x)\n", data^0xffffffff, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 }
 
 READ32_MEMBER( nubus_specpdq_device::specpdq_r )
 {
-//  if (offset != 0xc005c && offset != 0xc005e) printf("specpdq_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+//  if (offset != 0xc005c && offset != 0xc005e) printf("specpdq_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 
 	if (offset >= 0xc0000 && offset < 0x100000)
 	{

@@ -130,7 +130,7 @@ WRITE8_MEMBER(chaknpop_state::unknown_port_2_w)
 
 WRITE8_MEMBER(chaknpop_state::coinlock_w)
 {
-	logerror("%04x: coin lock %sable\n", cpu_get_pc(&space.device()), data ? "dis" : "en");
+	logerror("%04x: coin lock %sable\n", space.device().safe_pc(), data ? "dis" : "en");
 }
 
 

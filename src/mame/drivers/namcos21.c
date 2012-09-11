@@ -342,20 +342,20 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	UINT16 result = 0;
 	if( m_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( cpu_get_pc(&space.device()) )
+		switch( space.device().safe_pc() )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(&space.device()) );
+			logerror( "unk cuskey_r; pc=0x%x\n", space.device().safe_pc() );
 			break;
 		}
 	}
 	else if( m_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( cpu_get_pc(&space.device()) )
+		switch( space.device().safe_pc() )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -366,7 +366,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	}
 	else if( m_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( cpu_get_pc(&space.device()) )
+		switch( space.device().safe_pc() )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -880,7 +880,7 @@ WRITE16_MEMBER(namcos21_state::slave_port3_w)
 
 WRITE16_MEMBER(namcos21_state::slave_XF_output_w)
 {
-	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(&space.device()), data );
+	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", space.device().safe_pc(), data );
 } /* slave_XF_output_w */
 
 READ16_MEMBER(namcos21_state::slave_portf_r)
@@ -935,7 +935,7 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 #if 0
 	logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
 		cpu->tag,
-		cpu_get_pc(cpu),
+		cpu->safe_pc(),
 		offset,
 		m_pointram_control );
 
@@ -1120,7 +1120,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspcomram_w)
 
 READ16_MEMBER(namcos21_state::winrun_cuskey_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */

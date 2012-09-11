@@ -348,7 +348,7 @@ READ16_MEMBER(taitof2_state::ninjak_input_r)
 //          return (coin_word & mem_mask);
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", space.device().safe_pc(), offset);
 
 	return 0xff;
 }
@@ -372,7 +372,7 @@ READ16_MEMBER(taitof2_state::cameltry_paddle_r)
 			return res;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", space.device().safe_pc(), offset);
 
 	return 0;
 }
@@ -392,7 +392,7 @@ READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 		}
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", space.device().safe_pc(), offset);
 
 	return 0xff;
 }
@@ -418,7 +418,7 @@ READ16_MEMBER(taitof2_state::mjnquest_input_r)
 
 	}
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(&space.device()), m_mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", space.device().safe_pc(), m_mjnquest_input);
 
 	return 0xff;
 }
@@ -663,7 +663,7 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 WRITE16_MEMBER(taitof2_state::cchip2_word_w)
 {
 
-	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(&space.device()), offset, data);
+	logerror("cchip2_w pc: %06x offset %04x: %02x\n", space.device().safe_pc(), offset, data);
 
 	COMBINE_DATA(&m_cchip2_ram[offset]);
 }

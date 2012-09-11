@@ -107,7 +107,7 @@ READ16_MEMBER(esd16_state::esd_eeprom_r)
 		return ((m_eeprom->read_bit() & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(&space.device()), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", space.device().safe_pc(), mem_mask);
 	return 0;
 }
 
@@ -116,7 +116,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	if (ACCESSING_BITS_8_15)
 		ioport("EEPROMOUT")->write(data, 0xffff);
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(&space.device()), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 }
 
 

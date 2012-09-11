@@ -34,7 +34,7 @@ READ8_MEMBER(aeroboto_state::aeroboto_201_r)
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	static const UINT8 res[4] = { 0xff, 0x9f, 0x1b, 0x03 };
 
-	logerror("PC %04x: read 3004\n", cpu_get_pc(&space.device()));
+	logerror("PC %04x: read 3004\n", space.device().safe_pc());
 	return res[(m_count++) & 3];
 }
 

@@ -165,7 +165,7 @@ WRITE32_MEMBER( nubus_mac8390_device::en_w )
     }
     else
     {
-        fatalerror("asntmc3nb: write %08x to DP83902 @ %x with unhandled mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+        fatalerror("asntmc3nb: write %08x to DP83902 @ %x with unhandled mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
     }
 }
 
@@ -183,7 +183,7 @@ READ32_MEMBER( nubus_mac8390_device::en_r )
     }
     else
     {
-        fatalerror("asntmc3nb: read DP83902 @ %x with unhandled mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+        fatalerror("asntmc3nb: read DP83902 @ %x with unhandled mask %08x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
     }
 
     return 0;

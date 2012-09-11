@@ -227,14 +227,14 @@ INTERRUPT_GEN( mexico86_m68705_interrupt )
 READ8_MEMBER(mexico86_state::mexico86_68705_port_a_r)
 {
 
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space.device()), m_port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
 {
 
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
@@ -268,7 +268,7 @@ READ8_MEMBER(mexico86_state::mexico86_68705_port_b_r)
 
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 {
-	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 
 	if (BIT(m_ddr_b, 0) && BIT(~data, 0) && BIT(m_port_b_out, 0))
 	{
@@ -278,7 +278,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 	if (BIT(m_ddr_b, 1) && BIT(data, 1) && BIT(~m_port_b_out, 1)) /* positive edge trigger */
 	{
 		m_address = m_port_a_out;
-		//if (m_address >= 0x80) logerror("%04x: 68705 address %02x\n", cpu_get_pc(&space.device()), m_port_a_out);
+		//if (m_address >= 0x80) logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), m_port_a_out);
 	}
 
 	if (BIT(m_ddr_b, 3) && BIT(~data, 3) && BIT(m_port_b_out, 3))
@@ -287,18 +287,18 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 		{
 			if (data & 0x04)
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(&space.device()), m_protection_ram[m_address], m_address);
+				//logerror("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_protection_ram[m_address], m_address);
 				m_latch = m_protection_ram[m_address];
 			}
 			else
 			{
-				//logerror("%04x: 68705 read input port %04x\n", cpu_get_pc(&space.device()), m_address);
+				//logerror("%04x: 68705 read input port %04x\n", space.device().safe_pc(), m_address);
 				m_latch = ioport((m_address & 1) ? "IN2" : "IN1")->read();
 			}
 		}
 		else    /* write */
 		{
-				//logerror("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(&space.device()), port_a_out, m_address);
+				//logerror("%04x: 68705 write %02x to address %04x\n",space.device().safe_pc(), port_a_out, m_address);
 				m_protection_ram[m_address] = m_port_a_out;
 		}
 	}
@@ -312,12 +312,12 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 
 	if (BIT(m_ddr_b, 6) && BIT(~data, 6) && BIT(m_port_b_out, 6))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
 	}
 
 	if (BIT(m_ddr_b, 7) && BIT(~data, 7) && BIT(m_port_b_out, 7))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
 	}
 
 	m_port_b_out = data;

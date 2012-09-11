@@ -367,9 +367,9 @@ DRIVER_INIT_MEMBER(saturn_state,critcrsh)
 READ32_MEMBER(saturn_state::magzun_hef_hack_r)
 {
 
-	if(cpu_get_pc(&space.device())==0x604bf20) return 0x00000001; //HWEF
+	if(space.device().safe_pc()==0x604bf20) return 0x00000001; //HWEF
 
-	if(cpu_get_pc(&space.device())==0x604bfbe) return 0x00000002; //HREF
+	if(space.device().safe_pc()==0x604bfbe) return 0x00000002; //HREF
 
 	return m_workram_h[0x08e830/4];
 }
@@ -377,7 +377,7 @@ READ32_MEMBER(saturn_state::magzun_hef_hack_r)
 READ32_MEMBER(saturn_state::magzun_rx_hack_r)
 {
 
-	if(cpu_get_pc(&space.device())==0x604c006) return 0x40;
+	if(space.device().safe_pc()==0x604c006) return 0x40;
 
 	return m_workram_h[0x0ff3b4/4];
 }
@@ -653,7 +653,7 @@ bp 6001d22 (60ffef0)
 READ32_MEMBER(saturn_state::astrass_hack_r)
 {
 
-	if(cpu_get_pc(&space.device()) == 0x60011ba) return 0x00000000;
+	if(space.device().safe_pc() == 0x60011ba) return 0x00000000;
 
 	return m_workram_h[0x000770/4];
 }

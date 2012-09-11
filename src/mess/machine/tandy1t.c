@@ -165,9 +165,9 @@ static struct
 
 WRITE8_HANDLER ( pc_t1t_p37x_w )
 {
-//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", cpu_get_pc( &space->device()),offset, data));
+//  DBG_LOG(2,"T1T_p37x_w",("%.5x #%d $%02x\n", space->device().safe_pc( ),offset, data));
 	if (offset!=4)
-		logerror("T1T_p37x_w %.5x #%d $%02x\n", cpu_get_pc( &space->device()),offset, data);
+		logerror("T1T_p37x_w %.5x #%d $%02x\n", space->device().safe_pc( ),offset, data);
 	tandy.data[offset]=data;
 	switch( offset )
 	{
@@ -180,7 +180,7 @@ WRITE8_HANDLER ( pc_t1t_p37x_w )
  READ8_HANDLER ( pc_t1t_p37x_r )
 {
 	int data = tandy.data[offset];
-//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", cpu_get_pc( &space->device()), offset, data));
+//  DBG_LOG(1,"T1T_p37x_r",("%.5x #%d $%02x\n", space->device().safe_pc( ), offset, data));
     return data;
 }
 

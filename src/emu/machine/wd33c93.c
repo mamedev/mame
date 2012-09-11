@@ -487,7 +487,7 @@ WRITE8_MEMBER(wd33c93_device::write)
 
 		case 1:
 		{
-			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", cpu_get_pc(&space.device()), sasr, data ));
+			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", space.device().safe_pc(), sasr, data ));
 
 			/* update the register */
 			regs[sasr] = data;
@@ -495,7 +495,7 @@ WRITE8_MEMBER(wd33c93_device::write)
 			/* if we receive a command, schedule to process it */
 			if ( sasr == WD_COMMAND )
 			{
-				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", cpu_get_pc(&space.device()), data, getunit() ));
+				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", space.device().safe_pc(), data, getunit() ));
 
 				/* signal we're processing it */
 				regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
@@ -646,7 +646,7 @@ READ8_MEMBER(wd33c93_device::read)
 					irq_callback(machine(), 0);
 				}
 
-				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", cpu_get_pc(&space.device()), regs[WD_SCSI_STATUS] ));
+				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", space.device().safe_pc(), regs[WD_SCSI_STATUS] ));
 			}
 			else if ( sasr == WD_DATA )
 			{
@@ -715,7 +715,7 @@ READ8_MEMBER(wd33c93_device::read)
 				}
 			}
 
-			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", cpu_get_pc(&space.device()), regs[WD_DATA] ));
+			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", space.device().safe_pc(), regs[WD_DATA] ));
 
 			/* get the register value */
 			ret = regs[sasr];

@@ -269,7 +269,7 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 	UINT8 *RAM = state->memregion("maincpu")->base();
 	int offs;
 
-	logerror("%04x: bank select %02x\n", cpu_get_pc(device), lines);
+	logerror("%04x: bank select %02x\n", device->safe_pc(), lines);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */

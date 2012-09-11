@@ -1039,7 +1039,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 		logerror("FDC: Drive #%i: Drive selection set to %02x\n",data & 0x03,data);
 		break;
 	default:
-//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",cpu_get_pc(&space->device()),data,offset);
+//      logerror("FDC: [%08x] Wrote %04x to invalid FDC port %04x\n",space->device().safe_pc(),data,offset);
 		break;
 	}
 }
@@ -1255,7 +1255,7 @@ static WRITE16_HANDLER( x68k_sysport_w )
 		state->m_sysport.sram_writeprotect = data;
 		break;
 	default:
-//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",cpu_get_pc(&space->device()),data,offset);
+//      logerror("SYS: [%08x] Wrote %04x to invalid or unimplemented system port %04x\n",space->device().safe_pc(),data,offset);
 		break;
 	}
 }
@@ -1296,7 +1296,7 @@ static READ16_HANDLER( x68k_mfp_r )
 
 	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
     // MFP Timer C, and the power switch
-//  logerror("MFP: [%08x] Reading offset %i\n",cpu_get_pc(&space->device()),offset);
+//  logerror("MFP: [%08x] Reading offset %i\n",space->device().safe_pc(),offset);
     switch(offset)
     {
 #if 0
@@ -1310,7 +1310,7 @@ static READ16_HANDLER( x68k_mfp_r )
 //          ret |= 0x08;  // FM IRQ signal
         if(machine.primary_screen->hpos() > state->m_crtc.width - 32)
             ret |= 0x80;  // Hsync signal
-//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(&space->device()),offset,ret);
+//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",space->device().safe_pc(),offset,ret);
         return ret;  // bit 5 is always 1
     case 3:
         return state->m_mfp.iera;
@@ -1477,7 +1477,7 @@ static WRITE16_HANDLER( x68k_mfp_w )
 			// Keyboard control command.
 			state->m_mfp.usart.send_buffer = data;
 			x68k_keyboard_ctrl_w(state, data);
-//          logerror("MFP: [%08x] USART Sent data %04x\n",cpu_get_pc(&space->device()),data);
+//          logerror("MFP: [%08x] USART Sent data %04x\n",space->device().safe_pc(),data);
 		}
 		break;
 	default:

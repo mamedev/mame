@@ -106,7 +106,7 @@ static INTERRUPT_GEN( avengers_interrupt )
 
 WRITE8_MEMBER(lwings_state::avengers_protection_w)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 
 	if (pc == 0x2eeb)
 	{
@@ -238,7 +238,7 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	int x, y;
 	int dx, dy, dist, dir;
 
-	if (cpu_get_pc(&space.device()) == 0x7c7)
+	if (space.device().safe_pc() == 0x7c7)
 	{
 		/* palette data */
 		return avengers_fetch_paldata(machine());

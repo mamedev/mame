@@ -58,7 +58,7 @@ WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (cpu_get_pc(device->machine().device("maincpu")))
+	switch (device->machine().device("maincpu")->safe_pc())
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -88,16 +88,16 @@ static READ8_HANDLER( mariner_protection_2_r )
 
 READ8_HANDLER( triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(&space->device()));
-	if (cpu_get_pc(&space->device()) == 0x015a) return 0xff;
-	else if (cpu_get_pc(&space->device()) == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",space->device().safe_pc());
+	if (space->device().safe_pc() == 0x015a) return 0xff;
+	else if (space->device().safe_pc() == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_HANDLER( triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(&space->device()));
-	if (cpu_get_pc(&space->device()) == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",space->device().safe_pc());
+	if (space->device().safe_pc() == 0x015d) return 0x04;
 	else return 0;
 }
 

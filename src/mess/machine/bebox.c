@@ -170,7 +170,7 @@ WRITE64_HANDLER( bebox_cpu0_imask_w )
 		if (LOG_CPUIMASK)
 		{
 			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
-				(unsigned) cpu_get_pc( &space->device()), state->m_cpu_imask[0]);
+				(unsigned) space->device().safe_pc( ), state->m_cpu_imask[0]);
 		}
 		bebox_update_interrupts(space->machine());
 	}
@@ -188,7 +188,7 @@ WRITE64_HANDLER( bebox_cpu1_imask_w )
 		if (LOG_CPUIMASK)
 		{
 			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
-				(unsigned) cpu_get_pc( &space->device() ), state->m_cpu_imask[1]);
+				(unsigned) space->device() .safe_pc( ), state->m_cpu_imask[1]);
 		}
 		bebox_update_interrupts(space->machine());
 	}

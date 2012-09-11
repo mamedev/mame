@@ -35,7 +35,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine.device("maincpu")), buf );
+		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
 	}
 }
 
@@ -869,7 +869,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 				double time, ticks;
 				int timer = offset-(0x100/4);
 
-//              printf("Read timer reg %x (PC=%x)\n", timer, cpu_get_pc(&space.device()));
+//              printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -1670,7 +1670,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				m_timer_regs[offset] = (m_timer_regs[offset] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-//              printf("%x to timer %d (mask %x PC %x)\n", data, offset, ~mem_mask, cpu_get_pc(&space.device()));
+//              printf("%x to timer %d (mask %x PC %x)\n", data, offset, ~mem_mask, space.device().safe_pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -1829,7 +1829,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0200/4:
 			if( (mem_mask) & 0x0000ffff )
 			{
-//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, machine.primary_screen->vpos(), cpu_get_pc(&space.device()));
+//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, machine.primary_screen->vpos(), space.device().safe_pc());
 				m_IE = ( m_IE & ~mem_mask ) | ( data & mem_mask );
 #if 0
 				if (m_IE & m_IF)
@@ -2318,7 +2318,7 @@ READ32_MEMBER(gba_state::eeprom_r)
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, m_eeprom_state, activecpu_get_pc(), out);
 			return out;
 	}
-//  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_eeprom_state, cpu_get_pc(&space.device()), 0);
+//  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_eeprom_state, space.device().safe_pc(), 0);
 	return 0;
 }
 
@@ -2330,7 +2330,7 @@ WRITE32_MEMBER(gba_state::eeprom_w)
 		data >>= 16;
 	}
 
-//  printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, m_eeprom_state, cpu_get_pc(&space.device()));
+//  printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, m_eeprom_state, space.device().safe_pc());
 
 	switch (m_eeprom_state)
 	{
@@ -2395,7 +2395,7 @@ WRITE32_MEMBER(gba_state::eeprom_w)
 
 			if (m_eeprom_bits == 0)
 			{
-				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(machine().device("maincpu")), m_eep_data, m_eeprom_addr );
+				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_eeprom_addr );
 				if (m_eeprom_addr >= sizeof( m_gba_eeprom))
 				{
 					fatalerror( "eeprom: invalid address (%x)\n", m_eeprom_addr);

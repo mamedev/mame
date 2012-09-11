@@ -203,7 +203,7 @@ READ16_MEMBER(bmcbowl_state::bmc_random_read)
 
 READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 {
-	switch(cpu_get_previouspc(&space.device()))
+	switch(space.device().safe_pcbase())
 	{
 		case 0xca68:
 			switch(cpu_get_reg(&space.device(), M68K_D2))
@@ -214,7 +214,7 @@ READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 			}
 			break;
 	}
-	logerror("Protection read @ %X\n",cpu_get_previouspc(&space.device()));
+	logerror("Protection read @ %X\n",space.device().safe_pcbase());
 	return machine().rand();
 }
 

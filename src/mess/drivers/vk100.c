@@ -561,7 +561,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 {
 	UINT8 dipswitchLUT[8] = { 1,3,5,7,6,4,2,0 }; // the dipswitches map in a weird order to offsets
 #ifdef SYSTAT_A_VERBOSE
-	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
+	if (m_maincpu->safe_pc() != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", m_maincpu->safe_pc());
 #endif
 	return ((m_vgGO?0:1)<<7)|(vram_read(machine())<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|(m_vsync?0x2:0);
 }
@@ -585,7 +585,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 READ8_MEMBER(vk100_state::SYSTAT_B)
 {
 #ifdef SYSTAT_B_VERBOSE
-	logerror("0x%04X: SYSTAT_B Read!\n", cpu_get_pc(m_maincpu));
+	logerror("0x%04X: SYSTAT_B Read!\n", m_maincpu->safe_pc());
 #endif
 	return (m_ACTS<<7)|0x7F;
 }

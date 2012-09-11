@@ -465,7 +465,7 @@ READ8_DEVICE_HANDLER( sega_usb_status_r )
 {
 	usb_state *usb = get_safe_token(device);
 
-	LOG(("%04X:usb_data_r = %02X\n", cpu_get_pc(usb->maincpu), (usb->out_latch & 0x81) | (usb->in_latch & 0x7e)));
+	LOG(("%04X:usb_data_r = %02X\n", usb->maincpu->safe_pc(), (usb->out_latch & 0x81) | (usb->in_latch & 0x7e)));
 
 	device_adjust_icount(usb->maincpu, -200);
 
@@ -496,7 +496,7 @@ WRITE8_DEVICE_HANDLER( sega_usb_data_w )
 {
 	usb_state *usb = get_safe_token(device);
 
-	LOG(("%04X:usb_data_w = %02X\n", cpu_get_pc(usb->maincpu), data));
+	LOG(("%04X:usb_data_w = %02X\n", usb->maincpu->safe_pc(), data));
 	device->machine().scheduler().synchronize(FUNC(delayed_usb_data_w), data, usb);
 
 	/* boost the interleave so that sequences can be sent */
@@ -519,7 +519,7 @@ WRITE8_DEVICE_HANDLER( sega_usb_ram_w )
 	if (usb->in_latch & 0x80)
 		usb->program_ram[offset] = data;
 	else
-		LOG(("%04X:sega_usb_ram_w(%03X) = %02X while /LOAD disabled\n", cpu_get_pc(usb->maincpu), offset, data));
+		LOG(("%04X:sega_usb_ram_w(%03X) = %02X while /LOAD disabled\n", usb->maincpu->safe_pc(), offset, data));
 }
 
 
@@ -536,7 +536,7 @@ static READ8_DEVICE_HANDLER( usb_p1_r )
 
 	/* bits 0-6 are inputs and map to bits 0-6 of the input latch */
 	if ((usb->in_latch & 0x7f) != 0)
-		LOG(("%03X: P1 read = %02X\n", cpu_get_pc(usb->maincpu), usb->in_latch & 0x7f));
+		LOG(("%03X: P1 read = %02X\n", usb->maincpu->safe_pc(), usb->in_latch & 0x7f));
 	return usb->in_latch & 0x7f;
 }
 
@@ -547,7 +547,7 @@ static WRITE8_DEVICE_HANDLER( usb_p1_w )
 
 	/* bit 7 maps to bit 0 on the output latch */
 	usb->out_latch = (usb->out_latch & 0xfe) | (data >> 7);
-	LOG(("%03X: P1 write = %02X\n", cpu_get_pc(usb->maincpu), data));
+	LOG(("%03X: P1 write = %02X\n", usb->maincpu->safe_pc(), data));
 }
 
 
@@ -570,7 +570,7 @@ static WRITE8_DEVICE_HANDLER( usb_p2_w )
 	if ((old & 0x80) && !(data & 0x80))
 		usb->t1_clock = 0;
 
-	LOG(("%03X: P2 write -> bank=%d ready=%d clock=%d\n", cpu_get_pc(usb->maincpu), data & 3, (data >> 6) & 1, (data >> 7) & 1));
+	LOG(("%03X: P2 write -> bank=%d ready=%d clock=%d\n", usb->maincpu->safe_pc(), data & 3, (data >> 6) & 1, (data >> 7) & 1));
 }
 
 

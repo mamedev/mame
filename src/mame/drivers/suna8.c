@@ -491,7 +491,7 @@ READ8_MEMBER(suna8_state::hardhead_ip_r)
 		case 2:	return ioport("DSW1")->read();
 		case 3:	return ioport("DSW2")->read();
 		default:
-			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", cpu_get_pc(&space.device()), *m_hardhead_ip);
+			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", space.device().safe_pc(), *m_hardhead_ip);
 			return 0xff;
 	}
 }
@@ -505,7 +505,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",space.device().safe_pc(),data);
 	membank("bank1")->set_entry(bank);
 }
 
@@ -561,7 +561,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 	int bank = data & 0x07;
 	if ((~data & 0x10) && (bank >= 4))	bank += 4;
 
-	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank);
 
@@ -653,14 +653,14 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 	{
 		m_palettebank = data & 0x01;
 
-		logerror("CPU #0 - PC %04X: palettebank = %02X\n",cpu_get_pc(&space.device()),data);
-		if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 - PC %04X: palettebank = %02X\n",space.device().safe_pc(),data);
+		if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",space.device().safe_pc(),data);
 	}
 	else if ((m_protection_val & 0xfc) == 0x90)
 	{
 		soundlatch_byte_w(space, 0, data);
 
-		logerror("CPU #0 - PC %04X: soundlatch = %02X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 - PC %04X: soundlatch = %02X\n",space.device().safe_pc(),data);
 	}
 	else if ((m_protection_val & 0xfc) == 0x04)
 	{
@@ -668,8 +668,8 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 		set_led_status(machine(), 1, data & 0x02);
 		coin_counter_w(machine(), 0, data & 0x04);
 
-		logerror("CPU #0 - PC %04X: leds = %02X\n",cpu_get_pc(&space.device()),data);
-		if (data & ~0x07)	logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 - PC %04X: leds = %02X\n",space.device().safe_pc(),data);
+		if (data & ~0x07)	logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 	}
 	else if ((m_protection_val & 0xfc) == 0x9c)
 	{
@@ -678,18 +678,18 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 
 		// To be done: run-time opcode decryption change. Done in driver_init for now.
 
-		logerror("CPU #0 - PC %04X: op-decrypt = %02X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 - PC %04X: op-decrypt = %02X\n",space.device().safe_pc(),data);
 	}
 	else if ((m_protection_val & 0xfc) == 0x80)
 	{
 		// disables rom banking?
 		// see code at 11b1:
 
-		logerror("CPU #0 - PC %04X: rombank_disable = %02X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 - PC %04X: rombank_disable = %02X\n",space.device().safe_pc(),data);
 	}
 	else
 	{
-		logerror("CPU #0 - PC %04X: ignore = %02X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 - PC %04X: ignore = %02X\n",space.device().safe_pc(),data);
 	}
 }
 
@@ -705,8 +705,8 @@ WRITE8_MEMBER(suna8_state::brickzn_prot_w)
 	flip_screen_set(data & 0x01);
 	m_spritebank = (data >> 1) & 1;
 
-	logerror("CPU #0 - PC %04X: protection_val = %02X\n",cpu_get_pc(&space.device()),data);
-//	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	logerror("CPU #0 - PC %04X: protection_val = %02X\n",space.device().safe_pc(),data);
+//	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -726,7 +726,7 @@ WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
 	m_prot2_prev = m_prot2;
 	m_prot2 = data;
 
-	logerror("CPU #0 - PC %04X: unknown = %02X\n",cpu_get_pc(&space.device()),data);
+	logerror("CPU #0 - PC %04X: unknown = %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -737,7 +737,7 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank + (membank("bank1")->entry() & 0x10));
 
@@ -796,7 +796,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
 {
 	m_nmi_enable = data & 0x01;
-//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(&space.device()),data);
+//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -806,7 +806,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
 WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 {
 	flip_screen_set(data & 0x01);
-	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
@@ -814,7 +814,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
 	set_led_status(machine(), 0, data & 0x01);
 	set_led_status(machine(), 1, data & 0x02);
 	coin_counter_w(machine(), 0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -825,7 +825,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
 WRITE8_MEMBER(suna8_state::hardhea2_spritebank_w)
 {
 	m_spritebank = (data >> 1) & 1;
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -836,7 +836,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank);
 
@@ -911,7 +911,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna8_state::starfigh_spritebank_latch_w)
 {
 	m_spritebank_latch = (data >> 2) & 1;
-	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
@@ -973,7 +973,7 @@ WRITE8_MEMBER(suna8_state::sparkman_cmd_prot_w)
 		case 0x81: m_trash_prot = 1; break;
 		case 0x99: m_trash_prot = 1; break;
 		case 0x54: m_spritebank = 1; break;
-		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(&space.device()),data);
+		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",space.device().safe_pc(),data);
 	}
 }
 
@@ -990,14 +990,14 @@ WRITE8_MEMBER(suna8_state::suna8_wram_w)
 WRITE8_MEMBER(suna8_state::sparkman_flipscreen_w)
 {
 	flip_screen_set(data & 0x01);
-	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space.device()),data);
+	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(suna8_state::sparkman_leds_w)
 {
 	set_led_status(machine(), 0, data & 0x01);
 	set_led_status(machine(), 1, data & 0x02);
-	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space.device()),data);
+	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(suna8_state::sparkman_coin_counter_w)
@@ -1016,7 +1016,7 @@ WRITE8_MEMBER(suna8_state::sparkman_spritebank_w)
 		m_spritebank = 0;
 	else
 		m_spritebank = (data) & 1;
-	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
 }
 
 /*
@@ -1027,7 +1027,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 {
 	int bank = data & 0x0f;
 
-	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",space.device().safe_pc(),data);
 
 	membank("bank1")->set_entry(bank);
 	m_rombank = data;

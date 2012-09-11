@@ -452,7 +452,7 @@ static void int_control_w(address_space *space, int offset, UINT8 data)
 	segas32_state *state = space->machine().driver_data<segas32_state>();
 	int duration;
 
-//  logerror("%06X:int_control_w(%X) = %02X\n", cpu_get_pc(&space->device()), offset, data);
+//  logerror("%06X:int_control_w(%X) = %02X\n", space->device().safe_pc(), offset, data);
 	switch (offset)
 	{
 		case 0:
@@ -765,7 +765,7 @@ READ16_MEMBER(segas32_state::io_expansion_r)
 	if (!m_custom_io_r[0].isnull())
 		return (m_custom_io_r[0])(space, offset, mem_mask);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(&space.device()), offset);
+		logerror("%06X:io_expansion_r(%X)\n", space.device().safe_pc(), offset);
 	return 0xffff;
 }
 
@@ -779,7 +779,7 @@ WRITE16_MEMBER(segas32_state::io_expansion_w)
 	if (!m_custom_io_w[0].isnull())
 		(m_custom_io_w[0])(space, offset, data, mem_mask);
 	else
-		logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(&space.device()), offset, data & 0xff);
+		logerror("%06X:io_expansion_w(%X) = %02X\n", space.device().safe_pc(), offset, data & 0xff);
 }
 
 
@@ -789,7 +789,7 @@ READ32_MEMBER(segas32_state::io_expansion_0_r)
 		return (m_custom_io_r[0])(space, offset*2+0, mem_mask) |
 			  ((m_custom_io_r[0])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(&space.device()), offset);
+		logerror("%06X:io_expansion_r(%X)\n", space.device().safe_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -808,7 +808,7 @@ WRITE32_MEMBER(segas32_state::io_expansion_0_w)
 		if (!m_custom_io_w[0].isnull())
 			(m_custom_io_w[0])(space, offset*2+0, data, mem_mask);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(&space.device()), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", space.device().safe_pc(), offset, data & 0xff);
 
 	}
 	if (ACCESSING_BITS_16_23)
@@ -816,7 +816,7 @@ WRITE32_MEMBER(segas32_state::io_expansion_0_w)
 		if (!m_custom_io_w[0].isnull())
 			(m_custom_io_w[0])(space, offset*2+1, data >> 16, mem_mask >> 16);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(&space.device()), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", space.device().safe_pc(), offset, data & 0xff);
 	}
 }
 
@@ -827,7 +827,7 @@ READ32_MEMBER(segas32_state::io_expansion_1_r)
 		return (m_custom_io_r[1])(space, offset*2+0, mem_mask) |
 			  ((m_custom_io_r[1])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
-		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(&space.device()), offset);
+		logerror("%06X:io_expansion_r(%X)\n", space.device().safe_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -840,14 +840,14 @@ WRITE32_MEMBER(segas32_state::io_expansion_1_w)
 		if (!m_custom_io_w[1].isnull())
 			(m_custom_io_w[1])(space, offset*2+0, data, mem_mask);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(&space.device()), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", space.device().safe_pc(), offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		if (!m_custom_io_w[1].isnull())
 			(m_custom_io_w[1])(space, offset*2+1, data >> 16, mem_mask >> 16);
 		else
-			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(&space.device()), offset, data & 0xff);
+			logerror("%06X:io_expansion_w(%X) = %02X\n", space.device().safe_pc(), offset, data & 0xff);
 	}
 }
 
@@ -872,7 +872,7 @@ READ16_MEMBER(segas32_state::analog_custom_io_r)
 			m_analog_value[offset & 3] <<= 1;
 			return result;
 	}
-	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", cpu_get_pc(&space.device()), offset*2, mem_mask);
+	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -889,7 +889,7 @@ WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 			m_analog_value[offset & 3] = ioport(names[offset & 3])->read_safe(0);
 			return;
 	}
-	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
+	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -905,7 +905,7 @@ READ16_MEMBER(segas32_state::extra_custom_io_r)
 			return ioport(names[offset & 3])->read_safe(0xffff);
 	}
 
-	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", cpu_get_pc(&space.device()), offset*2, mem_mask);
+	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -926,7 +926,7 @@ WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 			m_analog_bank = data & 1;
 			return;
 	}
-	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
+	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -945,7 +945,7 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 			return (UINT8)(ioport(names[offset/2])->read() - m_sonic_last[offset/2]);
 	}
 
-	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", cpu_get_pc(&space.device()), offset*2, mem_mask);
+	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -964,7 +964,7 @@ WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 			return;
 	}
 
-	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
+	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -977,7 +977,7 @@ WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
 
 WRITE16_MEMBER(segas32_state::random_number_16_w)
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
+//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 READ16_MEMBER(segas32_state::random_number_16_r)
@@ -987,7 +987,7 @@ READ16_MEMBER(segas32_state::random_number_16_r)
 
 WRITE32_MEMBER(segas32_state::random_number_32_w)
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
+//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 READ32_MEMBER(segas32_state::random_number_32_r)

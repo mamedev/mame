@@ -615,7 +615,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 		return pasopia7_fdc_r(space, offset & 7);
 	else
 	{
-		logerror("(PC=%06x) Read i/o address %02x\n",cpu_get_pc(m_maincpu),io_port);
+		logerror("(PC=%06x) Read i/o address %02x\n",m_maincpu->safe_pc(),io_port);
 	}
 
 	return 0xff;
@@ -672,7 +672,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		pasopia7_fdc_w(space, offset & 7, data);
 	else
 	{
-		logerror("(PC=%06x) Write i/o address %02x = %02x\n",cpu_get_pc(m_maincpu),offset,data);
+		logerror("(PC=%06x) Write i/o address %02x = %02x\n",m_maincpu->safe_pc(),offset,data);
 	}
 }
 

@@ -714,7 +714,7 @@ VIDEO_RESET(macdafb)
 
 READ32_MEMBER(mac_state::dafb_r)
 {
-//  if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, m_maincpu->safe_pc());
 
 	switch (offset<<2)
 	{
@@ -745,7 +745,7 @@ READ32_MEMBER(mac_state::dafb_r)
 
 WRITE32_MEMBER(mac_state::dafb_w)
 {
-//  if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, m_maincpu->safe_pc());
 
 	switch (offset<<2)
 	{
@@ -809,14 +809,14 @@ WRITE32_MEMBER(mac_state::dafb_w)
 
 READ32_MEMBER(mac_state::dafb_dac_r)
 {
-//  printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, m_maincpu->safe_pc());
 
 	return 0;
 }
 
 WRITE32_MEMBER(mac_state::dafb_dac_w)
 {
-//  if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, cpu_get_pc(m_maincpu));
+//  if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, m_maincpu->safe_pc());
 
 	switch (offset<<2)
 	{
@@ -1018,7 +1018,7 @@ READ32_MEMBER(mac_state::macwd_r)
             break;
 
         default:
-//            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(m_maincpu));
+//            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, m_maincpu->safe_pc());
             break;
     }
     return 0;
@@ -1052,7 +1052,7 @@ WRITE32_MEMBER(mac_state::macwd_w)
             break;
 
         default:
-//            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(m_maincpu));
+//            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, m_maincpu->safe_pc());
             break;
     }
 }

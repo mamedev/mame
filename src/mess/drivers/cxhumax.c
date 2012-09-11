@@ -150,7 +150,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 	UINT32 data = m_scratch_reg;
 	verboselog( machine(), 9, "(SCRATCH) %08X -> %08X\n", 0xE0400024 + (offset << 2), data);
 
-	if((cpu_get_pc(m_maincpu)==0xF0003BB8) || (cpu_get_pc(m_maincpu)==0x01003724) || (cpu_get_pc(m_maincpu)==0x00005d8c)) { // HDCI-2000
+	if((m_maincpu->safe_pc()==0xF0003BB8) || (m_maincpu->safe_pc()==0x01003724) || (m_maincpu->safe_pc()==0x00005d8c)) { // HDCI-2000
 		//we're in disabled debug_printf
 		unsigned char* buf = (unsigned char *)alloca(200);
 		unsigned char temp;

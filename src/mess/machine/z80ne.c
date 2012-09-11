@@ -707,7 +707,7 @@ READ8_DEVICE_HANDLER(lx390_reset_bank)
 	offs_t pc;
 
 	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
-	pc = cpu_get_pc(device->machine().device("z80ne"));
+	pc = device->machine().device("z80ne")->safe_pc();
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
 		LOG(("lx390_reset_bank, reset memory bank 1\n"));

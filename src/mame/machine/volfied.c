@@ -344,7 +344,7 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data;
 
 //  if (offset != 0x8)
-//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(&space.device()), offset, data);
+//      logerror("%08x:  volfied c write %04x %04x\n", space.device().safe_pc(), offset, data);
 
 	if (m_current_bank == 0)
 	{
@@ -444,8 +444,8 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
 		}
 	}
 
-//  if (cpu_get_pc(&space.device())!=0x15ca8 && cpu_get_pc(&space.device())!=0x15cd8 && cpu_get_pc(&space.device())!=0x15cde)
-//      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(&space.device()), offset, current_bank);
+//  if (space.device().safe_pc()!=0x15ca8 && space.device().safe_pc()!=0x15cd8 && space.device().safe_pc()!=0x15cde)
+//      logerror("%08x:  volfied c read %04x (bank %04x)\n", space.device().safe_pc(), offset, current_bank);
 
 	/* Unknown */
 	if (m_current_bank == 2 && offset == 0x005)

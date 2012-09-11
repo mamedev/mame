@@ -129,7 +129,7 @@ const char *apollo_cpu_context(device_t *cpu) {
 		int s = t / osd_ticks_per_second();
 		int ms = (t % osd_ticks_per_second()) / 1000;
 
-		sprintf(statebuf, "%d.%03d %s pc=%08x", s, ms, cpu->tag(), cpu_get_previouspc(cpu));
+		sprintf(statebuf, "%d.%03d %s pc=%08x", s, ms, cpu->tag(), cpu->safe_pcbase());
 	} else {
 		strcpy(statebuf, "(no context)");
 	}
@@ -551,7 +551,7 @@ WRITE32_MEMBER(apollo_state::apollo_unmapped_w)
 WRITE32_MEMBER(apollo_state::apollo_rom_w)
 {
 	offs_t address =  offset * 4;
-	offs_t pc = cpu_get_previouspc(&space.device());
+	offs_t pc = space.device().safe_pcbase();
 
 	if (pc == 0x00002c1c && address == 0x00000004 && VERBOSE < 2) {
 		// don't log invalid code in 3500_boot_12191_7.bin

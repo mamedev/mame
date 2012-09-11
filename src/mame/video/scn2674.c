@@ -519,19 +519,19 @@ READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
         */
 
 		case 0:
-			LOG2674(("Read Irq Register %02x %06x\n",m_scn2674_irq_register,cpu_get_pc(&space.device())));
+			LOG2674(("Read Irq Register %02x %06x\n",m_scn2674_irq_register,space.device().safe_pc()));
 			return m_scn2674_irq_register;
 
 		case 1:
-			LOG2674(("Read Status Register %02X %06x\n",m_scn2674_status_register,cpu_get_pc(&space.device())));
+			LOG2674(("Read Status Register %02X %06x\n",m_scn2674_status_register,space.device().safe_pc()));
 			return m_scn2674_status_register;
 
-		case 2: LOG2674(("Read Screen1_l Register %06x\n",cpu_get_pc(&space.device())));return m_scn2674_screen1_l;
-		case 3: LOG2674(("Read Screen1_h Register %06x\n",cpu_get_pc(&space.device())));return m_scn2674_screen1_h;
-		case 4: LOG2674(("Read Cursor_l Register %06x\n",cpu_get_pc(&space.device())));return m_scn2674_cursor_l;
-		case 5: LOG2674(("Read Cursor_h Register %06x\n",cpu_get_pc(&space.device())));return m_scn2674_cursor_h;
-		case 6:	LOG2674(("Read Screen2_l Register %06x\n",cpu_get_pc(&space.device())));return m_scn2674_screen2_l;
-		case 7: LOG2674(("Read Screen2_h Register %06x\n",cpu_get_pc(&space.device())));return m_scn2674_screen2_h;
+		case 2: LOG2674(("Read Screen1_l Register %06x\n",space.device().safe_pc()));return m_scn2674_screen1_l;
+		case 3: LOG2674(("Read Screen1_h Register %06x\n",space.device().safe_pc()));return m_scn2674_screen1_h;
+		case 4: LOG2674(("Read Cursor_l Register %06x\n",space.device().safe_pc()));return m_scn2674_cursor_l;
+		case 5: LOG2674(("Read Cursor_h Register %06x\n",space.device().safe_pc()));return m_scn2674_cursor_h;
+		case 6:	LOG2674(("Read Screen2_l Register %06x\n",space.device().safe_pc()));return m_scn2674_screen2_l;
+		case 7: LOG2674(("Read Screen2_h Register %06x\n",space.device().safe_pc()));return m_scn2674_screen2_h;
 	}
 
 	return 0xffff;

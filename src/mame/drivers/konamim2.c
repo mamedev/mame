@@ -346,7 +346,7 @@ READ64_MEMBER(konamim2_state::unk3_r)
 READ64_MEMBER(konamim2_state::unk4_r)
 {
 	UINT64 r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(&space.device()));
+//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), space.device().safe_pc());
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -363,13 +363,13 @@ READ64_MEMBER(konamim2_state::unk4_r)
 WRITE64_MEMBER(konamim2_state::unk4_w)
 {
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
-//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(&space.device()));
+//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), space.device().safe_pc());
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
-//          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), cpu_get_pc(&space.device()));
+//          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
 			cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
@@ -902,7 +902,7 @@ READ64_MEMBER(konamim2_state::cde_r)
 
 		default:
 		{
-//                      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, cpu_get_pc(&space.device()));
+//                      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, space.device().safe_pc());
 			break;
 		}
 	}
@@ -936,7 +936,7 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 	{
 		case 0x028/4:		// Command write
 		{
-			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(&space.device()));
+			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, space.device().safe_pc());
 
 			if (d == 0x0180)
 			{
@@ -1064,7 +1064,7 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 
 		default:
 		{
-//                      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(&space.device()));
+//                      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, space.device().safe_pc());
 			break;
 		}
 	}

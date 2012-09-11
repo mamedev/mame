@@ -382,7 +382,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output0_w )
 
 	if (LOG_PORTS && (m_i8049_out0 ^ data) & 0xff)
 	{
-		printf("%03X:out0:", cpu_get_pc(&space.device()));
+		printf("%03X:out0:", space.device().safe_pc());
 		if ( (data & 0x80)) printf(" ???");
 		if ( (data & 0x40)) printf(" LED1");
 		if ( (data & 0x20)) printf(" LED2");
@@ -422,7 +422,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 
 	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{
-		mame_printf_debug("%03X:out1:", cpu_get_pc(&space.device()));
+		mame_printf_debug("%03X:out1:", space.device().safe_pc());
 		if (!(data & 0x08)) mame_printf_debug(" SMS");
 		mame_printf_debug("\n");
 		m_i8049_out1 = data;
@@ -570,7 +570,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 
 	if (LOG_PORTS && (m_i8049_port1 ^ data) & 0x1f)
 	{
-		printf("%03X:port1:", cpu_get_pc(&space.device()));
+		printf("%03X:port1:", space.device().safe_pc());
 		if (!(data & 0x10)) printf(" SPEED");
 		if (!(data & 0x08)) printf(" TIMENABLE");
 		if (!(data & 0x04)) printf(" REV");

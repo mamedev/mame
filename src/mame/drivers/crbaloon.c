@@ -61,7 +61,7 @@ WRITE8_MEMBER(crbaloon_state::pc3092_w)
 {
 	m_pc3092_data[offset] = data & 0x0f;
 
-	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(&space.device()), offset, m_pc3092_data[offset]);
+	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", space.device().safe_pc(), offset, m_pc3092_data[offset]);
 
 	pc3092_update(machine());
 }
@@ -141,7 +141,7 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
 		break;
 	}
 
-	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", cpu_get_pc(&space.device()), reg, ret);
+	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", space.device().safe_pc(), reg, ret);
 
 	return ret | (ioport("DSW1")->read() & 0xf0);
 }

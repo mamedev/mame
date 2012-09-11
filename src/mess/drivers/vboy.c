@@ -793,7 +793,7 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x42:	//XPCTRL
 					return m_vip_regs.XPCTRL;
 		case 0x44:	//VER
-					printf("%08x read VER\n",cpu_get_pc(m_maincpu));
+					printf("%08x read VER\n",m_maincpu->safe_pc());
 					return m_vip_regs.VER;
 		case 0x48:	//SPT0
 					return m_vip_regs.SPT[0];

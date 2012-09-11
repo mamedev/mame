@@ -34,7 +34,7 @@ READ16_MEMBER(stadhero_state::stadhero_control_r)
 			return ioport("DSW")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",cpu_get_pc(&space.device()),0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",space.device().safe_pc(),0x30c000+offset);
 	return ~0;
 }
 
@@ -49,7 +49,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+offset);
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+offset);
 			break;
 	}
 }

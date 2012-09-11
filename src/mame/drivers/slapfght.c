@@ -1770,10 +1770,10 @@ READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
         6D38: 20 F8         jr   nz,$6D32
         6D3A: 10 E0         djnz $6D1C
     */
-	if (cpu_get_pc(&space.device()) == 0x6d1e) return 0;
-	if (cpu_get_pc(&space.device()) == 0x6d24) return 6;
-	if (cpu_get_pc(&space.device()) == 0x6d2c) return 2;
-	if (cpu_get_pc(&space.device()) == 0x6d34) return 4;
+	if (space.device().safe_pc() == 0x6d1e) return 0;
+	if (space.device().safe_pc() == 0x6d24) return 6;
+	if (space.device().safe_pc() == 0x6d2c) return 2;
+	if (space.device().safe_pc() == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
         6AD4: DB 00         in   a,($00)
@@ -1794,11 +1794,11 @@ READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
         6AF7: 20 FA         jr   nz,$6AF3
        This seems to be what used to be the MCU status.
     */
-	if (cpu_get_pc(&space.device()) == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(&space.device()) == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(&space.device()) == 0x6af5) return 0; /* bit 2 must be OFF */
+	if (space.device().safe_pc() == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (space.device().safe_pc() == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (space.device().safe_pc() == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",cpu_get_pc(&space.device()));
+	logerror("Port Read PC=%04x\n",space.device().safe_pc());
 
 	return 0;
 }

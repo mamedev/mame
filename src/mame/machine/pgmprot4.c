@@ -286,7 +286,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 		state->m_kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->m_kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space->device().safe_pc(), state->m_kb_cmd, data);
 		if (state->m_kb_cmd == 0)
 			state->m_kb_reg = data;
 		else if (state->m_kb_cmd == 2)
@@ -342,7 +342,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->m_kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space->device().safe_pc(), state->m_kb_cmd, res);
 	return res;
 }
 
@@ -461,7 +461,7 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 		state->m_kb_cmd=data;
 	else //offset==2
 	{
-		printf("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(&space->device()),state->m_kb_cmd,data);
+		printf("%06X: ASIC25 W CMD %X  VAL %X\n",space->device().safe_pc(),state->m_kb_cmd,data);
 		if(state->m_kb_cmd==0)
 			reg=data;
 		else if(state->m_kb_cmd==3)	//??????????
@@ -518,7 +518,7 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(&space->device()),state->m_kb_cmd,res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",space->device().safe_pc(),state->m_kb_cmd,res);
 	return res;
 }
 

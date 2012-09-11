@@ -135,7 +135,7 @@ public:
 	// jzth protection
 	DECLARE_WRITE16_MEMBER( bl_710000_w )
 	{
-		int pc = cpu_get_pc(&space.device());
+		int pc = space.device().safe_pc();
 
 		logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
 
@@ -191,7 +191,7 @@ public:
 	DECLARE_READ16_MEMBER( bl_710000_r )
 	{
 		UINT16 ret;
-		int pc = cpu_get_pc(&space.device());
+		int pc = space.device().safe_pc();
 		logerror("%06x reading from bl_710000_r\n", pc);
 
 		if (m_protcount==6) { ret = 0xe; }

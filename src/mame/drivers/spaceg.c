@@ -255,8 +255,8 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 			break;
 
 		default:
-			logerror("mode = %02x pc = %04x\n", *m_io9401, cpu_get_pc(&space.device()));
-			popmessage("mode = %02x pc = %04x\n", *m_io9401, cpu_get_pc(&space.device()));
+			logerror("mode = %02x pc = %04x\n", *m_io9401, space.device().safe_pc());
+			popmessage("mode = %02x pc = %04x\n", *m_io9401, space.device().safe_pc());
 			return;
 	}
 

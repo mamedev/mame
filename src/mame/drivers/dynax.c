@@ -279,7 +279,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
 {
 	int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
-	//logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: rom bank = %02x\n", space.device().safe_pc(), data);
 	if (data < bank_n)
 		membank("bank1")->set_entry(data);
 	else
@@ -751,7 +751,7 @@ WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 {
        int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
-       //logerror("%04x: rom bank = %02x\n", cpu_get_pc(&space.device()), data);
+       //logerror("%04x: rom bank = %02x\n", space.device().safe_pc(), data);
        if (data < bank_n)
                membank("bank1")->set_entry(data);
        else
@@ -779,7 +779,7 @@ WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 		case 0x81:	dynax_blit_romregion_w(space, 0, 3);	return;
 		case 0x82:	dynax_blit_romregion_w(space, 0, 4);	return;	// mjcomv1
 	}
-	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
+	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
 }
 
 static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
@@ -1152,7 +1152,7 @@ WRITE8_MEMBER(dynax_state::htengoku_coin_w)
 
 		case 0xff:	break;	// CRT controller?
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_input_sel, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
 	}
 }
 
@@ -1167,7 +1167,7 @@ READ8_MEMBER(dynax_state::htengoku_input_r)
 		case 0x82:	return ioport(keynames0[m_keyb++])->read();
 		case 0x0d:	return 0xff;	// unused
 	}
-	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%04x: input_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -1181,7 +1181,7 @@ READ8_MEMBER(dynax_state::htengoku_coin_r)
 		case 0x02:	return 0xbf | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return m_coins;
 	}
-	logerror("%04x: coin_r with select = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%04x: coin_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -1200,7 +1200,7 @@ WRITE8_MEMBER(dynax_state::htengoku_blit_romregion_w)
 		case 0x81:	dynax_blit_romregion_w(space, 0, 1);	return;
 		case 0x00:	dynax_blit_romregion_w(space, 0, 2);	return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
+	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
 }
 
 static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
@@ -1273,7 +1273,7 @@ WRITE8_MEMBER(dynax_state::tenkai_ip_w)
 			break;
 		return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", cpu_get_pc(&space.device()), m_input_sel, data);
+	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", space.device().safe_pc(), m_input_sel, data);
 }
 
 READ8_MEMBER(dynax_state::tenkai_ip_r)
@@ -1291,7 +1291,7 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 					return ioport("COINS")->read();	// coins
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(&space.device()), m_input_sel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", space.device().safe_pc(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1306,17 +1306,17 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 				// player 2
 				case 0x81:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", cpu_get_pc(&space.device()), m_keyb);
+						logerror("%04x: unmapped keyb=%02x read\n", space.device().safe_pc(), m_keyb);
 					return 0xff;//ioport(keynames1[m_keyb++])->read();
 
 				// player 1
 				case 0x82:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", cpu_get_pc(&space.device()), m_keyb);
+						logerror("%04x: unmapped keyb=%02x read\n", space.device().safe_pc(), m_keyb);
 					return ioport(keynames0[m_keyb++])->read();
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(&space.device()), m_input_sel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", space.device().safe_pc(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1432,7 +1432,7 @@ READ8_MEMBER(dynax_state::tenkai_8000_r)
 	else if (m_rombank == 0x12)
 		return tenkai_palette_r(space, offset);
 
-	logerror("%04x: unmapped offset %04X read with rombank=%02X\n", cpu_get_pc(&space.device()), offset, m_rombank);
+	logerror("%04x: unmapped offset %04X read with rombank=%02X\n", space.device().safe_pc(), offset, m_rombank);
 	return 0x00;
 }
 
@@ -1452,7 +1452,7 @@ WRITE8_MEMBER(dynax_state::tenkai_8000_w)
 		return;
 	}
 
-	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", cpu_get_pc(&space.device()), offset, data, m_rombank);
+	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", space.device().safe_pc(), offset, data, m_rombank);
 }
 
 static void tenkai_show_6c( running_machine &machine )
@@ -1481,7 +1481,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 		case 0x83:	dynax_blit_romregion_w(space, 0, 1);	return;
 		case 0x80:	dynax_blit_romregion_w(space, 0, 2);	return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space.device()), data);
+	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
 }
 
 static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
@@ -1591,7 +1591,7 @@ READ8_MEMBER(dynax_state::gekisha_8000_r)
 		case 0x8067:	return ioport("DSW2")->read();
 	}
 
-	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",cpu_get_pc(&space.device()), offset, m_rombank);
+	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",space.device().safe_pc(), offset, m_rombank);
 	return 0x00;
 }
 
@@ -1647,7 +1647,7 @@ WRITE8_MEMBER(dynax_state::gekisha_8000_w)
 //              break;
 		}
 	}
-	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", cpu_get_pc(&space.device()), offset, data, m_rombank);
+	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n", space.device().safe_pc(), offset, data, m_rombank);
 }
 
 

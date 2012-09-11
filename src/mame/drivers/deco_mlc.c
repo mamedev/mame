@@ -111,7 +111,7 @@ READ32_MEMBER(deco_mlc_state::test2_r)
 {
 //  if (offset==0)
 //      return ioport("IN0")->read(); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(&space.device()),offset);
+//   logerror("%08x:  Test2_r %d\n",space.device().safe_pc(),offset);
 	return machine().rand(); //0xffffffff;
 }
 
@@ -123,7 +123,7 @@ READ32_MEMBER(deco_mlc_state::test3_r)
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(&space.device()),offset);
+//  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
 	return 0xffffffff;
 }
 
@@ -156,7 +156,7 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
 READ32_MEMBER(deco_mlc_state::decomlc_vbl_r)
 {
 	m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", cpu_get_pc(&space.device()));
+//logerror("vbl r %08x\n", space.device().safe_pc());
 	// Todo: Vblank probably in $10
 	return m_vbl_i;
 }
@@ -241,7 +241,7 @@ READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
     */
 	offset<<=1;
 
-	logerror("%08x:  Read prot %04x\n", cpu_get_pc(&space.device()), offset);
+	logerror("%08x:  Read prot %04x\n", space.device().safe_pc(), offset);
 
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
@@ -722,7 +722,7 @@ static void descramble_sound( running_machine &machine )
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
 	UINT32 a=m_mlc_ram[0x89a0/4];
-	UINT32 p=cpu_get_pc(&space.device());
+	UINT32 p=space.device().safe_pc();
 
 	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(&space.device());
 

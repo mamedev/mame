@@ -312,7 +312,7 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 
 	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 }
 
 
@@ -393,7 +393,7 @@ READ16_MEMBER(topspeed_state::topspeed_motor_r)
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", cpu_get_pc(&space.device()), offset);
+			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", space.device().safe_pc(), offset);
 			return 0;
 	}
 }
@@ -401,7 +401,7 @@ READ16_MEMBER(topspeed_state::topspeed_motor_r)
 WRITE16_MEMBER(topspeed_state::topspeed_motor_w)
 {
 	/* Writes $900000-25 and $900200-219 */
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", cpu_get_pc(&space.device()), data, offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", space.device().safe_pc(), data, offset);
 }
 
 

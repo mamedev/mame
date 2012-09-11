@@ -82,7 +82,7 @@ READ16_MEMBER(sderby_state::sderby_input_r)
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
 
-	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(&space.device()));
+	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,space.device().safe_pc());
 
 	return 0xffff;
 }
@@ -126,7 +126,7 @@ READ16_MEMBER(sderby_state::roulette_input_r)
 
 READ16_MEMBER(sderby_state::rprot_r)
 {
-	logerror("rprot_r : offset = %02x\n",cpu_get_pc(&space.device()));
+	logerror("rprot_r : offset = %02x\n",space.device().safe_pc());
 
 /* This is the only mask I found that allow a normal play.
    Using other values, the game hangs waiting for response,

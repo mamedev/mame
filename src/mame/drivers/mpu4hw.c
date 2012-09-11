@@ -2075,10 +2075,10 @@ WRITE8_MEMBER(mpu4_state::characteriser_w)
 {
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space.device()),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space.device().safe_pcbase(),offset,data));
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
+		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 		return;
 	}
 
@@ -2145,7 +2145,7 @@ READ8_MEMBER(mpu4_state::characteriser_r)
 {
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x", cpu_get_previouspc(&space.device()));
+		logerror("No Characteriser Table @ %04x", space.device().safe_pcbase());
 
 		/* a cheat ... many early games use a standard check */
 		int addr = cpu_get_reg(&space.device(), M6809_X);
@@ -2215,9 +2215,9 @@ WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 {
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space.device()),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space.device().safe_pcbase(),offset,data));
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
+		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 
 	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
 	{

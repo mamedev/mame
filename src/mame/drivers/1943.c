@@ -44,7 +44,7 @@ READ8_MEMBER(_1943_state::c1943_protection_r)
     */
 
 	int data = cpu_get_reg(&space.device(), Z80_BC) >> 8;
-//  logerror("protection read, PC: %04x Result:%02x\n", cpu_get_pc(&space.device()), data);
+//  logerror("protection read, PC: %04x Result:%02x\n", space.device().safe_pc(), data);
 	return data;
 }
 

@@ -702,19 +702,19 @@ void lans2004_decrypt_68k( running_machine &machine )
 
 static READ16_HANDLER( mslug5_prot_r )
 {
-	logerror("PC %06x: access protected\n",cpu_get_pc(&space->device()));
+	logerror("PC %06x: access protected\n",space->device().safe_pc());
 	return 0xa0;
 }
 
 static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 {
 	int bankaddress;
-	logerror("offset: %06x PC %06x: set banking %04x\n",offset,cpu_get_pc(&space->device()),data);
+	logerror("offset: %06x PC %06x: set banking %04x\n",offset,space->device().safe_pc(),data);
 	if ((offset == 0)&&(data == 0xa0))
 	{
 		bankaddress=0xa0;
 		neogeo_set_main_cpu_bank_address(space, bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,cpu_get_pc(&space->device()),bankaddress);
+		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space->device().safe_pc(),bankaddress);
 	}
 	else if(offset == 2)
 	{
@@ -722,7 +722,7 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 		//data=data&7;
 		bankaddress=data*0x100000;
 		neogeo_set_main_cpu_bank_address(space, bankaddress);
-		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,cpu_get_pc(&space->device()),bankaddress);
+		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space->device().safe_pc(),bankaddress);
 	}
 }
 

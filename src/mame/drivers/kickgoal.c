@@ -155,7 +155,7 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(&space->device()),data);
+		logerror("PC:%06x Writing %04x to Sound CPU\n",space->device().safe_pcbase(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				oki->write(0,0x40);	/* Stop playing the melody */

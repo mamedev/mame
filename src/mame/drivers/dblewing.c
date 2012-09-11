@@ -172,7 +172,7 @@ READ16_MEMBER(dblewing_state::dblewing_prot_r)
 		case 0x532: return m_580_data;
 	}
 
-//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask);
+//  printf("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
 
 	if ((offset*2) == 0x0f8) return 0; // m_080_data;
 	if ((offset*2) == 0x104) return 0;
@@ -184,7 +184,7 @@ READ16_MEMBER(dblewing_state::dblewing_prot_r)
 	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
 	if ((offset*2) == 0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", space.device().safe_pc(), offset * 2, mem_mask);
 
 	return 0;//machine().rand();
 }
@@ -193,7 +193,7 @@ WRITE16_MEMBER(dblewing_state::dblewing_prot_w)
 {
 
 //  if (offset * 2 != 0x380)
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", space.device().safe_pc(), offset * 2, mem_mask, data);
 
 	switch (offset * 2)
 	{
@@ -295,7 +295,7 @@ WRITE16_MEMBER(dblewing_state::dblewing_prot_w)
 			return;  // p2 inputs select screen  OK
 	}
 
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", space.device().safe_pc(), offset * 2, mem_mask, data);
 
 	if ((offset * 2) == 0x008) { m_008_data = data; return; }
 	if ((offset * 2) == 0x080) { m_080_data = data; return; } // p3 3rd boss?

@@ -463,7 +463,7 @@ DIRECT_UPDATE_MEMBER(atarigen_state::atarigen_slapstic_setdirect)
 	address &= ~m_slapstic_mirror;
 	if (address >= m_slapstic_base && address < m_slapstic_base + 0x8000)
 	{
-		offs_t pc = cpu_get_previouspc(&direct.space().device());
+		offs_t pc = direct.space().device().safe_pcbase();
 		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
 		{
 			m_slapstic_last_pc = pc;

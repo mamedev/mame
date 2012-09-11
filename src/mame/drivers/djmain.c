@@ -375,17 +375,17 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 
 WRITE32_MEMBER(djmain_state::unknown590000_w)
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space.device()), offset, data, mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(djmain_state::unknown802000_w)
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space.device()), offset, data, mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(djmain_state::unknownc02000_w)
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space.device()), offset, data, mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
 }
 
 

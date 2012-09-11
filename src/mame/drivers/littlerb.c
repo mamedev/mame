@@ -345,7 +345,7 @@ static void littlerb_recalc_address(running_machine &machine)
 
 READ16_MEMBER(littlerb_state::littlerb_vdp_r)
 {
-	logerror("%06x littlerb_vdp_r offs %04x mask %04x (address %08x)\n", cpu_get_pc(&space.device()), offset, mem_mask, m_write_address);
+	logerror("%06x littlerb_vdp_r offs %04x mask %04x (address %08x)\n", space.device().safe_pc(), offset, mem_mask, m_write_address);
 	UINT16 res = 0;
 
 	switch (offset & 3)
@@ -378,7 +378,7 @@ WRITE16_MEMBER(littlerb_state::littlerb_vdp_w)
 			m_type2_writes = 0;
 		}
 
-		if (LOG_VDP) logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		if (LOG_VDP) logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", space.device().safe_pc(), offset, data, mem_mask);
 	}
 	else
 	{
@@ -386,16 +386,16 @@ WRITE16_MEMBER(littlerb_state::littlerb_vdp_w)
 		{
 			if (m_type2_writes==0)
 			{
-				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", space.device().safe_pc(), offset, data, mem_mask);
 			}
 			if (m_type2_writes==0) m_write_address_laststart = m_write_address;
 			m_write_address_lastend = m_write_address;
 			m_type2_writes++;
-			m_lasttype2pc = cpu_get_pc(&space.device());
+			m_lasttype2pc = space.device().safe_pc();
 		}
 		else
 		{
-			if (LOG_VDP) logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+			if (LOG_VDP) logerror("xxx %06x littlerb_vdp_w offs %04x data %04x mask %04x\n", space.device().safe_pc(), offset, data, mem_mask);
 		}
 	}
 

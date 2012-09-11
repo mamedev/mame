@@ -144,7 +144,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(machine.device("maincpu")), buf);
+		logerror("%08x: %s", machine.device("maincpu")->safe_pc(), buf);
 	}
 }
 
@@ -253,7 +253,7 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		return ret8;
 	case 0x030/4:
 		//verboselog(( machine, 2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
-		switch(cpu_get_pc(&space.device()))
+		switch(space.device().safe_pc())
 		{
 			case 0x9fc1d9e4:	// interpreter (ip244415)
 			case 0x9fc1d9e0:	// DRC (ip244415)
@@ -499,7 +499,7 @@ READ32_MEMBER(ip22_state::hpc3_hd0_r)
 			return 0;
 		}
 	default:
-		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, cpu_get_pc(&space.device()) );
+		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, space.device().safe_pc() );
 		return 0;
 	}
 	return 0;
@@ -1370,7 +1370,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 				dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
 
-				printf("PC is %08x\n", cpu_get_pc(machine.device("maincpu")));
+				printf("PC is %08x\n", machine.device("maincpu")->safe_pc());
 				printf("DMA to device: length %x xie %d eox %d\n", length, xie, eox);
 
 				if (length <= 0x4000)

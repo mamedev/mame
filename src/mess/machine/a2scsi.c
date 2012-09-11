@@ -125,7 +125,7 @@ void a2bus_scsi_device::device_reset()
 
 UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 {
-    printf("Read c0n%x (PC=%x)\n", offset, cpu_get_pc(&space.device()));
+    printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
 
     switch (offset)
     {
@@ -153,7 +153,7 @@ UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
     switch (offset)
     {
@@ -206,7 +206,7 @@ UINT8 a2bus_scsi_device::read_cnxx(address_space &space, UINT8 offset)
 
 void a2bus_scsi_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
 {
-    printf("Write %02x to cn%02x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+    printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
 }
 
 /*-------------------------------------------------

@@ -79,7 +79,7 @@ UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 READ8_MEMBER( next_state::io_r )
 {
 	if(!space.debugger_access())
-		printf("io_r %08x (%08x)\n",offset+0x02000000, cpu_get_pc(&space.device()));
+		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
 
 	if(offset == 0xc0)
 		return 0;
@@ -90,21 +90,21 @@ READ8_MEMBER( next_state::io_r )
 WRITE8_MEMBER( next_state::io_w )
 {
 	if(!space.debugger_access())
-		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, cpu_get_pc(&space.device()));
+		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
 	if(0 && !space.debugger_access())
-		printf("%08x ROM MAP?\n",cpu_get_pc(&space.device()));
+		printf("%08x ROM MAP?\n",space.device().safe_pc());
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
 	if(0 && !space.debugger_access())
-		printf("%08x\n",cpu_get_pc(&space.device()));
+		printf("%08x\n",space.device().safe_pc());
 	/*
     x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
     -x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
@@ -141,7 +141,7 @@ READ32_MEMBER( next_state::scr2_r )
 WRITE32_MEMBER( next_state::scr2_w )
 {
 	if(0 && !space.debugger_access())
-		printf("scr2_w %08x (%08x)\n", data, cpu_get_pc(&space.device()));
+		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
 	COMBINE_DATA(&scr2);
 
 	rtc->ce_w(BIT(scr2, 8));
@@ -456,7 +456,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	}
 
 	const char *name = dma_name(slot);
-	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, cpu_get_pc(&space.device()));
+	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, space.device().safe_pc());
 
 	return res;
 }
@@ -468,7 +468,7 @@ WRITE32_MEMBER( next_state::dma_regs_w)
 
 	const char *name = dma_name(slot);
 
-	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, cpu_get_pc(&space.device()));
+	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, space.device().safe_pc());
 	switch(reg) {
 	case 0:
 		dma_slots[slot].start = data;
@@ -493,8 +493,8 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 
 	const char *name = dma_name(slot);
 
-	if(cpu_get_pc(&space.device()) != 0x409bb4e)
-		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, cpu_get_pc(&space.device()));
+	if(space.device().safe_pc() != 0x409bb4e)
+		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, space.device().safe_pc());
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -504,7 +504,7 @@ WRITE32_MEMBER( next_state::dma_ctrl_w)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 	const char *name = dma_name(slot);
-	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, cpu_get_pc(&space.device()));
+	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, space.device().safe_pc());
 	if(!reg) {
 		if(ACCESSING_BITS_16_23)
 			dma_do_ctrl_w(slot, data >> 16);
@@ -517,7 +517,7 @@ void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 {
 	const char *name = dma_name(slot);
 #if 0
-	fprintf(stderr, "dma_ctrl_w %s %02x (%08x)\n", name, data, cpu_get_pc(maincpu));
+	fprintf(stderr, "dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->safe_pc());
 
 	fprintf(stderr, "  ->%s%s%s%s%s%s%s\n",
 			data & DMA_SETENABLE ? " enable" : "",
@@ -529,7 +529,7 @@ void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 			data & DMA_INITBUFTURBO ? " initbufturbo" : "");
 #endif
 	if(data & DMA_SETENABLE)
-		logerror("dma enable %s %s %08x (%08x)\n", name, data & DMA_SETREAD ? "read" : "write", (dma_slots[slot].limit-dma_slots[slot].start) & 0x7fffffff, cpu_get_pc(maincpu));
+		logerror("dma enable %s %s %08x (%08x)\n", name, data & DMA_SETREAD ? "read" : "write", (dma_slots[slot].limit-dma_slots[slot].start) & 0x7fffffff, maincpu->safe_pc());
 
 	dma_slot &ds = dma_slots[slot];
 	if(data & (DMA_RESET|DMA_INITBUF|DMA_INITBUFTURBO)) {
@@ -561,7 +561,7 @@ const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 
 READ32_MEMBER( next_state::scsictrl_r )
 {
 	UINT32 res = (scsictrl << 24) | (scsistat << 16);
-	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, cpu_get_pc(&space.device()));
+	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, space.device().safe_pc());
 	return res;
 }
 
@@ -581,11 +581,11 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 				scsictrl & 0x04 ? " flush" : "",
 				scsictrl & 0x02 ? " reset" : "",
 				scsictrl & 0x01 ? "wd3392" : "ncr5390",
-				cpu_get_pc(&space.device()));
+				space.device().safe_pc());
 	}
 	if(ACCESSING_BITS_16_23) {
 		scsistat = data >> 16;
-		logerror("SCSIstat %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+		logerror("SCSIstat %02x (%08x)\n", data, space.device().safe_pc());
 	}
 }
 
@@ -608,7 +608,7 @@ READ32_MEMBER( next_state::dsp_r)
 
 WRITE32_MEMBER( next_state::fdc_control_w )
 {
-	logerror("FDC write %02x (%08x)\n", data >> 24, cpu_get_pc(&space.device()));
+	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
 }
 
 READ32_MEMBER( next_state::fdc_control_r )
@@ -647,14 +647,14 @@ READ32_MEMBER( next_state::fdc_control_r )
 
 READ32_MEMBER( next_state::phy_r )
 {
-	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], cpu_get_pc(&space.device()));
+	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
 	return phy[offset] | (0 << 24);
 }
 
 WRITE32_MEMBER( next_state::phy_w )
 {
 	COMBINE_DATA(phy+offset);
-	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], cpu_get_pc(&space.device()));
+	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
 }
 
 void next_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

@@ -1515,12 +1515,12 @@ READ16_MEMBER(lisa_state::lisa_r)
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = m_videoROM_ptr[m_videoROM_address|0x80] << 8;
-				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(machine().device("maincpu")), time_in_frame);
+				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, machine().device("maincpu")->safe_pc(), time_in_frame);
 					}
 					else
 					{
 						answer = m_videoROM_ptr[m_videoROM_address] << 8;
-				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(machine().device("maincpu")), time_in_frame);
+				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, machine().device("maincpu")->safe_pc(), time_in_frame);
 					}
 				}
 
@@ -1782,19 +1782,19 @@ INLINE void cpu_board_control_access(running_machine &machine, offs_t offset)
 		state->m_seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-		logerror("setup SET PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("setup SET PC=%x\n", machine.device("maincpu")->safe_pc());
 		state->m_setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-		logerror("setup UNSET PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("setup UNSET PC=%x\n", machine.device("maincpu")->safe_pc());
 		state->m_setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-		logerror("enable retrace PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("enable retrace PC=%x\n", machine.device("maincpu")->safe_pc());
 		state->m_VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-		logerror("disable retrace PC=%x\n", cpu_get_pc(machine.device("maincpu")));
+		logerror("disable retrace PC=%x\n", machine.device("maincpu")->safe_pc());
 		state->m_VTMSK = 0;
 		set_VTIR(machine, 2);
 		break;
@@ -1928,7 +1928,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			logerror("read status PC=%x val=%x\n", cpu_get_pc(machine().device("maincpu")), answer);
+			logerror("read status PC=%x val=%x\n", machine().device("maincpu")->safe_pc(), answer);
 
 			break;
 		}

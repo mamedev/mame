@@ -172,7 +172,7 @@ WRITE8_MEMBER(exerion_state::exerion_portb_w)
 
 READ8_MEMBER(exerion_state::exerion_protection_r)
 {
-	if (cpu_get_pc(&space.device()) == 0x4143)
+	if (space.device().safe_pc() == 0x4143)
 		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
 		return m_main_ram[0x8 + offset];

@@ -229,7 +229,7 @@ WRITE8_MEMBER(nmk16_state::ssmissin_soundbank_w)
 
 WRITE16_MEMBER(nmk16_state::tharrier_mcu_control_w)
 {
-//  logerror("%04x: mcu_control_w %02x\n",cpu_get_pc(&space.device()),data);
+//  logerror("%04x: mcu_control_w %02x\n",space.device().safe_pc(),data);
 }
 
 READ16_MEMBER(nmk16_state::tharrier_mcu_r)
@@ -245,8 +245,8 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 
 		int res;
 
-		if (cpu_get_pc(&space.device())==0x8aa) res = (m_mainram[0x9064/2])|0x20; /* Task Force Harrier */
-		else if (cpu_get_pc(&space.device())==0x8ce) res = (m_mainram[0x9064/2])|0x60; /* Task Force Harrier */
+		if (space.device().safe_pc()==0x8aa) res = (m_mainram[0x9064/2])|0x20; /* Task Force Harrier */
+		else if (space.device().safe_pc()==0x8ce) res = (m_mainram[0x9064/2])|0x60; /* Task Force Harrier */
 		else
 		{
 			res = to_main[m_prot_count++];
@@ -4659,7 +4659,7 @@ WRITE16_MEMBER(nmk16_state::twinactn_flipscreen_w)
 		flip_screen_set(data & 1);
 
 	if (data & (~1))
-		logerror("%06x: unknown flip screen bit written %04x\n", cpu_get_pc(&space.device()), data);
+		logerror("%06x: unknown flip screen bit written %04x\n", space.device().safe_pc(), data);
 }
 #endif
 
@@ -4708,7 +4708,7 @@ WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
 	if (data & (~3))
 		logerror("%s: invalid oki bank %02x\n", machine().describe_context(), data);
 
-//  logerror("%04x: oki bank %02x\n", cpu_get_pc(&space->device()), data);
+//  logerror("%04x: oki bank %02x\n", space->device().safe_pc(), data);
 }
 
 static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8, nmk16_state )

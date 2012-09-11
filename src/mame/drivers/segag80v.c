@@ -190,7 +190,7 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = cpu_get_previouspc(&space->device());
+	offs_t pc = space->device().safe_pcbase();
 	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
 		return offset;
 
@@ -361,7 +361,7 @@ WRITE8_MEMBER(segag80v_state::unknown_w)
 	/* writing an 0x04 here enables interrupts */
 	/* some games write 0x00/0x01 here as well */
 	if (data != 0x00 && data != 0x01 && data != 0x04)
-		mame_printf_debug("%04X:unknown_w = %02X\n", cpu_get_pc(&space.device()), data);
+		mame_printf_debug("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
 }
 
 

@@ -1266,7 +1266,7 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r(space.machine());
 		//  retvalue = space->machine().rand();
-		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(&space->device()),genesis_get_scanline_counter(machine), get_hposition(space.machine()),retvalue);
+		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",space->device().safe_pc(),genesis_get_scanline_counter(machine), get_hposition(space.machine()),retvalue);
 			break;
 
 		case 0x08:
@@ -1276,7 +1276,7 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters(space.machine());
 		//  retvalue = space->machine().rand();
-		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(&space->device()),genesis_get_scanline_counter(machine), get_hposition(space.machine()),retvalue);
+		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",space->device().safe_pc(),genesis_get_scanline_counter(machine), get_hposition(space.machine()),retvalue);
 			break;
 
 		case 0x10:

@@ -121,7 +121,7 @@ static int vdudriverset(running_machine &machine)
 {
 	bbc_state *state = machine.driver_data<bbc_state>();
 	int PC;
-	PC = cpu_get_pc(machine.device("maincpu")); // this needs to be set to the 6502 program counter
+	PC = machine.device("maincpu")->safe_pc(); // this needs to be set to the 6502 program counter
 	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((state->m_pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
 }
 
@@ -398,7 +398,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 static int bbcm_vdudriverset(running_machine &machine)
 {
 	int PC;
-	PC = cpu_get_pc(machine.device("maincpu"));
+	PC = machine.device("maincpu")->safe_pc();
 	return ((PC >= 0xc000) && (PC <= 0xdfff));
 }
 

@@ -483,7 +483,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 {
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -499,7 +499,7 @@ WRITE16_MEMBER( segaorun_state::misc_io_w )
 		m_custom_io_w(space, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space.device()), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -656,7 +656,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 			return watchdog_reset_r(space, 0);
 	}
 
-	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -698,7 +698,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			m_sprites->draw_write(space, offset, data, mem_mask);
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space.device()), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -727,7 +727,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 			return ioport(ports[m_adc_select])->read_safe(0x0010);
 		}
 	}
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
 	return open_bus_r(space,0,mem_mask);
 }
 
@@ -764,7 +764,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			// ADC trigger
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space.device()), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 }
 
 

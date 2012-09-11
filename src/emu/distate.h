@@ -186,12 +186,12 @@ protected:
 	const device_state_entry *state_find_entry(int index);
 
 	// constants
-	static const int k_fast_state_min = -4;							// range for fast state
-	static const int k_fast_state_max = 256;						// lookups
+	static const int FAST_STATE_MIN = -4;							// range for fast state
+	static const int FAST_STATE_MAX = 256;							// lookups
 
 	// state
 	simple_list<device_state_entry>			m_state_list;			// head of state list
-	device_state_entry *					m_fast_state[k_fast_state_max  + 1 - k_fast_state_min];
+	device_state_entry *					m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN];
 																	// fast access to common entries
 };
 
@@ -203,6 +203,28 @@ typedef device_interface_iterator<device_state_interface> state_interface_iterat
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
+
+//-------------------------------------------------
+//  device_t::safe_pc - return the current PC
+//	or 0 if no state object exists
+//-------------------------------------------------
+
+inline offs_t device_t::safe_pc()
+{
+	return (m_state != NULL) ? m_state->pc() : 0;
+}
+
+
+//-------------------------------------------------
+//  device_t::safe_pcbase - return the current PC 
+//	base or 0 if no state object exists
+//-------------------------------------------------
+
+inline offs_t device_t::safe_pcbase()
+{
+	return (m_state != NULL) ? m_state->pcbase() : 0;
+}
+
 
 //-------------------------------------------------
 //  device_state - return a pointer to the device

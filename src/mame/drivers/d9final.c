@@ -102,7 +102,7 @@ WRITE8_MEMBER(d9final_state::d9final_bank_w)
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
 READ8_MEMBER(d9final_state::prot_latch_r)
 {
-//  printf("PC=%06x\n",cpu_get_pc(&space.device()));
+//  printf("PC=%06x\n",space.device().safe_pc());
 
 	return 0x04;
 }

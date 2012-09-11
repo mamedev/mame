@@ -196,7 +196,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 			break;
 
 		default:
-			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(&space.device()) );
+			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, space.device().safe_pc() );
 			break;
 	}
 }

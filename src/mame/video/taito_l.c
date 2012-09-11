@@ -103,7 +103,7 @@ WRITE8_MEMBER(taitol_state::taitol_bankc_w)
 	if (m_bankc[offset] != data)
 	{
 		m_bankc[offset] = data;
-//      logerror("Bankc %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
+//      logerror("Bankc %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
 
 		m_bg18_tilemap->mark_all_dirty();
 		m_bg19_tilemap->mark_all_dirty();
@@ -119,7 +119,7 @@ READ8_MEMBER(taitol_state::taitol_bankc_r)
 WRITE8_MEMBER(taitol_state::taitol_control_w)
 {
 
-//  logerror("Control Write %02x (%04x)\n", data, cpu_get_pc(&space.device()));
+//  logerror("Control Write %02x (%04x)\n", data, space.device().safe_pc());
 
 	m_cur_ctrl = data;
 //popmessage("%02x",data);
@@ -140,7 +140,7 @@ WRITE8_MEMBER(taitol_state::taitol_control_w)
 READ8_MEMBER(taitol_state::taitol_control_r)
 {
 
-//  logerror("Control Read %02x (%04x)\n", cur_ctrl, cpu_get_pc(&space.device()));
+//  logerror("Control Read %02x (%04x)\n", cur_ctrl, space.device().safe_pc());
 	return m_cur_ctrl;
 }
 

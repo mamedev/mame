@@ -331,7 +331,7 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 
 WRITE8_MEMBER( rainbow_state::diagnostic_w )
 {
-//    printf("%02x to diag port (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
 
     if (!(data & 1))
     {

@@ -1236,7 +1236,7 @@ static void cndypuzl_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//(*state->m_chip_ram_w)(0x051c02, 0x0000);
 
@@ -1255,7 +1255,7 @@ static void haremchl_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x002907, 0x00);
 
@@ -1275,7 +1275,7 @@ static void lsrquiz_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x001e1b, 0x00);
 
@@ -1296,7 +1296,7 @@ static void lsrquiz2_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x046107, 0x00);
 
@@ -1316,7 +1316,7 @@ static void lasstixx_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x00281c, 0x00);
 
@@ -1336,7 +1336,7 @@ static void mgnumber_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//(*state->m_chip_ram_w)(0x04bfa0, 0x0000);
 
@@ -1355,7 +1355,7 @@ static void mgprem11_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
+	if (machine.device("maincpu")->safe_pc() < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x044f7e, 0x00);
 

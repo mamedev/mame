@@ -290,7 +290,7 @@ static void scv_set_banks( running_machine &machine )
 
 WRITE8_MEMBER( scv_state::scv_portc_w )
 {
-	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(machine().device("maincpu")), data );
+	//logerror("%04x: scv_portc_w: data = 0x%02x\n", machine().device("maincpu")->safe_pc(), data );
 	m_portc = data;
 
 	scv_set_banks( machine() );

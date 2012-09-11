@@ -64,7 +64,7 @@ static const eeprom_interface eeprom_intf =
 
 WRITE16_MEMBER(overdriv_state::eeprom_w)
 {
-//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(&space.device()),data);
+//logerror("%06x: write %04x to eeprom_w\n",space.device().safe_pc(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -109,7 +109,7 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 		coin_counter_w(machine(), 0, data & 0x10);
 		coin_counter_w(machine(), 1, data & 0x20);
 
-//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(&space.device()),data);
+//logerror("%06x: write %04x to cpuA_ctrl_w\n",space.device().safe_pc(),data);
 	}
 }
 

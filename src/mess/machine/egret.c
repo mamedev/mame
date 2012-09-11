@@ -137,21 +137,21 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				if (xcvr_session != ((data>>1)&1))
 				{
 					#ifdef EGRET_SUPER_VERBOSE
-                    printf("EG-> XCVR_SESSION: %d (PC=%x)\n", (data>>1)&1, cpu_get_pc(m_maincpu));
+                    printf("EG-> XCVR_SESSION: %d (PC=%x)\n", (data>>1)&1, m_maincpu->safe_pc());
 					#endif
 					xcvr_session = (data>>1) & 1;
 				}
                 if (via_data != ((data>>5)&1))
                 {
 					#ifdef EGRET_SUPER_VERBOSE
-                    printf("EG-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, cpu_get_pc(m_maincpu));
+                    printf("EG-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->safe_pc());
 					#endif
 					via_data = (data>>5) & 1;
                 }
                 if (via_clock != ((data>>4)&1))
                 {
 					#ifdef EGRET_SUPER_VERBOSE
-                    printf("EG-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, cpu_get_pc(m_maincpu));
+                    printf("EG-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->safe_pc());
 					#endif
 					via_clock = (data>>4) & 1;
 					via6522_device *via1 = machine().device<via6522_device>("via6522_0");

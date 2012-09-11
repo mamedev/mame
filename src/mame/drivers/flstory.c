@@ -154,7 +154,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(flstory_state::rumba_mcu_r)
 {
-	//printf("PC=%04x R %02x\n",cpu_get_pc(&space.device()),m_mcu_cmd);
+	//printf("PC=%04x R %02x\n",space.device().safe_pc(),m_mcu_cmd);
 
 	if((m_mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
 		return 0;
@@ -197,7 +197,7 @@ READ8_MEMBER(flstory_state::rumba_mcu_r)
 			return 0;
 		}
 		//case 0x42: return 0x06;
-		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(&space.device()),m_mcu_cmd); break;
+		//default:  printf("PC=%04x R %02x\n",space.device().safe_pc(),m_mcu_cmd); break;
 	}
 
 	return 0;
@@ -265,7 +265,7 @@ WRITE8_MEMBER(flstory_state::rumba_mcu_w)
                 */
 
 				m_mcu_bb_res = data;
-				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(&space.device()),m_mcu_cmd,data);
+				//printf("PC=%04x W %02x -> %02x\n",space.device().safe_pc(),m_mcu_cmd,data);
 				break;
 			}
 			case 0xb4: // when the bird touches the top / bottom / left / right of the screen, for correct repositioning

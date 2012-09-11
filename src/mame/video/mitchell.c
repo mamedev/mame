@@ -139,7 +139,7 @@ READ8_MEMBER(mitchell_state::pang_colorram_r)
 WRITE8_MEMBER(mitchell_state::pang_gfxctrl_w)
 {
 
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space.device()),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
 #if 0
 	char baf[40];
@@ -178,7 +178,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space.device()),data);
 WRITE8_MEMBER(mitchell_state::pangbl_gfxctrl_w)
 {
 
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space.device()),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
 #if 0
 	char baf[40];
@@ -215,7 +215,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space.device()),data);
 WRITE8_MEMBER(mitchell_state::mstworld_gfxctrl_w)
 {
 
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(&space.device()),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
 	char baf[40];
 	sprintf(baf,"%02x",data);

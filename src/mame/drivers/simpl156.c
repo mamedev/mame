@@ -1054,7 +1054,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 {
-	if (cpu_get_pc(&space.device()) == 0x284)
+	if (space.device().safe_pc() == 0x284)
 		device_spin_until_time(&space.device(), attotime::from_usec(400));
 	return m_systemram[0x18/4];
 }
@@ -1068,7 +1068,7 @@ DRIVER_INIT_MEMBER(simpl156_state,joemacr)
 
 READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 {
-	if (cpu_get_pc(&space.device()) == 0x2d4)
+	if (space.device().safe_pc() == 0x2d4)
 		device_spin_until_time(&space.device(), attotime::from_usec(400));
 	return m_systemram[0x18/4];
 }
@@ -1081,7 +1081,7 @@ DRIVER_INIT_MEMBER(simpl156_state,chainrec)
 
 READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 {
-	if (cpu_get_pc(&space.device()) == 0x4f0)
+	if (space.device().safe_pc() == 0x4f0)
 		device_spin_until_time(&space.device(), attotime::from_usec(400));
 	return m_systemram[0xae0/4];
 }
@@ -1095,7 +1095,7 @@ DRIVER_INIT_MEMBER(simpl156_state,prtytime)
 
 READ32_MEMBER(simpl156_state::charlien_speedup_r)
 {
-	if (cpu_get_pc(&space.device()) == 0xc8c8)
+	if (space.device().safe_pc() == 0xc8c8)
 		device_spin_until_time(&space.device(), attotime::from_usec(400));
 	return m_systemram[0x10/4];
 }
@@ -1108,7 +1108,7 @@ DRIVER_INIT_MEMBER(simpl156_state,charlien)
 
 READ32_MEMBER(simpl156_state::osman_speedup_r)
 {
-	if (cpu_get_pc(&space.device()) == 0x5974)
+	if (space.device().safe_pc() == 0x5974)
 		device_spin_until_time(&space.device(), attotime::from_usec(400));
 	return m_systemram[0x10/4];
 }

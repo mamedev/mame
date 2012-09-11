@@ -12,7 +12,7 @@ READ16_HANDLER( m68307_internal_timer_r )
 
 	if (timer)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 		int which = offset & 0x8;
 
 		switch (offset&0x7)
@@ -40,7 +40,7 @@ WRITE16_HANDLER( m68307_internal_timer_w )
 
 	if (timer)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 		int which = offset & 0x8;
 
 		switch (offset&0x7)

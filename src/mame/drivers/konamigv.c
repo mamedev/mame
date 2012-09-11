@@ -585,7 +585,7 @@ WRITE32_MEMBER(konamigv_state::btcflash_w)
 READ32_MEMBER(konamigv_state::btc_trackball_r)
 {
 
-//  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(&space.device()), offset, mem_mask );
+//  mame_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
 
 	if( offset == 1 && mem_mask == 0xffff0000 )
 	{
@@ -608,7 +608,7 @@ READ32_MEMBER(konamigv_state::btc_trackball_r)
 
 WRITE32_MEMBER(konamigv_state::btc_trackball_w)
 {
-//  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(&space.device()), offset, data, mem_mask );
+//  mame_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
 }
 
 DRIVER_INIT_MEMBER(konamigv_state,btchamp)

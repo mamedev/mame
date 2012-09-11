@@ -202,7 +202,7 @@ static void create_tilemaps(running_machine &machine);
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 { \
 	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
+	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
 	logerror(_format_,_offset_,_data_);\
 	logerror("\n");\
 }
@@ -211,7 +211,7 @@ static void create_tilemaps(running_machine &machine);
 
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
+	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
 	logerror(_format_,_offset_,_data_); \
 	logerror("\n");\
 }

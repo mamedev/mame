@@ -1587,7 +1587,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 					case 0xb:
 					{
 						m_video_ram_ptr = m_video_reg & 0xfffffff;
-						//logerror("video_chip_ram sel %08X at %08X\n", m_video_reg & 0x0fffffff, cpu_get_pc(&space.device()));
+						//logerror("video_chip_ram sel %08X at %08X\n", m_video_reg & 0x0fffffff, space.device().safe_pc());
 						break;
 					}
 					case 0x0:
@@ -1675,7 +1675,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data >> 32), cpu_get_pc(&space.device()));
+				logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data >> 32), space.device().safe_pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1683,7 +1683,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 		{
 			if (m_video_fifo_ptr >= 8)
 			{
-				logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data), cpu_get_pc(&space.device()));
+				logerror("FIFO packet w: %08X at %08X\n", (UINT32)(data), space.device().safe_pc());
 			}
 			m_video_fifo_ptr++;
 		}

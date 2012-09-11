@@ -460,7 +460,7 @@ READ8_MEMBER(mcr3_state::turbotag_kludge_r)
 	/* Unfortunately, the game refuses to start if any bad ROM is   */
 	/* found; to work around this, we catch the checksum byte read  */
 	/* and modify it to what we know we will be getting.            */
-	if (cpu_get_previouspc(&space.device()) == 0xb29)
+	if (space.device().safe_pcbase() == 0xb29)
 		return 0x82;
 	else
 		return 0x92;

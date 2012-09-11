@@ -744,7 +744,7 @@ static UINT16 ioasic_fifo_r(device_t *device)
 		/* main CPU is handling the I/O ASIC interrupt */
 		if (ioasic.fifo_bytes == 0 && ioasic.has_dcs)
 		{
-			ioasic.fifo_force_buffer_empty_pc = cpu_get_pc(ioasic.dcs_cpu);
+			ioasic.fifo_force_buffer_empty_pc = ioasic.dcs_cpu->safe_pc();
 			if (LOG_FIFO)
 				logerror("fifo_r(%04X): FIFO empty, PC = %04X\n", result, ioasic.fifo_force_buffer_empty_pc);
 		}
@@ -774,7 +774,7 @@ static UINT16 ioasic_fifo_status_r(device_t *device)
 	/* sure the FIFO clear bit is set */
 	if (ioasic.fifo_force_buffer_empty_pc && device == ioasic.dcs_cpu)
 	{
-		offs_t currpc = cpu_get_pc(ioasic.dcs_cpu);
+		offs_t currpc = ioasic.dcs_cpu->safe_pc();
 		if (currpc >= ioasic.fifo_force_buffer_empty_pc && currpc < ioasic.fifo_force_buffer_empty_pc + 0x10)
 		{
 			ioasic.fifo_force_buffer_empty_pc = 0;
@@ -932,7 +932,7 @@ READ32_HANDLER( midway_ioasic_r )
 	}
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%06X:ioasic_r(%d) = %08X\n", cpu_get_pc(&space->device()), offset, result);
+		logerror("%06X:ioasic_r(%d) = %08X\n", space->device().safe_pc(), offset, result);
 
 	return result;
 }
@@ -957,7 +957,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 	newreg = ioasic.reg[offset];
 
 	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
-		logerror("%06X:ioasic_w(%d) = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:ioasic_w(%d) = %08X\n", space->device().safe_pc(), offset, data);
 
 	switch (offset)
 	{

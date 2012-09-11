@@ -569,8 +569,8 @@ READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 			nflfoot_serial_in_active = FALSE;
 	}
 
-	if (cpu_get_pc(&space.device()) != 0x107)
-		logerror("%04X:ip2_r = %02X\n", cpu_get_pc(&space.device()), val);
+	if (space.device().safe_pc() != 0x107)
+		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);
 	return val;
 }
 
@@ -580,7 +580,7 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 	z80sio_device *sio = machine().device<z80sio_device>("ipu_sio");
 
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
-	logerror("%04X:op4_w(%d%d%d)\n", cpu_get_pc(&space.device()), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
+	logerror("%04X:op4_w(%d%d%d)\n", space.device().safe_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
 
 	/* look for a non-zero start bit to go active */
 	if (!nflfoot_serial_out_active && (data & 0x80))

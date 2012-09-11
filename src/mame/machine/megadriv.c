@@ -86,13 +86,13 @@ static void megadriv_z80_bank_w(UINT16 data)
 
 static WRITE16_HANDLER( megadriv_68k_z80_bank_write )
 {
-	//logerror("%06x: 68k writing bit to bank register %01x\n", cpu_get_pc(&space->device()),data&0x01);
+	//logerror("%06x: 68k writing bit to bank register %01x\n", space->device().safe_pc(),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
 static WRITE8_HANDLER(megadriv_z80_z80_bank_w)
 {
-	//logerror("%04x: z80 writing bit to bank register %01x\n", cpu_get_pc(&space->device()),data&0x01);
+	//logerror("%04x: z80 writing bit to bank register %01x\n", space->device().safe_pc(),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
@@ -419,7 +419,7 @@ READ16_HANDLER( megadriv_68k_io_read )
 	switch (offset)
 	{
 		case 0:
-			logerror("%06x read version register\n", cpu_get_pc(&space->device()));
+			logerror("%06x read version register\n", space->device().safe_pc());
 			retdata = megadrive_region_export<<7 | // Export
 			          megadrive_region_pal<<6 | // NTSC
 			          (sega_cd_connected?0x00:0x20) | // 0x20 = no sega cd
@@ -603,7 +603,7 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(&space->device()));
+		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", space->device().safe_pc());
 		return space->machine().rand();
 	}
 }
@@ -630,7 +630,7 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", cpu_get_pc(&space->device()));
+		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", space->device().safe_pc());
 	}
 }
 
@@ -655,13 +655,13 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", cpu_get_pc(&space->device()),retvalue, mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", space->device().safe_pc(),retvalue, mem_mask);
 		return retvalue;
 
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
 	{
-		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", cpu_get_pc(&space->device()),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", space->device().safe_pc(),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = 0x0001;
 		else retvalue = 0x0000;
 
@@ -669,11 +669,11 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	}
 	else
 	{
-		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", cpu_get_pc(&space->device()),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", space->device().safe_pc(),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", cpu_get_pc(&space->device()),mem_mask, retvalue);
+	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", space->device().safe_pc(),mem_mask, retvalue);
 		return retvalue;
 	}
 }
@@ -710,12 +710,12 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_has_bus = 1;
 		}
 	}
@@ -723,12 +723,12 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_has_bus = 1;
 		}
 	}
@@ -736,12 +736,12 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_has_bus = 1;
 		}
 	}
@@ -757,12 +757,12 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_is_reset = 1;
 		}
 	}
@@ -770,12 +770,12 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_is_reset = 1;
 		}
 	}
@@ -783,12 +783,12 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(&space->device()),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", space->device().safe_pc(),data,mem_mask);
 			genz80.z80_is_reset = 1;
 		}
 	}

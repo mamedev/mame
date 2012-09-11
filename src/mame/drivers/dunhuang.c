@@ -269,7 +269,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_clear_y_w)
 WRITE8_MEMBER(dunhuang_state::dunhuang_horiz_clear_w)
 {
 	int i;
-//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(&space.device()), m_clear_y,data);
+//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", space.device().safe_pc(), m_clear_y,data);
 	for (i = 0; i < 0x40; i++)
 	{
 		int addr = m_clear_y * 0x40 + i;
@@ -285,7 +285,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_horiz_clear_w)
 WRITE8_MEMBER(dunhuang_state::dunhuang_vert_clear_w)
 {
 	int i;
-//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_pos_x,m_pos_y,data);
+//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", space.device().safe_pc(), m_pos_x,m_pos_y,data);
 	for (i = 0; i < 0x08; i++)
 	{
 		int addr = (m_pos_x & 0x3f) + (i & 0x07) * 0x40;
@@ -343,7 +343,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 	int i,j, addr;
 	UINT8 *tile_addr;
 
-//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(&space.device()), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
+//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", space.device().safe_pc(), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
 
 	m_block_h = data;
 
@@ -382,7 +382,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", cpu_get_pc(&space.device()), m_block_dest);
+			popmessage("%06x: block dst=%x", space.device().safe_pc(), m_block_dest);
 	}
 }
 

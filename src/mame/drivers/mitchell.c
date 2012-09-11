@@ -280,7 +280,7 @@ WRITE8_MEMBER(mitchell_state::input_w)
 	{
 		case 0:
 		default:
-			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(&space.device()), data);
+			logerror("PC %04x: write %02x to port 01\n", space.device().safe_pc(), data);
 			break;
 		case 1:
 			mahjong_input_select_w(space, offset, data);

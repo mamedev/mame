@@ -196,7 +196,7 @@ READ8_MEMBER(bking_state::bking3_68705_port_c_r)
 	int port_c_in = 0;
 	if (main_sent) port_c_in |= 0x01;
 	if (!mcu_sent) port_c_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space.device()),port_c_in);
+//logerror("%04x: 68705 port C read %02x\n",space.device().safe_pc(),port_c_in);
 	return port_c_in;
 }
 #endif

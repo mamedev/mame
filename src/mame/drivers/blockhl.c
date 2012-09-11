@@ -335,7 +335,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 	/* other bits unknown */
 
 	if ((lines & 0x84) != 0x80)
-		logerror("%04x: setlines %02x\n", cpu_get_pc(device), lines);
+		logerror("%04x: setlines %02x\n", device->safe_pc(), lines);
 }
 
 

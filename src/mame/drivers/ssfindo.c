@@ -354,17 +354,17 @@ ssfindo_speedup_func ssfindo_speedup;
 
 static void ssfindo_speedups(address_space* space)
 {
-	if (cpu_get_pc(&space->device())==0x2d6c8) // ssfindo
+	if (space->device().safe_pc()==0x2d6c8) // ssfindo
 		device_spin_until_time(&space->device(), attotime::from_usec(20));
-	else if (cpu_get_pc(&space->device())==0x2d6bc) // ssfindo
+	else if (space->device().safe_pc()==0x2d6bc) // ssfindo
 		device_spin_until_time(&space->device(), attotime::from_usec(20));
 }
 
 static void ppcar_speedups(address_space* space)
 {
-	if (cpu_get_pc(&space->device())==0x000bc8) // ppcar
+	if (space->device().safe_pc()==0x000bc8) // ppcar
 		device_spin_until_time(&space->device(), attotime::from_usec(20));
-	else if (cpu_get_pc(&space->device())==0x000bbc) // ppcar
+	else if (space->device().safe_pc()==0x000bbc) // ppcar
 		device_spin_until_time(&space->device(), attotime::from_usec(20));
 }
 
@@ -378,7 +378,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
-		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(&space.device()));
+		mame_printf_debug("IOLINESR %i @%x\n", offset, space.device().safe_pc());
 #endif
 
 		if(m_flashType == 1)
@@ -434,13 +434,13 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 				if(data&0xc0)
 					m_adrLatch=0;
 
-			if(cpu_get_pc(&space.device()) == 0xbac0 && m_flashType == 1)
+			if(space.device().safe_pc() == 0xbac0 && m_flashType == 1)
 			{
 				m_flashN=data&1;
 			}
 
 #if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,cpu_get_pc(&space.device()));
+				logerror("IOLINESW %i = %x  @%x\n",offset,data,space.device().safe_pc());
 #endif
 			break;
 
@@ -520,7 +520,7 @@ WRITE32_MEMBER(ssfindo_state::io_w)
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(&space.device()),m_adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,space.device().safe_pc(),m_adrLatch);
 #endif
 
 	if(m_adrLatch==1)

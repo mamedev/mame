@@ -91,7 +91,7 @@ READ16_MEMBER(cninja_state::cninja_irq_r)
 		return 0;
 	}
 
-	logerror("%08x:  Unmapped IRQ read %d\n", cpu_get_pc(&space.device()), offset);
+	logerror("%08x:  Unmapped IRQ read %d\n", space.device().safe_pc(), offset);
 	return 0;
 }
 
@@ -106,7 +106,7 @@ WRITE16_MEMBER(cninja_state::cninja_irq_w)
             0xc8:   Raster IRQ turned on (68k IRQ level 4)
             0xd8:   Raster IRQ turned on (68k IRQ level 3)
         */
-		logerror("%08x:  IRQ write %d %08x\n", cpu_get_pc(&space.device()), offset, data);
+		logerror("%08x:  IRQ write %d %08x\n", space.device().safe_pc(), offset, data);
 		m_irq_mask = data & 0xff;
 		return;
 
@@ -123,7 +123,7 @@ WRITE16_MEMBER(cninja_state::cninja_irq_w)
 		return;
 	}
 
-	logerror("%08x:  Unmapped IRQ write %d %04x\n", cpu_get_pc(&space.device()), offset, data);
+	logerror("%08x:  Unmapped IRQ write %d %04x\n", space.device().safe_pc(), offset, data);
 }
 
 READ16_MEMBER(cninja_state::robocop2_prot_r)
@@ -137,10 +137,10 @@ READ16_MEMBER(cninja_state::robocop2_prot_r)
 		case 0x4e6: /* Dip switches */
 			return ioport("DSW")->read();
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
-			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(&space.device()), offset);
+			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
 			return 0x84;
 	}
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(&space.device()), offset);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", space.device().safe_pc(), offset);
 	return 0;
 }
 

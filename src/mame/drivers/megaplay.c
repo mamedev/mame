@@ -573,7 +573,7 @@ static WRITE8_HANDLER( megaplay_game_w )
 		state->m_bios_mode = MP_GAME;
 		state->m_readpos = 1;
 //      popmessage("Game bank selected: 0x%03x", state->m_game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", cpu_get_previouspc(&space->device()), state->m_game_banksel);
+		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", space->device().safe_pcbase(), state->m_game_banksel);
 	}
 
 	state->m_mp_bios_bank_addr = ((state->m_mp_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;

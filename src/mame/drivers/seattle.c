@@ -818,7 +818,7 @@ static UINT32 pci_bridge_r(address_space *space, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(&space->device()), reg, type, result);
+		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, result);
 	return result;
 }
 
@@ -828,7 +828,7 @@ static void pci_bridge_w(address_space *space, UINT8 reg, UINT8 type, UINT32 dat
 	seattle_state *state = space->machine().driver_data<seattle_state>();
 	state->m_galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(&space->device()), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, data);
 }
 
 
@@ -856,7 +856,7 @@ static UINT32 pci_3dfx_r(address_space *space, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(&space->device()), reg, type, result);
+		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, result);
 	return result;
 }
 
@@ -879,7 +879,7 @@ static void pci_3dfx_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(&space->device()), reg, type, data);
+		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, data);
 }
 
 
@@ -907,7 +907,7 @@ static UINT32 pci_ide_r(address_space *space, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(&space->device()), reg, type, result);
+		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, result);
 	return result;
 }
 
@@ -917,7 +917,7 @@ static void pci_ide_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 	seattle_state *state = space->machine().driver_data<seattle_state>();
 	state->m_galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(&space->device()), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space->device().safe_pc(), reg, type, data);
 }
 
 
@@ -1153,7 +1153,7 @@ READ32_MEMBER(seattle_state::galileo_r)
 			device_eat_cycles(&space.device(), 100);
 
 			if (LOG_TIMERS)
-				logerror("%08X:hires_timer_r = %08X\n", cpu_get_pc(&space.device()), result);
+				logerror("%08X:hires_timer_r = %08X\n", space.device().safe_pc(), result);
 			break;
 		}
 
@@ -1186,7 +1186,7 @@ READ32_MEMBER(seattle_state::galileo_r)
 			else
 			{
 				result = ~0;
-				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(&space.device()), bus, unit, func, reg, type, result);
+				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", space.device().safe_pc(), bus, unit, func, reg, type, result);
 			}
 			break;
 		}
@@ -1196,11 +1196,11 @@ READ32_MEMBER(seattle_state::galileo_r)
 		case GREG_INT_MASK:
 		case GREG_TIMER_CONTROL:
 //          if (LOG_GALILEO)
-//              logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(&space.device()), offset*4, result);
+//              logerror("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
 			break;
 
 		default:
-			logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(&space.device()), offset*4, result);
+			logerror("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
 			break;
 	}
 
@@ -1225,7 +1225,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 			int which = offset % 4;
 
 			if (LOG_DMA)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(&space.device()), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 
 			/* keep the read only activity bit */
 			galileo.reg[offset] &= ~0x4000;
@@ -1255,7 +1255,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 			if (!timer->active)
 				timer->count = data;
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", cpu_get_pc(&space.device()), offset % 4, data, timer->count);
+				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", space.device().safe_pc(), offset % 4, data, timer->count);
 			break;
 		}
 
@@ -1264,7 +1264,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 			int which, mask;
 
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter control = %08X\n", cpu_get_pc(&space.device()), data);
+				logerror("%08X:timer/counter control = %08X\n", space.device().safe_pc(), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
 				galileo_timer *timer = &galileo.timer[which];
@@ -1323,7 +1323,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 
 			/* anything else, just log */
 			else
-				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(&space.device()), bus, unit, func, reg, type, data);
+				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", space.device().safe_pc(), bus, unit, func, reg, type, data);
 			break;
 		}
 
@@ -1334,11 +1334,11 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 		case GREG_CONFIG_ADDRESS:
 		case GREG_INT_MASK:
 			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(&space.device()), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 
 		default:
-			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(&space.device()), offset*4, data, mem_mask);
+			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -1372,7 +1372,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 
 	/* spin until we send the magic trigger */
 	device_spin_until_trigger(&space.device(), 45678);
-	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(&space.device()));
+	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", space.device().safe_pc());
 }
 
 
@@ -1392,7 +1392,7 @@ static void voodoo_stall(device_t *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine().device("maincpu")));
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", device->machine().device("maincpu")->safe_pc());
 			device_spin_until_trigger(device->machine().device("maincpu"), 45678);
 		}
 	}
@@ -1451,7 +1451,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(&space.device()), data);
+		logerror("%08X:Unexpected analog port select = %08X\n", space.device().safe_pc(), data);
 	m_pending_analog_read = ioport(portnames[data & 7])->read();
 }
 

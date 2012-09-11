@@ -268,7 +268,7 @@ READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mes
 
 WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
 {
-	//logerror("0x%04X: kbmcu written with %02X!\n", cpu_get_pc(m_maincpu), data); //if (cpu_get_pc(m_maincpu) != 0x31D)
+	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->safe_pc(), data); //if (m_maincpu->safe_pc() != 0x31D)
 	// if two writes happen within one frame, reset the keyboard latches
 	m_kbmcu_rscount++;
 	if (m_kbmcu_rscount > 1)

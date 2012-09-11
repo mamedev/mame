@@ -128,7 +128,7 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 
 	flip_screen_set(m_flipscreen);
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
+//popmessage("%04x: gfxctrl = %02x\n", space.device().safe_pc(), data);
 
 }
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 		flip_screen_set(m_flipscreen);
 	}
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
+//popmessage("%04x: gfxctrl = %02x\n", space.device().safe_pc(), data);
 
 }
 

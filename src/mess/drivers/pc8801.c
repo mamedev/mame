@@ -1887,7 +1887,7 @@ WRITE8_MEMBER(pc8801_state::upd765_mc_w)
 
 READ8_MEMBER(pc8801_state::upd765_tc_r)
 {
-	//printf("%04x 1\n",cpu_get_pc(m_fdccpu));
+	//printf("%04x 1\n",m_fdccpu->safe_pc());
 
 	upd765_tc_w(machine().device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.

@@ -919,7 +919,7 @@ static void execute_fdunlock(running_machine &machine, int ref, int params, cons
 
 	/* support 0 or 1 parameters */
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
-		offset = cpu_get_pc(cpu);
+		offset = cpu->safe_pc();
 	keyaddr = addr_to_keyaddr(offset / 2);
 
 	/* toggle the ignore PC status */
@@ -961,7 +961,7 @@ static void execute_fdignore(running_machine &machine, int ref, int params, cons
 		return;
 	}
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
-		offset = cpu_get_pc(cpu);
+		offset = cpu->safe_pc();
 	offset /= 2;
 
 	/* toggle the ignore PC status */
@@ -1060,7 +1060,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 
 	/* support 0 or 1 parameters */
 	if (!debug_command_parameter_number(machine, param[0], &newpc))
-		newpc = cpu_get_pc(cpu);
+		newpc = cpu->safe_pc();
 
 	/* set the new PC */
 	cpu_set_reg(cpu, STATE_GENPC, newpc);
@@ -1078,7 +1078,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 static void execute_fdsearch(running_machine &machine, int ref, int params, const char **param)
 {
 	address_space *space = debug_cpu_get_visible_cpu(machine)->memory().space(AS_PROGRAM);
-	int pc = cpu_get_pc(&space->device());
+	int pc = space->device().safe_pc();
 	int length, first = TRUE;
 	UINT8 instrdata[2];
 	UINT16 decoded;

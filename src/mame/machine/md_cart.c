@@ -418,7 +418,7 @@ static WRITE16_HANDLER( chifi3_bank_w )
 	}
 	else
 	{
-		logerror("%06x chifi3, bankw? %04x %04x\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06x chifi3, bankw? %04x %04x\n", space->device().safe_pc(), offset, data);
 	}
 
 }
@@ -435,39 +435,39 @@ static READ16_HANDLER( chifi3_prot_r )
     04cefa chifi3, prot_r? 65262
     */
 
-	if (cpu_get_pc(&space->device()) == 0x01782) // makes 'VS' screen appear
+	if (space->device().safe_pc() == 0x01782) // makes 'VS' screen appear
 	{
 		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(&space->device()) == 0x1c24) // background gfx etc.
+	else if (space->device().safe_pc() == 0x1c24) // background gfx etc.
 	{
 		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(&space->device()) == 0x10c4a) // unknown
+	else if (space->device().safe_pc() == 0x10c4a) // unknown
 	{
 		return space->machine().rand();
 	}
-	else if (cpu_get_pc(&space->device()) == 0x10c50) // unknown
+	else if (space->device().safe_pc() == 0x10c50) // unknown
 	{
 		return space->machine().rand();
 	}
-	else if (cpu_get_pc(&space->device()) == 0x10c52) // relates to the game speed..
+	else if (space->device().safe_pc() == 0x10c52) // relates to the game speed..
 	{
 		retdat = cpu_get_reg(&space->device(), M68K_D4) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(&space->device()) == 0x061ae)
+	else if (space->device().safe_pc() == 0x061ae)
 	{
 		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
-	else if (cpu_get_pc(&space->device()) == 0x061b0)
+	else if (space->device().safe_pc() == 0x061b0)
 	{
 		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
 		retdat <<= 8;
@@ -475,7 +475,7 @@ static READ16_HANDLER( chifi3_prot_r )
 	}
 	else
 	{
-		logerror("%06x chifi3, prot_r? %04x\n", cpu_get_pc(&space->device()), offset);
+		logerror("%06x chifi3, prot_r? %04x\n", space->device().safe_pc(), offset);
 	}
 
 	return 0;
@@ -504,20 +504,20 @@ static WRITE16_HANDLER( kaiju_bank_w )
  *************************************/
 static READ16_HANDLER( soulb_400006_r )
 {
-//  printf("%06x soulb_400006_r\n",cpu_get_pc(&space->device()));
+//  printf("%06x soulb_400006_r\n",space->device().safe_pc());
 	return 0xf000;
 }
 
 static READ16_HANDLER( soulb_400002_r )
 {
-//  printf("%06x soulb_400002_r\n",cpu_get_pc(&space->device()));
+//  printf("%06x soulb_400002_r\n",space->device().safe_pc());
 	return 0x9800;
 }
 
 static READ16_HANDLER( soulb_400004_r )
 {
 //  return 0x9800;
-//  printf("%06x soulb_400004_r\n",cpu_get_pc(&space->device()));
+//  printf("%06x soulb_400004_r\n",space->device().safe_pc());
 //
 	return 0xc900;
 //aa
@@ -742,11 +742,11 @@ static READ16_HANDLER( topfig_6BD294_r ) /* colours on title screen */
      cpu #0 (PC=001771A2): unmapped program memory word read from 006BD294 & 00FF
      */
 
-	if (cpu_get_pc(&space->device())==0x1771a2) return 0x50;
+	if (space->device().safe_pc()==0x1771a2) return 0x50;
 	else
 	{
 		x++;
-		logerror("%06x topfig_6BD294_r %04x\n",cpu_get_pc(&space->device()), x);
+		logerror("%06x topfig_6BD294_r %04x\n",space->device().safe_pc(), x);
 		return x;
 	}
 }
@@ -755,14 +755,14 @@ static READ16_HANDLER( topfig_6F5344_r ) // after char select
 {
 	static int x = -1;
 
-	if (cpu_get_pc(&space->device())==0x4C94E)
+	if (space->device().safe_pc()==0x4C94E)
 	{
 		return cpu_get_reg(space->machine().device("maincpu"), (M68K_D0)) & 0xff;
 	}
 	else
 	{
 		x++;
-		logerror("%06x topfig_6F5344_r %04x\n",cpu_get_pc(&space->device()), x);
+		logerror("%06x topfig_6F5344_r %04x\n",space->device().safe_pc(), x);
 		return x;
 	}
 }
@@ -773,7 +773,7 @@ static WRITE16_HANDLER( topfig_bank_w )
 	if (data == 0x002a)
 	{
 		memcpy(ROM + 0x060000, ROM + 0x570000, 0x8000); // == 0x2e*0x8000?!
-		//  printf("%06x offset %06x, data %04x\n",cpu_get_pc(&space->device()), offset, data);
+		//  printf("%06x offset %06x, data %04x\n",space->device().safe_pc(), offset, data);
 
 	}
 	else if (data==0x0035) // characters ingame
@@ -789,11 +789,11 @@ static WRITE16_HANDLER( topfig_bank_w )
 		memcpy(ROM + 0x060000, ROM + 0x460000, 0x8000);
 		memcpy(ROM + 0x020000, ROM + 0x420000, 0x8000);
 		memcpy(ROM + 0x058000, ROM + 0x458000, 0x8000);
-		//  printf("%06x offset %06x, data %04x\n",cpu_get_pc(&space->device()), offset, data);
+		//  printf("%06x offset %06x, data %04x\n",space->device().safe_pc(), offset, data);
 	}
 	else
 	{
-		logerror("%06x offset %06x, data %04x\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06x offset %06x, data %04x\n", space->device().safe_pc(), offset, data);
 	}
 
 }

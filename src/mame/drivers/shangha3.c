@@ -46,13 +46,13 @@ READ16_MEMBER(shangha3_state::shangha3_prot_r)
 {
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
-	logerror("PC %04x: read 20004e\n",cpu_get_pc(&space.device()));
+	logerror("PC %04x: read 20004e\n",space.device().safe_pc());
 
 	return result[m_prot_count++ % 9];
 }
 WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 {
-	logerror("PC %04x: write %02x to 20004e\n",cpu_get_pc(&space.device()),data);
+	logerror("PC %04x: write %02x to 20004e\n",space.device().safe_pc(),data);
 }
 
 

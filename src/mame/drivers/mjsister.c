@@ -218,7 +218,7 @@ WRITE8_MEMBER(mjsister_state::mjsister_banksel1_w)
 		case 0xf: m_vrambank = 1 ; break;
 
 		default:
-			logerror("%04x p30_w:%02x\n", cpu_get_pc(&space.device()), data);
+			logerror("%04x p30_w:%02x\n", space.device().safe_pc(), data);
 	}
 
 	if (tmp != m_colorbank)
@@ -239,7 +239,7 @@ WRITE8_MEMBER(mjsister_state::mjsister_banksel2_w)
 		case 0xd: m_rombank1 = 1; break;
 
 		default:
-			logerror("%04x p31_w:%02x\n", cpu_get_pc(&space.device()), data);
+			logerror("%04x p31_w:%02x\n", space.device().safe_pc(), data);
 	}
 
 	membank("bank1")->set_entry(m_rombank0 * 2 + m_rombank1);

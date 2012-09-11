@@ -123,7 +123,7 @@ WRITE16_MEMBER(pirates_state::pirates_out_w)
 		/* bit 7 used (function unknown) */
 	}
 
-//  logerror("%06x: out_w %04x\n",cpu_get_pc(&space.device()),data);
+//  logerror("%06x: out_w %04x\n",space.device().safe_pc(),data);
 }
 
 CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
@@ -139,7 +139,7 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = cpu_get_pc(machine().device("main"));
+	pc = machine().device("main")->safe_pc();
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;

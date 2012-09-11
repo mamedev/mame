@@ -140,7 +140,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
         m_regs[2] = ((m_liveptr>>16) & 0xff) | m_bankhior;
     }
 
-//    printf("Read c0n%x (PC=%x) = %02x\n", offset, cpu_get_pc(&space.device()), retval);
+//    printf("Read c0n%x (PC=%x) = %02x\n", offset, space.device().safe_pc(), retval);
 
 	return retval;
 }
@@ -152,7 +152,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
     switch (offset)
     {

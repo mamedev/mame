@@ -179,17 +179,17 @@ WRITE8_MEMBER(monzagp_state::port_w)
 
 WRITE8_MEMBER(monzagp_state::port0_w)
 {
-//  printf("P0 %x = %x\n",cpu_get_pc(&space.device()),data);
+//  printf("P0 %x = %x\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(monzagp_state::port1_w)
 {
-//  printf("P1 %x = %x\n",cpu_get_pc(&space.device()),data);
+//  printf("P1 %x = %x\n",space.device().safe_pc(),data);
 }
 
 WRITE8_MEMBER(monzagp_state::port2_w)
 {
-//  printf("P2 %x = %x\n",cpu_get_pc(&space.device()),data);
+//  printf("P2 %x = %x\n",space.device().safe_pc(),data);
 	m_coordy=data;
 }
 

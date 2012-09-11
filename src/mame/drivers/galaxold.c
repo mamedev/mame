@@ -397,7 +397,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 /* Send sound data to the sound cpu and cause an nmi */
 READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
 {
-	switch (cpu_get_pc(&space.device()))
+	switch (space.device().safe_pc())
 	{
 		case 0x002e:
 		case 0x0297:
@@ -895,7 +895,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 {
-	switch (cpu_get_pc(&space.device()))
+	switch (space.device().safe_pc())
 	{
 		case 0x0022:
 			return 0;
@@ -916,7 +916,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 {
-	switch (cpu_get_pc(&space.device()))
+	switch (space.device().safe_pc())
 	{
 		case 0x0083:
 		case 0x008c:
@@ -928,7 +928,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 		case 0x6b58:
 			return 1;
 		default:
-			logerror("Reading data port at PC=%04X\n", cpu_get_pc(&space.device()));
+			logerror("Reading data port at PC=%04X\n", space.device().safe_pc());
 			break;
 	}
 

@@ -1183,7 +1183,7 @@ static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(machine.device("maincpu")));
+			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, machine.device("maincpu")->safe_pc());
 			break;
 	}
 }
@@ -1464,7 +1464,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 						}
 						break;
 					default:
-						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(&space.device()));
+						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), space.device().safe_pc());
 						break;
 				}
 			}
@@ -1491,7 +1491,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 
 READ64_MEMBER(model3_state::model3_sys_r)
 {
-//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, cpu_get_pc(&space.device()));
+//  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, space.device().safe_pc());
 
 	switch (offset)
 	{
@@ -1516,7 +1516,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x (PC %x)\n", m_irq_state, cpu_get_pc(&space.device()));
+//          printf("read irq_state %x (PC %x)\n", m_irq_state, space.device().safe_pc());
 			return (UINT64)m_irq_state<<56 | 0xff000000;
 	}
 
@@ -1668,14 +1668,14 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 READ64_MEMBER(model3_state::network_r)
 {
-	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(&space.device()));
+	mame_printf_debug("network_r: %02X at %08X\n", offset, space.device().safe_pc());
 	return m_network_ram[offset];
 }
 
 WRITE64_MEMBER(model3_state::network_w)
 {
 	COMBINE_DATA(m_network_ram + offset);
-	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(&space.device()));
+	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), space.device().safe_pc());
 }
 
 

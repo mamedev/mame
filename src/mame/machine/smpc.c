@@ -716,7 +716,7 @@ static void smpc_comreg_exec(address_space *space, UINT8 data, UINT8 is_stv)
 			smpc_nmi_set(space->machine(),data & 1);
 			break;
 		default:
-			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
+			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), space->device().safe_pc(), data);
 	}
 }
 
@@ -883,7 +883,7 @@ READ8_HANDLER( saturn_SMPC_r )
 		}
 	}
 
-	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, offset>>1, return_data);
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), space->device().safe_pc(), offset, offset>>1, return_data);
 
 
 	return return_data;

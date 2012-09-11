@@ -972,7 +972,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 		memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
 
-	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(&space.device()),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
+	//popmessage("PC=%06x %02x %02x %02x %08x",space.device().safe_pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
 WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
@@ -986,7 +986,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 		memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
 
-	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(&space.device()),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
+	//popmessage("PC=%06x %02x %02x %02x %08x",space.device().safe_pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
 WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
@@ -1761,7 +1761,7 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 	res = resp[m_respcount++];
 	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),res);
+//  logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),res);
 
 	return res;
 }
@@ -1979,7 +1979,7 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 	res = resp[m_respcount++];
 	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),res);
+//  logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),res);
 
 	return res;
 }
@@ -2258,7 +2258,7 @@ READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 	res = resp[m_respcount++];
 	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),res);
+//  logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),res);
 
 	return res;
 }
@@ -2395,7 +2395,7 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 	res = resp[m_respcount++];
 	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",cpu_get_pc(&space.device()),res);
+//  popmessage("%04x: mcu_r %02x",space.device().safe_pc(),res);
 
 	return res;
 }
@@ -2416,7 +2416,7 @@ READ16_MEMBER(jalmah_state::suchipi_mcu_r)
 	res = resp[m_respcount++];
 	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",cpu_get_pc(&space.device()),res);
+//  popmessage("%04x: mcu_r %02x",space.device().safe_pc(),res);
 
 	return res;
 }

@@ -117,7 +117,7 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
 				coin_counter_w(machine(), 1, data & 0x04000000);
 				m_coin_word = (data >> 16) &0xffff;
 			}
-			//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&device()),offset);
+			//logerror("CPU #0 PC %06x: write input %06x\n",device->safe_pc(),offset);
 			break;
 		}
 	}
@@ -434,7 +434,7 @@ ROM_END
 
 READ32_MEMBER(gunbustr_state::main_cycle_r)
 {
-	if (cpu_get_pc(&space.device())==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
+	if (space.device().safe_pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
 		device_spin_until_interrupt(&space.device());
 
 	return m_ram[0x3acc/4];

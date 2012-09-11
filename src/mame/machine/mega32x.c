@@ -446,7 +446,7 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 				printf("Fifo block a isn't filled!\n");
 
 			if (current_fifo_readblock == fifo_block_b && !fifo_block_b_full)
-				printf("%08x Fifo block b isn't filled!\n",cpu_get_pc(&space.device()));
+				printf("%08x Fifo block b isn't filled!\n",space.device().safe_pc());
 
 
 			if (current_fifo_read_pos==4)

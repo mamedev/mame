@@ -67,21 +67,21 @@ static void mcu_update_seed( running_machine &machine, UINT8 data )
 
 READ8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_r)
 {
-	//logerror("%04x: MCU port_a read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: MCU port_a read\n", space.device().safe_pc());
 	return m_mcu_result;
 }
 
 
 READ8_MEMBER(chaknpop_state::chaknpop_mcu_port_b_r)
 {
-	//logerror("%04x: MCU port_b read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: MCU port_b read\n", space.device().safe_pc());
 
 	return 0xff;
 }
 
 READ8_MEMBER(chaknpop_state::chaknpop_mcu_port_c_r)
 {
-	//logerror("%04x: MCU port_c read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: MCU port_c read\n", space.device().safe_pc());
 	return 0x00;
 }
 
@@ -101,7 +101,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_w)
 
 		mcu_update_seed(machine(), m_mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space.device()), mcu_command, m_mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", space.device().safe_pc(), mcu_command, m_mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
@@ -112,7 +112,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_w)
 
 		mcu_update_seed(machine(), m_mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space.device()), mcu_command, m_mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", space.device().safe_pc(), mcu_command, m_mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
@@ -122,24 +122,24 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_w)
 		{
 			m_mcu_select = mcu_command - 0x40;
 
-			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(&space.device()), m_mcu_select);
+			logerror("%04x: MCU select 0x%02x\n", space.device().safe_pc(), m_mcu_select);
 		}
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)
 	{
 		mcu_update_seed(machine(), data);
 
-		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(&space.device()), mcu_command);
+		logerror("%04x: MCU command 0x%02x\n", space.device().safe_pc(), mcu_command);
 	}
 }
 
 WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_b_w)
 {
-	//logerror("%04x: MCU port_b write 0x%02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: MCU port_b write 0x%02x\n", space.device().safe_pc(), data);
 }
 
 WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_c_w)
 {
-	//logerror("%04x: MCU port_c write 0x%02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: MCU port_c write 0x%02x\n", space.device().safe_pc(), data);
 }
 

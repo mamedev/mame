@@ -393,7 +393,7 @@ READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 		}
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_get_pc(&space.device()),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",space.device().safe_pc(),offset);
 
 	return 0x0;
 }

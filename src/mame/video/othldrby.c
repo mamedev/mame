@@ -120,7 +120,7 @@ WRITE16_MEMBER(othldrby_state::othldrby_vreg_w)
 	if (m_vreg_addr < OTHLDRBY_VREG_SIZE)
 		m_vreg[m_vreg_addr++] = data;
 	else
-		popmessage("%06x: VREG OUT OF BOUNDS %04x", cpu_get_pc(&space.device()), m_vreg_addr);
+		popmessage("%06x: VREG OUT OF BOUNDS %04x", space.device().safe_pc(), m_vreg_addr);
 }
 
 

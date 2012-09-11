@@ -293,7 +293,7 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
 	}
 
 	if (olddata != m_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space.device()), offset, m_control[offset], olddata);
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", space.device().safe_pc(), offset, m_control[offset], olddata);
 }
 
 

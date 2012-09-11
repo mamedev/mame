@@ -263,7 +263,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 	}
 	else
 	{
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", cpu_get_pc(&space.device()));
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", space.device().safe_pc());
 		return 0xff;
 	}
 }
@@ -276,7 +276,7 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 	if (m_soundbuf_len < 32)
 		m_soundbuf_len++;
 	else
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", cpu_get_pc(&space.device()));
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", space.device().safe_pc());
 }
 
 
@@ -1051,7 +1051,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
 	membank("bank2")->set_entry(data & 0x0f);
 }
@@ -1088,7 +1088,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
 	membank("bank2")->set_entry(data & 0x07);
 }
@@ -1119,7 +1119,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
 	membank("bank1")->set_entry(data & 0x0f);
 }
@@ -1167,7 +1167,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
 	membank("bank1")->set_entry(data & 0x07);
 }
@@ -1209,7 +1209,7 @@ WRITE8_MEMBER(cave_state::mirror_ram_w)
 WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 {
 	if (data & ~0x1f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 
 	membank("bank1")->set_entry(data & 0x1f);
 }

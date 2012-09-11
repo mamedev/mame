@@ -189,7 +189,7 @@ READ32_MEMBER(backfire_state::backfire_eeprom_r)
 READ32_MEMBER(backfire_state::backfire_control2_r)
 {
 
-//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space.device()), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
 	return (m_eeprom->read_bit() << 24) | ioport("IN1")->read() | (ioport("IN1")->read() << 16);
 }
 
@@ -197,7 +197,7 @@ READ32_MEMBER(backfire_state::backfire_control2_r)
 READ32_MEMBER(backfire_state::backfire_control3_r)
 {
 
-//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space.device()), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
 	return (m_eeprom->read_bit() << 24) | ioport("IN2")->read() | (ioport("IN2")->read() << 16);
 }
 #endif
@@ -699,10 +699,10 @@ static void descramble_sound( running_machine &machine )
 READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
 
-	//mame_printf_debug( "%08x\n",cpu_get_pc(&space.device()));
+	//mame_printf_debug( "%08x\n",space.device().safe_pc());
 
-	if (cpu_get_pc(&space.device() )== 0xce44)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfire
-	if (cpu_get_pc(&space.device()) == 0xcee4)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfirea
+	if (space.device() .safe_pc()== 0xce44)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfire
+	if (space.device().safe_pc() == 0xcee4)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfirea
 
 	return m_mainram[0x18/4];
 }

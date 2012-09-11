@@ -138,7 +138,7 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 
 WRITE8_MEMBER(crgolf_state::unknown_w)
 {
-	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(&space.device()), data);
+	logerror("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
 }
 
 

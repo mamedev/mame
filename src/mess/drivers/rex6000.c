@@ -141,7 +141,7 @@ UINT8 rex6000_state::identify_bank_type(UINT32 bank)
 	}
 	else
 	{
-		//logerror("%04x: unkonwn memory bank %x\n", cpu_get_pc(m_maincpu), bank);
+		//logerror("%04x: unkonwn memory bank %x\n", m_maincpu->safe_pc(), bank);
 		return BANK_UNKNOWN;
 	}
 }

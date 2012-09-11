@@ -203,7 +203,7 @@ WRITE8_MEMBER(itech8_state::itech8_palette_w)
 WRITE8_MEMBER(itech8_state::itech8_page_w)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(&space.device()), data, machine().primary_screen->vpos());
+	logerror("%04x:display_page = %02X (%d)\n", space.device().safe_pc(), data, machine().primary_screen->vpos());
 	m_page_select = data;
 }
 
@@ -444,7 +444,7 @@ READ8_MEMBER(itech8_state::itech8_blitter_r)
 	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", cpu_get_previouspc(&space.device()), offset / 2);
+	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", space.device().safe_pcbase(), offset / 2);
 
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -507,7 +507,7 @@ WRITE8_MEMBER(itech8_state::itech8_blitter_w)
 	}
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", cpu_get_previouspc(&space.device()), offset, data);
+	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", space.device().safe_pcbase(), offset, data);
 }
 
 

@@ -218,7 +218,7 @@ WRITE8_MEMBER(ppmast93_state::ppmast_sound_w)
 		case 0:
 		case 1: ym2413_w(machine().device("ymsnd"),offset,data); break;
 		case 2: machine().device<dac_device>("dac")->write_unsigned8(data);break;
-		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(&space.device()));
+		default: logerror("%x %x - %x\n",offset,data,space.device().safe_pcbase());
 	}
 }
 

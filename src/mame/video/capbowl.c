@@ -107,7 +107,7 @@ WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 			break;
 
 		default:
-			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", cpu_get_pc(&space.device()), offset, data);
+			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", space.device().safe_pc(), offset, data);
 			break;
 	}
 }
@@ -138,7 +138,7 @@ READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
 			break;
 
 		default:
-			logerror("PC=%04X Read from unsupported blitter address %02X\n", cpu_get_pc(&space.device()), offset);
+			logerror("PC=%04X Read from unsupported blitter address %02X\n", space.device().safe_pc(), offset);
 			break;
 	}
 

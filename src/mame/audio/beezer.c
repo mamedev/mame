@@ -499,7 +499,7 @@ READ8_DEVICE_HANDLER( beezer_sh6840_r )
 		return 0;
 		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
 		case 1:
-		logerror("%04X:beezer_sh6840_r - unexpected read, status register is TODO!\n", cpu_get_pc(state->m_maincpu));
+		logerror("%04X:beezer_sh6840_r - unexpected read, status register is TODO!\n", state->m_maincpu->safe_pc());
 		return 0;
 		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
 		case 2: case 4: case 6:

@@ -472,7 +472,7 @@ static void meritm_switch_banks( running_machine &machine )
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
 	m_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(&space.device()) );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
 	meritm_switch_banks(machine());
 };
 

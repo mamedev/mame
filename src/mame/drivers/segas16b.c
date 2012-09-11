@@ -1124,7 +1124,7 @@ READ16_MEMBER( segas16b_state::standard_io_r )
 		case 0x2000/2:
 			return ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(&space.device()), offset * 2);
+	logerror("%06X:standard_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -1159,7 +1159,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			coin_counter_w(machine(), 0, data & 0x01);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(&space.device()), offset * 2, data, mem_mask);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 }
 
 

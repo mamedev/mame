@@ -253,7 +253,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				intvkbd_tms9927_w(space, offset-0xc0, data);
 				break;
 			default:
-				logerror("%04X: Unknown write %02x to 0x40%02x\n",cpu_get_pc(&space.device()),data,offset);
+				logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
 				break;
 		}
 	}

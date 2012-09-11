@@ -182,7 +182,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 {
 	if (offset == 2)
 	{
-//        printf("Sonora: read monitor ID at PC=%x\n", cpu_get_pc(m_maincpu));
+//        printf("Sonora: read monitor ID at PC=%x\n", m_maincpu->safe_pc());
 		return (6 << 4);	// 640x480 RGB monitor
 	}
 
@@ -240,7 +240,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		{
 			data &= ~0x38;
 			data |= (space.machine().root_device().ioport("MONTYPE")->read_safe(2)<<3);
-//            printf("rbv_r montype: %02x (PC %x)\n", data, cpu_get_pc(space.cpu));
+//            printf("rbv_r montype: %02x (PC %x)\n", data, space.cpu->safe_pc());
 		}
 
 		// bit 7 of these registers always reads as 0 on RBV
@@ -256,12 +256,12 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		switch (offset)
 		{
 			case 13:	// IFR
-//              printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
+//              printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, m_maincpu->safe_pc(), m_rbv_regs[2]);
 				data = m_rbv_ifr;
 				break;
 
 			case 14:	// IER
-//              printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, cpu_get_pc(m_maincpu), m_rbv_regs[2]);
+//              printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, m_maincpu->safe_pc(), m_rbv_regs[2]);
 				data = m_rbv_ier;
 				break;
 
@@ -271,7 +271,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		}
 	}
 
-//  printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, cpu_get_pc(m_maincpu));
+//  printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, m_maincpu->safe_pc());
 
 	return data;
 }
@@ -281,7 +281,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 	if (offset < 0x100)
 	{
 //      if (offset == 0x10)
-//      printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+//      printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, m_maincpu->safe_pc());
 		switch (offset)
 		{
 			case 0x00:
@@ -364,7 +364,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 		switch (offset)
 		{
 			case 13:	// IFR
-//              printf("%02x to IFR (PC=%x)\n", data, cpu_get_pc(m_maincpu));
+//              printf("%02x to IFR (PC=%x)\n", data, m_maincpu->safe_pc());
 				if (data & 0x80)
 				{
 					data = 0x7f;
@@ -373,7 +373,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 				break;
 
 			case 14:	// IER
-//              printf("%02x to IER (PC=%x)\n", data, cpu_get_pc(m_maincpu));
+//              printf("%02x to IER (PC=%x)\n", data, m_maincpu->safe_pc());
 				if (data & 0x80)	// 1 bits write 1s
 				{
 					m_rbv_ier |= data & 0x7f;
@@ -440,24 +440,24 @@ READ32_MEMBER(mac_state::buserror_r)
 
 READ8_MEMBER(mac_state::scciop_r)
 {
-//  printf("scciop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+//  printf("scciop_r @ %x (PC=%x)\n", offset, m_maincpu->safe_pc());
 	return 0;
 }
 
 WRITE8_MEMBER(mac_state::scciop_w)
 {
-//  printf("scciop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+//  printf("scciop_w %x @ %x (PC=%x)\n", data, offset, m_maincpu->safe_pc());
 }
 
 READ8_MEMBER(mac_state::swimiop_r)
 {
-//  printf("swimiop_r @ %x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+//  printf("swimiop_r @ %x (PC=%x)\n", offset, m_maincpu->safe_pc());
 	return 0;
 }
 
 WRITE8_MEMBER(mac_state::swimiop_w)
 {
-//  printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, cpu_get_pc(m_maincpu));
+//  printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, m_maincpu->safe_pc());
 }
 
 READ8_MEMBER(mac_state::pmac_diag_r)
@@ -478,7 +478,7 @@ READ8_MEMBER(mac_state::amic_dma_r)
 
 WRITE8_MEMBER(mac_state::amic_dma_w)
 {
-//  printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, cpu_get_pc(m_maincpu));
+//  printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, m_maincpu->safe_pc());
 }
 
 // HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)

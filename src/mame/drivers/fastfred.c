@@ -21,7 +21,7 @@
 // to change if a different ROM set ever surfaces.
 READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 {
-    switch (cpu_get_pc(&space.device()))
+    switch (space.device().safe_pc())
     {
     case 0x03c0: return 0x9d;
     case 0x03e6: return 0x9f;
@@ -47,14 +47,14 @@ READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
     case 0x7b58: return 0x20;
     }
 
-    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(&space.device()));
+    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, space.device().safe_pc());
     return 0x00;
 }
 
 READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 {
 
-	switch (cpu_get_pc(&space.device()))
+	switch (space.device().safe_pc())
 	{
 	 case 0x049d: return 0xad;	/* compare */
 	 case 0x04b9:			/* compare with 0x9e ??? When ??? */
@@ -75,14 +75,14 @@ READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(&space.device()));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, space.device().safe_pc());
 	return 0x00;
 }
 
 READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 {
 
-	switch (cpu_get_pc(&space.device()))
+	switch (space.device().safe_pc())
 	{
 	 case 0x0395: return 0xf7;	/* $C900 compare         */
 	 case 0x03f5:			/* $c8fd                 */
@@ -100,7 +100,7 @@ READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(&space.device()));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, space.device().safe_pc());
 	return 0x00;
 }
 

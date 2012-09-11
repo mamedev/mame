@@ -229,7 +229,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	/* bit 7 selects one of two ROM banks for c000-dfff */
 	membank("bank1")->set_entry((data & 0x80) >> 7);
 
-	/*  logerror("Address: %04X - port 40 = %02x\n", cpu_get_pc(&space.device()), data); */
+	/*  logerror("Address: %04X - port 40 = %02x\n", space.device().safe_pc(), data); */
 }
 
 WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)

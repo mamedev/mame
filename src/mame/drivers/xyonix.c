@@ -74,7 +74,7 @@ static void handle_coins(running_machine &machine, int coin)
 
 READ8_MEMBER(xyonix_state::xyonix_io_r)
 {
-	int regPC = cpu_get_pc(&space.device());
+	int regPC = space.device().safe_pc();
 
 	if (regPC == 0x27ba)
 		return 0x88;
@@ -126,7 +126,7 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 WRITE8_MEMBER(xyonix_state::xyonix_io_w)
 {
 
-	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(&space.device()));
+	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, space.device().safe_pc());
 	m_e0_data = data;
 }
 

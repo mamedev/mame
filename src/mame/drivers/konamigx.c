@@ -482,7 +482,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
         */
 
 		konamigx_wrport1_1 = (data>>16)&0xff;
-//      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, cpu_get_pc(&space.device()));
+//      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, space.device().safe_pc());
 
 		// gx_syncen is to ensure each IRQ is trigger at least once after being enabled
 		if (konamigx_wrport1_1 & 0x80) gx_syncen |= konamigx_wrport1_1 & 0x1f;
@@ -546,7 +546,7 @@ READ32_MEMBER(konamigx_state::waitskip_r)
 {
 	UINT32 data = gx_workram[waitskip.offs+offset];
 
-	if (cpu_get_pc(&space.device()) == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
+	if (space.device().safe_pc() == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{
 		device_spin_until_trigger(&space.device(), resume_trigger);
 		suspension_active = 1;
@@ -730,7 +730,7 @@ READ32_MEMBER(konamigx_state::sound020_r)
 		rv |= LSW<<8;
 	}
 
-//  mame_printf_debug("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(&space.device()));
+//  mame_printf_debug("Read 68k @ %x (PC=%x)\n", reg, space.device().safe_pc());
 
 	// we clearly have some problem because some games require these hacks
 	// perhaps 68000/68020 timing is skewed?
@@ -740,43 +740,43 @@ READ32_MEMBER(konamigx_state::sound020_r)
 			if (reg == 0) rv |= 0xff00;
 			break;
 		case 2: // Winning Spike
-			if (cpu_get_pc(&space.device()) == 0x2026fe) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x2026fe) rv = 0xc0c0c0c0;
 			break;
 		case 3: // Run'n Gun 2
-			if (cpu_get_pc(&space.device()) == 0x24f0b6) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24f122) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24f0b6) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24f122) rv = 0xc0c0c0c0;
 			break;
 		case 4:	// Rushing Heroes
-			if (cpu_get_pc(&space.device()) == 0x20eda6) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x20eda6) rv = 0xc0c0c0c0;
 			break;
 		case 5:	// Vs. Net Soccer ver. UAB
-			if (cpu_get_pc(&space.device()) == 0x24c5d2) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24c63e) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24c5d2) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24c63e) rv = 0xc0c0c0c0;
 			break;
 		case 6: // Slam Dunk 2
-			if (cpu_get_pc(&space.device()) == 0x24f1b0) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24f21c) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24f1b0) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24f21c) rv = 0xc0c0c0c0;
 			break;
 		case 7:	// Vs. Net Soccer ver. AAA
-			if (cpu_get_pc(&space.device()) == 0x24c6b6) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24c722) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24c6b6) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24c722) rv = 0xc0c0c0c0;
 			break;
 		case 8:	// Vs. Net Soccer ver. EAD
-			if (cpu_get_pc(&space.device()) == 0x24c416) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24c482) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24c416) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24c482) rv = 0xc0c0c0c0;
 			break;
 		case 9:	// Vs. Net Soccer ver. EAB
-			if (cpu_get_pc(&space.device()) == 0x24c400) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24c46c) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24c400) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24c46c) rv = 0xc0c0c0c0;
 			break;
 		case 10: // Vs. Net Soccer ver. JAB
-			if (cpu_get_pc(&space.device()) == 0x24c584) rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x24c5f0) rv = 0xc0c0c0c0;
+			if (space.device().safe_pc() == 0x24c584) rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
 		case 11: // Racin' Force
 			if (reg == 0)
 			{
-				if (cpu_get_pc(&space.device()) == 0x0202190)
+				if (space.device().safe_pc() == 0x0202190)
 					rv |= 0x4000;
 			}
 			break;
@@ -784,33 +784,33 @@ READ32_MEMBER(konamigx_state::sound020_r)
 		case 12: // Open Golf / Golfing Greats 2
 			if (reg == 0)
 			{
-				if ((cpu_get_pc(&space.device()) == 0x0245e80) || (cpu_get_pc(&space.device()) == 0x02459d6) || (cpu_get_pc(&space.device()) == 0x0245e40) )
+				if ((space.device().safe_pc() == 0x0245e80) || (space.device().safe_pc() == 0x02459d6) || (space.device().safe_pc() == 0x0245e40) )
 					rv |= 0x4000;
 			}
 			break;
 		case 13: // Soccer Superstars
-			//if(cpu_get_pc(&space.device()) != 0x236dce && cpu_get_pc(&space.device()) != 0x236d8a && cpu_get_pc(&space.device()) != 0x236d8a)
-			//  printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(&space.device()));
-			if (cpu_get_pc(&space.device()) == 0x0236e04)  rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x0236e12)  rv = 0xffffffff;
+			//if(space.device().safe_pc() != 0x236dce && space.device().safe_pc() != 0x236d8a && space.device().safe_pc() != 0x236d8a)
+			//  printf("Read 68k @ %x (PC=%x)\n", reg, space.device().safe_pc());
+			if (space.device().safe_pc() == 0x0236e04)  rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x0236e12)  rv = 0xffffffff;
 			break;
 		case 14: // Soccer Superstars ver. JAC
-			//if(cpu_get_pc(&space.device()) != 0x2367b4)
-			//  printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(&space.device()));
-			if (cpu_get_pc(&space.device()) == 0x02367ea)  rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x02367f8)  rv = 0xffffffff;
+			//if(space.device().safe_pc() != 0x2367b4)
+			//  printf("Read 68k @ %x (PC=%x)\n", reg, space.device().safe_pc());
+			if (space.device().safe_pc() == 0x02367ea)  rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x02367f8)  rv = 0xffffffff;
 			break;
 		case 15: // Soccer Superstars ver. JAA
-			//if(cpu_get_pc(&space.device()) != 0x23670a)
-			//  printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(&space.device()));
-			if (cpu_get_pc(&space.device()) == 0x0236740)  rv = 0xffffffff;
-			if (cpu_get_pc(&space.device()) == 0x023674e)  rv = 0xffffffff;
+			//if(space.device().safe_pc() != 0x23670a)
+			//  printf("Read 68k @ %x (PC=%x)\n", reg, space.device().safe_pc());
+			if (space.device().safe_pc() == 0x0236740)  rv = 0xffffffff;
+			if (space.device().safe_pc() == 0x023674e)  rv = 0xffffffff;
 			break;
 		case 16: // Dragoon Might ver. JAA
 			{
 				UINT32 cur_pc;
 
-				cur_pc = cpu_get_pc(&space.device());
+				cur_pc = space.device().safe_pc();
 
 				switch(cur_pc)
 				{
@@ -1114,20 +1114,20 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				else if(last_prot_op == 0x515) // vsnetscr screen 1
 				{
 					int adr;
-					//printf("GXT4: command %x %d (PC=%x)\n", last_prot_op, cc++, cpu_get_pc(&space.device()));
+					//printf("GXT4: command %x %d (PC=%x)\n", last_prot_op, cc++, space.device().safe_pc());
 					for (adr = 0; adr < 0x400; adr += 2)
 						space.write_word(0xc01c00+adr, space.read_word(0xc01800+adr));
 				}
 				else if(last_prot_op == 0x115d) // vsnetscr screen 2
 				{
 					int adr;
-					//printf("GXT4: command %x %d (PC=%x)\n", last_prot_op, cc++, cpu_get_pc(&space.device()));
+					//printf("GXT4: command %x %d (PC=%x)\n", last_prot_op, cc++, space.device().safe_pc());
 					for (adr = 0; adr < 0x400; adr += 2)
 						space.write_word(0xc18c00+adr, space.read_word(0xc18800+adr));
 				}
 				else
 				{
-					printf("GXT4: unknown protection command %x (PC=%x)\n", last_prot_op, cpu_get_pc(&space.device()));
+					printf("GXT4: unknown protection command %x (PC=%x)\n", last_prot_op, space.device().safe_pc());
 				}
 
 				if (konamigx_wrport1_1 & 0x10)

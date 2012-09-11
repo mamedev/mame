@@ -1601,7 +1601,7 @@ READ8_HANDLER( m6801_io_r )
 	case IO_ICR2H:
 	case IO_ICR2L:
 	default:
-		logerror("M6801 '%s' PC %04x: warning - read from reserved internal register %02x\n",space->device().tag(),cpu_get_pc(&space->device()),offset);
+		logerror("M6801 '%s' PC %04x: warning - read from reserved internal register %02x\n",space->device().tag(),space->device().safe_pc(),offset);
 	}
 
 	return data;
@@ -1635,7 +1635,7 @@ WRITE8_HANDLER( m6801_io_w )
 			write_port2(cpustate);
 
 			if (cpustate->port2_ddr & 2)
-				logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->device().tag(),cpu_get_pc(&space->device()));
+				logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->device().tag(),space->device().safe_pc());
 		}
 		break;
 
@@ -1770,7 +1770,7 @@ WRITE8_HANDLER( m6801_io_w )
 	case IO_ICRH:
 	case IO_ICRL:
 	case IO_RDR:
-		//logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->device().tag(),cpu_get_pc(&space->device()),data,offset);
+		//logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->device().tag(),space->device().safe_pc(),data,offset);
 		break;
 
 	case IO_P3CSR:
@@ -1832,7 +1832,7 @@ WRITE8_HANDLER( m6801_io_w )
 	case IO_ICR2H:
 	case IO_ICR2L:
 	default:
-		logerror("M6801 '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->device().tag(),cpu_get_pc(&space->device()),data,offset);
+		logerror("M6801 '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->device().tag(),space->device().safe_pc(),data,offset);
 		break;
 	}
 }

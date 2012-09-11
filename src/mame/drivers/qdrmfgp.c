@@ -239,7 +239,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 	{
 		if (offset == 0x07)
 		{
-			switch (cpu_get_previouspc(&space.device()))
+			switch (space.device().safe_pcbase())
 			{
 				case 0xdb4c:
 					if ((m_workram[0x5fa4/2] - cpu_get_reg(&space.device(), M68K_D0)) <= 0x10)

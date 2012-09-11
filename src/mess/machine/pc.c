@@ -532,7 +532,7 @@ static UINT8	nmi_enabled;
 
 WRITE8_MEMBER(pc_state::pc_nmi_enable_w)
 {
-	logerror( "%08X: changing NMI state to %s\n", cpu_get_pc(&space.device()), data & 0x80 ? "enabled" : "disabled" );
+	logerror( "%08X: changing NMI state to %s\n", space.device().safe_pc(), data & 0x80 ? "enabled" : "disabled" );
 
 	nmi_enabled = data & 0x80;
 }

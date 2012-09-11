@@ -344,7 +344,7 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 
 	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 }
 
 

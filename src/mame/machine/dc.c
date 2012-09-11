@@ -353,7 +353,7 @@ READ64_HANDLER( dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, state->dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(&space->device()));
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %" I64FMT "x (PC=%x)\n", 0x5f6800+reg*4, state->dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space->device().safe_pc());
 	}
 	#endif
 
@@ -615,7 +615,7 @@ READ64_HANDLER( pvr_ctrl_r )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, state->pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, state->pvrctrl_regs[reg], offset, reg, mem_mask, space->device().safe_pc());
 	#endif
 
 	return (UINT64)state->pvrctrl_regs[reg] << shift;

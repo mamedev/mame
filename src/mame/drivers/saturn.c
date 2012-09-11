@@ -290,11 +290,11 @@ static READ32_HANDLER( saturn_scu_r )
 	{
 		case 0x5c/4:
 		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
+			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space->device().safe_pc());
 			res = state->m_scu_regs[0x7c/4];
 			break;
 		case 0x7c/4:
-			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(&space->device()));
+			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space->device().safe_pc());
 			res = state->m_scu_regs[offset];
 			break;
 		case 0x80/4:
@@ -305,19 +305,19 @@ static READ32_HANDLER( saturn_scu_r )
         	res = dsp_ram_addr_r();
         	break;
         case 0xa0/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",cpu_get_pc(&space->device()),mem_mask,state->m_scu_regs[0xa0/4]);
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space->device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
     		res = state->m_scu.ism;
     		break;
     	case 0xa4/4:
-    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",cpu_get_pc(&space->device()),mem_mask,state->m_scu_regs[0xa0/4]);
+    		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space->device().safe_pc(),mem_mask,state->m_scu_regs[0xa0/4]);
 			res = state->m_scu.ist;
 			break;
 		case 0xc8/4:
-			logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(&space->device()));
+			logerror("(PC=%08x) SCU version reg read\n",space->device().safe_pc());
 			res = 0x00000004;/*SCU Version 4, OK? */
 			break;
 		default:
-	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(&space->device()),offset,state->m_scu_regs[offset]);
+	    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space->device().safe_pc(),offset,state->m_scu_regs[offset]);
 	    	res = state->m_scu_regs[offset];
 			break;
 	}
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 			scu_test_pending_irq(space->machine());
 			break;
 		case 0xa4/4: /* IRQ control */
-			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",cpu_get_pc(&space->device()),state->m_scu_regs[41],mem_mask);
+			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",space->device().safe_pc(),state->m_scu_regs[41],mem_mask);
 			state->m_scu.ist &= state->m_scu_regs[offset];
 			break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",state->m_scu_regs[42]); break;
@@ -643,7 +643,7 @@ static WRITE32_HANDLER( minit_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
+	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), space->device().safe_pc(),data);
 	space->machine().scheduler().boost_interleave(state->m_minit_boost_timeslice, attotime::from_usec(state->m_minit_boost));
 	space->machine().scheduler().trigger(1000);
 	sh2_set_frt_input(state->m_slave, PULSE_LINE);
@@ -653,7 +653,7 @@ static WRITE32_HANDLER( sinit_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
+	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), space->device().safe_pc(),data);
 	space->machine().scheduler().boost_interleave(state->m_sinit_boost_timeslice, attotime::from_usec(state->m_sinit_boost));
 	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
 }

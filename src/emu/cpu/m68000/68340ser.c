@@ -12,7 +12,7 @@ READ32_HANDLER( m68340_internal_serial_r )
 
 	if (serial)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 		logerror("%08x m68340_internal_serial_r %08x, (%08x)\n", pc, offset*4,mem_mask);
 	}
 
@@ -27,7 +27,7 @@ WRITE32_HANDLER( m68340_internal_serial_w )
 
 	if (serial)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 		logerror("%08x m68340_internal_serial_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
 	}
 

@@ -163,7 +163,7 @@ WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
 READ16_MEMBER(xexex_state::xexex_waitskip_r)
 {
 
-	if (cpu_get_pc(&space.device()) == 0x1158)
+	if (space.device().safe_pc() == 0x1158)
 	{
 		device_spin_until_trigger(&space.device(), m_resume_trigger);
 		m_suspension_active = 1;

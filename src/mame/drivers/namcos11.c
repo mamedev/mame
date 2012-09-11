@@ -757,7 +757,7 @@ WRITE16_MEMBER(namcos11_state::c76_shared_w)
 
 READ16_MEMBER(namcos11_state::c76_inputs_r)
 {
-//  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(&space.device()));
+//  logerror("'c76' Read port %d @ %06X\n", offset, space.device().safe_pc());
 
 	switch (offset)
 	{
@@ -855,7 +855,7 @@ ADDRESS_MAP_END
 READ16_MEMBER(namcos11_state::c76_speedup_r)
 {
 
-	if ((cpu_get_pc(&space.device()) == 0xc153) && (!(m_su_83 & 0xff00)))
+	if ((space.device().safe_pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());
 	}

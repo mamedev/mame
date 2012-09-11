@@ -824,7 +824,7 @@ g_profiler.start(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(&space->device()), data);
+					logerror("%06x: unknown blitter command %02x\n", space->device().safe_pc(), data);
 				#endif
 			}
 
@@ -843,7 +843,7 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", cpu_get_pc(&space->device()), blitter, state->m_ddenlovr_blit_regs[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", space->device().safe_pc(), blitter, state->m_ddenlovr_blit_regs[blitter], data);
 			break;
 		}
 	}
@@ -1190,7 +1190,7 @@ g_profiler.start(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(&space.device()), data);
+					logerror("%06x: unknown blitter command %02x\n", space.device().safe_pc(), data);
 				#endif
 			}
 
@@ -1199,7 +1199,7 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter 0 reg %02x = %02x\n", cpu_get_pc(&space.device()), m_ddenlovr_blit_latch, data);
+			logerror("%06x: Blitter 0 reg %02x = %02x\n", space.device().safe_pc(), m_ddenlovr_blit_latch, data);
 			break;
 	}
 
@@ -1244,7 +1244,7 @@ READ8_MEMBER(dynax_state::rongrong_gfxrom_r)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(&space.device()), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", space.device().safe_pc(), address);
 		address %= size;
 	}
 
@@ -1589,7 +1589,7 @@ WRITE16_MEMBER(dynax_state::ddenlovr_select2_16_w)
 
 READ8_MEMBER(dynax_state::rongrong_input2_r)
 {
-//  logerror("%04x: input2_r offset %d select %x\n", cpu_get_pc(&space.device()), offset, m_input_sel);
+//  logerror("%04x: input2_r offset %d select %x\n", space.device().safe_pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch (m_input_sel)
 	{
@@ -1615,7 +1615,7 @@ static READ8_DEVICE_HANDLER( quiz365_input_r )
 
 READ16_MEMBER(dynax_state::quiz365_input2_r)
 {
-//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(&space.device()), offset, m_input_sel);
+//  logerror("%04x: input2_r offset %d select %x\n",space.device().safe_pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch (m_input_sel)
 	{
@@ -1632,7 +1632,7 @@ WRITE8_MEMBER(dynax_state::rongrong_blitter_busy_w)
 	m_rongrong_blitter_busy_select = data;
 
 	if (data != 0x18)
-		logerror("%04x: rongrong_blitter_busy_w data = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: rongrong_blitter_busy_w data = %02x\n", space.device().safe_pc(), data);
 }
 
 READ8_MEMBER(dynax_state::rongrong_blitter_busy_r)
@@ -1642,7 +1642,7 @@ READ8_MEMBER(dynax_state::rongrong_blitter_busy_r)
 		case 0x18:	return 0;	// bit 5 = blitter busy
 
 		default:
-			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n", cpu_get_pc(&space.device()), m_rongrong_blitter_busy_select);
+			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n", space.device().safe_pc(), m_rongrong_blitter_busy_select);
 	}
 	return 0xff;
 }
@@ -1969,7 +1969,7 @@ READ8_MEMBER(dynax_state::rongrong_input_r)
 
 WRITE8_MEMBER(dynax_state::rongrong_select_w)
 {
-//logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(&space.device()),data);
+//logerror("%04x: rongrong_select_w %02x\n",space.device().safe_pc(),data);
 
 	/* bits 0-4 = **both** ROM bank **AND** input select */
 	membank("bank1")->set_entry(data & 0x1f);
@@ -2238,7 +2238,7 @@ READ8_MEMBER(dynax_state::funkyfig_dsw_r)
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 2))  return ioport("DSW3")->read();
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", space.device().safe_pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -2249,7 +2249,7 @@ READ8_MEMBER(dynax_state::funkyfig_coin_r)
 		case 0x22:	return ioport("IN2")->read();
 		case 0x23:	return m_funkyfig_lockout;
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -2260,7 +2260,7 @@ READ8_MEMBER(dynax_state::funkyfig_key_r)
 		case 0x20:	return ioport("IN0")->read();
 		case 0x21:	return ioport("IN1")->read();
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -2273,13 +2273,13 @@ WRITE8_MEMBER(dynax_state::funkyfig_lockout_w)
 			coin_counter_w(machine(), 0,   data  & 0x01);
 			coin_lockout_w(machine(), 0, (~data) & 0x02);
 			if (data & ~0x03)
-				logerror("%06x: warning, unknown bits written, lockout = %02x\n", cpu_get_pc(&space.device()), data);
+				logerror("%06x: warning, unknown bits written, lockout = %02x\n", space.device().safe_pc(), data);
 			break;
 
 //      case 0xef:  16 bytes on startup
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_input_sel, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
 	}
 }
 
@@ -2391,7 +2391,7 @@ READ8_MEMBER(dynax_state::hanakanz_gfxrom_r)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(&space.device()), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", space.device().safe_pc(), address);
 		address %= size;
 	}
 
@@ -2422,7 +2422,7 @@ WRITE8_MEMBER(dynax_state::hanakanz_coincounter_w)
 	coin_counter_w(machine(), 1, data & 2);
 
 	if (data & 0xf0)
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
 
 #ifdef MAME_DEBUG
 //      popmessage("93 = %02x", data);
@@ -2620,7 +2620,7 @@ WRITE8_MEMBER(dynax_state::mjchuuka_coincounter_w)
 	coin_lockout_w(machine(), 0, (~data) & 0x08);
 
 	if (data & 0x74)
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
 
 #ifdef MAME_DEBUG
 //    popmessage("40 = %02x",data);
@@ -2678,7 +2678,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(dynax_state::mjmyster_rambank_w)
 {
 	membank("bank2")->set_entry(data & 0x07);
-	//logerror("%04x: rambank = %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: rambank = %02x\n", space.device().safe_pc(), data);
 }
 
 WRITE8_MEMBER(dynax_state::mjmyster_select2_w)
@@ -2699,7 +2699,7 @@ READ8_MEMBER(dynax_state::mjmyster_coins_r)
 		case 0x03:	return 0xff;
 	}
 
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", space.device().safe_pc(), m_input_sel);
 
 	return 0xff;
 }
@@ -2713,7 +2713,7 @@ READ8_MEMBER(dynax_state::mjmyster_keyb_r)
 	else if (BIT(m_keyb, 2))   ret = ioport("KEY2")->read();
 	else if (BIT(m_keyb, 3))   ret = ioport("KEY3")->read();
 	else if (BIT(m_keyb, 4))   ret = ioport("KEY4")->read();
-	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", cpu_get_pc(&space.device()), m_keyb);
+	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", space.device().safe_pc(), m_keyb);
 
 	m_keyb <<= 1;
 
@@ -2727,7 +2727,7 @@ READ8_MEMBER(dynax_state::mjmyster_dsw_r)
 	if (!BIT(m_dsw_sel, 2))   return ioport("DSW2")->read();
 	if (!BIT(m_dsw_sel, 3))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 4))   return ioport("DSW5")->read();
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", space.device().safe_pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -2745,7 +2745,7 @@ WRITE8_MEMBER(dynax_state::mjmyster_coincounter_w)
 			break;
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_input_sel, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
 	}
 }
 
@@ -2841,7 +2841,7 @@ READ8_MEMBER(dynax_state::hginga_coins_r)
 		case 0x22:	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x23:	return m_coins;
 	}
-	logerror("%04x: coins_r with select = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%04x: coins_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -2870,7 +2870,7 @@ WRITE8_MEMBER(dynax_state::hginga_coins_w)
 			m_coins = data;
 			break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_input_sel, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
 	}
 }
 
@@ -2892,7 +2892,7 @@ READ8_MEMBER(dynax_state::hginga_input_r)
 		case 0xa2:
 			return ioport(keynames1[m_keyb++])->read();
 	}
-	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%04x: input_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -2985,7 +2985,7 @@ READ8_MEMBER(dynax_state::hgokou_input_r)
 		case 0x22:	return hgokou_player_r(&space, 0);
 		case 0x23:	return m_coins;
 	}
-	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", space.device().safe_pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -3012,7 +3012,7 @@ WRITE8_MEMBER(dynax_state::hgokou_input_w)
 		case 0x2f:	break;	// ? written with 2f (hgokou)
 
 		default:
-			logerror("%04x: input_w with select = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel, data);
+			logerror("%04x: input_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_dsw_sel, data);
 	}
 }
 
@@ -3088,7 +3088,7 @@ READ8_MEMBER(dynax_state::hgokbang_input_r)
 			m_input_sel |= 1;
 			return ret;
 	}
-	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", cpu_get_pc(&space.device()), m_dsw_sel);
+	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", space.device().safe_pc(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -3148,7 +3148,7 @@ READ8_MEMBER(dynax_state::hparadis_input_r)
 		case 0x80:	return ioport(keynames0[m_keyb++])->read();	// P1 (Keys)
 		case 0x81:	return ioport(keynames1[m_keyb++])->read();	// P2 (Keys)
 	}
-	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", space.device().safe_pc(), m_input_sel);
 	return 0xff;
 }
 
@@ -3169,7 +3169,7 @@ WRITE8_MEMBER(dynax_state::hparadis_coin_w)
 		case 0x0c:	coin_counter_w(machine(), 0, data & 1);	break;
 		case 0x0d:	break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n",cpu_get_pc(&space.device()), m_input_sel, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n",space.device().safe_pc(), m_input_sel, data);
 	}
 }
 
@@ -3220,7 +3220,7 @@ READ8_MEMBER(dynax_state::mjmywrld_coins_r)
 		case 0x83:	return 0x00;
 	}
 
-	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", cpu_get_pc(&space.device()), m_input_sel);
+	logerror("%06x: warning, unknown bits read, input_sel = %02x\n", space.device().safe_pc(), m_input_sel);
 
 	return 0xff;
 }
@@ -3400,7 +3400,7 @@ WRITE8_MEMBER(dynax_state::mjflove_coincounter_w)
 
 	if (data & 0xfe)
 	{
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
 //      popmessage("COIN = %02x", data);
 	}
 }
@@ -3517,7 +3517,7 @@ WRITE8_MEMBER(dynax_state::sryudens_coincounter_w)
 	m_hopper = data & 0x04;
 
 	if (data & 0x68)
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
 
 #ifdef MAME_DEBUG
 //  popmessage("COIN = %02x", data);
@@ -3527,7 +3527,7 @@ WRITE8_MEMBER(dynax_state::sryudens_coincounter_w)
 WRITE8_MEMBER(dynax_state::sryudens_rambank_w)
 {
 	membank("bank2")->set_entry(data & 0x0f);
-	//logerror("%04x: rambank = %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: rambank = %02x\n", space.device().safe_pc(), data);
 }
 
 static ADDRESS_MAP_START( sryudens_portmap, AS_IO, 8, dynax_state )
@@ -3577,7 +3577,7 @@ WRITE8_MEMBER(dynax_state::janshinp_coincounter_w)
 	coin_counter_w(machine(), 1, data & 2);
 
 	if (data & ~0x8b)
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
 
 #ifdef MAME_DEBUG
 //  popmessage("COIN = %02x", data);

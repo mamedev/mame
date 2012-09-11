@@ -253,14 +253,14 @@ static TIMER_DEVICE_CALLBACK( m92_scanline_interrupt )
 READ16_MEMBER(m92_state::m92_eeprom_r)
 {
 	UINT8 *RAM = memregion("eeprom")->base();
-//  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(&space.device()),offset);
+//  logerror("%05x: EEPROM RE %04x\n",space.device().safe_pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_eeprom_w)
 {
 	UINT8 *RAM = memregion("eeprom")->base();
-//  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(&space.device()),offset);
+//  logerror("%05x: EEPROM WR %04x\n",space.device().safe_pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
@@ -283,7 +283,7 @@ WRITE16_MEMBER(m92_state::m92_bankswitch_w)
 	{
 		membank("bank1")->set_entry((data & 0x06) >> 1);
 		if (data & 0xf9)
-			logerror("%05x: bankswitch %04x\n", cpu_get_pc(&space.device()), data);
+			logerror("%05x: bankswitch %04x\n", space.device().safe_pc(), data);
 	}
 }
 
@@ -304,7 +304,7 @@ WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 
 READ16_MEMBER(m92_state::m92_sound_status_r)
 {
-//logerror("%06x: read sound status\n",cpu_get_pc(&space.device()));
+//logerror("%06x: read sound status\n",space.device().safe_pc());
 	return m_sound_status;
 }
 

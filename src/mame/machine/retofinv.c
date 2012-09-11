@@ -12,13 +12,13 @@
 
 READ8_MEMBER(retofinv_state::retofinv_68705_portA_r)
 {
-//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(&space.device()),m_portA_in);
+//logerror("%04x: 68705 port A read %02x\n",space.device().safe_pc(),m_portA_in);
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
 WRITE8_MEMBER(retofinv_state::retofinv_68705_portA_w)
 {
-//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(&space.device()),data);
+//logerror("%04x: 68705 port A write %02x\n",space.device().safe_pc(),data);
 	m_portA_out = data;
 }
 
@@ -46,7 +46,7 @@ READ8_MEMBER(retofinv_state::retofinv_68705_portB_r)
 
 WRITE8_MEMBER(retofinv_state::retofinv_68705_portB_w)
 {
-//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(&space.device()),data);
+//logerror("%04x: 68705 port B write %02x\n",space.device().safe_pc(),data);
 
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
@@ -86,13 +86,13 @@ READ8_MEMBER(retofinv_state::retofinv_68705_portC_r)
 	m_portC_in = 0;
 	if (m_main_sent) m_portC_in |= 0x01;
 	if (!m_mcu_sent) m_portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space.device()),m_portC_in);
+//logerror("%04x: 68705 port C read %02x\n",space.device().safe_pc(),m_portC_in);
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
 WRITE8_MEMBER(retofinv_state::retofinv_68705_portC_w)
 {
-logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(&space.device()),data);
+logerror("%04x: 68705 port C write %02x\n",space.device().safe_pc(),data);
 	m_portC_out = data;
 }
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrC_w)
 
 WRITE8_MEMBER(retofinv_state::retofinv_mcu_w)
 {
-logerror("%04x: mcu_w %02x\n",cpu_get_pc(&space.device()),data);
+logerror("%04x: mcu_w %02x\n",space.device().safe_pc(),data);
 	m_from_main = data;
 	m_main_sent = 1;
 	cputag_set_input_line(machine(), "68705", 0, ASSERT_LINE);
@@ -112,7 +112,7 @@ logerror("%04x: mcu_w %02x\n",cpu_get_pc(&space.device()),data);
 
 READ8_MEMBER(retofinv_state::retofinv_mcu_r)
 {
-logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),m_from_mcu);
+logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
@@ -123,7 +123,7 @@ READ8_MEMBER(retofinv_state::retofinv_mcu_status_r)
 
 	/* bit 4 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 5 = when 1, mcu has sent data to the main cpu */
-//logerror("%04x: mcu_status_r\n",cpu_get_pc(&space.device()));
+//logerror("%04x: mcu_status_r\n",space.device().safe_pc());
 	if (!m_main_sent) res |= 0x10;
 	if (m_mcu_sent) res |= 0x20;
 

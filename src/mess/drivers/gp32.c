@@ -314,7 +314,7 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 		}
 		break;
 	}
-	verboselog( machine(), 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
@@ -378,7 +378,7 @@ static void s3c240x_lcd_recalc( running_machine &machine)
 WRITE32_MEMBER(gp32_state::s3c240x_lcd_w)
 {
 	UINT32 old_value = m_s3c240x_lcd_regs[offset];
-	verboselog( machine(), 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_lcd_regs[offset]);
 	switch (offset)
 	{
@@ -400,13 +400,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_w)
 READ32_MEMBER(gp32_state::s3c240x_lcd_palette_r)
 {
 	UINT32 data = m_s3c240x_lcd_palette[offset];
-	verboselog( machine(), 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_lcd_palette_w)
 {
-	verboselog( machine(), 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_lcd_palette[offset]);
 	if (mem_mask != 0xffffffff)
 	{
@@ -455,13 +455,13 @@ static UINT32 s3c240x_get_pclk(gp32_state *state, int reg)
 READ32_MEMBER(gp32_state::s3c240x_clkpow_r)
 {
 	UINT32 data = m_s3c240x_clkpow_regs[offset];
-	verboselog( machine(), 9, "(CLKPOW) %08X -> %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(CLKPOW) %08X -> %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_clkpow_w)
 {
-	verboselog( machine(), 9, "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(CLKPOW) %08X <- %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_clkpow_regs[offset]);
 	switch (offset)
 	{
@@ -522,14 +522,14 @@ static void s3c240x_request_irq( running_machine &machine, UINT32 int_type)
 READ32_MEMBER(gp32_state::s3c240x_irq_r)
 {
 	UINT32 data = m_s3c240x_irq_regs[offset];
-	verboselog( machine(), 9, "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_irq_w)
 {
 	UINT32 old_value = m_s3c240x_irq_regs[offset];
-	verboselog( machine(), 9, "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_irq_regs[offset]);
 	switch (offset)
 	{
@@ -579,7 +579,7 @@ static const char *const timer_reg_names[] =
 READ32_MEMBER(gp32_state::s3c240x_pwm_r)
 {
 	UINT32 data = m_s3c240x_pwm_regs[offset];
-	verboselog( machine(), 9, "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
@@ -644,7 +644,7 @@ static void s3c240x_pwm_recalc( running_machine &machine, int timer)
 WRITE32_MEMBER(gp32_state::s3c240x_pwm_w)
 {
 	UINT32 old_value = m_s3c240x_pwm_regs[offset];
-	verboselog( machine(), 9, "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_pwm_regs[offset]);
 	switch (offset)
 	{
@@ -839,14 +839,14 @@ static void s3c240x_dma_recalc( running_machine &machine, int dma)
 READ32_MEMBER(gp32_state::s3c240x_dma_r)
 {
 	UINT32 data = m_s3c240x_dma_regs[offset];
-	verboselog( machine(), 9, "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 {
 	UINT32 old_value = m_s3c240x_dma_regs[offset];
-	verboselog( machine(), 9, "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_dma_regs[offset]);
 	switch (offset)
 	{
@@ -1103,14 +1103,14 @@ READ32_MEMBER(gp32_state::s3c240x_gpio_r)
 		}
 		break;
 	}
-	verboselog( machine(), 9, "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(GPIO) %08X -> %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_gpio_w)
 {
 	COMBINE_DATA(&m_s3c240x_gpio[offset]);
-	verboselog( machine(), 9, "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(GPIO) %08X <- %08X (PC %08X)\n", 0x15600000 + (offset << 2), data, space.device().safe_pc( ));
 	switch (offset)
 	{
 		// PBCON
@@ -1170,13 +1170,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_gpio_w)
 READ32_MEMBER(gp32_state::s3c240x_memcon_r)
 {
 	UINT32 data = m_s3c240x_memcon_regs[offset];
-	verboselog( machine(), 9, "(MEMCON) %08X -> %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(MEMCON) %08X -> %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_memcon_w)
 {
-	verboselog( machine(), 9, "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(MEMCON) %08X <- %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_memcon_regs[offset]);
 }
 
@@ -1186,13 +1186,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_memcon_w)
 READ32_MEMBER(gp32_state::s3c240x_usb_host_r)
 {
 	UINT32 data = m_s3c240x_usb_host_regs[offset];
-	verboselog( machine(), 9, "(USB H) %08X -> %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(USB H) %08X -> %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_usb_host_w)
 {
-	verboselog( machine(), 9, "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(USB H) %08X <- %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_usb_host_regs[offset]);
 }
 
@@ -1211,13 +1211,13 @@ READ32_MEMBER(gp32_state::s3c240x_uart_0_r)
 		}
 		break;
 	}
-	verboselog( machine(), 9, "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(UART 0) %08X -> %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_uart_0_w)
 {
-	verboselog( machine(), 9, "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(UART 0) %08X <- %08X (PC %08X)\n", 0x15000000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_uart_0_regs[offset]);
 }
 
@@ -1236,13 +1236,13 @@ READ32_MEMBER(gp32_state::s3c240x_uart_1_r)
 		}
 		break;
 	}
-	verboselog( machine(), 9, "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(UART 1) %08X -> %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_uart_1_w)
 {
-	verboselog( machine(), 9, "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(UART 1) %08X <- %08X (PC %08X)\n", 0x15004000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_uart_1_regs[offset]);
 }
 
@@ -1252,13 +1252,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_uart_1_w)
 READ32_MEMBER(gp32_state::s3c240x_usb_device_r)
 {
 	UINT32 data = m_s3c240x_usb_device_regs[offset];
-	verboselog( machine(), 9, "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_usb_device_w)
 {
-	verboselog( machine(), 9, "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(USB D) %08X <- %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_usb_device_regs[offset]);
 }
 
@@ -1268,13 +1268,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_usb_device_w)
 READ32_MEMBER(gp32_state::s3c240x_watchdog_r)
 {
 	UINT32 data = m_s3c240x_watchdog_regs[offset];
-	verboselog( machine(), 9, "(WDOG) %08X -> %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(WDOG) %08X -> %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_watchdog_w)
 {
-	verboselog( machine(), 9, "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(WDOG) %08X <- %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_watchdog_regs[offset]);
 }
 
@@ -1388,13 +1388,13 @@ READ32_MEMBER(gp32_state::s3c240x_iic_r)
 		}
 		break;
 	}
-	verboselog( machine(), 9, "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(IIC) %08X -> %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_iic_w)
 {
-	verboselog( machine(), 9, "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(IIC) %08X <- %08X (PC %08X)\n", 0x15400000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_iic_regs[offset]);
 	switch (offset)
 	{
@@ -1542,14 +1542,14 @@ READ32_MEMBER(gp32_state::s3c240x_iis_r)
 		break;
 	}
 #endif
-	verboselog( machine(), 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(IIS) %08X -> %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 {
 	UINT32 old_value = m_s3c240x_iis_regs[offset];
-	verboselog( machine(), 9, "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_iis_regs[offset]);
 	switch (offset)
 	{
@@ -1596,13 +1596,13 @@ static TIMER_CALLBACK( s3c240x_iis_timer_exp )
 READ32_MEMBER(gp32_state::s3c240x_rtc_r)
 {
 	UINT32 data = m_s3c240x_rtc_regs[offset];
-	verboselog( machine(), 9, "(RTC) %08X -> %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(RTC) %08X -> %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_rtc_w)
 {
-	verboselog( machine(), 9, "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(RTC) %08X <- %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_rtc_regs[offset]);
 }
 
@@ -1612,13 +1612,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_rtc_w)
 READ32_MEMBER(gp32_state::s3c240x_adc_r)
 {
 	UINT32 data = m_s3c240x_adc_regs[offset];
-	verboselog( machine(), 9, "(ADC) %08X -> %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(ADC) %08X -> %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_adc_w)
 {
-	verboselog( machine(), 9, "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(ADC) %08X <- %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_adc_regs[offset]);
 }
 
@@ -1628,13 +1628,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_adc_w)
 READ32_MEMBER(gp32_state::s3c240x_spi_r)
 {
 	UINT32 data = m_s3c240x_spi_regs[offset];
-	verboselog( machine(), 9, "(SPI) %08X -> %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(SPI) %08X -> %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_spi_w)
 {
-	verboselog( machine(), 9, "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(SPI) %08X <- %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_spi_regs[offset]);
 }
 
@@ -1644,13 +1644,13 @@ WRITE32_MEMBER(gp32_state::s3c240x_spi_w)
 READ32_MEMBER(gp32_state::s3c240x_mmc_r)
 {
 	UINT32 data = m_s3c240x_mmc_regs[offset];
-	verboselog( machine(), 9, "(MMC) %08X -> %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(MMC) %08X -> %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_mmc_w)
 {
-	verboselog( machine(), 9, "(MMC) %08X <- %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, cpu_get_pc( &space.device()));
+	verboselog( machine(), 9, "(MMC) %08X <- %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_mmc_regs[offset]);
 }
 

@@ -261,7 +261,7 @@ static READ32_HANDLER( atapi_r )
 		}
 		#endif
 
-		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space->device()));
+		mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, space->device().safe_pc());
 	}
 
 //  printf( "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -420,11 +420,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 #endif
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space->device()));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, space->device().safe_pc());
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-			printf("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space->device()));
+			printf("ATAPI command %x issued! (PC=%x)\n", data, space->device().safe_pc());
 
 			switch (data)
 			{
@@ -603,7 +603,7 @@ READ64_HANDLER( dc_mess_gdrom_r )
 		off=offset << 1;
 	}
 
-//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, cpu_get_pc(&space->device()));
+//  printf("gdrom_r: @ %x (off %x), mask %llx (PC %x)\n", offset, off, mem_mask, space->device().safe_pc());
 
 	if (offset == 3)
 	{
@@ -632,7 +632,7 @@ WRITE64_HANDLER( dc_mess_gdrom_w )
 		off=offset << 1;
 	}
 
-//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, cpu_get_pc(&space->device()));
+//  printf("GDROM: [%08x=%x]write %llx to %x, mask %llx (PC %x)\n", 0x5f7000+off*4, dat, data, offset, mem_mask, space->device().safe_pc());
 
 	if (off >= 0x20)
 	{

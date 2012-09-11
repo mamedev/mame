@@ -1047,7 +1047,7 @@ WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", cpu_get_previouspc(&space.device()), i, names[m_dac_register], voltage);
+				logerror("s%04X:   CEM#%d:%s=%f\n", space.device().safe_pcbase(), i, names[m_dac_register], voltage);
 			}
 #endif
 		}
@@ -1177,7 +1177,7 @@ static void update_grudge_steering(running_machine &machine)
 
 READ8_MEMBER(balsente_state::grudge_steering_r)
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(&space.device()), machine().primary_screen->vpos());
+	logerror("%04X:grudge_steering_r(@%d)\n", space.device().safe_pc(), machine().primary_screen->vpos());
 	m_grudge_steering_result |= 0x80;
 	return m_grudge_steering_result;
 }

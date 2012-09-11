@@ -62,12 +62,12 @@ READ8_MEMBER(thunderx_state::thunderx_bankedram_r)
 	{
 		if (m_pmcbank)
 		{
-//          logerror("%04x read pmcram %04x\n",cpu_get_pc(&space.device()),offset);
+//          logerror("%04x read pmcram %04x\n",space.device().safe_pc(),offset);
 			return m_pmcram[offset];
 		}
 		else
 		{
-			logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(&space.device()),offset);
+			logerror("%04x read pmc internal ram %04x\n",space.device().safe_pc(),offset);
 			return 0;
 		}
 	}
@@ -84,11 +84,11 @@ WRITE8_MEMBER(thunderx_state::thunderx_bankedram_w)
 	{
 		if (m_pmcbank)
 		{
-			logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(&space.device()),offset,data);
+			logerror("%04x pmcram %04x = %02x\n",space.device().safe_pc(),offset,data);
 			m_pmcram[offset] = data;
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(&space.device()),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data);
 	}
 	else
 		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
@@ -293,7 +293,7 @@ READ8_MEMBER(thunderx_state::thunderx_1f98_r)
 WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 {
 
-	// logerror("%04x: 1f98_w %02x\n", cpu_get_pc(&space.device()),data);
+	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
 
 	/* bit 0 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(m_k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
@@ -318,7 +318,7 @@ WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 	UINT8 *RAM = memregion("maincpu")->base();
 	int offs;
 
-//logerror("%04x: bank switch %02x\n",cpu_get_pc(&space.device()),data);
+//logerror("%04x: bank switch %02x\n",space.device().safe_pc(),data);
 
 	/* bits 0-3 ROM bank */
 	offs = 0x10000 + (data & 0x0f)*0x2000;
@@ -337,7 +337,7 @@ WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 
 WRITE8_MEMBER(thunderx_state::thunderx_videobank_w)
 {
-	//logerror("%04x: select video ram bank %02x\n",cpu_get_pc(&space.device()),data);
+	//logerror("%04x: select video ram bank %02x\n",space.device().safe_pc(),data);
 	/* 0x01 = work RAM at 4000-5fff */
 	/* 0x00 = palette at 5800-5fff */
 	/* 0x10 = unknown RAM at 5800-5fff */
@@ -991,7 +991,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 {
-	//logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(device->cpu), lines);
+	//logerror("thunderx %04x: bank select %02x\n", device->cpu->safe_pc(), lines);
 	device->machine().root_device().membank("bank1")->set_entry(((lines & 0x0f) ^ 0x08));
 }
 

@@ -125,7 +125,7 @@ static READ16_HANDLER( olds_r )
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->m_kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space->device().safe_pc(), state->m_kb_cmd, res);
 	return res;
 }
 
@@ -136,7 +136,7 @@ static WRITE16_HANDLER( olds_w )
 		state->m_kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(&space->device()), state->m_kb_cmd, data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",space->device().safe_pc(), state->m_kb_cmd, data);
 		if (state->m_kb_cmd == 0)
 			state->m_kb_reg = data;
 		else if(state->m_kb_cmd == 2)	//a bitswap=
@@ -185,7 +185,7 @@ static WRITE16_HANDLER( olds_w )
 
 static READ16_HANDLER( olds_prot_swap_r )
 {
-	if (cpu_get_pc(&space->device()) < 0x100000)		//bios
+	if (space->device().safe_pc() < 0x100000)		//bios
 		return pgm_mainram[0x178f4 / 2];
 	else						//game
 		return pgm_mainram[0x178d8 / 2];

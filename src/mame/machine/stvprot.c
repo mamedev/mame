@@ -120,9 +120,9 @@ static READ32_HANDLER( twcup98_prot_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(&space->device()),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(&space->device()),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -141,7 +141,7 @@ static READ32_HANDLER( twcup98_prot_r )
 static WRITE32_HANDLER ( twcup98_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(&space->device()),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -179,9 +179,9 @@ static READ32_HANDLER( sss_prot_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(&space->device()),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(&space->device()),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -208,7 +208,7 @@ static READ32_HANDLER( sss_prot_r )
 static WRITE32_HANDLER ( sss_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(&space->device()),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -244,9 +244,9 @@ static READ32_HANDLER( rsgun_prot_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(&space->device()),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(&space->device()),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -278,7 +278,7 @@ static READ32_HANDLER( rsgun_prot_r )
 static WRITE32_HANDLER ( rsgun_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(&space->device()),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -319,9 +319,9 @@ static READ32_HANDLER( elandore_prot_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(&space->device()),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(&space->device()),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -349,7 +349,7 @@ static READ32_HANDLER( elandore_prot_r )
 static WRITE32_HANDLER ( elandore_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(&space->device()),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		/* a bus value 2 seed is used too here. */
@@ -426,9 +426,9 @@ static READ32_HANDLER( ffreveng_prot_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(&space->device()),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space->device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(&space->device()),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space->device().safe_pc(),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -455,7 +455,7 @@ static READ32_HANDLER( ffreveng_prot_r )
 static WRITE32_HANDLER ( ffreveng_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(&space->device()),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space->device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
 		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -554,7 +554,7 @@ static READ32_HANDLER( decathlt_prot_r )
 	}
 	else
 	{
-		logerror("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",cpu_get_pc(&space->device()), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		logerror("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",space->device().safe_pc(), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
 	}
 
 	return decathlt_protregs[offset];

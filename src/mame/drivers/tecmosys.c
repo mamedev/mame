@@ -239,11 +239,11 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 
 		case 0x22/2:
 			machine().watchdog_reset();
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space.device()) );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
 			break;
 
 		default:
-			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space.device()) );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
 			break;
 	}
 }
@@ -252,7 +252,7 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 {
 	//UINT16 ret = m_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(&space.device()), m_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, space.device().safe_pc(), m_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 

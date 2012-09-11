@@ -988,7 +988,7 @@ static void parse_cpu_control( running_machine &machine )
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 {
-	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 
 	if (mem_mask == 0xff00) data >>= 8;
 	data &= 0xff;
@@ -1194,7 +1194,7 @@ READ16_MEMBER(taitoz_state::bshark_stick_r)
 			return ioport("Y_ADJUST")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", space.device().safe_pc(), offset);
 
 	return 0xff;
 }
@@ -1217,7 +1217,7 @@ READ16_MEMBER(taitoz_state::nightstr_stick_r)
 			return ioport("Y_ADJUST")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", space.device().safe_pc(), offset);
 
 	return 0xff;
 }
@@ -1247,7 +1247,7 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 			return (steer & 0xff00) >> 8;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", space.device().safe_pc(), offset);
 
 	return 0xff;
 }
@@ -1318,7 +1318,7 @@ READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 			return steer & 0xff;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", space.device().safe_pc(), offset);
 
 	return 0x00;
 }
@@ -1335,7 +1335,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(&space.device()),offset);
+			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",space.device().safe_pc(),offset);
 			return 0;
 	}
 }
@@ -1353,7 +1353,7 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 			break;
 	}
 
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(&space.device()),data,offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",space.device().safe_pc(),data,offset);
 }
 
 

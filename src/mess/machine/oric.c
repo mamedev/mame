@@ -729,12 +729,12 @@ WRITE8_MEMBER(oric_state::oric_jasmin_w)
 			wd17xx_reset(fdc);
 			break;
 		case 0x0a:
-			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, cpu_get_pc(machine().device("maincpu")));
+			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, machine().device("maincpu")->safe_pc());
 			m_port_3fa_w = data;
 			oric_jasmin_set_mem_0x0c000(machine());
 			break;
 		case 0x0b:
-			//logerror("jasmin romdis w: %02x PC: %04x\n", data, cpu_get_pc(machine().device("maincpu")));
+			//logerror("jasmin romdis w: %02x PC: %04x\n", data, machine().device("maincpu")->safe_pc());
 			m_port_3fb_w = data;
 			oric_jasmin_set_mem_0x0c000(machine());
 			break;

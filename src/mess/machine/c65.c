@@ -508,7 +508,7 @@ static void c65_fdc_state(void)
 static void c65_fdc_w( running_machine &machine, int offset, int data )
 {
 	c65_state *state = machine.driver_data<c65_state>();
-	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(machine.device("maincpu")), offset, data));
+	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", machine.device("maincpu")->safe_pc(), offset, data));
 	switch (offset & 0xf)
 	{
 	case 0:
@@ -593,7 +593,7 @@ static int c65_fdc_r( running_machine &machine, int offset )
 		data = state->m_fdc.reg[offset & 0xf];
 		break;
 	}
-	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(machine.device("maincpu")), offset, data));
+	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", machine.device("maincpu")->safe_pc(), offset, data));
 	return data;
 }
 

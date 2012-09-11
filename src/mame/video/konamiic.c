@@ -1463,7 +1463,7 @@ READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 		case 7:
 			return ROM[romofs+2];
 		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(&space->device())));
+			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, space->device().safe_pc()));
 			break;
 	}
 
@@ -1666,7 +1666,7 @@ static UINT8 K054000_ram[0x20];
 
 static WRITE8_HANDLER( K054000_w )
 {
-//logerror("%04x: write %02x to 054000 address %02x\n",cpu_get_pc(&space->device()),data,offset);
+//logerror("%04x: write %02x to 054000 address %02x\n",space->device().safe_pc(),data,offset);
 
 	K054000_ram[offset] = data;
 }
@@ -1676,7 +1676,7 @@ static READ8_HANDLER( K054000_r )
 	int Acx,Acy,Aax,Aay;
 	int Bcx,Bcy,Bax,Bay;
 
-//logerror("%04x: read 054000 address %02x\n",cpu_get_pc(&space->device()),offset);
+//logerror("%04x: read 054000 address %02x\n",space->device().safe_pc(),offset);
 
 	if (offset != 0x18) return 0;
 
@@ -2265,7 +2265,7 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(&space->device()), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space->device().safe_pc(), mem_mask));
 	}
 	return 0;
 }
@@ -2290,7 +2290,7 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(&space->device()), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space->device().safe_pc(), mem_mask));
 	}
 	return 0;
 }

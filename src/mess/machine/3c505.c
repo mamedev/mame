@@ -280,7 +280,7 @@ const char *threecom3c505_device::cpu_context()
 	if (cpu != NULL)
 	{
 		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu_get_previouspc(cpu), tag());
+				cpu->safe_pcbase(), tag());
 	}
 	else
 	{
@@ -1252,8 +1252,8 @@ UINT8 threecom3c505_device::read_data_port(){
 
 void threecom3c505_device::write_control_port( UINT8 data)
 {
-	// if (cpu_get_previouspc(m_device->machine->firstcpu) == 0x3C4BAD48) verbose = 3;
-	// if (cpu_get_previouspc(m_device->machine->firstcpu) == 0x010464DC) verbose = 3;
+	// if (m_device->machine->firstcpu->safe_pcbase() == 0x3C4BAD48) verbose = 3;
+	// if (m_device->machine->firstcpu->safe_pcbase() == 0x010464DC) verbose = 3;
 
 	if (verbose <= 2 && (data & (DMAE | TCEN /*| CMDE*/)) != 0)
 	{
@@ -1398,7 +1398,7 @@ UINT8 threecom3c505_device::read_port(offs_t offset)
 		// omit excessive logging
 		if (data == last_data)
 		{
-			UINT32 pc = cpu_get_previouspc(machine().device(MAINCPU));
+			UINT32 pc = machine().device(MAINCPU)->safe_pcbase();
 			if (pc == last_pc) {
 				return data;
 			}

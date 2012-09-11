@@ -131,7 +131,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 		case 5: return ioport("DSW3")->read();
 		case 6: return ioport("DSW4")->read();
 		case 7: return ioport("SYS1")->read();
-		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(&space.device()),offset+0xc0);
+		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",space.device().safe_pc(),offset+0xc0);
 	}
 
 	return 0xff;

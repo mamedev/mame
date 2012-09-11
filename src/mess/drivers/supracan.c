@@ -212,7 +212,7 @@ INLINE void verboselog(const char *tag, running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%06x: %s: %s", cpu_get_pc(machine.device(tag)), tag, buf );
+		logerror( "%06x: %s: %s", machine.device(tag)->safe_pc(), tag, buf );
 	}
 }
 

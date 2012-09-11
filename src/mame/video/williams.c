@@ -543,7 +543,7 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			cpu_get_pc(&space.device()), machine().primary_screen->vpos(),
+			space.device().safe_pc(), machine().primary_screen->vpos(),
 			m_blitterram[2], m_blitterram[3],
 			m_blitterram[4], m_blitterram[5],
 			m_blitterram[6], m_blitterram[7],

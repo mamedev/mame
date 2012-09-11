@@ -140,7 +140,7 @@ popmessage(t);
 				coin_counter_w(machine(), 1, data & 0x04000000);
 				m_coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&device()),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",device->safe_pc(),offset);
 		}
 	}
 }

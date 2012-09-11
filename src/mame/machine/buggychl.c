@@ -41,14 +41,14 @@ INLINE buggychl_mcu_state *get_safe_token( device_t *device )
 static READ8_DEVICE_HANDLER( buggychl_68705_port_a_r )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(state->m_mcu), state->m_port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", state->m_mcu->safe_pc(), state->m_port_a_in);
 	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_port_a_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(state->m_mcu), data);
+	//logerror("%04x: 68705 port A write %02x\n", state->m_mcu->safe_pc(), data);
 	state->m_port_a_out = data;
 }
 
@@ -88,7 +88,7 @@ static READ8_DEVICE_HANDLER( buggychl_68705_port_b_r )
 static WRITE8_DEVICE_HANDLER( buggychl_68705_port_b_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(state->m_mcu), data);
+	logerror("%04x: 68705 port B write %02x\n", state->m_mcu->safe_pc(), data);
 
 	if ((state->m_ddr_b & 0x02) && (~data & 0x02) && (state->m_port_b_out & 0x02))
 	{
@@ -132,14 +132,14 @@ static READ8_DEVICE_HANDLER( buggychl_68705_port_c_r )
 		state->m_port_c_in |= 0x01;
 	if (!state->m_mcu_sent)
 		state->m_port_c_in |= 0x02;
-	logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(state->m_mcu), state->m_port_c_in);
+	logerror("%04x: 68705 port C read %02x\n", state->m_mcu->safe_pc(), state->m_port_c_in);
 	return (state->m_port_c_out & state->m_ddr_c) | (state->m_port_c_in & ~state->m_ddr_c);
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_port_c_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(state->m_mcu), data);
+	logerror("%04x: 68705 port C write %02x\n", state->m_mcu->safe_pc(), data);
 	state->m_port_c_out = data;
 }
 
@@ -153,7 +153,7 @@ static WRITE8_DEVICE_HANDLER( buggychl_68705_ddr_c_w )
 WRITE8_DEVICE_HANDLER( buggychl_mcu_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: mcu_w %02x\n", cpu_get_pc(state->m_mcu), data);
+	logerror("%04x: mcu_w %02x\n", state->m_mcu->safe_pc(), data);
 	state->m_from_main = data;
 	state->m_main_sent = 1;
 	device_set_input_line(state->m_mcu, 0, ASSERT_LINE);
@@ -162,7 +162,7 @@ WRITE8_DEVICE_HANDLER( buggychl_mcu_w )
 READ8_DEVICE_HANDLER( buggychl_mcu_r )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: mcu_r %02x\n", cpu_get_pc(state->m_mcu), state->m_from_mcu);
+	logerror("%04x: mcu_r %02x\n", state->m_mcu->safe_pc(), state->m_from_mcu);
 	state->m_mcu_sent = 0;
 	return state->m_from_mcu;
 }
@@ -174,7 +174,7 @@ READ8_DEVICE_HANDLER( buggychl_mcu_status_r )
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",cpu_get_pc(state->m_mcu));
+	//logerror("%04x: mcu_status_r\n",state->m_mcu->safe_pc());
 	if (!state->m_main_sent)
 		res |= 0x01;
 	if (state->m_mcu_sent)

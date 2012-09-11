@@ -127,7 +127,7 @@ READ8_MEMBER(ojankohs_state::ojankohs_keymatrix_r)
 					ret &= ioport("KEY4")->read();
 					break;
 		default:	ret = 0xff;
-					logerror("PC:%04X unknown %02X\n", cpu_get_pc(&space.device()), m_portselect);
+					logerror("PC:%04X unknown %02X\n", space.device().safe_pc(), m_portselect);
 					break;
 	}
 

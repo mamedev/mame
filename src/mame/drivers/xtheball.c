@@ -127,7 +127,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 	{
 		if (bitvals[offset] != (data & 1))
 		{
-			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(&space.device()), offset, data & 1);
+			logerror("%08x:bit_controls_w(%x,%d)\n", space.device().safe_pc(), offset, data & 1);
 
 			switch (offset)
 			{

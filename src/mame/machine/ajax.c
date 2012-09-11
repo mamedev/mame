@@ -126,7 +126,7 @@ READ8_MEMBER(ajax_state::ajax_ls138_f10_r)
 			break;
 
 		default:
-			logerror("%04x: (ls138_f10) read from an unknown address %02x\n",cpu_get_pc(&space.device()), offset);
+			logerror("%04x: (ls138_f10) read from an unknown address %02x\n",space.device().safe_pc(), offset);
 	}
 
 	return data;
@@ -159,7 +159,7 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 			break;
 
 		default:
-			logerror("%04x: (ls138_f10) write %02x to an unknown address %02x\n", cpu_get_pc(&space.device()), data, offset);
+			logerror("%04x: (ls138_f10) write %02x to an unknown address %02x\n", space.device().safe_pc(), data, offset);
 	}
 }
 

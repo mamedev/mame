@@ -419,7 +419,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 {
 	if(offset == 1) //status port
 	{
-		//printf("STATUS PC=%04x\n",cpu_get_pc(m_maincpu));
+		//printf("STATUS PC=%04x\n",m_maincpu->safe_pc());
 
 		return 1;
 	}
@@ -427,14 +427,14 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 	{
 		UINT8 i,pt;
 
-		//printf("%04x\n",cpu_get_pc(m_maincpu));
+		//printf("%04x\n",m_maincpu->safe_pc());
 
 		/* TODO: internal state of this */
-		if(cpu_get_pc(m_maincpu) == m_dsw_pc_hack)
+		if(m_maincpu->safe_pc() == m_dsw_pc_hack)
 			m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 		else if(m_mcu[0].rst)
 		{
-			//printf("READ PC=%04x\n",cpu_get_pc(m_maincpu));
+			//printf("READ PC=%04x\n",m_maincpu->safe_pc());
 			{
 
 				switch(m_mcu[0].state)
@@ -500,7 +500,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 {
 	if(offset == 1) //command port
 	{
-		//printf("%02x CMD PC=%04x\n",data,cpu_get_pc(m_maincpu));
+		//printf("%02x CMD PC=%04x\n",data,m_maincpu->safe_pc());
 		switch(data)
 		{
 			case 0:
@@ -535,7 +535,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 	}
 	else
 	{
-		//printf("%02x DATA PC=%04x\n",data,cpu_get_pc(m_maincpu));
+		//printf("%02x DATA PC=%04x\n",data,m_maincpu->safe_pc());
 
 		m_mcu[0].txd = data;
 

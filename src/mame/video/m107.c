@@ -372,7 +372,7 @@ WRITE16_MEMBER(m107_state::m107_spritebuffer_w)
 		/*
         TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
         */
-//      logerror("%04x: buffered spriteram\n",cpu_get_pc(&space.device()));
+//      logerror("%04x: buffered spriteram\n",space.device().safe_pc());
 		m_sprite_display	= (!(data & 0x1000));
 
 		memcpy(m_buffered_spriteram, m_spriteram, 0x1000);

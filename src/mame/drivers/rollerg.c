@@ -24,7 +24,7 @@ static KONAMI_SETLINES_CALLBACK( rollerg_banking );
 
 WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 {
-	logerror("%04x: write %02x to 0010\n",cpu_get_pc(&space.device()), data);
+	logerror("%04x: write %02x to 0010\n",space.device().safe_pc(), data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);

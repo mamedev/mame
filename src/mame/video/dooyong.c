@@ -149,7 +149,7 @@ WRITE8_MEMBER(dooyong_state::primella_ctrl_w)
 
 	/* bit 5 used but unknown */
 
-//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(&space.device()),data&0xe0);
+//  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
 }
 
 WRITE8_MEMBER(dooyong_state::paletteram_flytiger_w)

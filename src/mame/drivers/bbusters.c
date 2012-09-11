@@ -279,7 +279,7 @@ READ16_MEMBER(bbusters_state::control_3_r)
 WRITE16_MEMBER(bbusters_state::gun_select_w)
 {
 
-	logerror("%08x: gun r\n",cpu_get_pc(&space.device()));
+	logerror("%08x: gun r\n",space.device().safe_pc());
 
 	device_set_input_line(&space.device(), 2, HOLD_LINE);
 

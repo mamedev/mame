@@ -637,7 +637,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
 	{
 
 		m_mcu_data = data & 0xff;
-		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", cpu_get_previouspc(&space.device()), m_mcu_data);
+		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", space.device().safe_pcbase(), m_mcu_data);
 	}
 }
 
@@ -699,7 +699,7 @@ WRITE16_MEMBER(toaplan2_state::ghox_mcu_w)
 		}
 		else
 		{
-			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n", cpu_get_previouspc(&space.device()), m_mcu_data);
+			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n", space.device().safe_pcbase(), m_mcu_data);
 		}
 		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	// Return a RTS instruction
 		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
@@ -1012,7 +1012,7 @@ WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 {
 
 	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(&space.device()),data);
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",space.device().safe_pc(),data);
 
 	if ( ACCESSING_BITS_0_7 )
 		ioport("EEPROMOUT")->write(data, 0xff);

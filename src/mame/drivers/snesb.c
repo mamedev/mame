@@ -206,7 +206,7 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 		case 0xfb7:	return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, cpu_get_pc(&space.device()));
+	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
 
 	return 0;
 }

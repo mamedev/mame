@@ -240,7 +240,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 
 	device_set_input_line(m_dsp, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", cpu_get_previouspc(&space.device()), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 READ16_MEMBER(taitoair_state::lineram_r)
@@ -274,7 +274,7 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 {
 
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", cpu_get_previouspc(&space.device()), m_dsp_hold_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", space.device().safe_pcbase(), m_dsp_hold_signal);
 
 	return m_dsp_hold_signal;
 }
@@ -282,7 +282,7 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", cpu_get_previouspc(&space.device()), data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", space.device().safe_pcbase(), data);
 }
 
 

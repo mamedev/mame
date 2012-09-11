@@ -23,14 +23,14 @@
 READ8_MEMBER(flstory_state::flstory_68705_port_a_r)
 {
 
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space.device()), m_port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
 WRITE8_MEMBER(flstory_state::flstory_68705_port_a_w)
 {
 
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
@@ -57,7 +57,7 @@ READ8_MEMBER(flstory_state::flstory_68705_port_b_r)
 
 WRITE8_MEMBER(flstory_state::flstory_68705_port_b_w)
 {
-	//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(&space.device()),data);
+	//logerror("%04x: 68705 port B write %02x\n",space.device().safe_pc(),data);
 
 	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
 	{
@@ -93,13 +93,13 @@ READ8_MEMBER(flstory_state::flstory_68705_port_c_r)
 	if (!m_mcu_sent)
 		m_port_c_in |= 0x02;
 
-	//logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(&space.device()), port_c_in);
+	//logerror("%04x: 68705 port C read %02x\n", space.device().safe_pc(), port_c_in);
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
 WRITE8_MEMBER(flstory_state::flstory_68705_port_c_w)
 {
-	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(&space.device()), data);
+	logerror("%04x: 68705 port C write %02x\n", space.device().safe_pc(), data);
 	m_port_c_out = data;
 }
 
@@ -111,7 +111,7 @@ WRITE8_MEMBER(flstory_state::flstory_68705_ddr_c_w)
 WRITE8_MEMBER(flstory_state::flstory_mcu_w)
 {
 
-	logerror("%04x: mcu_w %02x\n", cpu_get_pc(&space.device()), data);
+	logerror("%04x: mcu_w %02x\n", space.device().safe_pc(), data);
 	m_from_main = data;
 	m_main_sent = 1;
 	device_set_input_line(m_mcu, 0, ASSERT_LINE);
@@ -120,7 +120,7 @@ WRITE8_MEMBER(flstory_state::flstory_mcu_w)
 READ8_MEMBER(flstory_state::flstory_mcu_r)
 {
 
-	logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()), m_from_mcu);
+	logerror("%04x: mcu_r %02x\n",space.device().safe_pc(), m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
@@ -131,7 +131,7 @@ READ8_MEMBER(flstory_state::flstory_mcu_status_r)
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: mcu_status_r\n", space.device().safe_pc());
 	if (!m_main_sent)
 		res |= 0x01;
 	if (m_mcu_sent)
@@ -258,7 +258,7 @@ WRITE8_MEMBER(flstory_state::victnine_mcu_w)
 
 READ8_MEMBER(flstory_state::victnine_mcu_r)
 {
-	//logerror("%04x: mcu read (0x%02x)\n", cpu_get_previouspc(&space.device()), m_from_mcu);
+	//logerror("%04x: mcu read (0x%02x)\n", space.device().safe_pcbase(), m_from_mcu);
 
 	return m_from_mcu - VICTNINE_MCU_SEED;
 }

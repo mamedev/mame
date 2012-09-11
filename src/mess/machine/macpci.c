@@ -53,7 +53,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
 //  macpci_state *mac = device->machine().driver_data<macpci_state>();
 
-//    printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 IN_A (PC %x)\n", mac->m_maincpu->safe_pc());
 
 	return 0x80;
 }
@@ -65,7 +65,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
     val |= mac->m_cuda->get_treq()<<3;
 
-//    printf("VIA1 IN B = %02x (PC %x)\n", val, cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 IN B = %02x (PC %x)\n", val, mac->m_maincpu->safe_pc());
 
     return val;
 }
@@ -74,17 +74,17 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
 //  macpci_state *mac = device->machine().driver_data<macpci_state>();
 
-//    printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 OUT A: %02x (PC %x)\n", data, mac->m_maincpu->safe_pc());
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
 	macpci_state *mac = device->machine().driver_data<macpci_state>();
 
-//    printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 OUT B: %02x (PC %x)\n", data, mac->m_maincpu->safe_pc());
 
     #if LOG_ADB
-    printf("PPC: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, cpu_get_pc(mac->m_maincpu));
+    printf("PPC: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->safe_pc());
     #endif
     mac->m_cuda->set_byteack((data&0x10) ? 1 : 0);
     mac->m_cuda->set_tip((data&0x20) ? 1 : 0);
@@ -98,7 +98,7 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		printf("mac_via_r: offset=0x%02x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
+		printf("mac_via_r: offset=0x%02x (PC=%x)\n", offset, m_maincpu->safe_pc());
 	data = m_via1->read(space, offset);
 
 	device_adjust_icount(m_maincpu, m_via_cycles);
@@ -112,7 +112,7 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		printf("mac_via_w: offset=0x%02x data=0x%08x (PC=%x)\n", offset, data, cpu_get_pc(m_maincpu));
+		printf("mac_via_w: offset=0x%02x data=0x%08x (PC=%x)\n", offset, data, m_maincpu->safe_pc());
 
 	if (ACCESSING_BITS_0_7)
 		m_via1->write(space, offset, data & 0xff);
@@ -181,7 +181,7 @@ MAC_DRIVER_INIT(pippin, PCIMODEL_MAC_PIPPIN)
 
 READ32_MEMBER(macpci_state::mac_read_id)
 {
-    printf("Mac read ID reg @ PC=%x\n", cpu_get_pc(m_maincpu));
+    printf("Mac read ID reg @ PC=%x\n", m_maincpu->safe_pc());
 
 	switch (m_model)
 	{

@@ -559,7 +559,7 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	UINT32 ret = s3c2410_lcd_r(s3c2410, offset+0x10/4, mem_mask);
 
 
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 
 	// these are vblank waits
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)

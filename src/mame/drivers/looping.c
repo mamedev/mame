@@ -444,8 +444,8 @@ WRITE8_MEMBER(looping_state::ballon_enable_w)
 WRITE8_MEMBER(looping_state::out_0_w){ mame_printf_debug("out0 = %02X\n", data); }
 WRITE8_MEMBER(looping_state::out_2_w){ mame_printf_debug("out2 = %02X\n", data); }
 
-READ8_MEMBER(looping_state::adc_r){ mame_printf_debug("%04X:ADC read\n", cpu_get_pc(&space.device())); return 0xff; }
-WRITE8_MEMBER(looping_state::adc_w){ mame_printf_debug("%04X:ADC write = %02X\n", cpu_get_pc(&space.device()), data); }
+READ8_MEMBER(looping_state::adc_r){ mame_printf_debug("%04X:ADC read\n", space.device().safe_pc()); return 0xff; }
+WRITE8_MEMBER(looping_state::adc_w){ mame_printf_debug("%04X:ADC write = %02X\n", space.device().safe_pc(), data); }
 
 WRITE8_MEMBER(looping_state::plr2_w)
 {

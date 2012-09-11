@@ -178,7 +178,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n", cpu_get_pc(&space.device()), offset, data);
+		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n", space.device().safe_pc(), offset, data);
 	}
 }
 

@@ -166,7 +166,7 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 
 READ8_MEMBER(pcxt_state::disk_iobank_r)
 {
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(&space.device()));
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,space.device().safe_pc());
 	//if(offset == 0) return ioport("DSW")->read();
 	if(offset == 1) return ioport("IN1")->read();
 
@@ -386,7 +386,7 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 READ8_MEMBER(pcxt_state::fdc765_status_r)
 {
 	UINT8 tmp;
-//  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(&space.device()));
+//  popmessage("Read FDC status @ PC=%05x",space.device().safe_pc());
 	tmp = m_status | 0x80;
 	m_clr_status++;
 	if(m_clr_status == 0x10)

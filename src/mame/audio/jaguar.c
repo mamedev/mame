@@ -217,7 +217,7 @@ void jaguar_state::sound_start()
 READ16_MEMBER( jaguar_state::jerry_regs_r )
 {
 	if (offset != JINTCTRL && offset != JINTCTRL+2)
-		logerror("%08X:jerry read register @ F10%03X\n", cpu_get_previouspc(&space.device()), offset * 2);
+		logerror("%08X:jerry read register @ F10%03X\n", space.device().safe_pcbase(), offset * 2);
 
 	switch (offset)
 	{
@@ -244,7 +244,7 @@ WRITE16_MEMBER( jaguar_state::jerry_regs_w )
 	}
 
 	if (offset != JINTCTRL && offset != JINTCTRL+2 && offset != ASICTRL)
-		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(&space.device()), offset * 2, data);
+		logerror("%08X:jerry write register @ F10%03X = %04X\n", space.device().safe_pcbase(), offset * 2, data);
 }
 
 
@@ -322,7 +322,7 @@ void jaguar_state::serial_update()
 
 READ32_MEMBER( jaguar_state::serial_r )
 {
-	logerror("%08X:jaguar_serial_r(%X)\n", cpu_get_previouspc(&space.device()), offset);
+	logerror("%08X:jaguar_serial_r(%X)\n", space.device().safe_pcbase(), offset);
 	return 0;
 }
 
@@ -358,7 +358,7 @@ WRITE32_MEMBER( jaguar_state::serial_w )
 			break;
 
 		default:
-			logerror("%08X:jaguar_serial_w(%X,%X)\n", cpu_get_previouspc(&space.device()), offset, data);
+			logerror("%08X:jaguar_serial_w(%X,%X)\n", space.device().safe_pcbase(), offset, data);
 			break;
 	}
 }

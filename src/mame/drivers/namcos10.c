@@ -421,25 +421,25 @@ READ32_MEMBER(namcos10_state::nand_status_r )
 
 WRITE32_MEMBER(namcos10_state::nand_address1_w )
 {
-	logerror("nand_a1_w %08x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nand_a1_w %08x (%08x)\n", data, space.device().safe_pc());
 	nand_address = ( nand_address & 0x00ffffff ) | ( ( data & 0xff ) << 24 );
 }
 
 WRITE32_MEMBER(namcos10_state::nand_address2_w )
 {
-	logerror("nand_a2_w %08x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nand_a2_w %08x (%08x)\n", data, space.device().safe_pc());
 	nand_address = ( nand_address & 0xff00ffff ) | ( ( data & 0xff ) << 16 );
 }
 
 WRITE32_MEMBER(namcos10_state::nand_address3_w )
 {
-	logerror("nand_a3_w %08x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nand_a3_w %08x (%08x)\n", data, space.device().safe_pc());
 	nand_address = ( nand_address & 0xffff00ff ) | ( ( data & 0xff ) << 8 );
 }
 
 WRITE32_MEMBER(namcos10_state::nand_address4_w )
 {
-	logerror("nand_a4_w %08x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nand_a4_w %08x (%08x)\n", data, space.device().safe_pc());
 	nand_address = ( nand_address & 0xffffff00 ) | ( ( data & 0xff ) << 0 );
 }
 

@@ -811,7 +811,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 	int x;
 	int call=data;
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
+		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 
 	if (offset == 0)
 	{
@@ -839,7 +839,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 READ8_MEMBER(mpu3_state::characteriser_r)
 {
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
+		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
 
 	if (offset == 0)
 	{

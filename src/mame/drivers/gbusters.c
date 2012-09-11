@@ -56,7 +56,7 @@ WRITE8_MEMBER(gbusters_state::gbusters_1f98_w)
 	/* other bits unused/unknown */
 	if (data & 0xfe)
 	{
-		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(&space.device()), data);
+		//logerror("%04x: (1f98) write %02x\n",space.device().safe_pc(), data);
 		//popmessage("$1f98 = %02x", data);
 	}
 }
@@ -84,13 +84,13 @@ WRITE8_MEMBER(gbusters_state::gbusters_coin_counter_w)
 		sprintf(baf, "ccnt = %02x", data);
 		popmessage(baf);
 #endif
-		logerror("%04x: (ccount) write %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: (ccount) write %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 WRITE8_MEMBER(gbusters_state::gbusters_unknown_w)
 {
-	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(&space.device()), data);
+	logerror("%04x: write %02x to 0x1f9c\n",space.device().safe_pc(), data);
 
 {
 char baf[40];
@@ -430,7 +430,7 @@ static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 
 	if (lines & 0xf0)
 	{
-		//logerror("%04x: (lines) write %02x\n",cpu_get_pc(device), lines);
+		//logerror("%04x: (lines) write %02x\n",device->safe_pc(), lines);
 		//popmessage("lines = %02x", lines);
 	}
 

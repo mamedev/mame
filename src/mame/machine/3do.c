@@ -62,12 +62,12 @@ Expansion bus stuff:
 
 
 READ32_MEMBER(_3do_state::_3do_nvarea_r){
-	logerror( "%08X: NVRAM read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset );
+	logerror( "%08X: NVRAM read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset );
 	return 0;
 }
 
 WRITE32_MEMBER(_3do_state::_3do_nvarea_w){
-	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset, data, mem_mask );
+	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset, data, mem_mask );
 }
 
 
@@ -100,7 +100,7 @@ WRITE32_MEMBER(_3do_state::_3do_nvarea_w){
 READ32_MEMBER(_3do_state::_3do_slow2_r){
 	UINT32 data = 0;
 
-	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset );
+	logerror( "%08X: UNK_318 read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset );
 
 	switch( offset ) {
 	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
@@ -114,7 +114,7 @@ READ32_MEMBER(_3do_state::_3do_slow2_r){
 
 WRITE32_MEMBER(_3do_state::_3do_slow2_w)
 {
-	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset, data, mem_mask );
+	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset, data, mem_mask );
 
 	switch( offset )
 	{
@@ -146,7 +146,7 @@ READ32_MEMBER(_3do_state::_3do_svf_r)
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	UINT32 *p = m_vram + addr;
 
-	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4 );
+	logerror( "%08X: SVF read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset*4 );
 
 	switch( offset & ( 0xE000 / 4 ) )
 	{
@@ -171,7 +171,7 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	UINT32 *p = m_vram + addr;
 
-	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	switch( offset & ( 0xe000 / 4 ) )
 	{
@@ -207,7 +207,7 @@ WRITE32_MEMBER(_3do_state::_3do_svf_w)
 
 
 READ32_MEMBER(_3do_state::_3do_madam_r){
-	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4 );
+	logerror( "%08X: MADAM read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset*4 );
 
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
@@ -358,7 +358,7 @@ READ32_MEMBER(_3do_state::_3do_madam_r){
 	case 0x07f8/4:
 		return m_madam.mult_status;
 	default:
-		logerror( "%08X: unhandled MADAM read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4 );
+		logerror( "%08X: unhandled MADAM read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset*4 );
 		break;
 	}
 	return 0;
@@ -366,7 +366,7 @@ READ32_MEMBER(_3do_state::_3do_madam_r){
 
 
 WRITE32_MEMBER(_3do_state::_3do_madam_w){
-	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	switch( offset ) {
 	case 0x0000/4:
@@ -537,7 +537,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 		break;
 
 	default:
-		logerror( "%08X: unhandled MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4, data, mem_mask );
+		logerror( "%08X: unhandled MADAM write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 		break;
 	}
 }
@@ -554,7 +554,7 @@ void _3do_madam_init( running_machine &machine )
 
 READ32_MEMBER(_3do_state::_3do_clio_r)
 {
-	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset * 4 );
+	logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 
 	switch( offset )
 	{
@@ -693,7 +693,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.uncle_rom;
 
 	default:
-		logerror( "%08X: unhandled CLIO read offset = %08X\n", cpu_get_pc(machine().device("maincpu")), offset * 4 );
+		logerror( "%08X: unhandled CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 		break;
 	}
 	return 0;
@@ -701,7 +701,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 
 WRITE32_MEMBER(_3do_state::_3do_clio_w)
 {
-	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	switch( offset )
 	{
@@ -945,7 +945,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		break;
 
 	default:
-		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(machine().device("maincpu")), offset*4, data, mem_mask );
+		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 		break;
 	}
 }

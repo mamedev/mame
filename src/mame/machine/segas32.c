@@ -224,14 +224,14 @@ void darkedge_fd1149_vblank(device_t *device)
 WRITE16_MEMBER(segas32_state::darkedge_protection_w)
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		cpu_get_pc(&space.device()), 0xa00000 + 2*offset, data, mem_mask);
+		space.device().safe_pc(), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
 READ16_MEMBER(segas32_state::darkedge_protection_r)
 {
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		cpu_get_pc(&space.device()), 0xa00000 + 2*offset, mem_mask);
+		space.device().safe_pc(), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 
@@ -284,7 +284,7 @@ READ16_MEMBER(segas32_state::dbzvrvs_protection_r)
 // protection ram is 8-bits wide and only occupies every other address
 READ16_MEMBER(segas32_state::arabfgt_protection_r)
 {
-	int PC = cpu_get_pc(&space.device());
+	int PC = space.device().safe_pc();
 	int cmpVal;
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)

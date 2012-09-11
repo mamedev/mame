@@ -28,32 +28,32 @@ UINT16 actel_id;
 
 static READ64_HANDLER( naomi_biose_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc04173c)
+	if (space->device().safe_pc()==0xc04173c)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 		//device_spin_until_interrupt(&space->device());
 //  else
-//      printf("%08x\n", cpu_get_pc(&space->device()));
+//      printf("%08x\n", space->device().safe_pc());
 
 	return naomi_ram64[0x2ad238/8];
 }
 
 static READ64_HANDLER( naomi_biosh_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc045ffc)
+	if (space->device().safe_pc()==0xc045ffc)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
-//   printf("%08x\n", cpu_get_pc(&space->device()));
+//   printf("%08x\n", space->device().safe_pc());
 
 	return naomi_ram64[0x2b0600/8];
 }
 
 static READ64_HANDLER( naomi2_biose_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc04637c)
+	if (space->device().safe_pc()==0xc04637c)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 		//device_spin_until_interrupt(&space->device());
 //  else
-//      printf("%08x\n", cpu_get_pc(&space->device()));
+//      printf("%08x\n", space->device().safe_pc());
 
 	return naomi_ram64[0x2b0600/8];
 }
@@ -243,7 +243,7 @@ DRIVER_INIT_MEMBER(dc_state,naomigd_mp)
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0x0c0c9adc)
+	if (space->device().safe_pc()==0x0c0c9adc)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x1aae18/8];
@@ -257,7 +257,7 @@ DRIVER_INIT_MEMBER(dc_state,ggxxsla)
 
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc0b5c3c) // or 0xc0bab0c
+	if (space->device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x1837b8/8];
@@ -272,10 +272,10 @@ DRIVER_INIT_MEMBER(dc_state,ggxx)
 
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc0b84bc) // or 0xc0bab0c
+	if (space->device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
-	//printf("%08x\n", cpu_get_pc(&space->device()));
+	//printf("%08x\n", space->device().safe_pc());
 
 	return naomi_ram64[0x18d6c8/8];
 }
@@ -289,7 +289,7 @@ DRIVER_INIT_MEMBER(dc_state,ggxxrl)
 /* at least speeds up the annoying copyright screens ;-) */
 static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc36a2dc)
+	if (space->device().safe_pc()==0xc36a2dc)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 
 	return naomi_ram64[0x5dc900/8];
@@ -334,11 +334,11 @@ DRIVER_INIT_MEMBER(dc_state,kick4csh)
 
 static READ64_HANDLER( hotd2_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc0cfcbc)
+	if (space->device().safe_pc()==0xc0cfcbc)
 		device_spin_until_time(&space->device(), attotime::from_usec(500));
 		//device_spin_until_interrupt(&space->device());
 //  else
-//  printf("%08x\n", cpu_get_pc(&space->device()));
+//  printf("%08x\n", space->device().safe_pc());
 
 	return naomi_ram64[0xa25fb8/8];
 }

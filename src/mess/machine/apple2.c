@@ -1450,12 +1450,12 @@ READ8_MEMBER ( apple2_state::apple2_c05x_r )
             if (offset == 0xa)  // RAM
             {
                 apple2_setvar(space.machine(), VAR_TK2000RAM, ~0);
-                printf("TK2000: RAM (PC %x)\n", cpu_get_pc(m_maincpu));
+                printf("TK2000: RAM (PC %x)\n", m_maincpu->safe_pc());
             }
             else if (offset == 0xb) // ROM
             {
                 apple2_setvar(space.machine(), 0, ~VAR_TK2000RAM);
-                printf("TK2000: ROM (PC %x)\n", cpu_get_pc(m_maincpu));
+                printf("TK2000: ROM (PC %x)\n", m_maincpu->safe_pc());
             }
         }
 

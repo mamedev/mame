@@ -74,7 +74,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(machine.device("maincpu")), buf );
+		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
 	}
 }
 
@@ -443,13 +443,13 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 // INT/INT2/INT3 interrupt controllers
 READ32_MEMBER(ip20_state::int_r)
 {
-	mame_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+	mame_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 	return 0;
 }
 
 WRITE32_MEMBER(ip20_state::int_w)
 {
-	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 }
 
 static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32, ip20_state )

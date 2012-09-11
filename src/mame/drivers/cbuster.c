@@ -75,7 +75,7 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 
 		break;
 	}
-	logerror("Warning %04x- %02x written to control %02x\n", cpu_get_pc(&space.device()), data, offset);
+	logerror("Warning %04x- %02x written to control %02x\n", space.device().safe_pc(), data, offset);
 }
 
 READ16_MEMBER(cbuster_state::twocrude_control_r)
@@ -90,7 +90,7 @@ READ16_MEMBER(cbuster_state::twocrude_control_r)
 			return ioport("DSW")->read();
 
 		case 4: /* Protection */
-			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(&space.device()), offset);
+			logerror("%04x : protection control read at 30c000 %d\n", space.device().safe_pc(), offset);
 			return m_prot;
 
 		case 6: /* Credits, VBL in byte 7 */

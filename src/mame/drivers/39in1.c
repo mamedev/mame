@@ -1370,13 +1370,13 @@ READ32_MEMBER(_39in1_state::unknown_r)
 READ32_MEMBER(_39in1_state::cpld_r)
 {
 
-	//if (cpu_get_pc(&space.device()) != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, cpu_get_pc(&space.device()), state);
+	//if (space.device().safe_pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, space.device().safe_pc(), state);
 
-	if (cpu_get_pc(&space.device()) == 0x3f04)
+	if (space.device().safe_pc() == 0x3f04)
 	{
 		return 0xf0;	  // any non-zero value works here
 	}
-	else if (cpu_get_pc(&space.device()) == 0xe3af4)
+	else if (space.device().safe_pc() == 0xe3af4)
 	{
 		return ioport("MCUIPT")->read();
 	}
@@ -1431,11 +1431,11 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 		m_seed = data<<16;
 	}
 
-	if (cpu_get_pc(&space.device()) == 0x280c)
+	if (space.device().safe_pc() == 0x280c)
 	{
 		m_state = 1;
 	}
-	if (cpu_get_pc(&space.device()) == 0x2874)
+	if (space.device().safe_pc() == 0x2874)
 	{
 		m_state = 2;
 		m_magic = space.read_byte(0xa02d4ff0);
@@ -1446,7 +1446,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #if 0
 	else
 	{
-		printf("%08x: CPLD_W: %08x = %08x & %08x\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		printf("%08x: CPLD_W: %08x = %08x & %08x\n", space.device().safe_pc(), offset, data, mem_mask);
 	}
 #endif
 }

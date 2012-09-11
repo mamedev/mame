@@ -184,14 +184,14 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_w)
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
 {
 
-	//logerror("%04x: 6801U4 port 1 read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: 6801U4 port 1 read\n", space.device().safe_pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 {
-	//logerror("%04x: 6801U4 port 1 write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 6801U4 port 1 write %02x\n", space.device().safe_pc(), data);
 
 	// bit 4: coin lockout
 	coin_lockout_global_w(machine(), ~data & 0x10);
@@ -215,13 +215,13 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port2_r)
 {
 
-	//logerror("%04x: 6801U4 port 2 read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: 6801U4 port 2 read\n", space.device().safe_pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 {
-	//logerror("%04x: 6801U4 port 2 write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 6801U4 port 2 write %02x\n", space.device().safe_pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	// bits 0-3: bits 8-11 of shared RAM address
@@ -255,25 +255,25 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port3_r)
 {
-	//logerror("%04x: 6801U4 port 3 read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: 6801U4 port 3 read\n", space.device().safe_pc());
 	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port3_w)
 {
-	//logerror("%04x: 6801U4 port 3 write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 6801U4 port 3 write %02x\n", space.device().safe_pc(), data);
 	m_port3_out = data;
 }
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port4_r)
 {
-	//logerror("%04x: 6801U4 port 4 read\n", cpu_get_pc(&space.device()));
+	//logerror("%04x: 6801U4 port 4 read\n", space.device().safe_pc());
 	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port4_w)
 {
-	//logerror("%04x: 6801U4 port 4 write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 6801U4 port 4 write %02x\n", space.device().safe_pc(), data);
 
 	// bits 0-7 of shared RAM address
 
@@ -292,7 +292,7 @@ in boblbobl, so they don't matter. All checks are patched out in sboblbob.
 READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
 {
 	// if (offset >= 2)
-	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", cpu_get_pc(&space.device()), offset, res);
+	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", space.device().safe_pc(), offset, res);
 
 	if (offset == 0)
 		return m_ic43_a << 4;
@@ -342,13 +342,13 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
 {
 	static const int xorval[4] = { 4, 1, 8, 2 };
 
-	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", cpu_get_pc(&space.device()), offset, data);
+	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", space.device().safe_pc(), offset, data);
 	m_ic43_b = (data >> 4) ^ xorval[offset];
 }
 
 READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
 {
-	//  logerror("%04x: ic43_b_r (offs %d)\n", cpu_get_pc(&space.device()), offset);
+	//  logerror("%04x: ic43_b_r (offs %d)\n", space.device().safe_pc(), offset);
 	if (offset == 0)
 		return m_ic43_b << 4;
 	else
@@ -382,13 +382,13 @@ INTERRUPT_GEN( bublbobl_m68705_interrupt )
 
 READ8_MEMBER(bublbobl_state::bublbobl_68705_port_a_r)
 {
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space.device()), m_port_a_in);
+	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_a_w)
 {
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
@@ -425,7 +425,7 @@ READ8_MEMBER(bublbobl_state::bublbobl_68705_port_b_r)
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 {
-	//logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	if ((m_ddr_b & 0x01) && (~data & 0x01) && (m_port_b_out & 0x01))
@@ -435,7 +435,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 	if ((m_ddr_b & 0x02) && (data & 0x02) && (~m_port_b_out & 0x02)) /* positive edge trigger */
 	{
 		m_address = (m_address & 0xff00) | m_port_a_out;
-		//logerror("%04x: 68705 address %02x\n", cpu_get_pc(&space.device()), m_port_a_out);
+		//logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), m_port_a_out);
 	}
 	if ((m_ddr_b & 0x04) && (data & 0x04) && (~m_port_b_out & 0x04)) /* positive edge trigger */
 	{
@@ -447,26 +447,26 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 		{
 			if ((m_address & 0x0800) == 0x0000)
 			{
-				//logerror("%04x: 68705 read input port %02x\n", cpu_get_pc(&space.device()), m_address);
+				//logerror("%04x: 68705 read input port %02x\n", space.device().safe_pc(), m_address);
 				m_latch = ioport(portnames[m_address & 3])->read();
 			}
 			else if ((m_address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(&space.device()), m_mcu_sharedram[m_address], m_address);
+				//logerror("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_mcu_sharedram[m_address], m_address);
 				m_latch = m_mcu_sharedram[m_address & 0x03ff];
 			}
 			else
-				logerror("%04x: 68705 unknown read address %04x\n", cpu_get_pc(&space.device()), m_address);
+				logerror("%04x: 68705 unknown read address %04x\n", space.device().safe_pc(), m_address);
 		}
 		else	/* write */
 		{
 			if ((m_address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 write %02x to address %04x\n", cpu_get_pc(&space.device()), m_port_a_out, m_address);
+				//logerror("%04x: 68705 write %02x to address %04x\n", space.device().safe_pc(), m_port_a_out, m_address);
 				m_mcu_sharedram[m_address & 0x03ff] = m_port_a_out;
 			}
 			else
-				logerror("%04x: 68705 unknown write to address %04x\n", cpu_get_pc(&space.device()), m_address);
+				logerror("%04x: 68705 unknown write to address %04x\n", space.device().safe_pc(), m_address);
 		}
 	}
 	if ((m_ddr_b & 0x20) && (~data & 0x20) && (m_port_b_out & 0x20))
@@ -479,11 +479,11 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 	}
 	if ((m_ddr_b & 0x40) && (~data & 0x40) && (m_port_b_out & 0x40))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
 	}
 	if ((m_ddr_b & 0x80) && (~data & 0x80) && (m_port_b_out & 0x80))
 	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
 	}
 
 	m_port_b_out = data;

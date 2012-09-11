@@ -223,7 +223,7 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 
 READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 {
-	// logerror("BankRead %05x %08x\n",cpu_get_pc(&space.device()),offset);
+	// logerror("BankRead %05x %08x\n",space.device().safe_pc(),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
    so just hack around the protection here.  (The hacks are 'right' as I have
@@ -232,9 +232,9 @@ READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 	if (!strcmp(machine().system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
-		if (cpu_get_pc(&space.device()) == 0x9ace)
+		if (space.device().safe_pc() == 0x9ace)
 			return 0;
-		if (cpu_get_pc(&space.device()) == 0x9ae4)
+		if (space.device().safe_pc() == 0x9ae4)
 			return 0x63;
 
 		/* Just return whatever the code is expecting */
@@ -251,7 +251,7 @@ READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 
 WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 {
-	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(&space.device()), offset, data);
+	logerror("BankWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
@@ -355,14 +355,14 @@ CUSTOM_INPUT_MEMBER(ddragon_state::sub_cpu_busy)
 
 WRITE8_MEMBER(ddragon_state::darktowr_mcu_w)
 {
-	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(&space.device()), offset, data);
+	logerror("McuWrite %05x %08x %08x\n",space.device().safe_pc(), offset, data);
 	m_darktowr_mcu_ports[offset] = data;
 }
 
 
 READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
 {
-	logerror("%04x: read %d\n", cpu_get_pc(&space.device()), offset);
+	logerror("%04x: read %d\n", space.device().safe_pc(), offset);
 	return 0;
 }
 
@@ -396,7 +396,7 @@ READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
 {
 
 	/* Double Dragon crash fix - see notes above */
-	if (offset == 0x49 && cpu_get_pc(&space.device()) == 0x6261 && m_spriteram[offset] == 0x1f)
+	if (offset == 0x49 && space.device().safe_pc() == 0x6261 && m_spriteram[offset] == 0x1f)
 		return 0x1;
 
 	return m_spriteram[offset];

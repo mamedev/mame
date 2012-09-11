@@ -556,12 +556,12 @@ READ8_DEVICE_HANDLER ( mea8000_r )
 	case 1:
 		/* ready to accept next frame */
 #if 0
-		LOG(( "$%04x %f: mea8000_r ready=%i\n", cpu_get_previouspc( device->machine().firstcpu ), machine.time().as_double(), mea8000_accept_byte( mea8000 ) ));
+		LOG(( "$%04x %f: mea8000_r ready=%i\n", device->machine().firstcpu ->safe_pcbase( ), machine.time().as_double(), mea8000_accept_byte( mea8000 ) ));
 #endif
 		return mea8000_accept_byte(mea8000) << 7;
 
 	default:
-		logerror( "$%04x mea8000_r invalid read offset %i\n",  cpu_get_previouspc( device->machine().firstcpu ), offset );
+		logerror( "$%04x mea8000_r invalid read offset %i\n",  device->machine().firstcpu ->safe_pcbase( ), offset );
 	}
 	return 0;
 }
@@ -577,19 +577,19 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 		{
 			/* got pitch byte before first frame */
 			mea8000->pitch = 2 * data;
-			LOG(( "$%04x %f: mea8000_w pitch %i\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mea8000->pitch ));
+			LOG(( "$%04x %f: mea8000_w pitch %i\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mea8000->pitch ));
 			mea8000->state = MEA8000_WAIT_FIRST;
 			mea8000->bufpos = 0;
 		}
 		else if (mea8000->bufpos == 4)
 		{
 			/* overflow */
-			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), data ));
+			LOG(( "$%04x %f: mea8000_w data overflow %02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), data ));
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(),
+			LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(),
 			      data, mea8000->bufpos ));
 			mea8000->buf[mea8000->bufpos] = data;
 			mea8000->bufpos++;
@@ -623,7 +623,7 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 			mea8000_stop_frame(device->machine(), mea8000);
 
 		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-		      cpu_get_previouspc(device->machine().firstcpu), device->machine().time().as_double(), data,
+		      device->machine().firstcpu->safe_pcbase(), device->machine().time().as_double(), data,
 		      stop, mea8000->cont, mea8000->roe ));
 
 		mea8000_update_req(device);
@@ -631,7 +631,7 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 	}
 
 	default:
-		logerror( "$%04x mea8000_w invalid write offset %i\n", cpu_get_previouspc( device->machine().firstcpu ), offset );
+		logerror( "$%04x mea8000_w invalid write offset %i\n", device->machine().firstcpu ->safe_pcbase( ), offset );
 	}
 }
 

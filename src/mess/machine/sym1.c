@@ -123,7 +123,7 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
 	sym1_state *state = device->machine().driver_data<sym1_state>();
-	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine().device("maincpu") ), data);
+	logerror("%x: riot_a_w 0x%02x\n", device->machine().device("maincpu") ->safe_pc( ), data);
 
 	/* save for later use */
 	state->m_riot_port_a = data;
@@ -133,7 +133,7 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
 	sym1_state *state = device->machine().driver_data<sym1_state>();
-	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine().device("maincpu") ), data);
+	logerror("%x: riot_b_w 0x%02x\n", device->machine().device("maincpu") ->safe_pc( ), data);
 
 	/* save for later use */
 	state->m_riot_port_b = data;

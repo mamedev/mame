@@ -265,7 +265,7 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 	int		            MapPage;
 	char                page_num[10];
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,cpu_get_pc(&space_0->device())));
+	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0->device().safe_pc()));
 	for(Page=first;Page<=last;Page++)
 	{
 		sprintf(page_num,"bank%d",Page+1);

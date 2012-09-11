@@ -206,7 +206,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_freset_w)
 	device_t *io56xx = machine().device("56xx");
 	int bit = !BIT(offset, 11);
 
-	logerror("%04x: freset %d\n",cpu_get_pc(&space.device()), bit);
+	logerror("%04x: freset %d\n",space.device().safe_pc(), bit);
 
 	namcoio_set_reset_line(io58xx, bit ? CLEAR_LINE : ASSERT_LINE);
 	namcoio_set_reset_line(io56xx, bit ? CLEAR_LINE : ASSERT_LINE);

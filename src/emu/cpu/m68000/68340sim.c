@@ -12,7 +12,7 @@ READ16_HANDLER( m68340_internal_sim_r )
 
 	if (sim)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset<<1)
 		{
@@ -63,7 +63,7 @@ READ8_HANDLER( m68340_internal_sim_ports_r )
 
 	if (sim)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset)
 		{
@@ -119,7 +119,7 @@ READ32_HANDLER( m68340_internal_sim_cs_r )
 
 	if (sim)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset<<2)
 		{
@@ -149,7 +149,7 @@ WRITE16_HANDLER( m68340_internal_sim_w )
 
 	if (sim)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset<<1)
 		{
@@ -199,7 +199,7 @@ WRITE8_HANDLER( m68340_internal_sim_ports_w )
 
 	if (sim)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset)
 		{
@@ -252,7 +252,7 @@ WRITE32_HANDLER( m68340_internal_sim_cs_w )
 
 	if (sim)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset<<2)
 		{

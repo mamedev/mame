@@ -518,7 +518,7 @@ static void debug_dsp_command(running_machine &machine)
 
 WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 {
-	//mame_printf_debug("dsp_shared: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(&space.device()));
+	//mame_printf_debug("dsp_shared: %08X, %04X at %08X\n", offset, data >> 16, space.device().safe_pc());
 	if (ACCESSING_BITS_24_31)
 	{
 		m_dsp_shared_ram[offset] &= 0x00ff;
@@ -588,7 +588,7 @@ static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(&space->device()));
+			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, space->device().safe_pc());
 			break;
 		}
 	}
@@ -615,7 +615,7 @@ static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(&space->device()));
+			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, space->device().safe_pc());
 			break;
 		}
 	}
@@ -978,7 +978,7 @@ READ16_MEMBER(taitojc_state::dsp_texaddr_r)
 WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 {
 	m_dsp_tex_address = data;
-//  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(&space.device()));
+//  mame_printf_debug("texaddr = %08X at %08X\n", data, space.device().safe_pc());
 
 	m_texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
 	m_texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);
@@ -1301,7 +1301,7 @@ MACHINE_CONFIG_END
 
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 {
-	if(cpu_get_pc(&space.device())==0x404c)
+	if(space.device().safe_pc()==0x404c)
 		device_spin_until_time(&space.device(), attotime::from_usec(500));
 
 	return m_dsp_shared_ram[0x7f0];
@@ -1309,7 +1309,7 @@ READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 
 READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 {
-	if(cpu_get_pc(&space.device())==0x402e)
+	if(space.device().safe_pc()==0x402e)
 		device_spin_until_time(&space.device(), attotime::from_usec(500));
 
 	return m_dsp_shared_ram[0x7f0];

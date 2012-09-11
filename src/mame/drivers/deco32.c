@@ -314,7 +314,7 @@ READ32_MEMBER(deco32_state::deco32_irq_controller_r)
 //      return 0xffffff80 | vblank | (0x40); //test for lock load guns
 	}
 
-	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",cpu_get_pc(&space.device()),offset,mem_mask);
+	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",space.device().safe_pc(),offset,mem_mask);
 	return 0xffffffff;
 }
 
@@ -324,7 +324,7 @@ WRITE32_MEMBER(deco32_state::deco32_irq_controller_w)
 
 	switch (offset) {
 	case 0: /* IRQ enable - probably an irq mask, but only values used are 0xc8 and 0xca */
-//      logerror("%08x:  IRQ write %d %08x\n",cpu_get_pc(&space.device()),offset,data);
+//      logerror("%08x:  IRQ write %d %08x\n",space.device().safe_pc(),offset,data);
 		m_raster_enable=(data&0xff)==0xc8; /* 0xca seems to be off */
 		break;
 
@@ -364,7 +364,7 @@ READ32_MEMBER(deco32_state::captaven_prot_r)
 	case 0xed4: return ioport("IN2")->read(); /* Misc */
 	}
 
-	logerror("%08x: Unmapped protection read %04x\n",cpu_get_pc(&space.device()),offset<<2);
+	logerror("%08x: Unmapped protection read %04x\n",space.device().safe_pc(),offset<<2);
 	return 0xffffffff;
 }
 
@@ -405,13 +405,13 @@ WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 
 READ32_MEMBER(deco32_state::dragngun_service_r)
 {
-//  logerror("%08x:Read service\n",cpu_get_pc(&space.device()));
+//  logerror("%08x:Read service\n",space.device().safe_pc());
 	return ioport("IN2")->read();
 }
 
 READ32_MEMBER(deco32_state::lockload_gun_mirror_r)
 {
-//logerror("%08x:Read gun %d\n",cpu_get_pc(&space.device()),offset);
+//logerror("%08x:Read gun %d\n",space.device().safe_pc(),offset);
 //return ((machine().rand()%0xffff)<<16) | machine().rand()%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
 		return ioport("IN4")->read() | ((machine().rand()%0xff)<<16);
@@ -420,7 +420,7 @@ READ32_MEMBER(deco32_state::lockload_gun_mirror_r)
 
 READ32_MEMBER(deco32_state::dragngun_prot_r)
 {
-//  logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(&space.device()),offset<<1,mem_mask);
+//  logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
 
 	if (!m_strobe) m_strobe=8;
 	else m_strobe=0;
@@ -487,7 +487,7 @@ READ32_MEMBER(deco32_state::tattass_prot_r)
 	case 0x35a: return m_tattass_eprom_bit << 16;
 	}
 
-	logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(&space.device()),offset<<1,mem_mask);
+	logerror("%08x:Read prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
 
 	return 0xffffffff;
 }
@@ -645,7 +645,7 @@ READ32_MEMBER(deco32_state::nslasher_prot_r)
 	case 0x35a: return (machine().device<eeprom_device>("eeprom")->read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
-	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(&space.device()),offset<<1,mem_mask);
+	//logerror("%08x: Read unmapped prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
 
 	return 0xffffffff;
 }
@@ -666,7 +666,7 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 
 WRITE32_MEMBER(deco32_state::nslasher_prot_w)
 {
-	//logerror("%08x:write prot %08x (%08x) %08x\n",cpu_get_pc(&space.device()),offset<<1,mem_mask,data);
+	//logerror("%08x:write prot %08x (%08x) %08x\n",space.device().safe_pc(),offset<<1,mem_mask,data);
 
 	/* Only sound port of chip is used - no protection */
 	if (offset==0x700/4) {

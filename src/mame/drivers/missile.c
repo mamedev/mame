@@ -555,7 +555,7 @@ static MACHINE_RESET( missile )
 INLINE int get_madsel(address_space *space)
 {
 	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT16 pc = cpu_get_previouspc(&space->device());
+	UINT16 pc = space->device().safe_pcbase();
 
 	/* if we're at a different instruction than last time, reset our delay counter */
 	if (pc != state->m_madsel_lastpc)
@@ -766,7 +766,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(&space.device()), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", space.device().safe_pc(), offset, data);
 }
 
 
@@ -821,7 +821,7 @@ READ8_MEMBER(missile_state::missile_r)
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(&space.device()), offset);
+		logerror("%04X:Unknown read from %04X\n", space.device().safe_pc(), offset);
 	return result;
 }
 

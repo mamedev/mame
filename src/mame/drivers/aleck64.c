@@ -188,7 +188,7 @@ static WRITE32_HANDLER( aleck_dips_w )
 			break;
 
 		default:
-			logerror("Unknown aleck_dips_w(0x%08x, 0x%08x, %08x) @ 0x%08x PC=%08x\n", offset, data, mem_mask, 0xc0800000 + offset*4, cpu_get_pc(&space->device()));
+			logerror("Unknown aleck_dips_w(0x%08x, 0x%08x, %08x) @ 0x%08x PC=%08x\n", offset, data, mem_mask, 0xc0800000 + offset*4, space->device().safe_pc());
 	}
 }
 
@@ -227,7 +227,7 @@ static READ32_HANDLER( aleck_dips_r )
 		}
 		default:
 		{
-			logerror("Unknown aleck_dips_r(0x%08x, 0x%08x) @ 0x%08x PC=%08x\n", offset, 0xc0800000 + offset*4, mem_mask, cpu_get_pc(&space->device()));
+			logerror("Unknown aleck_dips_r(0x%08x, 0x%08x) @ 0x%08x PC=%08x\n", offset, 0xc0800000 + offset*4, mem_mask, space->device().safe_pc());
 			return 0;
 		}
 	}

@@ -117,7 +117,7 @@ WRITE8_MEMBER(fuuki16_state::fuuki16_sound_rombank_w)
 	if (data <= 2)
 		membank("bank1")->set_entry(data);
 	else
-		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", space.device().safe_pc(), data);
 }
 
 WRITE8_MEMBER(fuuki16_state::fuuki16_oki_banking_w)

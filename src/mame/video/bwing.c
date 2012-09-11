@@ -119,7 +119,7 @@ WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
 			m_srbank = data >> 6;
 
 			#if BW_DEBUG
-				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", device().tag, cpu_get_pc(&space.device()), data, 0x1b00 + offset, machine().primary_screen->frame_number());
+				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", device().tag, space.device().safe_pc(), data, 0x1b00 + offset, machine().primary_screen->frame_number());
 			#endif
 		break;
 	}

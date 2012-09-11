@@ -273,7 +273,7 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 		return (((class_code_val[function]) >> (reg & 3)*8) & 0xff);
 	}
 
-	printf("%08x PIIX4: read %d, %02X\n", cpu_get_pc(&space->device()), function, reg);
+	printf("%08x PIIX4: read %d, %02X\n", space->device().safe_pc(), function, reg);
 
 	return state->m_piix4_config_reg[function][reg];
 }

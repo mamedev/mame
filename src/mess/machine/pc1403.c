@@ -128,7 +128,7 @@ void pc1403_outc(device_t *device, int data)
 {
 	pc1403_state *state = device->machine().driver_data<pc1403_state>();
     state->m_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), cpu_get_pc(device->machine().device("maincpu")), data);
+//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->machine().device("maincpu")->safe_pc(), data);
 }
 
 

@@ -1336,7 +1336,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 	if(offset & 0x200 && m_sys3_card && m_acard) // route Arcade Card handling ports
 		return pce_cd_acard_w(space,offset,data);
 
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(&space.device()), offset, data );
+	logerror("%04X: write to CD interface offset %02X, data %02X\n", space.device().safe_pc(), offset, data );
 
 	switch( offset & 0xf )
 	{
@@ -1590,7 +1590,7 @@ READ8_MEMBER(pce_state::pce_cd_intf_r)
 	if(offset & 0x200 && m_sys3_card && m_acard) // route Arcade Card handling ports
 		return pce_cd_acard_r(space,offset);
 
-	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(&space.device()), offset );
+	logerror("%04X: read from CD interface offset %02X\n", space.device().safe_pc(), offset );
 
 	if((offset & 0xc0) == 0xc0 && m_sys3_card) //System 3 Card header handling
 	{

@@ -784,7 +784,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 {
 	if (lines >= 0x1c)
-		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines);
+		logerror("PC = %04x : Unknown bank selected %02x\n", device->safe_pc(), lines);
 	else
 		device->machine().root_device().membank("bank1")->set_entry(lines);
 }

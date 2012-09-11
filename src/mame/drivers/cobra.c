@@ -1052,7 +1052,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 		if (cpu != NULL)
 		{
 			// cpu has a name and a PC
-			sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
+			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 		}
 		else
 		{
@@ -1072,7 +1072,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 			if (cpu != NULL)
 			{
 				// cpu has a name and a PC
-				sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
+				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 			}
 			else
 			{
@@ -1129,7 +1129,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 			if (cpu != NULL)
 			{
 				// cpu has a name and a PC
-				sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
+				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 			}
 			else
 			{
@@ -1150,7 +1150,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 		if (cpu != NULL)
 		{
 			// cpu has a name and a PC
-			sprintf(accessor_location, "(%s) %08X", cpu->tag(), cpu_get_pc((device_t *)cpu));
+			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
 		}
 		else
 		{

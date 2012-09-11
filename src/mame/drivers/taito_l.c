@@ -375,7 +375,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 			logerror("New rom size : %x\n", (m_high + 1) * 0x2000);
 		}
 
-		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
+		//logerror("robs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
 		m_cur_rombank = data;
 		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x2000 * m_cur_rombank);
 	}
@@ -394,7 +394,7 @@ WRITE8_MEMBER(taitol_state::rombank2switch_w)
 			logerror("New rom2 size : %x\n", (m_high2 + 1) * 0x4000);
 		}
 
-		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space.device()));
+		//logerror("robs2 %02x (%04x)\n", data, space.device().safe_pc());
 
 		m_cur_rombank2 = data;
 		membank("bank6")->set_base(machine().root_device().memregion("slave")->base() + 0x4000 * m_cur_rombank2);
@@ -417,7 +417,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 	if (m_cur_rambank[offset] != data)
 	{
 		m_cur_rambank[offset] = data;
-//logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
+//logerror("rabs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
 		if (data >= 0x14 && data <= 0x1f)
 		{
 			data -= 0x14;
@@ -431,7 +431,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 		}
 		else
 		{
-			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
+			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
 			m_current_notifier[offset] = 0;
 			m_current_base[offset] = m_empty_ram;
 		}
@@ -504,8 +504,8 @@ READ8_MEMBER(taitol_state::extport_select_and_ym2203_r)
 WRITE8_MEMBER(taitol_state::mcu_data_w)
 {
 	m_last_data = data;
-	m_last_data_adr = cpu_get_pc(&space.device());
-//  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(&space.device()));
+	m_last_data_adr = space.device().safe_pc();
+//  logerror("mcu write %02x (%04x)\n", data, space.device().safe_pc());
 	switch (data)
 	{
 	case 0x43:
@@ -517,13 +517,13 @@ WRITE8_MEMBER(taitol_state::mcu_data_w)
 
 WRITE8_MEMBER(taitol_state::mcu_control_w)
 {
-//  logerror("mcu control %02x (%04x)\n", data, cpu_get_pc(&space.device()));
+//  logerror("mcu control %02x (%04x)\n", data, space.device().safe_pc());
 }
 
 READ8_MEMBER(taitol_state::mcu_data_r)
 {
 
-//  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(&space.device()), last_data, last_data_adr);
+//  logerror("mcu read (%04x) [%02x, %04x]\n", space.device().safe_pc(), last_data, last_data_adr);
 	if (m_mcu_pos == m_mcu_reply_len)
 		return 0;
 
@@ -532,14 +532,14 @@ READ8_MEMBER(taitol_state::mcu_data_r)
 
 READ8_MEMBER(taitol_state::mcu_control_r)
 {
-//  logerror("mcu control read (%04x)\n", cpu_get_pc(&space.device()));
+//  logerror("mcu control read (%04x)\n", space.device().safe_pc());
 	return 0x1;
 }
 
 #if 0
 WRITE8_MEMBER(taitol_state::sound_w)
 {
-	logerror("Sound_w %02x (%04x)\n", data, cpu_get_pc(&space.device()));
+	logerror("Sound_w %02x (%04x)\n", data, space.device().safe_pc());
 }
 #endif
 
@@ -559,7 +559,7 @@ READ8_MEMBER(taitol_state::mux_r)
 	case 7:
 		return ioport("IN2")->read();
 	default:
-		logerror("Mux read from unknown port %d (%04x)\n", m_mux_ctrl, cpu_get_pc(&space.device()));
+		logerror("Mux read from unknown port %d (%04x)\n", m_mux_ctrl, space.device().safe_pc());
 		return 0xff;
 	}
 }
@@ -573,7 +573,7 @@ WRITE8_MEMBER(taitol_state::mux_w)
 		control2_w(space, 0, data);
 		break;
 	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", m_mux_ctrl, data, cpu_get_pc(&space.device()));
+		logerror("Mux write to unknown port %d, %02x (%04x)\n", m_mux_ctrl, data, space.device().safe_pc());
 	}
 }
 
@@ -1788,7 +1788,7 @@ WRITE8_MEMBER(taitol_state::portA_w)
 		m_cur_bank = data & 0x03;
 		bankaddress = m_cur_bank * 0x4000;
 		membank("bank7")->set_base(&RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_bank, cpu_get_pc(&space->device()) );
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", m_cur_bank, space->device().safe_pc() );
 	}
 }
 

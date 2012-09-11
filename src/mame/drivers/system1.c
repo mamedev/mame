@@ -567,7 +567,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-					 cpu_get_pc(&space.device()), m_mcu_control, offset, data);
+					 space.device().safe_pc(), m_mcu_control, offset, data);
 			break;
 	}
 }
@@ -588,7 +588,7 @@ READ8_MEMBER(system1_state::mcu_io_r)
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					 cpu_get_pc(&space.device()), m_mcu_control, offset);
+					 space.device().safe_pc(), m_mcu_control, offset);
 			return 0xff;
 	}
 }
@@ -681,25 +681,25 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
 
 READ8_MEMBER(system1_state::nobb_inport1c_r)
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(&space.device()));
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",space.device().safe_pc());
 	return(0x80);	// infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 READ8_MEMBER(system1_state::nobb_inport22_r)
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(&space.device()),nobb_inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",space.device().safe_pc(),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
 READ8_MEMBER(system1_state::nobb_inport23_r)
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(&space.device()),m_nobb_inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",space.device().safe_pc(),m_nobb_inport23_step);
 	return(m_nobb_inport23_step);
 }
 
 WRITE8_MEMBER(system1_state::nobb_outport24_w)
 {
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(&space.device()),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",space.device().safe_pc(),data);
 	m_nobb_inport23_step = data;
 }
 
@@ -4705,7 +4705,7 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 READ8_MEMBER(system1_state::nob_start_r)
 {
 	/* in reality, it's likely some M1-dependent behavior */
-	return (cpu_get_pc(&space.device()) <= 0x0003) ? 0x80 : memregion("maincpu")->base()[1];
+	return (space.device().safe_pc() <= 0x0003) ? 0x80 : memregion("maincpu")->base()[1];
 }
 
 DRIVER_INIT_MEMBER(system1_state,nob)

@@ -137,7 +137,7 @@ READ16_MEMBER(koftball_state::prot_r)
 		case 0x8000: return 0x0f0f;
 	}
 
-	logerror("unk prot r %x %x\n",m_prot_data,	cpu_get_previouspc(&space.device()));
+	logerror("unk prot r %x %x\n",m_prot_data,	space.device().safe_pcbase());
 	return machine().rand();
 }
 

@@ -747,7 +747,7 @@ static UINT8 z80_fifoout_pop(address_space *space)
 	UINT8 r;
 	if (state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(&space->device()));
+		logerror("Sound FIFOOUT underflow at %08X\n", space->device().safe_pc());
 	}
 	r = state->m_fifoout_data[state->m_fifoout_rpos++];
 	if(state->m_fifoout_rpos == FIFO_SIZE)
@@ -773,7 +773,7 @@ static void z80_fifoout_push(address_space *space, UINT8 data)
 	}
 	if(state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X\n", cpu_get_pc(&space->device()));
+		fatalerror("Sound FIFOOUT overflow at %08X\n", space->device().safe_pc());
 	}
 
 	state->m_fifoout_read_request = 1;
@@ -785,7 +785,7 @@ static UINT8 z80_fifoin_pop(address_space *space)
 	UINT8 r;
 	if (state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X\n", cpu_get_pc(&space->device()));
+		fatalerror("Sound FIFOIN underflow at %08X\n", space->device().safe_pc());
 	}
 	r = state->m_fifoin_data[state->m_fifoin_rpos++];
 	if(state->m_fifoin_rpos == FIFO_SIZE)
@@ -811,7 +811,7 @@ static void z80_fifoin_push(address_space *space, UINT8 data)
 	}
 	if(state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X\n", cpu_get_pc(&space->device()));
+		fatalerror("Sound FIFOIN overflow at %08X\n", space->device().safe_pc());
 	}
 
 	state->m_fifoin_read_request = 1;
@@ -1945,25 +1945,25 @@ MACHINE_CONFIG_END
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
 {
-	if (cpu_get_pc(&space.device())==0x00305bb2) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x00305bb2) device_spin_until_interrupt(&space.device()); // idle
 	return m_spimainram[(0x0018cb4-0x800)/4];
 }
 
 READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 {
-	if (cpu_get_pc(&space.device())== 0x30582e) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()== 0x30582e) device_spin_until_interrupt(&space.device()); // idle
 	return m_spimainram[(0x0018c9c-0x800)/4];
 }
 
 READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 {
-//  printf("cpu_get_pc(&space.device()) %06x\n", cpu_get_pc(&space.device()));
+//  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
 
 	/* batlbalu */
-	if (cpu_get_pc(&space.device())==0x00305996) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x00305996) device_spin_until_interrupt(&space.device()); // idle
 
 	/* batlball */
-	if (cpu_get_pc(&space.device())==0x003058aa) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x003058aa) device_spin_until_interrupt(&space.device()); // idle
 
 	return m_spimainram[(0x0018db4-0x800)/4];
 }
@@ -1971,21 +1971,21 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
 	/* rdft */
-	if (cpu_get_pc(&space.device())==0x0203f0a) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f0a) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdftau */
-	if (cpu_get_pc(&space.device())==0x0203f16) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f16) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdftj */
-	if (cpu_get_pc(&space.device())==0x0203f22) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f22) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdftdi */
-	if (cpu_get_pc(&space.device())==0x0203f46) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f46) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdftu */
-	if (cpu_get_pc(&space.device())==0x0203f3a) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f3a) device_spin_until_interrupt(&space.device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_spimainram[(0x00298d0-0x800)/4];
 }
@@ -1993,15 +1993,15 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 {
 	/* viprp1 */
-	if (cpu_get_pc(&space.device())==0x0202769) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0202769) device_spin_until_interrupt(&space.device()); // idle
 
 	/* viprp1s */
-	if (cpu_get_pc(&space.device())==0x02027e9) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x02027e9) device_spin_until_interrupt(&space.device()); // idle
 
 	/* viprp1ot */
-	if (cpu_get_pc(&space.device())==0x02026bd) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x02026bd) device_spin_until_interrupt(&space.device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_spimainram[(0x001e2e0-0x800)/4];
 }
@@ -2009,8 +2009,8 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
 	/* viperp1o */
-	if (cpu_get_pc(&space.device())==0x0201f99) device_spin_until_interrupt(&space.device()); // idle
-//  mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
+	if (space.device().safe_pc()==0x0201f99) device_spin_until_interrupt(&space.device()); // idle
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
 	return m_spimainram[(0x001d49c-0x800)/4];
 }
 
@@ -2018,8 +2018,8 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 // causes input problems?
 READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
-// mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
- if (cpu_get_pc(&space.device())==0x03032c7) device_spin_until_interrupt(&space.device()); // idle
+// mame_printf_debug("%08x\n",space.device().safe_pc());
+ if (space.device().safe_pc()==0x03032c7) device_spin_until_interrupt(&space.device()); // idle
  return m_spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -2028,18 +2028,18 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
 
 	/* rdft22kc */
-	if (cpu_get_pc(&space.device())==0x0203926) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203926) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdft2, rdft2j */
-	if (cpu_get_pc(&space.device())==0x0204372) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0204372) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdft2us */
-	if (cpu_get_pc(&space.device())==0x020420e) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x020420e) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rdft2a */
-	if (cpu_get_pc(&space.device())==0x0204366) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0204366) device_spin_until_interrupt(&space.device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
 
 	return m_spimainram[(0x0282AC-0x800)/4];
 }
@@ -2047,10 +2047,10 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (cpu_get_pc(&space.device())==0x0206082) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0206082) device_spin_until_interrupt(&space.device()); // idle
 
 	/* rfjetus */
-	if (cpu_get_pc(&space.device())==0x0205b39)
+	if (space.device().safe_pc()==0x0205b39)
 	{
 		UINT32 r;
 		device_spin_until_interrupt(&space.device()); // idle
@@ -2060,9 +2060,9 @@ READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 	}
 
 	/* rfjetj */
-	if (cpu_get_pc(&space.device())==0x0205f2e) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0205f2e) device_spin_until_interrupt(&space.device()); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
 
 
 	return m_spimainram[(0x002894c-0x800)/4];

@@ -320,7 +320,7 @@ static void glass_ROM16_split_gfx( running_machine &machine, const char *src_reg
 READ16_MEMBER( glass_state::glass_mainram_r )
 {
 	UINT16 ret = m_mainram[offset];
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 
 	if (offset == (0xfede96 - 0xfec000)>>1)
 	{
@@ -353,7 +353,7 @@ READ16_MEMBER( glass_state::glass_mainram_r )
 
 WRITE16_MEMBER( glass_state::glass_mainram_w )
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 
 	COMBINE_DATA(&m_mainram[offset]);
 

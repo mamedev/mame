@@ -346,7 +346,7 @@ READ8_MEMBER( ncr539x_device::read )
 
 	#if VERBOSE
 	#if VERBOSE_READS
-	printf("539x: Read @ %s (%02x) (PC=%x) (status %02x irq_status %02x)\n", rdregs[offset], offset, cpu_get_pc(&space.device()), m_status, m_irq_status);
+	printf("539x: Read @ %s (%02x) (PC=%x) (status %02x irq_status %02x)\n", rdregs[offset], offset, space.device().safe_pc(), m_status, m_irq_status);
 	#endif
 	#endif
 
@@ -377,7 +377,7 @@ READ8_MEMBER( ncr539x_device::read )
 					update_fifo_internal_state(fifo_bytes);
 
 					#if VERBOSE
-					printf("Read %02x from FIFO[%d], FIFO now contains %d bytes (PC=%x, m_buffer_remaining %x)\n", rv, m_fifo_ptr-1, fifo_bytes, cpu_get_pc(&space.device()), m_buffer_remaining);
+					printf("Read %02x from FIFO[%d], FIFO now contains %d bytes (PC=%x, m_buffer_remaining %x)\n", rv, m_fifo_ptr-1, fifo_bytes, space.device().safe_pc(), m_buffer_remaining);
 					#endif
 
 					if (fifo_bytes == 0)
@@ -484,7 +484,7 @@ READ8_MEMBER( ncr539x_device::read )
 WRITE8_MEMBER( ncr539x_device::write )
 {
 	#if VERBOSE
-	if (offset != 2) printf("539x: Write %02x @ %s (%02x) (PC=%x)\n", data, wrregs[offset], offset, cpu_get_pc(&space.device()));
+	if (offset != 2) printf("539x: Write %02x @ %s (%02x) (PC=%x)\n", data, wrregs[offset], offset, space.device().safe_pc());
 	#endif
 
 	switch (offset)

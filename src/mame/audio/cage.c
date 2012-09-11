@@ -410,7 +410,7 @@ static READ32_HANDLER( tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", cpu_get_pc(&space->device()), register_names[offset & 0x7f], result);
+		logerror("CAGE:%06X:%s read -> %08X\n", space->device().safe_pc(), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -423,7 +423,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", cpu_get_pc(&space->device()), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("CAGE:%06X:%s write = %08X\n", space->device().safe_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -506,7 +506,7 @@ static READ32_HANDLER( cage_from_main_r )
 {
 	cage_t *state = &cage;
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(&space->device()), state->from_main);
+		logerror("%06X:CAGE read command = %04X\n", space->device().safe_pc(), state->from_main);
 	state->cpu_to_cage_ready = 0;
 	update_control_lines(space->machine());
 	device_set_input_line(state->cpu, TMS3203X_IRQ0, CLEAR_LINE);
@@ -519,7 +519,7 @@ static WRITE32_HANDLER( cage_from_main_ack_w )
 	if (LOG_COMM)
 	{
 		cage_t *state = &cage;
-		logerror("%06X:CAGE ack command = %04X\n", cpu_get_pc(&space->device()), state->from_main);
+		logerror("%06X:CAGE ack command = %04X\n", space->device().safe_pc(), state->from_main);
 	}
 }
 
@@ -528,7 +528,7 @@ static WRITE32_HANDLER( cage_to_main_w )
 {
 	cage_t *state = &cage;
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(&space->device()), data);
+		logerror("%06X:Data from CAGE = %04X\n", space->device().safe_pc(), data);
 	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	drvstate->soundlatch_word_w(*space, 0, data, mem_mask);
 	state->cage_to_cpu_ready = 1;

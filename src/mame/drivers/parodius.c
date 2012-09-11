@@ -76,7 +76,7 @@ WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 {
 
 	if (m_videobank & 0xf8)
-		logerror("%04x: videobank = %02x\n",cpu_get_pc(&space.device()),data);
+		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
 	/* bit 1 = select 052109 or 053245 at 2000-27ff */
@@ -88,7 +88,7 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 {
 
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space.device()),data);
+		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -427,7 +427,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( parodius_banking )
 {
 	if (lines & 0xf0)
-		logerror("%04x: setlines %02x\n", cpu_get_pc(device), lines);
+		logerror("%04x: setlines %02x\n", device->safe_pc(), lines);
 
 	device->machine().root_device().membank("bank1")->set_entry((lines & 0x0f) ^ 0x0f);
 }

@@ -873,7 +873,7 @@ READ32_MEMBER(ksys573_state::atapi_r)
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space.device()));
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, space.device().safe_pc());
 
 		data <<= shift;
 	}
@@ -1031,11 +1031,11 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space.device()));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, space.device().safe_pc());
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space.device()));
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, space.device().safe_pc());
 
 			switch (data)
 			{
@@ -1246,7 +1246,7 @@ READ32_MEMBER(ksys573_state::flash_r)
 
 	if( m_flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, m_control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", space.device().safe_pc(), offset, mem_mask, m_control );
 		data = 0xffffffff;
 	}
 	else
@@ -1284,7 +1284,7 @@ WRITE32_MEMBER(ksys573_state::flash_w)
 
 	if( m_flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, data, m_control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", space.device().safe_pc(), offset, mem_mask, data, m_control );
 	}
 	else
 	{
@@ -2013,7 +2013,7 @@ READ32_MEMBER(ksys573_state::gx894pwbba_r)
 	}
 
 	verboselog( machine(), 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", space.device().safe_pc(), offset, mem_mask, data );
 	return data;
 }
 

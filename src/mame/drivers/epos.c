@@ -42,7 +42,7 @@ WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
 	else
 		m_counter = (m_counter - 1) & 0x03;
 
-//  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(&space.device()), m_counter);
+//  logerror("PC %08x: ctr=%04x\n",space.device().safe_pc(), m_counter);
 
 	membank("bank1")->set_entry(m_counter);
 

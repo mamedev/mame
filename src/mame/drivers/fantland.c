@@ -64,7 +64,7 @@ WRITE8_MEMBER(fantland_state::fantland_nmi_enable_w)
 	m_nmi_enable = data;
 
 	if ((m_nmi_enable != 0) && (m_nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", space.device().safe_pc(), data);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
@@ -169,7 +169,7 @@ WRITE8_MEMBER(fantland_state::borntofi_nmi_enable_w)
 	// data & 0x31 changes when lightgun fires
 
 	if ((m_nmi_enable != 0) && (m_nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", space.device().safe_pc(), data);
 
 //  popmessage("%02X", data);
 }
@@ -345,7 +345,7 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 		{
 			case 0x00:		borntofi_adpcm_stop(msm, voice); break;
 			case 0x03:		borntofi_adpcm_start(msm, voice); break;
-			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", cpu_get_pc(&space.device()), reg, data);
+			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", space.device().safe_pc(), reg, data);
 		}
 	}
 	else

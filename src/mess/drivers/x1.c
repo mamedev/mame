@@ -1632,7 +1632,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(&space->device()),offset);
+		//logerror("(PC=%06x) Read i/o address %04x\n",space->device().safe_pc(),offset);
 	}
 	return 0xff;
 }
@@ -1675,7 +1675,7 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",cpu_get_pc(&space->device()),data,offset);
+		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space->device().safe_pc(),data,offset);
 	}
 }
 
@@ -1722,7 +1722,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
 	else
 	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",cpu_get_pc(&space->device()),offset);
+		//logerror("(PC=%06x) Read i/o address %04x\n",space->device().safe_pc(),offset);
 	}
 	return 0xff;
 }
@@ -1778,7 +1778,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
 	else
 	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",cpu_get_pc(&space->device()),data,offset);
+		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",space->device().safe_pc(),data,offset);
 	}
 }
 

@@ -108,6 +108,6 @@ WRITE8_HANDLER( invinco_audio_w )
 	}
 
 #if 0
-	logerror("Went LO: %02X  %04X\n", bitsGoneLow, cpu_get_pc(&space->device()));
+	logerror("Went LO: %02X  %04X\n", bitsGoneLow, space->device().safe_pc());
 #endif
 }

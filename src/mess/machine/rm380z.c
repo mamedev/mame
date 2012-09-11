@@ -29,7 +29,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 	switch ( offset )
 	{
 	case 0xFC:		// PORT0
-		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum);
+		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,machine().device("maincpu")->safe_pc(),writenum);
 		m_port0 = data;
 		if (data&0x01)
 		{
@@ -43,7 +43,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 		break;
 
 	case 0xFD:		// screen line counter (?)
-		//printf("FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,data,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum);
+		//printf("FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,data,m_fbfe,machine().device("maincpu")->safe_pc(),writenum);
 
 		m_old_old_fbfd=m_old_fbfd;
 		m_old_fbfd=m_fbfd;
@@ -56,7 +56,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 		break;
 
 	case 0xFE:		// line on screen to write to divided by 2
-		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,cpu_get_pc(machine().device("maincpu")),writenum);
+		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,machine().device("maincpu")->safe_pc(),writenum);
 		m_fbfe=data;
 		break;
 
@@ -81,7 +81,7 @@ READ8_MEMBER( rm380z_state::port_read )
 		data = m_port0_kbd;
 		//if (m_port0_kbd!=0) m_port0_kbd=0;
 		//m_port0_kbd=0;
-		//printf("read of port0 (kbd) from PC [%x]\n",cpu_get_pc(machine().device("maincpu")));
+		//printf("read of port0 (kbd) from PC [%x]\n",machine().device("maincpu")->safe_pc());
 		break;
 
 	case 0xFD:		// "counter" (?)
@@ -91,7 +91,7 @@ READ8_MEMBER( rm380z_state::port_read )
 
 	case 0xFE:		// PORT1
 		data = m_port1;
-		//printf("read of port1 from PC [%x]\n",cpu_get_pc(machine().device("maincpu")));
+		//printf("read of port1 from PC [%x]\n",machine().device("maincpu")->safe_pc());
 		break;
 
 	case 0xFF:		// user port
@@ -134,7 +134,7 @@ READ8_MEMBER( rm380z_state::rm380z_portlow_r )
 
 WRITE8_MEMBER( rm380z_state::rm380z_portlow_w )
 {
-	//printf("port write [%x] [%x] at PC [%x]\n",offset,data,cpu_get_pc(machine().device("maincpu")));
+	//printf("port write [%x] [%x] at PC [%x]\n",offset,data,machine().device("maincpu")->safe_pc());
 }
 
 READ8_MEMBER( rm380z_state::rm380z_porthi_r )

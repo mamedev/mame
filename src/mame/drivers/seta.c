@@ -1392,7 +1392,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				(cpu != NULL) ? cpu_get_pc(cpu) : -1, no );
+				(cpu != NULL) ? cpu->safe_pc() : -1, no );
 	}
 }
 
@@ -1698,7 +1698,7 @@ READ16_MEMBER(seta_state::calibr50_ip_r)
 		case 0x16/2:	return (dir2 >> 8);			// upper 4 bits of p2 rotation
 		case 0x18/2:	return 0xffff;				// ? (value's read but not used)
 		default:
-			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset*2);
+			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
 			return 0;
 	}
 }
@@ -2510,7 +2510,7 @@ READ16_MEMBER(seta_state::krzybowl_input_r)
 		case 0xc/2:	return dir2y & 0xff;
 		case 0xe/2:	return dir2y >> 8;
 		default:
-			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset*2);
+			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
 			return 0;
 	}
 }
@@ -2675,7 +2675,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 		case 0x08/2:	return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset*2);
+			logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset*2);
 			return 0x0000;
 	}
 }
@@ -2701,12 +2701,12 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::thunderl_protection_r)
 {
-//  logerror("PC %06X - Protection Read\n", cpu_get_pc(&space.device()));
+//  logerror("PC %06X - Protection Read\n", space.device().safe_pc());
 	return 0x00dd;
 }
 WRITE16_MEMBER(seta_state::thunderl_protection_w)
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", cpu_get_pc(&space.device()), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", space.device().safe_pc(), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -2872,14 +2872,14 @@ READ16_MEMBER(seta_state::pairlove_prot_r)
 	int retdata;
 
 	retdata = m_pairslove_protram[offset];
-	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",cpu_get_pc(&space.device()), offset,retdata);
+	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",space.device().safe_pc(), offset,retdata);
 	m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
 	return retdata;
 }
 
 WRITE16_MEMBER(seta_state::pairlove_prot_w)
 {
-	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(&space.device()), offset,data);
+	//mame_printf_debug("pairs love protection? write %06x %04x %04x\n",space.device().safe_pc(), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
 	m_pairslove_protram[offset] = data;
 }
@@ -2956,7 +2956,7 @@ READ16_MEMBER(seta_state::inttoote_key_r)
 		case 0x80:	return ioport("BET4")->read();
 	}
 
-	logerror("%06X: unknown read, select = %04x\n",cpu_get_pc(&space.device()), *m_inttoote_key_select);
+	logerror("%06X: unknown read, select = %04x\n",space.device().safe_pc(), *m_inttoote_key_select);
 	return 0xffff;
 }
 
@@ -10708,12 +10708,12 @@ READ16_MEMBER(seta_state::twineagl_200100_r)
 {
 
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(&space.device()),offset);
+	logerror("%04x: twineagl_200100_r %d\n",space.device().safe_pc(),offset);
 	return m_twineagl_xram[offset];
 }
 WRITE16_MEMBER(seta_state::twineagl_200100_w)
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(&space.device()),offset,data);
+	logerror("%04x: twineagl_200100_w %d = %02x\n",space.device().safe_pc(),offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{

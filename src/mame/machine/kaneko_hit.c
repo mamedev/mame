@@ -194,7 +194,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 			return (machine().rand() & 0xffff);
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(&space.device()),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",space.device().safe_pc(),offset<<1);
 	}
 
 	return 0;
@@ -219,7 +219,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
 		case 0x12/2: hit.mult_b = data; break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(&space.device()),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",space.device().safe_pc(),offset<<1);
 	}
 }
 
@@ -286,7 +286,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
 		case 0x32/2: return hit.y2s;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(&space.device()),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",space.device().safe_pc(),offset<<1);
 	}
 
 	return 0;
@@ -314,7 +314,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type1_w)
 		case 0x38/2: break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(&space.device()),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",space.device().safe_pc(),offset<<1);
 	}
 }
 
@@ -422,7 +422,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type2_w)
 					hit3.mode=data;break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x [ %06x] = %06x\n",cpu_get_pc(&space.device()),offset<<1, idx, data);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x [ %06x] = %06x\n",space.device().safe_pc(),offset<<1, idx, data);
 	}
 
 	type2_recalc_collisions(hit3);
@@ -474,7 +474,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type2_r)
 		case 0x88: return hit3.z1toz2;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x [ %06x]\n",cpu_get_pc(&space.device()),offset<<1, idx);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x [ %06x]\n",space.device().safe_pc(),offset<<1, idx);
 	}
 
 	return 0;

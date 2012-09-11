@@ -596,7 +596,7 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 	{
 		UINT8 nibble = m_parallel_latched;//(ioport(m_portnames[m_parallel_pointer / 3])->read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", cpu_get_pc(&space.device()));
+		logerror("%08X:parallel_port_r()\n", space.device().safe_pc());
 #if 0
 		if (m_controls_data == 0x18)
 		{
@@ -645,7 +645,7 @@ WRITE32_MEMBER(mediagx_state::parallel_port_w)
                 7x..ff = advance pointer
         */
 
-		logerror("%08X:", cpu_get_pc(&space.device()));
+		logerror("%08X:", space.device().safe_pc());
 
 		m_parallel_latched = (ioport(portnames[m_parallel_pointer / 3])->read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
@@ -1266,7 +1266,7 @@ INLINE UINT32 generic_speedup(address_space *space, int idx)
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	if (cpu_get_pc(&space->device()) == state->m_speedup_table[idx].pc)
+	if (space->device().safe_pc() == state->m_speedup_table[idx].pc)
 	{
 		state->m_speedup_hits[idx]++;
 		device_spin_until_interrupt(&space->device());

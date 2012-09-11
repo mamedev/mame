@@ -469,7 +469,7 @@ READ8_MEMBER( pioneer_ldv1000_device::z80_controller_r )
 WRITE8_MEMBER( pioneer_ldv1000_device::z80_controller_w )
 {
 	if (LOG_STATUS_CHANGES && data != m_status)
-		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(&space.device()), data);
+		printf("%04X:CONTROLLER.W=%02X\n", space.device().safe_pc(), data);
 	m_status = data;
 }
 

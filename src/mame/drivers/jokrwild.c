@@ -184,10 +184,10 @@ static PALETTE_INIT( jokrwild )
 
 READ8_MEMBER(jokrwild_state::rng_r)
 {
-	if(cpu_get_pc(&space.device()) == 0xab32)
+	if(space.device().safe_pc() == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;
 
-	if(cpu_get_pc(&space.device()) == 0xab3a)
+	if(space.device().safe_pc() == 0xab3a)
 		return (offset == 2) ? 0x49 : 0x92;
 
 	return machine().rand() & 0xff;

@@ -27,7 +27,7 @@
 
 WRITE16_MEMBER(midyunit_state::midyunit_cmos_w)
 {
-	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(&space.device()), offset);
+	logerror("%08x:CMOS Write @ %05X\n", space.device().safe_pc(), offset);
 	COMBINE_DATA(&m_cmos_ram[offset + m_cmos_page]);
 }
 
@@ -49,7 +49,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 {
 	m_cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", cpu_get_pc(&space.device()), data);
+	logerror("%08x:Protection write = %04X\n", space.device().safe_pc(), data);
 
 	/* only go down this path if we have a data structure */
 	if (m_prot_data)
@@ -98,7 +98,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 READ16_MEMBER(midyunit_state::midyunit_protection_r)
 {
 	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", cpu_get_pc(&space.device()), m_prot_result);
+	logerror("%08X:Protection read = %04X\n", space.device().safe_pc(), m_prot_result);
 	return m_prot_result;
 }
 
@@ -185,7 +185,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 
 WRITE16_MEMBER(midyunit_state::term2_hack_w)
 {
-	if (offset == 1 && cpu_get_pc(&space.device()) == 0xffce6520)
+	if (offset == 1 && space.device().safe_pc() == 0xffce6520)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -195,7 +195,7 @@ WRITE16_MEMBER(midyunit_state::term2_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 {
-	if (offset == 0 && cpu_get_pc(&space.device()) == 0xffce5230)
+	if (offset == 0 && space.device().safe_pc() == 0xffce5230)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -205,7 +205,7 @@ WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 {
-	if (offset == 0 && cpu_get_pc(&space.device()) == 0xffce4b80)
+	if (offset == 0 && space.device().safe_pc() == 0xffce4b80)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -215,7 +215,7 @@ WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
 {
-	if (offset == 0 && cpu_get_pc(&space.device()) == 0xffce33f0)
+	if (offset == 0 && space.device().safe_pc() == 0xffce33f0)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -580,7 +580,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space.device()), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", space.device().safe_pc(), data);
 		return;
 	}
 

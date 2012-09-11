@@ -289,7 +289,7 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 	UINT8 value = m_ws_portram[offset];
 
 	if ( offset != 2 )
-		logerror( "PC=%X: port read %02X\n", cpu_get_pc( machine().device("maincpu") ), offset );
+		logerror( "PC=%X: port read %02X\n", machine().device("maincpu") ->safe_pc( ), offset );
 	switch( offset )
 	{
 		case 0x02:		/* Current line */
@@ -360,7 +360,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
 	wswan_state *state = machine().driver_data<wswan_state>();
 	UINT8 input;
-	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( &mem->device() ), offset, data );
+	logerror( "PC=%X: port write %02X <- %02X\n", mem->device().safe_pc(), offset, data );
 	switch( offset )
 	{
 		case 0x00:	/* Display control
@@ -1254,7 +1254,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 				m_ws_portram[0xcb] = m_rtc.year;
 				break;
 			default:
-				logerror( "%X: Unknown RTC command (%X) requested\n", cpu_get_pc( &mem->device() ), data );
+				logerror( "%X: Unknown RTC command (%X) requested\n", mem->device().safe_pc(), data );
 			}
 			break;
 		case 0xcb:	/* RTC Data */

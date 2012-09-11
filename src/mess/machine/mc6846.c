@@ -267,7 +267,7 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 	case 0:
 	case 4:
 		LOG (( "$%04x %f: mc6846 CSR read $%02X intr=%i (timer=%i, cp1=%i, cp2=%i)\n",
-		       cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(),
+		       device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(),
 		       mc6846->csr, (mc6846->csr >> 7) & 1,
 		       mc6846->csr & 1, (mc6846->csr >> 1) & 1, (mc6846->csr >> 2) & 1 ));
 		mc6846->csr0_to_be_cleared = mc6846->csr & 1;
@@ -276,15 +276,15 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 		return mc6846->csr;
 
 	case 1:
-		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mc6846->pcr ));
+		LOG (( "$%04x %f: mc6846 PCR read $%02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mc6846->pcr ));
 		return mc6846->pcr;
 
 	case 2:
-		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mc6846->ddr ));
+		LOG (( "$%04x %f: mc6846 DDR read $%02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mc6846->ddr ));
 		return mc6846->ddr;
 
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), PORT ));
+		LOG (( "$%04x %f: mc6846 PORT read $%02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), PORT ));
 		if ( ! (mc6846->pcr & 0x80) )
 		{
 			if ( mc6846->csr1_to_be_cleared )
@@ -298,11 +298,11 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 		return PORT;
 
 	case 5:
-		LOG (( "$%04x %f: mc6846 TCR read $%02X\n",cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mc6846->tcr ));
+		LOG (( "$%04x %f: mc6846 TCR read $%02X\n",device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mc6846->tcr ));
 		return mc6846->tcr;
 
 	case 6:
-		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mc6846_counter( device ) >> 8 ));
+		LOG (( "$%04x %f: mc6846 COUNTER hi read $%02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mc6846_counter( device ) >> 8 ));
 		if ( mc6846->csr0_to_be_cleared )
 		{
 			mc6846->csr &= ~1;
@@ -312,7 +312,7 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 		return mc6846_counter( device ) >> 8;
 
 	case 7:
-		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mc6846_counter( device ) & 0xff ));
+		LOG (( "$%04x %f: mc6846 COUNTER low read $%02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mc6846_counter( device ) & 0xff ));
 		if ( mc6846->csr0_to_be_cleared )
 		{
 			mc6846->csr &= ~1;
@@ -322,7 +322,7 @@ READ8_DEVICE_HANDLER ( mc6846_r )
 		return mc6846_counter( device ) & 0xff;
 
 	default:
-		logerror( "$%04x mc6846 invalid read offset %i\n", cpu_get_previouspc( device->machine().firstcpu ), offset );
+		logerror( "$%04x mc6846 invalid read offset %i\n", device->machine().firstcpu ->safe_pcbase( ), offset );
 	}
 	return 0;
 }
@@ -353,7 +353,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 			"latcged,pos-edge", "latcged,pos-edge,intr"
 		};
 		LOG (( "$%04x %f: mc6846 PCR write $%02X reset=%i cp2=%s cp1=%s\n",
-		       cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), data,
+		       device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), data,
 		       (data >> 7) & 1, cp2[ (data >> 3) & 7 ], cp1[ data & 7 ] ));
 
 	}
@@ -366,7 +366,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 		mc6846_update_irq( device );
 	}
 	if ( data & 4 )
-		logerror( "$%04x mc6846 CP1 latching not implemented\n", cpu_get_previouspc( device->machine().firstcpu ) );
+		logerror( "$%04x mc6846 CP1 latching not implemented\n", device->machine().firstcpu ->safe_pcbase( ) );
 	if (data & 0x20)
 	{
 		if (data & 0x10)
@@ -376,12 +376,12 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 				mc6846->iface->out_cp2_func( device, 0, mc6846->cp2_cpu );
 		}
 		else
-			logerror( "$%04x mc6846 acknowledge not implemented\n", cpu_get_previouspc( device->machine().firstcpu ) );
+			logerror( "$%04x mc6846 acknowledge not implemented\n", device->machine().firstcpu ->safe_pcbase( ) );
 	}
 	break;
 
 	case 2:
-		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), data ));
+		LOG (( "$%04x %f: mc6846 DDR write $%02X\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), data ));
 		if ( ! (mc6846->pcr & 0x80) )
 		{
 			mc6846->ddr = data;
@@ -391,7 +391,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 		break;
 
 	case 3:
-		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), data,mc6846->ddr ));
+		LOG (( "$%04x %f: mc6846 PORT write $%02X (mask=$%02X)\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), data,mc6846->ddr ));
 		if ( ! (mc6846->pcr & 0x80) )
 		{
 			mc6846->pdr = data;
@@ -400,12 +400,12 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 			if ( mc6846->csr1_to_be_cleared && (mc6846->csr & 2) )
 			{
 				mc6846->csr &= ~2;
-				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double() ));
+				LOG (( "$%04x %f: mc6846 CP1 intr reset\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double() ));
 			}
 			if ( mc6846->csr2_to_be_cleared && (mc6846->csr & 4) )
 			{
 				mc6846->csr &= ~4;
-				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double() ));
+				LOG (( "$%04x %f: mc6846 CP2 intr reset\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double() ));
 			}
 			mc6846->csr1_to_be_cleared = 0;
 			mc6846->csr2_to_be_cleared = 0;
@@ -421,7 +421,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
 			};
 		LOG (( "$%04x %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
-		       cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), data,
+		       device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), data,
 		       (data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
 		       (data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
 		       (data & 1) ? "enabled" : "0" ));
@@ -455,7 +455,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 
 	case 7:
 		mc6846->latch = ( ((UINT16) mc6846->time_MSB) << 8 ) + data;
-		LOG (( "$%04x %f: mc6846 COUNT write %i\n", cpu_get_previouspc( device->machine().firstcpu ), device->machine().time().as_double(), mc6846->latch  ));
+		LOG (( "$%04x %f: mc6846 COUNT write %i\n", device->machine().firstcpu ->safe_pcbase( ), device->machine().time().as_double(), mc6846->latch  ));
 		if (!(mc6846->tcr & 0x38))
 		{
 			/* timer initialization */
@@ -471,7 +471,7 @@ WRITE8_DEVICE_HANDLER ( mc6846_w )
 		break;
 
 	default:
-		logerror( "$%04x mc6846 invalid write offset %i\n", cpu_get_previouspc( device->machine().firstcpu ), offset );
+		logerror( "$%04x mc6846 invalid write offset %i\n", device->machine().firstcpu ->safe_pcbase( ), offset );
 	}
 }
 

@@ -115,7 +115,7 @@ READ16_MEMBER(st0020_device::st0020_blit_r)
 			return 0;
 	}
 
-	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(&space.device()),offset*2);
+	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",space.device().safe_pc(),offset*2);
 	return 0;
 }
 
@@ -137,7 +137,7 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 		case 0x8a/2:
 		{
 			if (data & ~0x43)
-				logerror("CPU #0 PC: %06X - Unknown st0020_gfxram_bank bit written %04X\n",cpu_get_pc(&space.device()),data);
+				logerror("CPU #0 PC: %06X - Unknown st0020_gfxram_bank bit written %04X\n",space.device().safe_pc(),data);
 
 			if (ACCESSING_BITS_0_7)
 				m_st0020_gfxram_bank = data & 3;
@@ -162,7 +162,7 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 
 			if (!rom)
 			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(&space.device()),src,dst,len);
+				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",space.device().safe_pc(),src,dst,len);
 				return;
 			}
 
@@ -184,13 +184,13 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 			}
 			else
 			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(&space.device()),src,dst,len);
+				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",space.device().safe_pc(),src,dst,len);
 			}
 		}
 		break;
 
 		default:
-			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(&space.device()),offset*2,data);
+			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",space.device().safe_pc(),offset*2,data);
 	}
 }
 

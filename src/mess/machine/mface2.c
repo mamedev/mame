@@ -39,7 +39,7 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 {
 		int pc;
 
-		pc = cpu_get_pc(machine().device("maincpu"));
+		pc = machine().device("maincpu")->safe_pc();
 		/* there are two places where CALL &0065 can be found
         in the multiface rom. At this address there is a RET.
 

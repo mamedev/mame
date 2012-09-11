@@ -228,7 +228,7 @@ WRITE16_MEMBER(mcr68_state::pigskin_protection_w)
 		m_protection_data[3] = m_protection_data[4];
 		m_protection_data[4] = data & 0xff;
 
-		logerror("%06X:protection_w=%02X\n", cpu_get_previouspc(&space.device()), data & 0xff);
+		logerror("%06X:protection_w=%02X\n", space.device().safe_pcbase(), data & 0xff);
 	}
 }
 

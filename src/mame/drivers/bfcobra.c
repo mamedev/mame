@@ -779,7 +779,7 @@ READ8_MEMBER(bfcobra_state::ramdac_r)
 		}
 		default:
 		{
-			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(&space.device()));
+			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", space.device().safe_pcbase());
 		}
 	}
 
@@ -930,7 +930,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(&space.device()));
+			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, space.device().safe_pcbase());
 		}
 	}
 
@@ -946,7 +946,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(&space.device()), data);
+				popmessage("%x: Unusual bank access (%x)\n", space.device().safe_pcbase(), data);
 
 			data &= 0x3f;
 			m_bank_data[offset] = data;
@@ -1020,7 +1020,7 @@ WRITE8_MEMBER(bfcobra_state::chipset_w)
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(&space.device()));
+			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, space.device().safe_pcbase());
 		}
 	}
 }

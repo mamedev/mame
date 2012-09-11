@@ -501,7 +501,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		msm5205_reset_w(device, 0);
 	}
 
-//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space->device()) );
+//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space->device().safe_pc() );
 }
 
 
@@ -524,18 +524,18 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		msm5205_reset_w(device, 0);
 	}
 
-//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space->device()) );
+//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space->device().safe_pc() );
 }
 
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
 {
-//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space.device()) );
+//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
 {
-//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space.device()) );
+//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
 
 static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )

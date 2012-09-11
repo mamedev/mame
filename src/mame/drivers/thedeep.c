@@ -125,7 +125,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(&space.device()),m_protection_command);
+			logerror( "pc %04x: protection_command %02x\n", space.device().safe_pc(),m_protection_command);
 	}
 }
 
@@ -143,7 +143,7 @@ READ8_MEMBER(thedeep_state::thedeep_protection_r)
 WRITE8_MEMBER(thedeep_state::thedeep_e100_w)
 {
 	if (data != 1)
-		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(&space.device()),data);
+		logerror("pc %04x: e100 = %02x\n", space.device().safe_pc(),data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )

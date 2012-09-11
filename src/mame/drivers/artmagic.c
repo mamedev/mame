@@ -124,7 +124,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
 		oki->set_bank_base((((data >> 4) & 1) * 0x40000) % oki->region()->bytes());
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(&space.device()), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);
 }
 
 
@@ -145,7 +145,7 @@ static TIMER_CALLBACK( irq_off )
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	UINT32 pc = cpu_get_pc(&space.device());
+	UINT32 pc = space.device().safe_pc();
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		m_hack_irq = 1;

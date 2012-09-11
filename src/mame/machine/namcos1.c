@@ -88,13 +88,13 @@ static READ8_HANDLER( faceoff_inputs_r );
 
 static READ8_HANDLER( no_key_r )
 {
-	popmessage("CPU %s PC %08x: keychip read %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
 	return 0;
 }
 
 static WRITE8_HANDLER( no_key_w )
 {
-	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, data);
+	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
 }
 
 
@@ -200,7 +200,7 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 static READ8_HANDLER( key_type1_r )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
 
 	if (offset < 3)
 	{
@@ -232,7 +232,7 @@ static READ8_HANDLER( key_type1_r )
 static WRITE8_HANDLER( key_type1_w )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
 
 	if (offset < 4)
 		state->m_key[offset] = data;
@@ -385,7 +385,7 @@ CPU #0 PC e574: keychip read 0001
 static READ8_HANDLER( key_type2_r )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
 
 	state->m_key_numerator_high_word = 0;
 
@@ -405,7 +405,7 @@ static READ8_HANDLER( key_type2_r )
 static WRITE8_HANDLER( key_type2_w )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
 
 	if (offset < 5)
 	{
@@ -515,7 +515,7 @@ static READ8_HANDLER( key_type3_r )
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
 	int op;
 
-//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset);
+//  logerror("CPU %s PC %04x: keychip read %04x\n", space->device().tag(), space->device().safe_pc(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
        using it as temporary storage, so maybe it expects to act as RAM, however
@@ -531,7 +531,7 @@ static READ8_HANDLER( key_type3_r )
 	if (op == state->m_key_bottom4)	return (offset << 4) | (state->m_key[state->m_key_swap4_arg] & 0x0f);
 	if (op == state->m_key_top4)		return (offset << 4) | (state->m_key[state->m_key_swap4_arg] >> 4);
 
-	popmessage("CPU %s PC %08x: keychip read %04x", space->device().tag(), cpu_get_pc(&space->device()), offset);
+	popmessage("CPU %s PC %08x: keychip read %04x", space->device().tag(), space->device().safe_pc(), offset);
 
 	return 0;
 }
@@ -539,7 +539,7 @@ static READ8_HANDLER( key_type3_r )
 static WRITE8_HANDLER( key_type3_w )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, data);
+//  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space->device().tag(), space->device().safe_pc(), offset, data);
 
 	state->m_key[(offset & 0x70) >> 4] = data;
 }
@@ -571,7 +571,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_sound_bankswitch_w)
 
 WRITE8_MEMBER(namcos1_state::namcos1_cpu_control_w)
 {
-//  logerror("reset control pc=%04x %02x\n",cpu_get_pc(&space.device()),data);
+//  logerror("reset control pc=%04x %02x\n",space.device().safe_pc(),data);
 	if ((data & 1) ^ m_reset)
 	{
 		m_mcu_patch_data = 0;
@@ -646,21 +646,21 @@ static WRITE8_HANDLER( soundram_w )
 
 static WRITE8_HANDLER( rom_w )
 {
-	logerror("CPU %s PC %04x: warning - write %02x to rom address %04x\n", space->device().tag(), cpu_get_pc(&space->device()), data, offset);
+	logerror("CPU %s PC %04x: warning - write %02x to rom address %04x\n", space->device().tag(), space->device().safe_pc(), data, offset);
 }
 
 /* error handlers */
 static READ8_HANDLER( unknown_r )
 {
-	logerror("CPU %s PC %04x: warning - read from unknown chip\n", space->device().tag(), cpu_get_pc(&space->device()) );
-//  popmessage("CPU %s PC %04x: read from unknown chip", space->device().tag(), cpu_get_pc(&space->device()) );
+	logerror("CPU %s PC %04x: warning - read from unknown chip\n", space->device().tag(), space->device().safe_pc() );
+//  popmessage("CPU %s PC %04x: read from unknown chip", space->device().tag(), space->device().safe_pc() );
 	return 0;
 }
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("CPU %s PC %04x: warning - wrote to unknown chip\n", space->device().tag(), cpu_get_pc(&space->device()) );
-//  popmessage("CPU %s PC %04x: wrote to unknown chip", space->device().tag(), cpu_get_pc(&space->device()) );
+	logerror("CPU %s PC %04x: warning - wrote to unknown chip\n", space->device().tag(), space->device().safe_pc() );
+//  popmessage("CPU %s PC %04x: wrote to unknown chip", space->device().tag(), space->device().safe_pc() );
 }
 
 /* Main bankswitching routine */
@@ -939,7 +939,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_mcu_bankswitch_w)
 
 WRITE8_MEMBER(namcos1_state::namcos1_mcu_patch_w)
 {
-	//logerror("mcu C000 write pc=%04x data=%02x\n",cpu_get_pc(&space.device()),data);
+	//logerror("mcu C000 write pc=%04x data=%02x\n",space.device().safe_pc(),data);
 	if (m_mcu_patch_data == 0xa6) return;
 	m_mcu_patch_data = data;
 	m_triram[0] = data;

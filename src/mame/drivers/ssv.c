@@ -526,7 +526,7 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 	if (input_sel & 0x0002)	return ioport("KEY1")->read();
 	if (input_sel & 0x0004)	return ioport("KEY2")->read();
 	if (input_sel & 0x0008)	return ioport("KEY3")->read();
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
 	return 0xffff;
 }
 
@@ -651,7 +651,7 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 	if (input_sel & 0x0004)	return ioport("KEY1")->read();
 	if (input_sel & 0x0008)	return ioport("KEY2")->read();
 	if (input_sel & 0x0010)	return ioport("KEY3")->read();
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
 	return 0xffff;
 }
 
@@ -699,7 +699,7 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 	if (input_sel & 0x0004)	return ioport("KEY1")->read();
 	if (input_sel & 0x0008)	return ioport("KEY2")->read();
 	if (input_sel & 0x0010)	return ioport("KEY3")->read();
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
 	return 0xffff;
 }
 

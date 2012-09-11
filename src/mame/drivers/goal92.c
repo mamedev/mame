@@ -40,7 +40,7 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 			return ioport("DSW2")->read();
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(&space.device()));
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,space.device().safe_pc());
 	}
 
 	return 0;

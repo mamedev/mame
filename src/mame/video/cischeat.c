@@ -60,13 +60,13 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #define SHOW_READ_ERROR(_format_,_offset_)\
 {\
 	popmessage(_format_,_offset_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
+	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
 	logerror(_format_ "\n",_offset_);\
 }
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
 	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
+	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
 	logerror(_format_ "\n",_offset_,_data_); \
 }
 
@@ -74,12 +74,12 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
 #define SHOW_READ_ERROR(_format_,_offset_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
+	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
 	logerror(_format_ "\n",_offset_);\
 }
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(&space.device())); \
+	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
 	logerror(_format_ "\n",_offset_,_data_); \
 }
 

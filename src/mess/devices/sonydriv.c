@@ -271,7 +271,7 @@ int sony_read_status(device_t *device)
 	if (LOG_SONY_EXTRA)
 	{
 		printf("sony.status(): action=%x pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(device->machine().firstcpu), sony.floppy_enable ? "" : " (no drive enabled)");
+			action, (int) device->machine().firstcpu->safe_pc(), sony.floppy_enable ? "" : " (no drive enabled)");
 	}
 
 	if ((! sony_enable2()) && sony.floppy_enable)
@@ -333,7 +333,7 @@ int sony_read_status(device_t *device)
 			}
 			break;
 		case 0x0a:	/* At track 0: 0=track zero 1=not track zero */
-			logerror("sony.status(): reading Track 0 pc=0x%08x\n", (int) cpu_get_pc(device->machine().firstcpu));
+			logerror("sony.status(): reading Track 0 pc=0x%08x\n", (int) device->machine().firstcpu->safe_pc());
 			if (cur_image)
 				result = floppy_tk00_r(&cur_image->device());
 			else
@@ -407,7 +407,7 @@ static void sony_doaction(device_t *device)
 	if (LOG_SONY)
 	{
 		logerror("sony_doaction(): action=%d pc=0x%08x%s\n",
-			action, (int) cpu_get_pc(device->machine().firstcpu), (sony.floppy_enable) ? "" : " (MOTOR OFF)");
+			action, (int) device->machine().firstcpu->safe_pc(), (sony.floppy_enable) ? "" : " (MOTOR OFF)");
 	}
 
 	if (sony.floppy_enable)

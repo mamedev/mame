@@ -164,7 +164,7 @@ READ8_MEMBER(mjkjidai_state::keyboard_r)
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
-//  logerror("%04x: keyboard_r\n", cpu_get_pc(&space.device()));
+//  logerror("%04x: keyboard_r\n", space.device().safe_pc());
 
 	for (i = 0; i < 12; i++)
 	{
@@ -189,7 +189,7 @@ READ8_MEMBER(mjkjidai_state::keyboard_r)
 WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
 {
 
-//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(&space.device()),offset,data);
+//  logerror("%04x: keyboard_select %d = %02x\n",space.device().safe_pc(),offset,data);
 
 	switch (offset)
 	{

@@ -633,11 +633,11 @@ READ8_MEMBER(smc777_state::smc777_io_r)
 	else if(low_offs >= 0x18 && low_offs <= 0x19) { logerror("6845 read %02x",low_offs & 1); }
 	else if(low_offs >= 0x1a && low_offs <= 0x1b) { return key_r(space,low_offs & 1); }
 	else if(low_offs == 0x1c)					  { return system_input_r(space,0); }
-	else if(low_offs == 0x1d)					  { logerror("System and control data R PC=%04x\n",cpu_get_pc(&space.device())); return 0xff; }
+	else if(low_offs == 0x1d)					  { logerror("System and control data R PC=%04x\n",space.device().safe_pc()); return 0xff; }
 	else if(low_offs == 0x20)					  { return display_reg_r(space,0); }
 	else if(low_offs == 0x21)					  { return smc777_irq_mask_r(space,0); }
-	else if(low_offs == 0x25)					  { logerror("RTC read PC=%04x\n",cpu_get_pc(&space.device())); return 0xff; }
-	else if(low_offs == 0x26)					  { logerror("RS-232c RX %04x\n",cpu_get_pc(&space.device())); return 0xff; }
+	else if(low_offs == 0x25)					  { logerror("RTC read PC=%04x\n",space.device().safe_pc()); return 0xff; }
+	else if(low_offs == 0x26)					  { logerror("RS-232c RX %04x\n",space.device().safe_pc()); return 0xff; }
 	else if(low_offs >= 0x28 && low_offs <= 0x2c) { logerror("FDC 2 read %02x\n",low_offs & 7); return 0xff; }
 	else if(low_offs >= 0x2d && low_offs <= 0x2f) { logerror("RS-232c no. 2 read %02x\n",low_offs & 3); return 0xff; }
 	else if(low_offs >= 0x30 && low_offs <= 0x34) { return smc777_fdc1_r(space,low_offs & 7); }
@@ -655,7 +655,7 @@ READ8_MEMBER(smc777_state::smc777_io_r)
 	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM read %02x\n",low_offs & 1); }
 	else if(low_offs >= 0x80)					  { return smc777_fbuf_r(space,offset & 0xff7f); }
 
-	logerror("Undefined read at %04x offset = %02x\n",cpu_get_pc(&space.device()),low_offs);
+	logerror("Undefined read at %04x offset = %02x\n",space.device().safe_pc(),low_offs);
 	return 0xff;
 }
 
@@ -697,7 +697,7 @@ WRITE8_MEMBER(smc777_state::smc777_io_w)
 	else if(low_offs == 0x75)					  { logerror("VTR Controller ROM write %02x\n",data); }
 	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM write [%02x] %02x\n",low_offs & 1,data); }
 	else if(low_offs >= 0x80)					  { smc777_fbuf_w(space,offset & 0xff7f,data); }
-	else										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(&space.device()),low_offs,data); }
+	else										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",space.device().safe_pc(),low_offs,data); }
 }
 
 static ADDRESS_MAP_START( smc777_io , AS_IO, 8, smc777_state )

@@ -741,7 +741,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 		break; /* no protection? */
 	}
 
-	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(&space.device()) );
+	logerror( "custom_key_r(%d); pc=%08x\n", offset, space.device().safe_pc() );
 	return 0;
 } /* custom_key_r */
 

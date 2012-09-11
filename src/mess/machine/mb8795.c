@@ -86,7 +86,7 @@ bool mb8795_device::mcast_chk(const UINT8 *buf, int len)
 
 READ8_MEMBER(mb8795_device::txstat_r)
 {
-	//  fprintf(stderr, "mb8795: txstat_r %02x (%08x)\n", txstat, cpu_get_pc(&space.device()));
+	//  fprintf(stderr, "mb8795: txstat_r %02x (%08x)\n", txstat, space.device().safe_pc());
 	return txstat;
 }
 
@@ -94,12 +94,12 @@ WRITE8_MEMBER(mb8795_device::txstat_w)
 {
 	txstat = txstat & (0xf0 | ~data);
 	check_irq();
-	fprintf(stderr, "mb8795: txstat_w %02x (%08x)\n", txstat, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: txstat_w %02x (%08x)\n", txstat, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::txmask_r)
 {
-	fprintf(stderr, "mb8795: txmask_r %02x (%08x)\n", txmask, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: txmask_r %02x (%08x)\n", txmask, space.device().safe_pc());
 	return txmask;
 }
 
@@ -107,12 +107,12 @@ WRITE8_MEMBER(mb8795_device::txmask_w)
 {
 	txmask = data & 0xaf;
 	check_irq();
-	fprintf(stderr, "mb8795: txmask_w %02x (%08x)\n", txmask, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: txmask_w %02x (%08x)\n", txmask, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::rxstat_r)
 {
-	fprintf(stderr, "mb8795: rxstat_r %02x (%08x)\n", rxstat, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: rxstat_r %02x (%08x)\n", rxstat, space.device().safe_pc());
 	return rxstat;
 }
 
@@ -120,12 +120,12 @@ WRITE8_MEMBER(mb8795_device::rxstat_w)
 {
 	rxstat = rxstat & (0x70 | ~data);
 	check_irq();
-	fprintf(stderr, "mb8795: rxstat_w %02x (%08x)\n", rxstat, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: rxstat_w %02x (%08x)\n", rxstat, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::rxmask_r)
 {
-	fprintf(stderr, "mb8795: rxmask_r %02x (%08x)\n", rxmask, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: rxmask_r %02x (%08x)\n", rxmask, space.device().safe_pc());
 	return rxmask;
 }
 
@@ -133,31 +133,31 @@ WRITE8_MEMBER(mb8795_device::rxmask_w)
 {
 	rxmask = data & 0x9f;
 	check_irq();
-	fprintf(stderr, "mb8795: rxmask_w %02x (%08x)\n", rxmask, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: rxmask_w %02x (%08x)\n", rxmask, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::txmode_r)
 {
-	fprintf(stderr, "mb8795: txmode_r %02x (%08x)\n", txmode, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: txmode_r %02x (%08x)\n", txmode, space.device().safe_pc());
 	return txmode;
 }
 
 WRITE8_MEMBER(mb8795_device::txmode_w)
 {
 	txmode = data;
-	fprintf(stderr, "mb8795: txmode_w %02x (%08x)\n", txmode, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: txmode_w %02x (%08x)\n", txmode, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::rxmode_r)
 {
-	fprintf(stderr, "mb8795: rxmode_r %02x (%08x)\n", rxmode, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: rxmode_r %02x (%08x)\n", rxmode, space.device().safe_pc());
 	return rxmode;
 }
 
 WRITE8_MEMBER(mb8795_device::rxmode_w)
 {
 	rxmode = data;
-	fprintf(stderr, "mb8795: rxmode_w %02x (%08x)\n", rxmode, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: rxmode_w %02x (%08x)\n", rxmode, space.device().safe_pc());
 }
 
 WRITE8_MEMBER(mb8795_device::reset_w)
@@ -168,7 +168,7 @@ WRITE8_MEMBER(mb8795_device::reset_w)
 
 READ8_MEMBER(mb8795_device::tdc_lsb_r)
 {
-	fprintf(stderr, "mb8795: tdc_lsb_r %02x (%08x)\n", txcount & 0xff, cpu_get_pc(&space.device()));
+	fprintf(stderr, "mb8795: tdc_lsb_r %02x (%08x)\n", txcount & 0xff, space.device().safe_pc());
 	return txcount;
 }
 
@@ -177,7 +177,7 @@ READ8_MEMBER(mb8795_device::mac_r)
 	if(offset < 6)
 		return mac[offset];
 	if(offset == 7) {
-		fprintf(stderr, "mb8795: tdc_msb_r %02x (%08x)\n", txcount >> 8, cpu_get_pc(&space.device()));
+		fprintf(stderr, "mb8795: tdc_msb_r %02x (%08x)\n", txcount >> 8, space.device().safe_pc());
 		return (txcount >> 8) & 0x3f;
 	}
 	return 0;

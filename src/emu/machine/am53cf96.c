@@ -32,11 +32,11 @@ READ8_MEMBER( am53cf96_device::read )
 
 	if (offset == REG_FIFO)
 	{
-//      mame_printf_debug("53cf96: read FIFO PC=%x\n", cpu_get_pc(&space.device()));
+//      mame_printf_debug("53cf96: read FIFO PC=%x\n", space.device().safe_pc());
 		return 0;
 	}
 
-//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, cpu_get_pc(&space.device()));
+//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, space.device().safe_pc());
 
 	if (offset == REG_IRQSTATE)
 	{
@@ -55,7 +55,7 @@ void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 
 WRITE8_MEMBER( am53cf96_device::write )
 {
-//  logerror("53cf96: w %x to reg %d (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+//  logerror("53cf96: w %x to reg %d (PC=%x)\n", data, offset, space.device().safe_pc());
 
 	// if writing to the target ID, cache it off for later
 	if (offset == REG_STATUS)
@@ -93,7 +93,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 			case 2: // reset device
 				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 
-				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, cpu_get_pc(&space.device()));
+				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, space.device().safe_pc());
 				if (devices[last_id])
 				{
 					devices[last_id]->reset();
@@ -121,7 +121,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 					scsi_regs[REG_INTSTATE] = 4;
 				}
 
-				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, cpu_get_pc(&space.device()));
+				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, space.device().safe_pc());
 				if (devices[last_id])
 				{
 					int length;

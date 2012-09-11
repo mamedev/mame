@@ -259,7 +259,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 		m_last_result = (INT8)m_last_signed * (UINT8)m_last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space.device()), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", space.device().safe_pc(), offset, result);
 
 	return result | (result << 8);
 }

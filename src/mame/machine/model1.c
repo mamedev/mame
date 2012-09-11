@@ -16,7 +16,7 @@ static UINT32 fifoout_pop(address_space *space)
 	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT32 v;
 	if(state->m_fifoout_wpos == state->m_fifoout_rpos) {
-		fatalerror("TGP FIFOOUT underflow (%x)\n", cpu_get_pc(&space->device()));
+		fatalerror("TGP FIFOOUT underflow (%x)\n", space->device().safe_pc());
 	}
 	v = state->m_fifoout_data[state->m_fifoout_rpos++];
 	if(state->m_fifoout_rpos == FIFO_SIZE)
@@ -60,7 +60,7 @@ static UINT32 fifoin_pop(model1_state *state)
 static void fifoin_push(address_space *space, UINT32 data)
 {
 	model1_state *state = space->machine().driver_data<model1_state>();
-	//  logerror("TGP FIFOIN write %08x (%x)\n", data, cpu_get_pc(&space->device()));
+	//  logerror("TGP FIFOIN write %08x (%x)\n", data, space->device().safe_pc());
 	state->m_fifoin_data[state->m_fifoin_wpos++] = data;
 	if(state->m_fifoin_wpos == FIFO_SIZE)
 		state->m_fifoin_wpos = 0;
@@ -1948,7 +1948,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
 {
 	if(offset) {
 		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
-		m_pushpc = cpu_get_pc(&space.device());
+		m_pushpc = space.device().safe_pc();
 		fifoin_push(&space, m_copro_w);
 	} else
 		m_copro_w = (m_copro_w & 0xffff0000) | data;
@@ -1967,7 +1967,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_adr_w)
 READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
 {
 	if(!offset) {
-		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), cpu_get_pc(&space.device()));
+		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), space.device().safe_pc());
 		return m_ram_data[m_ram_adr];
 	} else
 		return m_ram_data[m_ram_adr++] >> 16;
@@ -1978,7 +1978,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 	COMBINE_DATA(m_ram_latch+offset);
 	if(offset) {
 		UINT32 v = m_ram_latch[0]|(m_ram_latch[1]<<16);
-		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), cpu_get_pc(&space.device()));
+		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), space.device().safe_pc());
 		m_ram_data[m_ram_adr] = v;
 		m_ram_adr++;
 	}
@@ -2077,7 +2077,7 @@ static void copro_fifoin_push(address_space *space, UINT32 data)
 	model1_state *state = space->machine().driver_data<model1_state>();
 	if (state->m_copro_fifoin_num == FIFO_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)\n", cpu_get_pc(&space->device()));
+		fatalerror("Copro FIFOIN overflow (at %08X)\n", space->device().safe_pc());
 		return;
 	}
 
@@ -2123,7 +2123,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 	model1_state *state = device->machine().driver_data<model1_state>();
 	if (state->m_copro_fifoout_num == FIFO_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)\n", cpu_get_pc(device));
+		fatalerror("Copro FIFOOUT overflow (at %08X)\n", device->safe_pc());
 		return;
 	}
 

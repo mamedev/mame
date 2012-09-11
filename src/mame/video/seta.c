@@ -306,7 +306,7 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 						if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
 							memcpy(&rom[0xc0000],&rom[addr],0x40000);
 						else
-							logerror("PC %06X - Invalid samples bank %02X !\n", cpu_get_pc(&space.device()), new_bank);
+							logerror("PC %06X - Invalid samples bank %02X !\n", space.device().safe_pc(), new_bank);
 					}
 					else if (samples_len == 0x480000)	/* zombraid */
 					{

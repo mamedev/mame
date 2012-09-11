@@ -612,7 +612,7 @@ WRITE8_MEMBER(centiped_state::mazeinv_input_select_w)
 
 READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 {
-	switch (cpu_get_pc(&space.device()))
+	switch (space.device().safe_pc())
 	{
 		case 0x0033:
 		case 0x6b19:

@@ -196,7 +196,7 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 {
 	rm380z_state *state = machine().driver_data<rm380z_state>();
 
-	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,state->m_port0,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")));
+	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,state->m_port0,m_fbfd,m_fbfe,machine().device("maincpu")->safe_pc());
 
 	int lineWidth=0x80;
 	if (m_videomode==RM380Z_VIDEOMODE_40COL)

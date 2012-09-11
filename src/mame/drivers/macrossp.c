@@ -320,7 +320,7 @@ WRITE32_MEMBER(macrossp_state::paletteram32_macrossp_w)
 READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 {
 
-	//  logerror("%08x read soundstatus\n", cpu_get_pc(&space.device()));
+	//  logerror("%08x read soundstatus\n", space.device().safe_pc());
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
@@ -335,7 +335,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(&space.device()),data,mem_mask);
+		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
 		soundlatch_word_w(space, 0, data >> 16, 0xffff);
 		m_sndpending = 1;
 		device_set_input_line(m_audiocpu, 2, HOLD_LINE);
@@ -347,7 +347,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
 
-	//  logerror("%06x read soundcmd\n",cpu_get_pc(&space.device()));
+	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
 	m_sndpending = 0;
 	return soundlatch_word_r(space, offset, mem_mask);
 }
@@ -770,7 +770,7 @@ PC :00018110 018110: beq     18104
 */
 
 	COMBINE_DATA(&m_mainram[0x10158 / 4]);
-	if (cpu_get_pc(&space.device()) == 0x001810A) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc() == 0x001810A) device_spin_until_interrupt(&space.device());
 }
 
 #ifdef UNUSED_FUNCTION
@@ -778,7 +778,7 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 {
 
 	COMBINE_DATA(&m_mainram[0x00020 / 4]);
-	if (cpu_get_pc(&space.device()) == 0x1cc) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc() == 0x1cc) device_spin_until_interrupt(&space.device());
 }
 #endif
 

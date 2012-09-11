@@ -263,7 +263,7 @@ READ32_MEMBER( n64_periphs::mi_reg_r )
 			break;
 
 		default:
-			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&mem_map->device()));
+			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, mem_map->device().safe_pc());
 			break;
 	}
 
@@ -350,7 +350,7 @@ WRITE32_MEMBER( n64_periphs::mi_reg_w )
 		}
 
 		default:
-			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
 			break;
 	}
 }
@@ -469,7 +469,7 @@ READ32_MEMBER( n64_periphs::rdram_reg_r )
 	//printf("rdram_reg_r %08x = %08x\n", offset * 4, rdram_regs[offset]); fflush(stdout);
 	if(offset > 0x24/4)
 	{
-		logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(maincpu));
+		logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
 		return 0;
 	}
 	return rdram_regs[offset];
@@ -480,7 +480,7 @@ WRITE32_MEMBER( n64_periphs::rdram_reg_w )
 	//printf("rdram_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	if(offset > 0x24/4)
 	{
-		logerror("rdram_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+		logerror("rdram_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
 		return;
 	}
 	COMBINE_DATA(&rdram_regs[offset]);
@@ -673,7 +673,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 			break;
 
         default:
-            logerror("sp_reg_r: %08X at %08X\n", offset, cpu_get_pc(maincpu));
+            logerror("sp_reg_r: %08X at %08X\n", offset, maincpu->safe_pc());
             break;
 	}
 
@@ -868,7 +868,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 				break;
 
 			default:
-				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
 				break;
 		}
 	}
@@ -888,7 +888,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                 break;
 
             default:
-                logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+                logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
                 break;
 		}
 	}
@@ -940,7 +940,7 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 		}
 
 		default:
-			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(device));
+			logerror("dp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, device->safe_pc());
 			break;
 	}
 
@@ -984,7 +984,7 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 		}
 
 		default:
-			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(device));
+			logerror("dp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, device->safe_pc());
 			break;
 	}
 }
@@ -1115,7 +1115,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		default:
-			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(maincpu));
+			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
 			break;
 	}
 
@@ -1205,7 +1205,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
         */
 
 		default:
-			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
 			break;
 	}
 }
@@ -1354,7 +1354,7 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 			break;
 
         default:
-            logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(maincpu));
+            logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
             break;
     }
 
@@ -1396,7 +1396,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
             break;
 
         default:
-            logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+            logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
             break;
     }
 }
@@ -1532,7 +1532,7 @@ READ32_MEMBER( n64_periphs::pi_reg_r )
             break;
 
 		default:
-			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(maincpu));
+			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
 			break;
 	}
 
@@ -1635,7 +1635,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
             break;
 
 		default:
-			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
 			break;
 	}
 }
@@ -1647,7 +1647,7 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 	//printf("ri_reg_r %08x = %08x\n", offset * 4, ri_regs[offset]);
 	if(offset > 0x1c/4)
 	{
-		logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(maincpu));
+		logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
 		return 0;
 	}
 	return ri_regs[offset];
@@ -1658,7 +1658,7 @@ WRITE32_MEMBER( n64_periphs::ri_reg_w )
 	//printf("ri_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
 	if(offset > 0x1c/4)
 	{
-		logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(maincpu));
+		logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
 		return;
 	}
 	COMBINE_DATA(&ri_regs[offset]);

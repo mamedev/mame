@@ -222,7 +222,7 @@ unsigned char psxcd_device::read_byte(const unsigned int addr)
 	}
 
 	#ifdef debug_cdrom_registers
-		printf("cdrom: read byte %08x = %02x (PC=%x)\n",addr,ret,cpu_get_pc(machine().device("maincpu")));
+		printf("cdrom: read byte %08x = %02x (PC=%x)\n",addr,ret,machine().device("maincpu")->safe_pc());
 	#endif
 
 	return ret;
@@ -235,7 +235,7 @@ unsigned char psxcd_device::read_byte(const unsigned int addr)
 void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 {
 	#ifdef debug_cdrom_registers
-		printf("cdrom: write byte %08x = %02x (PC=%x)\n",addr,byte,cpu_get_pc(machine().device("maincpu")));
+		printf("cdrom: write byte %08x = %02x (PC=%x)\n",addr,byte,machine().device("maincpu")->safe_pc());
 	#endif
 
 	switch (addr&3)

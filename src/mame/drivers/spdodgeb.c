@@ -211,7 +211,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 READ8_MEMBER(spdodgeb_state::mcu63701_r)
 {
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(&space.device()),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",space.device().safe_pc(),offset);
 
 	if (m_mcu63701_command == 0) return 0x6a;
 	else switch (offset)
@@ -227,7 +227,7 @@ READ8_MEMBER(spdodgeb_state::mcu63701_r)
 
 WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 {
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(&space.device()),data);
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",space.device().safe_pc(),data);
 	m_mcu63701_command = data;
 	mcu63705_update_inputs(machine());
 }

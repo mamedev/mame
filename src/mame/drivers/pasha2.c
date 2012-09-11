@@ -476,7 +476,7 @@ ROM_END
 READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 {
 
-	if(cpu_get_pc(&space.device()) == 0x8302)
+	if(space.device().safe_pc() == 0x8302)
 		device_spin_until_interrupt(&space.device());
 
 	return m_wram[(0x95744 / 2) + offset];

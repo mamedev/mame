@@ -210,7 +210,7 @@ READ8_HANDLER( decocass_input_r )
 WRITE8_HANDLER( decocass_reset_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+	LOG(1,("%10s 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 	state->m_decocass_reset = data;
 
 	/* CPU #1 active high reset */
@@ -289,7 +289,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data,
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -337,7 +337,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -369,7 +369,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data,
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -417,7 +417,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -449,7 +449,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data,
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -497,7 +497,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 			(((state->m_latch1 >> MAP7(state->m_type1_inmap)) & 1)	   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -529,7 +529,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data,
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -577,7 +577,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -611,7 +611,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 
 		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
 		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x <- (%s %s)\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data,
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -659,7 +659,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(state->m_type1_outmap));
 
 		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x\n",
-			space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 
 		state->m_latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -689,7 +689,7 @@ static READ8_HANDLER( decocass_type2_r )
 		{
 			UINT8 *prom = state->memregion("dongle")->base();
 			data = prom[256 * state->m_type2_d2_latch + state->m_type2_promaddr];
-			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, 256 * state->m_type2_d2_latch + state->m_type2_promaddr));
+			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, 256 * state->m_type2_d2_latch + state->m_type2_promaddr));
 		}
 		else
 		{
@@ -703,7 +703,7 @@ static READ8_HANDLER( decocass_type2_r )
 		else
 			data = offset & 0xff;
 
-		LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, offset & 1 ? "STATUS" : "DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "STATUS" : "DATA"));
 	}
 	return data;
 }
@@ -715,18 +715,18 @@ static WRITE8_HANDLER( decocass_type2_w )
 	{
 		if (1 == (offset & 1))
 		{
-			LOG(4,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			state->m_type2_promaddr = data;
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, state->m_type2_promaddr));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type2_promaddr));
 			return;
 		}
 	}
 	else
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
 	}
 	if (1 == (offset & 1))
 	{
@@ -773,7 +773,7 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			UINT8 *prom = state->memregion("dongle")->base();
 			data = prom[state->m_type3_ctrs];
-			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, state->m_type3_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type3_ctrs));
 			if (++state->m_type3_ctrs == 4096)
 				state->m_type3_ctrs = 0;
 		}
@@ -782,12 +782,12 @@ static READ8_HANDLER( decocass_type3_r )
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = upi41_master_r(state->m_mcu, 1);
-				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 			}
 		}
 	}
@@ -796,7 +796,7 @@ static READ8_HANDLER( decocass_type3_r )
 		if (1 == state->m_type3_pal_19)
 		{
 			save = data = 0xff;    /* open data bus? */
-			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 		else
 		{
@@ -938,7 +938,7 @@ static READ8_HANDLER( decocass_type3_r )
 						(BIT(save, 7) << 7);
 				}
 				state->m_type3_d0_latch = save & 1;
-				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
@@ -952,7 +952,7 @@ static READ8_HANDLER( decocass_type3_r )
 					(BIT(save, 5) << 5) |
 					(BIT(save, 6) << 7) |
 					(BIT(save, 7) << 6);
-				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 				state->m_type3_d0_latch = save & 1;
 			}
 		}
@@ -969,7 +969,7 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == state->m_type3_pal_19)
 		{
 			state->m_type3_ctrs = data << 4;
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, "LDCTRS"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "LDCTRS"));
 			return;
 		}
 		else
@@ -981,11 +981,11 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == state->m_type3_pal_19)
 		{
 			/* write nowhere?? */
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, "nowhere?"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	upi41_master_w(state->m_mcu, offset, data);
 }
 
@@ -1012,12 +1012,12 @@ static READ8_HANDLER( decocass_type4_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 1);
-			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 	}
 	else
@@ -1027,7 +1027,7 @@ static READ8_HANDLER( decocass_type4_r )
 			UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 			data = prom[state->m_type4_ctrs];
-			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.', state->m_type4_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.', state->m_type4_ctrs));
 			state->m_type4_ctrs = (state->m_type4_ctrs + 1) & 0x7fff;
 		}
 		else
@@ -1035,12 +1035,12 @@ static READ8_HANDLER( decocass_type4_r )
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = upi41_master_r(state->m_mcu, 0);
-				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 			}
 		}
 	}
@@ -1056,7 +1056,7 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (1 == state->m_type4_latch)
 		{
 			state->m_type4_ctrs = (state->m_type4_ctrs & 0x00ff) | ((data & 0x7f) << 8);
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, state->m_type4_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type4_ctrs));
 			return;
 		}
 		else
@@ -1070,11 +1070,11 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (state->m_type4_latch)
 		{
 			state->m_type4_ctrs = (state->m_type4_ctrs & 0xff00) | data;
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, state->m_type4_ctrs));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, state->m_type4_ctrs));
 			return;
 		}
 	}
-	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	upi41_master_w(state->m_mcu, offset, data);
 }
 
@@ -1097,12 +1097,12 @@ static READ8_HANDLER( decocass_type5_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 1);
-			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 	}
 	else
@@ -1110,19 +1110,19 @@ static READ8_HANDLER( decocass_type5_r )
 		if (state->m_type5_latch)
 		{
 			data = 0x55;	/* Only a fixed value? It looks like this is all we need to do */
-			LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
 				data = upi41_master_r(state->m_mcu, 0);
-				LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+				LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 			}
 		}
 	}
@@ -1137,7 +1137,7 @@ static WRITE8_HANDLER( decocass_type5_w )
 	{
 		if (1 == state->m_type5_latch)
 		{
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, "latch #2??"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "latch #2??"));
 			return;
 		}
 		else
@@ -1149,11 +1149,11 @@ static WRITE8_HANDLER( decocass_type5_w )
 		if (state->m_type5_latch)
 		{
 			/* write nowhere?? */
-			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, "nowhere?"));
+			LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 	upi41_master_w(state->m_mcu, offset, data);
 }
 
@@ -1175,12 +1175,12 @@ static READ8_HANDLER( decocass_nodong_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 1);
-			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 	}
 	else
@@ -1188,12 +1188,12 @@ static READ8_HANDLER( decocass_nodong_r )
 		if (0 == (offset & E5XX_MASK))
 		{
 			data = upi41_master_r(state->m_mcu, 0);
-			LOG(3,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 		}
 	}
 
@@ -1228,7 +1228,7 @@ READ8_HANDLER( decocass_e5xx_r )
 
 		LOG(4,("%10s 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
 			space->machine().time().as_string(6),
-			cpu_get_previouspc(&space->device()),
+			space->device().safe_pcbase(),
 			offset, data,
 			data & 0x01 ? "" : "REQ/",
 			data & 0x02 ? "" : " FNO/",
@@ -1260,7 +1260,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 
 	if (0 == (offset & E5XX_MASK))
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
 		upi41_master_w(state->m_mcu, offset & 1, data);
 #ifdef MAME_DEBUG
 		decocass_fno(space->machine(), offset, data);
@@ -1268,7 +1268,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 	}
 	else
 	{
-		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data));
+		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", space->machine().time().as_string(6), space->device().safe_pcbase(), offset, data));
 	}
 }
 
@@ -1758,7 +1758,7 @@ WRITE8_HANDLER( i8041_p1_w )
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p1_w: $%02x (%s%s%s%s%s%s%s%s)\n",
 			space->machine().time().as_string(6),
-			cpu_get_previouspc(&space->device()),
+			space->device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
 			data & 0x02 ? "" : " DATA-CLK",
@@ -1795,7 +1795,7 @@ READ8_HANDLER( i8041_p1_r )
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p1_r: $%02x (%s%s%s%s%s%s%s%s)\n",
 			space->machine().time().as_string(6),
-			cpu_get_previouspc(&space->device()),
+			space->device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
 			data & 0x02 ? "" : " DATA-CLK",
@@ -1817,7 +1817,7 @@ WRITE8_HANDLER( i8041_p2_w )
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p2_w: $%02x (%s%s%s%s%s%s%s%s)\n",
 			space->machine().time().as_string(6),
-			cpu_get_previouspc(&space->device()),
+			space->device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "FNO/",
 			data & 0x02 ? "" : " EOT/",
@@ -1843,7 +1843,7 @@ READ8_HANDLER( i8041_p2_r )
 	{
 		LOG(4,("%10s 8041-PC: %03x i8041_p2_r: $%02x (%s%s%s%s%s%s%s%s)\n",
 			space->machine().time().as_string(6),
-			cpu_get_previouspc(&space->device()),
+			space->device().safe_pcbase(),
 			data,
 			data & 0x01 ? "" : "FNO/",
 			data & 0x02 ? "" : " EOT/",

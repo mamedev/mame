@@ -1600,11 +1600,11 @@ static WRITE16_HANDLER( characteriser16_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space->device()),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space->device().safe_pcbase(),offset,data));
 
 	if (!state->m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x\n", space->device().safe_pcbase());
 		return;
 	}
 
@@ -1630,19 +1630,19 @@ static WRITE16_HANDLER( characteriser16_w )
 static READ16_HANDLER( characteriser16_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(&space->device()),offset,state->m_current_chr_table[state->m_prot_col].response));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space->device().safe_pcbase(),offset,state->m_current_chr_table[state->m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
 
 	if (!state->m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x\n", space->device().safe_pcbase());
 		return 0x00;
 	}
 
 
 	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
-	if (cpu_get_previouspc(&space->device())==0x283a)
+	if (space->device().safe_pcbase()==0x283a)
 	{
 		return 0x00;
 	}
@@ -1672,10 +1672,10 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data &0xff;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space->device()),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space->device().safe_pcbase(),offset,data));
 	if (!state->m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x\n", space->device().safe_pcbase());
 		return;
 	}
 

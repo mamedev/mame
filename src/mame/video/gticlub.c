@@ -390,7 +390,7 @@ READ32_HANDLER( K001005_r )
 			}
 
 		default:
-			mame_printf_debug("K001005_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
+			mame_printf_debug("K001005_r: %08X, %08X at %08X\n", offset, mem_mask, space->device().safe_pc());
 			break;
 	}
 	return 0;
@@ -421,7 +421,7 @@ WRITE32_HANDLER( K001005_w )
 				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
-	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(&space->device()));
+	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space->device().safe_pc());
 			K001005_fifo[K001005_fifo_write_ptr] = data;
 			K001005_fifo_write_ptr++;
 			K001005_fifo_write_ptr &= 0x7ff;
@@ -446,13 +446,13 @@ WRITE32_HANDLER( K001005_w )
 #endif
 
 			// !!! HACK to get past the FIFO B test (GTI Club & Thunder Hurricane) !!!
-			if (cpu_get_pc(&space->device()) == 0x201ee)
+			if (space->device().safe_pc() == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
 				device_spin_until_trigger(&space->device(), 10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
-			if (cpu_get_pc(&space->device()) == 0x201e6)
+			if (space->device().safe_pc() == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
 				device_spin_until_trigger(&space->device(), 10000);
@@ -545,7 +545,7 @@ WRITE32_HANDLER( K001005_w )
 			break;
 
 		default:
-			//mame_printf_debug("K001005_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+			//mame_printf_debug("K001005_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space->device().safe_pc());
 			break;
 	}
 

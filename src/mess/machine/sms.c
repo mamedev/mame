@@ -1226,7 +1226,7 @@ WRITE8_MEMBER(sms_state::sms_bios_w)
 {
 	m_bios_port = data;
 
-	logerror("bios write %02x, pc: %04x\n", data, cpu_get_pc(&space.device()));
+	logerror("bios write %02x, pc: %04x\n", data, space.device().safe_pc());
 
 	setup_rom(&space);
 }
@@ -2087,7 +2087,7 @@ READ8_MEMBER(sms_state::sms_store_control_r)
 
 WRITE8_MEMBER(sms_state::sms_store_control_w)
 {
-	logerror("0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(&space.device()), data);
+	logerror("0x%04X: sms_store_control write 0x%02X\n", space.device().safe_pc(), data);
 	if (data & 0x02)
 	{
 		machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);

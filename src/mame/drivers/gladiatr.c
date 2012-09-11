@@ -995,7 +995,7 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 
 READ8_MEMBER(gladiatr_state::f6a3_r)
 {
-	if(cpu_get_previouspc(&space.device())==0x8e)
+	if(space.device().safe_pcbase()==0x8e)
 		m_nvram[0x6a3]=1;
 
 	return m_nvram[0x6a3];

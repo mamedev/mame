@@ -89,7 +89,7 @@ Notes:
 
 WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(&space.device()),data);
+//logerror("%04x: coincntr_w %02x\n",space.device().safe_pc(),data);
 
 	/* bits 0/1 = coin counters */
 	coin_counter_w(machine(), 0,data & 0x01);

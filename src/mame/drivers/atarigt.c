@@ -283,7 +283,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
         Read ($38488)
 */
 
-	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(&space->device()), offset, data);
+	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", space->device().safe_pcbase(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(state, offset);
@@ -299,7 +299,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
 	atarigt_state *state = space->machine().driver_data<atarigt_state>();
-	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(&space->device()), offset);
+	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", space->device().safe_pcbase(), offset);
 
 	/* track accesses */
 	tmek_update_mode(state, offset);
@@ -368,7 +368,7 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	if (LOG_PROTECTION)
 	{
-	UINT32 pc = cpu_get_previouspc(&space->device());
+	UINT32 pc = space->device().safe_pcbase();
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -401,7 +401,7 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection W@%06X = %04X\n", cpu_get_previouspc(&space->device()), offset, data);
+			logerror("%06X:Unknown protection W@%06X = %04X\n", space->device().safe_pcbase(), offset, data);
 			break;
 	}
 	}
@@ -442,7 +442,7 @@ static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *d
 
 if (LOG_PROTECTION)
 {
-	UINT32 pc = cpu_get_previouspc(&space->device());
+	UINT32 pc = space->device().safe_pcbase();
 	UINT32 p1, p2, a6;
 	switch (pc)
 	{
@@ -505,7 +505,7 @@ if (LOG_PROTECTION)
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection R@%06X\n", cpu_get_previouspc(&space->device()), offset);
+			logerror("%06X:Unknown protection R@%06X\n", space->device().safe_pcbase(), offset);
 			break;
 	}
 }
@@ -1244,19 +1244,19 @@ ROM_END
 
 WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 {
-	offs_t pc = cpu_get_pc(&space.device());
+	offs_t pc = space.device().safe_pc();
 
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space.device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(&space.device()), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A3) - 2);
 
 	atarigen_playfield32_w(&space, offset, data, mem_mask);
 }

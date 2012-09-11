@@ -161,7 +161,7 @@ void a2bus_ayboard_device::device_reset()
 
 UINT8 a2bus_ayboard_device::read_cnxx(address_space &space, UINT8 offset)
 {
-//    printf("Mockingboard(%d): read @ Cn%02X (PC=%x)\n", m_slot, offset, cpu_get_pc(&space.device()));
+//    printf("Mockingboard(%d): read @ Cn%02X (PC=%x)\n", m_slot, offset, space.device().safe_pc());
     if (m_isPhasor)
     {
         UINT8 retVal = 0;
@@ -227,7 +227,7 @@ void a2bus_ayboard_device::write_cnxx(address_space &space, UINT8 offset, UINT8 
                 viaSel = (offset & 0x80) ? 2 : 1;
             }
 
-//            printf("Phasor(%d): write %02x to Cn%02X (PC=%x) (native %d viaSel %d)\n", m_slot, data, offset, cpu_get_pc(&space.device()), m_PhasorNative ? 1 : 0, viaSel);
+//            printf("Phasor(%d): write %02x to Cn%02X (PC=%x) (native %d viaSel %d)\n", m_slot, data, offset, space.device().safe_pc(), m_PhasorNative ? 1 : 0, viaSel);
 
             if (viaSel & 1)
             {
@@ -251,7 +251,7 @@ void a2bus_ayboard_device::write_cnxx(address_space &space, UINT8 offset, UINT8 
         }
         else
         {
-            printf("Mockingboard(%d): unk write %02x to Cn%02X (PC=%x)\n", m_slot, data, offset, cpu_get_pc(&space.device()));
+            printf("Mockingboard(%d): unk write %02x to Cn%02X (PC=%x)\n", m_slot, data, offset, space.device().safe_pc());
         }
     }
 }

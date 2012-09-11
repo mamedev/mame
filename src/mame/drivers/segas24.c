@@ -669,13 +669,13 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 
 READ16_MEMBER( segas24_state::iod_r )
 {
-	logerror("IO daughterboard read %02x (%x)\n", offset, cpu_get_pc(&space.device()));
+	logerror("IO daughterboard read %02x (%x)\n", offset, space.device().safe_pc());
 	return 0xffff;
 }
 
 WRITE16_MEMBER( segas24_state::iod_w )
 {
-	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
+	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
 
@@ -783,7 +783,7 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag(), cpu_get_pc(&space.device()));
+			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag(), space.device().safe_pc());
 			return;
 		}
 
@@ -794,9 +794,9 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space.device().tag(), cpu_get_pc(&space.device()));
+			logerror("Magic latching %02x ^ %02x as %02x (%s:%x)\n", data & 0xff, mxor, mlatch, space.device().tag(), space.device().safe_pc());
 		} else {
-			logerror("Magic latch reset (%s:%x)\n", space.device().tag(), cpu_get_pc(&space.device()));
+			logerror("Magic latch reset (%s:%x)\n", space.device().tag(), space.device().safe_pc());
 			mlatch = 0x00;
 		}
 	}
@@ -1031,7 +1031,7 @@ static void irq_ym(device_t *device, int irq)
 
 READ16_MEMBER ( segas24_state::sys16_io_r )
 {
-	//  logerror("IO read %02x (%s:%x)\n", offset, space->device().tag(), cpu_get_pc(&space->device()));
+	//  logerror("IO read %02x (%s:%x)\n", offset, space->device().tag(), space->device().safe_pc());
 	if(offset < 8)
 		return (this->*io_r)(offset);
 	else if (offset < 0x20) {
@@ -1049,7 +1049,7 @@ READ16_MEMBER ( segas24_state::sys16_io_r )
 		case 0xf:
 			return io_dir;
 		default:
-			logerror("IO control read %02x (%s:%x)\n", offset, space.device().tag(), cpu_get_pc(&space.device()));
+			logerror("IO control read %02x (%s:%x)\n", offset, space.device().tag(), space.device().safe_pc());
 			return 0xff;
 		}
 	} else
@@ -1061,7 +1061,7 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 	if(ACCESSING_BITS_0_7) {
 		if(offset < 8) {
 			if(!(io_dir & (1 << offset))) {
-				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, io_dir, data & 0xff, space.device().tag(), cpu_get_pc(&space.device()));
+				logerror("IO port write on input-only port (%d, [%02x], %02x, %s:%x)\n", offset, io_dir, data & 0xff, space.device().tag(), space.device().safe_pc());
 				return;
 			}
 			(this->*io_w)(offset, data);
@@ -1075,7 +1075,7 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 				io_dir = data;
 				break;
 			default:
-				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space.device().tag(), cpu_get_pc(&space.device()));
+				logerror("IO control write %02x, %02x (%s:%x)\n", offset, data & 0xff, space.device().tag(), space.device().safe_pc());
 			}
 		}
 	}

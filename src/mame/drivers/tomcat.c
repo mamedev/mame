@@ -223,7 +223,7 @@ READ16_MEMBER(tomcat_state::tomcat_320bio_r)
 
 READ16_MEMBER(tomcat_state::dsp_BIO_r)
 {
-	if ( cpu_get_pc(&space.device()) == 0x0001 )
+	if ( space.device().safe_pc() == 0x0001 )
 	{
 		if ( m_dsp_idle == 0 )
 		{
@@ -232,7 +232,7 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 		}
 		return !m_dsp_BIO;
 	}
-	else if ( cpu_get_pc(&space.device()) == 0x0003 )
+	else if ( space.device().safe_pc() == 0x0003 )
 	{
 		if ( m_dsp_BIO == 1 )
 		{

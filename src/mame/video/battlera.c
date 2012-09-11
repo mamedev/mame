@@ -159,7 +159,7 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			case 16:
 			case 17:
 			case 18:
-				logerror("%04x: dma 2 %02x\n",cpu_get_pc(&space.device()),data);
+				logerror("%04x: dma 2 %02x\n",space.device().safe_pc(),data);
 				break;
 
 			case 19: /* SATB */
@@ -221,7 +221,7 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			case 16:
 			case 17:
 			case 18:
-				logerror("%04x: dma 2 %02x\n",cpu_get_pc(&space.device()),data);
+				logerror("%04x: dma 2 %02x\n",space.device().safe_pc(),data);
 				break;
 
 			case 19: /* SATB - Sprites */
@@ -230,7 +230,7 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			}
 			break;
 	}
-	logerror("%04x: unknown write to  VDC_register %02x (%02x) at %02x\n",cpu_get_pc(&space.device()),m_VDC_register,data,offset);
+	logerror("%04x: unknown write to  VDC_register %02x (%02x) at %02x\n",space.device().safe_pc(),m_VDC_register,data,offset);
 }
 
 /******************************************************************************/

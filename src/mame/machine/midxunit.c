@@ -87,8 +87,8 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			output_set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
 			output_set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
-			logerror("%08X:I/O write to %d = %04X\n", cpu_get_pc(&space.device()), offset, data);
-//          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(&space.device()), offset, data);
+			logerror("%08X:I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
+//          logerror("%08X:Unknown I/O write to %d = %04X\n", space.device().safe_pc(), offset, data);
 			break;
 	}
 	m_iodata[offset] = newword;
@@ -103,7 +103,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 		dcs_reset_w(machine(), data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", cpu_get_pc(&space.device()), offs, data & 0xff);
+		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", space.device().safe_pc(), offs, data & 0xff);
 }
 
 
@@ -129,7 +129,7 @@ READ16_MEMBER(midxunit_state::midxunit_io_r)
 			return ioport(portnames[offset])->read();
 
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", cpu_get_pc(&space.device()), offset);
+			logerror("%08X:Unknown I/O read from %d\n", space.device().safe_pc(), offset);
 			break;
 	}
 	return ~0;
@@ -238,7 +238,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 			break;
 	}
 
-/*  logerror("%08X:UART R @ %X = %02X\n", cpu_get_pc(&space.device()), offset, result);*/
+/*  logerror("%08X:UART R @ %X = %02X\n", space.device().safe_pc(), offset, result);*/
 	return result;
 }
 
@@ -274,7 +274,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 			break;
 	}
 
-/*  logerror("%08X:UART W @ %X = %02X\n", cpu_get_pc(&space.device()), offset, data);*/
+/*  logerror("%08X:UART W @ %X = %02X\n", space.device().safe_pc(), offset, data);*/
 }
 
 
@@ -361,7 +361,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 
 READ16_MEMBER(midxunit_state::midxunit_sound_r)
 {
-	logerror("%08X:Sound read\n", cpu_get_pc(&space.device()));
+	logerror("%08X:Sound read\n", space.device().safe_pc());
 
 	return dcs_data_r(machine()) & 0xff;
 }
@@ -378,14 +378,14 @@ WRITE16_MEMBER(midxunit_state::midxunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(&space.device()), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", space.device().safe_pc(), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space.device()), data);
+		logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
 		dcs_data_w(machine(), data & 0xff);
 	}
 }

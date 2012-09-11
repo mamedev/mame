@@ -80,7 +80,7 @@ WRITE8_MEMBER(airbustr_state::airbustr_scrollregs_w)
 		case 0x06:	m_bg_scrollx = data;	break;
 		case 0x08:	m_highbits   = ~data;	break;	// complemented high bits
 
-		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, cpu_get_pc(&space.device()));
+		default:	logerror("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, space.device().safe_pc());
 	}
 
 	m_bg_tilemap->set_scrolly(0, ((m_highbits << 5) & 0x100) + m_bg_scrolly);

@@ -168,7 +168,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	//logerror ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset);
+	//logerror ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), space->device().safe_pc(), offset);
 
 	switch(offset)
 	{
@@ -194,7 +194,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 
 			return modr;
 		default:
-			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2);
+			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space->device().tag(), space->device().safe_pc(), offset*2);
 			break;
 	}
 
@@ -346,7 +346,7 @@ WRITE32_HANDLER ( saturn_vdp1_vram_w )
 
 //  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
 //  {
-//      logerror("cpu %s (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", space->device().tag(), cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+//      logerror("cpu %s (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", space->device().tag(), space->device().safe_pc(), offset*4, data, mem_mask);
 //  }
 
 	data = state->m_vdp1_vram[offset];

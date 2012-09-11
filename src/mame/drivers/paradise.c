@@ -99,7 +99,7 @@ WRITE8_MEMBER(paradise_state::paradise_rombank_w)
 
 	if (bank >= bank_n)
 	{
-		logerror("PC %04X - invalid rom bank %x\n", cpu_get_pc(&space.device()), bank);
+		logerror("PC %04X - invalid rom bank %x\n", space.device().safe_pc(), bank);
 		bank %= bank_n;
 	}
 

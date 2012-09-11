@@ -242,7 +242,7 @@ WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 
 	m_nmi_enable = data & 0x80;     // nmi enable?
 #ifdef VERBOSE
-	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(&space.device()),m_nmi_enable);
+	logerror("PC %06X: NMI change %02x\n",space.device().safe_pc(),m_nmi_enable);
 #endif
 
 	m_out[0] = data;
@@ -294,7 +294,7 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
 READ8_MEMBER(igspoker_state::custom_io_r)
 {
 #ifdef VERBOSE
-	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(&space.device()), (int) m_protection_res);
+	logerror("PC %06X: Protection read %02x\n",space.device().safe_pc(), (int) m_protection_res);
 #endif
 	return m_protection_res;
 }
@@ -302,7 +302,7 @@ READ8_MEMBER(igspoker_state::custom_io_r)
 WRITE8_MEMBER(igspoker_state::custom_io_w)
 {
 #ifdef VERBOSE
-	logerror("PC %06X: Protection write %02x\n",cpu_get_pc(&space.device()),data);
+	logerror("PC %06X: Protection write %02x\n",space.device().safe_pc(),data);
 #endif
 
 	switch (data)

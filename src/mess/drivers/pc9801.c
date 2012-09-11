@@ -719,7 +719,7 @@ READ8_MEMBER(pc9801_state::pc9801_40_r)
 			printf("Read to undefined port [%02x]\n",offset+0x40);
 		else
 		{
-			//printf("Read to 8251 kbd port [%02x] %08x\n",offset+0x40,cpu_get_pc(m_maincpu));
+			//printf("Read to 8251 kbd port [%02x] %08x\n",offset+0x40,m_maincpu->safe_pc());
 			if(offset == 1)
 			{
 				UINT8 res;

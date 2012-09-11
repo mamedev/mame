@@ -218,7 +218,7 @@ static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
 
 WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 {
-	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space.device()),data);
+	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
 
 	coin_counter_w(machine(), 0, ~data & 0x0001);
 	coin_counter_w(machine(), 1, ~data & 0x0002);
@@ -250,7 +250,7 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 READ16_MEMBER(coolpool_state::amerdart_iop_r)
 {
 
-//  logerror("%08x:IOP read %04x\n",cpu_get_pc(&space.device()),m_iop_answer);
+//  logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
 	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 
 	return m_iop_answer;
@@ -259,7 +259,7 @@ READ16_MEMBER(coolpool_state::amerdart_iop_r)
 WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
 {
 
-//  logerror("%08x:IOP write %04x\n", cpu_get_pc(&space.device()), data);
+//  logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
 	COMBINE_DATA(&m_iop_cmd);
 	m_cmd_pending = 1;
 }
@@ -267,7 +267,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
 READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
 {
 
-//  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(&space.device()), m_iop_cmd);
+//  logerror("%08x:DSP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
 	m_cmd_pending = 0;
 	return m_iop_cmd;
 }
@@ -275,7 +275,7 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
 WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
 {
 
-//  logerror("%08x:DSP answer %04x\n", cpu_get_pc(&space.device()), data);
+//  logerror("%08x:DSP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
 	cputag_set_input_line(machine(), "maincpu", 1, ASSERT_LINE);
 }
@@ -423,7 +423,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(&space, 2, ((m_result >> 12) & 0xf)) << 12);
 
 
-//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(&space.device()), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);
+//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", space.device().safe_pc(), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);
 
 	m_lastresult = m_result;
 
@@ -439,7 +439,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 
 WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 {
-	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space.device()),data);
+	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
 
 	coin_counter_w(machine(), 0, ~data & 0x0001);
 	coin_counter_w(machine(), 1, ~data & 0x0002);
@@ -471,7 +471,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 
 WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 {
-	logerror("%08x:IOP write %04x\n", cpu_get_pc(&space.device()), data);
+	logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
 	machine().scheduler().synchronize(FUNC(deferred_iop_w), data);
 }
 
@@ -479,7 +479,7 @@ WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 READ16_MEMBER(coolpool_state::coolpool_iop_r)
 {
 
-	logerror("%08x:IOP read %04x\n",cpu_get_pc(&space.device()),m_iop_answer);
+	logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
 	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 
 	return m_iop_answer;
@@ -498,7 +498,7 @@ READ16_MEMBER(coolpool_state::dsp_cmd_r)
 {
 
 	m_cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(&space.device()), m_iop_cmd);
+	logerror("%08x:IOP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
 	return m_iop_cmd;
 }
 
@@ -506,7 +506,7 @@ READ16_MEMBER(coolpool_state::dsp_cmd_r)
 WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 {
 
-	logerror("%08x:IOP answer %04x\n", cpu_get_pc(&space.device()), data);
+	logerror("%08x:IOP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
 	cputag_set_input_line(machine(), "maincpu", 1, ASSERT_LINE);
 }
@@ -625,7 +625,7 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
 		}
 	}
 
-//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(&space.device()),
+//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", space.device().safe_pc(),
 //      m_newx[1], m_newy[1], m_oldx[1], m_oldy[1], m_result);
 	m_lastresult = m_result;
 	return m_result;

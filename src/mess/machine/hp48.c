@@ -166,7 +166,7 @@ static void hp48_rs232_send_byte( running_machine &machine )
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
 	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n",
-		     cpu_get_previouspc(machine.device("maincpu")), machine.time().as_double(), data ));
+		     machine.device("maincpu")->safe_pcbase(), machine.time().as_double(), data ));
 
 	/* set byte sending and send buffer full */
 	state->m_io[0x12] |= 3;
@@ -244,7 +244,7 @@ void hp48_reg_out( device_t *device, int out )
 {
 	hp48_state *state = device->machine().driver_data<hp48_state>();
 	LOG(( "%05x %f hp48_reg_out: %03x\n",
-	      cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), out ));
+	      device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), out ));
 
 	/* bits 0-8: keyboard lines */
 	state->m_out = out & 0x1ff;
@@ -282,7 +282,7 @@ int hp48_reg_in( device_t *device )
 {
 	int in = hp48_get_in(device->machine());
 	LOG(( "%05x %f hp48_reg_in: %04x\n",
-	      cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), in ));
+	      device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), in ));
 	return in;
 }
 
@@ -327,7 +327,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 void hp48_rsi( device_t *device )
 {
 	hp48_state *state = device->machine().driver_data<hp48_state>();
-	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double() ));
+	LOG(( "%05x %f hp48_rsi\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double() ));
 
 	/* enables interrupts on key repeat
        (normally, there is only one interrupt, when the key is pressed)
@@ -370,7 +370,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 {
 	hp48_state *state = space->machine().driver_data<hp48_state>();
 	LOG(( "%05x %f hp48_io_w: off=%02x data=%x\n",
-	      cpu_get_previouspc(&space->device()), space->machine().time().as_double(), offset, data ));
+	      space->device().safe_pcbase(), space->machine().time().as_double(), offset, data ));
 
 	switch( offset )
 	{
@@ -413,7 +413,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 
 	/* cards */
 	case 0x0e:
-		LOG(( "%05x: card control write %02x\n", cpu_get_previouspc(&space->device()), data ));
+		LOG(( "%05x: card control write %02x\n", space->device().safe_pcbase(), data ));
 
 		/* bit 0: software interrupt */
 		if ( data & 1 )
@@ -432,7 +432,7 @@ static WRITE8_HANDLER ( hp48_io_w )
 		break;
 
 	case 0x0f:
-		LOG(( "%05x: card info write %02x\n", cpu_get_previouspc(&space->device()), data ));
+		LOG(( "%05x: card info write %02x\n", space->device().safe_pcbase(), data ));
 		state->m_io[0x0f] = data;
 		break;
 
@@ -563,7 +563,7 @@ static READ8_HANDLER ( hp48_io_r )
 	/* cards */
 	case 0x0e: /* detection */
 		data = state->m_io[0x0e];
-		LOG(( "%05x: card control read %02x\n", cpu_get_previouspc(&space->device()), data ));
+		LOG(( "%05x: card control read %02x\n", space->device().safe_pcbase(), data ));
 		break;
 	case 0x0f: /* card info */
 		data = 0;
@@ -581,7 +581,7 @@ static READ8_HANDLER ( hp48_io_r )
 			if ( state->m_port_size[0] && state->m_port_write[0] ) data |= 4;
 			if ( state->m_port_size[1] && state->m_port_write[1] ) data |= 8;
 		}
-		LOG(( "%05x: card info read %02x\n", cpu_get_previouspc(&space->device()), data ));
+		LOG(( "%05x: card info read %02x\n", space->device().safe_pcbase(), data ));
 		break;
 
 
@@ -589,7 +589,7 @@ static READ8_HANDLER ( hp48_io_r )
 	}
 
 	LOG(( "%05x %f hp48_io_r: off=%02x data=%x\n",
-	      cpu_get_previouspc(&space->device()), space->machine().time().as_double(), offset, data ));
+	      space->device().safe_pcbase(), space->machine().time().as_double(), offset, data ));
 	return data;
 }
 
@@ -603,7 +603,7 @@ static READ8_HANDLER ( hp48_bank_r )
 	offset &= 0x7e;
 	if ( state->m_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp48_bank_r: off=%03x\n", cpu_get_previouspc(&space->device()), space->machine().time().as_double(), offset ));
+		LOG(( "%05x %f hp48_bank_r: off=%03x\n", space->device().safe_pcbase(), space->machine().time().as_double(), offset ));
 		state->m_bank_switch = offset;
 		hp48_apply_modules(state);
 	}
@@ -834,7 +834,7 @@ static void hp48_reset_modules( running_machine &machine )
 /* RESET opcode */
 void hp48_mem_reset( device_t *device )
 {
-	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double() ));
+	LOG(( "%05x %f hp48_mem_reset\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double() ));
 	hp48_reset_modules(device->machine());
 }
 
@@ -845,7 +845,7 @@ void hp48_mem_config( device_t *device, int v )
 	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
 
-	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), v ));
+	LOG(( "%05x %f hp48_mem_config: %05x\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -877,7 +877,7 @@ void hp48_mem_unconfig( device_t *device, int v )
 {
 	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
-	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), v ));
+	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -921,7 +921,7 @@ int  hp48_mem_id( device_t *device )
 	}
 
 	LOG(( "%05x %f hp48_mem_id = %02x\n",
-	      cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
+	      device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
 
 	return data; /* everything is configured */
 }

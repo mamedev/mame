@@ -105,7 +105,7 @@ static void video_regdump(running_machine &machine, int ref, int params, const c
 READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 {
 	rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
-    int     pc=cpu_get_pc(&space.device());
+    int     pc=space.device().safe_pc();
     UINT16  result;
 
     switch (offset)
@@ -266,7 +266,7 @@ static UINT16 read_reg_00A(rmnimbus_state *state)
 WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
 {
     rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
-	int pc=cpu_get_pc(&space.device());
+	int pc=space.device().safe_pc();
 
     if(offset<reg028)
     {

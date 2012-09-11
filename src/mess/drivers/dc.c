@@ -44,7 +44,7 @@ static UINT64 *dc_ram;
 
 static READ64_HANDLER( dcus_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc0ba52a)
+	if (space->device().safe_pc()==0xc0ba52a)
 		device_spin_until_time(&space->device(), attotime::from_usec(2500));
 	//  device_spinuntil_int(&space->device());
 
@@ -53,7 +53,7 @@ static READ64_HANDLER( dcus_idle_skip_r )
 
 static READ64_HANDLER( dcjp_idle_skip_r )
 {
-	if (cpu_get_pc(&space->device())==0xc0bac62)
+	if (space->device().safe_pc()==0xc0bac62)
 		device_spin_until_time(&space->device(), attotime::from_usec(2500));
 	//  device_spinuntil_int(&space->device());
 

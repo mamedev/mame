@@ -329,7 +329,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(&space.device()), data&0xFF, old_data&0xFF);
+		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",space.device().safe_pc(), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
 		if ( (m_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition

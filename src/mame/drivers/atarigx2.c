@@ -146,7 +146,7 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 {
 	{
-		int pc = cpu_get_previouspc(&space.device());
+		int pc = space.device().safe_pcbase();
 //      if (pc == 0x11cbe || pc == 0x11c30)
 //          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(&space.device(), M68K_A2));
 //      else
@@ -1126,14 +1126,14 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 				result = machine().rand() << 16;
 			else
 				result = 0xffff << 16;
-			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(&space.device()), offset, result);
+			logerror("%06X:Unhandled protection R@%04X = %04X\n", space.device().safe_pcbase(), offset, result);
 		}
 	}
 
 	if (ACCESSING_BITS_16_31)
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space.device()), offset * 4, result >> 16);
+		logerror("%06X:Protection R@%04X = %04X\n", space.device().safe_pcbase(), offset * 4, result >> 16);
 	else
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(&space.device()), offset * 4 + 2, result);
+		logerror("%06X:Protection R@%04X = %04X\n", space.device().safe_pcbase(), offset * 4 + 2, result);
 	return result;
 }
 

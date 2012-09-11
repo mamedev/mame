@@ -79,18 +79,18 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 ***************************************************************************/
 READ8_MEMBER(taitosj_state::taitosj_fake_data_r)
 {
-	LOG(("%04x: protection read\n",cpu_get_pc(&space.device())));
+	LOG(("%04x: protection read\n",space.device().safe_pc()));
 	return 0;
 }
 
 WRITE8_MEMBER(taitosj_state::taitosj_fake_data_w)
 {
-	LOG(("%04x: protection write %02x\n",cpu_get_pc(&space.device()),data));
+	LOG(("%04x: protection write %02x\n",space.device().safe_pc(),data));
 }
 
 READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
 {
-	LOG(("%04x: protection status read\n",cpu_get_pc(&space.device())));
+	LOG(("%04x: protection status read\n",space.device().safe_pc()));
 	return 0xff;
 }
 
@@ -98,7 +98,7 @@ READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
 /* timer callback : */
 READ8_MEMBER(taitosj_state::taitosj_mcu_data_r)
 {
-	LOG(("%04x: protection read %02x\n",cpu_get_pc(&space.device()),m_toz80));
+	LOG(("%04x: protection read %02x\n",space.device().safe_pc(),m_toz80));
 	m_zaccept = 1;
 	return m_toz80;
 }
@@ -114,7 +114,7 @@ static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 
 WRITE8_MEMBER(taitosj_state::taitosj_mcu_data_w)
 {
-	LOG(("%04x: protection write %02x\n",cpu_get_pc(&space.device()),data));
+	LOG(("%04x: protection write %02x\n",space.device().safe_pc(),data));
 	machine().scheduler().synchronize(FUNC(taitosj_mcu_real_data_w), data);
 	/* temporarily boost the interleave to sync things up */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -132,13 +132,13 @@ READ8_MEMBER(taitosj_state::taitosj_mcu_status_r)
 
 READ8_MEMBER(taitosj_state::taitosj_68705_portA_r)
 {
-	LOG(("%04x: 68705 port A read %02x\n",cpu_get_pc(&space.device()),m_portA_in));
+	LOG(("%04x: 68705 port A read %02x\n",space.device().safe_pc(),m_portA_in));
 	return m_portA_in;
 }
 
 WRITE8_MEMBER(taitosj_state::taitosj_68705_portA_w)
 {
-	LOG(("%04x: 68705 port A write %02x\n",cpu_get_pc(&space.device()),data));
+	LOG(("%04x: 68705 port A write %02x\n",space.device().safe_pc(),data));
 	m_portA_out = data;
 }
 
@@ -186,11 +186,11 @@ static TIMER_CALLBACK( taitosj_mcu_status_real_w )
 
 WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 {
-	LOG(("%04x: 68705 port B write %02x\n", cpu_get_pc(&space.device()), data));
+	LOG(("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data));
 
 	if (~data & 0x01)
 	{
-		LOG(("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n", cpu_get_pc(&space.device())));
+		LOG(("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n", space.device().safe_pc()));
 	}
 	if (~data & 0x02)
 	{
@@ -198,7 +198,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 		machine().scheduler().synchronize(FUNC(taitosj_mcu_data_real_r));
 		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 		m_portA_in = m_fromz80;
-		LOG(("%04x: 68705 <- Z80 %02x\n", cpu_get_pc(&space.device()), m_portA_in));
+		LOG(("%04x: 68705 <- Z80 %02x\n", space.device().safe_pc(), m_portA_in));
 	}
 	if (~data & 0x08)
 		m_busreq = 1;
@@ -206,7 +206,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 		m_busreq = 0;
 	if (~data & 0x04)
 	{
-		LOG(("%04x: 68705 -> Z80 %02x\n", cpu_get_pc(&space.device()), m_portA_out));
+		LOG(("%04x: 68705 -> Z80 %02x\n", space.device().safe_pc(), m_portA_out));
 
 		/* 68705 is writing data for the Z80 */
 		machine().scheduler().synchronize(FUNC(taitosj_mcu_status_real_w), m_portA_out);
@@ -214,7 +214,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 	if (~data & 0x10)
 	{
 		address_space *cpu0space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(&space.device()), m_portA_out, m_address));
+		LOG(("%04x: 68705 write %02x to address %04x\n",space.device().safe_pc(), m_portA_out, m_address));
 
 		cpu0space->write_byte(m_address, m_portA_out);
 
@@ -225,16 +225,16 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 	{
 		address_space *cpu0space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		m_portA_in = cpu0space->read_byte(m_address);
-		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(&space.device()), m_portA_in, m_address));
+		LOG(("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_portA_in, m_address));
 	}
 	if (~data & 0x40)
 	{
-		LOG(("%04x: 68705 address low %02x\n", cpu_get_pc(&space.device()), m_portA_out));
+		LOG(("%04x: 68705 address low %02x\n", space.device().safe_pc(), m_portA_out));
 		m_address = (m_address & 0xff00) | m_portA_out;
 	}
 	if (~data & 0x80)
 	{
-		LOG(("%04x: 68705 address high %02x\n", cpu_get_pc(&space.device()), m_portA_out));
+		LOG(("%04x: 68705 address high %02x\n", space.device().safe_pc(), m_portA_out));
 		m_address = (m_address & 0x00ff) | (m_portA_out << 8);
 	}
 }
@@ -254,7 +254,7 @@ READ8_MEMBER(taitosj_state::taitosj_68705_portC_r)
 	int res;
 
 	res = (m_zready << 0) | (m_zaccept << 1) | ((m_busreq^1) << 2);
-	LOG(("%04x: 68705 port C read %02x\n",cpu_get_pc(&space.device()),res));
+	LOG(("%04x: 68705 port C read %02x\n",space.device().safe_pc(),res));
 	return res;
 }
 
@@ -263,7 +263,7 @@ READ8_MEMBER(taitosj_state::taitosj_68705_portC_r)
 
 READ8_MEMBER(taitosj_state::spacecr_prot_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 
 	if( pc != 0x368A && pc != 0x36A6 )
 		logerror("Read protection from an unknown location: %04X\n",pc);

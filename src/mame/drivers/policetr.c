@@ -152,7 +152,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", cpu_get_previouspc(&space.device()), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", space.device().safe_pcbase(), data, mem_mask);
 }
 
 
@@ -203,7 +203,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 	COMBINE_DATA(m_speedup_data);
 
 	/* see if the PC matches */
-	if ((cpu_get_previouspc(&space.device()) & 0x1fffffff) == m_speedup_pc)
+	if ((space.device().safe_pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
 		UINT64 curr_cycles = machine().firstcpu->total_cycles();
 

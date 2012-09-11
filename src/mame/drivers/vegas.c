@@ -631,7 +631,7 @@ static WRITE32_HANDLER( timekeeper_w )
 		state->m_cmos_unlocked = 0;
 	}
 	else
-		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
+		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", space->device().safe_pc(), offset, data, mem_mask);
 }
 
 
@@ -677,7 +677,7 @@ static READ32_HANDLER( pci_bridge_r )
 	}
 
 	if (LOG_PCI)
-		logerror("%06X:PCI bridge read: reg %d = %08X\n", cpu_get_pc(&space->device()), offset, result);
+		logerror("%06X:PCI bridge read: reg %d = %08X\n", space->device().safe_pc(), offset, result);
 	return result;
 }
 
@@ -687,7 +687,7 @@ static WRITE32_HANDLER( pci_bridge_w )
 	vegas_state *state = space->machine().driver_data<vegas_state>();
 	state->m_pci_bridge_regs[offset] = data;
 	if (LOG_PCI)
-		logerror("%06X:PCI bridge write: reg %d = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:PCI bridge write: reg %d = %08X\n", space->device().safe_pc(), offset, data);
 }
 
 
@@ -717,7 +717,7 @@ static READ32_HANDLER( pci_ide_r )
 	}
 
 	if (LOG_PCI)
-		logerror("%06X:PCI IDE read: reg %d = %08X\n", cpu_get_pc(&space->device()), offset, result);
+		logerror("%06X:PCI IDE read: reg %d = %08X\n", space->device().safe_pc(), offset, result);
 	return result;
 }
 
@@ -750,7 +750,7 @@ static WRITE32_HANDLER( pci_ide_w )
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%06X:PCI IDE write: reg %d = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:PCI IDE write: reg %d = %08X\n", space->device().safe_pc(), offset, data);
 }
 
 
@@ -790,7 +790,7 @@ static READ32_HANDLER( pci_3dfx_r )
 	}
 
 	if (LOG_PCI)
-		logerror("%06X:PCI 3dfx read: reg %d = %08X\n", cpu_get_pc(&space->device()), offset, result);
+		logerror("%06X:PCI 3dfx read: reg %d = %08X\n", space->device().safe_pc(), offset, result);
 	return result;
 }
 
@@ -842,7 +842,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 
 	}
 	if (LOG_PCI)
-		logerror("%06X:PCI 3dfx write: reg %d = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:PCI 3dfx write: reg %d = %08X\n", space->device().safe_pc(), offset, data);
 }
 
 
@@ -961,37 +961,37 @@ static READ32_HANDLER( nile_r )
 	{
 		case NREG_CPUSTAT+0:	/* CPU status */
 		case NREG_CPUSTAT+1:	/* CPU status */
-			if (LOG_NILE) logerror("%08X:NILE READ: CPU status(%03X) = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: CPU status(%03X) = %08X\n", space->device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTCTRL+0:	/* Interrupt control */
 		case NREG_INTCTRL+1:	/* Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt control(%03X) = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt control(%03X) = %08X\n", space->device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 0(%03X) = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 0(%03X) = %08X\n", space->device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 1/enable(%03X) = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt status 1/enable(%03X) = %08X\n", space->device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
 		case NREG_INTCLR+1:		/* Interrupt clear */
-			if (LOG_NILE) logerror("%08X:NILE READ: interrupt clear(%03X) = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: interrupt clear(%03X) = %08X\n", space->device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
 		case NREG_INTPPES+1:	/* PCI Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE READ: PCI interrupt control(%03X) = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+			if (LOG_NILE) logerror("%08X:NILE READ: PCI interrupt control(%03X) = %08X\n", space->device().safe_pc(), offset*4, result);
 			logit = 0;
 			break;
 
@@ -1018,7 +1018,7 @@ static READ32_HANDLER( nile_r )
 				result = state->m_nile_regs[offset + 1] = state->m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK;
 			}
 
-			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", cpu_get_pc(&space->device()), which, offset*4, result);
+			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", space->device().safe_pc(), which, offset*4, result);
 			logit = 0;
 			break;
 
@@ -1059,7 +1059,7 @@ static READ32_HANDLER( nile_r )
 	}
 
 	if (LOG_NILE && logit)
-		logerror("%06X:nile read from offset %03X = %08X\n", cpu_get_pc(&space->device()), offset*4, result);
+		logerror("%06X:nile read from offset %03X = %08X\n", space->device().safe_pc(), offset*4, result);
 	return result;
 }
 
@@ -1076,34 +1076,34 @@ static WRITE32_HANDLER( nile_w )
 	{
 		case NREG_CPUSTAT+0:	/* CPU status */
 		case NREG_CPUSTAT+1:	/* CPU status */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
 		case NREG_INTCTRL+0:	/* Interrupt control */
 		case NREG_INTCTRL+1:	/* Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs(space->machine());
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
 		case NREG_INTCLR+1:		/* Interrupt clear */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			state->m_nile_irq_state &= ~(state->m_nile_regs[offset] & ~0xf00);
 			update_nile_irqs(space->machine());
@@ -1111,7 +1111,7 @@ static WRITE32_HANDLER( nile_w )
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
 		case NREG_INTPPES+1:	/* PCI Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
@@ -1136,7 +1136,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_T2CTRL+1:		/* general purpose timer control (control bits) */
 		case NREG_T3CTRL+1:		/* watchdog timer control (control bits) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), which, offset*4, data, mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", space->device().safe_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			/* timer just enabled? */
@@ -1165,7 +1165,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_T2CNTR:		/* general purpose timer control (counter) */
 		case NREG_T3CNTR:		/* watchdog timer control (counter) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", cpu_get_pc(&space->device()), which, offset*4, data, mem_mask);
+			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", space->device().safe_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			if (state->m_nile_regs[offset - 1] & 1)
@@ -1220,7 +1220,7 @@ static WRITE32_HANDLER( nile_w )
 	}
 
 	if (LOG_NILE && logit)
-		logerror("%06X:nile write to offset %03X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
+		logerror("%06X:nile write to offset %03X = %08X & %08X\n", space->device().safe_pc(), offset*4, data, mem_mask);
 }
 
 
@@ -1394,7 +1394,7 @@ static WRITE32_HANDLER( sio_w )
 	if (ACCESSING_BITS_16_23) offset += 2;
 	if (ACCESSING_BITS_24_31) offset += 3;
 	if (LOG_SIO && offset != 0)
-		logerror("%08X:sio write to offset %X = %02X\n", cpu_get_pc(&space->device()), offset, data >> (offset*8));
+		logerror("%08X:sio write to offset %X = %02X\n", space->device().safe_pc(), offset, data >> (offset*8));
 	if (offset < 4)
 		state->m_sio_data[offset] = data >> (offset*8);
 	if (offset == 1)
@@ -1413,7 +1413,7 @@ static READ32_HANDLER( sio_r )
 	if (offset < 4)
 		result = state->m_sio_data[0] | (state->m_sio_data[1] << 8) | (state->m_sio_data[2] << 16) | (state->m_sio_data[3] << 24);
 	if (LOG_SIO && offset != 2)
-		logerror("%08X:sio read from offset %X = %02X\n", cpu_get_pc(&space->device()), offset, result >> (offset*8));
+		logerror("%08X:sio read from offset %X = %02X\n", space->device().safe_pc(), offset, result >> (offset*8));
 	return result;
 }
 
@@ -1438,7 +1438,7 @@ static WRITE32_HANDLER( analog_port_w )
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(&space->device()), data);
+		logerror("%08X:Unexpected analog port select = %08X\n", space->device().safe_pc(), data);
 	state->m_pending_analog_read = state->ioport(portnames[data & 7])->read_safe(0);
 }
 

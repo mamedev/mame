@@ -253,13 +253,13 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		INT32 result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space.device()), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", space.device().safe_pc(), offset);
 
 	return m_tms32031_control[offset];
 }
@@ -277,7 +277,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 
@@ -288,7 +288,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 			m_timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
 }
 
 
@@ -409,7 +409,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(&space.device()), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
 	return result;
 }
 
@@ -438,7 +438,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(&space.device()), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", space.device().safe_pc(), offset, data);
 }
 
 

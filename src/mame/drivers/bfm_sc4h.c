@@ -64,7 +64,7 @@ UINT8 read_input_matrix(running_machine &machine, int row)
 
 READ16_MEMBER(sc4_state::sc4_cs1_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 
 	if (offset<0x100000/2)
 	{
@@ -113,7 +113,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 
 READ16_MEMBER(sc4_state::sc4_mem_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int cs = m68307_get_cs(m_maincpu, offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 //  if (!(debugger_access())) printf("cs is %d\n", cs);
@@ -269,7 +269,7 @@ WRITE8_MEMBER(sc4_state::mux_output2_w)
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int cs = m68307_get_cs(m_maincpu, offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 
@@ -395,7 +395,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int cs = m68340_get_cs(m_adder4cpu, offset * 4);
 
 	switch ( cs )
@@ -417,7 +417,7 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 
 WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int cs = m68340_get_cs(m_adder4cpu, offset * 4);
 
 	switch ( cs )
@@ -554,7 +554,7 @@ void bfm_sc4_68307_portb_w(address_space *space, bool dedicated, UINT16 data, UI
 {
 //  if (dedicated == false)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 		//m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
@@ -567,7 +567,7 @@ void bfm_sc4_68307_portb_w(address_space *space, bool dedicated, UINT16 data, UI
 }
 UINT8 bfm_sc4_68307_porta_r(address_space *space, bool dedicated, UINT8 line_mask)
 {
-	int pc = cpu_get_pc(&space->device());
+	int pc = space->device().safe_pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
 	return space->machine().rand();
 }

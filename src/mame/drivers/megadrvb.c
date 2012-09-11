@@ -273,13 +273,13 @@ static WRITE16_HANDLER( aladmdb_w )
       - aladmdb_w : 1b2d18 - data = aa00 (only once on reset)
       - aladmdb_w : 1b2d42 - data = 0000 (only once on reset)
     */
-	logerror("aladmdb_w : %06x - data = %04x\n",cpu_get_pc(&space->device()),data);
+	logerror("aladmdb_w : %06x - data = %04x\n",space->device().safe_pc(),data);
 }
 
 static READ16_HANDLER( aladmdb_r )
 {
 	md_boot_state *state = space->machine().driver_data<md_boot_state>();
-	if (cpu_get_pc(&space->device())==0x1b2a56)
+	if (space->device().safe_pc()==0x1b2a56)
 	{
 		state->m_aladmdb_mcu_port = state->ioport("MCU")->read();
 
@@ -288,11 +288,11 @@ static READ16_HANDLER( aladmdb_r )
 		else
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}
-	if (cpu_get_pc(&space->device())==0x1b2a72) return 0x0000;
-	if (cpu_get_pc(&space->device())==0x1b2d24) return (space->machine().root_device().ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
-	if (cpu_get_pc(&space->device())==0x1b2d4e) return 0x0000;
+	if (space->device().safe_pc()==0x1b2a72) return 0x0000;
+	if (space->device().safe_pc()==0x1b2d24) return (space->machine().root_device().ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
+	if (space->device().safe_pc()==0x1b2d4e) return 0x0000;
 
-	logerror("aladbl_r : %06x\n",cpu_get_pc(&space->device()));
+	logerror("aladbl_r : %06x\n",space->device().safe_pc());
 
 	return 0x0000;
 }

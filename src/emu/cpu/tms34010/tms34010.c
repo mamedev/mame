@@ -1224,7 +1224,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(&space->device()));
+			if (data) logerror("Plane masking not supported. PC=%08X\n", space->device().safe_pc());
 			break;
 
 		case REG_DPYCTL:
@@ -1375,7 +1375,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(&space->device()));
+			if (data) logerror("Plane masking not supported. PC=%08X\n", space->device().safe_pc());
 			break;
 
 		case REG020_DPYCTL:

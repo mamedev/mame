@@ -82,7 +82,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
 		case 0x07:	device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 
-		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(&space.device()), data, offset);
+		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",space.device().safe_pc(), data, offset);
 				break;
 	}
 }

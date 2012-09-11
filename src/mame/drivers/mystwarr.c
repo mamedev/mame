@@ -235,7 +235,7 @@ WRITE16_MEMBER(mystwarr_state::K053247_scattered_word_w)
 {
 	if (offset & 0x0078)
 	{
-//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, space.device().safe_pc());
 		COMBINE_DATA(m_spriteram+offset);
 	}
 	else

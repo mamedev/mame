@@ -102,7 +102,7 @@ READ16_MEMBER( sega_16bit_common_base::open_bus_r )
 
 	// read original encrypted memory at that address
 	m_open_bus_recurse = true;
-	UINT16 result = space.read_word(cpu_get_pc(&space.device()));
+	UINT16 result = space.read_word(space.device().safe_pc());
 	m_open_bus_recurse = false;
 	return result;
 }

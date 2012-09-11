@@ -1806,7 +1806,7 @@ WRITE32_MEMBER(zn_state::bam2_mcu_w)
 		else if (ACCESSING_BITS_16_31)
 		{
 			m_bam2_mcu_command = data>>16;
-			logerror("MCU command: %04x (PC %08x)\n", m_bam2_mcu_command, cpu_get_pc(&space.device()));
+			logerror("MCU command: %04x (PC %08x)\n", m_bam2_mcu_command, space.device().safe_pc());
 		}
 	}
 }
@@ -1816,11 +1816,11 @@ READ32_MEMBER(zn_state::bam2_mcu_r)
 	switch (offset)
 	{
 		case 0:
-			logerror("MCU port 0 read @ PC %08x mask %08x\n", cpu_get_pc(&space.device()), mem_mask);
+			logerror("MCU port 0 read @ PC %08x mask %08x\n", space.device().safe_pc(), mem_mask);
 			break;
 
 		case 1:
-			logerror("MCU status read @ PC %08x mask %08x\n", cpu_get_pc(&space.device()), mem_mask);
+			logerror("MCU status read @ PC %08x mask %08x\n", space.device().safe_pc(), mem_mask);
 
 			switch (m_bam2_mcu_command)
 			{

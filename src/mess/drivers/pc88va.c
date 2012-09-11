@@ -641,7 +641,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 		case SPROV:  m_cmd = SPROV; /* TODO: where it returns the info? */ break;
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
-		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",cpu_get_pc(&space.device()),data); break;
+		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",space.device().safe_pc(),data); break;
 	}
 }
 

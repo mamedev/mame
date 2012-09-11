@@ -433,7 +433,7 @@ WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
 
 	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(&space.device()),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",space.device().safe_pc(),data);
 }
 
 
@@ -485,7 +485,7 @@ static INTERRUPT_GEN( wgp_cpub_interrupt )
 
 READ16_MEMBER(wgp_state::lan_status_r)
 {
-	logerror("CPU #2 PC %06x: warning - read lan status\n",cpu_get_pc(&space.device()));
+	logerror("CPU #2 PC %06x: warning - read lan status\n",space.device().safe_pc());
 
 	return  (0x4 << 8);	/* CPUB expects this in code at $104d0 (Wgp) */
 }
@@ -512,7 +512,7 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 	{
 		case 0x00:
 		{
-//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",cpu_get_pc(&space.device()),port_sel,data);
+//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",space.device().safe_pc(),port_sel,data);
 
 			m_rotate_ctrl[m_port_sel] = data;
 			return;
@@ -586,7 +586,7 @@ READ16_MEMBER(wgp_state::wgp_adinput_r)
 			return ioport(UNKNOWN_PORT_TAG)->read_safe(0x00);	/* unknown */
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",cpu_get_pc(&space.device()),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space.device().safe_pc(),offset);
 
 	return 0xff;
 }

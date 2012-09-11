@@ -84,7 +84,7 @@ static void f1dream_protection_w(address_space *space)
 	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
 	int indx;
 	int value = 255;
-	int prevpc = cpu_get_previouspc(&space->device());
+	int prevpc = space->device().safe_pcbase();
 
 	if (prevpc == 0x244c)
 	{
@@ -145,7 +145,7 @@ static void f1dream_protection_w(address_space *space)
 
 WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 {
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space.device()), m_ram16[0x3fe0/2]);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",space.device().safe_pc(), m_ram16[0x3fe0/2]);
 	f1dream_protection_w(&space);
 }
 

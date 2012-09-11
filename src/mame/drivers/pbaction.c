@@ -472,7 +472,7 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 {
 
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (cpu_get_pc(&space.device()) == 0xab80)
+	if (space.device().safe_pc() == 0xab80)
 		return 0;
 
 	return m_work_ram[0];

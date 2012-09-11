@@ -3866,7 +3866,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		/* don't log multiple identical status reads from the same address */
 		if (regnum == status)
 		{
-			offs_t pc = cpu_get_pc(v->cpu);
+			offs_t pc = v->cpu->safe_pc();
 			if (pc == v->last_status_pc && result == v->last_status_value)
 				logit = FALSE;
 			v->last_status_pc = pc;

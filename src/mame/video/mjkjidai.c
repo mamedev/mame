@@ -50,7 +50,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 {
 	UINT8 *rom = memregion("maincpu")->base();
 
-//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(&space.device()),data);
+//  logerror("%04x: port c0 = %02x\n",space.device().safe_pc(),data);
 
 	/* bit 0 = NMI enable */
 	m_nmi_mask = data & 1;

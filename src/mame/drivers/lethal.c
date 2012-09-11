@@ -397,7 +397,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 					break;
 
 				default:
-					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, space.device().safe_pc());
 					break;
 			}
 		}

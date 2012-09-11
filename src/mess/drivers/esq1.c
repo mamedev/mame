@@ -205,7 +205,7 @@ static void duart_output(device_t *device, UINT8 data)
 	int bank = ((data >> 1) & 0x7);
 	esq1_state *state = device->machine().driver_data<esq1_state>();
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-//  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, cpu_get_pc(device->machine().firstcpu));
+//  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, device->machine().firstcpu->safe_pc());
     state->membank("osbank")->set_base(state->memregion("osrom")->base() + (bank * 0x1000) );
 
     state->m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;

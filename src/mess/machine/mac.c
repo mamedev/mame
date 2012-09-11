@@ -1049,7 +1049,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, space->device().safe_pc());
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -1158,7 +1158,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	result = applefdc_r(fdc, (offset >> 8));
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, cpu_get_pc(m_maincpu));
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->safe_pc());
 
 	return (result << 8) | result;
 }
@@ -1168,7 +1168,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 	device_t *fdc = space.machine().device("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(m_maincpu));
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->safe_pc());
 
 	if (ACCESSING_BITS_0_7)
 		applefdc_w(fdc, (offset >> 8), data & 0xff);
@@ -1266,7 +1266,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-//  printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(device->machine().device("maincpu")));
+//  printf("VIA1 IN_A (PC %x)\n", device->machine().device("maincpu")->safe_pc());
 
 	switch (mac->m_model)
 	{
@@ -1376,7 +1376,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 			val |= 1;
 	}
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(device->machine().device("maincpu")));
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, device->machine().device("maincpu")->safe_pc());
 
 	return val;
 }
@@ -1387,7 +1387,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	device_t *fdc = device->machine().device("fdc");
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine().device("maincpu")));
+//  printf("VIA1 OUT A: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
 	{
@@ -1431,7 +1431,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	int new_rtc_rTCClk;
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine().device("maincpu")));
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
 	{
@@ -1534,7 +1534,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	else if (ADB_IS_EGRET)
 	{
 		#if LOG_ADB
-		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, cpu_get_pc(mac->m_maincpu));
+		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->safe_pc());
 		#endif
         mac->m_egret->set_via_full((data&0x10) ? 1 : 0);
         mac->m_egret->set_sys_session((data&0x20) ? 1 : 0);
@@ -1542,7 +1542,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	else if (ADB_IS_CUDA)
 	{
 		#if LOG_ADB
-		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, cpu_get_pc(mac->m_maincpu));
+		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->safe_pc());
 		#endif
         mac->m_cuda->set_byteack((data&0x10) ? 1 : 0);
         mac->m_cuda->set_tip((data&0x20) ? 1 : 0);
@@ -1609,7 +1609,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	data = m_via2->read(space, offset);
 
 	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, cpu_get_pc(space.machine().device("maincpu")));
+		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, space.machine().device("maincpu")->safe_pc());
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1620,7 +1620,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space.machine().device("maincpu")));
+		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, space.machine().device("maincpu")->safe_pc());
 
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(space, offset, data & 0xff);
@@ -1654,7 +1654,7 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
 	mac_state *mac =device->machine().driver_data<mac_state>();
 
-//  logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(device->machine().device("maincpu")));
+//  logerror("VIA2 IN B (PC %x)\n", device->machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA2)
 	{
@@ -1685,7 +1685,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine().device("maincpu")));
+//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
 	if (ADB_IS_PM_VIA2)
 	{
 		mac->m_pm_data_send = data;
@@ -1697,7 +1697,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine().device("maincpu")));
+//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, device->machine().device("maincpu")->safe_pc());
 
 	if (ADB_IS_PM_VIA2)
 	{
@@ -2012,7 +2012,7 @@ DIRECT_UPDATE_MEMBER(mac_state::overlay_opbaseoverride)
 
 READ32_MEMBER(mac_state::mac_read_id)
 {
-//    printf("Mac read ID reg @ PC=%x\n", cpu_get_pc(m_maincpu));
+//    printf("Mac read ID reg @ PC=%x\n", m_maincpu->safe_pc());
 
 	switch (m_model)
 	{

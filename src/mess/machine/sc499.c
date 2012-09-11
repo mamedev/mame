@@ -257,7 +257,7 @@ const char *sc499_device::cpu_context()
 	if (cpu != NULL)
 	{
 		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu_get_previouspc(cpu), tag());
+				cpu->safe_pcbase(), tag());
 	}
 	else
 	{

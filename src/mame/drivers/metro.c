@@ -174,7 +174,7 @@ static IRQ_CALLBACK( metro_irq_callback )
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", cpu_get_pc(&space.device()), data);
+	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -477,14 +477,14 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 //      coin_lockout_w(machine(), 0, data & 1);
 //      coin_lockout_w(machine(), 1, data & 2);
 	}
-	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", cpu_get_pc(&space.device()), data);
+	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
 
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
 //  coin_lockout_w(machine(), (offset >> 1) & 1, offset & 1);
-	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", cpu_get_pc(&space.device()), data);
+	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
 
@@ -608,7 +608,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 		int shift   = (dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", cpu_get_pc(&space.device()), tmap, src_offs, dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -618,7 +618,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", cpu_get_pc(&space.device()), tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
 				return;
 		}
 
@@ -628,7 +628,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", cpu_get_pc(&space.device()), b1, src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -704,7 +704,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 				break;
 
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(&space.device()),b1,src_offs-1);
+				logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",space.device().safe_pc(),b1,src_offs-1);
 				return;
 			}
 
@@ -781,7 +781,7 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 		case 0x17FFE:	return BIT(dsw2, 6) ? 0x40 : 0;
 		case 0x0FFFE:	return BIT(dsw2, 7) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", space.device().safe_pc(), offset);
 	return 0xffff;
 }
 

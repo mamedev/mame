@@ -90,7 +90,7 @@ READ8_MEMBER(seicross_state::friskyt_portB_r)
 WRITE8_MEMBER(seicross_state::friskyt_portB_w)
 {
 
-	//logerror("PC %04x: 8910 port B = %02x\n", cpu_get_pc(&space->device()), data);
+	//logerror("PC %04x: 8910 port B = %02x\n", space->device().safe_pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
 

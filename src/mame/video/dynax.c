@@ -238,7 +238,7 @@ WRITE8_MEMBER(dynax_state::dynax_flipscreen_w)
 {
 	m_flipscreen = data & 1;
 	if (data & ~1)
-		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(&space.device()), data);
+		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", space.device().safe_pc(), data);
 	LOG(("F=%02X ", data));
 }
 

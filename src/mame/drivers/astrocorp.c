@@ -192,7 +192,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_sound_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * ((data >> 8) & 1));
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(&space->device()), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space->device().safe_pc(), data);
 	}
 }
 
@@ -203,7 +203,7 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_sound_bank_w)
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 1));
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(&space->device()), data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", space->device().safe_pc(), data);
 	}
 }
 
@@ -274,7 +274,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_screen_enable_w)
 	COMBINE_DATA(&m_screen_enable);
 //  popmessage("%04X",data);
 	if (m_screen_enable & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n", cpu_get_pc(&space.device()), m_screen_enable);
+		logerror("CPU #0 PC %06X: screen enable = %04X\n", space.device().safe_pc(), m_screen_enable);
 }
 
 READ16_MEMBER(astrocorp_state::astrocorp_unk_r)

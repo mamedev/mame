@@ -230,6 +230,8 @@ public:
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
+	offs_t safe_pc();
+	offs_t safe_pcbase();
 
 	void set_default_bios(UINT8 bios) { m_default_bios = bios; }
 	void set_system_bios(UINT8 bios) { m_system_bios = bios; }

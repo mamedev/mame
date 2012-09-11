@@ -211,11 +211,11 @@ static void btime_decrypt( address_space *space )
 	/* xxxx xxx1 xxxx x1xx are encrypted. */
 
 	/* get the address of the next opcode */
-	addr = cpu_get_pc(&space->device());
+	addr = space->device().safe_pc();
 
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
-	addr1 = cpu_get_previouspc(&space->device());
+	addr1 = space->device().safe_pcbase();
 	src1 = (addr1 < 0x9000) ? state->m_rambase : state->memregion("maincpu")->base();
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1 + 1] + 256 * src1[addr1 + 2];
@@ -240,7 +240,7 @@ WRITE8_MEMBER(btime_state::lnc_w)
 	else if (offset == 0x9000)                     { return; }  /* AM_NOP */
 	else if (offset == 0x9002)                     { audio_command_w(space, 0, data); return; }
 	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), cpu_get_pc(&space.device()), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 
 	m_rambase[offset] = data;
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(btime_state::mmonkey_w)
 	else if (offset == 0x9000)                     { return; }  /* AM_NOP */
 	else if (offset == 0x9002)                     { audio_command_w(space, 0, data); return; }
 	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(space, offset - 0xb000, data); return; }
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), cpu_get_pc(&space.device()), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 
 	m_rambase[offset] = data;
 
@@ -276,7 +276,7 @@ WRITE8_MEMBER(btime_state::btime_w)
 	else if (offset == 0x4002)                     btime_video_control_w(space, 0, data);
 	else if (offset == 0x4003)                     audio_command_w(space, 0, data);
 	else if (offset == 0x4004)                     bnj_scroll1_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), cpu_get_pc(&space.device()), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 
 	m_rambase[offset] = data;
 
@@ -295,7 +295,7 @@ WRITE8_MEMBER(btime_state::tisland_w)
 	else if (offset == 0x4004)                     bnj_scroll1_w(space, 0, data);
 	else if (offset == 0x4005)			     bnj_scroll2_w(space, 0, data);
 //  else if (offset == 0x8000)                     btime_video_control_w(space,0,data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), cpu_get_pc(&space.device()), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 
 	m_rambase[offset] = data;
 
@@ -313,7 +313,7 @@ WRITE8_MEMBER(btime_state::zoar_w)
 	else if (offset == 0x9804)                     bnj_scroll2_w(space, 0, data);
 	else if (offset == 0x9805)                     bnj_scroll1_w(space, 0, data);
 	else if (offset == 0x9806)                     audio_command_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), cpu_get_pc(&space.device()), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 
 	m_rambase[offset] = data;
 
@@ -327,7 +327,7 @@ WRITE8_MEMBER(btime_state::disco_w)
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
 	else if (offset == 0x9a00)                     audio_command_w(space, 0, data);
 	else if (offset == 0x9c00)                     disco_video_control_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), cpu_get_pc(&space.device()), data, offset);
+	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
 
 	m_rambase[offset] = data;
 

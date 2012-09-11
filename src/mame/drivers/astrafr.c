@@ -53,7 +53,7 @@ public:
 
 	DECLARE_READ8_MEMBER( astra_fgpa_r )
 	{
-		int pc = cpu_get_pc(&space.device());
+		int pc = space.device().safe_pc();
 
 		if (offset==fgpa_first_read_addr)
 		{
@@ -68,7 +68,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( astra_fgpa_w )
 	{
-		int pc = cpu_get_pc(&space.device());
+		int pc = space.device().safe_pc();
 
 		if (offset==fgpa_rom_write_addr)
 		{
@@ -84,7 +84,7 @@ public:
 	/* 2nd copy for the 2nd board (assume same addresses for now */
 	DECLARE_READ8_MEMBER( astra_fgpa_slave_r )
 	{
-		int pc = cpu_get_pc(&space.device());
+		int pc = space.device().safe_pc();
 
 		if (offset==fgpa_first_read_addr)
 		{
@@ -99,7 +99,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( astra_fgpa_slave_w )
 	{
-		int pc = cpu_get_pc(&space.device());
+		int pc = space.device().safe_pc();
 
 		if (offset==fgpa_rom_write_addr)
 		{
@@ -126,7 +126,7 @@ public:
 
 READ32_MEMBER(astrafr_state::astrafr_mem_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int cs = m68340_get_cs(m_maincpu, offset * 4);
 
 	switch ( cs )
@@ -153,7 +153,7 @@ READ32_MEMBER(astrafr_state::astrafr_mem_r)
 
 WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int address = offset * 4;
 	int cs = m68340_get_cs(m_maincpu, address);
 
@@ -183,7 +183,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 
 READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int cs = m68340_get_cs(m_slavecpu, offset * 4);
 
 	switch ( cs )
@@ -208,7 +208,7 @@ READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 
 WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 {
-	int pc = cpu_get_pc(&space.device());
+	int pc = space.device().safe_pc();
 	int address = offset * 4;
 	int cs = m68340_get_cs(m_slavecpu, address);
 

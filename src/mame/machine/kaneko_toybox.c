@@ -179,7 +179,7 @@ WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_com3_w){ toybox_mcu_com_w(offset
 */
 READ16_MEMBER(kaneko_toybox_device::toybox_mcu_status_r)
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), cpu_get_previouspc(&space.device()));
+	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), space.device().safe_pcbase());
 	return 0; // most games test bit 0 for failure
 }
 

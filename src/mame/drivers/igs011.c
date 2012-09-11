@@ -223,10 +223,10 @@ WRITE16_MEMBER(igs011_state::igs011_priority_w)
 {
 	COMBINE_DATA(&m_priority);
 
-//  logerror("%06x: priority = %02x\n", cpu_get_pc(&space.device()), m_priority);
+//  logerror("%06x: priority = %02x\n", space.device().safe_pc(), m_priority);
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to priority = %02x\n", cpu_get_pc(&space.device()), m_priority);
+		logerror("%06x: warning, unknown bits written to priority = %02x\n", space.device().safe_pc(), m_priority);
 }
 
 
@@ -445,7 +445,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	COMBINE_DATA(&blitter.flags);
 
 #if LOG_BLITTER
-	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", cpu_get_pc(&space.device()),
+	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", space.device().safe_pc(),
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
@@ -1374,7 +1374,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 				coin_counter_w(machine(), 0,data & 2);
 
 			if (data & ~0x2)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
 
 			break;
 
@@ -1387,7 +1387,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
@@ -1421,7 +1421,7 @@ READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1441,7 +1441,7 @@ WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 	}
 
 	if ( m_igs_input_sel & (~0xff) )
-		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
+		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
 
 //  popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 }
@@ -1458,7 +1458,7 @@ READ16_MEMBER(igs011_state::lhb_inputs_r)
 			if (~m_igs_input_sel & 0x08)	return ioport("KEY3")->read();
 			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
 
-			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
+			logerror("%06x: warning, reading with igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
 			break;
 	}
 	return 0;
@@ -1486,7 +1486,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			}
 
 			if ( m_igs_input_sel & ~0x7f )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
 
 //          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
@@ -1501,13 +1501,13 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			}
 
 			if ( m_lhb2_pen_hi & ~0xf )
-				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", cpu_get_pc(&space.device()), m_lhb2_pen_hi);
+				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", space.device().safe_pc(), m_lhb2_pen_hi);
 
 //          popmessage("oki %02x",m_lhb2_pen_hi & 0x08);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::lhb2_igs003_r)
@@ -1522,7 +1522,7 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 			if (~m_igs_input_sel & 0x10)	return ioport("KEY4")->read();
 			/* fall through */
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
 			break;
 
 //      case 0x03:
@@ -1581,13 +1581,13 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 			}
 
 			if (data & ~0x33)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
 
 //          popmessage("coin %02x",data);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::wlcc_igs003_r)
@@ -1619,7 +1619,7 @@ READ16_MEMBER(igs011_state::wlcc_igs003_r)
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1647,13 +1647,13 @@ WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 			}
 
 			if ( m_igs_input_sel & 0x40 )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", space.device().safe_pc(), m_igs_input_sel);
 
 //          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::xymg_igs003_r)
@@ -1693,7 +1693,7 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
 			break;
 	}
 
@@ -1719,13 +1719,13 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 			}
 
 			if (data & ~0x3)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space.device()), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
 
 			break;
 
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
 READ16_MEMBER(igs011_state::vbowl_igs003_r)
@@ -1761,7 +1761,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -2507,7 +2507,7 @@ WRITE16_MEMBER(igs011_state::vbowl_pen_hi_w)
 	}
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(&space.device()), m_priority);
+		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", space.device().safe_pc(), m_priority);
 }
 
 WRITE16_MEMBER(igs011_state::vbowl_link_0_w){ }

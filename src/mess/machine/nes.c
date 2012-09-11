@@ -376,7 +376,7 @@ READ8_MEMBER(nes_state::nes_IN0_r)
 		}
 
 		if (LOG_JOY)
-			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space.device()), m_in_0.shift, m_in_0.i0);
+			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_0.shift, m_in_0.i0);
 
 		m_in_0.shift++;
 	}
@@ -465,7 +465,7 @@ READ8_MEMBER(nes_state::nes_IN1_r)
 		}
 
 		if (LOG_JOY)
-			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(&space.device()), m_in_1.shift, m_in_1.i0);
+			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_1.shift, m_in_1.i0);
 
 		m_in_1.shift++;
 	}

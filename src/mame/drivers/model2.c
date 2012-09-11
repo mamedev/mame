@@ -119,7 +119,7 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 		if (state->m_dsp_type == DSP_TYPE_TGP)
 			return 0;
 
-		fatalerror("Copro FIFOIN underflow (at %08X)\n", cpu_get_pc(device));
+		fatalerror("Copro FIFOIN underflow (at %08X)\n", device->safe_pc());
 		return 0;
 	}
 
@@ -153,11 +153,11 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 	model2_state *state = device->machine().driver_data<model2_state>();
 	if (state->m_copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)\n", cpu_get_pc(device));
+		fatalerror("Copro FIFOIN overflow (at %08X)\n", device->safe_pc());
 		return;
 	}
 
-	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(device), data, *(float*)&data);
+	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", device->safe_pc(), data, *(float*)&data);
 
 	state->m_copro_fifoin_data[state->m_copro_fifoin_wpos++] = data;
 	if (state->m_copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
@@ -225,7 +225,7 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 	//if (state->m_copro_fifoout_wpos == state->m_copro_fifoout_rpos)
 	if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)\n", cpu_get_pc(device));
+		fatalerror("Copro FIFOOUT overflow (at %08X)\n", device->safe_pc());
 		return;
 	}
 
@@ -666,7 +666,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data);
 		else
@@ -777,7 +777,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
     }
     else
     {
-        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
     }
 }
 
@@ -843,7 +843,7 @@ READ32_MEMBER(model2_state::geo_r)
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(&space.device()), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", space.device().safe_pc(), address);
 
 	return 0;
 }
@@ -1074,7 +1074,7 @@ READ32_MEMBER(model2_state::model2_prot_r)
 		else
 			return 0xfff0;
 	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 
 	return retval;
 }
@@ -1144,7 +1144,7 @@ WRITE32_MEMBER(model2_state::model2_prot_w)
 			strcpy((char *)m_protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
 		}
 	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 
 }
 
@@ -1905,7 +1905,7 @@ static const scsp_interface scsp_config =
 READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 {
 	UINT32 result = 0;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(&space.device()));
+	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", space.device().safe_pc());
 
 	copro_fifoin_pop(machine().device("dsp"), &result);
 	return result;
@@ -1924,7 +1924,7 @@ READ32_MEMBER(model2_state::copro_sharc_buffer_r)
 
 WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
 {
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(&space.device()), data, *(float*)&data);
+	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
 	m_bufferram[offset & 0x7fff] = data;
 }
 

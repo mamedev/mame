@@ -393,7 +393,7 @@ void lsi53c810_device::dma_exec()
 
 UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 {
-//	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, cpu_get_pc(&space->device()));
+//	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, space->device().safe_pc());
 	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */
@@ -476,7 +476,7 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 
 void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 {
-//	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, cpu_get_pc(&space->device()));
+//	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, space->device().safe_pc());
 	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */

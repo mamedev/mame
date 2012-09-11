@@ -343,7 +343,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 		{
 	//  case 3: return 0x142;
 		case 4: return 0x142;
-	//  case 3: popmessage("blah %08x",cpu_get_pc(&space->device()));
+	//  case 3: popmessage("blah %08x",space->device().safe_pc());
 		default: return space->machine().rand();
 		}
 		break;

@@ -558,7 +558,7 @@ READ32_MEMBER(jaguar_state::misc_control_r)
 
 WRITE32_MEMBER(jaguar_state::misc_control_w)
 {
-	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(&space.device()), data);
+	logerror("%08X:misc_control_w(%02X)\n", space.device().safe_pcbase(), data);
 
 	/*  D7    = board reset (low)
         D6    = audio must & reset (high)
@@ -751,7 +751,7 @@ WRITE32_MEMBER(jaguar_state::joystick_w)
 
 WRITE32_MEMBER(jaguar_state::latch_w)
 {
-	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(&space.device()), data);
+	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
 
 	/* adjust banking */
 	if (memregion("romboard")->base())
@@ -795,7 +795,7 @@ WRITE32_MEMBER(jaguar_state::eeprom_data_w)
 			m_nvram[offset] = data & 0xff000000;
 	}
 //  else
-//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(&space.device()));
+//      logerror("%08X:error writing to disabled EEPROM\n", space.device().safe_pcbase());
 	m_eeprom_enable = false;
 }
 
@@ -833,7 +833,7 @@ WRITE32_MEMBER(jaguar_state::gpu_jump_w)
 {
 	/* update the data in memory */
 	COMBINE_DATA(m_gpu_jump_address);
-	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(&space.device()), *m_gpu_jump_address);
+	logerror("%08X:GPU jump address = %08X\n", space.device().safe_pcbase(), *m_gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
 	gpu_resume();
@@ -848,7 +848,7 @@ READ32_MEMBER(jaguar_state::gpu_jump_r)
 {
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
-	if (*m_gpu_jump_address == m_gpu_spin_pc && cpu_get_previouspc(&space.device()) == m_gpu_spin_pc)
+	if (*m_gpu_jump_address == m_gpu_spin_pc && space.device().safe_pcbase() == m_gpu_spin_pc)
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */

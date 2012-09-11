@@ -103,8 +103,8 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
-	logerror("%04x: keyboard_r\n",cpu_get_pc(&space.device()));
-	switch(cpu_get_pc(&space.device()))
+	logerror("%04x: keyboard_r\n",space.device().safe_pc());
+	switch(space.device().safe_pc())
 	{
 		/* read keyboard */
 		case 0x0aba:	// rmhaihai, rmhaisei
@@ -151,7 +151,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 
 WRITE8_MEMBER(rmhaihai_state::keyboard_w)
 {
-logerror("%04x: keyboard_w %02x\n",cpu_get_pc(&space.device()),data);
+logerror("%04x: keyboard_w %02x\n",space.device().safe_pc(),data);
 	m_keyboard_cmd = data;
 }
 

@@ -1619,7 +1619,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 				break;
 
 			default:
-				logerror( "%08x: master port#7: 0x%04x\n", cpu_get_previouspc(&space.device()), data );
+				logerror( "%08x: master port#7: 0x%04x\n", space.device().safe_pcbase(), data );
 				break;
 		}
 		break;
@@ -2378,7 +2378,7 @@ READ32_MEMBER(namcos22_state::namcos22_keycus_r)
 	// this chip is also used for reading random values in some games
 	// for example in timecris to determine where certain enemies will emerge
 	// but it is not yet understood how this works
-//  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space.device()));
+//  printf("Hit keycus mask %x PC=%x\n", mem_mask, space.device().safe_pc());
 
 	if (ACCESSING_BITS_0_15)
 		return m_keycus_id;
@@ -5409,7 +5409,7 @@ INPUT_PORTS_END /* Rave Racer */
 // for MCU BIOS v1.41
 READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 {
-	if ((cpu_get_pc(&space.device()) == 0xc12d) && (!(m_su_82 & 0xff00)))
+	if ((space.device().safe_pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());
 	}
@@ -5425,7 +5425,7 @@ WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 // for MCU BIOS v1.30
 READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 {
-	if ((cpu_get_pc(&space.device()) == 0xc12a) && (!(m_su_82 & 0xff00)))
+	if ((space.device().safe_pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());
 	}
@@ -5436,7 +5436,7 @@ READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 // for NSTX7702 v1.00 (C74)
 READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 {
-	if (((cpu_get_pc(&space.device()) == 0xc0df) || (cpu_get_pc(&space.device()) == 0xc101)) && (!(m_su_82 & 0xff00)))
+	if (((space.device().safe_pc() == 0xc0df) || (space.device().safe_pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
 		device_spin_until_interrupt(&space.device());
 	}

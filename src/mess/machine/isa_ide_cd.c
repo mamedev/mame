@@ -127,7 +127,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 		}
 		if (m_cur_drive==1) return 0x00;
 		data = atapi_regs[reg];
-		//logerror("ATAPI: reg %d = %x (offset %x mask %x) [%08x][read]\n", reg, data, offset, mem_mask,cpu_get_pc(machine().device("maincpu")));
+		//logerror("ATAPI: reg %d = %x (offset %x mask %x) [%08x][read]\n", reg, data, offset, mem_mask,machine().device("maincpu")->safe_pc());
     	data <<= shift;
 	}
 	return data;

@@ -655,7 +655,7 @@ static void modeFV_switch(running_machine &machine, UINT16 offset, UINT8 data)
 {
 	a2600_state *state = machine.driver_data<a2600_state>();
 	//printf("ModeFV %04x\n",offset);
-	if (!state->m_FVlocked && ( cpu_get_pc(machine.device("maincpu")) & 0x1F00 ) == 0x1F00 )
+	if (!state->m_FVlocked && ( machine.device("maincpu")->safe_pc() & 0x1F00 ) == 0x1F00 )
 	{
 		state->m_FVlocked = 1;
 		state->m_current_bank = state->m_current_bank ^ 0x01;
@@ -673,7 +673,7 @@ static void modeJVP_switch(running_machine &machine, UINT16 offset, UINT8 data)
 		state->m_current_bank ^= 1;
 		break;
 	default:
-		printf("%04X: write to unknown mapper address %02X\n", cpu_get_pc(machine.device("maincpu")), 0xfa0 + offset );
+		printf("%04X: write to unknown mapper address %02X\n", machine.device("maincpu")->safe_pc(), 0xfa0 + offset );
 		break;
 	}
 	state->m_bank_base[1] = CART + 0x1000 * state->m_current_bank;
@@ -805,11 +805,11 @@ READ8_MEMBER(a2600_state::modeSS_r)
 {
 	UINT8 data = ( offset & 0x800 ) ? m_bank_base[2][offset & 0x7FF] : m_bank_base[1][offset];
 
-	//logerror("%04X: read from modeSS area offset = %04X\n", cpu_get_pc(machine().device("maincpu")), offset);
+	//logerror("%04X: read from modeSS area offset = %04X\n", machine().device("maincpu")->safe_pc(), offset);
 	/* Check for control register "write" */
 	if ( offset == 0xFF8 )
 	{
-		//logerror("%04X: write to modeSS control register data = %02X\n", cpu_get_pc(machine().device("maincpu")), m_modeSS_byte);
+		//logerror("%04X: write to modeSS control register data = %02X\n", machine().device("maincpu")->safe_pc(), m_modeSS_byte);
 		m_modeSS_write_enabled = m_modeSS_byte & 0x02;
 		m_modeSS_write_delay = m_modeSS_byte >> 5;
 		switch ( m_modeSS_byte & 0x1C )
@@ -862,7 +862,7 @@ READ8_MEMBER(a2600_state::modeSS_r)
 	{
 		/* Cassette port read */
 		double tap_val = machine().device<cassette_image_device>(CASSETTE_TAG)->input();
-		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(machine().device("maincpu")), tap_val);
+		//logerror("%04X: Cassette port read, tap_val = %f\n", machine().device("maincpu")->safe_pc(), tap_val);
 		if ( tap_val < 0 )
 		{
 			data = 0x00;
@@ -878,10 +878,10 @@ READ8_MEMBER(a2600_state::modeSS_r)
 		if ( m_modeSS_write_enabled )
 		{
 			int diff = machine().device<cpu_device>("maincpu")->total_cycles() - m_modeSS_byte_started;
-			//logerror("%04X: offset = %04X, %d\n", cpu_get_pc(machine().device("maincpu")), offset, diff);
+			//logerror("%04X: offset = %04X, %d\n", machine().device("maincpu")->safe_pc(), offset, diff);
 			if ( diff - m_modeSS_diff_adjust == 5 )
 			{
-				//logerror("%04X: RAM write offset = %04X, data = %02X\n", cpu_get_pc(machine().device("maincpu")), offset, m_modeSS_byte );
+				//logerror("%04X: RAM write offset = %04X, data = %02X\n", machine().device("maincpu")->safe_pc(), offset, m_modeSS_byte );
 				if ( offset & 0x800 )
 				{
 					if ( m_modeSS_high_ram_enabled )
@@ -919,7 +919,7 @@ READ8_MEMBER(a2600_state::modeSS_r)
 	}
 	/* Because the mame core caches opcode data and doesn't perform reads like normal */
 	/* we have to put in this little hack here to get Suicide Mission to work. */
-	if ( offset != 0xFF8 && ( cpu_get_pc(machine().device("maincpu")) & 0x1FFF ) == 0x1FF8 )
+	if ( offset != 0xFF8 && ( machine().device("maincpu")->safe_pc() & 0x1FFF ) == 0x1FF8 )
 	{
 		modeSS_r( space, 0xFF8 );
 	}
@@ -984,7 +984,7 @@ READ8_MEMBER(a2600_state::modeDPC_r)
 	UINT8	data_fetcher = offset & 0x07;
 	UINT8	data = 0xFF;
 
-	logerror("%04X: Read from DPC offset $%02X\n", cpu_get_pc(machine().device("maincpu")), offset);
+	logerror("%04X: Read from DPC offset $%02X\n", machine().device("maincpu")->safe_pc(), offset);
 	if ( offset < 0x08 )
 	{
 		switch( offset & 0x06 )
@@ -1091,13 +1091,13 @@ WRITE8_MEMBER(a2600_state::modeDPC_w)
 		m_dpc.movamt = data;
 		break;
 	case 0x28:			/* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(machine().device("maincpu")), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", machine().device("maincpu")->safe_pc(), offset, data);
 		break;
 	case 0x30:			/* Random number generator reset */
 		m_dpc.shift_reg = 0;
 		break;
 	case 0x38:			/* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(machine().device("maincpu")), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", machine().device("maincpu")->safe_pc(), offset, data);
 		break;
 	}
 }
@@ -1498,7 +1498,7 @@ READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 	UINT16	last_address, prev_address;
 	UINT8	last_byte, prev_byte;
 
-	last_address = cpu_get_pc(machine().device("maincpu")) - 1;
+	last_address = machine().device("maincpu")->safe_pc() - 1;
 	if ( ! ( last_address & 0x1080 ) )
 	{
 		return offset;

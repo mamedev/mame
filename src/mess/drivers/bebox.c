@@ -79,7 +79,7 @@ static READ64_HANDLER(bb_slave_64be_r)
 	pci_bus_device *device = space->machine().device<pci_bus_device>("pcibus");
 
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
-	if ((cpu_get_pc(&space->device()) == 0xfff02e94) || (cpu_get_pc(&space->device()) == 0xfff02e84))
+	if ((space->device().safe_pc() == 0xfff02e94) || (space->device().safe_pc() == 0xfff02e84))
 	{
 		return 0x108000ff;	// indicate slave CPU
 	}

@@ -64,7 +64,7 @@ READ32_MEMBER(taito_f3_state::f3_control_r)
 	if (offset < 6)
 		return ioport(iptnames[offset])->read();
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space.device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", space.device().safe_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -105,7 +105,7 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 			}
 			return;
 	}
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(&space.device()),offset,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",space.device().safe_pc(),offset,data);
 }
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_reset_0_w)

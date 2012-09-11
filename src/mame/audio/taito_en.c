@@ -94,7 +94,7 @@ static WRITE16_HANDLER( en_volume_w )
 
 static READ16_HANDLER( es5510_dsp_r )
 {
-//  logerror("%06x: DSP read offset %04x (data is %04x)\n",cpu_get_pc(&space->device()),offset,es5510_dsp_ram[offset]);
+//  logerror("%06x: DSP read offset %04x (data is %04x)\n",space->device().safe_pc(),offset,es5510_dsp_ram[offset]);
 //  if (es_tmp) return es5510_dsp_ram[offset];
 /*
     switch (offset) {
@@ -128,7 +128,7 @@ static WRITE16_HANDLER( es5510_dsp_w )
 	UINT8 *snd_mem = (UINT8 *)space->machine().root_device().memregion("ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
-//      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(&space->device()),offset,data);
+//      logerror("%06x: DSP write offset %04x %04x\n",space->device().safe_pc(),offset,data);
 
 	COMBINE_DATA(&es5510_dsp_ram[offset]);
 

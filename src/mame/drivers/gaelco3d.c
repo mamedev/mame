@@ -273,7 +273,7 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
 	else if (ACCESSING_BITS_0_7)
 		gaelco_serial_tr_w(machine().device("serial"), 0, data & 0x01);
 	else
-		logerror("%06X:irq_ack_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:irq_ack_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 
@@ -313,11 +313,11 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 	{
 		UINT8 data = gaelco_serial_data_r(machine().device("serial"),0);
 		if (LOG)
-			logerror("%06X:read(%02X) = %08X & %08X\n", cpu_get_pc(machine().device("maincpu")), offset, data, mem_mask);
+			logerror("%06X:read(%02X) = %08X & %08X\n", machine().device("maincpu")->safe_pc(), offset, data, mem_mask);
 		return  data | 0xffffff00;
 	}
 	else
-		logerror("%06X:read(%02X) = mask %08X\n", cpu_get_pc(machine().device("maincpu")), offset, mem_mask);
+		logerror("%06X:read(%02X) = mask %08X\n", machine().device("maincpu")->safe_pc(), offset, mem_mask);
 
 	return 0xffffffff;
 }
@@ -378,7 +378,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 WRITE16_MEMBER(gaelco3d_state::sound_data_w)
 {
 	if (LOG)
-		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
@@ -396,7 +396,7 @@ READ16_MEMBER(gaelco3d_state::sound_data_r)
 READ16_MEMBER(gaelco3d_state::sound_status_r)
 {
 	if (LOG)
-		logerror("%06X:sound_status_r(%02X) = %02X\n", cpu_get_pc(&space.device()), offset, m_sound_status);
+		logerror("%06X:sound_status_r(%02X) = %02X\n", space.device().safe_pc(), offset, m_sound_status);
 	if (ACCESSING_BITS_0_7)
 		return m_sound_status;
 	return 0xffff;
@@ -441,7 +441,7 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_clock_w)
 	else
 	{
 		if (LOG)
-			logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+			logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	}
 }
 
@@ -462,7 +462,7 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 	else
 	{
 		if (LOG)
-			logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+			logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	}
 
 }
@@ -477,7 +477,7 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 
 READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", cpu_get_pc(&space.device()), offset, !(offset & 1) ? ((INT32)m_m68k_ram_base[offset/2] >> 16) : (int)(INT16)m_m68k_ram_base[offset/2]);
+//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((INT32)m_m68k_ram_base[offset/2] >> 16) : (int)(INT16)m_m68k_ram_base[offset/2]);
 	return (INT32)(INT16)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
@@ -508,7 +508,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
 	if (LOG)
-		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 		cputag_set_input_line(machine(), "tms", INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -518,7 +518,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
 	if (LOG)
-		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		cputag_set_input_line(machine(), "tms", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -527,7 +527,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
 WRITE16_MEMBER(gaelco3d_state::tms_control3_w)
 {
 	if (LOG)
-		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 
@@ -535,7 +535,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
 {
 	COMBINE_DATA(&m_tms_comm_base[offset ^ m_tms_offset_xor]);
 	if (LOG)
-		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset*2, data, mem_mask);
+		logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -739,27 +739,27 @@ WRITE32_MEMBER(gaelco3d_state::radikalb_lamp_w)
 {
 	/* arbitrary data written */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_127_w = %02X\n", cpu_get_pc(&space.device()), data & 0xff);
+		logerror("%06X:unknown_127_w = %02X\n", space.device().safe_pc(), data & 0xff);
 	else
-		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(gaelco3d_state::unknown_137_w)
 {
 	/* only written $00 or $ff */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_137_w = %02X\n", cpu_get_pc(&space.device()), data & 0xff);
+		logerror("%06X:unknown_137_w = %02X\n", space.device().safe_pc(), data & 0xff);
 	else
-		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(gaelco3d_state::unknown_13a_w)
 {
 	/* only written $0000 or $0001 */
 	if (ACCESSING_BITS_0_15)
-		logerror("%06X:unknown_13a_w = %04X\n", cpu_get_pc(&space.device()), data & 0xffff);
+		logerror("%06X:unknown_13a_w = %04X\n", space.device().safe_pc(), data & 0xffff);
 	else
-		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", cpu_get_pc(&space.device()), offset, data, mem_mask);
+		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 

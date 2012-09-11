@@ -362,7 +362,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 
 		case 4:		/* $a0 */
 			result = ioport(portnames[offset])->read();
-			if (cpu_get_pc(&space.device()) == 0x802d428)
+			if (space.device().safe_pc() == 0x802d428)
 				device_spin_until_interrupt(&space.device());
 			break;
 	}

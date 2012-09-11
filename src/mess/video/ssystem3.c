@@ -18,7 +18,7 @@ void ssystem3_lcd_write(running_machine &machine, int clock, int data)
 		state->m_lcd.data[state->m_lcd.count/8]&=~(1<<(state->m_lcd.count&7));
 		if (data) state->m_lcd.data[state->m_lcd.count/8]|=1<<(state->m_lcd.count&7);
 		if (state->m_lcd.count+1==40) {
-			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)cpu_get_pc(machine.device("maincpu")),
+			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)machine.device("maincpu")->safe_pc(),
 				state->m_lcd.data[0], state->m_lcd.data[1], state->m_lcd.data[2], state->m_lcd.data[3], state->m_lcd.data[4]);
 		}
 		state->m_lcd.count=(state->m_lcd.count+1)%40;

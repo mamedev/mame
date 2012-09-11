@@ -158,7 +158,7 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
 
 	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 }
 
 WRITE16_MEMBER(darius_state::darius_watchdog_w)
@@ -195,7 +195,7 @@ READ16_MEMBER(darius_state::darius_ioc_r)
 			return ioport("DSW")->read();
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space.device()),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",space.device().safe_pc(),offset);
 
 	return 0xff;
 }
@@ -231,7 +231,7 @@ WRITE16_MEMBER(darius_state::darius_ioc_w)
 			return;
 	}
 
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(&space.device()),offset,data);
+logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",space.device().safe_pc(),offset,data);
 }
 
 
@@ -516,7 +516,7 @@ static const msm5205_interface msm5205_config =
 READ8_MEMBER(darius_state::adpcm_command_read)
 {
 
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(&space.device()) ); */
+	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, space.device().safe_pc() ); */
 	return m_adpcm_command;
 }
 
@@ -534,13 +534,13 @@ WRITE8_MEMBER(darius_state::adpcm_nmi_disable)
 {
 
 	m_nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(&space.device()) ); */
+	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, space.device().safe_pc() ); */
 }
 
 WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 {
 	m_nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(&space.device()) ); */
+	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", space.device().safe_pc() ); */
 }
 
 WRITE8_MEMBER(darius_state::adpcm_data_w)

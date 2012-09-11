@@ -683,11 +683,11 @@ READ32_MEMBER(viper_state::epic_r)
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, cpu_get_pc(&space.device()));
+			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, space.device().safe_pc());
 		}
 		else
 		{
-			printf("EPIC: read %08X at %08X\n", reg, cpu_get_pc(&space.device()));
+			printf("EPIC: read %08X at %08X\n", reg, space.device().safe_pc());
 		}
 	}
 
@@ -868,11 +868,11 @@ WRITE32_MEMBER(viper_state::epic_w)
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, cpu_get_pc(&space.device()));
+			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, space.device().safe_pc());
 		}
 		else
 		{
-			printf("EPIC: write %08X, %08X at %08X\n", data, reg, cpu_get_pc(&space.device()));
+			printf("EPIC: write %08X, %08X at %08X\n", data, reg, space.device().safe_pc());
 		}
 	}
 
@@ -1448,7 +1448,7 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, cpu_get_pc(device->machine().device("maincpu")));
+			fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, device->machine().device("maincpu")->safe_pc());
 	}
 	return 0;
 }
@@ -1518,7 +1518,7 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, cpu_get_pc(device->machine().device("maincpu")));
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, device->machine().device("maincpu")->safe_pc());
 	}
 }
 
@@ -1529,7 +1529,7 @@ READ64_MEMBER(viper_state::voodoo3_io_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space.device()));
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
 	device_t *device = machine().device("voodoo");
 	write64be_with_32le_device_handler(banshee_io_w, device, offset, data, mem_mask);
@@ -1542,7 +1542,7 @@ READ64_MEMBER(viper_state::voodoo3_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space.device()));
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
 	device_t *device = machine().device("voodoo");
 	write64be_with_32le_device_handler(banshee_w, device,  offset, data, mem_mask);
@@ -1555,7 +1555,7 @@ READ64_MEMBER(viper_state::voodoo3_lfb_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, cpu_get_pc(&space.device()));
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
 
 	device_t *device = machine().device("voodoo");
 	write64be_with_32le_device_handler(banshee_fb_w, device, offset, data, mem_mask);
@@ -1752,7 +1752,7 @@ READ64_MEMBER(viper_state::e70000_r)
 		ds2430_bit_timer->reset();
 		ds2430_bit_timer->start_time();
 
-//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(cpu));
+//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
 	}
 
 	return 0;
@@ -1767,7 +1767,7 @@ WRITE64_MEMBER(viper_state::e70000_w)
 			ds2430_timer->adjust(attotime::from_usec(40), 1);	// presence pulse for 240 microsecs
 
 			unk1_bit = 1;
-//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(&space.device()));
+//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, space.device().safe_pc());
 		}
 		else
 		{
@@ -1792,7 +1792,7 @@ WRITE64_MEMBER(viper_state::unk1a_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(cpu));
+	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
 	}
 }
 
@@ -1801,7 +1801,7 @@ WRITE64_MEMBER(viper_state::unk1b_w)
 	if (ACCESSING_BITS_56_63)
 	{
 		unk1_bit = 0;
-	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu_get_pc(cpu));
+	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
 	}
 }
 

@@ -29,7 +29,7 @@ READ8_HANDLER( m68307_internal_serial_r )
 		else
 		{
 
-			int pc = cpu_get_pc(&space->device());
+			int pc = space->device().safe_pc();
 
 			switch (offset)
 			{
@@ -97,7 +97,7 @@ WRITE8_HANDLER( m68307_internal_serial_w )
 	m68307_serial* serial = m68k->m68307SERIAL;
 	assert(serial != NULL);
 
-	int pc = cpu_get_pc(&space->device());
+	int pc = space->device().safe_pc();
 
 	if (serial)
 	{

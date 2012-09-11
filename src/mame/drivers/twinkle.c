@@ -601,12 +601,12 @@ WRITE32_MEMBER(twinkle_state::shared_psx_w)
 	if (mem_mask == 0xff)
 	{
 		m_spu_shared[offset*2] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(&space.device()));
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, space.device().safe_pc());
 	}
 	else if (mem_mask == 0xff0000)
 	{
 		m_spu_shared[(offset*2)+1] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(&space.device()));
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, space.device().safe_pc());
 	}
 	else
 	{
@@ -621,7 +621,7 @@ READ32_MEMBER(twinkle_state::shared_psx_r)
 
 	result = m_spu_shared[offset*2] | m_spu_shared[(offset*2)+1]<<16;
 
-//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(&space.device()));
+//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, space.device().safe_pc());
 
 	result = 0;	// HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
 

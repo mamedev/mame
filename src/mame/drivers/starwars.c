@@ -125,7 +125,7 @@ DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
-		offs_t pc = cpu_get_pc(&direct.space().device());
+		offs_t pc = direct.space().device().safe_pc();
 
 		/* filter out duplicates; we get these because the handler gets called for
            multiple reasons:

@@ -14,7 +14,7 @@ READ8_HANDLER( m68307_internal_mbus_r )
 
 	if (mbus)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 
 		switch (offset)
@@ -61,7 +61,7 @@ WRITE8_HANDLER( m68307_internal_mbus_w )
 
 	if (mbus)
 	{
-		int pc = cpu_get_pc(&space->device());
+		int pc = space->device().safe_pc();
 
 		switch (offset)
 		{

@@ -191,13 +191,13 @@ WRITE8_MEMBER(vball_state::vb_scrollx_hi_w)
 	m_vb_scrollx_hi = (data & 0x02) << 7;
 	vb_bgprombank_w(machine(), (data >> 2) & 0x07);
 	vb_spprombank_w(machine(), (data >> 5) & 0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(&space.device()), m_vb_scrollx_hi);
+	//logerror("%04x: vb_scrollx_hi = %d\n", space.device().safe_pcbase(), m_vb_scrollx_hi);
 }
 
 WRITE8_MEMBER(vball_state::vb_scrollx_lo_w)
 {
 	m_vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(&space.device()), m_vb_scrollx_lo);
+	//logerror("%04x: vb_scrollx_lo =%d\n", space.device().safe_pcbase(), m_vb_scrollx_lo);
 }
 
 

@@ -76,7 +76,7 @@ READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
 	else if ((m_control_word & 0xe0) == 0x80)
 		offset += 0x00000; // main ram
 	else
-		logerror("%08x: unmapped read z80 rom %08x\n", cpu_get_pc(&space.device()), offset);
+		logerror("%08x: unmapped read z80 rom %08x\n", space.device().safe_pc(), offset);
 	return 0xff00 | targetspace->read_byte(offset);
 }
 
@@ -85,7 +85,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_v30_v20_w)
 	address_space *targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	if ((m_control_word & 0xe0) != 0x80)
-		logerror("%08x: write unmapped v30 rom %08x\n", cpu_get_pc(&space.device()), offset);
+		logerror("%08x: write unmapped v30 rom %08x\n", space.device().safe_pc(), offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
@@ -181,7 +181,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
 
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
-//      logerror("%08x:  Changed bank to %04x (%d)\n", cpu_get_pc(&space.device()), tatsumi_control_w,offset);
+//      logerror("%08x:  Changed bank to %04x (%d)\n", space.device().safe_pc(), tatsumi_control_w,offset);
 
 //todo - watchdog
 
@@ -227,7 +227,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 WRITE16_MEMBER(tatsumi_state::roundup5_d0000_w)
 {
 	COMBINE_DATA(&m_roundup5_d0000_ram[offset]);
-//  logerror("d_68k_d0000_w %06x %04x\n", cpu_get_pc(&space.device()), data);
+//  logerror("d_68k_d0000_w %06x %04x\n", space.device().safe_pc(), data);
 }
 
 WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
@@ -239,14 +239,14 @@ WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
 	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
 	cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
-//  logerror("d_68k_e0000_w %06x %04x\n", cpu_get_pc(&space.device()), data);
+//  logerror("d_68k_e0000_w %06x %04x\n", space.device().safe_pc(), data);
 }
 
 /******************************************************************************/
 
 READ16_MEMBER(tatsumi_state::cyclwarr_control_r)
 {
-//  logerror("%08x:  control_r\n", cpu_get_pc(&space.device()));
+//  logerror("%08x:  control_r\n", space.device().safe_pc());
 	return m_control_word;
 }
 
@@ -255,7 +255,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
 	COMBINE_DATA(&m_control_word);
 
 //  if ((m_control_word&0xfe) != (m_last_control&0xfe))
-//      logerror("%08x:  control_w %04x\n", cpu_get_pc(&space.device()), data);
+//      logerror("%08x:  control_w %04x\n", space.device().safe_pc(), data);
 
 /*
 
@@ -280,7 +280,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
 
 
 	// hack
-	if (cpu_get_pc(&space.device()) == 0x2c3c34)
+	if (space.device().safe_pc() == 0x2c3c34)
 	{
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //      logerror("hack 68k2 on\n");
@@ -295,12 +295,12 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 {
 	const UINT16* rom=(UINT16*)machine().root_device().memregion("sub")->base();
 
-logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space.device()), offset*2, m_control_word);
+logerror("%05X:68000_r(%04X),cw=%04X\n", space.device().safe_pc(), offset*2, m_control_word);
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{
 		// hack to make roundup 5 boot
-		if (cpu_get_pc(&space.device())==0xec575)
+		if (space.device().safe_pc()==0xec575)
 		{
 			UINT8 *dst = memregion("maincpu")->base();
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
@@ -340,9 +340,9 @@ READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 	address_space *space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	int r=ym2151_status_port_r(device,0);
 
-	if (cpu_get_pc(&space->device())==0x2aca || cpu_get_pc(&space->device())==0x29fe
-		|| cpu_get_pc(&space->device())==0xf9721
-		|| cpu_get_pc(&space->device())==0x1b96 || cpu_get_pc(&space->device())==0x1c65) // BigFight
+	if (space->device().safe_pc()==0x2aca || space->device().safe_pc()==0x29fe
+		|| space->device().safe_pc()==0xf9721
+		|| space->device().safe_pc()==0x1b96 || space->device().safe_pc()==0x1c65) // BigFight
 		return 0x80;
 	return r;
 }
@@ -354,14 +354,14 @@ READ8_DEVICE_HANDLER(tatsumi_hack_oki_r)
 	address_space *space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 	int r=downcast<okim6295_device *>(device)->read(*space,0);
 
-	if (cpu_get_pc(&space->device())==0x2b70 || cpu_get_pc(&space->device())==0x2bb5
-		|| cpu_get_pc(&space->device())==0x2acc
-		|| cpu_get_pc(&space->device())==0x1c79 // BigFight
-		|| cpu_get_pc(&space->device())==0x1cbe // BigFight
-		|| cpu_get_pc(&space->device())==0xf9881)
+	if (space->device().safe_pc()==0x2b70 || space->device().safe_pc()==0x2bb5
+		|| space->device().safe_pc()==0x2acc
+		|| space->device().safe_pc()==0x1c79 // BigFight
+		|| space->device().safe_pc()==0x1cbe // BigFight
+		|| space->device().safe_pc()==0xf9881)
 		return 0xf;
-	if (cpu_get_pc(&space->device())==0x2ba3 || cpu_get_pc(&space->device())==0x2a9b || cpu_get_pc(&space->device())==0x2adc
-		|| cpu_get_pc(&space->device())==0x1cac) // BigFight
+	if (space->device().safe_pc()==0x2ba3 || space->device().safe_pc()==0x2a9b || space->device().safe_pc()==0x2adc
+		|| space->device().safe_pc()==0x1cac) // BigFight
 		return 0;
 	return r;
 }

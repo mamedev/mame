@@ -81,7 +81,7 @@ READ16_MEMBER(kaneko_grap2_device::galpani3_regs1_r)
 		}
 
 		default:
-			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space.device().tag(), cpu_get_previouspc(&space.device()), offset, mem_mask);
+			logerror("cpu '%s' (PC=%06X): galpani3_regs1_r %02x %04x\n", space.device().tag(), space.device().safe_pcbase(), offset, mem_mask);
 			break;
 
 	}

@@ -267,7 +267,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			{
 				int actual_color = BITSWAP8(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
 
-//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], cpu_get_pc(&space.device()) );
+//              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", actual_color, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
 				m_palette[actual_color] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -313,7 +313,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 			break;
 
 		default:
-//          if (offset >= 0x3800) printf("spec8s3_w: %08x @ %x (mask %08x  PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
+//          if (offset >= 0x3800) printf("spec8s3_w: %08x @ %x (mask %08x  PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 }
@@ -341,7 +341,7 @@ READ32_MEMBER( nubus_spec8s3_device::spec8s3_r )
 			return 0;
 
 		default:
-//          if (offset >= 0x3800) printf("spec8s3_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, cpu_get_pc(&space.device()));
+//          if (offset >= 0x3800) printf("spec8s3_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 			break;
 	}
 	return 0;

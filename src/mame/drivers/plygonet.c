@@ -200,7 +200,7 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(&space.device()));
+	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, space.device().safe_pc());
 
 	return value;
 }
@@ -214,13 +214,13 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (m_shared_ram[offset] & 0xffff0000) >> 16,
 															   0xc000 + (offset<<1),
-															   cpu_get_pc(&space.device()));
+															   space.device().safe_pc());
 	}
 	else if (mem_mask == 0x0000ffff)
 	{
 		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (m_shared_ram[offset] & 0x0000ffff),
 															   0xc000 +((offset<<1)+1),
-															   cpu_get_pc(&space.device()));
+															   space.device().safe_pc());
 	}
 	else
 	{
@@ -229,7 +229,7 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 																				  0xc000 + (offset<<1),
 																				  0xc000 +((offset<<1)+1),
 																				  mem_mask,
-																				  cpu_get_pc(&space.device()));
+																				  space.device().safe_pc());
 	}
 
 	/* write to the current dsp56k word */

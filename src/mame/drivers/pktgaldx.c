@@ -104,7 +104,7 @@ READ16_MEMBER(pktgaldx_state::pckgaldx_unknown_r)
 
 READ16_MEMBER(pktgaldx_state::pckgaldx_protection_r)
 {
-	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(&space.device()));
+	logerror("pckgaldx_protection_r address %06x\n",space.device().safe_pc());
 	return -1;
 }
 

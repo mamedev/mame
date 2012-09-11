@@ -69,7 +69,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 
 
 //  if (offset * 2 == 0x4)
-	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(&space.device()), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
+	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", space.device().safe_pc(), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
                                         m_iodata[8/2], m_iodata[0xa/2], m_iodata[0xc/2], m_iodata[0xe/2]);*/
 
 	switch(offset)
@@ -78,7 +78,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 		case 0x2/2:
 		{
 			int arm_pwr = ioport("IN0")->read();//throw
-			//popmessage("PC=%08x %02x",cpu_get_pc(&space.device()),arm_pwr);
+			//popmessage("PC=%08x %02x",space.device().safe_pc(),arm_pwr);
 
 			if(arm_pwr > 0xe0) return ~0x1800;
 			if(arm_pwr > 0xc0) return ~0x1400;
@@ -88,7 +88,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 		}
 		case 0x4/2: return (m_defender_sensor) | (m_shutter_sensor);
 		case 0xe/2: return ioport("IN2")->read();//coins
-//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space.device()), offset * 2, m_iodata[offset]);
+//      default:  printf("PC=%08x [%04x] -> %04x R\n", space.device().safe_pc(), offset * 2, m_iodata[offset]);
 	}
 
 	return 0xffff;
@@ -110,7 +110,7 @@ WRITE16_MEMBER(_2mindril_state::drill_io_w)
 	}
 
 //  if(data != 0 && offset != 8)
-//  printf("PC=%08x [%04x] <- %04x W\n", cpu_get_pc(&space.device()), offset * 2, data);
+//  printf("PC=%08x [%04x] <- %04x W\n", space.device().safe_pc(), offset * 2, data);
 }
 
 /*

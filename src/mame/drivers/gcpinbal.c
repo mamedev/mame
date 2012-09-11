@@ -101,7 +101,7 @@ READ16_MEMBER(gcpinbal_state::ioc_r)
 
 	}
 
-//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space.device()),offset);
+//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",space.device().safe_pc(),offset);
 
 	return m_ioc_ram[offset];
 }
@@ -192,7 +192,7 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", cpu_get_pc(&space.device()), offset, data);
+			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
 			break;
 	}
 

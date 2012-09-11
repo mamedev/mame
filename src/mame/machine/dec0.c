@@ -28,11 +28,11 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 			return ioport("DSW")->read();
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(&space.device()), 0x30c000+offset, m_i8751_return);
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", space.device().safe_pc(), 0x30c000+offset, m_i8751_return);
 			return m_i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(&space.device()), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", space.device().safe_pc(), 0x30c000+offset);
 	return ~0;
 }
 
@@ -80,7 +80,7 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 			return 0;	/* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(&space.device()), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", space.device().safe_pc(), 0x180000+offset);
 	return ~0;
 }
 
@@ -331,14 +331,14 @@ WRITE16_MEMBER(dec0_state::sprite_mirror_w)
 
 READ16_MEMBER(dec0_state::robocop_68000_share_r)
 {
-//logerror("%08x: Share read %04x\n",cpu_get_pc(&space.device()),offset);
+//logerror("%08x: Share read %04x\n",space.device().safe_pc(),offset);
 
 	return m_robocop_shared_ram[offset];
 }
 
 WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 {
-//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(&space.device()),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",space.device().safe_pc(),offset,data);
 
 	m_robocop_shared_ram[offset]=data&0xff;
 

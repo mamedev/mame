@@ -218,7 +218,7 @@ static const char *cpu_context(const device_t *device) {
 		int ms = (t % osd_ticks_per_second()) / 1000;
 
 		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu_get_previouspc(cpu), device->tag());
+				cpu->safe_pcbase(), device->tag());
 	} else {
 		strcpy(statebuf, "(no context)");
 	}

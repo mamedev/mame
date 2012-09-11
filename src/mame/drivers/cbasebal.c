@@ -31,7 +31,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 {
 
 	/* bits 0-4 select ROM bank */
-	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(&space.device()), data);
+	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 
 	/* bit 5 used but unknown */

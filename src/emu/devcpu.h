@@ -294,9 +294,6 @@ const device_type name = &legacy_device_creator<basename##_device>
 
 // CPU timing
 #define cpu_get_reg(cpu, _reg)				device_state(cpu)->state(_reg)
-#define	cpu_get_previouspc(cpu)				((offs_t)device_state(cpu)->state(STATE_GENPCBASE))
-#define	cpu_get_pc(cpu)						((offs_t)device_state(cpu)->state(STATE_GENPC))
-
 #define cpu_set_reg(cpu, _reg, val)			device_state(cpu)->set_state(_reg, val)
 
 // helpers for using machine/cputag instead of cpu objects

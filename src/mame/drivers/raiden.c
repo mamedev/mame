@@ -555,7 +555,7 @@ ROM_END
 #ifdef SYNC_HACK
 READ16_MEMBER(raiden_state::sub_cpu_spin_r)
 {
-	int pc=cpu_get_pc(&space.device());
+	int pc=space.device().safe_pc();
 	int ret=m_shared_ram[0x4];
 
 	// main set

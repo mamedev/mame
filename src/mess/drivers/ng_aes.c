@@ -333,7 +333,7 @@ WRITE16_MEMBER(ng_aes_state::io_control_w)
 //  case 0x33: break; // coui lockout
 
 	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", cpu_get_pc(&space.device()), offset, data);
+		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset, data);
 		break;
 	}
 }
@@ -513,7 +513,7 @@ WRITE16_MEMBER(ng_aes_state::audio_command_w)
 		/* boost the interleave to let the audio CPU read the command */
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
-		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(&space.device()), data, mem_mask);
+		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", space.device().safe_pc(), data, mem_mask);
 	}
 }
 
@@ -522,7 +522,7 @@ READ8_MEMBER(ng_aes_state::audio_command_r)
 {
 	UINT8 ret = soundlatch_byte_r(space, 0);
 
-	if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(&space.device()), ret);
+	if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", space.device().safe_pc(), ret);
 
 	/* this is a guess */
 	audio_cpu_clear_nmi_w(space, 0, 0);
@@ -534,7 +534,7 @@ READ8_MEMBER(ng_aes_state::audio_command_r)
 WRITE8_MEMBER(ng_aes_state::audio_result_w)
 {
 
-	if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(&space.device()), data);
+	if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", space.device().safe_pc(), data);
 
 	m_audio_result = data;
 }
@@ -545,7 +545,7 @@ static CUSTOM_INPUT( get_audio_result )
 	neogeo_state *state = field.machine().driver_data<neogeo_state>();
 	UINT32 ret = state->m_audio_result;
 
-//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field.machine().device("maincpu")), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", field.machine(->safe_pc().device("maincpu")), ret);
 
 	return ret;
 }
@@ -588,14 +588,14 @@ WRITE16_MEMBER(ng_aes_state::main_cpu_bank_select_w)
 	UINT32 len = memregion("maincpu")->bytes();
 
 	if ((len <= 0x100000) && (data & 0x07))
-		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", cpu_get_pc(&space.device()), data);
+		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", space.device().safe_pc(), data);
 	else
 	{
 		bank_address = ((data & 0x07) + 1) * 0x100000;
 
 		if (bank_address >= len)
 		{
-			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", cpu_get_pc(&space.device()), data);
+			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", space.device().safe_pc(), data);
 			bank_address = 0x100000;
 		}
 
@@ -642,7 +642,7 @@ static void audio_cpu_bank_select( address_space *space, int region, UINT8 bank 
 {
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 
-	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", cpu_get_pc(&space->device()), region, bank);
+	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", space->device().safe_pc(), region, bank);
 
 	state->m_audio_cpu_banks[region] = bank;
 
@@ -698,7 +698,7 @@ static void _set_audio_cpu_rom_source( address_space *space )
 
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 
-		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", cpu_get_pc(&space->device()), state->m_audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
+		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", space->device().safe_pc(), state->m_audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
 }
 
@@ -779,11 +779,11 @@ WRITE16_MEMBER(ng_aes_state::system_control_w)
 		case 0x02: /* unknown - HC32 middle pin 1 */
 		case 0x03: /* unknown - uPD4990 pin ? */
 		case 0x04: /* unknown - HC32 middle pin 10 */
-			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", cpu_get_pc(&space.device()), offset & 0x07, bit);
+			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
 			break;
 		}
 
-		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", cpu_get_pc(&space.device()), offset & 0x07, bit);
+		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
 	}
 }
 

@@ -44,7 +44,7 @@ static const eeprom_interface eeprom_intf =
 WRITE16_MEMBER(xmen_state::eeprom_w)
 {
 
-	logerror("%06x: write %04x to 108000\n",cpu_get_pc(&space.device()),data);
+	logerror("%06x: write %04x to 108000\n",space.device().safe_pc(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */

@@ -194,7 +194,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	UINT8 coin = 0;
 	UINT8 port = ioport("IN2")->read() & 0x70;
 
-	if (cpu_get_pc(&space.device()) == 0x1188)
+	if (space.device().safe_pc() == 0x1188)
 		return ~m_coin_command_pending;
 
 	if (port != 0x70)
@@ -214,7 +214,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 
 READ8_MEMBER(firetrap_state::firetrap_8751_r)
 {
-	//logerror("PC:%04x read from 8751\n",cpu_get_pc(&space.device()));
+	//logerror("PC:%04x read from 8751\n",space.device().safe_pc());
 	return m_i8751_return;
 }
 
@@ -293,7 +293,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	else
 	{
 		m_i8751_return = 0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(&space.device()),data);
+		logerror("%04x: Unknown i8751 command %02x!\n",space.device().safe_pc(),data);
 	}
 
 	/* Signal main cpu task is complete */

@@ -356,7 +356,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 				#if 0
 				if ((state->m_mxtc_config_reg[0x63] & 0x50) | ( state->m_mxtc_config_reg[0x63] & 0xA0)) // Only DO if comes a change to disable ROM.
 				{
-					if ( cpu_get_pc(busdevice->machine().device("maincpu"))==0xff74e) cpu_set_reg(busdevice->machine().device("maincpu"), STATE_GENPC, 0xff74d);
+					if ( busdevice->machine(->safe_pc().device("maincpu"))==0xff74e) cpu_set_reg(busdevice->machine().device("maincpu"), STATE_GENPC, 0xff74d);
 				}
 				#endif
 
@@ -961,7 +961,7 @@ MACHINE_CONFIG_END
 READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
 
-	if(cpu_get_pc(&space.device())==0x1406f48)
+	if(space.device().safe_pc()==0x1406f48)
 		device_spin_until_interrupt(m_maincpu);
 
 	return m_idle_skip_ram;

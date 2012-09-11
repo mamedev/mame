@@ -44,7 +44,7 @@ WRITE16_MEMBER(suna16_state::suna16_soundlatch_w)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff );
 	}
-	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
+	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", space.device().safe_pc(), data);
 }
 
 
@@ -58,7 +58,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 		set_led_status(machine(), 3, data & 0x08);
 		coin_counter_w(machine(), 0, data & 0x10);
 	}
-	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
+	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
 }
 
 
@@ -70,7 +70,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 		set_led_status(machine(), 0, data & 0x02);
 		set_led_status(machine(), 1, data & 0x04);
 	}
-	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
+	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
 }
 
 
@@ -80,7 +80,7 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 	{
 		coin_counter_w(machine(), 0, data & 0x04);
 	}
-	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
+	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
 }
 
 
@@ -161,7 +161,7 @@ WRITE16_MEMBER(suna16_state::bestbest_prot_w)
 			case 0x00:	m_prot = m_prot ^ 0x0009;	break;
 			case 0x08:	m_prot = m_prot ^ 0x0002;	break;
 			case 0x0c:	m_prot = m_prot ^ 0x0003;	break;
-			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(&space.device()), data);
+			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", space.device().safe_pc(), data);
 		}
 	}
 }
@@ -262,7 +262,7 @@ WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	UINT8 *RAM = memregion("pcm1")->base();
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
+	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
 	membank("bank1")->set_base(&RAM[bank * 0x10000 + 0x1000]);
 }
 
@@ -270,7 +270,7 @@ WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	UINT8 *RAM = memregion("pcm2")->base();
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
+	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
 	membank("bank2")->set_base(&RAM[bank * 0x10000 + 0x1000]);
 }
 
@@ -340,7 +340,7 @@ WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	UINT8 *RAM = memregion("pcm1")->base();
 	int bank = data & 1;
-	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
+	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
 	membank("bank1")->set_base(&RAM[bank * 0x10000 + 0x400]);
 }
 

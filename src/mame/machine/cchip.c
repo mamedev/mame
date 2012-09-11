@@ -90,7 +90,7 @@ WRITE16_HANDLER( cchip1_ram_w )
 	}
 	else
 	{
-logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",cpu_get_pc(&space->device()),current_bank,offset,data);
+logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space->device().safe_pc(),current_bank,offset,data);
 	}
 }
 

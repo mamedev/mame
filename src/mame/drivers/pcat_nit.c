@@ -151,7 +151,7 @@ static const microtouch_serial_interface pcat_nit_microtouch_interface =
 
 WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 {
-	logerror( "rom bank #%02x at PC=%08X\n", data, cpu_get_pc(&space.device()) );
+	logerror( "rom bank #%02x at PC=%08X\n", data, space.device().safe_pc() );
 	if ( data & 0x40 )
 	{
 		// rom bank
