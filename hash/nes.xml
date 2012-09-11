@@ -50756,15 +50756,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="xiyouji" supported="no">
+	<software name="xiyouji">
 		<description>Xi You Ji Hou Zhuan (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1097"/>
 		<info name="alt_title" value="西游记后传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" />	<!-- Chinese dump uses Mapper 162 (new), I will probably use WAIXING-ES-1097 for the time being -->
+			<feature name="pcb" value="UNL-FS304" />	<!-- Chinese dump uses Mapper 162 (new?) -->
 			<dataarea name="prg" size="1048576">
 				<rom name="xiyouji houzhuan (unl) (waixing).prg" size="1048576" crc="1c098942" sha1="a6a0a3dc8438558fa5da3af8d3349aa8cf080404" offset="00000" status="baddump" />
 			</dataarea>
@@ -50862,14 +50861,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mummy" supported="no">
+	<software name="mummy" supported="partial">
 		<description>Mummy - Shen Gui Chuan Qi (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1109"/>
 		<info name="alt_title" value="神鬼传奇"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 162, which should be a modified version of 163... -->
+			<feature name="pcb" value="HENGGEDIANZI" /> <!-- header says mapper 162, which should be a modified version of 163... -->
 			<dataarea name="prg" size="1048576">
 				<rom name="mummy (es-1109) (c).prg" size="1048576" crc="08fbf3f0" sha1="6dc200340d4b7b9397e4d4f28fa307059ce834ec" offset="00000" status="baddump" />
 			</dataarea>
@@ -51123,7 +51122,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- [NJ009] 口袋水晶 ~ Kou Dai Shou Jing (Pokémon Crystal) -->
 
-	<software name="kdzs">
+	<software name="kdzs" supported="no">
 		<description>Kou Dai Zuan Shi (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -62728,6 +62727,7 @@ Other
 		<info name="alt_title" value="愤怒的小鸟"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="angry bird 2 (from multicart) (unl).chr" size="32768" crc="e6d94fb4" sha1="abff89ad1bb5bdb075ef8b09ef90e23ef2572432" offset="00000" status="baddump" />
 			</dataarea>
