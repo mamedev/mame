@@ -1736,7 +1736,7 @@ static UINT8 cop_angle_mod_val;
 static struct
 {
 	int x,y;
-	int min_x,min_y,max_x,max_y;
+	INT16 min_x,min_y,max_x,max_y;
 	UINT16 hitbox;
 	UINT16 hitbox_x,hitbox_y;
 }cop_collision_info[2];
@@ -1759,13 +1759,30 @@ static UINT16 u1,u2;
 
 
 /*
-Godzilla 0x12c0 height 50m
-Megaron  0x12d0 height 55m
-King Ghidorah 0x12c8 100m
-Mecha Ghidorah 0x12dc 140m
-Mecha Godzilla 0x12d4 50m
-Gigan 0x12cc 55m
+Godzilla 0x12c0 X = 0x21ed Y = 0x57da
+Megaron  0x12d0 X = 0x1ef1 Y = 0x55db
+King Ghidorah 0x12c8 X = 0x26eb Y = 0x55dc
+Mecha Ghidorah 0x12dc X = 0x24ec Y = 0x55dc
+Mecha Godzilla 0x12d4 X = 0x1cf1 Y = 0x52dc
+Gigan 0x12cc X = 0x23e8 Y = 0x55db
 */
+static void cop_take_hit_box_params(UINT8 offs)
+{
+	INT16 start_x,start_y,end_x,end_y;
+
+	start_x = INT8(cop_collision_info[offs].hitbox_x);
+	start_y = INT8(cop_collision_info[offs].hitbox_y);
+
+	end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
+	end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
+
+	cop_collision_info[offs].min_x = start_x + (cop_collision_info[offs].x >> 16);
+	cop_collision_info[offs].min_y = start_y + (cop_collision_info[offs].y >> 16);
+	cop_collision_info[offs].max_x = end_x + (cop_collision_info[offs].x >> 16);
+	cop_collision_info[offs].max_y = end_y + (cop_collision_info[offs].y >> 16);
+}
+
+
 static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 {
 	static UINT8 res;
@@ -1780,17 +1797,19 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
 		res &= ~1;
 
-	cop_hit_val_x = (cop_collision_info[0].min_x - cop_collision_info[1].min_x) >> 16;
-	cop_hit_val_y = (cop_collision_info[0].min_y - cop_collision_info[1].min_y) >> 16;
+	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
+	cop_hit_val_y = (cop_collision_info[0].y - cop_collision_info[1].y) >> 16;
 	cop_hit_val_z = 1;
-	cop_hit_val_unk = res;//((cop_collision_info[0].min_y >> 16) != (cop_collision_info[1].min_y >> 16));
+	cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+
+
+	//popmessage("%d %d %04x %04x %04x %04x",cop_hit_val_x,cop_hit_val_y,cop_collision_info[0].hitbox_x,cop_collision_info[0].hitbox_y,cop_collision_info[1].hitbox_x,cop_collision_info[1].hitbox_y);
 
 	//if(res == 0)
 	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
 
 	return res;
 }
-
 
 static READ16_HANDLER( generic_cop_r )
 {
@@ -2296,29 +2315,12 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
 			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
-				UINT8 start_x,end_x,end_y;
-				//UINT8 start_y;
 				cop_collision_info[0].hitbox = space->read_word(cop_register[2]);
 				cop_collision_info[0].hitbox_y = space->read_word((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox));
 				cop_collision_info[0].hitbox_x = space->read_word(((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox))+2);
-				// TODO: z
-
-				start_x = (cop_collision_info[0].hitbox_x & 0xff);
-				//start_y = (cop_collision_info[0].hitbox_y & 0xff);
-				end_x = (cop_collision_info[0].hitbox_x >> 8);
-				end_y = (cop_collision_info[0].hitbox_y >> 8);
-
-				/* TODO: understand this one */
-				if(start_x == 0)
-					cop_collision_info[0].min_x = cop_collision_info[0].x - ((0x10) << 16);
-				else
-					cop_collision_info[0].min_x = cop_collision_info[0].x + ((0) << 16);
-
-				cop_collision_info[0].min_y = cop_collision_info[0].y + ((0) << 16);
-				cop_collision_info[0].max_x = cop_collision_info[0].x + ((end_x) << 16);
-				cop_collision_info[0].max_y = cop_collision_info[0].y + ((end_y) << 16);
 
 				/* do the math */
+				cop_take_hit_box_params(0);
 				cop_hit_status = cop_calculate_collsion_detection(space->machine());
 
 				return;
@@ -2334,33 +2336,12 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
 			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
-				UINT8 start_x, end_x,end_y;
-				//UINT8 start_y;
-
-				/* Take hitbox param, TODO */
 				cop_collision_info[1].hitbox = space->read_word(cop_register[3]);
 				cop_collision_info[1].hitbox_y = space->read_word((cop_register[3]&0xffff0000)|(cop_collision_info[1].hitbox));
 				cop_collision_info[1].hitbox_x = space->read_word(((cop_register[3]&0xffff0000)|(cop_collision_info[1].hitbox))+2);
-				// TODO: z
-
-				start_x = (cop_collision_info[0].hitbox_x & 0xff);
-				//start_y = (cop_collision_info[0].hitbox_y & 0xff);
-				end_x = (cop_collision_info[0].hitbox_x >> 8);
-				end_y = (cop_collision_info[0].hitbox_y >> 8);
-
-				/* TODO: understand this one */
-				if(start_x == 0)
-					cop_collision_info[1].min_x = cop_collision_info[1].x - ((0x10) << 16);
-				else
-					cop_collision_info[1].min_x = cop_collision_info[1].x + ((0) << 16);
-
-				cop_collision_info[1].min_y = cop_collision_info[1].y + ((0) << 16);
-				cop_collision_info[1].max_x = cop_collision_info[1].x + ((end_x) << 16);
-				cop_collision_info[1].max_y = cop_collision_info[1].y + ((end_y) << 16);
-
-				//if(cop_collision_info[0].x || cop_collision_info[1].x)
 
 				/* do the math */
+				cop_take_hit_box_params(1);
 				cop_hit_status = cop_calculate_collsion_detection(space->machine());
 				return;
 			}
