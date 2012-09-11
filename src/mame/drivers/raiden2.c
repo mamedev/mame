@@ -680,9 +680,6 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		int xflip, yflip;
 		int xstep, ystep;
 
-		if (sx & 0x8000) sx -= 0x10000;
-		if (sy & 0x8000) sy -= 0x10000;
-
 
 		ytlim = (source[0] >> 12) & 0x7;
 		xtlim = (source[0] >> 8) & 0x7;
@@ -714,6 +711,12 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		{
 			for (ytiles = 0; ytiles < ytlim; ytiles++)
 			{
+				/* note this wraparound handling could be wrong if some of the COP maths is wrong */
+
+#define ZEROTEAM_MASK_X (0x1ff) // causes a blank square in the corner of zero team, but otherwise the thrusters of the ship in the r2 intro are clipped, using 0x8000 as a sign bit instead of this logic works for r2, but not zero team
+#define ZEROTEAM_MASK_Y (0x1ff)
+
+
 				drawgfx_transpen(
 						bitmap,
 						cliprect,
@@ -721,7 +724,35 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						tile_number,
 						colr,
 						yflip,xflip,
-						sx+xstep*xtiles,sy+ystep*ytiles,15);
+						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
+
+				drawgfx_transpen(
+						bitmap,
+						cliprect,
+						gfx,
+						tile_number,
+						colr,
+						yflip,xflip,
+						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
+
+				drawgfx_transpen(
+						bitmap,
+						cliprect,
+						gfx,
+						tile_number,
+						colr,
+						yflip,xflip,
+						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
+
+				drawgfx_transpen(
+						bitmap,
+						cliprect,
+						gfx,
+						tile_number,
+						colr,
+						yflip,xflip,
+						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
+
 
 				tile_number++;
 			}

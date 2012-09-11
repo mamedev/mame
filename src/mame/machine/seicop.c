@@ -2502,7 +2502,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				//if(dma_trigger != 0x87)
 				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x %02x %02x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_fade_table * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger,pal_brightness_val,pal_brightness_mode);
 
-				src = (cop_dma_src[cop_dma_trigger] << 6) ;
+				src = (cop_dma_src[cop_dma_trigger] << 6);
 				dst = (cop_dma_dst[cop_dma_trigger] << 6);
 				size = ((cop_dma_size[cop_dma_trigger] << 5) - (cop_dma_dst[cop_dma_trigger] << 6) + 0x20)/2;
 
