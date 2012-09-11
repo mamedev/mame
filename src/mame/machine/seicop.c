@@ -1774,18 +1774,16 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 
 	/* outbound X check */
 	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
-		res &= ~1;
+		res &= ~2;
 
 	/* outbound Y check */
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
-		res &= ~2;
+		res &= ~1;
 
-	/* TODO: Legionnaire does collision detection via the other two regs,
-             for now just implement a version that allows the player to spam flying kicks and hit everything else on the screen ;-) */
 	cop_hit_val_x = (cop_collision_info[0].min_x - cop_collision_info[1].min_x) >> 16;
 	cop_hit_val_y = (cop_collision_info[0].min_y - cop_collision_info[1].min_y) >> 16;
 	cop_hit_val_z = 1;
-	cop_hit_val_unk = 0;//((cop_collision_info[0].min_y >> 16) != (cop_collision_info[1].min_y >> 16));
+	cop_hit_val_unk = res;//((cop_collision_info[0].min_y >> 16) != (cop_collision_info[1].min_y >> 16));
 
 	//if(res == 0)
 	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
@@ -2298,7 +2296,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
 			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
-				UINT8 start_x,/*start_y,*/end_x,end_y;
+				UINT8 start_x,end_x,end_y;
+				//UINT8 start_y;
 				cop_collision_info[0].hitbox = space->read_word(cop_register[2]);
 				cop_collision_info[0].hitbox_y = space->read_word((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox));
 				cop_collision_info[0].hitbox_x = space->read_word(((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox))+2);
@@ -2335,7 +2334,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
 			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
-				UINT8 start_x,/*start_y,*/end_x,end_y;
+				UINT8 start_x, end_x,end_y;
+				//UINT8 start_y;
 
 				/* Take hitbox param, TODO */
 				cop_collision_info[1].hitbox = space->read_word(cop_register[3]);
