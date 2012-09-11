@@ -2305,7 +2305,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				// TODO: z
 
 				start_x = (cop_collision_info[0].hitbox_x & 0xff);
-				start_y = (cop_collision_info[0].hitbox_y & 0xff);
+				//start_y = (cop_collision_info[0].hitbox_y & 0xff);
 				end_x = (cop_collision_info[0].hitbox_x >> 8);
 				end_y = (cop_collision_info[0].hitbox_y >> 8);
 
@@ -2344,7 +2344,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				// TODO: z
 
 				start_x = (cop_collision_info[0].hitbox_x & 0xff);
-				start_y = (cop_collision_info[0].hitbox_y & 0xff);
+				//start_y = (cop_collision_info[0].hitbox_y & 0xff);
 				end_x = (cop_collision_info[0].hitbox_x >> 8);
 				end_y = (cop_collision_info[0].hitbox_y >> 8);
 
