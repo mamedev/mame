@@ -2049,6 +2049,8 @@ $(DRIVERS)/funworld.o:	$(LAYOUT)/jollycrd.lh \
 			$(LAYOUT)/novoplay.lh \
 			$(LAYOUT)/royalcrd.lh
 
+$(DRIVERS)/g627.o:	$(LAYOUT)/g627.lh
+
 $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \

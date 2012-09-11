@@ -30,6 +30,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "machine/i8155.h"
 #include "sound/astrocde.h"
+#include "g627.lh"
 
 
 class g627_state : public driver_device
@@ -125,6 +126,9 @@ static MACHINE_CONFIG_START( g627, g627_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* Video */
+	MCFG_DEFAULT_LAYOUT(layout_g627)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
