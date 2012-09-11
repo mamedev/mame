@@ -117,7 +117,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 // StealSee doesn't use interrupts, just the vblank
 CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
 {
-	int pc = m_maincpu->safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (pc==0x400081ec)
 		if(!eolith_vblank)

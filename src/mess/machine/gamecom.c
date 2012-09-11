@@ -329,7 +329,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 	case SM8521_55: case SM8521_56: case SM8521_57: case SM8521_58:
 	case SM8521_59: case SM8521_5A: case SM8521_5B: case SM8521_5C:
 	case SM8521_5D:
-		logerror( "%X: Write to reserved address (0x%02X). Value written: 0x%02X\n", m_maincpu->safe_pc(), offset, data );
+		logerror( "%X: Write to reserved address (0x%02X). Value written: 0x%02X\n", m_maincpu->pc(), offset, data );
 		break;
 	}
 	m_p_ram[offset] = data;

@@ -250,7 +250,7 @@ READ32_MEMBER( gp2x_state::nand_r )
 				break;
 
 			default:
-				logerror("NAND: read unk command %x (PC %x)\n", m_nand_cmd, m_maincpu->safe_pc());
+				logerror("NAND: read unk command %x (PC %x)\n", m_nand_cmd, m_maincpu->pc());
 				break;
 		}
 	}
@@ -266,7 +266,7 @@ WRITE32_MEMBER( gp2x_state::nand_w )
 	{
 		case 4:	// command
 			m_nand_cmd = data;
-//          printf("NAND: command %x (PC %x0)\n", data, m_maincpu->safe_pc());
+//          printf("NAND: command %x (PC %x0)\n", data, m_maincpu->pc());
 			m_nand_stage = 0;
 			m_nand_subword_stage = 0;
 			break;

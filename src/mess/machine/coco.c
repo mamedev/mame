@@ -261,8 +261,8 @@ UINT8 coco_state::floating_bus_read(void)
 	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// get the previous and current PC
-	UINT16 prev_pc = m_maincpu->safe_pcbase();
-	UINT16 pc = m_maincpu->safe_pc();
+	UINT16 prev_pc = m_maincpu->pcbase();
+	UINT16 pc = m_maincpu->pc();
 
 	// get the byte; and skip over header bytes
 	byte = program->read_byte(prev_pc);

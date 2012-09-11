@@ -177,7 +177,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x read %.2x\n",(int) m_maincpu->safe_pc(),vg230->index,data);
+			logerror("%.5x vg230 %02x read %.2x\n",(int) m_maincpu->pc(),vg230->index,data);
       //    data=machine.root_device().memregion("maincpu")->base()[0x4000+offset];
 	}
 	else
@@ -221,7 +221,7 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x write %.2x\n",(int)m_maincpu->safe_pc(),vg230->index,data);
+			logerror("%.5x vg230 %02x write %.2x\n",(int)m_maincpu->pc(),vg230->index,data);
 	}
 	else
 		vg230->index=data;
@@ -288,7 +288,7 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 		ems->mapper[ems->index].address=(ems->mapper[ems->index].data[0]<<14)|((ems->mapper[ems->index].data[1]&0xf)<<22);
 		ems->mapper[ems->index].on=ems->mapper[ems->index].data[1]&0x80;
 		ems->mapper[ems->index].type=(ems->mapper[ems->index].data[1]&0x70)>>4;
-		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)m_maincpu->safe_pc(),ems->index, ems->data<<12,
+		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)m_maincpu->pc(),ems->index, ems->data<<12,
 			ems->mapper[ems->index].on, ems->mapper[ems->index].type, ems->mapper[ems->index].address );
 
 		switch (ems->mapper[ems->index].type)

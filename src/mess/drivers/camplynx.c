@@ -121,7 +121,7 @@ WRITE8_MEMBER( camplynx_state::lynx48k_bank_w )
 	if (data & 4)
 		membank("bank1")->set_entry(2);
 	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->safe_pc(), data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->pc(), data);
 }
 
 WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
@@ -157,7 +157,7 @@ WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 		membank("bank8")->set_base(base + 0x2e000);
 	}
 	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->safe_pc(), data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->pc(), data);
 
 	/* Set write banks */
 	bank = data & 0xd0;
@@ -186,7 +186,7 @@ WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 		membank("bank18")->set_base(base + 0x2e000);
 	}
 	else
-		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->safe_pc(), data);
+		logerror("%04X: Cannot understand bankswitch command %X\n",m_maincpu->pc(), data);
 }
 
 static ADDRESS_MAP_START( lynx48k_mem, AS_PROGRAM, 8, camplynx_state )

@@ -1158,7 +1158,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	result = applefdc_r(fdc, (offset >> 8));
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->safe_pc());
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
 
 	return (result << 8) | result;
 }
@@ -1168,7 +1168,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 	device_t *fdc = space.machine().device("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->safe_pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		applefdc_w(fdc, (offset >> 8), data & 0xff);
@@ -1534,7 +1534,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	else if (ADB_IS_EGRET)
 	{
 		#if LOG_ADB
-		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->safe_pc());
+		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->pc());
 		#endif
         mac->m_egret->set_via_full((data&0x10) ? 1 : 0);
         mac->m_egret->set_sys_session((data&0x20) ? 1 : 0);
@@ -1542,7 +1542,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	else if (ADB_IS_CUDA)
 	{
 		#if LOG_ADB
-		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->safe_pc());
+		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, mac->m_maincpu->pc());
 		#endif
         mac->m_cuda->set_byteack((data&0x10) ? 1 : 0);
         mac->m_cuda->set_tip((data&0x20) ? 1 : 0);
@@ -2012,7 +2012,7 @@ DIRECT_UPDATE_MEMBER(mac_state::overlay_opbaseoverride)
 
 READ32_MEMBER(mac_state::mac_read_id)
 {
-//    printf("Mac read ID reg @ PC=%x\n", m_maincpu->safe_pc());
+//    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 
 	switch (m_model)
 	{

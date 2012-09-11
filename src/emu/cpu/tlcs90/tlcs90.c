@@ -1967,7 +1967,7 @@ static CPU_EXECUTE( t90 )
 				break;
 
 			default:
-				fatalerror("%04x: unimplemented opcode, op=%02x\n",device->safe_pc(),cpustate->op);
+				fatalerror("%04x: unimplemented opcode, op=%02x\n",device->pc(),cpustate->op);
 		}
 
 		if ( cpustate->op != EI )

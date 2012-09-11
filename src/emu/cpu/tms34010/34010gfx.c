@@ -84,7 +84,7 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 		int diff, cycles = 3;
 
 		if (WINDOW_CHECKING(tms) == 2)
-			logerror("%08x: %s apply_window window mode %d not supported!\n", tms->device->safe_pc(), inst_name, WINDOW_CHECKING(tms));
+			logerror("%08x: %s apply_window window mode %d not supported!\n", tms->device->pc(), inst_name, WINDOW_CHECKING(tms));
 
 		CLR_V(tms);
 		if (WINDOW_CHECKING(tms) == 1)

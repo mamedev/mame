@@ -529,7 +529,7 @@ void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 			data & DMA_INITBUFTURBO ? " initbufturbo" : "");
 #endif
 	if(data & DMA_SETENABLE)
-		logerror("dma enable %s %s %08x (%08x)\n", name, data & DMA_SETREAD ? "read" : "write", (dma_slots[slot].limit-dma_slots[slot].start) & 0x7fffffff, maincpu->safe_pc());
+		logerror("dma enable %s %s %08x (%08x)\n", name, data & DMA_SETREAD ? "read" : "write", (dma_slots[slot].limit-dma_slots[slot].start) & 0x7fffffff, maincpu->pc());
 
 	dma_slot &ds = dma_slots[slot];
 	if(data & (DMA_RESET|DMA_INITBUF|DMA_INITBUFTURBO)) {

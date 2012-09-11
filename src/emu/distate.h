@@ -162,6 +162,11 @@ public:
 	// state setters
 	void set_state(int index, UINT64 value);
 	void set_state_string(int index, const char *string);
+	
+	// deliberately ambiguous functions; if you have the state interface
+	// just use pc() and pcbase() directly
+	offs_t safe_pc() { return pc(); }
+	offs_t safe_pcbase() { return pcbase(); }
 
 public:	// protected eventually
 

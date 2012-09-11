@@ -430,7 +430,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 		//printf("%04x\n",m_maincpu->safe_pc());
 
 		/* TODO: internal state of this */
-		if(m_maincpu->safe_pc() == m_dsw_pc_hack)
+		if(m_maincpu->pc() == m_dsw_pc_hack)
 			m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 		else if(m_mcu[0].rst)
 		{
