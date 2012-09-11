@@ -403,7 +403,7 @@ WRITE_LINE_MEMBER( southbridge_device::at_dma8237_out_eop )
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
-		m_isabus->eop_w(m_dma_channel, ASSERT_LINE );
+		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void southbridge_device::pc_select_dma_channel(int channel, bool state)
