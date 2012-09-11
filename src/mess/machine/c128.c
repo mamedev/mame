@@ -452,12 +452,12 @@ void c128_state::bankswitch_64(int reset)
 
 	if ((!m_game && m_exrom) || (charen && (loram || hiram)))
 	{
-		m_subcpu->memory().space(AS_PROGRAM)->install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(c128_state::read_io), this));
+		m_subcpu->space(AS_PROGRAM)->install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(c128_state::read_io), this));
 		m_write_io = 1;
 	}
 	else
 	{
-		m_subcpu->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank5");
+		m_subcpu->space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank5");
 		m_write_io = 0;
 		if ((!charen && (loram || hiram)))
 			membank("bank13")->set_base(m_chargen);
@@ -636,17 +636,17 @@ void c128_state::bankswitch_128(int reset)
 		else
 			m_ram_top = 0x10000;
 
-		m_subcpu->memory().space(AS_PROGRAM)->install_read_handler(0xff00, 0xff04, read8_delegate(FUNC(c128_state::mmu8722_ff00_r), this));
+		m_subcpu->space(AS_PROGRAM)->install_read_handler(0xff00, 0xff04, read8_delegate(FUNC(c128_state::mmu8722_ff00_r), this));
 
 		if (MMU_IO_ON)
 		{
 			m_write_io = 1;
-			m_subcpu->memory().space(AS_PROGRAM)->install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(c128_state::read_io), this));
+			m_subcpu->space(AS_PROGRAM)->install_read_handler(0xd000, 0xdfff, read8_delegate(FUNC(c128_state::read_io), this));
 		}
 		else
 		{
 			m_write_io = 0;
-			m_subcpu->memory().space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank13");
+			m_subcpu->space(AS_PROGRAM)->install_read_bank(0xd000, 0xdfff, "bank13");
 		}
 
 
@@ -1025,8 +1025,8 @@ WRITE8_MEMBER( c128_state::cpu_w )
 
 	bankswitch_64(0);
 
-	m_memory[0x000] = m_subcpu->memory().space(AS_PROGRAM)->read_byte(0);
-	m_memory[0x001] = m_subcpu->memory().space(AS_PROGRAM)->read_byte(1);
+	m_memory[0x000] = m_subcpu->space(AS_PROGRAM)->read_byte(0);
+	m_memory[0x001] = m_subcpu->space(AS_PROGRAM)->read_byte(1);
 }
 
 READ8_MEMBER( c128_state::cpu_r)

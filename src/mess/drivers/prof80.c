@@ -48,7 +48,7 @@
 
 void prof80_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = memregion(Z80_TAG)->base();
 	int bank;

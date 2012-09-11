@@ -438,7 +438,7 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 
 WRITE8_MEMBER( portfolio_state::ncc1_w )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	if (BIT(data, 0))
 	{
@@ -763,7 +763,7 @@ static DEVICE_IMAGE_LOAD( portfolio_cart )
 
 void portfolio_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* set CPU interrupt vector callback */
 	device_set_irq_callback(m_maincpu, portfolio_int_ack);
@@ -801,7 +801,7 @@ void portfolio_state::machine_start()
 
 void portfolio_state::machine_reset()
 {
-	address_space *io = m_maincpu->memory().space(AS_IO);
+	address_space *io = m_maincpu->space(AS_IO);
 
 	// peripherals
 	m_pid = ioport("PERIPHERAL")->read();

@@ -674,7 +674,7 @@ static ACIA6850_INTERFACE( osi470_acia_intf )
 
 void sb2m600_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM banking */
 	membank("bank1")->configure_entry(0, memregion(M6502_TAG)->base());
@@ -699,7 +699,7 @@ void sb2m600_state::machine_start()
 
 void c1p_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM banking */
 	membank("bank1")->configure_entry(0, memregion(M6502_TAG)->base());

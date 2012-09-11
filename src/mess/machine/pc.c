@@ -1409,7 +1409,7 @@ static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().i
 
 DRIVER_INIT_MEMBER(pc_state,pc1640)
 {
-	address_space *io_space = machine().firstcpu->memory().space( AS_IO );
+	address_space *io_space = machine().firstcpu->space( AS_IO );
 
 	io_space->install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
 	io_space->install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);

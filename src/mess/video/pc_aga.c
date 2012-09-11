@@ -689,9 +689,9 @@ void pc_aga_set_mode(running_machine &machine, AGA_MODE mode)
 
 VIDEO_START( pc_aga )
 {
-	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
-	int buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->space(AS_IO);
+	int buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -720,9 +720,9 @@ VIDEO_START( pc_aga )
 
 VIDEO_START( pc200 )
 {
-	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
-	int buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->space(AS_IO);
+	int buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:

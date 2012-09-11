@@ -72,7 +72,7 @@ static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 
 void pc8401a_state::bankswitch(UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int rombank = data & 0x03;
 	int ram0000 = (data >> 2) & 0x03;

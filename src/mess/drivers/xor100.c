@@ -57,7 +57,7 @@ enum
 
 void xor100_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	int banks = m_ram->size() / 0x10000;
 
 	switch (m_mode)

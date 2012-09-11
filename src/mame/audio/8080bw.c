@@ -898,7 +898,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 
 static void schaser_reinit_555_time_remain(_8080bw_state *state)
 {
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	state->m_schaser_effect_555_time_remain = attotime::from_double(state->m_schaser_effect_555_time_remain_savable);
 	state->schaser_sh_port_2_w(*space, 0, state->m_port_2_last_extra);
 }

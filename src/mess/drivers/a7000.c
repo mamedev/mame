@@ -604,7 +604,7 @@ static TIMER_CALLBACK( flyback_timer_callback )
 
 void a7000_state::viddma_transfer_start()
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_viddma_addr_start;
 	UINT32 dst = 0;
 	UINT32 size = m_viddma_addr_end;

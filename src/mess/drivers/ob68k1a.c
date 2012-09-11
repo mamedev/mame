@@ -288,7 +288,7 @@ static serial_terminal_interface terminal_intf =
 
 void ob68k1a_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
 	switch (m_ram->size())
@@ -306,7 +306,7 @@ void ob68k1a_state::machine_start()
 
 void ob68k1a_state::machine_reset()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// initialize COM8116
 //  m_dbrg->stt_w(program, 0, 0x01);

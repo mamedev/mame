@@ -1197,7 +1197,7 @@ static void amstrad_setLowerRom(running_machine &machine)
 	}
 	else  // CPC+/GX4000
 	{
-		//address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+		//address_space *space = state->m_maincpu->space(AS_PROGRAM);
 
 /*      if ( state->m_asic.enabled && ( state->m_asic.rmr2 & 0x18 ) == 0x18 )
         {
@@ -2176,7 +2176,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSnapshot)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space* space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space* space = state->m_maincpu->space(AS_PROGRAM);
 	mc6845_device *mc6845 = state->m_crtc;
 	device_t *ay8910 = state->m_ay;
 	int RegData;
@@ -2459,7 +2459,7 @@ BDIR BC1       |
 static void update_psg(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	device_t *ay8910 = state->m_ay;
 	mc146818_device *rtc = state->m_rtc;
 
@@ -2833,7 +2833,7 @@ static const UINT8 amstrad_cycle_table_ex[256]=
 static void amstrad_common_init(running_machine &machine)
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	device_t* romexp;
 	rom_image_device* romimage;
 	char str[20];
@@ -2982,7 +2982,7 @@ MACHINE_START( plus )
 MACHINE_RESET( plus )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	int i;
 	UINT8 *rom = state->memregion("maincpu")->base();
 
@@ -3034,7 +3034,7 @@ MACHINE_START( gx4000 )
 MACHINE_RESET( gx4000 )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	int i;
 	UINT8 *rom = state->memregion("maincpu")->base();
 

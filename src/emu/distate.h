@@ -233,18 +233,4 @@ inline offs_t device_t::safe_pcbase()
 }
 
 
-//-------------------------------------------------
-//  device_state - return a pointer to the device
-//  state interface for this device
-//-------------------------------------------------
-
-inline device_state_interface *device_state(device_t *device)
-{
-	device_state_interface *intf;
-	if (!device->interface(intf))
-		throw emu_fatalerror("Device '%s' does not have state interface", device->tag());
-	return intf;
-}
-
-
 #endif	/* __DISTATE_H__ */

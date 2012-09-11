@@ -123,7 +123,7 @@ Hardware:   PPIA 8255
 
 void atom_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	UINT8 *eprom = memregion(EXTROM_TAG)->base() + (m_eprom << 12);
 
@@ -648,7 +648,7 @@ void atom_state::machine_start()
     generator. I don't know if this is hardware, or random data because the
     ram chips are not cleared at start-up. So at this time, these numbers
     are poked into the memory to simulate it. When I have more details I will fix it */
-	UINT8 *m_baseram = (UINT8 *)m_maincpu->memory().space(AS_PROGRAM)->get_write_ptr(0x0000);
+	UINT8 *m_baseram = (UINT8 *)m_maincpu->space(AS_PROGRAM)->get_write_ptr(0x0000);
 
 	m_baseram[0x08] = machine().rand() & 0x0ff;
 	m_baseram[0x09] = machine().rand() & 0x0ff;

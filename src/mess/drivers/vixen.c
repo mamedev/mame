@@ -809,7 +809,7 @@ void vixen_state::machine_start()
 
 void vixen_state::machine_reset()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	program->install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
 	program->install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
@@ -910,7 +910,7 @@ DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
 	{
 		if (m_reset)
 		{
-			address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+			address_space *program = m_maincpu->space(AS_PROGRAM);
 
 			program->install_read_bank(0x0000, 0xefff, "bank1");
 			program->install_write_bank(0x0000, 0xefff, "bank2");

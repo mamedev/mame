@@ -216,7 +216,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
     d0 Select bit 0 */
 
 	/* get address space instead of io space */
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT8 *base = memregion("maincpu")->base();
 
 	m_mode = (m_mode & 0x73) | (data & 0x8c);
@@ -561,7 +561,7 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
     d0 inverse video (entire screen) */
 
 	/* get address space instead of io space */
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	m_mode = (m_mode & 0x87) | ((data & 0x0f) << 3);
 
@@ -867,7 +867,7 @@ MACHINE_RESET( trs80 )
 MACHINE_RESET( trs80m4 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	address_space *mem = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = state->m_maincpu->space(AS_PROGRAM);
 	state->m_cassette_data = 0;
 
 	mem->install_read_bank (0x0000, 0x0fff, "bank1");
@@ -896,7 +896,7 @@ MACHINE_RESET( trs80m4 )
 MACHINE_RESET( lnw80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	state->m_cassette_data = 0;
 	state->m_reg_load = 1;
 	state->lnw80_fe_w(*space, 0, 0);

@@ -448,14 +448,14 @@ WRITE8_MEMBER( pc8001_state::dma_mem_w )
 
 READ8_MEMBER( pc8001_state::dma_io_r )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	return program->read_byte(offset);
 }
 
 WRITE8_MEMBER( pc8001_state::dma_io_w )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	program->write_byte(offset, data);
 }
@@ -483,7 +483,7 @@ static UPD1990A_INTERFACE( rtc_intf )
 
 void pc8001_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);

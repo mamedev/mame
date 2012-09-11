@@ -127,7 +127,7 @@ WRITE8_MEMBER( camplynx_state::lynx48k_bank_w )
 WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 {
 	/* get address space */
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT8 *base = mem->machine().root_device().memregion("maincpu")->base();
 
 	/* Set read banks */
@@ -328,7 +328,7 @@ INPUT_PORTS_END
 static MACHINE_RESET( lynx128k )
 {
 	camplynx_state *state = machine.driver_data<camplynx_state>();
-	address_space *mem = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = state->m_maincpu->space(AS_PROGRAM);
 	mem->install_read_bank (0x0000, 0x1fff, "bank1");
 	mem->install_read_bank (0x2000, 0x3fff, "bank2");
 	mem->install_read_bank (0x4000, 0x5fff, "bank3");

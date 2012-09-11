@@ -32,7 +32,7 @@
 
 void tvc_state::tvc_set_mem_page(UINT8 data)
 {
-	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 	switch(data & 0x18)
 	{
 		case 0x00 : // system ROM selected

@@ -389,7 +389,7 @@ static MACHINE_RESET( mschamp )
 static MACHINE_RESET( superabc )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	state->superabc_bank_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, 0);
+	state->superabc_bank_w(*state->m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 
@@ -5745,7 +5745,7 @@ ROM_END
 static void maketrax_rom_decode(running_machine &machine)
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
@@ -5769,8 +5769,8 @@ static void maketrax_rom_decode(running_machine &machine)
 DRIVER_INIT_MEMBER(pacman_state,maketrax)
 {
 	/* set up protection handlers */
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),this));
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),this));
 
 	maketrax_rom_decode(machine());
 }
@@ -5778,7 +5778,7 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 static void korosuke_rom_decode(running_machine &machine)
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
@@ -5802,8 +5802,8 @@ static void korosuke_rom_decode(running_machine &machine)
 DRIVER_INIT_MEMBER(pacman_state,korosuke)
 {
 	/* set up protection handlers */
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),this));
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::korosuke_special_port3_r),this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::korosuke_special_port3_r),this));
 
 	korosuke_rom_decode(machine());
 }
@@ -6105,7 +6105,7 @@ READ8_MEMBER(pacman_state::mspacii_protection_r)
 DRIVER_INIT_MEMBER(pacman_state,mspacii)
 {
 	// protection
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), this));
 }
 
 DRIVER_INIT_MEMBER(pacman_state,superabc)
@@ -6166,10 +6166,10 @@ DRIVER_INIT_MEMBER(pacman_state,cannonbp)
 {
 
 	/* extra memory */
-	m_maincpu->memory().space(AS_PROGRAM)->install_ram(0x4800, 0x4bff);
+	m_maincpu->space(AS_PROGRAM)->install_ram(0x4800, 0x4bff);
 
 	/* protection? */
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3fff, read8_delegate(FUNC(pacman_state::cannonbp_protection_r),this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x3000, 0x3fff, read8_delegate(FUNC(pacman_state::cannonbp_protection_r),this));
 }
 
 

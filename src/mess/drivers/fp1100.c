@@ -171,7 +171,7 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 	irq_mask = data;
 	///printf("%02x\n",data);
 	// FIXME - the below 2 lines are needed, otherwise nothing ever gets written to videoram
-	address_space *mem = m_subcpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_subcpu->space(AS_PROGRAM);
 	data = mem->read_byte(0xe800);
 }
 

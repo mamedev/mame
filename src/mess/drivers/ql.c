@@ -941,7 +941,7 @@ void ql_state::machine_start()
 
 void ql_state::machine_reset()
 {
-	address_space	*program	= m_maincpu->memory().space(AS_PROGRAM);
+	address_space	*program	= m_maincpu->space(AS_PROGRAM);
 
 	m_disk_type=ioport(QL_CONFIG_PORT)->read() & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",m_disk_type);

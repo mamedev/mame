@@ -67,7 +67,7 @@ void st_state::flush_dma_fifo()
 	if (m_fdc_fifo_empty[m_fdc_fifo_sel]) return;
 
 	if (m_fdc_dmabytes) {
-		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
 			UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
 
@@ -98,7 +98,7 @@ void st_state::flush_dma_fifo()
 void st_state::fill_dma_fifo()
 {
 	if (m_fdc_dmabytes) {
-		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
 			UINT16 data = program->read_word(m_dma_base);
 
@@ -2142,7 +2142,7 @@ static IRQ_CALLBACK( atarist_int_ack )
 
 void st_state::configure_memory()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	switch (m_ram->size())
 	{
@@ -2292,7 +2292,7 @@ void megaste_state::machine_start()
 void stbook_state::machine_start()
 {
 	/* configure RAM banking */
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	switch (m_ram->size())
 	{

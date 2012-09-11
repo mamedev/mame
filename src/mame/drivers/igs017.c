@@ -3399,7 +3399,7 @@ static MACHINE_RESET( lhzb2a )
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	MACHINE_RESET_CALL( mgcs );
-	state->lhzb2a_input_addr_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, 0xf0);
+	state->lhzb2a_input_addr_w(*state->m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
 static MACHINE_CONFIG_START( lhzb2a, igs017_state )

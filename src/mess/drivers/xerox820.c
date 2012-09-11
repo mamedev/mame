@@ -143,7 +143,7 @@ static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 
 void xerox820_state::bankswitch(int bank)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	if (bank)
@@ -162,7 +162,7 @@ void xerox820_state::bankswitch(int bank)
 
 void xerox820ii_state::bankswitch(int bank)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	if (bank)

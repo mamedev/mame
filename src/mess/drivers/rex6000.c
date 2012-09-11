@@ -153,7 +153,7 @@ READ8_MEMBER( rex6000_state::bankswitch_r )
 
 WRITE8_MEMBER( rex6000_state::bankswitch_w )
 {
-	address_space* program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space* program = m_maincpu->space(AS_PROGRAM);
 
 	m_bank[offset&3] = data;
 
@@ -451,7 +451,7 @@ void rex6000_state::machine_start()
 }
 void rex6000_state::machine_reset()
 {
-	address_space* program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space* program = m_maincpu->space(AS_PROGRAM);
 
 	program->install_readwrite_handler(0x8000, 0x9fff, 0, 0, read8_delegate(FUNC(rex6000_state::flash_0x8000_r), this), write8_delegate(FUNC(rex6000_state::flash_0x8000_w), this));
 	program->install_readwrite_handler(0xa000, 0xbfff, 0, 0, read8_delegate(FUNC(rex6000_state::flash_0xa000_r), this), write8_delegate(FUNC(rex6000_state::flash_0xa000_w), this));
@@ -492,7 +492,7 @@ UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				else
 				{
-					data =  m_flash[mem_type]->memory().space(0)->read_byte(((lcd_bank & 0x7f)<<13) | (y*30 + x));
+					data =  m_flash[mem_type]->space(0)->read_byte(((lcd_bank & 0x7f)<<13) | (y*30 + x));
 				}
 
 

@@ -872,8 +872,8 @@ static void supergm3_set_bank(running_machine &machine)
 		state->m_supergm3_chr_bank == 0x40 )
 	{
 		// VRAM
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
-		ppu->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
+		ppu->space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
 		state->membank("bank1")->set_base(state->m_vram);
 
 		if (state->m_supergm3_chr_bank == 0x40)
@@ -881,15 +881,15 @@ static void supergm3_set_bank(running_machine &machine)
 	}
 	else
 	{
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank2");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0400, 0x07ff, "bank3");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0800, 0x0bff, "bank4");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0c00, 0x0fff, "bank5");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1000, 0x13ff, "bank6");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1400, 0x17ff, "bank7");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1800, 0x1bff, "bank8");
-		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1c00, 0x1fff, "bank9");
-		ppu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x1fff);
+		ppu->space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank2");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x0400, 0x07ff, "bank3");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x0800, 0x0bff, "bank4");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x0c00, 0x0fff, "bank5");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x1000, 0x13ff, "bank6");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x1400, 0x17ff, "bank7");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x1800, 0x1bff, "bank8");
+		ppu->space(AS_PROGRAM)->install_read_bank(0x1c00, 0x1fff, "bank9");
+		ppu->space(AS_PROGRAM)->unmap_write(0x0000, 0x1fff);
 
 		set_videorom_bank(machine, 0, 8, 0, 8);
 	}

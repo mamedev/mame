@@ -237,7 +237,7 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 void tmc600_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (m_ram->size())

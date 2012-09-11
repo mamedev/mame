@@ -220,7 +220,7 @@ READ8_MEMBER( a5105_state::a5105_memsel_r )
 
 WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 {
-	address_space *prog = m_maincpu->memory().space( AS_PROGRAM );
+	address_space *prog = m_maincpu->space( AS_PROGRAM );
 
 	if (m_memsel[0] != ((data & 0x03) >> 0))
 	{
@@ -455,7 +455,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(a5105_state)
 {
-	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 	a5105_ab_w(*space, 0, 9); // turn motor off
 	beep_set_frequency(m_beep, 500);
 

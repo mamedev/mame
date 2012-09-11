@@ -702,7 +702,7 @@ static void SCSP_UpdateSlotReg(scsp_state *scsp,int s,int r)
 static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	address_space *space = scsp->device->machine().firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = scsp->device->machine().firstcpu->space(AS_PROGRAM);
 
 	switch(reg&0x3f)
 	{
@@ -1325,7 +1325,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		case 0x416:
 			COMBINE_DATA(&scsp->dma_regs[((offset-0x412)/2) & 3]);
 			if(ACCESSING_BITS_8_15 && offset*2 == 0x416)
-				dma_scsp(device->machine().firstcpu->memory().space(AS_PROGRAM), scsp);
+				dma_scsp(device->machine().firstcpu->space(AS_PROGRAM), scsp);
 			break;
 		case 0x42a:		//check main cpu IRQ
 			scsp->main_irq(1);

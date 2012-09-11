@@ -252,7 +252,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::clear_data )
 
 void cosmicos_state::set_ram_mode()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 
 	if (m_ram_disable)
@@ -486,7 +486,7 @@ static COSMAC_INTERFACE( cosmicos_config )
 
 void cosmicos_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize LED display */
 	m_led->rbi_w(1);

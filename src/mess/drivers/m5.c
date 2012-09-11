@@ -617,7 +617,7 @@ static const z80_daisy_config m5_daisy_chain[] =
 
 void m5_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
 	switch (m_ram->size())

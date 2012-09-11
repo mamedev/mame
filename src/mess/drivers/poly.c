@@ -165,7 +165,7 @@ WRITE8_MEMBER( poly_state::kbd_put )
 {
 	m_term_data = data;
 	//m_term_key = 1;
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	mem->write_byte(0xebec, data); // this has to be 0xecf1 for bios 1
 	mem->write_byte(0xebd0, 1); // any non-zero here
 }

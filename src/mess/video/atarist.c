@@ -180,7 +180,7 @@ static TIMER_CALLBACK( atarist_shifter_tick )
 
 inline void st_state::shifter_load()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT16 data = program->read_word(m_shifter_ofs);
 
 	m_shifter_ir[m_shifter_bitplane] = data;
@@ -619,7 +619,7 @@ WRITE8_MEMBER( ste_state::shifter_pixelofs_w )
 
 void st_state::blitter_source()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT16 data = program->read_word(m_blitter_src);
 
 	if (m_blitter_src_inc_x < 0)
@@ -669,7 +669,7 @@ UINT16 st_state::blitter_hop()
 
 void st_state::blitter_op(UINT16 s, UINT32 dstaddr, UINT16 mask)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	UINT16 d = program->read_word(dstaddr);
 	UINT16 result = 0;

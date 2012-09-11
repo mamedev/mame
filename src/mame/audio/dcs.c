@@ -2141,7 +2141,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2), param);
 		return;
 	}
-	output_latch_w(dcs.cpu->memory().space(AS_PROGRAM), 0, 0x000a, 0xffff);
+	output_latch_w(dcs.cpu->space(AS_PROGRAM), 0, 0x000a, 0xffff);
 }
 
 
@@ -2153,7 +2153,7 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 		machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), param);
 		return;
 	}
-	output_latch_w(dcs.cpu->memory().space(AS_PROGRAM), 0, param, 0xffff);
+	output_latch_w(dcs.cpu->space(AS_PROGRAM), 0, param, 0xffff);
 
 	/* chain to the next word we need to write back */
 	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2));
@@ -2285,7 +2285,7 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 
 static TIMER_CALLBACK( s2_ack_callback )
 {
-	address_space *space = dcs.cpu->memory().space(AS_PROGRAM);
+	address_space *space = dcs.cpu->space(AS_PROGRAM);
 
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())

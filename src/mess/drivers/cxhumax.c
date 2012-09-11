@@ -154,7 +154,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 		//we're in disabled debug_printf
 		unsigned char* buf = (unsigned char *)alloca(200);
 		unsigned char temp;
-		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *program = m_maincpu->space(AS_PROGRAM);
 
 		memset(buf,0,200);
 

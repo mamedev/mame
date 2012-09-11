@@ -167,7 +167,7 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 
 void tmc2000_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = memregion(CDP1802_TAG)->base();
 
@@ -220,7 +220,7 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 WRITE8_MEMBER( nano_state::bankswitch_w )
 {
 	/* enable RAM */
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	program->install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
 
@@ -745,7 +745,7 @@ void nano_state::machine_reset()
 	m_cti->reset();
 
 	/* enable ROM */
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion(CDP1802_TAG)->base();
 	program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }

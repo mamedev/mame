@@ -71,7 +71,7 @@ WRITE16_MEMBER( unixpc_state::romlmap_w )
 
 void unixpc_state::machine_reset()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// force ROM into lower mem on reset
 	romlmap_w(*program, 0, 0, 0xffff);

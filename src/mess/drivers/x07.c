@@ -1042,7 +1042,7 @@ static DEVICE_IMAGE_LOAD( x07_card )
 {
 	running_machine &machine = image.device().machine();
 	x07_state *state = machine.driver_data<x07_state>();
-	address_space *space = state->m_maincpu->memory().space( AS_PROGRAM );
+	address_space *space = state->m_maincpu->space( AS_PROGRAM );
 	UINT16 ram_size = state->m_ram->size();
 
 	if (image.software_entry() == NULL)
@@ -1454,7 +1454,7 @@ void x07_state::machine_start()
 	save_item(NAME(m_cursor.on));
 
 	/* install RAM */
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	program->install_ram(0x0000, m_ram->size() - 1, m_ram->pointer());
 }
 

@@ -2533,7 +2533,7 @@ static MACHINE_RESET( invmulti )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
-	state->invmulti_bank_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, 0);
+	state->invmulti_bank_w(*state->m_maincpu->space(AS_PROGRAM), 0, 0);
 
 	MACHINE_RESET_CALL(mw8080bw);
 }

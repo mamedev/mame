@@ -104,7 +104,7 @@ READ8_MEMBER( pc8201_state::bank_r )
 
 void pc8201_state::bankswitch(UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
@@ -454,7 +454,7 @@ READ8_MEMBER( kc85_state::keyboard_r )
 
 void tandy200_state::bankswitch(UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int rom_bank = data & 0x03;
 	int ram_bank = (data >> 2) & 0x03;
@@ -1127,7 +1127,7 @@ static const i8251_interface tandy200_uart_intf =
 
 void kc85_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1194,7 +1194,7 @@ void pc8201_state::machine_start()
 
 void trsm100_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);

@@ -761,9 +761,9 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 				UINT32 src_addr = (page << 14) | m_adsp_regs.bdma_external_addr;
 
 				if (type == 0)
-					addr_space = m_adsp->memory().space(AS_PROGRAM);
+					addr_space = m_adsp->space(AS_PROGRAM);
 				else
-					addr_space = m_adsp->memory().space(AS_DATA);
+					addr_space = m_adsp->space(AS_DATA);
 
 				if (dir == 0)
 				{

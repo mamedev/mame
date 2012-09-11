@@ -361,7 +361,7 @@ MACHINE_START( sorcerer )
 
 	UINT16 endmem = 0xbfff;
 
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
 	switch (state->m_ram->size())
 	{
@@ -389,7 +389,7 @@ MACHINE_START( sorcererd )
 
 	UINT16 endmem = 0xbbff;
 
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
 	switch (state->m_ram->size())
 	{

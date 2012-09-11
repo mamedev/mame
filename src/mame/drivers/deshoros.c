@@ -252,7 +252,7 @@ void destiny_state::machine_start()
 
 void destiny_state::machine_reset()
 {
-	bank_select_w(*m_maincpu->memory().space(AS_PROGRAM), 0, 0);
+	bank_select_w(*m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 static MACHINE_CONFIG_START( destiny, destiny_state )

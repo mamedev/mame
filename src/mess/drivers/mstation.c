@@ -173,7 +173,7 @@ UINT32 mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 {
-	address_space* program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space* program = m_maincpu->space(AS_PROGRAM);
 	int &active_flash = (bank == 1 ? m_flash_at_0x4000 : m_flash_at_0x8000);
 	char bank_tag[6];
 

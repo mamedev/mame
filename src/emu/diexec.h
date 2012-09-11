@@ -220,6 +220,10 @@ public:
 	// required operation overrides
 	void run() { execute_run(); }
 
+	// deliberately ambiguous functions; if you have the execute interface
+	// just use it
+	device_execute_interface &execute() { return *this; }
+
 protected:
 	// internal helpers
 	void run_thread_wrapper();

@@ -42,7 +42,7 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
     d0 drive A */
 
 	/* get address space */
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	if (data & 0x80)
 	{
@@ -329,7 +329,7 @@ MACHINE_RESET( kayproii )
 MACHINE_RESET( kaypro2x )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	state->kaypro2x_system_port_w(*space, 0, 0x80);
 	MACHINE_RESET_CALL(kay_kbd);
 }
@@ -348,7 +348,7 @@ MACHINE_RESET( kaypro2x )
 QUICKLOAD_LOAD( kayproii )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *RAM = state->memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;
@@ -371,7 +371,7 @@ QUICKLOAD_LOAD( kayproii )
 QUICKLOAD_LOAD( kaypro2x )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *RAM = state->memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;

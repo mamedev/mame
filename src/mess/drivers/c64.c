@@ -849,12 +849,12 @@ static CBM_IEC_INTERFACE( iec_intf )
 
 READ8_MEMBER( c64_state::exp_dma_r )
 {
-	return m_maincpu->memory().space(AS_PROGRAM)->read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM)->read_byte(offset);
 }
 
 WRITE8_MEMBER( c64_state::exp_dma_w )
 {
-	m_maincpu->memory().space(AS_PROGRAM)->write_byte(offset, data);
+	m_maincpu->space(AS_PROGRAM)->write_byte(offset, data);
 }
 
 WRITE_LINE_MEMBER( c64_state::exp_irq_w )

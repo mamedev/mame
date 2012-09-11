@@ -120,7 +120,7 @@ READ8_MEMBER( prestige_state::bankswitch_r )
 
 WRITE8_MEMBER( prestige_state::bankswitch_w )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	switch (offset)
 	{

@@ -590,7 +590,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 void ace_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* configure RAM */
 	switch (m_ram->size())

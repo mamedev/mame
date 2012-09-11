@@ -236,7 +236,7 @@ static CDP1861_INTERFACE( elf2_cdp1861_intf )
 
 void elf2_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize LED displays */
 	m_led_l->rbi_w(1);

@@ -182,7 +182,7 @@ UINT8 abc1600_state::read_ram(offs_t offset)
 	else if (offset < 0x180000)
 	{
 		// video RAM
-		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *program = m_maincpu->space(AS_PROGRAM);
 		data = video_ram_r(*program, offset);
 	}
 	else
@@ -209,7 +209,7 @@ void abc1600_state::write_ram(offs_t offset, UINT8 data)
 	else if (offset < 0x180000)
 	{
 		// video RAM
-		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *program = m_maincpu->space(AS_PROGRAM);
 		video_ram_w(*program, offset, data);
 	}
 	else
@@ -242,7 +242,7 @@ UINT8 abc1600_state::read_io(offs_t offset)
 
 UINT8 abc1600_state::read_internal_io(offs_t offset)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	if (X11)
@@ -467,7 +467,7 @@ void abc1600_state::write_io(offs_t offset, UINT8 data)
 
 void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	if (X11)
 	{
@@ -770,7 +770,7 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 
 UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 data = 0;
 
 	if (!A2 && !A1)
@@ -799,7 +799,7 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 
 void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	if (!A2 && !A1)
 	{
@@ -1879,7 +1879,7 @@ void abc1600_state::machine_start()
 
 void abc1600_state::machine_reset()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// clear special control register
 	for (int i = 0; i < 8; i++)

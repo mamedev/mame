@@ -124,7 +124,7 @@ WRITE8_MEMBER( vic10_state::write )
 
 READ8_MEMBER( vic10_state::vic_videoram_r )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	if (offset < 0x3000)
 		return program->read_byte(offset);

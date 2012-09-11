@@ -441,7 +441,7 @@ static SCREEN_UPDATE_RGB32( vii )
 
 void vii_state::vii_do_dma(UINT32 len)
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_video_regs[0x70];
 	UINT32 dst = m_video_regs[0x71] + 0x2c00;
 	UINT32 j;
@@ -612,7 +612,7 @@ void vii_state::vii_do_i2c()
 
 void vii_state::spg_do_dma(UINT32 len)
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	UINT32 src = ((m_io_regs[0x101] & 0x3f) << 16) | m_io_regs[0x100];
 	UINT32 dst = m_io_regs[0x103] & 0x3fff;

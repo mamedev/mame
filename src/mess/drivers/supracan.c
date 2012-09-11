@@ -990,7 +990,7 @@ WRITE16_MEMBER( supracan_state::supracan_dma_w )
 {
 	acan_dma_regs_t *acan_dma_regs = &m_acan_dma_regs;
 	int ch = (offset < 0x10/2) ? 0 : 1;
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	switch(offset)
 	{
@@ -1125,7 +1125,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( supracan_state::supracan_6502_soundmem_r )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT8 data = m_soundram[offset];
 
 	switch(offset)
@@ -1354,7 +1354,7 @@ static PALETTE_INIT( supracan )
 
 WRITE16_MEMBER( supracan_state::supracan_68k_soundram_w )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	m_soundram[offset*2 + 1] = data & 0xff;
 	m_soundram[offset*2 + 0] = data >> 8;
 
@@ -1377,7 +1377,7 @@ WRITE16_MEMBER( supracan_state::supracan_68k_soundram_w )
 
 READ16_MEMBER( supracan_state::supracan_68k_soundram_r )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT16 val = m_soundram[offset*2 + 0] << 8;
 	val |= m_soundram[offset*2 + 1];
 
@@ -1451,7 +1451,7 @@ WRITE16_MEMBER( supracan_state::supracan_sound_w )
 
 READ16_MEMBER( supracan_state::supracan_video_r )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	UINT16 data = m_video_regs[offset];
 
 	switch(offset)
@@ -1554,7 +1554,7 @@ static TIMER_CALLBACK( supracan_video_callback )
 
 WRITE16_MEMBER( supracan_state::supracan_video_w )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	acan_sprdma_regs_t *acan_sprdma_regs = &m_acan_sprdma_regs;
 	int i;
 

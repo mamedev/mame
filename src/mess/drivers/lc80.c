@@ -296,7 +296,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 
 void lc80_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base()); // TODO

@@ -251,7 +251,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
-	address_space *space = busdevice->machine().firstcpu->memory().space( AS_PROGRAM );
+	address_space *space = busdevice->machine().firstcpu->space( AS_PROGRAM );
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 
 	function &= 3;

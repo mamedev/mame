@@ -151,7 +151,7 @@ VIDEO_START( ti85 )
 SCREEN_UPDATE_IND16( ti85 )
 {
 	ti85_state *state = screen.machine().driver_data<ti85_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	int x,y,b;
 	int brightnes;
 	int lcdmem;

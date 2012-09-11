@@ -190,7 +190,7 @@ static const serial_terminal_interface terminal_intf =
 
 void exp85_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x07ff, "bank1");

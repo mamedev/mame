@@ -1595,7 +1595,7 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 		// TODO: This should be moved to card implementations that actually had this feature
 		m_p3df = data;
 		if (data & 1) {
-			address_space *space_prg = machine().firstcpu->memory().space(AS_PROGRAM);
+			address_space *space_prg = machine().firstcpu->space(AS_PROGRAM);
 
 			space_prg->install_readwrite_handler(0xb8000, 0xb87ff, read8_delegate( FUNC(isa8_cga_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_device::char_ram_write), this) );
 		} else {
@@ -2013,7 +2013,7 @@ void isa8_cga_pc1512_device::device_start()
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
 	m_isa->install_bank(0xb8000, 0xbbfff, 0, 0, "bank1", m_vram);
 
-    address_space *space = machine().firstcpu->memory().space( AS_PROGRAM );
+    address_space *space = machine().firstcpu->space( AS_PROGRAM );
 
     space->install_write_handler( 0xb8000, 0xbbfff, 0, 0x0C000, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
 }

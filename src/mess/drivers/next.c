@@ -304,7 +304,7 @@ void next_state::dma_drq_w(int slot, bool state)
 	dma_slot &ds = dma_slots[slot];
 	ds.drq = state;
 	if(state && (ds.state & DMA_ENABLE)) {
-		address_space *space = maincpu->memory().space(AS_PROGRAM);
+		address_space *space = maincpu->space(AS_PROGRAM);
 		if(ds.state & DMA_READ) {
 			while(ds.drq) {
 				dma_check_update(slot);

@@ -576,7 +576,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 
 	if(m_mio_sel)
 	{
-		address_space *ram_space = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *ram_space = m_maincpu->space(AS_PROGRAM);
 
 		m_mio_sel = 0;
 		//printf("%08x\n",offset);
@@ -627,7 +627,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 
 	if(m_mio_sel)
 	{
-		address_space *ram_space = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *ram_space = m_maincpu->space(AS_PROGRAM);
 		m_mio_sel = 0;
 		ram_space->write_byte(offset, data);
 		return;

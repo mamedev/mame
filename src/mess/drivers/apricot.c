@@ -256,7 +256,7 @@ static const mc6845_interface apricot_mc6845_intf =
 
 DRIVER_INIT_MEMBER(apricot_state,apricot)
 {
-	address_space *prg = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *prg = m_maincpu->space(AS_PROGRAM);
 
 	UINT8 *ram = m_ram->pointer();
 	UINT32 ram_size = m_ram->size();

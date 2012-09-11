@@ -329,11 +329,11 @@ static int internal_pc_cga_video_start(running_machine &machine)
 static VIDEO_START( pc_cga )
 {
 	int buswidth;
-	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
+	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->space(AS_IO);
 
 	space->install_readwrite_bank(0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
-	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	UINT64 mask = 0;
 	switch(buswidth)
 	{
@@ -370,12 +370,12 @@ static VIDEO_START( pc_cga )
 static VIDEO_START( pc_cga32k )
 {
 	int buswidth;
-	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
-	address_space *spaceio = machine.firstcpu->memory().space(AS_IO);
+	address_space *space = machine.firstcpu->space(AS_PROGRAM);
+	address_space *spaceio = machine.firstcpu->space(AS_IO);
 
 
 	space->install_readwrite_bank(0xb8000, 0xbffff, "bank11" );
-	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	UINT64 mask = 0;
 	switch(buswidth)
 	{
@@ -1201,8 +1201,8 @@ static WRITE8_HANDLER( pc_cga8_w )
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
 		// The original CGA card had a char rom
-		UINT8 buswidth = space->machine().firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
-		address_space *space_prg = space->machine().firstcpu->memory().space(AS_PROGRAM);
+		UINT8 buswidth = space->machine().firstcpu->space_config(AS_PROGRAM)->m_databus_width;
+		address_space *space_prg = space->machine().firstcpu->space(AS_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {
 			UINT64 mask = 0;
@@ -1635,8 +1635,8 @@ static VIDEO_START( pc1512 )
 	cga.videoram_size = 0x10000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x10000 );
 
-	address_space *space = machine.firstcpu->memory().space( AS_PROGRAM );
-	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
+	address_space *space = machine.firstcpu->space( AS_PROGRAM );
+	address_space *io_space = machine.firstcpu->space( AS_IO );
 
 	space->install_read_bank( 0xb8000, 0xbbfff, 0, 0x0C000, "bank1" );
 	machine.root_device().membank("bank1")->set_base(cga.videoram + videoram_offset[0]);

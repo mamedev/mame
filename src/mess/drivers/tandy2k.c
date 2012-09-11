@@ -49,7 +49,7 @@ void tandy2k_state::speaker_update()
 
 READ8_MEMBER( tandy2k_state::videoram_r )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
 	UINT16 data = program->read_word(addr);
@@ -319,7 +319,7 @@ UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
     tandy2k_state *state = device->machine().driver_data<tandy2k_state>();
-    address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
+    address_space *program = state->m_maincpu->space(AS_PROGRAM);
 
     for (int sx = 0; sx < x_count; sx++)
     {
@@ -670,7 +670,7 @@ static TANDY2K_KEYBOARD_INTERFACE( kb_intf )
 void tandy2k_state::machine_start()
 {
 	// memory banking
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
 

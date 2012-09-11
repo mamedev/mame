@@ -15,7 +15,7 @@ void newbrain_state::video_start()
 
 void newbrain_state::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int y, sx;
 	int columns = (m_tvctl & NEWBRAIN_VIDEO_80L) ? 80 : 40;

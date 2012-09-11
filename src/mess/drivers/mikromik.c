@@ -757,7 +757,7 @@ void mm1_state::machine_start()
 
 void mm1_state::machine_reset()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	// reset LS259

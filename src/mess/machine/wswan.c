@@ -357,7 +357,7 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 
 WRITE8_MEMBER( wswan_state::wswan_port_w )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	wswan_state *state = machine().driver_data<wswan_state>();
 	UINT8 input;
 	logerror( "PC=%X: port write %02X <- %02X\n", mem->device().safe_pc(), offset, data );

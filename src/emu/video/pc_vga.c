@@ -2015,7 +2015,7 @@ void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t m
 	int buswidth;
 	UINT64 mask = 0;
 
-	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -2440,7 +2440,7 @@ void pc_svga_trident_io_init(running_machine &machine, address_space *mem_space,
 	int buswidth;
 	UINT64 mask = 0;
 
-	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -4461,7 +4461,7 @@ void pc_vga_gamtor_io_init(running_machine &machine, address_space *mem_space, o
 	int buswidth;
 	UINT64 mask = 0;
 
-	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:

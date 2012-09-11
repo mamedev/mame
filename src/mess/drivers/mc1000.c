@@ -26,7 +26,7 @@
 
 void mc1000_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
 	membank("bank2")->set_entry(m_mc6845_bank);
@@ -323,7 +323,7 @@ static const ay8910_interface ay8910_intf =
 
 void mc1000_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup memory banking */
 	UINT8 *rom = memregion(Z80_TAG)->base();

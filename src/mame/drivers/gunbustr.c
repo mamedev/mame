@@ -443,7 +443,7 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 {
 	/* Speedup handler */
-	m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
+	m_maincpu->space(AS_PROGRAM)->install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
 }
 
 DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)

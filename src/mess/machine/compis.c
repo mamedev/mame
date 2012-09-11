@@ -1054,8 +1054,8 @@ READ16_MEMBER( compis_state::compis_i186_internal_port_r )
 
 WRITE16_MEMBER( compis_state::compis_i186_internal_port_w )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
-	address_space *io = m_maincpu->memory().space(AS_IO);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
+	address_space *io = m_maincpu->space(AS_IO);
 	int temp, which, data16 = data;
 
 	switch (offset)

@@ -1260,13 +1260,13 @@ static int c64_crt_load( device_image_interface &image )
 ***************************************************************************/
 
 #define install_write_handler(_start, _end, _handler) \
-	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(_start, _end, FUNC(_handler));
+	image.device().machine().firstcpu->space(AS_PROGRAM)->install_legacy_write_handler(_start, _end, FUNC(_handler));
 
 #define install_io1_handler(_handler) \
-	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xde00, 0xde00, 0, 0xff, FUNC(_handler));
+	image.device().machine().firstcpu->space(AS_PROGRAM)->install_legacy_write_handler(0xde00, 0xde00, 0, 0xff, FUNC(_handler));
 
 #define install_io2_handler(_handler) \
-	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
+	image.device().machine().firstcpu->space(AS_PROGRAM)->install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
 
 #define allocate_cartridge_timer(_period, _func) \
 	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>(); \
@@ -1577,7 +1577,7 @@ static void load_super_explode_cartridge(device_image_interface &image)
 
 	map_cartridge_roml(image.device().machine(), 0x0000);
 
-	address_space *space = image.device().machine().firstcpu->memory().space(AS_PROGRAM);
+	address_space *space = image.device().machine().firstcpu->space(AS_PROGRAM);
 	space->install_legacy_read_handler(0xdf00, 0xdfff, FUNC(super_explode_r));
 
 	install_io2_handler(super_explode_bank_w);

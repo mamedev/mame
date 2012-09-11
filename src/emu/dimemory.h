@@ -123,6 +123,10 @@ public:
 	bool write(address_spacenum spacenum, offs_t offset, int size, UINT64 value) { return memory_write(spacenum, offset, size, value); }
 	bool readop(offs_t offset, int size, UINT64 &value) { return memory_readop(offset, size, value); }
 
+	// deliberately ambiguous functions; if you have the memory interface
+	// just use it
+	device_memory_interface &memory() { return *this; }
+
 protected:
 	// required overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const = 0;

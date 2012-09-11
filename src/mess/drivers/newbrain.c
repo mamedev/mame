@@ -66,7 +66,7 @@ void newbrain_state::check_interrupt()
 
 void newbrain_eim_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	int bank;
 
 	for (bank = 1; bank < 9; bank++)
@@ -104,7 +104,7 @@ void newbrain_eim_state::bankswitch()
 
 void newbrain_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	int bank;
 
 	for (bank = 1; bank < 9; bank++)

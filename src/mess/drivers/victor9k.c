@@ -75,7 +75,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
 	victor9k_state *state = device->machine().driver_data<victor9k_state>();
-	address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = state->m_maincpu->space(AS_PROGRAM);
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	if (BIT(ma, 13))
@@ -926,7 +926,7 @@ void victor9k_state::machine_start()
 	device_set_irq_callback(m_maincpu, victor9k_irq_callback);
 
 	// memory banking
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 	program->install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 }
 

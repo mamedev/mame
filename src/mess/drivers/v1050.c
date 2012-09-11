@@ -126,7 +126,7 @@ void v1050_state::set_interrupt(UINT8 mask, int state)
 
 void v1050_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int bank = (m_bank >> 1) & 0x03;
 
@@ -1020,7 +1020,7 @@ static IRQ_CALLBACK( v1050_int_ack )
 
 void v1050_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// initialize SASI bus
 	m_sasibus->init_scsibus(256);

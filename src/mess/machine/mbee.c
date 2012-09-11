@@ -222,19 +222,19 @@ READ8_MEMBER( mbee_state::mbee256_speed_high_r )
 
 WRITE8_MEMBER( mbee_state::mbee_04_w )	// address
 {
-	address_space *mem = m_maincpu->memory().space(AS_IO);
+	address_space *mem = m_maincpu->space(AS_IO);
 	machine().device<mc146818_device>("rtc")->write(*mem, 0, data);
 }
 
 WRITE8_MEMBER( mbee_state::mbee_06_w )	// write
 {
-	address_space *mem = m_maincpu->memory().space(AS_IO);
+	address_space *mem = m_maincpu->space(AS_IO);
 	machine().device<mc146818_device>("rtc")->write(*mem, 1, data);
 }
 
 READ8_MEMBER( mbee_state::mbee_07_r )	// read
 {
-	address_space *mem = m_maincpu->memory().space(AS_IO);
+	address_space *mem = m_maincpu->space(AS_IO);
 	return machine().device<mc146818_device>("rtc")->read(*mem, 1);
 }
 
@@ -263,7 +263,7 @@ static TIMER_CALLBACK( mbee_rtc_irq )
 
 WRITE8_MEMBER( mbee_state::mbee256_50_w )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	// primary low banks
 	membank("boot")->set_entry((data & 3) | ((data & 0x20) >> 3));
@@ -345,7 +345,7 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 
 WRITE8_MEMBER( mbee_state::mbee128_50_w )
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	// primary low banks
 	membank("boot")->set_entry((data & 3));

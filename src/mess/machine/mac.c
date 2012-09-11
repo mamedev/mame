@@ -1814,7 +1814,7 @@ void mac_state::machine_reset()
 
 	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
 	{
-		m_awacs->set_dma_base(m_maincpu->memory().space(AS_PROGRAM), 0x10000, 0x12000);
+		m_awacs->set_dma_base(m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
 	}
 
 	// start 60.15 Hz timer for most systems

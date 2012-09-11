@@ -51,7 +51,7 @@ void bw2_state::bankswitch(UINT8 data)
 
     */
 
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int max_ram_bank = 0;
 
@@ -133,7 +133,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
     */
 
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	int max_ram_bank = BANK_RAM1;
 
@@ -200,7 +200,7 @@ void bw2_state::ramcard_bankswitch(UINT8 data)
 
 WRITE8_MEMBER( bw2_state::ramcard_bank_w )
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	UINT8 ramcard_bank = data & 0x0f;
 	UINT32 bank_offset = ramcard_bank * 0x8000;

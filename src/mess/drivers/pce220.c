@@ -337,7 +337,7 @@ WRITE8_MEMBER( pce220_state::boot_bank_w )
 	// set to 1 after boot for restore the ram in the first bank
 	if (data & 0x01)
 	{
-		address_space *space_prg = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *space_prg = m_maincpu->space(AS_PROGRAM);
 		space_prg->install_write_bank(0x0000, 0x3fff, "bank1");
 		membank("bank1")->set_entry(0);
 	}
@@ -469,7 +469,7 @@ READ8_MEMBER( pcg850v_state::g850v_bank_r )
 
 WRITE8_MEMBER( pcg850v_state::g850v_bank_w )
 {
-	address_space *space_prg = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space_prg = m_maincpu->space(AS_PROGRAM);
 
 	if (data < 0x16)
 	{
@@ -872,7 +872,7 @@ void pcg850v_state::machine_start()
 
 void pce220_state::machine_reset()
 {
-	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 	space->unmap_write(0x0000, 0x3fff);
 
 	// install the boot code into the first bank

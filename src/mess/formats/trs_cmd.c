@@ -35,7 +35,7 @@
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
-    address_space *program = image.device().machine().firstcpu->memory().space(AS_PROGRAM);
+    address_space *program = image.device().machine().firstcpu->space(AS_PROGRAM);
 
 	UINT8 type, length;
 	UINT8 data[0x100];

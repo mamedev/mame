@@ -44,7 +44,7 @@ WRITE8_MEMBER( tiki100_state::gfxram_w )
 
 void tiki100_state::bankswitch()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	if (m_vire)
 	{

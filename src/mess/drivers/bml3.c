@@ -634,7 +634,7 @@ static MACHINE_START(bml3)
 
 void bml3_state::machine_reset()
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 
 	/* defaults */
 	mem->install_rom(0xa000, 0xfeff,mem->machine().root_device().memregion("maincpu")->base() + 0xa000);
@@ -698,7 +698,7 @@ const mc6843_interface bml3_6843_if = { NULL };
 
 WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 {
-	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *mem = m_maincpu->space(AS_PROGRAM);
 	/* ROM banking:
     -0-- --0- 0xa000 - 0xbfff ROM R RAM W
     -1-- --0- 0xa000 - 0xbfff RAM R/W

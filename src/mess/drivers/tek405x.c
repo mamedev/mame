@@ -117,7 +117,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 void tek4051_state::bankswitch(UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	//int d = data & 0x07;
 	int lbs = (data >> 3) & 0x07;
@@ -1167,7 +1167,7 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 void tek4051_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
 	switch (m_ram->size())
