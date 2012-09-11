@@ -450,6 +450,23 @@ WRITE16_MEMBER(raiden2_state::cop_reg_low_w)
 	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
 }
 
+void raiden2_state::cop_take_hit_box_params(UINT8 offs)
+{
+	INT16 start_x,start_y,end_x,end_y;
+
+	start_x = INT8(cop_collision_info[offs].hitbox_x);
+	start_y = INT8(cop_collision_info[offs].hitbox_y);
+
+	end_x = INT8(cop_collision_info[offs].hitbox_x >> 8);
+	end_y = INT8(cop_collision_info[offs].hitbox_y >> 8);
+
+	cop_collision_info[offs].min_x = start_x + (cop_collision_info[offs].x >> 16);
+	cop_collision_info[offs].min_y = start_y + (cop_collision_info[offs].y >> 16);
+	cop_collision_info[offs].max_x = end_x + (cop_collision_info[offs].x >> 16);
+	cop_collision_info[offs].max_y = end_y + (cop_collision_info[offs].y >> 16);
+}
+
+
 UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine &machine)
 {
 	static UINT8 res;
@@ -458,13 +475,17 @@ UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine &machine)
 
 	/* outbound X check */
 	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
-		res &= ~1;
+		res &= ~2;
 
 	/* outbound Y check */
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
-		res &= ~2;
+		res &= ~1;
 
-	/* TODO: special collision detection for Zero Team */
+	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
+	cop_hit_val_y = (cop_collision_info[0].y - cop_collision_info[1].y) >> 16;
+	cop_hit_val_z = 1;
+	cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+
 
 	return res;
 }
@@ -570,38 +591,34 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		break;
 
 	case 0xa100:
+	case 0xa180:
 		cop_collision_info[0].y = (space.read_dword(cop_regs[0]+4));
 		cop_collision_info[0].x = (space.read_dword(cop_regs[0]+8));
 		break;
 
 	case 0xa900:
+	case 0xa980:
 		cop_collision_info[1].y = (space.read_dword(cop_regs[1]+4));
 		cop_collision_info[1].x = (space.read_dword(cop_regs[1]+8));
 		break;
 
 	case 0xb100:
-		/* Take hitbox param, TODO */
 		cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
-
-		cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
-		cop_collision_info[0].min_y = cop_collision_info[0].y + (0 << 16);
-		cop_collision_info[0].max_x = cop_collision_info[0].x + (0x10 << 16);
-		cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
+		cop_collision_info[0].hitbox_y = space.read_word((cop_regs[2]&0xffff0000)|(cop_collision_info[0].hitbox));
+		cop_collision_info[0].hitbox_x = space.read_word(((cop_regs[2]&0xffff0000)|(cop_collision_info[0].hitbox))+2);
 
 		/* do the math */
+		cop_take_hit_box_params(0);
 		cop_hit_status = cop_calculate_collsion_detection(space.machine());
 		break;
 
 	case 0xb900:
-		/* Take hitbox param, TODO */
 		cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
-
-		cop_collision_info[1].min_x = cop_collision_info[1].x + (0 << 16);
-		cop_collision_info[1].min_y = cop_collision_info[1].y + (0 << 16);
-		cop_collision_info[1].max_x = cop_collision_info[1].x + (0x10 << 16);
-		cop_collision_info[1].max_y = cop_collision_info[1].y + (0x10 << 16);
+		cop_collision_info[1].hitbox_y = space.read_word((cop_regs[3]&0xffff0000)|(cop_collision_info[1].hitbox));
+		cop_collision_info[1].hitbox_x = space.read_word(((cop_regs[3]&0xffff0000)|(cop_collision_info[1].hitbox))+2);
 
 		/* do the math */
+		cop_take_hit_box_params(1);
 		cop_hit_status = cop_calculate_collsion_detection(space.machine());
 		break;
 
@@ -1181,6 +1198,26 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_dst2_w)
 	dst2 = data;
 }
 
+READ16_MEMBER(raiden2_state::cop_collision_status_y_r)
+{
+	return cop_hit_val_y;
+}
+
+READ16_MEMBER(raiden2_state::cop_collision_status_x_r)
+{
+	return cop_hit_val_x;
+}
+
+READ16_MEMBER(raiden2_state::cop_collision_status_z_r)
+{
+	return cop_hit_val_z;
+}
+
+READ16_MEMBER(raiden2_state::cop_collision_status_unk_r)
+{
+	return cop_hit_val_unk;
+}
+
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 //  AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP // angle compare (for 0x6200 COP macro)
@@ -1210,7 +1247,10 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x004c0, 0x004c9) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
 	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
-//  AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status2_r) // used by Zero Team (only this, why?)
+	AM_RANGE(0x00582, 0x00583) AM_READ(cop_collision_status_y_r)
+	AM_RANGE(0x00584, 0x00585) AM_READ(cop_collision_status_x_r)
+	AM_RANGE(0x00586, 0x00587) AM_READ(cop_collision_status_z_r)
+	AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status_unk_r)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)

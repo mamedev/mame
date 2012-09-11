@@ -33,6 +33,11 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_cmd_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 	DECLARE_READ16_MEMBER ( cop_collision_status_r );
+	DECLARE_READ16_MEMBER (cop_collision_status_y_r);
+	DECLARE_READ16_MEMBER (cop_collision_status_x_r);
+	DECLARE_READ16_MEMBER (cop_collision_status_z_r);
+	DECLARE_READ16_MEMBER (cop_collision_status_unk_r);
+
 	DECLARE_READ16_MEMBER ( cop_status_r );
 	DECLARE_READ16_MEMBER ( cop_dist_r );
 	DECLARE_READ16_MEMBER ( cop_angle_r );
@@ -110,12 +115,15 @@ public:
 		int x,y;
 		int min_x,min_y,max_x,max_y;
 		UINT16 hitbox;
+		UINT16 hitbox_x,hitbox_y;
 	}cop_collision_info[2];
 
 	UINT16 cop_hit_status;
+	INT16 cop_hit_val_x,cop_hit_val_y,cop_hit_val_z,cop_hit_val_unk;
 
 	void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect ,int pri_mask );
 	UINT8 cop_calculate_collsion_detection(running_machine &machine);
+	void cop_take_hit_box_params(UINT8 offs);
 
 	DECLARE_DRIVER_INIT(raidendx);
 	DECLARE_DRIVER_INIT(xsedae);
