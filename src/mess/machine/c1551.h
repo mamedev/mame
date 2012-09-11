@@ -22,7 +22,7 @@
 #include "machine/6525tpi.h"
 #include "machine/c1541.h"
 #include "machine/cbmipt.h"
-#include "machine/pls100.h"
+#include "machine/pla.h"
 #include "machine/plus4exp.h"
 
 

@@ -204,6 +204,21 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "includes/c64_legacy.h"
 
 
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define A15 BIT(offset, 15)
+#define A14 BIT(offset, 14)
+#define A13 BIT(offset, 13)
+#define A12 BIT(offset, 12)
+#define A11 BIT(offset, 11)
+#define A10 BIT(offset, 10)
+#define VMA5 BIT(vma, 13)
+#define VMA4 BIT(vma, 12)
+
+
 /*************************************
  *
  *  Main CPU memory handlers
@@ -225,27 +240,55 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
  * 0xe000-0xffff ram as bank 0
  */
 
-void c128_state::bankswitch_pla(offs_t offset, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
-		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic,
+void c128_state::bankswitch_pla(offs_t offset, offs_t ta, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
+		int *sden, int *dir, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic,
 		int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb)
 {
-	//int game = m_exp->game_r(offset, ba, rw, m_hiram);
-	//int exrom = m_exp->exrom_r(offset, ba, rw, m_hiram);
-	//int vicfix = 0;
-	//int _128_256 = 1;
+	int _128_256 = 1;
+	int dmaack = 1;
+	int vicfix = 0;
+	int game = m_exp->game_r(ta, ba, rw, m_hiram);
+	int exrom = m_exp->exrom_r(ta, ba, rw, m_hiram);
+	int clk = 1;
+
+	UINT32 input = clk << 26 | m_va14 << 25 | m_charen << 24 |
+		m_hiram << 23 | m_loram << 22 | ba << 21 | VMA5 << 20 | VMA4 << 19 | ms0 << 18 | ms1 << 17 | ms2 << 16 |
+		exrom << 15 | game << 14 | rw << 13 | aec << 12 | A10 << 11 | A11 << 10 | A12 << 9 | A13 << 8 |
+		A14 << 7 | A15 << 6 | z80io << 5 | m_z80en << 4 | ms3 << 3 | vicfix << 2 | dmaack << 1 | _128_256;
+
+	UINT32 data = m_pla->read(input);
+
+	*sden = BIT(data, 0);
+	*rom4 = BIT(data, 1);
+	*rom2 = BIT(data, 2);
+	*dir = BIT(data, 3);
+	*roml = BIT(data, 4);
+	*romh = BIT(data, 5);
+	*clrbank = BIT(data, 6);
+	*from1 = BIT(data, 7);
+	*rom3 = BIT(data, 8);
+	*rom1 = BIT(data, 9);
+	*iocs = BIT(data, 10);
+	*dwe = BIT(data, 11);
+	*casenb = BIT(data, 12);
+	*vic = BIT(data, 13);
+	*ioacc = BIT(data, 14);
+	*gwe = BIT(data, 15);
+	*colorram = BIT(data, 16);
+	*charom = BIT(data, 17);
 }
 
 UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
-	int cas = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
+	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 
-	bankswitch_pla(offset, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
+	bankswitch_pla(offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
+		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
 		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
 
 	UINT8 data = 0xff;
@@ -357,14 +400,14 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
-	int cas = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
+	int sden = 1, dir = 1, gwe = 1, rom1 = 1, rom2 = 1, rom3 = 1, rom4 = 1, charom = 1, colorram = 1, vic = 1, 
 		from1 = 1, romh = 1, roml = 1, dwe = 1, ioacc = 1, clrbank = 1, iocs = 1, casenb = 1;
 	int io1 = 1, io2 = 1;
 
 	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
 
-	bankswitch_pla(offset, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
-		&cas, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
+	bankswitch_pla(offset, ta, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0,
+		&sden, &dir, &gwe, &rom1, &rom2, &rom3, &rom4, &charom, &colorram, &vic, 
 		&from1, &romh, &roml, &dwe, &ioacc, &clrbank, &iocs, &casenb);
 
 	if (!casenb && !dwe)
@@ -830,6 +873,8 @@ WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
+
+	m_z80en = state;
 }
 
 WRITE_LINE_MEMBER( c128_state::mmu_fsdir_w )
@@ -1063,6 +1108,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 
 	// devices
 	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
+	MCFG_MOS8721_ADD(MOS8721_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, c128_cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, c128_cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1169,6 +1215,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 
 	// devices
 	MCFG_MOS8722_ADD(MOS8722_TAG, mmu_intf)
+	MCFG_MOS8721_ADD(MOS8721_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, c128_cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, c128_cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1259,6 +1306,9 @@ ROM_START( c128 )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )		// Character
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1280,6 +1330,9 @@ ROM_START( c128cr )
 	ROM_LOAD( "390059-01.u18", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character, "MOS // (C)1985 CBM // 390059-01 // M468613 8547H"
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1302,6 +1355,9 @@ ROM_START( c128ger )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )		// Character
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1320,6 +1376,9 @@ ROM_START( c128sfi )
 	ROM_LOAD( "325181-02.u18", 0x120000, 0x2000, BAD_DUMP CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) ) // C128 Char Sw/Fi
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1338,6 +1397,9 @@ ROM_START( c128fra )
 	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1357,6 +1419,9 @@ ROM_START( c128nor )
 	ROM_LOAD( "char.nor", 0x120000, 0x2000, BAD_DUMP CRC(ba95c625) SHA1(5a87faa457979e7b6f434251a9e32f4483b337b3) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1374,6 +1439,9 @@ ROM_START( c128d )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1396,6 +1464,9 @@ ROM_START( c128dcr )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )			// Character
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1410,6 +1481,9 @@ ROM_START( c128drde )
 	ROM_LOAD( "315079-01.bin", 0x120000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1424,6 +1498,9 @@ ROM_START( c128drsw )
 	ROM_LOAD( "325181-01.bin", 0x120000, 0x2000, CRC(7a70d9b8) SHA1(aca3f7321ee7e6152f1f0afad646ae41964de4fb) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1441,6 +1518,9 @@ ROM_START( c128drit )
 	ROM_LOAD( "325167-01.bin", 0x120000, 0x2000, BAD_DUMP CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1457,6 +1537,9 @@ ROM_START( c128d81 )
 	ROM_LOAD( "390059-01.bin", 0x120000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
 
 	ROM_REGION( 0x10000, M8502_TAG, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x100, MOS8721_TAG, 0 )
+	ROM_LOAD( "8721r3.u11", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 

@@ -26,8 +26,8 @@
 
 #pragma once
 
-#ifndef __PLS100__
-#define __PLS100__
+#ifndef __PLA__
+#define __PLA__
 
 #include "emu.h"
 #include "jedparse.h"
@@ -38,9 +38,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define PAL_INPUTS		16
-#define PAL_OUTPUTS		8
-#define PAL_TERMS		48
+#define MAX_TERMS       512
 
 
 
@@ -51,42 +49,67 @@
 #define MCFG_PLS100_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PLS100, 0)
 
+#define MCFG_MOS8721_ADD(_tag) \
+    MCFG_DEVICE_ADD(_tag, MOS8721, 0)
 
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> pls100_device
+// ======================> pla_device
 
-class pls100_device :	public device_t
+class pla_device :	public device_t
 {
 public:
     // construction/destruction
-    pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask);
 
-	UINT8 read(UINT16 input);
+	UINT32 read(UINT32 input);
 
 protected:
     // device-level overrides
     virtual void device_start();
 
-private:
 	inline void parse_fusemap();
 	inline int get_product(int term);
 	inline void update_outputs();
 
-	UINT16 m_i;
-	UINT8 m_s;
-	UINT16 m_and_true[PAL_TERMS];
-	UINT16 m_and_comp[PAL_TERMS];
-	UINT16 m_or[PAL_TERMS];
-	UINT8 m_xor;
+    int m_inputs;
+    int m_outputs;
+    int m_terms;
+    UINT32 m_output_mask;
+
+	UINT32 m_i;
+	UINT32 m_s;
+	UINT32 m_and_true[MAX_TERMS];
+	UINT32 m_and_comp[MAX_TERMS];
+	UINT32 m_or[MAX_TERMS];
+	UINT32 m_xor;
+};
+
+
+// ======================> pls100_device
+
+class pls100_device : public pla_device
+{
+public:
+    pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> mos8721_device
+
+class mos8721_device : public pla_device
+{
+public:
+    mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 // device type definition
 extern const device_type PLS100;
+extern const device_type MOS8721;
 
 
 

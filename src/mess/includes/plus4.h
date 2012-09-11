@@ -15,7 +15,7 @@
 #include "machine/cbmipt.h"
 #include "machine/mos6529.h"
 #include "machine/petcass.h"
-#include "machine/pls100.h"
+#include "machine/pla.h"
 #include "machine/ram.h"
 
 #define MOS7501_TAG			"u2"

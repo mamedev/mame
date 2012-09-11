@@ -24,6 +24,7 @@
 #include "machine/cbmipt.h"
 #include "machine/mos8722.h"
 #include "machine/petcass.h"
+#include "machine/pla.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
@@ -57,6 +58,7 @@ public:
 		  m_maincpu(*this, Z80A_TAG),
 		  m_subcpu(*this, M8502_TAG),
 		  m_mmu(*this, MOS8722_TAG),
+		  m_pla(*this, MOS8721_TAG),
 		  m_vdc(*this, MOS8563_TAG),
 		  m_vic(*this, MOS8564_TAG),
 		  m_sid(*this, MOS6581_TAG),
@@ -80,6 +82,7 @@ public:
 	required_device<legacy_cpu_device> m_maincpu;
 	required_device<legacy_cpu_device> m_subcpu;
 	required_device<mos8722_device> m_mmu;
+	required_device<mos8721_device> m_pla;
 	required_device<mos8563_device> m_vdc;
 	required_device<mos6566_device> m_vic;
 	required_device<sid6581_device> m_sid;
@@ -96,8 +99,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	void bankswitch_pla(offs_t offset, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
-		int *cas, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb);
+	void bankswitch_pla(offs_t offset, offs_t ta, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0,
+		int *sden, int *dir, int *gwe, int *rom1, int *rom2, int *rom3, int *rom4, int *charom, int *colorram, int *vic, int *from1, int *romh, int *roml, int *dwe, int *ioacc, int *clrbank, int *iocs, int *casenb);
 	UINT8 read_memory(address_space &space, offs_t offset, offs_t vma, int ba, int aec, int z80io);
 	void write_memory(address_space &space, offs_t offset, offs_t vma, UINT8 data, int ba, int aec, int z80io);
 
@@ -171,6 +174,12 @@ public:
 	void bankswitch(int reset);
 	void mmu8722_reset();
 
+	// memory state
+	int m_loram;
+	int m_hiram;
+	int m_charen;
+	int m_va14;
+	int m_va15;
 	const UINT8 *m_rom1;
 	const UINT8 *m_rom2;
 	const UINT8 *m_rom3;

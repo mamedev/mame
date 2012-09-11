@@ -294,6 +294,10 @@ WRITE8_MEMBER( c128_state::cia2_pa_w )
 
 	m_vicaddr = m_memory + helper[data & 0x03];
 	m_c128_vicaddr = m_memory + helper[data & 0x03] + m_va1617;
+
+	// VIC banking
+	m_va14 = BIT(data, 0);
+	m_va15 = BIT(data, 1);
 }
 
 WRITE_LINE_MEMBER( c128_state::cia2_irq_w )
@@ -994,15 +998,35 @@ READ8_MEMBER( c128_state::vic_dma_read_color )
 
 WRITE8_MEMBER( c128_state::cpu_w )
 {
+	/*
+
+        bit     description
+
+        P0      LORAM
+        P1      HIRAM
+        P2      CHAREN
+        P3      CASS WRT
+        P4
+        P5      CASS MOTOR
+        P6
+
+    */
+
+    // memory banking
+	m_loram = BIT(data, 0);
+	m_hiram = BIT(data, 1);
+	m_charen = BIT(data, 2);
+
+	// cassette write
 	m_cassette->write(BIT(data, 3));
 
+	// cassette motor
 	m_cassette->motor_w(BIT(data, 5));
 
 	bankswitch_64(0);
 
 	m_memory[0x000] = m_subcpu->memory().space(AS_PROGRAM)->read_byte(0);
 	m_memory[0x001] = m_subcpu->memory().space(AS_PROGRAM)->read_byte(1);
-
 }
 
 READ8_MEMBER( c128_state::cpu_r)

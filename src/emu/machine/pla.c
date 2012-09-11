@@ -7,8 +7,7 @@
 
 **********************************************************************/
 
-#include "emu.h"
-#include "pls100.h"
+#include "pla.h"
 
 
 
@@ -17,6 +16,7 @@
 //**************************************************************************
 
 const device_type PLS100 = &device_creator<pls100_device>;
+const device_type MOS8721 = &device_creator<mos8721_device>;
 
 
 
@@ -28,32 +28,32 @@ const device_type PLS100 = &device_creator<pls100_device>;
 //  parse_fusemap -
 //-------------------------------------------------
 
-inline void pls100_device::parse_fusemap()
+inline void pla_device::parse_fusemap()
 {
 	jed_data jed;
 	jedbin_parse(machine().root_device().memregion(tag())->base(), machine().root_device().memregion(tag())->bytes(), &jed);
 	UINT32 fusenum = 0;
 	m_xor = 0;
 
-	for (int term = 0; term < PAL_TERMS; term++)
+	for (int term = 0; term < m_terms; term++)
 	{
 		m_and_comp[term] = 0;
 		m_and_true[term] = 0;
 		m_or[term] = 0;
 
-		for (int i = 0; i < PAL_INPUTS; i++)
+		for (int i = 0; i < m_inputs; i++)
 		{
 			m_and_comp[term] |= jed_get_fuse(&jed, fusenum++) << i;
 			m_and_true[term] |= jed_get_fuse(&jed, fusenum++) << i;
 		}
 
-		for (int f = 0; f < PAL_OUTPUTS; f++)
+		for (int f = 0; f < m_outputs; f++)
 		{
 			m_or[term] |= !jed_get_fuse(&jed, fusenum++) << f;
 		}
 	}
 
-	for (int f = 0; f < PAL_OUTPUTS; f++)
+	for (int f = 0; f < m_outputs; f++)
 	{
 		m_xor |= jed_get_fuse(&jed, fusenum++) << f;
 	}
@@ -64,12 +64,12 @@ inline void pls100_device::parse_fusemap()
 //  get_product -
 //-------------------------------------------------
 
-inline int pls100_device::get_product(int term)
+inline int pla_device::get_product(int term)
 {
-	UINT16 input_true = m_and_true[term] | m_i;
-	UINT16 input_comp = m_and_comp[term] | (m_i ^ 0xffff);
+	UINT32 input_true = m_and_true[term] | m_i;
+	UINT32 input_comp = m_and_comp[term] | ~m_i;
 
-	return (input_true & input_comp) == 0xffff;
+	return ((input_true & input_comp) & m_output_mask) == m_output_mask;
 }
 
 
@@ -77,11 +77,11 @@ inline int pls100_device::get_product(int term)
 //  update_outputs -
 //-------------------------------------------------
 
-inline void pls100_device::update_outputs()
+inline void pla_device::update_outputs()
 {
 	m_s = 0;
 
-	for (int term = 0; term < PAL_TERMS; term++)
+	for (int term = 0; term < m_terms; term++)
 	{
 		if (get_product(term))
 		{
@@ -97,11 +97,25 @@ inline void pls100_device::update_outputs()
 //**************************************************************************
 
 //-------------------------------------------------
-//  pls100_device - constructor
+//  pla_device - constructor
 //-------------------------------------------------
 
+pla_device::pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  m_inputs(inputs),
+	  m_outputs(outputs),
+	  m_terms(terms),
+	  m_output_mask(output_mask)
+{
+}
+
 pls100_device::pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PLS100, "PLS100", tag, owner, clock)
+    : pla_device(mconfig, PLS100, "PLS100", tag, owner, clock, 16, 8, 48, 0xffff)
+{
+}
+
+mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : pla_device(mconfig, MOS8721, "MOS8721", tag, owner, clock, 27, 18, 48, 0x7ffffff)
 {
 }
 
@@ -110,7 +124,7 @@ pls100_device::pls100_device(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pls100_device::device_start()
+void pla_device::device_start()
 {
 	// parse fusemap
 	assert(machine().root_device().memregion(tag()) != NULL);
@@ -126,7 +140,7 @@ void pls100_device::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 pls100_device::read(UINT16 input)
+UINT32 pla_device::read(UINT32 input)
 {
 	m_i = input;
 

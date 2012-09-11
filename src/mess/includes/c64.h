@@ -13,7 +13,7 @@
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "machine/petcass.h"
-#include "machine/pls100.h"
+#include "machine/pla.h"
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
