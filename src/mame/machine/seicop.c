@@ -1729,7 +1729,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 static UINT16 cop_status,cop_dist,cop_angle;
 static UINT16 cop_hit_status;
-static INT32 cop_hit_val_x,cop_hit_val_y;
+static INT16 cop_hit_val_x,cop_hit_val_y,cop_hit_val_z,cop_hit_val_unk;
 static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
 static INT8 cop_angle_compare;
 static UINT8 cop_angle_mod_val;
@@ -1738,6 +1738,7 @@ static struct
 	int x,y;
 	int min_x,min_y,max_x,max_y;
 	UINT16 hitbox;
+	UINT16 hitbox_x,hitbox_y;
 }cop_collision_info[2];
 
 /* RE from Seibu Cup Soccer bootleg */
@@ -1757,6 +1758,14 @@ static UINT16 u1,u2;
 	u1 == _u1_ && u2 == _u2_) \
 
 
+/*
+Godzilla 0x12c0 height 50m
+Megaron  0x12d0 height 55m
+King Ghidorah 0x12c8 100m
+Mecha Ghidorah 0x12dc 140m
+Mecha Godzilla 0x12d4 50m
+Gigan 0x12cc 55m
+*/
 static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 {
 	static UINT8 res;
@@ -1773,14 +1782,17 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 
 	/* TODO: Legionnaire does collision detection via the other two regs,
              for now just implement a version that allows the player to spam flying kicks and hit everything else on the screen ;-) */
-	cop_hit_val_x = (res & 1) ? cop_collision_info[0].max_x - cop_collision_info[1].min_x : 0;
-	cop_hit_val_y = (res & 2) ? cop_collision_info[0].max_y - cop_collision_info[1].min_y : 0;
+	cop_hit_val_x = (cop_collision_info[0].min_x - cop_collision_info[1].min_x) >> 16;
+	cop_hit_val_y = (cop_collision_info[0].min_y - cop_collision_info[1].min_y) >> 16;
+	cop_hit_val_z = 1;
+	cop_hit_val_unk = 0;//((cop_collision_info[0].min_y >> 16) != (cop_collision_info[1].min_y >> 16));
 
 	//if(res == 0)
-	//  printf("0:%08x %08x 1:%08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].min_y,cop_collision_info[1].min_x,cop_collision_info[1].min_y);
+	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
 
 	return res;
 }
+
 
 static READ16_HANDLER( generic_cop_r )
 {
@@ -1802,18 +1814,18 @@ static READ16_HANDLER( generic_cop_r )
 			return cop_hit_status;
 
 		/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
-		case 0x184/2:
-			return (cop_hit_val_x & 0xffff0000) >> 16;
-
 		case 0x182/2:
-			return cop_hit_val_x & 0xffff;
+			return (cop_hit_val_y);
 
-		/* Legionnaire only - y value compare? */
-		case 0x188/2:
-			return (cop_hit_val_y & 0xffff0000) >> 16;
+		case 0x184/2:
+			return (cop_hit_val_x);
 
+		/* Legionnaire only - z value compare? */
 		case 0x186/2:
-			return cop_hit_val_y & 0xffff;
+			return (cop_hit_val_z);
+
+		case 0x188/2:
+			return cop_hit_val_unk;
 
 		/* BCD */
 		case 0x190/2:
@@ -2286,25 +2298,30 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
 			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
-				/* Take hitbox param, TODO */
+				UINT8 start_x,start_y,end_x,end_y;
 				cop_collision_info[0].hitbox = space->read_word(cop_register[2]);
+				cop_collision_info[0].hitbox_y = space->read_word((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox));
+				cop_collision_info[0].hitbox_x = space->read_word(((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox))+2);
+				// TODO: z
 
-				if(cop_collision_info[0].hitbox == 0xc8) //hack for SD Gundam
-				{
-					cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
-					cop_collision_info[0].min_y = cop_collision_info[0].y - (0x10 << 16);
-					cop_collision_info[0].max_x = cop_collision_info[0].x + (0xc0 << 16);
-					cop_collision_info[0].max_y = cop_collision_info[0].y + (0 << 16);
-				}
+				start_x = (cop_collision_info[0].hitbox_x & 0xff);
+				start_y = (cop_collision_info[0].hitbox_y & 0xff);
+				end_x = (cop_collision_info[0].hitbox_x >> 8);
+				end_y = (cop_collision_info[0].hitbox_y >> 8);
+
+				/* TODO: understand this one */
+				if(start_x == 0)
+					cop_collision_info[0].min_x = cop_collision_info[0].x - ((0x10) << 16);
 				else
-				{
-					cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
-					cop_collision_info[0].min_y = cop_collision_info[0].y + (0 << 16);
-					cop_collision_info[0].max_x = cop_collision_info[0].x + (0x10 << 16);
-					cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
-				}
+					cop_collision_info[0].min_x = cop_collision_info[0].x + ((0) << 16);
+
+				cop_collision_info[0].min_y = cop_collision_info[0].y + ((0) << 16);
+				cop_collision_info[0].max_x = cop_collision_info[0].x + ((end_x) << 16);
+				cop_collision_info[0].max_y = cop_collision_info[0].y + ((end_y) << 16);
+
 				/* do the math */
 				cop_hit_status = cop_calculate_collsion_detection(space->machine());
+
 				return;
 			}
 
@@ -2318,16 +2335,30 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
 			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
+				UINT8 start_x,start_y, end_x,end_y;
+
 				/* Take hitbox param, TODO */
 				cop_collision_info[1].hitbox = space->read_word(cop_register[3]);
+				cop_collision_info[1].hitbox_y = space->read_word((cop_register[3]&0xffff0000)|(cop_collision_info[1].hitbox));
+				cop_collision_info[1].hitbox_x = space->read_word(((cop_register[3]&0xffff0000)|(cop_collision_info[1].hitbox))+2);
+				// TODO: z
 
-				cop_collision_info[1].min_x = cop_collision_info[1].x + (0 << 16);
-				cop_collision_info[1].min_y = cop_collision_info[1].y + (0 << 16);
-				cop_collision_info[1].max_x = cop_collision_info[1].x + (0x10 << 16);
-				cop_collision_info[1].max_y = cop_collision_info[1].y + (0x10 << 16);
+				start_x = (cop_collision_info[0].hitbox_x & 0xff);
+				start_y = (cop_collision_info[0].hitbox_y & 0xff);
+				end_x = (cop_collision_info[0].hitbox_x >> 8);
+				end_y = (cop_collision_info[0].hitbox_y >> 8);
+
+				/* TODO: understand this one */
+				if(start_x == 0)
+					cop_collision_info[1].min_x = cop_collision_info[1].x - ((0x10) << 16);
+				else
+					cop_collision_info[1].min_x = cop_collision_info[1].x + ((0) << 16);
+
+				cop_collision_info[1].min_y = cop_collision_info[1].y + ((0) << 16);
+				cop_collision_info[1].max_x = cop_collision_info[1].x + ((end_x) << 16);
+				cop_collision_info[1].max_y = cop_collision_info[1].y + ((end_y) << 16);
 
 				//if(cop_collision_info[0].x || cop_collision_info[1].x)
-				//popmessage("0: %08x %08x %08x 1: %08x %08x %08x",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
 
 				/* do the math */
 				cop_hit_status = cop_calculate_collsion_detection(space->machine());

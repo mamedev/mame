@@ -2305,7 +2305,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         RO
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (Electronic Devices license)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_IMPERFECT_GRAPHICS )
 
