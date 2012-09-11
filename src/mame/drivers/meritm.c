@@ -29,9 +29,9 @@
   Known Games:
 
   CRT 250:
+  Dodge City (c) 1988
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
-  * Dodge City (c) 1989
   Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
   *Pit Boss Superstar III 30 (c)1993?
@@ -52,8 +52,6 @@
   Megatouch 6 (c)1998
   *Megatouch 7 Encore (c)2000
 
-  * indicates that game needs to be dumped or redumped
-    Dodge City: 9131-02 (U9 through U11)
 
 Custom Program Versions (from different Megatouch manuals):
 
@@ -708,6 +706,46 @@ static INPUT_PORTS_START(meritm_crt250)
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(dodgecty)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("PIO1_PORTA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Hold 1 / Take / Lo" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Hold 2" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Hold 3" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Hold 4" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Hold 5 / Double Up / Hi" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Bet" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Deal" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START(pitbossm)
 	PORT_INCLUDE(meritm_crt250)
 
@@ -1148,6 +1186,13 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 
 MACHINE_CONFIG_END
 
+
+ROM_START( dodgecty ) /* Use small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9131-02_u9-2t.u9",  0x00000, 0x10000, CRC(22e73039) SHA1(368f03b31f7c3cb81a95b20d1cb954e8557d2017) ) /* 9131-02 U9-2T  880111 */
+	ROM_LOAD( "9131-02_u10-0.u10", 0x10000, 0x10000, CRC(bc3391f3) SHA1(4df46f31489bc5e3de3f6fc917e23b9bb5231e5a) )
+	ROM_LOAD( "9131-02_u11-0.u11", 0x20000, 0x10000, CRC(f137d70c) SHA1(8ec04ec17300aa3a6ef14bcca1ca1c2aec0eea18) )
+ROM_END
 
 /*
     Pit Boss II - Merit Industries Inc. 1988
@@ -2025,6 +2070,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat6)
 }
 
 /* CRT 250 */
+GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,      driver_device, 0, ROT0, "Merit", "Dodge City (9131-02)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, pitboss2,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, spitboss,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosss,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", GAME_IMPERFECT_GRAPHICS )

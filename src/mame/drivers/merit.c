@@ -1914,24 +1914,32 @@ ROM_START( phrcrazev )
 	ROM_LOAD( "phrz1-07_sex-1a", 0x90000, 0x8000, CRC(ed7604b8) SHA1(b1e841b50b8ef6ae95fafac1c34b6d0337a05d18) )
 ROM_END
 
-ROM_START( dodge )
+ROM_START( dodgectya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2131-82.u5",     0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) )
+	ROM_LOAD( "2131-82.u5", 0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-    /*
-    dodge.u37        1ST AND 2ND HALF IDENTICAL
-    dodge.u38        1ST AND 2ND HALF IDENTICAL
-    dodge.u39        1ST AND 2ND HALF IDENTICAL */
+	ROM_LOAD( "dodg_u39.u39", 0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) ) /* These 3 roms: 1st & 2nd half identical - Verified correct */
+	ROM_LOAD( "dodg_u38.u38", 0x08000, 0x8000, CRC(654d5b00) SHA1(9e16330b2dc8821fc20a39eb42176fda23085bfc) )
+	ROM_LOAD( "dodg_u37.u37", 0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
 
-	ROM_LOAD( "dodge.u39",    0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) )
-	ROM_LOAD( "dodge.u38",    0x08000, 0x8000, CRC(654d5b00) SHA1(9e16330b2dc8821fc20a39eb42176fda23085bfc) )
-	ROM_LOAD( "dodge.u37",    0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
-
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_ERASEFF )
-    /* socket at position u40 is unpopulated */
-	ROM_LOAD( "dodge.u40",    0x00000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x0800, "gfx2", ROMREGION_ERASEFF )
+	ROM_LOAD( "ctr-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
 ROM_END
+
+ROM_START( dodgectyb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-82_gt.u5", 0x0000, 0x8000, CRC(3858cd50) SHA1(1b1e208076df964afd68d01aa8d5489d36a934a5) ) /* Hand written label */
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "dodg_u39.u39", 0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) ) /* These 3 roms: 1st & 2nd half identical - Verified correct */
+	ROM_LOAD( "dodg_u38.u38", 0x08000, 0x8000, CRC(654d5b00) SHA1(9e16330b2dc8821fc20a39eb42176fda23085bfc) )
+	ROM_LOAD( "dodg_u37.u37", 0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
+
+	ROM_REGION( 0x0800, "gfx2", ROMREGION_ERASEFF )
+	ROM_LOAD( "ctr-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+ROM_END
+
 
 ROM_START( couple )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -2099,9 +2107,10 @@ GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "
 GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (Expanded Questions, set 2)",    GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit, Vertical)",            GAME_SUPPORTS_SAVE )
 
-GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,      ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )
+GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,      ROT0,  "Merit", "Big Apple Games",                           GAME_SUPPORTS_SAVE )
 
-GAME( 1986, dodge,    0,       dodge,    couple, driver_device,   0,      ROT0,  "Merit", "Dodge City",                                  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectya,dodgecty,dodge,    couple, driver_device,   0,      ROT0,  "Merit", "Dodge City (2131-82, set 1)",               GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectyb,dodgecty,dodge,    couple, driver_device,   0,      ROT0,  "Merit", "Dodge City (2131-82, set 2)",               GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5, merit_state,  dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (Edition 5)",  GAME_SUPPORTS_SAVE )
 
