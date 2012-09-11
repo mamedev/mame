@@ -1218,6 +1218,78 @@ READ16_MEMBER(raiden2_state::cop_collision_status_unk_r)
 	return cop_hit_val_unk;
 }
 
+WRITE16_MEMBER(raiden2_state::cop_sort_lookup_hi_w)
+{
+	cop_sort_lookup = (cop_sort_lookup&0x0000ffff)|(data<<16);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_sort_lookup_lo_w)
+{
+	cop_sort_lookup = (cop_sort_lookup&0xffff0000)|(data&0xffff);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_sort_ram_addr_hi_w)
+{
+	cop_sort_ram_addr = (cop_sort_ram_addr&0x0000ffff)|(data<<16);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_sort_ram_addr_lo_w)
+{
+	cop_sort_ram_addr = (cop_sort_ram_addr&0xffff0000)|(data&0xffff);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_sort_param_w)
+{
+	cop_sort_param = data;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_sort_dma_trig_w)
+{
+	UINT16 sort_size;
+
+	sort_size = data;
+
+	//printf("%04x %04x %04x %04x\n",cop_sort_ram_addr,cop_sort_lookup,cop_sort_param,data);
+
+	{
+		int i,j;
+		UINT8 xchg_flag;
+		UINT32 addri,addrj;
+		UINT16 vali,valj;
+
+		/* TODO: use a better algorithm than bubble sort! */
+		for(i=2;i<sort_size;i+=2)
+		{
+			for(j=i-2;j<sort_size;j+=2)
+			{
+				addri = cop_sort_ram_addr+space.read_word(cop_sort_lookup+i);
+				addrj = cop_sort_ram_addr+space.read_word(cop_sort_lookup+j);
+
+				vali = space.read_word(addri);
+				valj = space.read_word(addrj);
+
+				//printf("%08x %08x %04x %04x\n",addri,addrj,vali,valj);
+
+				switch(cop_sort_param)
+				{
+					case 2:	xchg_flag = (vali > valj); break;
+					case 1: xchg_flag = (vali < valj); break;
+					default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); break;
+				}
+
+				if(xchg_flag)
+				{
+					UINT16 xch_val;
+
+					xch_val = space.read_word(cop_sort_lookup+i);
+					space.write_word(cop_sort_lookup+i,space.read_word(cop_sort_lookup+j));
+					space.write_word(cop_sort_lookup+j,xch_val);
+				}
+			}
+		}
+	}
+}
+
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 //  AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP // angle compare (for 0x6200 COP macro)
@@ -1233,7 +1305,11 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
-	AM_RANGE(0x00450, 0x00459) AM_WRITENOP //sort-DMA params, Zero Team uses it
+	AM_RANGE(0x00450, 0x00451) AM_WRITE(cop_sort_ram_addr_hi_w)
+	AM_RANGE(0x00452, 0x00453) AM_WRITE(cop_sort_ram_addr_lo_w)
+	AM_RANGE(0x00454, 0x00455) AM_WRITE(cop_sort_lookup_hi_w)
+	AM_RANGE(0x00456, 0x00457) AM_WRITE(cop_sort_lookup_lo_w)
+	AM_RANGE(0x00458, 0x00459) AM_WRITE(cop_sort_param_w)
 	AM_RANGE(0x0045a, 0x0045b) AM_WRITENOP //palette DMA brightness val, used by X Se Dae / Zero Team
 	AM_RANGE(0x0045c, 0x0045d) AM_WRITENOP //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
@@ -1276,7 +1352,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(sprite_prot_dst2_r) AM_WRITE(sprite_prot_dst2_w)
 	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
-	AM_RANGE(0x006fe, 0x006ff) AM_WRITENOP // sort-DMA trigger
+	AM_RANGE(0x006fe, 0x006ff) AM_WRITE(cop_sort_dma_trig_w) // sort-DMA trigger
 
 	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
 ADDRESS_MAP_END

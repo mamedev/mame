@@ -125,6 +125,16 @@ public:
 	UINT8 cop_calculate_collsion_detection(running_machine &machine);
 	void cop_take_hit_box_params(UINT8 offs);
 
+	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_hi_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_ram_addr_lo_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_param_w);
+	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
+
+	UINT32 cop_sort_ram_addr, cop_sort_lookup;
+	UINT16 cop_sort_param;
+
 	DECLARE_DRIVER_INIT(raidendx);
 	DECLARE_DRIVER_INIT(xsedae);
 	DECLARE_DRIVER_INIT(zeroteam);
