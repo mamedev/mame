@@ -48,7 +48,7 @@
 
 
 Sega X-Board System Overview
-Sega, 1987-1990
+Sega, 1987-1992
 
 The following games are known to exist on the X-Board hardware...
 
