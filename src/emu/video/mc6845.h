@@ -283,7 +283,8 @@ protected:
 	void set_vsync(int state);
 	void set_cur(int state);
 	void handle_line_timer();
-	void update_cursor_state();
+	virtual void update_cursor_state();
+	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
 };
 
 
@@ -407,6 +408,9 @@ protected:
 	UINT8 m_char_buffer[80];
 	UINT8 m_attr_buffer[80];
 
+	bool	m_char_blink_state;
+	UINT8	m_char_blink_count;
+
 	/* register file */
 	UINT16	m_attribute_addr;		/* 0x14/0x15 */
 	UINT8	m_horiz_char;			/* 0x16 */
@@ -423,6 +427,9 @@ protected:
 	UINT16	m_de_begin;				/* 0x22/0x23 */
 	UINT8	m_dram_refresh;			/* 0x24 */
 	UINT8	m_sync_polarity;		/* 0x25 */
+
+	virtual void update_cursor_state();
+	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
 };
 
 class mos8568_device : public mos8563_device

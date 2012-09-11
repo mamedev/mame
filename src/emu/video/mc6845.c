@@ -22,6 +22,20 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- mos8563
+
+		- horizontal scroll
+		- vertical scroll
+		- pixel double width
+		- bitmap modes
+		- display enable begin/end
+
+*/
+
 #include "emu.h"
 #include "mc6845.h"
 #include "machine/devhelpr.h"
@@ -369,8 +383,8 @@ WRITE8_MEMBER( mos8563_device::register_w )
 		case 0x15:  m_attribute_addr   = ((data & 0xff) << 0) | (m_attribute_addr & 0xff00); break;
 		case 0x16: 	m_horiz_char       =   data & 0xff; break;
 		case 0x17:	m_vert_char_disp   =   data & 0x1f; break;
-		case 0x18:	m_vert_scroll	   =   data & 0x1f; break;
-		case 0x19:	m_horiz_scroll	   =   data & 0x1f; break;
+		case 0x18:	m_vert_scroll	   =   data & 0xff; break;
+		case 0x19:	m_horiz_scroll	   =   data & 0xff; break;
 		case 0x1a:	m_color	   		   =   data & 0xff; break;
 		case 0x1b:	m_row_addr_incr	   =   data & 0xff; break;
 		case 0x1c:	m_char_base_addr   =   data & 0xf0; break;
@@ -856,6 +870,43 @@ void mc6845_device::update_cursor_state()
 }
 
 
+UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param)
+{
+	/* compute the current raster line */
+	UINT8 ra = y % (m_max_ras_addr + 1);
+
+	/* check if the cursor is visible and is on this scanline */
+	int cursor_visible = m_cursor_state &&
+						(ra >= (m_cursor_start_ras & 0x1f)) &&
+						(ra <= m_cursor_end_ras) &&
+						(m_cursor_addr >= m_current_disp_addr) &&
+						(m_cursor_addr < (m_current_disp_addr + m_horiz_disp));
+
+	/* compute the cursor X position, or -1 if not visible */
+	INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
+
+	/* call the external system to draw it */
+	if (MODE_ROW_COLUMN_ADDRESSING)
+	{
+		UINT8 cc = 0;
+		UINT8 cr = y / (m_max_ras_addr + 1);
+		UINT16 ma = (cr << 8) | cc;
+
+		m_update_row(this, bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, param);
+	}
+	else
+	{
+		m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, param);
+	}
+
+	/* update MA if the last raster address */
+	if (ra == m_max_ras_addr)
+		m_current_disp_addr = (m_current_disp_addr + m_horiz_disp) & 0x3fff;
+
+	return ra;
+}
+
+
 UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	assert(bitmap.valid());
@@ -881,36 +932,7 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		/* for each row in the visible region */
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			/* compute the current raster line */
-			UINT8 ra = y % (m_max_ras_addr + 1);
-
-			/* check if the cursor is visible and is on this scanline */
-			int cursor_visible = m_cursor_state &&
-								(ra >= (m_cursor_start_ras & 0x1f)) &&
-								(ra <= m_cursor_end_ras) &&
-								(m_cursor_addr >= m_current_disp_addr) &&
-								(m_cursor_addr < (m_current_disp_addr + m_horiz_disp));
-
-			/* compute the cursor X position, or -1 if not visible */
-			INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
-
-			/* call the external system to draw it */
-			if (MODE_ROW_COLUMN_ADDRESSING)
-			{
-				UINT8 cc = 0;
-				UINT8 cr = y / (m_max_ras_addr + 1);
-				UINT16 ma = (cr << 8) | cc;
-
-				m_update_row(this, bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, param);
-			}
-			else
-			{
-				m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, param);
-			}
-
-			/* update MA if the last raster address */
-			if (ra == m_max_ras_addr)
-				m_current_disp_addr = (m_current_disp_addr + m_horiz_disp) & 0x3fff;
+			this->draw_scanline(y, bitmap, cliprect, param);
 		}
 
 		/* call the tear down function if any */
@@ -1171,6 +1193,24 @@ void mos8563_device::device_start()
 
 	m_update_row = vdc_update_row;
 
+	m_char_blink_state = false;
+	m_char_blink_count = 0;
+	m_attribute_addr = 0;
+	m_horiz_char = 0;
+	m_vert_char_disp = 0;
+	m_vert_scroll = 0;
+	m_horiz_scroll = 0;
+	m_color = 0;
+	m_row_addr_incr = 0;
+	m_char_base_addr = 0;
+	m_underline_ras = 0;
+	m_word_count = 0;
+	m_data = 0;
+	m_block_addr = 0;
+	m_de_begin = 0;
+	m_dram_refresh = 0;
+	m_sync_polarity = 0;
+
 	save_item(NAME(m_char_buffer));
 	save_item(NAME(m_attr_buffer));
 	save_item(NAME(m_attribute_addr));
@@ -1187,14 +1227,13 @@ void mos8563_device::device_start()
 	save_item(NAME(m_block_addr));
 	save_item(NAME(m_de_begin));
 	save_item(NAME(m_dram_refresh));
+	save_item(NAME(m_sync_polarity));
 }
 
 
 void mos8568_device::device_start()
 {
 	mos8563_device::device_start();
-
-	save_item(NAME(m_sync_polarity));
 }
 
 
@@ -1362,6 +1401,39 @@ static const rgb_t MOS8563_PALETTE[] =
 };
 
 
+void mos8563_device::update_cursor_state()
+{
+	mc6845_device::update_cursor_state();
+
+	/* save and increment character blink counter */
+	UINT8 last_char_blink_count = m_char_blink_count;
+	m_char_blink_count++;
+
+	/* switch on character blinking mode */
+	if (VSS_CBRATE)
+	{
+		if ((last_char_blink_count & 0x20) != (m_char_blink_count & 0x20))
+			m_char_blink_state = !m_char_blink_state;
+	}
+	else
+	{
+		if ((last_char_blink_count & 0x10) != (m_char_blink_count & 0x10))
+			m_char_blink_state = !m_char_blink_state;
+	}
+}
+
+
+UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param)
+{
+	UINT8 ra = mc6845_device::draw_scanline(y, bitmap, cliprect, param);
+
+	if (ra == m_max_ras_addr)
+		m_current_disp_addr = (m_current_disp_addr + m_row_addr_incr) & 0x3fff;
+
+	return ra;
+}
+
+
 void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	for (int column = 0; column < x_count; column++)
@@ -1372,9 +1444,9 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		}
 		else
 		{
-			UINT8 code = read_videoram(ma + column);
+			UINT16 code = read_videoram(ma + column);
 
-			offs_t attr_addr = m_attribute_addr + column;
+			offs_t attr_addr = m_attribute_addr + (ma - m_disp_start_addr) + column;
 			UINT8 attr = 0;
 
 			UINT8 cth = (m_horiz_char >> 4) + 1;
@@ -1397,16 +1469,19 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 			offs_t font_addr;
 
+			code |= ATTR_ALTERNATE_CHARSET << 8;
+
 			if (m_max_ras_addr < 16)
-				font_addr = ((m_char_base_addr >> 5) << 13) | (ATTR_ALTERNATE_CHARSET << 12) | (code << 4) | ra;
+				font_addr = ((m_char_base_addr >> 5) << 13) | (code << 4) | ra;
 			else
-				font_addr = ((m_char_base_addr >> 5) << 13) | (ATTR_ALTERNATE_CHARSET << 13) | (code << 5) | ra;
+				font_addr = ((m_char_base_addr >> 5) << 13) | (code << 5) | ra;
 
 			UINT8 data = read_videoram(font_addr);
 
 			if (column == cursor_x) data = 0xff;
 			if (ra >= cdv) data = 0;
 			if (ATTR_UNDERLINE && (ra == m_underline_ras)) data = 0xff;
+			if (ATTR_BLINK && !m_char_blink_state) data = 0;
 
 			if (ATTR_REVERSE)
 			{
@@ -1414,14 +1489,14 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				bg = fg;
 				fg = temp;
 			}
-			// TODO ATTR_BLINK
 
-			for (int bit = 0; bit < MIN(cdh, 8); bit++)
+			for (int bit = 0; bit < cdh; bit++)
 			{
 				int x = (column * cth) + bit;
 
-				bitmap.pix32(y, x) = MOS8563_PALETTE[BIT(data, 7) ? fg : bg];
-				data <<= 1;
+				bitmap.pix32(y, x) = MOS8563_PALETTE[(BIT(data, 7) ^ VSS_RVS) ? fg : bg];
+
+				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}
 		}
 	}
