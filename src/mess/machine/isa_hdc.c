@@ -506,7 +506,7 @@ void isa8_hdc_device::hdc_command()
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpu_get_reg(machine().firstcpu, STATE_GENPC), cmd, command_name, drv);
+			(unsigned) machine().firstcpu->pc(), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -544,7 +544,7 @@ void isa8_hdc_device::hdc_command()
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine().firstcpu, STATE_GENPC), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
+					(unsigned) machine().firstcpu->pc(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
 			}
 
 			if (test_ready())
@@ -559,7 +559,7 @@ void isa8_hdc_device::hdc_command()
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x  D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine().firstcpu, STATE_GENPC), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
+					(unsigned) machine().firstcpu->pc(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
 			}
 
 			if (test_ready())
@@ -673,7 +673,7 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine().firstcpu, STATE_GENPC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) machine().firstcpu->pc());
 
             status &= ~STA_COMMAND;
 			status &= ~STA_REQUEST;

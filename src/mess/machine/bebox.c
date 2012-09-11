@@ -333,8 +333,8 @@ void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) cpu_get_reg(machine.device("ppc1"), STATE_GENPC),
-			(unsigned) cpu_get_reg(machine.device("ppc2"), STATE_GENPC),
+			(unsigned) machine.device("ppc1")->safe_pc(),
+			(unsigned) machine.device("ppc2")->safe_pc(),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}

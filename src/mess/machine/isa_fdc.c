@@ -371,7 +371,7 @@ static READ8_DEVICE_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) device->machine().firstcpu->pc(), offset, data);
 	return data;
 }
 
@@ -382,7 +382,7 @@ static WRITE8_DEVICE_HANDLER ( pc_fdc_w )
 	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
 
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(device->machine().firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) device->machine().firstcpu->pc(), offset, data);
 	pc_fdc_check_data_rate(fdc,device->machine());  // check every time a command may start
 	device_t *hdd = NULL;
 

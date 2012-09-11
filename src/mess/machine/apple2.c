@@ -1002,7 +1002,7 @@ void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask,
-					(unsigned int) cpu_get_reg(machine.device("maincpu"), STATE_GENPC)));
+					(unsigned int) machine.device("maincpu")->safe_pc()));
 
 	assert((val & mask) == val);
 

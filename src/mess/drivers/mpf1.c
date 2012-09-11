@@ -340,7 +340,7 @@ static TIMER_DEVICE_CALLBACK( check_halt_callback )
 
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = cpu_get_reg(state->m_maincpu, Z80_HALT);
+	INT64 led_halt = state->m_maincpu->state_int(Z80_HALT);
 	set_led_status(timer.machine(), 1, led_halt);
 }
 

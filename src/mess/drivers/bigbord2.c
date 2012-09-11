@@ -185,14 +185,14 @@ WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 		{
 			// simulate interrupt by saving current pc on
 			// the stack and jumping to interrupt handler.
-			UINT16 spreg = cpu_get_reg(m_maincpu, Z80_SP);
-			UINT16 pcreg = cpu_get_reg(m_maincpu, Z80_PC);
+			UINT16 spreg = m_maincpu->state_int(Z80_SP);
+			UINT16 pcreg = m_maincpu->state_int(Z80_PC);
 			spreg--;
 			space.write_byte(spreg, pcreg >> 8);
 			spreg--;
 			space.write_byte(spreg, pcreg);
-			cpu_set_reg(m_maincpu, Z80_SP, spreg);
-			cpu_set_reg(m_maincpu, Z80_PC, 0xF120);
+			m_maincpu->set_state_int(Z80_SP, spreg);
+			m_maincpu->set_state_int(Z80_PC, 0xF120);
 		}
 	}
 }
@@ -424,14 +424,14 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 		framecnt = 0;
 		// simulate interrupt by saving current pc on
 		// the stack and jumping to interrupt handler.
-		UINT16 spreg = cpu_get_reg(m_maincpu, Z80_SP);
-		UINT16 pcreg = cpu_get_reg(m_maincpu, Z80_PC);
+		UINT16 spreg = m_maincpu->state_int(Z80_SP);
+		UINT16 pcreg = m_maincpu->state_int(Z80_PC);
 		spreg--;
 		space->write_byte(spreg, pcreg >> 8);
 		spreg--;
 		space->write_byte(spreg, pcreg);
-		cpu_set_reg(m_maincpu, Z80_SP, spreg);
-		cpu_set_reg(m_maincpu, Z80_PC, 0xF18E);
+		m_maincpu->set_state_int(Z80_SP, spreg);
+		m_maincpu->set_state_int(Z80_PC, 0xF18E);
 	}
 }
 

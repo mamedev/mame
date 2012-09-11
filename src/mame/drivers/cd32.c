@@ -1240,7 +1240,7 @@ static void cndypuzl_input_hack(running_machine &machine)
 	{
 		//(*state->m_chip_ram_w)(0x051c02, 0x0000);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		(*state->m_chip_ram_w)(state, r_A5 - 0x7ebe, 0x0000);
 	}
 }
@@ -1259,7 +1259,7 @@ static void haremchl_input_hack(running_machine &machine)
 	{
 		//amiga_chip_ram_w8(state, 0x002907, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		UINT32 r_A2 = ((*state->m_chip_ram_r)(state, r_A5 - 0x7f00 + 0) << 16) | ((*state->m_chip_ram_r)(state, r_A5 - 0x7f00 + 2));
 		amiga_chip_ram_w8(state, r_A2 + 0x1f, 0x00);
 	}
@@ -1279,7 +1279,7 @@ static void lsrquiz_input_hack(running_machine &machine)
 	{
 		//amiga_chip_ram_w8(state, 0x001e1b, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		UINT32 r_A2 = ((*state->m_chip_ram_r)(state, r_A5 - 0x7fe0 + 0) << 16) | ((*state->m_chip_ram_r)(state, r_A5 - 0x7fe0 + 2));
 		amiga_chip_ram_w8(state, r_A2 + 0x13, 0x00);
 	}
@@ -1300,7 +1300,7 @@ static void lsrquiz2_input_hack(running_machine &machine)
 	{
 		//amiga_chip_ram_w8(state, 0x046107, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		UINT32 r_A2 = ((*state->m_chip_ram_r)(state, r_A5 - 0x7fdc + 0) << 16) | ((*state->m_chip_ram_r)(state, r_A5 - 0x7fdc + 2));
 		amiga_chip_ram_w8(state, r_A2 + 0x17, 0x00);
 	}
@@ -1320,7 +1320,7 @@ static void lasstixx_input_hack(running_machine &machine)
 	{
 		//amiga_chip_ram_w8(state, 0x00281c, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		UINT32 r_A2 = ((*state->m_chip_ram_r)(state, r_A5 - 0x7fa2 + 0) << 16) | ((*state->m_chip_ram_r)(state, r_A5 - 0x7fa2 + 2));
 		amiga_chip_ram_w8(state, r_A2 + 0x24, 0x00);
 	}
@@ -1340,7 +1340,7 @@ static void mgnumber_input_hack(running_machine &machine)
 	{
 		//(*state->m_chip_ram_w)(0x04bfa0, 0x0000);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		(*state->m_chip_ram_w)(state, r_A5 - 0x7ed8, 0x0000);
 	}
 }
@@ -1359,7 +1359,7 @@ static void mgprem11_input_hack(running_machine &machine)
 	{
 		//amiga_chip_ram_w8(state, 0x044f7e, 0x00);
 
-		UINT32 r_A5 = cpu_get_reg(machine.device("maincpu"), M68K_A5);
+		UINT32 r_A5 = machine.device("maincpu")->state().state_int(M68K_A5);
 		amiga_chip_ram_w8(state, r_A5 - 0x7eca, 0x00);
 	}
 }

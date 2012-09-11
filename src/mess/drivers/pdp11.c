@@ -280,7 +280,7 @@ static MACHINE_RESET(pdp11ub2)
 			addr = 0165000;
 		}
 		addr += machine.root_device().ioport("S1_2")->read() * 2;
-		cpu_set_reg(machine.device("maincpu"), T11_PC, addr);
+		machine.device("maincpu")->state().set_state_int(T11_PC, addr);
 	}
 
 	//0173000
@@ -296,7 +296,7 @@ static MACHINE_RESET(pdp11ub2)
 
 static MACHINE_RESET(pdp11qb)
 {
-	cpu_set_reg(machine.device("maincpu"), T11_PC, 0xea00);
+	machine.device("maincpu")->state().set_state_int(T11_PC, 0xea00);
 }
 
 static const struct t11_setup pdp11_data =

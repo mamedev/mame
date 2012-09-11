@@ -18,7 +18,7 @@ READ8_MEMBER(gmaster_state::gmaster_io_r)
     if (m_gmachine.ports[2] & 1)
 	{
 		data = memregion("maincpu")->base()[0x4000 + offset];
-		logerror("%.4x external memory %.4x read %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
+		logerror("%.4x external memory %.4x read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
     }
 	else
 	{
@@ -26,13 +26,13 @@ READ8_MEMBER(gmaster_state::gmaster_io_r)
 		{
 		case 1:
 			data=m_video.pixels[m_video.y][m_video.x];
-			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), m_video.x, m_video.y, 0x4000 + offset, data);
+			logerror("%.4x lcd x:%.2x y:%.2x %.4x read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), m_video.x, m_video.y, 0x4000 + offset, data);
 			if (!(m_video.mode) && m_video.delayed)
 				m_video.x++;
 			m_video.delayed = TRUE;
 			break;
 		default:
-			logerror("%.4x memory %.4x read %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
+			logerror("%.4x memory %.4x read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
 		}
     }
     return data;
@@ -45,7 +45,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
     if (m_gmachine.ports[2] & 1)
 	{
 		memregion("maincpu")->base()[0x4000 + offset] = data;
-		logerror("%.4x external memory %.4x written %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
+		logerror("%.4x external memory %.4x written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
 	}
 	else
 	{
@@ -53,7 +53,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 		{
 		case 0:
 			m_video.delayed=FALSE;
-			logerror("%.4x lcd %.4x written %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
+			logerror("%.4x lcd %.4x written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
 			// e2 af a4 a0 a9 falling block init for both halves
 			if ((data & 0xfc) == 0xb8)
 			{
@@ -77,7 +77,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 			if (m_video.x < ARRAY_LENGTH(m_video.pixels[0])) // continental galaxy flutlicht
 				m_video.pixels[m_video.y][m_video.x] = data;
 			logerror("%.4x lcd x:%.2x y:%.2x %.4x written %.2x\n",
-				(int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), m_video.x, m_video.y, 0x4000 + offset, data);
+				(int)space.device().state().state_int(CPUINFO_INT_PC), m_video.x, m_video.y, 0x4000 + offset, data);
 			m_video.x++;
 /* 02 b8 1a
    02 bb 1a
@@ -95,7 +95,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 */
 			break;
 		default:
-			logerror("%.4x memory %.4x written %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), 0x4000 + offset, data);
+			logerror("%.4x memory %.4x written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), 0x4000 + offset, data);
 		}
 	}
 }
@@ -110,7 +110,7 @@ READ8_MEMBER(gmaster_state::gmaster_port_r)
 		data = ioport("JOY")->read();
 		break;
 	default:
-		logerror("%.4x port %d read %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), offset, data);
+		logerror("%.4x port %d read %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), offset, data);
     }
     return data;
 }
@@ -118,7 +118,7 @@ READ8_MEMBER(gmaster_state::gmaster_port_r)
 WRITE8_MEMBER(gmaster_state::gmaster_port_w)
 {
     m_gmachine.ports[offset] = data;
-    logerror("%.4x port %d written %.2x\n", (int)cpu_get_reg(&space.device(), CPUINFO_INT_PC), offset, data);
+    logerror("%.4x port %d written %.2x\n", (int)space.device().state().state_int(CPUINFO_INT_PC), offset, data);
     switch (offset)
 	{
 		case UPD7810_PORTC:

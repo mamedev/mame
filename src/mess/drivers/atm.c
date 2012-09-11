@@ -35,7 +35,7 @@ public:
 DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 {
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE);
+	UINT16 pc = machine().device("maincpu")->state().state_int(STATE_GENPCBASE);
 
 	if (beta->started() && betadisk_is_active(beta))
 	{

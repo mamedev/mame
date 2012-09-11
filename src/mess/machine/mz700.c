@@ -651,7 +651,7 @@ WRITE8_MEMBER(mz_state::mz800_ramdisk_w)
 /* port EB */
 WRITE8_MEMBER(mz_state::mz800_ramaddr_w)
 {
-	m_mz800_ramaddr = (cpu_get_reg(machine().device("maincpu"), Z80_BC) & 0xff00) | (data & 0xff);
+	m_mz800_ramaddr = (machine().device("maincpu")->state().state_int(Z80_BC) & 0xff00) | (data & 0xff);
 	LOG(1,"mz800_ramaddr_w",("%04X\n", m_mz800_ramaddr),machine());
 }
 

@@ -1952,7 +1952,7 @@ static WRITE16_HANDLER( adsp_control_w )
 static TIMER_DEVICE_CALLBACK( dcs_irq )
 {
 	/* get the index register */
-	int reg = cpu_get_reg(dcs.cpu, ADSP2100_I0 + dcs.ireg);
+	int reg = dcs.cpu->state_int(ADSP2100_I0 + dcs.ireg);
 
 	/* copy the current data into the buffer */
 	{
@@ -1981,7 +1981,7 @@ static TIMER_DEVICE_CALLBACK( dcs_irq )
 	}
 
 	/* store it */
-	dcs.cpu->set_state(ADSP2100_I0 + dcs.ireg, reg);
+	dcs.cpu->set_state_int(ADSP2100_I0 + dcs.ireg, reg);
 }
 
 
@@ -2043,15 +2043,15 @@ static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = device.state(ADSP2100_I0 + dcs.ireg);
-			dcs.incs = device.state(ADSP2100_M0 + mreg);
-			dcs.size = device.state(ADSP2100_L0 + lreg);
+			source = device.state_int(ADSP2100_I0 + dcs.ireg);
+			dcs.incs = device.state_int(ADSP2100_M0 + mreg);
+			dcs.size = device.state_int(ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= dcs.incs;
 
 			/* make it go back one so we dont lose the first sample */
-			device.set_state(ADSP2100_I0 + dcs.ireg, source);
+			device.set_state_int(ADSP2100_I0 + dcs.ireg, source);
 
 			/* save it as it is now */
 			dcs.ireg_base = source;

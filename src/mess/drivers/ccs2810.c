@@ -112,7 +112,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 MACHINE_RESET_MEMBER(ccs2810_state)
 {
-	cpu_set_reg(m_maincpu, Z80_PC, 0xf000);
+	m_maincpu->set_state_int(Z80_PC, 0xf000);
 	m_26_count = 0x41;
 }
 

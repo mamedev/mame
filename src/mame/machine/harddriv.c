@@ -961,12 +961,12 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	if (&space->device() == state->m_maincpu && pc == state->m_ds3_transfer_pc &&
 		!(!state->m_ds3_g68flag && state->m_ds3_g68irqs) && !(state->m_ds3_gflag && state->m_ds3_gfirqs))
 	{
-		UINT32 destaddr = state->m_maincpu->state(M68K_A1);
-		UINT16 count68k = state->m_maincpu->state(M68K_D1);
-		UINT16 mstat = state->m_adsp->state(ADSP2100_MSTAT);
-		UINT16 i6 = state->m_adsp->state((mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC);
-		UINT16 l6 = state->m_adsp->state(ADSP2100_L6) - 1;
-		UINT16 m7 = state->m_adsp->state(ADSP2100_M7);
+		UINT32 destaddr = state->m_maincpu->state_int(M68K_A1);
+		UINT16 count68k = state->m_maincpu->state_int(M68K_D1);
+		UINT16 mstat = state->m_adsp->state_int(ADSP2100_MSTAT);
+		UINT16 i6 = state->m_adsp->state_int((mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC);
+		UINT16 l6 = state->m_adsp->state_int(ADSP2100_L6) - 1;
+		UINT16 m7 = state->m_adsp->state_int(ADSP2100_M7);
 
 		logerror("%06X:optimizing 68k transfer, %d words\n", state->m_maincpu->pcbase(), count68k);
 
@@ -980,8 +980,8 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 			}
 			count68k--;
 		}
-		state->m_maincpu->set_state(M68K_D1, count68k);
-		state->m_adsp->set_state((mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC, i6);
+		state->m_maincpu->set_state_int(M68K_D1, count68k);
+		state->m_adsp->set_state_int((mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC, i6);
 		state->m_adsp_speedup_count[1]++;
 	}
 
@@ -1596,7 +1596,7 @@ READ16_HANDLER( rdgsp_speedup1_r )
 
 	/* if this address is equal to $f000, spin until something gets written */
 	if (&space->device() == state->m_gsp && space->device().safe_pc() == state->m_gsp_speedup_pc &&
-		(result & 0xff) < cpu_get_reg(&space->device(), TMS34010_A1))
+		(result & 0xff) < space->device().state().state_int(TMS34010_A1))
 	{
 		state->m_gsp_speedup_count[0]++;
 		device_spin_until_interrupt(&space->device());

@@ -634,7 +634,7 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 	cpu_device *adsp = timer.machine().device<cpu_device>("adsp");
 
 	/* get the index register */
-	int reg = adsp->state(ADSP2100_I0 + state->m_adsp_ireg);
+	int reg = adsp->state_int(ADSP2100_I0 + state->m_adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", state->m_adsp_ireg, reg, state->m_adsp_incs, state->m_adsp_size);
@@ -655,7 +655,7 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 	}
 
 	/* store it */
-	adsp->set_state(ADSP2100_I0 + state->m_adsp_ireg, reg);
+	adsp->set_state_int(ADSP2100_I0 + state->m_adsp_ireg, reg);
 }
 
 
@@ -684,15 +684,15 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = device.state(ADSP2100_I0 + state->m_adsp_ireg);
-			state->m_adsp_incs = device.state(ADSP2100_M0 + mreg);
-			state->m_adsp_size = device.state(ADSP2100_L0 + lreg);
+			source = device.state_int(ADSP2100_I0 + state->m_adsp_ireg);
+			state->m_adsp_incs = device.state_int(ADSP2100_M0 + mreg);
+			state->m_adsp_size = device.state_int(ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= state->m_adsp_incs;
 
 			/* make it go back one so we dont lose the first sample */
-			device.set_state(ADSP2100_I0 + state->m_adsp_ireg, source);
+			device.set_state_int(ADSP2100_I0 + state->m_adsp_ireg, source);
 
 			/* save it as it is now */
 			state->m_adsp_ireg_base = source;

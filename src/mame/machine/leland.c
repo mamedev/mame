@@ -1096,7 +1096,7 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 		case 0x01:	/* /GIN1 */
 			result = ioport("IN1")->read();
-			if (cpu_get_reg(machine().device("slave"), Z80_HALT))
+			if (machine().device("slave")->state().state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
 
@@ -1178,7 +1178,7 @@ READ8_MEMBER(leland_state::ataxx_master_input_r)
 
 		case 0x07:	/* /SLVBLK */
 			result = ioport("IN1")->read();
-			if (cpu_get_reg(machine().device("slave"), Z80_HALT))
+			if (machine().device("slave")->state().state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
 

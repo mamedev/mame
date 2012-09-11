@@ -177,7 +177,7 @@ static QUICKLOAD_LOAD( lynx )
 	space->write_byte(0x1fc, start & 0xff);
 	space->write_byte(0x1fd, start >> 8);
 
-	cpu_set_reg(cpu, STATE_GENPC, start);
+	cpu->state().set_pc(start);
 
 	return IMAGE_INIT_PASS;
 }

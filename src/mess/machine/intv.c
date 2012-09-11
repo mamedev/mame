@@ -625,7 +625,7 @@ MACHINE_RESET( intv )
 	device_set_input_line_vector(machine.device("maincpu"), CP1610_INT_INTR,  0x1004);
 
 	/* Set initial PC */
-	cpu_set_reg(machine.device("maincpu"), CP1610_R7, 0x1000);
+	machine.device("maincpu")->state().set_state_int(CP1610_R7, 0x1000);
 
 	return;
 }
@@ -645,7 +645,7 @@ MACHINE_RESET( intvecs )
 	device_set_input_line_vector(machine.device("maincpu"), CP1610_INT_INTR,  0x1004);
 
 	/* Set initial PC */
-	cpu_set_reg(machine.device("maincpu"), CP1610_R7, 0x1000);
+	machine.device("maincpu")->state().set_state_int(CP1610_R7, 0x1000);
 
 	return;
 }

@@ -292,10 +292,6 @@ const device_type name = &legacy_device_creator<basename##_device>
 #define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, entry, string)
 
 
-// CPU timing
-#define cpu_get_reg(cpu, _reg)				device_state(cpu)->state(_reg)
-#define cpu_set_reg(cpu, _reg, val)			device_state(cpu)->set_state(_reg, val)
-
 // helpers for using machine/cputag instead of cpu objects
 #define cputag_set_input_line(mach, tag, line, state)					device_execute((mach).device(tag))->set_input_line(line, state)
 #define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach).device(tag))->set_input_line_and_vector(line, state, vec)

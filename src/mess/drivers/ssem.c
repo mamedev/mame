@@ -202,7 +202,7 @@ static INPUT_CHANGED( panel_check )
 		case PANEL_HALT:
 			if(misc_state & 0x04)
 			{
-				cpu_set_reg(ssem_cpu, SSEM_HALT, 1 - cpu_get_reg(ssem_cpu, SSEM_HALT));
+				ssem_cpu->state().set_state_int(SSEM_HALT, 1 - ssem_cpu->state().state_int(SSEM_HALT));
 			}
 			break;
 	}
@@ -446,7 +446,7 @@ static SCREEN_UPDATE_RGB32( ssem )
 	ssem_state *state = screen.machine().driver_data<ssem_state>();
 	UINT32 line = 0;
 	device_t *ssem_cpu = screen.machine().device("maincpu");
-	UINT32 accum = cpu_get_reg(ssem_cpu, SSEM_A);
+	UINT32 accum = ssem_cpu->state().state_int(SSEM_A);
 	UINT32 bit = 0;
 	UINT32 word = 0;
 
@@ -485,7 +485,7 @@ static SCREEN_UPDATE_RGB32( ssem )
 				   (state->m_store[(state->m_store_line << 2) | 1] << 16) |
 				   (state->m_store[(state->m_store_line << 2) | 2] <<  8) |
 				   (state->m_store[(state->m_store_line << 2) | 3] <<  0));
-	glyph_print(screen.machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", state->m_store_line, word, cpu_get_reg(ssem_cpu, SSEM_HALT));
+	glyph_print(screen.machine(), bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", state->m_store_line, word, ssem_cpu->state().state_int(SSEM_HALT));
 	return 0;
 }
 

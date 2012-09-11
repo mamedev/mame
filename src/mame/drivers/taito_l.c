@@ -315,7 +315,7 @@ static TIMER_DEVICE_CALLBACK( vbl_interrupt )
 	device_set_irq_callback(state->m_maincpu, irq_callback);
 
 	/* kludge to make plgirls boot */
-	if (cpu_get_reg(state->m_maincpu, Z80_IM) != 2)
+	if (state->m_maincpu->state().state_int(Z80_IM) != 2)
 		return;
 
 	// What is really generating interrupts 0 and 1 is still to be found

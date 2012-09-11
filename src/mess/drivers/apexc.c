@@ -421,7 +421,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 	if (control_transitions & panel_run)
 	{	/* toggle run/stop state */
-		cpu_set_reg(device, APEXC_STATE, ! cpu_get_reg(device, APEXC_STATE));
+		device->state().set_state_int(APEXC_STATE, ! device->state().state_int(APEXC_STATE));
 	}
 
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
@@ -463,10 +463,10 @@ static INTERRUPT_GEN( apexc_interrupt )
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				cpu_set_reg(device, reg_id, state->m_panel_data_reg);
+				device->state().set_state_int(reg_id, state->m_panel_data_reg);
 			else
 				/* read reg */
-				state->m_panel_data_reg = cpu_get_reg(device, reg_id);
+				state->m_panel_data_reg = device->state().state_int(reg_id);
 		}
 	}
 
@@ -475,11 +475,11 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space->write_dword(cpu_get_reg(device, APEXC_ML_FULL)<<2, state->m_panel_data_reg);
+			space->write_dword(device->state().state_int(APEXC_ML_FULL)<<2, state->m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			state->m_panel_data_reg = space->read_dword(cpu_get_reg(device, APEXC_ML_FULL)<<2);
+			state->m_panel_data_reg = space->read_dword(device->state().state_int(APEXC_ML_FULL)<<2);
 		}
 	}
 
@@ -605,7 +605,7 @@ static SCREEN_UPDATE_IND16( apexc )
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(screen.machine().device("maincpu"), APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, screen.machine().device("maincpu")->state().state_int(APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{

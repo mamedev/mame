@@ -207,12 +207,12 @@ static void microtan_set_cpu_regs(running_machine &machine,const UINT8 *snapshot
     logerror("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
         snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
         snapshot_buff[base+4], snapshot_buff[base+5], snapshot_buff[base+6]);
-    cpu_set_reg(machine.device("maincpu"), M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
-    cpu_set_reg(machine.device("maincpu"), M6502_P, snapshot_buff[base+2]);
-    cpu_set_reg(machine.device("maincpu"), M6502_A, snapshot_buff[base+3]);
-    cpu_set_reg(machine.device("maincpu"), M6502_X, snapshot_buff[base+4]);
-    cpu_set_reg(machine.device("maincpu"), M6502_Y, snapshot_buff[base+5]);
-    cpu_set_reg(machine.device("maincpu"), M6502_S, snapshot_buff[base+6]);
+    machine.device("maincpu")->state().set_state_int(M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
+    machine.device("maincpu")->state().set_state_int(M6502_P, snapshot_buff[base+2]);
+    machine.device("maincpu")->state().set_state_int(M6502_A, snapshot_buff[base+3]);
+    machine.device("maincpu")->state().set_state_int(M6502_X, snapshot_buff[base+4]);
+    machine.device("maincpu")->state().set_state_int(M6502_Y, snapshot_buff[base+5]);
+    machine.device("maincpu")->state().set_state_int(M6502_S, snapshot_buff[base+6]);
 }
 
 static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buff, int snapshot_size)

@@ -238,7 +238,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(unior)
 {
-	cpu_set_reg(machine.device("maincpu"), I8085_PC, 0xF800);
+	machine.device("maincpu")->state().set_state_int(I8085_PC, 0xF800);
 }
 
 static VIDEO_START( unior )

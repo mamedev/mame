@@ -1063,7 +1063,7 @@ static void execute_fdpc(running_machine &machine, int ref, int params, const ch
 		newpc = cpu->safe_pc();
 
 	/* set the new PC */
-	cpu_set_reg(cpu, STATE_GENPC, newpc);
+	cpu->state().set_pc(newpc);
 
 	/* recompute around that */
 	instruction_hook(*cpu, newpc);
@@ -1116,7 +1116,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			cpu_set_reg(&space->device(), STATE_GENPC, pc);
+			space->device().state().set_pc(pc);
 			if (instruction_hook(space->device(), pc))
 				break;
 		}

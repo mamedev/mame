@@ -352,7 +352,7 @@ void alphatro_state::machine_reset()
 	// do what the IPL does
 	//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
 	UINT8* ROM = memregion("maincpu")->base();
-	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
+	m_maincpu->set_pc(0xe000);
 	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
 	//  membank("bank1")->set_base(RAM);

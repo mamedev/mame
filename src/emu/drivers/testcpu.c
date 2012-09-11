@@ -88,17 +88,17 @@ public:
 			m_space->write_dword(RAM_BASE + 4, 0x4e800020);
 
 			// initialize the register state
-			m_cpu->set_state(PPC_PC, RAM_BASE);
+			m_cpu->set_state_int(PPC_PC, RAM_BASE);
 			for (int regnum = 0; regnum < 32; regnum++)
-				m_cpu->set_state(PPC_R0 + regnum, regnum | (regnum << 8) | (regnum << 16) | (regnum << 24));
-			m_cpu->set_state(PPC_CR, 0);
-			m_cpu->set_state(PPC_LR, 0x12345678);
-			m_cpu->set_state(PPC_CTR, 0x1000);
-			m_cpu->set_state(PPC_XER, 0);
+				m_cpu->set_state_int(PPC_R0 + regnum, regnum | (regnum << 8) | (regnum << 16) | (regnum << 24));
+			m_cpu->set_state_int(PPC_CR, 0);
+			m_cpu->set_state_int(PPC_LR, 0x12345678);
+			m_cpu->set_state_int(PPC_CTR, 0x1000);
+			m_cpu->set_state_int(PPC_XER, 0);
 			for (int regnum = 0; regnum < 32; regnum++)
 			{
 				double value = double(regnum | (regnum << 8) | (regnum << 16) | (regnum << 24));
-				m_cpu->set_state(PPC_F0 + regnum, d2u(value));
+				m_cpu->set_state_int(PPC_F0 + regnum, d2u(value));
 			}
 
 			// output initial state
@@ -151,7 +151,7 @@ public:
 		}
 
 		// output the registers
-		printf("PC : %08X", UINT32(m_cpu->state(PPC_PC)));
+		printf("PC : %08X", UINT32(m_cpu->state_int(PPC_PC)));
 		if (disassemble && bytes > 0)
 		{
 			printf(" => ");
@@ -162,15 +162,15 @@ public:
 		printf("\n");
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
-			printf("R%-2d: %08X   ", regnum, UINT32(m_cpu->state(PPC_R0 + regnum)));
+			printf("R%-2d: %08X   ", regnum, UINT32(m_cpu->state_int(PPC_R0 + regnum)));
 			if (regnum % 4 == 3) printf("\n");
 		}
 		printf("CR : %08X   LR : %08X   CTR: %08X   XER: %08X\n",
-				UINT32(m_cpu->state(PPC_CR)), UINT32(m_cpu->state(PPC_LR)),
-				UINT32(m_cpu->state(PPC_CTR)), UINT32(m_cpu->state(PPC_XER)));
+				UINT32(m_cpu->state_int(PPC_CR)), UINT32(m_cpu->state_int(PPC_LR)),
+				UINT32(m_cpu->state_int(PPC_CTR)), UINT32(m_cpu->state_int(PPC_XER)));
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
-			printf("F%-2d: %10g   ", regnum, u2d(m_cpu->state(PPC_F0 + regnum)));
+			printf("F%-2d: %10g   ", regnum, u2d(m_cpu->state_int(PPC_F0 + regnum)));
 			if (regnum % 4 == 3) printf("\n");
 		}
 	}

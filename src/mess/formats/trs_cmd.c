@@ -67,7 +67,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			image.fread( &addr, 2);
 			UINT16 address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD transfer address %04x\n", address);
-			cpu_set_reg(image.device().machine().firstcpu, Z80_PC, address);
+			image.device().machine().firstcpu->set_state_int(Z80_PC, address);
 			}
 			break;
 

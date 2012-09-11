@@ -325,9 +325,9 @@ DIRECT_UPDATE_MEMBER(spectrum_state::spectrum_direct)
 {
     /* Hack for correct handling 0xffff interrupt vector */
     if (address == 0x0001)
-        if (cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE)==0xffff)
+        if (machine().device("maincpu")->safe_pcbase()==0xffff)
         {
-            cpu_set_reg(machine().device("maincpu"), Z80_PC, 0xfff4);
+            machine().device("maincpu")->state().set_state_int(Z80_PC, 0xfff4);
             return 0xfff4;
         }
     return address;

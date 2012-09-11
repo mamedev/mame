@@ -462,7 +462,7 @@ if (LOG_PROTECTION)
 		case 0x275bc:
 			break;
 		case 0x275cc:
-			a6 = cpu_get_reg(&space->device(), M68K_A6);
+			a6 = space->device().state().state_int(M68K_A6);
 			p1 = (space->read_word(a6+8) << 16) | space->read_word(a6+10);
 			p2 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
@@ -480,7 +480,7 @@ if (LOG_PROTECTION)
 
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
-			a6 = cpu_get_reg(&space->device(), M68K_A6);
+			a6 = space->device().state().state_int(M68K_A6);
 			p1 = (space->read_word(a6+12) << 16) | space->read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
@@ -491,7 +491,7 @@ if (LOG_PROTECTION)
 
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
-			a6 = cpu_get_reg(&space->device(), M68K_A6);
+			a6 = space->device().state().state_int(M68K_A6);
 			p1 = space->read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
@@ -1249,14 +1249,14 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)space.device().state().state_int(M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(&space.device(), M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)space.device().state().state_int(M68K_A3) - 2);
 
 	atarigen_playfield32_w(&space, offset, data, mem_mask);
 }

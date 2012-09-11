@@ -163,7 +163,7 @@ static TIMER_CALLBACK( radio86_reset )
 
 READ8_MEMBER(radio86_state::radio_cpu_state_r)
 {
-	return cpu_get_reg(&space.device(), I8085_STATUS);
+	return space.device().state().state_int(I8085_STATUS);
 }
 
 READ8_MEMBER(radio86_state::radio_io_r)

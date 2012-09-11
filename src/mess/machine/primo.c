@@ -273,20 +273,20 @@ static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UIN
 
 	/* Z80 registers */
 
-	cpu_set_reg(machine.device("maincpu"), Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_DE, snapshot_data[6] + snapshot_data[7]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_HL, snapshot_data[8] + snapshot_data[9]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_AF, snapshot_data[10] + snapshot_data[11]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_BC2, snapshot_data[12] + snapshot_data[13]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_DE2, snapshot_data[14] + snapshot_data[15]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_HL2, snapshot_data[16] + snapshot_data[17]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_AF2, snapshot_data[18] + snapshot_data[19]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, snapshot_data[20] + snapshot_data[21]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_SP, snapshot_data[22] + snapshot_data[23]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_I, snapshot_data[24]);
-	cpu_set_reg(machine.device("maincpu"), Z80_R, snapshot_data[25]);
-	cpu_set_reg(machine.device("maincpu"), Z80_IX, snapshot_data[26] + snapshot_data[27]*256);
-	cpu_set_reg(machine.device("maincpu"), Z80_IY, snapshot_data[28] + snapshot_data[29]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_DE, snapshot_data[6] + snapshot_data[7]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_HL, snapshot_data[8] + snapshot_data[9]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_AF, snapshot_data[10] + snapshot_data[11]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_BC2, snapshot_data[12] + snapshot_data[13]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_DE2, snapshot_data[14] + snapshot_data[15]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_HL2, snapshot_data[16] + snapshot_data[17]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_AF2, snapshot_data[18] + snapshot_data[19]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_PC, snapshot_data[20] + snapshot_data[21]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_SP, snapshot_data[22] + snapshot_data[23]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_I, snapshot_data[24]);
+	machine.device("maincpu")->state().set_state_int(Z80_R, snapshot_data[25]);
+	machine.device("maincpu")->state().set_state_int(Z80_IX, snapshot_data[26] + snapshot_data[27]*256);
+	machine.device("maincpu")->state().set_state_int(Z80_IY, snapshot_data[28] + snapshot_data[29]*256);
 
 
 	/* IO ports */
@@ -349,7 +349,7 @@ static void primo_setup_pp (running_machine &machine,UINT8* quickload_data, UINT
 	for (i=4; i<quickload_size; i++)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->write_byte(start_addr+i-4, quickload_data[i]);
 
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, start_addr);
+	machine.device("maincpu")->state().set_state_int(Z80_PC, start_addr);
 
 	logerror ("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
 }

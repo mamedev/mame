@@ -1959,8 +1959,8 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 {
 	UINT32 data, cpsr, pc;
 	cpu_device *cpu = downcast<cpu_device *>(machine().device( "maincpu"));
-	pc = cpu_get_reg( cpu, ARM7_PC);
-	cpsr = cpu_get_reg( cpu, ARM7_CPSR);
+	pc = cpu->state_int( ARM7_PC);
+	cpsr = cpu->state_int( ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
 		data = space.read_dword( pc + 8);

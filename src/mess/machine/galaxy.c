@@ -72,51 +72,51 @@ static void galaxy_setup_snapshot (running_machine &machine, const UINT8 * data,
 	switch (size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
-			cpu_set_reg(cpu, Z80_AF,   data[0x00] | data[0x01] << 8);
-			cpu_set_reg(cpu, Z80_BC,   data[0x04] | data[0x05] << 8);
-			cpu_set_reg(cpu, Z80_DE,   data[0x08] | data[0x09] << 8);
-			cpu_set_reg(cpu, Z80_HL,   data[0x0c] | data[0x0d] << 8);
-			cpu_set_reg(cpu, Z80_IX,   data[0x10] | data[0x11] << 8);
-			cpu_set_reg(cpu, Z80_IY,   data[0x14] | data[0x15] << 8);
-			cpu_set_reg(cpu, Z80_PC,   data[0x18] | data[0x19] << 8);
-			cpu_set_reg(cpu, Z80_SP,   data[0x1c] | data[0x1d] << 8);
-			cpu_set_reg(cpu, Z80_AF2,  data[0x20] | data[0x21] << 8);
-			cpu_set_reg(cpu, Z80_BC2,  data[0x24] | data[0x25] << 8);
-			cpu_set_reg(cpu, Z80_DE2,  data[0x28] | data[0x29] << 8);
-			cpu_set_reg(cpu, Z80_HL2,  data[0x2c] | data[0x2d] << 8);
-			cpu_set_reg(cpu, Z80_IFF1, data[0x30]);
-			cpu_set_reg(cpu, Z80_IFF2, data[0x34]);
-			cpu_set_reg(cpu, Z80_HALT, data[0x38]);
-			cpu_set_reg(cpu, Z80_IM,   data[0x3c]);
-			cpu_set_reg(cpu, Z80_I,    data[0x40]);
-			cpu_set_reg(cpu, Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
+			cpu->state().set_state_int(Z80_AF,   data[0x00] | data[0x01] << 8);
+			cpu->state().set_state_int(Z80_BC,   data[0x04] | data[0x05] << 8);
+			cpu->state().set_state_int(Z80_DE,   data[0x08] | data[0x09] << 8);
+			cpu->state().set_state_int(Z80_HL,   data[0x0c] | data[0x0d] << 8);
+			cpu->state().set_state_int(Z80_IX,   data[0x10] | data[0x11] << 8);
+			cpu->state().set_state_int(Z80_IY,   data[0x14] | data[0x15] << 8);
+			cpu->state().set_state_int(Z80_PC,   data[0x18] | data[0x19] << 8);
+			cpu->state().set_state_int(Z80_SP,   data[0x1c] | data[0x1d] << 8);
+			cpu->state().set_state_int(Z80_AF2,  data[0x20] | data[0x21] << 8);
+			cpu->state().set_state_int(Z80_BC2,  data[0x24] | data[0x25] << 8);
+			cpu->state().set_state_int(Z80_DE2,  data[0x28] | data[0x29] << 8);
+			cpu->state().set_state_int(Z80_HL2,  data[0x2c] | data[0x2d] << 8);
+			cpu->state().set_state_int(Z80_IFF1, data[0x30]);
+			cpu->state().set_state_int(Z80_IFF2, data[0x34]);
+			cpu->state().set_state_int(Z80_HALT, data[0x38]);
+			cpu->state().set_state_int(Z80_IM,   data[0x3c]);
+			cpu->state().set_state_int(Z80_I,    data[0x40]);
+			cpu->state().set_state_int(Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
 
 			memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data + 0x084c, (machine.device<ram_device>(RAM_TAG)->size() < 0x1800) ? machine.device<ram_device>(RAM_TAG)->size() : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			cpu_set_reg(cpu, Z80_AF,   data[0x00] | data[0x01] << 8);
-			cpu_set_reg(cpu, Z80_BC,   data[0x02] | data[0x03] << 8);
-			cpu_set_reg(cpu, Z80_DE,   data[0x04] | data[0x05] << 8);
-			cpu_set_reg(cpu, Z80_HL,   data[0x06] | data[0x07] << 8);
-			cpu_set_reg(cpu, Z80_IX,   data[0x08] | data[0x09] << 8);
-			cpu_set_reg(cpu, Z80_IY,   data[0x0a] | data[0x0b] << 8);
-			cpu_set_reg(cpu, Z80_PC,   data[0x0c] | data[0x0d] << 8);
-			cpu_set_reg(cpu, Z80_SP,   data[0x0e] | data[0x0f] << 8);
-			cpu_set_reg(cpu, Z80_AF2,  data[0x10] | data[0x11] << 8);
-			cpu_set_reg(cpu, Z80_BC2,  data[0x12] | data[0x13] << 8);
-			cpu_set_reg(cpu, Z80_DE2,  data[0x14] | data[0x15] << 8);
-			cpu_set_reg(cpu, Z80_HL2,  data[0x16] | data[0x17] << 8);
+			cpu->state().set_state_int(Z80_AF,   data[0x00] | data[0x01] << 8);
+			cpu->state().set_state_int(Z80_BC,   data[0x02] | data[0x03] << 8);
+			cpu->state().set_state_int(Z80_DE,   data[0x04] | data[0x05] << 8);
+			cpu->state().set_state_int(Z80_HL,   data[0x06] | data[0x07] << 8);
+			cpu->state().set_state_int(Z80_IX,   data[0x08] | data[0x09] << 8);
+			cpu->state().set_state_int(Z80_IY,   data[0x0a] | data[0x0b] << 8);
+			cpu->state().set_state_int(Z80_PC,   data[0x0c] | data[0x0d] << 8);
+			cpu->state().set_state_int(Z80_SP,   data[0x0e] | data[0x0f] << 8);
+			cpu->state().set_state_int(Z80_AF2,  data[0x10] | data[0x11] << 8);
+			cpu->state().set_state_int(Z80_BC2,  data[0x12] | data[0x13] << 8);
+			cpu->state().set_state_int(Z80_DE2,  data[0x14] | data[0x15] << 8);
+			cpu->state().set_state_int(Z80_HL2,  data[0x16] | data[0x17] << 8);
 
-			cpu_set_reg(cpu, Z80_IFF1, data[0x18] & 0x01);
-			cpu_set_reg(cpu, Z80_IFF2, (UINT64)0);
+			cpu->state().set_state_int(Z80_IFF1, data[0x18] & 0x01);
+			cpu->state().set_state_int(Z80_IFF2, (UINT64)0);
 
-			cpu_set_reg(cpu, Z80_HALT, (UINT64)0);
+			cpu->state().set_state_int(Z80_HALT, (UINT64)0);
 
-			cpu_set_reg(cpu, Z80_IM,   (data[0x18] >> 1) & 0x03);
+			cpu->state().set_state_int(Z80_IM,   (data[0x18] >> 1) & 0x03);
 
-			cpu_set_reg(cpu, Z80_I,    data[0x19]);
-			cpu_set_reg(cpu, Z80_R,    data[0x1a]);
+			cpu->state().set_state_int(Z80_I,    data[0x19]);
+			cpu->state().set_state_int(Z80_R,    data[0x1a]);
 
 			memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data + 0x0834, (machine.device<ram_device>(RAM_TAG)->size() < 0x1800) ? machine.device<ram_device>(RAM_TAG)->size() : 0x1800);
 

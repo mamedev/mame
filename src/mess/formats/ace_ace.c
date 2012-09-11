@@ -85,25 +85,25 @@ SNAPSHOT_LOAD( ace )
 
 	if ((ace_index & 0x3FFF)==0)
 	{
-		cpu_set_reg(cpu, Z80_AF, RAM[0x2100] | (RAM[0x2101] << 8));
-		cpu_set_reg(cpu, Z80_BC, RAM[0x2104] | (RAM[0x2105] << 8));
-		cpu_set_reg(cpu, Z80_DE, RAM[0x2108] | (RAM[0x2109] << 8));
-		cpu_set_reg(cpu, Z80_HL, RAM[0x210c] | (RAM[0x210d] << 8));
-		cpu_set_reg(cpu, Z80_IX, RAM[0x2110] | (RAM[0x2111] << 8));
-		cpu_set_reg(cpu, Z80_IY, RAM[0x2114] | (RAM[0x2115] << 8));
-		cpu_set_reg(cpu, STATE_GENPC, RAM[0x211c] | (RAM[0x211d] << 8));
-		cpu_set_reg(cpu, Z80_AF2, RAM[0x2120] | (RAM[0x2121] << 8));
-		cpu_set_reg(cpu, Z80_BC2, RAM[0x2124] | (RAM[0x2125] << 8));
-		cpu_set_reg(cpu, Z80_DE2, RAM[0x2128] | (RAM[0x2129] << 8));
-		cpu_set_reg(cpu, Z80_HL2, RAM[0x212c] | (RAM[0x212d] << 8));
-		cpu_set_reg(cpu, Z80_IM, RAM[0x2130]);
-		cpu_set_reg(cpu, Z80_IFF1, RAM[0x2134]);
-		cpu_set_reg(cpu, Z80_IFF2, RAM[0x2138]);
-		cpu_set_reg(cpu, Z80_I, RAM[0x213c]);
-		cpu_set_reg(cpu, Z80_R, RAM[0x2140]);
+		cpu->set_state_int(Z80_AF, RAM[0x2100] | (RAM[0x2101] << 8));
+		cpu->set_state_int(Z80_BC, RAM[0x2104] | (RAM[0x2105] << 8));
+		cpu->set_state_int(Z80_DE, RAM[0x2108] | (RAM[0x2109] << 8));
+		cpu->set_state_int(Z80_HL, RAM[0x210c] | (RAM[0x210d] << 8));
+		cpu->set_state_int(Z80_IX, RAM[0x2110] | (RAM[0x2111] << 8));
+		cpu->set_state_int(Z80_IY, RAM[0x2114] | (RAM[0x2115] << 8));
+		cpu->set_pc(RAM[0x211c] | (RAM[0x211d] << 8));
+		cpu->set_state_int(Z80_AF2, RAM[0x2120] | (RAM[0x2121] << 8));
+		cpu->set_state_int(Z80_BC2, RAM[0x2124] | (RAM[0x2125] << 8));
+		cpu->set_state_int(Z80_DE2, RAM[0x2128] | (RAM[0x2129] << 8));
+		cpu->set_state_int(Z80_HL2, RAM[0x212c] | (RAM[0x212d] << 8));
+		cpu->set_state_int(Z80_IM, RAM[0x2130]);
+		cpu->set_state_int(Z80_IFF1, RAM[0x2134]);
+		cpu->set_state_int(Z80_IFF2, RAM[0x2138]);
+		cpu->set_state_int(Z80_I, RAM[0x213c]);
+		cpu->set_state_int(Z80_R, RAM[0x2140]);
 
 		if ((RAM[0x2119] < 0x80) || !ace_index)
-			cpu_set_reg(cpu, STATE_GENSP, RAM[0x2118] | (RAM[0x2119] << 8));
+			cpu->set_state_int(STATE_GENSP, RAM[0x2118] | (RAM[0x2119] << 8));
 	}
 
 	/* Copy data to the address space */

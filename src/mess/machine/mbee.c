@@ -789,7 +789,7 @@ QUICKLOAD_LOAD( mbee )
 		if (sw)
 		{
 			space->write_word(0xa2,0x801e);	/* fix warm-start vector to get around some copy-protections */
-			cpu_set_reg(cpu, STATE_GENPC, 0x801e);
+			cpu->state().set_pc(0x801e);
 		}
 		else
 			space->write_word(0xa2,0x8517);
@@ -816,7 +816,7 @@ QUICKLOAD_LOAD( mbee )
 			}
 		}
 
-		if (sw) cpu_set_reg(cpu, STATE_GENPC, 0x100);
+		if (sw) cpu->state().set_pc(0x100);
 	}
 
 	return IMAGE_INIT_PASS;

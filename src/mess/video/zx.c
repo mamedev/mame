@@ -99,7 +99,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	bitmap_ind16 &bitmap = state->m_bitmap;
 	r.set(r1.min_x, r1.max_x, state->m_ula_scanline_count, state->m_ula_scanline_count);
 	bitmap.fill(1, r);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_PC));
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) machine.device("maincpu")->state().state_int(Z80_R), (unsigned) machine.device("maincpu")->state().state_int(Z80_PC));
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	if (++state->m_ula_scanline_count == height)
 		state->m_ula_scanline_count = 0;
@@ -116,7 +116,7 @@ static TIMER_CALLBACK(zx_ula_irq)
      */
 	if (state->m_ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) machine.device("maincpu")->state().state_int(Z80_R), (unsigned) machine.device("maincpu")->state().state_int(Z80_PC));
 
 		state->m_ula_irq_active = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
@@ -135,13 +135,13 @@ void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT
 	{
 		bitmap_ind16 &bitmap = state->m_bitmap;
 		UINT16 y, *scanline;
-		UINT16 ireg = cpu_get_reg(machine.device("maincpu"), Z80_I) << 8;
+		UINT16 ireg = machine.device("maincpu")->state().state_int(Z80_I) << 8;
 		UINT8 data, *chrgen, creg;
 
 		if (param)
-			creg = cpu_get_reg(machine.device("maincpu"), Z80_B);
+			creg = machine.device("maincpu")->state().state_int(Z80_B);
 		else
-			creg = cpu_get_reg(machine.device("maincpu"), Z80_C);
+			creg = machine.device("maincpu")->state().state_int(Z80_C);
 
 		chrgen = state->memregion(region)->base();
 

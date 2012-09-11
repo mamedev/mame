@@ -180,6 +180,7 @@ public:
 	bool interface(device_state_interface *&intf) const { intf = m_state; return (intf != NULL); }
 	device_execute_interface &execute() const { assert(m_execute != NULL); return *m_execute; }
 	device_memory_interface &memory() const { assert(m_memory != NULL); return *m_memory; }
+	device_state_interface &state() const { assert(m_state != NULL); return *m_state; }
 
 	// owned object helpers
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }

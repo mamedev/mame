@@ -565,14 +565,14 @@ void n64_periphs::sp_set_status(UINT32 status)
 	if (status & 0x1)
 	{
 		device_set_input_line(rspcpu, INPUT_LINE_HALT, ASSERT_LINE);
-        cpu_set_reg(rspcpu, RSP_SR, cpu_get_reg(rspcpu, RSP_SR) | RSP_STATUS_HALT);
+        rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_HALT);
 	}
 
 	if (status & 0x2)
 	{
-        cpu_set_reg(rspcpu, RSP_SR, cpu_get_reg(rspcpu, RSP_SR) | RSP_STATUS_BROKE);
+        rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_BROKE);
 
-        if (cpu_get_reg(rspcpu, RSP_SR) & RSP_STATUS_INTR_BREAK)
+        if (rspcpu->state().state_int(RSP_SR) & RSP_STATUS_INTR_BREAK)
 		{
 			signal_rcp_interrupt(SP_INTERRUPT);
 		}
@@ -599,7 +599,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 		case 0x10/4:		// SP_STATUS_REG
 			//machine().scheduler().synchronize();
 			//machine().scheduler().boost_interleave(attotime::from_msec(1), attotime::from_msec(m));
-            ret = cpu_get_reg(rspcpu, RSP_SR);
+            ret = rspcpu->state().state_int(RSP_SR);
 			break;
 
 		case 0x14/4:		// SP_DMA_FULL_REG
@@ -669,7 +669,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 		}
 
         case 0x40000/4:     // PC
-            ret = cpu_get_reg(rspcpu, RSP_PC) & 0x00000fff;
+            ret = rspcpu->state().state_int(RSP_PC) & 0x00000fff;
 			break;
 
         default:
@@ -677,7 +677,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
             break;
 	}
 
-	//printf("%08x sp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, ret); fflush(stdout);
+	//printf("%08x sp_reg_r %08x = %08x\n", (UINT32)maincpu->state().state_int(MIPS3_PC), offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
@@ -688,7 +688,7 @@ READ32_DEVICE_HANDLER( n64_sp_reg_r )
 
 void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
-	//printf("%08x sp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(maincpu, MIPS3_PC), offset * 4, data, mem_mask); fflush(stdout);
+	//printf("%08x sp_reg_w %08x %08x %08x\n", (UINT32)maincpu->state().state_int(MIPS3_PC), offset * 4, data, mem_mask); fflush(stdout);
 
 	if ((offset & 0x10000) == 0)
 	{
@@ -718,7 +718,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 
             case 0x10/4:        // RSP_STATUS_REG
             {
-            	UINT32 oldstatus = cpu_get_reg(rspcpu, RSP_SR);
+            	UINT32 oldstatus = rspcpu->state().state_int(RSP_SR);
             	UINT32 newstatus = oldstatus;
 
                 // printf( "RSP_STATUS_REG Write; %08x\n", data );
@@ -760,7 +760,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 					//printf("***SP SSTEP SET***\n"); fflush(stdout);
                     if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
                     {
-                        cpu_set_reg(rspcpu, RSP_STEPCNT, 1 );
+                        rspcpu->state().set_state_int(RSP_STEPCNT, 1 );
                         device_yield(machine().device("rsp"));
                     }
                 }
@@ -854,7 +854,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                     newstatus |= RSP_STATUS_SIGNAL7;		// set signal 7
 					//printf("***SP SIG7 SET***\n"); fflush(stdout);
                 }
-                cpu_set_reg(rspcpu, RSP_SR, newstatus);
+                rspcpu->state().set_state_int(RSP_SR, newstatus);
                 break;
             }
 
@@ -877,13 +877,13 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
         switch (offset & 0xffff)
         {
             case 0x00/4:        // SP_PC_REG
-                if( cpu_get_reg(rspcpu, RSP_NEXTPC) != 0xffffffff )
+                if( rspcpu->state().state_int(RSP_NEXTPC) != 0xffffffff )
                 {
-                    cpu_set_reg(rspcpu, RSP_NEXTPC, 0x1000 | (data & 0xfff));
+                    rspcpu->state().set_state_int(RSP_NEXTPC, 0x1000 | (data & 0xfff));
                 }
                 else
                 {
-                    cpu_set_reg(rspcpu, RSP_PC, 0x1000 | (data & 0xfff));
+                    rspcpu->state().set_state_int(RSP_PC, 0x1000 | (data & 0xfff));
                 }
                 break;
 
@@ -944,7 +944,7 @@ READ32_DEVICE_HANDLER( n64_dp_reg_r )
 			break;
 	}
 
-	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, ret); fflush(stdout);
+	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)device->machine().device("rsp")->state().state_int(RSP_PC), offset, ret); fflush(stdout);
 	return ret;
 }
 
@@ -953,7 +953,7 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 	n64_state *state = device->machine().driver_data<n64_state>();
 	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
 
-	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)cpu_get_reg(device->machine().device("rsp"), RSP_PC), offset, data, mem_mask); fflush(stdout);
+	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)device->machine().device("rsp")->state().state_int(RSP_PC), offset, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:		// DP_START_REG

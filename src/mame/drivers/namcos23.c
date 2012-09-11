@@ -1518,7 +1518,7 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 	case 0: return 0x8e | (machine().primary_screen->vblank() ? 0x0000 : 0x8000);
 	case 1: return c417.adr;
 	case 4:
-		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 		return c417.ram[c417.adr];
 	case 5:
 		if(c417.pointrom_adr >= m_ptrom_limit)
@@ -1531,7 +1531,7 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 
 	}
 
-	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -1553,7 +1553,7 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 		c417.pointrom_adr = 0;
 		break;
 	case 4:
-		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417.adr, data, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 		COMBINE_DATA(c417.ram + c417.adr);
 		break;
 	case 7:
@@ -1561,7 +1561,7 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 		cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ2, CLEAR_LINE);
 		break;
 	default:
-		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -1570,7 +1570,7 @@ READ16_MEMBER(namcos23_state::s23_c412_ram_r)
 {
 	c412_t &c412 = m_c412;
 
-	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x100000)
 		return c412.sdram_a[offset & 0xfffff];
 	else if(offset < 0x200000)
@@ -1587,7 +1587,7 @@ WRITE16_MEMBER(namcos23_state::s23_c412_ram_w)
 {
 	c412_t &c412 = m_c412;
 
-	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x100000)
 		COMBINE_DATA(c412.sdram_a + (offset & 0xfffff));
 	else if(offset < 0x200000)
@@ -1611,7 +1611,7 @@ READ16_MEMBER(namcos23_state::s23_c412_r)
 	case 10: return s23_c412_ram_r(space, c412.adr, mem_mask);
 	}
 
-	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("c412_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -1624,7 +1624,7 @@ WRITE16_MEMBER(namcos23_state::s23_c412_w)
 	case 9: c412.adr = ((data & mem_mask) << 16) | (c412.adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 10: s23_c412_ram_w(space, c412.adr, data, mem_mask); c412.adr += 2; break;
 	default:
-		logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -1633,7 +1633,7 @@ READ16_MEMBER(namcos23_state::s23_c421_ram_r)
 {
 	c421_t &c421 = m_c421;
 
-	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x40000)
 		return c421.dram_a[offset & 0x3ffff];
 	else if(offset < 0x80000)
@@ -1648,7 +1648,7 @@ WRITE16_MEMBER(namcos23_state::s23_c421_ram_w)
 {
 	c421_t &c421 = m_c421;
 
-	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	if(offset < 0x40000)
 		COMBINE_DATA(c421.dram_a + (offset & 0x3ffff));
 	else if(offset < 0x80000)
@@ -1667,7 +1667,7 @@ READ16_MEMBER(namcos23_state::s23_c421_r)
 	case 3: return c421.adr;
 	}
 
-	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("c421_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -1680,7 +1680,7 @@ WRITE16_MEMBER(namcos23_state::s23_c421_w)
 	case 2: c421.adr = ((data & mem_mask) << 16) | (c421.adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 3: c421.adr = (data & mem_mask) | (c421.adr & (0xffffffff ^ mem_mask)); break;
 	default:
-		logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		logerror("c421_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 		break;
 	}
 }
@@ -1717,11 +1717,11 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 
 	case 6:	// gmen wars spams this heavily with 0 prior to starting the GMEN board test
 		if (data != 0)
-			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+			logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 		break;
 
 	default:
-		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	}
 }
 
@@ -1736,7 +1736,7 @@ READ16_MEMBER(namcos23_state::s23_ctl_r)
 		return res;
 	}
 	}
-	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0xffff;
 }
 
@@ -1780,7 +1780,7 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 		break;
 
 	default:
-		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	}
 }
 
@@ -1790,7 +1790,7 @@ READ16_MEMBER(namcos23_state::s23_c361_r)
 	case 5: return machine().primary_screen->vpos()*2 | (machine().primary_screen->vblank() ? 1 : 0);
 	case 6: return machine().primary_screen->vblank();
 	}
-	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0xffff;
 }
 
@@ -2185,7 +2185,7 @@ READ32_MEMBER(namcos23_state::p3d_r)
 	case 0xa: return 1; // Busy flag
 	}
 
-	logerror("p3d_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("p3d_r %02x @ %08x (%08x, %08x)\n", offset, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 	return 0;
 }
 
@@ -2203,7 +2203,7 @@ WRITE32_MEMBER(namcos23_state::p3d_w)
 		m_c361.timer->adjust(attotime::never);
 		return;
 	}
-	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)cpu_get_reg(&space.device(), MIPS3_R31));
+	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 }
 
 static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)

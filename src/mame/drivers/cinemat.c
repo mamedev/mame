@@ -148,7 +148,7 @@ static UINT8 joystick_read(device_t *device)
 		return 0;
 	else
 	{
-		int xval = (INT16)(cpu_get_reg(device, CCPU_X) << 4) >> 4;
+		int xval = (INT16)(device->state().state_int(CCPU_X) << 4) >> 4;
 		return (state->ioport(state->m_mux_select ? "ANALOGX" : "ANALOGY")->read_safe(0) - xval) < 0x800;
 	}
 }
@@ -273,7 +273,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 
 WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
 {
-	membank("bank1")->set_entry(cpu_get_reg(machine().device("maincpu"), CCPU_P) & 3);
+	membank("bank1")->set_entry(machine().device("maincpu")->state().state_int(CCPU_P) & 3);
 }
 
 

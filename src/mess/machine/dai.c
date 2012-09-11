@@ -36,7 +36,7 @@ static void dai_update_memory(running_machine &machine, int dai_rom_bank)
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
 {
-	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0xc000);
+	machine.device("maincpu")->state().set_pc(0xc000);
 }
 
 

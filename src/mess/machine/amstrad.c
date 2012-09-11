@@ -2184,70 +2184,70 @@ static void amstrad_handle_snapshot(running_machine &machine, unsigned char *pSn
 
 	/* init Z80 */
 	RegData = (pSnapshot[0x011] & 0x0ff) | ((pSnapshot[0x012] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_AF, RegData);
+	state->m_maincpu->set_state_int(Z80_AF, RegData);
 
 	RegData = (pSnapshot[0x013] & 0x0ff) | ((pSnapshot[0x014] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_BC, RegData);
+	state->m_maincpu->set_state_int(Z80_BC, RegData);
 
 	RegData = (pSnapshot[0x015] & 0x0ff) | ((pSnapshot[0x016] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_DE, RegData);
+	state->m_maincpu->set_state_int(Z80_DE, RegData);
 
 	RegData = (pSnapshot[0x017] & 0x0ff) | ((pSnapshot[0x018] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_HL, RegData);
+	state->m_maincpu->set_state_int(Z80_HL, RegData);
 
 	RegData = (pSnapshot[0x019] & 0x0ff) ;
-	cpu_set_reg(state->m_maincpu, Z80_R, RegData);
+	state->m_maincpu->set_state_int(Z80_R, RegData);
 
 	RegData = (pSnapshot[0x01a] & 0x0ff);
-	cpu_set_reg(state->m_maincpu, Z80_I, RegData);
+	state->m_maincpu->set_state_int(Z80_I, RegData);
 
 	if ((pSnapshot[0x01b] & 1)==1)
 	{
-		cpu_set_reg(state->m_maincpu, Z80_IFF1, (UINT64)1);
+		state->m_maincpu->set_state_int(Z80_IFF1, (UINT64)1);
 	}
 	else
 	{
-		cpu_set_reg(state->m_maincpu, Z80_IFF1, (UINT64)0);
+		state->m_maincpu->set_state_int(Z80_IFF1, (UINT64)0);
 	}
 
 	if ((pSnapshot[0x01c] & 1)==1)
 	{
-		cpu_set_reg(state->m_maincpu, Z80_IFF2, (UINT64)1);
+		state->m_maincpu->set_state_int(Z80_IFF2, (UINT64)1);
 	}
 	else
 	{
-		cpu_set_reg(state->m_maincpu, Z80_IFF2, (UINT64)0);
+		state->m_maincpu->set_state_int(Z80_IFF2, (UINT64)0);
 	}
 
 	RegData = (pSnapshot[0x01d] & 0x0ff) | ((pSnapshot[0x01e] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_IX, RegData);
+	state->m_maincpu->set_state_int(Z80_IX, RegData);
 
 	RegData = (pSnapshot[0x01f] & 0x0ff) | ((pSnapshot[0x020] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_IY, RegData);
+	state->m_maincpu->set_state_int(Z80_IY, RegData);
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_SP, RegData);
-	cpu_set_reg(state->m_maincpu, STATE_GENSP, RegData);
+	state->m_maincpu->set_state_int(Z80_SP, RegData);
+	state->m_maincpu->set_state_int(STATE_GENSP, RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 
-	cpu_set_reg(state->m_maincpu, Z80_PC, RegData);
-//  cpu_set_reg(state->m_maincpu, REG_SP, RegData);
+	state->m_maincpu->set_state_int(Z80_PC, RegData);
+//  state->m_maincpu->set_state_int(REG_SP, RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
-	cpu_set_reg(state->m_maincpu, Z80_IM, RegData);
+	state->m_maincpu->set_state_int(Z80_IM, RegData);
 
 	RegData = (pSnapshot[0x026] & 0x0ff) | ((pSnapshot[0x027] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_AF2, RegData);
+	state->m_maincpu->set_state_int(Z80_AF2, RegData);
 
 	RegData = (pSnapshot[0x028] & 0x0ff) | ((pSnapshot[0x029] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_BC2, RegData);
+	state->m_maincpu->set_state_int(Z80_BC2, RegData);
 
 	RegData = (pSnapshot[0x02a] & 0x0ff) | ((pSnapshot[0x02b] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_DE2, RegData);
+	state->m_maincpu->set_state_int(Z80_DE2, RegData);
 
 	RegData = (pSnapshot[0x02c] & 0x0ff) | ((pSnapshot[0x02d] & 0x0ff)<<8);
-	cpu_set_reg(state->m_maincpu, Z80_HL2, RegData);
+	state->m_maincpu->set_state_int(Z80_HL2, RegData);
 
 	/* init GA */
 	for (i=0; i<17; i++)

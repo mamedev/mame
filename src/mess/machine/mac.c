@@ -3216,7 +3216,7 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	s = &buf[strlen(buf)];
 	mem = mac_ram_ptr;
-	a0 = cpu_get_reg(M68K_A0);
+	a0 = M68K_A0);
 	a7 = cpu_get_reg(M68K_A7);
 	d0 = cpu_get_reg(M68K_D0);
 	d1 = cpu_get_reg(M68K_D1);
@@ -3227,7 +3227,7 @@ static void mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		ioVRefNum = *((INT16*) (mem + a0 + 22));
 		ioCRefNum = *((INT16*) (mem + a0 + 24));
 		csCode = *((UINT16*) (mem + a0 + 26));
-		sprintf(s, " ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
+		sprintf(s->state().state_int(" ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
 		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
 		{

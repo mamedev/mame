@@ -296,7 +296,7 @@ static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 
 static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 {
-	if ( cpu_get_reg( device->machine().firstcpu, STATE_GENPC ) == 0xF0454 )
+	if ( device->machine().firstcpu->pc() == 0xF0454 )
 	{
 		pc_int_delay_timer->adjust( device->machine().firstcpu->cycles_to_attotime(1), state );
 	}
@@ -1265,8 +1265,8 @@ READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r )
 	data = wd17xx_drq_r(device);
 	if (!data && !wd17xx_intrq_r(device)) {
 		/* fake cpu halt by resetting PC one insn back */
-		newpc = cpu_get_reg( device->machine().firstcpu, STATE_GENPC );
-		cpu_set_reg( device->machine().firstcpu, STATE_GENPC, newpc - 1 );
+		newpc = device->machine().firstcpu->pc();
+		device->machine().firstcpu->set_pc( newpc - 1 );
 	}
 
 	return data;

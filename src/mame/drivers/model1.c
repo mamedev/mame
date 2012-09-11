@@ -850,7 +850,7 @@ WRITE16_MEMBER(model1_state::mr2_w)
 
 READ16_MEMBER(model1_state::snd_68k_ready_r)
 {
-	int sr = cpu_get_reg(machine().device("audiocpu"), M68K_SR);
+	int sr = machine().device("audiocpu")->state().state_int(M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{

@@ -2148,7 +2148,7 @@ READ8_MEMBER(mpu4_state::characteriser_r)
 		logerror("No Characteriser Table @ %04x", space.device().safe_pcbase());
 
 		/* a cheat ... many early games use a standard check */
-		int addr = cpu_get_reg(&space.device(), M6809_X);
+		int addr = space.device().state().state_int(M6809_X);
 		if ((addr>=0x800) && (addr<=0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
 		UINT8 ret = space.read_byte(addr);

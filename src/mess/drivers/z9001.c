@@ -153,7 +153,7 @@ static TIMER_DEVICE_CALLBACK( timer_callback )
 MACHINE_RESET_MEMBER( z9001_state )
 {
 	beep_set_frequency(m_beeper, 800);
-	cpu_set_reg(m_maincpu, Z80_PC, 0xf000);
+	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
 VIDEO_START_MEMBER( z9001_state )

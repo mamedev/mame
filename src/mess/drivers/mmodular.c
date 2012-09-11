@@ -947,7 +947,7 @@ WRITE16_MEMBER(polgar_state::write_unknown2)
 
 READ32_MEMBER(polgar_state::read_unknown3_32)
 {
-	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) cpu_get_reg(machine().device("maincpu"), M68K_PC));
+	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) machine().device("maincpu")->state().state_int(M68K_PC));
 	return 0xffffffff;
 	//return unknown2_data|unknown2_data<<24;
 

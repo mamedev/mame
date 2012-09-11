@@ -2209,7 +2209,7 @@ ROM_END
 
 static int irq_active(address_space *space)
 {
-	UINT32 FCR = cpu_get_reg(&space->device(), 27);
+	UINT32 FCR = space->device().state().state_int(27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)
 		return 1;
 	else

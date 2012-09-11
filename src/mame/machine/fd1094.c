@@ -665,7 +665,7 @@ void fd1094_device::change_state(int newstate)
 	m_state_change(state());
 
 	// force a flush of the prefetch cache on any state change
-	set_state(M68K_PREF_ADDR, 0x0010);
+	set_state_int(M68K_PREF_ADDR, 0x0010);
 }
 
 

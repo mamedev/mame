@@ -148,7 +148,7 @@ WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 	{
 		int pc = space.device().safe_pcbase();
 //      if (pc == 0x11cbe || pc == 0x11c30)
-//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(&space.device(), M68K_A2));
+//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, space.device().state().state_int(M68K_A2));
 //      else
 		if (ACCESSING_BITS_16_31)
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4, data >> 16);

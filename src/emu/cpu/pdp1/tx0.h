@@ -20,8 +20,8 @@ enum
 	TX0_IO_COMPLETE		/* hack, do not use directly, use tx0_pulse_io_complete instead */
 };
 
-#define tx0_pulse_reset(cpudevice)			cpu_set_reg(cpudevice, TX0_RESET, 0)
-#define tx0_pulse_io_complete(cpudevice)	cpu_set_reg(cpudevice, TX0_IO_COMPLETE, 0)
+#define tx0_pulse_reset(cpudevice)			(cpudevice)->state().set_state_int(TX0_RESET, 0)
+#define tx0_pulse_io_complete(cpudevice)	(cpudevice)->state().set_state_int(TX0_IO_COMPLETE, 0)
 
 typedef struct _tx0_reset_param_t tx0_reset_param_t;
 struct _tx0_reset_param_t

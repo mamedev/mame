@@ -1775,11 +1775,11 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	m_main_cpu->set_state(STATE_GENSP, 0x1000);
+	m_main_cpu->set_state_int(STATE_GENSP, 0x1000);
 	m_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
-	m_main_cpu->set_state(STATE_GENPC, quickload_begin);
+	m_main_cpu->set_pc(quickload_begin);
 	m_shared_ram[1]=quickload_begin;
 	return IMAGE_INIT_PASS;
 }
@@ -1835,7 +1835,7 @@ int jaguar_state::cart_load(device_image_interface &image)
 //  m_cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
-	m_main_cpu->set_state(STATE_GENPC, m_rom_base[1]);
+	m_main_cpu->set_pc(m_rom_base[1]);
 	return IMAGE_INIT_PASS;
 }
 

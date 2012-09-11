@@ -107,7 +107,7 @@ static MACHINE_RESET(altair)
 {
 	altair_state *state = machine.driver_data<altair_state>();
 	// Set startup addess done by turn-key
-	cpu_set_reg(machine.device("maincpu"), I8085_PC, 0xFD00);
+	machine.device("maincpu")->state().set_state_int(I8085_PC, 0xFD00);
 
 	state->m_term_data = 0;
 }

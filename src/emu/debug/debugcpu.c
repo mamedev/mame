@@ -3126,7 +3126,7 @@ void device_debug::set_logunmap(symbol_table &table, void *ref, UINT64 value)
 UINT64 device_debug::get_state(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_state->state(reinterpret_cast<FPTR>(ref));
+	return device->debug()->m_state->state_int(reinterpret_cast<FPTR>(ref));
 }
 
 
@@ -3138,7 +3138,7 @@ UINT64 device_debug::get_state(symbol_table &table, void *ref)
 void device_debug::set_state(symbol_table &table, void *ref, UINT64 value)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	device->debug()->m_state->set_state(reinterpret_cast<FPTR>(ref), value);
+	device->debug()->m_state->set_state_int(reinterpret_cast<FPTR>(ref), value);
 }
 
 

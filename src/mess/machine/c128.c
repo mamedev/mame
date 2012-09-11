@@ -758,8 +758,8 @@ void c128_state::bankswitch(int reset)
              * driver used to work with this behavior, so I am doing this hack
              * where I set CPU #1's PC to 0x1100 on reset.
              */
-			if (cpu_get_reg(m_subcpu, STATE_GENPC) == 0x0000)
-				cpu_set_reg(m_subcpu, STATE_GENPC, 0x1100);
+			if (m_subcpu->pc() == 0x0000)
+				m_subcpu->set_pc(0x1100);
 		}
 		m_mmu_cpu = MMU_CPU8502;
 		return;

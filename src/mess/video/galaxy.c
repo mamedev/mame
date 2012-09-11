@@ -25,11 +25,11 @@ static TIMER_CALLBACK( gal_video )
 		if ((state->m_gal_cnt >= 48 * 2) && (state->m_gal_cnt < 48 * 210))  // display on screen just state->m_first 208 lines
 		{
 			UINT8 mode = (state->m_latch_value >> 1) & 1; // bit 2 latch represents mode
-			UINT16 addr = (cpu_get_reg(machine.device("maincpu"), Z80_I) << 8) | cpu_get_reg(machine.device("maincpu"), Z80_R) | ((state->m_latch_value & 0x80) ^ 0x80);
+			UINT16 addr = (machine.device("maincpu")->state().state_int(Z80_I) << 8) | machine.device("maincpu")->state().state_int(Z80_R) | ((state->m_latch_value & 0x80) ^ 0x80);
 			if (mode == 0)
 			{
 				// Text mode
-				if (state->m_first == 0 && (cpu_get_reg(machine.device("maincpu"), Z80_R) & 0x1f) == 0)
+				if (state->m_first == 0 && (machine.device("maincpu")->state().state_int(Z80_R) & 0x1f) == 0)
 				{
 					// Due to a fact that on real processor latch value is set at
 					// the end of last cycle we need to skip dusplay of double
@@ -58,7 +58,7 @@ static TIMER_CALLBACK( gal_video )
 			}
 			else
 			{ // Graphics mode
-				if (state->m_first < 4 && (cpu_get_reg(machine.device("maincpu"), Z80_R) & 0x1f) == 0)
+				if (state->m_first < 4 && (machine.device("maincpu")->state().state_int(Z80_R) & 0x1f) == 0)
 				{
 					// Due to a fact that on real processor latch value is set at
 					// the end of last cycle we need to skip dusplay of 4 times

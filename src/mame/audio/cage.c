@@ -494,11 +494,11 @@ static void update_control_lines(running_machine &machine)
 	}
 
 	/* set the IOF input lines */
-	val = cpu_get_reg(state->cpu, TMS3203X_IOF);
+	val = state->cpu->state_int(TMS3203X_IOF);
 	val &= ~0x88;
 	if (state->cpu_to_cage_ready) val |= 0x08;
 	if (state->cage_to_cpu_ready) val |= 0x80;
-	state->cpu->set_state(TMS3203X_IOF, val);
+	state->cpu->set_state_int(TMS3203X_IOF, val);
 }
 
 

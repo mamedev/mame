@@ -133,7 +133,7 @@ READ8_MEMBER( p8k_state::p8k_port0_r )
 // see memory explanation above
 WRITE8_MEMBER( p8k_state::p8k_port0_w )
 {
-	UINT8 breg = cpu_get_reg(m_maincpu, Z80_B) >> 4;
+	UINT8 breg = m_maincpu->state_int(Z80_B) >> 4;
 	if ((data==1) || (data==2) || (data==4))
 	{
 		char banknum[8];
@@ -177,14 +177,14 @@ WRITE8_MEMBER( p8k_state::kbd_put )
 	// This is a dreadful hack..
 	// simulate interrupt by saving current pc on
 	// the stack and jumping to interrupt handler.
-	UINT16 spreg = cpu_get_reg(m_maincpu, Z80_SP);
-	UINT16 pcreg = cpu_get_reg(m_maincpu, Z80_PC);
+	UINT16 spreg = m_maincpu->state_int(Z80_SP);
+	UINT16 pcreg = m_maincpu->state_int(Z80_PC);
 	spreg--;
 	space.write_byte(spreg, pcreg >> 8);
 	spreg--;
 	space.write_byte(spreg, pcreg);
-	cpu_set_reg(m_maincpu, Z80_SP, spreg);
-	cpu_set_reg(m_maincpu, Z80_PC, 0x078A);
+	m_maincpu->set_state_int(Z80_SP, spreg);
+	m_maincpu->set_state_int(Z80_PC, 0x078A);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )

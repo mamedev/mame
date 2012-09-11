@@ -62,12 +62,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(horizon)
 {
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xe800);
+	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xe800);
 }
 
 static MACHINE_RESET(horizon_sd)
 {
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xe900);
+	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xe900);
 }
 
 WRITE8_MEMBER( horizon_state::kbd_put )

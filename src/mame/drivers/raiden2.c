@@ -143,12 +143,12 @@ Current Problem(s) - in order of priority
 
 static UINT16 rps(running_machine &machine)
 {
-	return cpu_get_reg(machine.device("maincpu"), NEC_CS);
+	return machine.device("maincpu")->state().state_int(NEC_CS);
 }
 
 static UINT16 rpc(running_machine &machine)
 {
-	return cpu_get_reg(machine.device("maincpu"), NEC_IP);
+	return machine.device("maincpu")->state().state_int(NEC_IP);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)

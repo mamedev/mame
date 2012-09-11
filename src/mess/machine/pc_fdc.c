@@ -513,7 +513,7 @@ READ8_HANDLER ( pc_fdc_r )
     }
 
 	if (LOG_FDC)
-		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_r(): pc=0x%08x offset=%d result=0x%02X\n", (unsigned) space->machine().firstcpu->pc(), offset, data);
 	return data;
 }
 
@@ -522,7 +522,7 @@ READ8_HANDLER ( pc_fdc_r )
 WRITE8_HANDLER ( pc_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
+		logerror("pc_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) space->machine().firstcpu->pc(), offset, data);
 
 	pc_fdc_check_data_rate(space->machine());  // check every time a command may start
 	switch(offset)
@@ -563,7 +563,7 @@ WRITE8_HANDLER ( pc_fdc_w )
 WRITE8_HANDLER ( pcjr_fdc_w )
 {
 	if (LOG_FDC)
-		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) cpu_get_reg(space->machine().firstcpu,STATE_GENPC), offset, data);
+		logerror("pcjr_fdc_w(): pc=0x%08x offset=%d data=0x%02X\n", (unsigned) space->machine().firstcpu->pc(), offset, data);
 
 	switch(offset)
 	{

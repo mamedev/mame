@@ -975,7 +975,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_break )
 		if (!m_lcd_on)
 		{
 			m_lcd_on = 1;
-			cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
+			m_maincpu->set_state_int(Z80_PC, 0xc3c3);
 		}
 		else
 		{
@@ -1489,7 +1489,7 @@ void x07_state::machine_reset()
 
 	m_regs_r[2] = ioport("CARDBATTERY")->read();
 
-	cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
+	m_maincpu->set_state_int(Z80_PC, 0xc3c3);
 }
 
 static const cassette_interface x07_cassette_interface =

@@ -58,7 +58,7 @@ void meadows_sh_update(running_machine &machine)
 		/* amplitude is a combination of the upper 4 bits of 0c01 */
 		/* and bit 4 merged from S2650's flag output */
 		amp = ((state->m_0c03 & ENABLE_CTR1) == 0) ? 0 : (state->m_0c01 & 0xf0) >> 1;
-		if( cpu_get_reg(machine.device("maincpu"), S2650_FO) )
+		if( machine.device("maincpu")->state().state_int(S2650_FO) )
 			amp += 0x80;
 		/* calculate frequency for counter #1 */
 		/* bit 0..3 of 0c01 are ctr preset */

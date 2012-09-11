@@ -309,41 +309,41 @@ static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bit
 static void pdp1_draw_panel(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	/* column 1: registers, test word, test address */
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_pc_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_PC), 16);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_ma_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_MA), 16);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_mb_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_MB), 18);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_ac_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_AC), 18);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_io_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_IO), 18);
-	pdp1_draw_switch(machine, bitmap, x_panel_col1_offset, y_panel_ta_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_EXTEND_SW));
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+16, y_panel_ta_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_TA), 16);
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset, y_panel_tw_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_TW), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_pc_offset+8, machine.device("maincpu")->state().state_int(PDP1_PC), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_ma_offset+8, machine.device("maincpu")->state().state_int(PDP1_MA), 16);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_mb_offset+8, machine.device("maincpu")->state().state_int(PDP1_MB), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_ac_offset+8, machine.device("maincpu")->state().state_int(PDP1_AC), 18);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset, y_panel_io_offset+8, machine.device("maincpu")->state().state_int(PDP1_IO), 18);
+	pdp1_draw_switch(machine, bitmap, x_panel_col1_offset, y_panel_ta_offset+8, machine.device("maincpu")->state().state_int(PDP1_EXTEND_SW));
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset+16, y_panel_ta_offset+8, machine.device("maincpu")->state().state_int(PDP1_TA), 16);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col1_offset, y_panel_tw_offset+8, machine.device("maincpu")->state().state_int(PDP1_TW), 18);
 
 	/* column 2: 1-bit indicators */
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, cpu_get_reg(machine.device("maincpu"), PDP1_RUN));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cyc_offset, cpu_get_reg(machine.device("maincpu"), PDP1_CYC));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_defer_offset, cpu_get_reg(machine.device("maincpu"), PDP1_DEFER));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, machine.device("maincpu")->state().state_int(PDP1_RUN));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cyc_offset, machine.device("maincpu")->state().state_int(PDP1_CYC));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_defer_offset, machine.device("maincpu")->state().state_int(PDP1_DEFER));
 	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_hs_cyc_offset, 0);	/* not emulated */
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, cpu_get_reg(machine.device("maincpu"), PDP1_BRK_CTR) & 1);
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, cpu_get_reg(machine.device("maincpu"), PDP1_BRK_CTR) & 2);
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ov_offset, cpu_get_reg(machine.device("maincpu"), PDP1_OV));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, cpu_get_reg(machine.device("maincpu"), PDP1_RIM));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_sbm_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SBM));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_exd_offset, cpu_get_reg(machine.device("maincpu"), PDP1_EXD));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, cpu_get_reg(machine.device("maincpu"), PDP1_IOH));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioc_offset, cpu_get_reg(machine.device("maincpu"), PDP1_IOC));
-	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, cpu_get_reg(machine.device("maincpu"), PDP1_IOS));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_1_offset, machine.device("maincpu")->state().state_int(PDP1_BRK_CTR) & 1);
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_brk_ctr_2_offset, machine.device("maincpu")->state().state_int(PDP1_BRK_CTR) & 2);
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ov_offset, machine.device("maincpu")->state().state_int(PDP1_OV));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, machine.device("maincpu")->state().state_int(PDP1_RIM));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_sbm_offset, machine.device("maincpu")->state().state_int(PDP1_SBM));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_exd_offset, machine.device("maincpu")->state().state_int(PDP1_EXD));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, machine.device("maincpu")->state().state_int(PDP1_IOH));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioc_offset, machine.device("maincpu")->state().state_int(PDP1_IOC));
+	pdp1_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, machine.device("maincpu")->state().state_int(PDP1_IOS));
 
 	/* column 3: power, single step, single inst, sense, flags, instr... */
 	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_power_offset, 1);	/* always on */
 	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_power_offset, 1);	/* always on */
-	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_STEP));
-	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_STEP));
-	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_INST));
-	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, cpu_get_reg(machine.device("maincpu"), PDP1_SNGL_INST));
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_SS), 6);
-	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+16, cpu_get_reg(machine.device("maincpu"), PDP1_SS), 6);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_pf_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_PF), 6);
-	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ir_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_IR), 5);
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_step_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_STEP));
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_step_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_STEP));
+	pdp1_draw_led(machine, bitmap, x_panel_col3_offset, y_panel_sngl_inst_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_INST));
+	pdp1_draw_switch(machine, bitmap, x_panel_col3_offset+8, y_panel_sngl_inst_offset, machine.device("maincpu")->state().state_int(PDP1_SNGL_INST));
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+8, machine.device("maincpu")->state().state_int(PDP1_SS), 6);
+	pdp1_draw_multipleswitch(machine, bitmap, x_panel_col3_offset, y_panel_ss_offset+16, machine.device("maincpu")->state().state_int(PDP1_SS), 6);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_pf_offset+8, machine.device("maincpu")->state().state_int(PDP1_PF), 6);
+	pdp1_draw_multipleled(machine, bitmap, x_panel_col3_offset, y_panel_ir_offset+8, machine.device("maincpu")->state().state_int(PDP1_IR), 5);
 }
 
 

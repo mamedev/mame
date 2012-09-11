@@ -580,7 +580,7 @@ QUICKLOAD_LOAD(vc4000)
 		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
 
 		// Start the quickload
-		cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+		image.device().machine().device("maincpu")->state().set_pc(exec_addr);
 		return IMAGE_INIT_PASS;
 	}
 	else
@@ -625,7 +625,7 @@ QUICKLOAD_LOAD(vc4000)
 		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
 		// Start the quickload
-		cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+		image.device().machine().device("maincpu")->state().set_pc(exec_addr);
 		return IMAGE_INIT_PASS;
 	}
 	else

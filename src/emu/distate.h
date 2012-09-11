@@ -151,20 +151,22 @@ public:
 	const device_state_entry *state_first() const { return m_state_list.first(); }
 
 	// state getters
-	UINT64 state(int index);
-	offs_t pc() { return state(STATE_GENPC); }
-	offs_t pcbase() { return state(STATE_GENPCBASE); }
-	offs_t sp() { return state(STATE_GENSP); }
-	UINT64 flags() { return state(STATE_GENFLAGS); }
+	UINT64 state_int(int index);
 	astring &state_string(int index, astring &dest);
 	int state_string_max_length(int index);
+	offs_t pc() { return state_int(STATE_GENPC); }
+	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
+	offs_t sp() { return state_int(STATE_GENSP); }
+	UINT64 flags() { return state_int(STATE_GENFLAGS); }
 
 	// state setters
-	void set_state(int index, UINT64 value);
+	void set_state_int(int index, UINT64 value);
 	void set_state_string(int index, const char *string);
+	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 	
 	// deliberately ambiguous functions; if you have the state interface
-	// just use pc() and pcbase() directly
+	// just use it or pc() and pcbase() directly
+	device_state_interface &state() { return *this; }
 	offs_t safe_pc() { return pc(); }
 	offs_t safe_pcbase() { return pcbase(); }
 

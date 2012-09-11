@@ -330,23 +330,23 @@ SNAPSHOT_LOAD(sorcerer)
 	image.fread( RAM+0xc000, 0x4000);
 
 	/* patch CPU registers */
-	cpu_set_reg(cpu, Z80_I, header[0]);
-	cpu_set_reg(cpu, Z80_HL2, header[1] | (header[2] << 8));
-	cpu_set_reg(cpu, Z80_DE2, header[3] | (header[4] << 8));
-	cpu_set_reg(cpu, Z80_BC2, header[5] | (header[6] << 8));
-	cpu_set_reg(cpu, Z80_AF2, header[7] | (header[8] << 8));
-	cpu_set_reg(cpu, Z80_HL, header[9] | (header[10] << 8));
-	cpu_set_reg(cpu, Z80_DE, header[11] | (header[12] << 8));
-	cpu_set_reg(cpu, Z80_BC, header[13] | (header[14] << 8));
-	cpu_set_reg(cpu, Z80_IY, header[15] | (header[16] << 8));
-	cpu_set_reg(cpu, Z80_IX, header[17] | (header[18] << 8));
-	cpu_set_reg(cpu, Z80_IFF1, header[19]&2 ? 1 : 0);
-	cpu_set_reg(cpu, Z80_IFF2, header[19]&4 ? 1 : 0);
-	cpu_set_reg(cpu, Z80_R, header[20]);
-	cpu_set_reg(cpu, Z80_AF, header[21] | (header[22] << 8));
-	cpu_set_reg(cpu, STATE_GENSP, header[23] | (header[24] << 8));
-	cpu_set_reg(cpu, Z80_IM, header[25]);
-	cpu_set_reg(cpu, STATE_GENPC, header[26] | (header[27] << 8));
+	cpu->state().set_state_int(Z80_I, header[0]);
+	cpu->state().set_state_int(Z80_HL2, header[1] | (header[2] << 8));
+	cpu->state().set_state_int(Z80_DE2, header[3] | (header[4] << 8));
+	cpu->state().set_state_int(Z80_BC2, header[5] | (header[6] << 8));
+	cpu->state().set_state_int(Z80_AF2, header[7] | (header[8] << 8));
+	cpu->state().set_state_int(Z80_HL, header[9] | (header[10] << 8));
+	cpu->state().set_state_int(Z80_DE, header[11] | (header[12] << 8));
+	cpu->state().set_state_int(Z80_BC, header[13] | (header[14] << 8));
+	cpu->state().set_state_int(Z80_IY, header[15] | (header[16] << 8));
+	cpu->state().set_state_int(Z80_IX, header[17] | (header[18] << 8));
+	cpu->state().set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
+	cpu->state().set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
+	cpu->state().set_state_int(Z80_R, header[20]);
+	cpu->state().set_state_int(Z80_AF, header[21] | (header[22] << 8));
+	cpu->state().set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
+	cpu->state().set_state_int(Z80_IM, header[25]);
+	cpu->state().set_pc(header[26] | (header[27] << 8));
 
 	return IMAGE_INIT_PASS;
 }

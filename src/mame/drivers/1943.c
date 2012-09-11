@@ -43,7 +43,7 @@ READ8_MEMBER(_1943_state::c1943_protection_r)
         if a read from this address doesn't return the value it expects.
     */
 
-	int data = cpu_get_reg(&space.device(), Z80_BC) >> 8;
+	int data = space.device().state().state_int(Z80_BC) >> 8;
 //  logerror("protection read, PC: %04x Result:%02x\n", space.device().safe_pc(), data);
 	return data;
 }

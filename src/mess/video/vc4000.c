@@ -116,7 +116,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 
 #ifndef ANALOG_HACK
 	case 0xcc:
-		if (!activecpu_get_reg(S2650_FO)) data=ioport("JOY1_X")->read();
+		if (!activeS2650_FO)) data=ioport("JOY1_X")->read();
 		else data=ioport("JOY1_Y")->read();
 		break;
 	case 0xcd:
@@ -128,7 +128,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 	case 0xcc:		/* left joystick */
 		if (ioport("CONFIG")->read()&1)
 		{		/* paddle */
-			if (!cpu_get_reg(machine().device("maincpu"), S2650_FO))
+			if (!machine().device("maincpu")->state().state_int(S2650_FO))
 			{
 				data = ioport("JOYS")->read() & 0x03;
 				switch (data)
@@ -167,7 +167,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		}
 		else
 		{		/* buttons */
-			if (!cpu_get_reg(machine().device("maincpu"), S2650_FO))
+			if (!machine().device("maincpu")->state().state_int(S2650_FO))
 			{
 				data = ioport("JOYS")->read() & 0x03;
 				switch (data)
@@ -205,7 +205,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 	case 0xcd:		/* right joystick */
 		if (ioport("CONFIG")->read()&1)
 		{
-			if (!cpu_get_reg(machine().device("maincpu"), S2650_FO))
+			if (!machine().device("maincpu")->state().state_int(S2650_FO))
 			{
 				data = ioport("JOYS")->read() & 0x30;
 				switch (data)
@@ -244,7 +244,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		}
 		else
 		{
-			if (!cpu_get_reg(machine().device("maincpu"), S2650_FO))
+			if (!machine().device("maincpu")->state().state_int(S2650_FO))
 			{
 				data = ioport("JOYS")->read() & 0x30;
 				switch (data)

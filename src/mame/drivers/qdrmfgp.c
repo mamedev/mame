@@ -242,7 +242,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 			switch (space.device().safe_pcbase())
 			{
 				case 0xdb4c:
-					if ((m_workram[0x5fa4/2] - cpu_get_reg(&space.device(), M68K_D0)) <= 0x10)
+					if ((m_workram[0x5fa4/2] - space.device().state().state_int(M68K_D0)) <= 0x10)
 						m_gp2_irq_control = 1;
 					break;
 				case 0xdec2:

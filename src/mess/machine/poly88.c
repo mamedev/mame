@@ -302,7 +302,7 @@ SNAPSHOT_LOAD( poly88 )
 					break;
 			case 3 :
 					/* 03 Auto Start @ Address */
-					cpu_set_reg(image.device().machine().device("maincpu"), I8085_PC, address);
+					image.device().machine().device("maincpu")->state().set_state_int(I8085_PC, address);
 					theend = 1;
 					break;
 			case 4 :

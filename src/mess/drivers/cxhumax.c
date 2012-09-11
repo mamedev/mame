@@ -159,7 +159,7 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 		memset(buf,0,200);
 
 		int i = 0;
-		while ((temp=program->read_byte(cpu_get_reg(m_maincpu, ARM7_R0)+i))) {
+		while ((temp=program->read_byte(m_maincpu->state_int(ARM7_R0)+i))) {
 			buf[i++]=temp;
 			//m_terminal->write(space, 0, temp);
 		}

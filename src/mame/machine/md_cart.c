@@ -437,13 +437,13 @@ static READ16_HANDLER( chifi3_prot_r )
 
 	if (space->device().safe_pc() == 0x01782) // makes 'VS' screen appear
 	{
-		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
+		retdat = space->device().state().state_int(M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
 	else if (space->device().safe_pc() == 0x1c24) // background gfx etc.
 	{
-		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
+		retdat = space->device().state().state_int(M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
@@ -457,19 +457,19 @@ static READ16_HANDLER( chifi3_prot_r )
 	}
 	else if (space->device().safe_pc() == 0x10c52) // relates to the game speed..
 	{
-		retdat = cpu_get_reg(&space->device(), M68K_D4) & 0xff;
+		retdat = space->device().state().state_int(M68K_D4) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
 	else if (space->device().safe_pc() == 0x061ae)
 	{
-		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
+		retdat = space->device().state().state_int(M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
 	else if (space->device().safe_pc() == 0x061b0)
 	{
-		retdat = cpu_get_reg(&space->device(), M68K_D3) & 0xff;
+		retdat = space->device().state().state_int(M68K_D3) & 0xff;
 		retdat <<= 8;
 		return retdat;
 	}
@@ -757,7 +757,7 @@ static READ16_HANDLER( topfig_6F5344_r ) // after char select
 
 	if (space->device().safe_pc()==0x4C94E)
 	{
-		return cpu_get_reg(space->machine().device("maincpu"), (M68K_D0)) & 0xff;
+		return space->machine().device("maincpu")->state().state_int((M68K_D0)) & 0xff;
 	}
 	else
 	{

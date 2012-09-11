@@ -350,7 +350,7 @@ static QUICKLOAD_LOAD( d6800 )
 	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
 
 	// Start the quickload
-	cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+	image.device().machine().device("maincpu")->state().set_pc(exec_addr);
 	return IMAGE_INIT_PASS;
 }
 

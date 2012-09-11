@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 {
 	if (state)
 	{
-		if (cpu_get_reg(m_maincpu, Z80_HALT))
+		if (m_maincpu->state_int(Z80_HALT))
 		{
 			device_set_input_line(m_maincpu, INPUT_LINE_NMI, HOLD_LINE);
 		}

@@ -70,7 +70,7 @@ QUICKLOAD_LOAD( atom_atm )
 
 	image_fread_memory(image, start_address, size);
 
-	cpu_set_reg(image.device().machine().firstcpu, STATE_GENPC, run_address);
+	image.device().machine().firstcpu->set_pc(run_address);
 
 	return IMAGE_INIT_PASS;
 }

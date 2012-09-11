@@ -69,7 +69,7 @@ QUICKLOAD_LOAD(kc)
 	if (execution_address != 0 && header->number_addresses >= 3 )
 	{
 		// if specified, jumps to the quickload start address
-		cpu_set_reg(state->m_maincpu, STATE_GENPC, execution_address);
+		state->m_maincpu->set_pc(execution_address);
 	}
 
 	auto_free(image.device().machine(), data);
@@ -790,7 +790,7 @@ void kc_state::machine_reset()
     at address 0x0000-0x01000 which has a single jump in it,
     can't see yet where it disables it later!!!! so for now
     here will be a override */
-	cpu_set_reg(m_maincpu, STATE_GENPC, 0x0f000);
+	m_maincpu->set_pc(0x0f000);
 }
 
 void kc85_4_state::machine_reset()

@@ -256,7 +256,7 @@ static SNAPSHOT_LOAD( vtech1 )
 		space->write_byte(0x788e, start % 256); /* usr subroutine address */
 		space->write_byte(0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, start);				/* start program */
+		image.device().machine().device("maincpu")->state().set_pc(start);				/* start program */
 		break;
 
 	default:

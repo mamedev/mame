@@ -56,6 +56,6 @@ DECLARE_LEGACY_CPU_DEVICE(I8085A, i8085);
 
 CPU_DISASSEMBLE( i8085 );
 
-#define i8085_set_sid(cpu, sid)		cpu_set_reg(cpu, I8085_SID, sid)
+#define i8085_set_sid(cpu, sid)		(cpu)->state().set_state_int(I8085_SID, sid)
 
 #endif

@@ -257,7 +257,7 @@ SCREEN_UPDATE_IND16( z1013 )
 MACHINE_RESET( z1013 )
 {
 	z1013_state *state = machine.driver_data<z1013_state>();
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xF000);
+	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xF000);
 	state->m_keyboard_part = 0;
 	state->m_keyboard_line = 0;
 }
@@ -352,7 +352,7 @@ SNAPSHOT_LOAD( z1013 )
 		 data+0x20, endaddr - startaddr + 1);
 
 	if (runaddr)
-		cpu_set_reg(image.device().machine().device("maincpu"), Z80_PC, runaddr);
+		image.device().machine().device("maincpu")->state().set_state_int(Z80_PC, runaddr);
 	else
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Loaded but cannot run");

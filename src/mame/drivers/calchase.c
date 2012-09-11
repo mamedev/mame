@@ -356,7 +356,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 				#if 0
 				if ((state->m_mxtc_config_reg[0x63] & 0x50) | ( state->m_mxtc_config_reg[0x63] & 0xA0)) // Only DO if comes a change to disable ROM.
 				{
-					if ( busdevice->machine(->safe_pc().device("maincpu"))==0xff74e) cpu_set_reg(busdevice->machine().device("maincpu"), STATE_GENPC, 0xff74d);
+					if ( busdevice->machine(->safe_pc().device("maincpu"))==0xff74e) busdevice->machine().device("maincpu")->state().set_pc(0xff74d);
 				}
 				#endif
 

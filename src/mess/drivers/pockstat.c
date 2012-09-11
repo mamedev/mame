@@ -919,7 +919,7 @@ static MACHINE_START( pockstat )
 static MACHINE_RESET( pockstat )
 {
 	pockstat_state *state = machine.driver_data<pockstat_state>();
-	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0x4000000);
+	machine.device("maincpu")->state().set_pc(0x4000000);
 
 	state->m_ps_flash_write_enable_count = 0;
 	state->m_ps_flash_write_count = 0;

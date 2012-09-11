@@ -523,7 +523,7 @@ NVRAM_HANDLER( ti83p )
 			if (file)
 			{
 				file->read(state->m_ti8x_ram, sizeof(unsigned char)*32*1024);
-				cpu_set_reg(state->m_maincpu, Z80_PC,0x0c59);
+				state->m_maincpu->set_state_int(Z80_PC,0x0c59);
 			}
 			else
 				memset(state->m_ti8x_ram, 0, sizeof(unsigned char)*32*1024);
@@ -542,7 +542,7 @@ NVRAM_HANDLER( ti86 )
 			if (file)
 			{
 				file->read(state->m_ti8x_ram, sizeof(unsigned char)*128*1024);
-				cpu_set_reg(state->m_maincpu, Z80_PC,0x0c59);
+				state->m_maincpu->set_state_int(Z80_PC,0x0c59);
 			}
 			else
 				memset(state->m_ti8x_ram, 0, sizeof(unsigned char)*128*1024);
@@ -562,47 +562,47 @@ static void ti8x_snapshot_setup_registers (running_machine &machine, UINT8 * dat
 	/* Set registers */
 	lo = reg[0x00] & 0x0ff;
 	hi = reg[0x01] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_AF, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_AF, (hi << 8) | lo);
 	lo = reg[0x04] & 0x0ff;
 	hi = reg[0x05] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_BC, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_BC, (hi << 8) | lo);
 	lo = reg[0x08] & 0x0ff;
 	hi = reg[0x09] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_DE, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_DE, (hi << 8) | lo);
 	lo = reg[0x0c] & 0x0ff;
 	hi = reg[0x0d] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_HL, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_HL, (hi << 8) | lo);
 	lo = reg[0x10] & 0x0ff;
 	hi = reg[0x11] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_IX, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_IX, (hi << 8) | lo);
 	lo = reg[0x14] & 0x0ff;
 	hi = reg[0x15] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_IY, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_IY, (hi << 8) | lo);
 	lo = reg[0x18] & 0x0ff;
 	hi = reg[0x19] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_PC, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_PC, (hi << 8) | lo);
 	lo = reg[0x1c] & 0x0ff;
 	hi = reg[0x1d] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_SP, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_SP, (hi << 8) | lo);
 	lo = reg[0x20] & 0x0ff;
 	hi = reg[0x21] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_AF2, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_AF2, (hi << 8) | lo);
 	lo = reg[0x24] & 0x0ff;
 	hi = reg[0x25] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_BC2, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_BC2, (hi << 8) | lo);
 	lo = reg[0x28] & 0x0ff;
 	hi = reg[0x29] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_DE2, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_DE2, (hi << 8) | lo);
 	lo = reg[0x2c] & 0x0ff;
 	hi = reg[0x2d] & 0x0ff;
-	cpu_set_reg(state->m_maincpu, Z80_HL2, (hi << 8) | lo);
-	cpu_set_reg(state->m_maincpu, Z80_IFF1, reg[0x30]&0x0ff);
-	cpu_set_reg(state->m_maincpu, Z80_IFF2, reg[0x34]&0x0ff);
-	cpu_set_reg(state->m_maincpu, Z80_HALT, reg[0x38]&0x0ff);
-	cpu_set_reg(state->m_maincpu, Z80_IM, reg[0x3c]&0x0ff);
-	cpu_set_reg(state->m_maincpu, Z80_I, reg[0x40]&0x0ff);
+	state->m_maincpu->set_state_int(Z80_HL2, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(Z80_IFF1, reg[0x30]&0x0ff);
+	state->m_maincpu->set_state_int(Z80_IFF2, reg[0x34]&0x0ff);
+	state->m_maincpu->set_state_int(Z80_HALT, reg[0x38]&0x0ff);
+	state->m_maincpu->set_state_int(Z80_IM, reg[0x3c]&0x0ff);
+	state->m_maincpu->set_state_int(Z80_I, reg[0x40]&0x0ff);
 
-	cpu_set_reg(state->m_maincpu, Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
+	state->m_maincpu->set_state_int(Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
 
 	device_set_input_line(state->m_maincpu, 0, 0);
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, 0);

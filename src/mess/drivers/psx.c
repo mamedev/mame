@@ -164,13 +164,13 @@ static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 			n_size--;
 		}
 
-		cpu_set_reg( cpu, PSXCPU_PC, psxexe_header->pc0 );
-		cpu_set_reg( cpu, PSXCPU_R28, psxexe_header->gp0 );
+		cpu->state().set_state_int( PSXCPU_PC, psxexe_header->pc0 );
+		cpu->state().set_state_int( PSXCPU_R28, psxexe_header->gp0 );
 		n_stack = psxexe_header->s_addr + psxexe_header->s_size;
 		if( n_stack != 0 )
 		{
-			cpu_set_reg( cpu, PSXCPU_R29, n_stack );
-			cpu_set_reg( cpu, PSXCPU_R30, n_stack );
+			cpu->state().set_state_int( PSXCPU_R29, n_stack );
+			cpu->state().set_state_int( PSXCPU_R30, n_stack );
 		}
 
 		return 1;
@@ -183,37 +183,37 @@ static void cpe_set_register( device_t *cpu, int n_reg, int n_value )
 	if( n_reg < 0x80 && ( n_reg % 4 ) == 0 )
 	{
 		logerror( "psx_exe_load: r%-2d   %08x\n", n_reg / 4, n_value );
-		cpu_set_reg( cpu, PSXCPU_R0 + ( n_reg / 4 ), n_value );
+		cpu->state().set_state_int( PSXCPU_R0 + ( n_reg / 4 ), n_value );
 	}
 	else if( n_reg == 0x80 )
 	{
 		logerror( "psx_exe_load: lo    %08x\n", n_value );
-		cpu_set_reg( cpu, PSXCPU_LO, n_value );
+		cpu->state().set_state_int( PSXCPU_LO, n_value );
 	}
 	else if( n_reg == 0x84 )
 	{
 		logerror( "psx_exe_load: hi    %08x\n", n_value );
-		cpu_set_reg( cpu, PSXCPU_HI, n_value );
+		cpu->state().set_state_int( PSXCPU_HI, n_value );
 	}
 	else if( n_reg == 0x88 )
 	{
 		logerror( "psx_exe_load: sr    %08x\n", n_value );
-		cpu_set_reg( cpu, PSXCPU_CP0R12, n_value );
+		cpu->state().set_state_int( PSXCPU_CP0R12, n_value );
 	}
 	else if( n_reg == 0x8c )
 	{
 		logerror( "psx_exe_load: cause %08x\n", n_value );
-		cpu_set_reg( cpu, PSXCPU_CP0R13, n_value );
+		cpu->state().set_state_int( PSXCPU_CP0R13, n_value );
 	}
 	else if( n_reg == 0x90 )
 	{
 		logerror( "psx_exe_load: pc    %08x\n", n_value );
-		cpu_set_reg( cpu, PSXCPU_PC, n_value );
+		cpu->state().set_state_int( PSXCPU_PC, n_value );
 	}
 	else if( n_reg == 0x94 )
 	{
 		logerror( "psx_exe_load: prid  %08x\n", n_value );
-		cpu_set_reg( cpu, PSXCPU_CP0R15, n_value );
+		cpu->state().set_state_int( PSXCPU_CP0R15, n_value );
 	}
 	else
 	{
@@ -438,7 +438,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 		{
 /*          DEBUGGER_BREAK; */
 
-			address = cpu_get_reg( cpu, PSXCPU_PC );
+			address = cpu->state().state_int( PSXCPU_PC );
 		}
 		else
 		{

@@ -34,7 +34,7 @@
 
 #define LOAD_REG(_cpu, _reg, _data) \
         do { \
-          cpu_set_reg(_cpu, _reg, (_data)); \
+          _cpu->state().set_state_int(_reg, (_data)); \
         } while (0)
 
 #define EXEC_NA "N/A"
@@ -609,7 +609,7 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
           space->write_byte(BASE_RAM + i, snapdata[SNA48_HDR + i]);
 
         /* Get PC from stack */
-        addr = cpu_get_reg(cpu, Z80_SP);
+        addr = cpu->state().state_int(Z80_SP);
 
         if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 2)
           logerror("Corrupted SP out of range:%04X", addr);
@@ -626,7 +626,7 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
         addr += 2;
         logerror("Fixing SP:%04X\n", addr);
-        cpu_set_reg(cpu, Z80_SP, addr);
+        cpu->state().set_state_int(Z80_SP, addr);
 
         /* Set border color */
         data = snapdata[SNA48_OFFSET + 26] & 0x07;
@@ -951,7 +951,7 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
     addr += 6;
     logerror("Fixing SP:%04X\n", addr);
-    cpu_set_reg(cpu, Z80_SP, addr);
+    cpu->state().set_state_int(Z80_SP, addr);
 
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
@@ -1153,7 +1153,7 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
 
     addr += 6;
     logerror("Fixing SP:%04X\n", addr);
-    cpu_set_reg(cpu, Z80_SP, addr);
+    cpu->state().set_state_int(Z80_SP, addr);
 
     /* Set border color */
     data = (space->read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
@@ -1886,7 +1886,7 @@ void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     spectrum_snx_decompress_block(machine, snapdata, BASE_RAM, 3*SPECTRUM_BANK);
 
     /* get pc from stack */
-    addr = cpu_get_reg(cpu, Z80_SP);
+    addr = cpu->state().state_int(Z80_SP);
 
     if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 2)
       logerror("Corrupted SP out of range:%04X", addr);
@@ -1902,7 +1902,7 @@ void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
     addr += 2;
     logerror("Fixed the stack at SP:%04X\n", addr);
-    cpu_set_reg(cpu, Z80_SP, addr);
+    cpu->state().set_state_int(Z80_SP, addr);
 
     /* Set border color */
     data = snapdata[SNX_OFFSET + 32] & 0x07;
@@ -2235,27 +2235,27 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     /* AF */
     hi = snapdata[0] & 0x0ff;
     lo = snapdata[1] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_AF, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_AF, (hi << 8) | lo);
     /* BC */
     lo = snapdata[2] & 0x0ff;
     hi = snapdata[3] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_BC, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_BC, (hi << 8) | lo);
     /* HL */
     lo = snapdata[4] & 0x0ff;
     hi = snapdata[5] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_HL, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_HL, (hi << 8) | lo);
 
     /* SP */
     lo = snapdata[8] & 0x0ff;
     hi = snapdata[9] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_SP, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_SP, (hi << 8) | lo);
 
     /* I */
-    cpu_set_reg(machine.device("maincpu"), Z80_I, (snapdata[10] & 0x0ff));
+    machine.device("maincpu")->state().set_state_int(Z80_I, (snapdata[10] & 0x0ff));
 
     /* R */
     data = (snapdata[11] & 0x07f) | ((snapdata[12] & 0x01) << 7);
-    cpu_set_reg(machine.device("maincpu"), Z80_R, data);
+    machine.device("maincpu")->state().set_state_int(Z80_R, data);
 
     /* Set border color */
     state->m_port_fe_data = (state->m_port_fe_data & 0xf8) | ((snapdata[12] & 0x0e) >> 1);
@@ -2263,42 +2263,42 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
     lo = snapdata[13] & 0x0ff;
     hi = snapdata[14] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_DE, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_DE, (hi << 8) | lo);
 
     lo = snapdata[15] & 0x0ff;
     hi = snapdata[16] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_BC2, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_BC2, (hi << 8) | lo);
 
     lo = snapdata[17] & 0x0ff;
     hi = snapdata[18] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_DE2, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_DE2, (hi << 8) | lo);
 
     lo = snapdata[19] & 0x0ff;
     hi = snapdata[20] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_HL2, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_HL2, (hi << 8) | lo);
 
     hi = snapdata[21] & 0x0ff;
     lo = snapdata[22] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_AF2, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_AF2, (hi << 8) | lo);
 
     lo = snapdata[23] & 0x0ff;
     hi = snapdata[24] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_IY, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_IY, (hi << 8) | lo);
 
     lo = snapdata[25] & 0x0ff;
     hi = snapdata[26] & 0x0ff;
-    cpu_set_reg(machine.device("maincpu"), Z80_IX, (hi << 8) | lo);
+    machine.device("maincpu")->state().set_state_int(Z80_IX, (hi << 8) | lo);
 
     /* Interrupt Flip/Flop */
     if (snapdata[27] == 0)
     {
-        cpu_set_reg(machine.device("maincpu"), Z80_IFF1, (UINT64)0);
-        /* cpu_set_reg(machine.device("maincpu"), Z80_IRQ_STATE, 0); */
+        machine.device("maincpu")->state().set_state_int(Z80_IFF1, (UINT64)0);
+        /* machine.device("maincpu")->state().set_state_int(Z80_IRQ_STATE, 0); */
     }
     else
     {
-        cpu_set_reg(machine.device("maincpu"), Z80_IFF1, 1);
-        /* cpu_set_reg(machine.device("maincpu"), Z80_IRQ_STATE, 1); */
+        machine.device("maincpu")->state().set_state_int(Z80_IFF1, 1);
+        /* machine.device("maincpu")->state().set_state_int(Z80_IRQ_STATE, 1); */
     }
 
     cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -2314,16 +2314,16 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     {
         data = 0;
     }
-    cpu_set_reg(machine.device("maincpu"), Z80_IFF2, data);
+    machine.device("maincpu")->state().set_state_int(Z80_IFF2, data);
 
     /* Interrupt Mode */
-    cpu_set_reg(machine.device("maincpu"), Z80_IM, (snapdata[29] & 0x03));
+    machine.device("maincpu")->state().set_state_int(Z80_IM, (snapdata[29] & 0x03));
 
     if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K_OLD)
     {
         lo = snapdata[6] & 0x0ff;
         hi = snapdata[7] & 0x0ff;
-        cpu_set_reg(machine.device("maincpu"), Z80_PC, (hi << 8) | lo);
+        machine.device("maincpu")->state().set_state_int(Z80_PC, (hi << 8) | lo);
 
         spectrum_page_basicrom(machine);
 
@@ -2348,7 +2348,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
         lo = snapdata[32] & 0x0ff;
         hi = snapdata[33] & 0x0ff;
-        cpu_set_reg(machine.device("maincpu"), Z80_PC, (hi << 8) | lo);
+        machine.device("maincpu")->state().set_state_int(Z80_PC, (hi << 8) | lo);
 
         if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine.system().name,"ts2068")))
         {

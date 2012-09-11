@@ -106,7 +106,7 @@ READ8_MEMBER(pecom_state::pecom_keyboard_r)
        Address is available on address bus during reading of value from port, and that is
        used to determine keyboard line reading
     */
-	UINT16 addr = cpu_get_reg(machine().device(CDP1802_TAG), COSMAC_R0 + cpu_get_reg(machine().device(CDP1802_TAG), COSMAC_X));
+	UINT16 addr = machine().device(CDP1802_TAG)->state().state_int(COSMAC_R0 + machine().device(CDP1802_TAG)->state().state_int(COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
 	return ioport(keynames[addr - 0x7cca])->read() & 0x03;

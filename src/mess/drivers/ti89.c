@@ -464,7 +464,7 @@ void ti68k_state::machine_start()
 
 void ti68k_state::machine_reset()
 {
-	m_maincpu->set_state(M68K_PC, m_initial_pc);
+	m_maincpu->set_state_int(M68K_PC, m_initial_pc);
 
 	m_kb_mask = 0xff;
 	m_on_key = 0;

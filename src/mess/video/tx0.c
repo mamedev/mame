@@ -300,35 +300,35 @@ static void tx0_draw_panel(running_machine &machine, bitmap_ind16 &bitmap)
 	int i;
 
 	/* column 1: registers, test accumulator, test buffer, toggle switch storage */
-	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset+2*8, y_panel_pc_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_PC), 16);
-	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset+2*8, y_panel_mar_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_MAR), 16);
-	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset, y_panel_mbr_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_MBR), 18);
-	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset, y_panel_ac_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_AC), 18);
-	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset, y_panel_lr_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_LR), 18);
-	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset+4*8, y_panel_xr_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_XR), 14);
-	tx0_draw_multipleswitch(machine, bitmap, x_panel_col1b_offset, y_panel_tbr_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_TBR), 18);
-	tx0_draw_multipleswitch(machine, bitmap, x_panel_col1b_offset, y_panel_tac_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_TAC), 18);
-	cm_sel = cpu_get_reg(machine.device("maincpu"), TX0_CM_SEL);
-	lr_sel = cpu_get_reg(machine.device("maincpu"), TX0_LR_SEL);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset+2*8, y_panel_pc_offset+8, machine.device("maincpu")->state().state_int(TX0_PC), 16);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset+2*8, y_panel_mar_offset+8, machine.device("maincpu")->state().state_int(TX0_MAR), 16);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset, y_panel_mbr_offset+8, machine.device("maincpu")->state().state_int(TX0_MBR), 18);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset, y_panel_ac_offset+8, machine.device("maincpu")->state().state_int(TX0_AC), 18);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset, y_panel_lr_offset+8, machine.device("maincpu")->state().state_int(TX0_LR), 18);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col1b_offset+4*8, y_panel_xr_offset+8, machine.device("maincpu")->state().state_int(TX0_XR), 14);
+	tx0_draw_multipleswitch(machine, bitmap, x_panel_col1b_offset, y_panel_tbr_offset+8, machine.device("maincpu")->state().state_int(TX0_TBR), 18);
+	tx0_draw_multipleswitch(machine, bitmap, x_panel_col1b_offset, y_panel_tac_offset+8, machine.device("maincpu")->state().state_int(TX0_TAC), 18);
+	cm_sel = machine.device("maincpu")->state().state_int(TX0_CM_SEL);
+	lr_sel = machine.device("maincpu")->state().state_int(TX0_LR_SEL);
 	for (i=0; i<16; i++)
 	{
 		tx0_draw_switch(machine, bitmap, x_panel_col1a_offset+16, y_panel_tss_offset+8+i*8, (cm_sel >> i) & 1);
-		tx0_draw_multipleswitch(machine, bitmap, x_panel_col1a_offset+24, y_panel_tss_offset+8+i*8, cpu_get_reg(machine.device("maincpu"), TX0_TSS00+i), 18);
+		tx0_draw_multipleswitch(machine, bitmap, x_panel_col1a_offset+24, y_panel_tss_offset+8+i*8, machine.device("maincpu")->state().state_int(TX0_TSS00+i), 18);
 		tx0_draw_switch(machine, bitmap, x_panel_col1a_offset+168, y_panel_tss_offset+8+i*8, (lr_sel >> i) & 1);
 	}
 
 	/* column 2: stop c0, stop c1, cm sel, 1-bit indicators, instr, flags */
-	tx0_draw_switch(machine, bitmap, x_panel_col2_offset, y_panel_stop_c0_offset, cpu_get_reg(machine.device("maincpu"), TX0_STOP_CYC0));
-	tx0_draw_switch(machine, bitmap, x_panel_col2_offset, y_panel_stop_c1_offset, cpu_get_reg(machine.device("maincpu"), TX0_STOP_CYC1));
-	tx0_draw_switch(machine, bitmap, x_panel_col2_offset, y_panel_gbl_cm_sel_offset, cpu_get_reg(machine.device("maincpu"), TX0_GBL_CM_SEL));
-	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, cpu_get_reg(machine.device("maincpu"), TX0_RUN));
-	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cycle1_offset, cpu_get_reg(machine.device("maincpu"), TX0_CYCLE) & 1);
-	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cycle2_offset, cpu_get_reg(machine.device("maincpu"), TX0_CYCLE) & 2);
-	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, cpu_get_reg(machine.device("maincpu"), TX0_RIM));
-	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, cpu_get_reg(machine.device("maincpu"), TX0_IOH));
-	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, cpu_get_reg(machine.device("maincpu"), TX0_IOS));
-	tx0_draw_multipleled(machine, bitmap, x_panel_col2_offset, y_panel_ir_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_IR), 5);
-	tx0_draw_multipleled(machine, bitmap, x_panel_col2_offset, y_panel_pf_offset+8, cpu_get_reg(machine.device("maincpu"), TX0_PF), 6);
+	tx0_draw_switch(machine, bitmap, x_panel_col2_offset, y_panel_stop_c0_offset, machine.device("maincpu")->state().state_int(TX0_STOP_CYC0));
+	tx0_draw_switch(machine, bitmap, x_panel_col2_offset, y_panel_stop_c1_offset, machine.device("maincpu")->state().state_int(TX0_STOP_CYC1));
+	tx0_draw_switch(machine, bitmap, x_panel_col2_offset, y_panel_gbl_cm_sel_offset, machine.device("maincpu")->state().state_int(TX0_GBL_CM_SEL));
+	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_run_offset, machine.device("maincpu")->state().state_int(TX0_RUN));
+	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cycle1_offset, machine.device("maincpu")->state().state_int(TX0_CYCLE) & 1);
+	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_cycle2_offset, machine.device("maincpu")->state().state_int(TX0_CYCLE) & 2);
+	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_rim_offset, machine.device("maincpu")->state().state_int(TX0_RIM));
+	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ioh_offset, machine.device("maincpu")->state().state_int(TX0_IOH));
+	tx0_draw_led(machine, bitmap, x_panel_col2_offset, y_panel_ios_offset, machine.device("maincpu")->state().state_int(TX0_IOS));
+	tx0_draw_multipleled(machine, bitmap, x_panel_col2_offset, y_panel_ir_offset+8, machine.device("maincpu")->state().state_int(TX0_IR), 5);
+	tx0_draw_multipleled(machine, bitmap, x_panel_col2_offset, y_panel_pf_offset+8, machine.device("maincpu")->state().state_int(TX0_PF), 6);
 }
 
 

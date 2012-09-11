@@ -879,7 +879,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (cpu_get_reg(machine.device("maincpu"), M68K_SR) & 0x2000)
+	if (machine.device("maincpu")->state().state_int(M68K_SR) & 0x2000)
 	{
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
@@ -1412,7 +1412,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 		}
 	}
 
-	if (cpu_get_reg(machine().device("maincpu"), M68K_SR) & 0x2000)
+	if (machine().device("maincpu")->state().state_int(M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1619,7 +1619,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 		}
 	}
 
-	if (cpu_get_reg(machine().device("maincpu"), M68K_SR) & 0x2000)
+	if (machine().device("maincpu")->state().state_int(M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 

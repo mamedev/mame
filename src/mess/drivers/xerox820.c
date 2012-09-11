@@ -594,7 +594,7 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 
 WRITE_LINE_MEMBER( xerox820_state::intrq_w )
 {
-	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
+	int halt = m_maincpu->state_int(Z80_HALT);
 
 	m_fdc_irq = state;
 
@@ -606,7 +606,7 @@ WRITE_LINE_MEMBER( xerox820_state::intrq_w )
 
 WRITE_LINE_MEMBER( xerox820_state::drq_w )
 {
-	int halt = cpu_get_reg(m_maincpu, Z80_HALT);
+	int halt = m_maincpu->state_int(Z80_HALT);
 
 	m_fdc_drq = state;
 

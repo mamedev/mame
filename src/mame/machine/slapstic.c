@@ -884,7 +884,7 @@ static int alt2_kludge(address_space *space, offs_t offset)
 			{
 				/* fetch the value of the register for the second operand, and see */
 				/* if it matches the third alternate */
-				UINT32 regval = cpu_get_reg(&space->device(), M68K_A0 + ((opcode >> 9) & 7)) >> 1;
+				UINT32 regval = space->device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
 				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
 				{
 					alt_bank = (regval >> slapstic.altshift) & 3;

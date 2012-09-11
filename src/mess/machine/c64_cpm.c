@@ -95,7 +95,7 @@ inline void c64_cpm_cartridge_device::update_signals()
         if (m_reset)
         {
         	m_maincpu->reset();
-            m_maincpu->set_state(Z80_PC, 0);
+            m_maincpu->set_state_int(Z80_PC, 0);
         	m_reset = 0;
         }
 	}

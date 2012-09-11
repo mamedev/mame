@@ -35,7 +35,7 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 {
 	UINT8 *RAM = memregion("maincpu")->base();
-	return RAM[cpu_get_reg(&space.device(), Z80_HL)];
+	return RAM[space.device().state().state_int(Z80_HL)];
 }
 
 

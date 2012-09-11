@@ -289,7 +289,7 @@ READ16_MEMBER(segas32_state::arabfgt_protection_r)
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)
 	{
-		cmpVal = cpu_get_reg(&space.device(), 1);
+		cmpVal = space.device().state().state_int(1);
 
 		// R0 always contains the value the protection is supposed to return (!)
 		return cmpVal;

@@ -1210,7 +1210,7 @@ READ8_MEMBER(mz2500_state::mz2500_rom_r)
 	UINT8 *rom = memregion("rom")->base();
 	UINT8 res;
 
-	m_lrom_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	m_lrom_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	m_rom_index = (m_rom_index & 0xffff00) | (m_lrom_index & 0xff);
 
@@ -1221,7 +1221,7 @@ READ8_MEMBER(mz2500_state::mz2500_rom_r)
 
 WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 {
-	m_hrom_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	m_hrom_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	m_rom_index = (data << 8) | (m_rom_index & 0x0000ff) | ((m_hrom_index & 0xff)<<16);
 	//printf("%02x\n",data);
@@ -1233,7 +1233,7 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 	UINT8 pal_index;
 	UINT8 pal_entry;
 
-	pal_index = cpu_get_reg(machine().device("maincpu"), Z80_B);
+	pal_index = machine().device("maincpu")->state().state_int(Z80_B);
 	pal_entry = (pal_index & 0x1e) >> 1;
 
 	if(pal_index & 1)
@@ -1440,14 +1440,14 @@ WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
 
 READ8_MEMBER(mz2500_state::rp5c15_8_r)
 {
-	UINT8 rtc_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	UINT8 rtc_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	return m_rtc->read(space, rtc_index);
 }
 
 WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 {
-	UINT8 rtc_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	UINT8 rtc_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	m_rtc->write(space, rtc_index, data);
 }
@@ -1458,7 +1458,7 @@ READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 emm_lo_index;
 
-	emm_lo_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	emm_lo_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
@@ -1472,7 +1472,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 {
 	UINT8 emm_hi_index;
 
-	emm_hi_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	emm_hi_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
@@ -1482,7 +1482,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 emm_lo_index;
 
-	emm_lo_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
+	emm_lo_index = (machine().device("maincpu")->state().state_int(Z80_B));
 
 	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 

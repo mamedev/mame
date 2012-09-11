@@ -29,7 +29,7 @@ READ8_MEMBER(solomon_state::solomon_0xe603_r)
 	}
 	else if (space.device().safe_pc() == 0x4cf0) // stop it clearing the screen at certain scores
 	{
-		return (cpu_get_reg(&space.device(), Z80_BC) & 0x08);
+		return (space.device().state().state_int(Z80_BC) & 0x08);
 	}
 	else
 	{

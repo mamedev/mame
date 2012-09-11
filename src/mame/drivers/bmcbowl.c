@@ -206,7 +206,7 @@ READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 	switch(space.device().safe_pcbase())
 	{
 		case 0xca68:
-			switch(cpu_get_reg(&space.device(), M68K_D2))
+			switch(space.device().state().state_int(M68K_D2))
 			{
 				case 0: 		 return 0x37<<8;
 				case 0x1013: return 0;

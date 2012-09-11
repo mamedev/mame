@@ -96,7 +96,7 @@ QUICKLOAD_LOAD( super80 )
 		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		if (autorun)
-			cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, exec_addr);
+			image.device().machine().device("maincpu")->state().set_pc(exec_addr);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -129,7 +129,7 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		if (autorun)
 		{
 			space->write_word(0xa2, execute_address);		/* fix warm-start vector to get around some copy-protections */
-			cpu_set_reg(cpu, STATE_GENPC, execute_address);
+			cpu->state().set_pc(execute_address);
 		}
 		else
 		{
@@ -194,12 +194,12 @@ QUICKLOAD_LOAD( sorcerer )
 			if ((execute_address != 0xc858) && autorun)
 				space->write_word(0xf028, execute_address);
 
-			cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, 0xf01f);
+			image.device().machine().device("maincpu")->state().set_pc(0xf01f);
 		}
 		else
 		{
 			if (autorun)
-				cpu_set_reg(image.device().machine().device("maincpu"), STATE_GENPC, execute_address);
+				image.device().machine().device("maincpu")->state().set_pc(execute_address);
 		}
 
 	}

@@ -280,7 +280,7 @@ WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 
 static TIMER_CALLBACK( kaypro_timer_callback )
 {
-	if (cpu_get_reg(machine.device("maincpu"), Z80_HALT))
+	if (machine.device("maincpu")->state().state_int(Z80_HALT))
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -364,7 +364,7 @@ QUICKLOAD_LOAD( kayproii )
 	state->common_pio_system_w(*space, 0, state->m_system_port & 0x7f);	// switch TPA in
 	RAM[0x80]=0;							// clear out command tail
 	RAM[0x81]=0;
-	cpu_set_reg(state->m_maincpu, STATE_GENPC, 0x100);				// start program
+	state->m_maincpu->set_pc(0x100);				// start program
 	return IMAGE_INIT_PASS;
 }
 
@@ -386,6 +386,6 @@ QUICKLOAD_LOAD( kaypro2x )
 	state->kaypro2x_system_port_w(*space, 0, state->m_system_port & 0x7f);
 	RAM[0x80]=0;
 	RAM[0x81]=0;
-	cpu_set_reg(state->m_maincpu, STATE_GENPC, 0x100);
+	state->m_maincpu->set_pc(0x100);
 	return IMAGE_INIT_PASS;
 }

@@ -74,7 +74,7 @@ static MACHINE_RESET(vector4)
 {
 	vector4_state *state = machine.driver_data<vector4_state>();
 	state->m_term_data = 0;
-	cpu_set_reg(machine.device("maincpu"), Z80_PC, 0xe000);
+	machine.device("maincpu")->state().set_state_int(Z80_PC, 0xe000);
 }
 
 WRITE8_MEMBER( vector4_state::kbd_put )

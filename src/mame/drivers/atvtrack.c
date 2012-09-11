@@ -344,7 +344,7 @@ static MACHINE_RESET(atvtrack)
 	// Here there is the setup of the cpu, the boot program is copied in machine_start
 	as = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	// set cpu PC register to 0x0c7f0000
-	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0x0c7f0000);
+	machine.device("maincpu")->state().set_pc(0x0c7f0000);
 	// set BCR2 to 1
 	sh4_internal_w(as, 0x3001, 1, 0xffffffff);
 	device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine.device("subcpu"));

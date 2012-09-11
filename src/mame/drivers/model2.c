@@ -972,7 +972,7 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 
 static int snd_68k_ready_r(address_space *space)
 {
-	int sr = cpu_get_reg(space->machine().device("audiocpu"), M68K_SR);
+	int sr = space->machine().device("audiocpu")->state().state_int(M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{

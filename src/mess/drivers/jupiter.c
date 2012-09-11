@@ -242,7 +242,7 @@ void jupiter3_state::machine_reset()
 {
 	UINT8* ROM = memregion(Z80_TAG)->base();
 	memcpy(m_p_ram, ROM, 0x1000);
-	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
+	m_maincpu->set_pc(0xe000);
 }
 
 

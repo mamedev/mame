@@ -666,7 +666,7 @@ READ16_MEMBER( vii_state::vii_io_r )
 			break;
 
 		case 0x2f: // Data Segment
-			val = cpu_get_reg(machine().device("maincpu"), UNSP_SR) >> 10;
+			val = machine().device("maincpu")->state().state_int(UNSP_SR) >> 10;
 			verboselog(machine(), 3, "vii_io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
 			break;
 
@@ -757,8 +757,8 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			break;
 
 		case 0x2f: // Data Segment
-			temp = cpu_get_reg(machine().device("maincpu"), UNSP_SR);
-			cpu_set_reg(machine().device("maincpu"), UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
+			temp = machine().device("maincpu")->state().state_int(UNSP_SR);
+			machine().device("maincpu")->state().set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
 			verboselog(machine(), 3, "vii_io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
 			break;
 

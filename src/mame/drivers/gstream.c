@@ -633,7 +633,7 @@ ROM_END
 
 READ32_MEMBER(gstream_state::gstream_speedup_r)
 {
-	if (m_maincpu->state(STATE_GENPC) == 0xc0001592)
+	if (m_maincpu->pc() == 0xc0001592)
 	{
 		m_maincpu->eat_cycles(50);
 	}

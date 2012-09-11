@@ -1246,7 +1246,7 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 
 			// EXISR needs to update for the *next* instruction during FIFO tests
 			// TODO: try to abort the timeslice before the next instruction?
-			cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x10);
+			m_subcpu->set_state_int(PPC_EXISR, m_subcpu->state_int(PPC_EXISR) & ~0x10);
 			break;
 		}
 
@@ -1431,7 +1431,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		// EXISR needs to update for the *next* instruction during FIFO tests
 		// TODO: try to abort the timeslice before the next instruction?
-		cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x10);
+		m_subcpu->set_state_int(PPC_EXISR, m_subcpu->state_int(PPC_EXISR) | 0x10);
 	}
 	if (ACCESSING_BITS_32_39)
 	{
@@ -1739,22 +1739,22 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		{
 			if (!m_s2mfifo->is_half_full())
 			{
-				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x08);
+				m_subcpu->set_state_int(PPC_EXISR, m_subcpu->state_int(PPC_EXISR) | 0x08);
 			}
 			else
 			{
-				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x08);
+				m_subcpu->set_state_int(PPC_EXISR, m_subcpu->state_int(PPC_EXISR) & ~0x08);
 			}
 		}
 		else
 		{
 			if (m_s2mfifo->is_empty())
 			{
-				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) | 0x08);
+				m_subcpu->set_state_int(PPC_EXISR, m_subcpu->state_int(PPC_EXISR) | 0x08);
 			}
 			else
 			{
-				cpu_set_reg(m_subcpu, PPC_EXISR, cpu_get_reg(m_subcpu, PPC_EXISR) & ~0x08);
+				m_subcpu->set_state_int(PPC_EXISR, m_subcpu->state_int(PPC_EXISR) & ~0x08);
 			}
 		}
 	}

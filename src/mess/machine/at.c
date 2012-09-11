@@ -132,7 +132,7 @@ WRITE8_MEMBER( at_state::at_page8_w )
 	if (LOG_PORT80 && (offset == 0))
 	{
 		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) cpu_get_reg(m_maincpu, STATE_GENPC));
+							(unsigned) m_maincpu->pc());
 	}
 
 	switch(offset % 8)

@@ -160,7 +160,7 @@ WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 /* Must return the A register except when it is doing a rom search */
 READ8_MEMBER( pegasus_state::pegasus_protection_r )
 {
-	UINT8 data = cpu_get_reg(m_maincpu, M6809_A);
+	UINT8 data = m_maincpu->state_int(M6809_A);
 	if (data == 0x20) data = 0xff;
 	return data;
 }

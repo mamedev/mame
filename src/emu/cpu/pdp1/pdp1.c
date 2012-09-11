@@ -1707,7 +1707,7 @@ static void null_iot(device_t *device, int op2, int nac, int mb, int *io, int ac
 	if (LOG_IOT_EXTRA)
 	{
 		if (op2 == 000)
-			logerror("IOT sync instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(device, PDP1_PC));
+			logerror("IOT sync instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) device->state().state_int(PDP1_PC));
 	}
 	if (LOG)
 	{

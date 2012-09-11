@@ -242,7 +242,7 @@ WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
 DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 {
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE);
+	UINT16 pc = machine().device("maincpu")->safe_pcbase();
 
 	m_ram_disabled_by_beta = 0;
 	if (betadisk_is_active(beta))

@@ -425,7 +425,7 @@ static TIMER_DEVICE_CALLBACK(st0016_int)
 	if(scanline == 240)
 		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
 	else if((scanline % 64) == 0)
-		if(cpu_get_reg(state->m_maincpu, Z80_IFF1)) /* dirty hack ... */
+		if(state->m_maincpu->state_int(Z80_IFF1)) /* dirty hack ... */
 			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 

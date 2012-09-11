@@ -267,9 +267,9 @@ WRITE32_MEMBER( jaguar_state::dsp_flags_w )
 	if (&space.device() == m_dsp && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
-		if (!(data & 0x04000) && m_dsp->state(JAGUAR_R22) != 0)
+		if (!(data & 0x04000) && m_dsp->state_int(JAGUAR_R22) != 0)
 		{
-			UINT32 r30 = m_dsp->state(JAGUAR_R30) & 0xffffff;
+			UINT32 r30 = m_dsp->state_int(JAGUAR_R30) & 0xffffff;
 			if (r30 >= 0xf1b124 && r30 <= 0xf1b126)
 				dsp_suspend();
 		}
