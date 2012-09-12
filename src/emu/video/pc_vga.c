@@ -43,6 +43,8 @@
 
 #include "emu.h"
 #include "pc_vga.h"
+#include "video/isa_vga_ati.h"
+#include "machine/eeprom.h"
 #include "debugger.h"
 
 /***************************************************************************
@@ -188,11 +190,13 @@ static struct
 
 enum
 {
-	S3_IDLE = 0,
-	S3_DRAWING_RECT,
-	S3_DRAWING_LINE,
-	S3_DRAWING_BITBLT,
-	S3_DRAWING_PATTERN
+	IBM8514_IDLE = 0,
+	IBM8514_DRAWING_RECT,
+	IBM8514_DRAWING_LINE,
+	IBM8514_DRAWING_BITBLT,
+	IBM8514_DRAWING_PATTERN,
+	IBM8514_DRAWING_SSV_1,
+	IBM8514_DRAWING_SSV_2
 };
 
 static struct
@@ -248,10 +252,40 @@ static struct
 	UINT8 cursor_fg_ptr;
 	UINT8 cursor_bg_ptr;
 	UINT8 extended_dac_ctrl;
+} s3;
 
+static struct
+{
+	UINT8 ext_reg[64];
+	UINT8 ext_reg_select;
+	UINT16 scratch0;
+	UINT16 scratch1;
+	UINT16 linedraw;
+} ati;
+
+static struct
+{
+	UINT16 htotal;  // Horizontal total (9 bits)
+	UINT16 vtotal;  // Vertical total adjust (3 bits), Vertical total base (9 bit)
+	UINT16 vdisp;
+	UINT16 vsync;
+	UINT16 subctrl;
+	UINT16 substatus;
+	UINT16 ssv;
+	UINT16 ec0;
+	UINT16 ec1;
+	UINT16 ec2;
+	UINT16 ec3;
 	bool gpbusy;
+	bool data_avail;
 	int state;
-}s3;
+
+	UINT8 wait_vector_len;
+	UINT8 wait_vector_dir;
+	bool wait_vector_draw;
+	UINT8 wait_vector_count;
+
+} ibm8514;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
@@ -2070,6 +2104,17 @@ size_t pc_vga_memory_size(void)
 	return vga.svga_intf.vram_size;
 }
 
+static struct eeprom_interface ati_eeprom_interface =
+{
+	6,		/* address bits */
+	16,		/* data bits */
+	"*110",	/*  read command */
+	"*101",	/* write command */
+	"*111",	/* erase command */
+	"*10000xxxx",	// lock         1 00 00xxxx
+	"*10011xxxx"	// unlock       1 00 11xxxx
+};
+
 MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
@@ -2095,6 +2140,16 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_s3_isa )
 	MCFG_SCREEN_UPDATE_STATIC(pc_video_s3)
 
 	MCFG_PALETTE_LENGTH(0x100)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( pcvideo_ati_isa )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_STATIC(pc_video)
+
+	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_EEPROM_ADD("ati_eeprom",ati_eeprom_interface)
 MACHINE_CONFIG_END
 
 /******************************************
@@ -2631,14 +2686,18 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 	{
 		switch(index)
 		{
-//			case 0x2e:
-//				res = 0x11;  // Trio64
-//				break;
-//			case 0x2f:
-//				res = 0x00;
-//				break;
+			case 0x2d:
+				res = 0x88;  // always?
+				break;
+			case 0x2e:
+				res = 0x11;  // Trio64
+				break;
+			case 0x2f:
+				res = 0x00;
+				break;
 			case 0x30: // CR30 Chip ID/REV register
-				res = 0xc0; // BIOS is from a card with the 764 chipset (Trio64), should be 0xe0 or 0xe1, but the Vision 330 driver in win95 doesn't like that
+				//res = 0xe1; // BIOS is from a card with the 764 chipset (Trio64), should be 0xe0 or 0xe1, but the Vision 330 driver in win95 doesn't like that
+				res = 0xc0; // But win95 wants this...
 				break;
 			case 0x31:
 				res = s3.memory_config;
@@ -2768,8 +2827,8 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 				s3.enable_8514 = data & 0x01;  // enable 8514/A registers (x2e8, x6e8, xae8, xee8)
 				if(data & 0x01)
 				{
-					s3.state = S3_IDLE;
-					s3.gpbusy = false;
+					ibm8514.state = IBM8514_IDLE;
+					ibm8514.gpbusy = false;
 					s3.write_count = 0;
 				}
 				break;
@@ -3306,15 +3365,74 @@ bit   0-7  Queue State.
             available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
             12 words and 0 for 13 words available.
  */
+READ16_HANDLER(ibm8514_gpstatus_r)
+{
+	UINT16 ret = 0x0000;
+
+	//logerror("S3: 9AE8 read\n");
+	if(ibm8514.gpbusy == true)
+		ret |= 0x0200;
+	if(ibm8514.data_avail == true)
+		ret |= 0x0100;
+	return ret;
+}
+
+static void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
+{
+	UINT32 offset;
+	int x = 0;
+
+	while(x <= len)
+	{
+		offset = (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x;
+		if(draw)
+			s3_write(offset,offset);
+		switch(dir)
+		{
+		case 0:  // 0 degrees
+			s3.curr_x++;
+			break;
+		case 1:  // 45 degrees
+			s3.curr_x++;
+			s3.curr_y--;
+			break;
+		case 2:  // 90 degrees
+			s3.curr_y--;
+			break;
+		case 3:  // 135 degrees
+			s3.curr_y--;
+			s3.curr_x--;
+			break;
+		case 4:  // 180 degrees
+			s3.curr_x--;
+			break;
+		case 5:  // 225 degrees
+			s3.curr_x--;
+			s3.curr_y++;
+			break;
+		case 6:  // 270 degrees
+			s3.curr_y++;
+			break;
+		case 7:  // 315 degrees
+			s3.curr_y++;
+			s3.curr_x++;
+			break;
+		}
+		x++;
+	}
+}
+
 READ16_HANDLER(s3_gpstatus_r)
 {
 	UINT16 ret = 0x0000;
 
-	logerror("S3: 9AE8 read\n");
+	//logerror("S3: 9AE8 read\n");
 	if(s3.enable_8514 != 0)
 	{
-		if(s3.gpbusy == true)
+		if(ibm8514.gpbusy == true)
 			ret |= 0x0200;
+		if(ibm8514.data_avail == true)
+			ret |= 0x0100;
 		return ret;
 	}
 	else
@@ -3404,263 +3522,274 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 rectangle, which is copied repeatably to the destination
                 rectangle.
  */
-WRITE16_HANDLER(s3_cmd_w)
+WRITE16_HANDLER(ibm8514_cmd_w)
 {
-	if(s3.enable_8514 != 0)
-	{
-		int x,y;
-		int pattern_x,pattern_y;
-		UINT32 offset,src;
+	int x,y;
+	int pattern_x,pattern_y;
+	UINT32 off,src;
 
-		s3.current_cmd = data;
-		s3.src_x = 0;
-		s3.src_y = 0;
-		switch(data & 0xe000)
+	s3.current_cmd = data;
+	s3.src_x = 0;
+	s3.src_y = 0;
+	s3.bus_size = (data & 0x0600) >> 9;
+	switch(data & 0xe000)
+	{
+	case 0x0000:  // NOP (for "Short Stroke Vectors")
+		ibm8514.state = IBM8514_IDLE;
+		ibm8514.gpbusy = false;
+		logerror("S3: Command (%04x) - NOP (Short Stroke Vector)\n",s3.current_cmd);
+		break;
+	case 0x2000:  // Line
+		ibm8514.state = IBM8514_IDLE;
+		ibm8514.gpbusy = false;
+		if(data & 0x0008)
 		{
-		case 0x0000:  // NOP (for "Short Stroke Vectors")
-			s3.state = S3_IDLE;
-			s3.gpbusy = false;
-			logerror("S3: Command (%04x) - NOP\n",s3.current_cmd);
-			break;
-		case 0x2000:  // Line
-			s3.state = S3_IDLE;
-			s3.gpbusy = false;
-			if(data & 0x0008)
+			if(data & 0x0100)
 			{
-				// TODO
-				logerror("S3: Command (%04x) - Line (Vector) - %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
+				ibm8514.state = IBM8514_DRAWING_LINE;
+				ibm8514.data_avail = true;
+				logerror("S3: Command (%04x) - Vector Line (WAIT) %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
 			}
 			else
 			{
-				// Not perfect, but will do for now.
-				INT16 dx = s3.rect_width;
-				INT16 dy = s3.line_axial_step >> 1;
-				INT16 err = s3.line_errorterm;
-				int sx = (data & 0x0020) ? 1 : -1;
-				int sy = (data & 0x0080) ? 1 : -1;
-				int count = 0;
-				INT16 temp;
-
-				logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
-					s3.curr_x,s3.curr_y,s3.line_axial_step,s3.line_diagonal_step,s3.line_errorterm,s3.rect_width,s3.rect_height);
-
-				if((data & 0x0040))
-				{
-					temp = dx; dx = dy; dy = temp;
-				}
-				for(;;)
-				{
-					s3_write(s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH),s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH));
-					if (count > s3.rect_width) break;
-					count++;
-					if((err*2) > -dy)
-					{
-						err -= dy;
-						s3.curr_x += sx;
-					}
-					if((err*2) < dx)
-					{
-						err += dx;
-						s3.curr_y += sy;
-					}
-				}
+				ibm8514_draw_vector(s3.rect_width,(data & 0x00e0) >> 5,(data & 0010) ? true : false);
+				logerror("S3: Command (%04x) - Vector Line - %i,%i \n",s3.current_cmd,s3.curr_x,s3.curr_y);
 			}
-			break;
-		case 0x4000:  // Rectangle Fill
-			if(data & 0x0100)  // WAIT (for read/write of PIXEL TRANSFER (E2E8))
+		}
+		else
+		{
+			// Not perfect, but will do for now.
+			INT16 dx = s3.rect_width;
+			INT16 dy = s3.line_axial_step >> 1;
+			INT16 err = s3.line_errorterm;
+			int sx = (data & 0x0020) ? 1 : -1;
+			int sy = (data & 0x0080) ? 1 : -1;
+			int count = 0;
+			INT16 temp;
+
+			logerror("S3: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",s3.current_cmd,
+				s3.curr_x,s3.curr_y,s3.line_axial_step,s3.line_diagonal_step,s3.line_errorterm,s3.rect_width,s3.rect_height);
+
+			if((data & 0x0040))
 			{
-				s3.state = S3_DRAWING_RECT;
-				//s3.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
-				s3.bus_size = (data & 0x0600) >> 9;
-				logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
-						s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
-				break;
+				temp = dx; dx = dy; dy = temp;
 			}
-			logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+			for(;;)
+			{
+				s3_write(s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH),s3.curr_x + (s3.curr_y * VGA_LINE_LENGTH));
+				if (count > s3.rect_width) break;
+				count++;
+				if((err*2) > -dy)
+				{
+					err -= dy;
+					s3.curr_x += sx;
+				}
+				if((err*2) < dx)
+				{
+					err += dx;
+					s3.curr_y += sy;
+				}
+			}
+		}
+		break;
+	case 0x4000:  // Rectangle Fill
+		if(data & 0x0100)  // WAIT (for read/write of PIXEL TRANSFER (E2E8))
+		{
+			ibm8514.state = IBM8514_DRAWING_RECT;
+			//ibm8514.gpbusy = true;  // DirectX 5 keeps waiting for the busy bit to be clear...
+			s3.bus_size = (data & 0x0600) >> 9;
+			ibm8514.data_avail = true;
+			logerror("S3: Command (%04x) - Rectangle Fill (WAIT) %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
 					s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
-			offset = 0;
-			offset += (VGA_LINE_LENGTH * s3.curr_y);
-			offset += s3.curr_x;
-			for(y=0;y<=s3.rect_height;y++)
-			{
-				for(x=0;x<=s3.rect_width;x++)
-				{
-					if(data & 0x0020)  // source pattern is always based on current X/Y?
-						s3_write((offset+x) % vga.svga_intf.vram_size,(offset+x) % vga.svga_intf.vram_size);
-					else
-						s3_write((offset-x) % vga.svga_intf.vram_size,(offset-x) % vga.svga_intf.vram_size);
-					if(s3.current_cmd & 0x0020)
-					{
-						s3.curr_x++;
-						if(s3.curr_x > s3.prev_x + s3.rect_width)
-						{
-							s3.curr_x = s3.prev_x;
-							s3.src_x = 0;
-							if(s3.current_cmd & 0x0080)
-								s3.curr_y++;
-							else
-								s3.curr_y--;
-						}
-					}
-					else
-					{
-						s3.curr_x--;
-						if(s3.curr_x < s3.prev_x - s3.rect_width)
-						{
-							s3.curr_x = s3.prev_x;
-							s3.src_x = 0;
-							if(s3.current_cmd & 0x0080)
-								s3.curr_y++;
-							else
-								s3.curr_y--;
-						}
-					}
-				}
-				if(data & 0x0080)
-					offset += VGA_LINE_LENGTH;
-				else
-					offset -= VGA_LINE_LENGTH;
-			}
-			s3.state = S3_IDLE;
-			s3.gpbusy = false;
 			break;
-		case 0xc000:  // BitBLT
-			logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
-					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
-			offset = 0;
-			offset += (VGA_LINE_LENGTH * s3.dest_y);
-			offset += s3.dest_x;
-			src = 0;
-			src += (VGA_LINE_LENGTH * s3.curr_y);
-			src += s3.curr_x;
-			for(y=0;y<=s3.rect_height;y++)
+		}
+		logerror("S3: Command (%04x) - Rectangle Fill %i,%i Width: %i Height: %i Colour: %08x\n",s3.current_cmd,s3.curr_x,
+				s3.curr_y,s3.rect_width,s3.rect_height,s3.fgcolour);
+		off = 0;
+		off += (VGA_LINE_LENGTH * s3.curr_y);
+		off += s3.curr_x;
+		for(y=0;y<=s3.rect_height;y++)
+		{
+			for(x=0;x<=s3.rect_width;x++)
 			{
-				for(x=0;x<=s3.rect_width;x++)
+				if(data & 0x0020)  // source pattern is always based on current X/Y?
+					s3_write((off+x) % vga.svga_intf.vram_size,(off+x) % vga.svga_intf.vram_size);
+				else
+					s3_write((off-x) % vga.svga_intf.vram_size,(off-x) % vga.svga_intf.vram_size);
+				if(s3.current_cmd & 0x0020)
 				{
-					if(data & 0x0020)
-						vga.memory[(offset+x) % vga.svga_intf.vram_size] = vga.memory[(src+x) % vga.svga_intf.vram_size];
-					else
-						vga.memory[(offset-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
-					if(s3.current_cmd & 0x0020)
+					s3.curr_x++;
+					if(s3.curr_x > s3.prev_x + s3.rect_width)
 					{
-						s3.curr_x++;
-						if(s3.curr_x > s3.prev_x + s3.rect_width)
-						{
-							s3.curr_x = s3.prev_x;
-							s3.src_x = 0;
-							if(s3.current_cmd & 0x0080)
-								s3.curr_y++;
-							else
-								s3.curr_y--;
-						}
+						s3.curr_x = s3.prev_x;
+						s3.src_x = 0;
+						if(s3.current_cmd & 0x0080)
+							s3.curr_y++;
+						else
+							s3.curr_y--;
 					}
-					else
-					{
-						s3.curr_x--;
-						if(s3.curr_x < s3.prev_x - s3.rect_width)
-						{
-							s3.curr_x = s3.prev_x;
-							s3.src_x = 0;
-							if(s3.current_cmd & 0x0080)
-								s3.curr_y++;
-							else
-								s3.curr_y--;
-						}
-					}
-				}
-				if(data & 0x0080)
-				{
-					src += VGA_LINE_LENGTH;
-					offset += VGA_LINE_LENGTH;
 				}
 				else
 				{
-					src -= VGA_LINE_LENGTH;
-					offset -= VGA_LINE_LENGTH;
+					s3.curr_x--;
+					if(s3.curr_x < s3.prev_x - s3.rect_width)
+					{
+						s3.curr_x = s3.prev_x;
+						s3.src_x = 0;
+						if(s3.current_cmd & 0x0080)
+							s3.curr_y++;
+						else
+							s3.curr_y--;
+					}
 				}
 			}
-			s3.state = S3_IDLE;
-			s3.gpbusy = false;
-			break;
-		case 0xe000:  // Pattern Fill
-			logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
-					s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
-			offset = 0;
-			offset += (VGA_LINE_LENGTH * s3.dest_y);
-			offset += s3.dest_x;
-			src = 0;
-			src += (VGA_LINE_LENGTH * s3.curr_y);
-			src += s3.curr_x;
+			if(data & 0x0080)
+				off += VGA_LINE_LENGTH;
+			else
+				off -= VGA_LINE_LENGTH;
+		}
+		ibm8514.state = IBM8514_IDLE;
+		ibm8514.gpbusy = false;
+		break;
+	case 0xc000:  // BitBLT
+		logerror("S3: Command (%04x) - BitBLT from %i,%i to %i,%i  Width: %i  Height: %i\n",s3.current_cmd,
+				s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
+		off = 0;
+		off += (VGA_LINE_LENGTH * s3.dest_y);
+		off += s3.dest_x;
+		src = 0;
+		src += (VGA_LINE_LENGTH * s3.curr_y);
+		src += s3.curr_x;
+		for(y=0;y<=s3.rect_height;y++)
+		{
+			for(x=0;x<=s3.rect_width;x++)
+			{
+				if(data & 0x0020)
+					vga.memory[(off+x) % vga.svga_intf.vram_size] = vga.memory[(src+x) % vga.svga_intf.vram_size];
+				else
+					vga.memory[(off-x) % vga.svga_intf.vram_size] = vga.memory[(src-x) % vga.svga_intf.vram_size];
+				if(s3.current_cmd & 0x0020)
+				{
+					s3.curr_x++;
+					if(s3.curr_x > s3.prev_x + s3.rect_width)
+					{
+						s3.curr_x = s3.prev_x;
+						s3.src_x = 0;
+						if(s3.current_cmd & 0x0080)
+							s3.curr_y++;
+						else
+							s3.curr_y--;
+					}
+				}
+				else
+				{
+					s3.curr_x--;
+					if(s3.curr_x < s3.prev_x - s3.rect_width)
+					{
+						s3.curr_x = s3.prev_x;
+						s3.src_x = 0;
+						if(s3.current_cmd & 0x0080)
+							s3.curr_y++;
+						else
+							s3.curr_y--;
+					}
+				}
+			}
+			if(data & 0x0080)
+			{
+				src += VGA_LINE_LENGTH;
+				off += VGA_LINE_LENGTH;
+			}
+			else
+			{
+				src -= VGA_LINE_LENGTH;
+				off -= VGA_LINE_LENGTH;
+			}
+		}
+		ibm8514.state = IBM8514_IDLE;
+		ibm8514.gpbusy = false;
+		break;
+	case 0xe000:  // Pattern Fill
+		logerror("S3: Command (%04x) - Pattern Fill - source %i,%i  dest %i,%i  Width: %i Height: %i\n",s3.current_cmd,
+				s3.curr_x,s3.curr_y,s3.dest_x,s3.dest_y,s3.rect_width,s3.rect_height);
+		off = 0;
+		off += (VGA_LINE_LENGTH * s3.dest_y);
+		off += s3.dest_x;
+		src = 0;
+		src += (VGA_LINE_LENGTH * s3.curr_y);
+		src += s3.curr_x;
+		if(data & 0x0020)
+			pattern_x = 0;
+		else
+			pattern_x = 7;
+		if(data & 0x0080)
+			pattern_y = 0;
+		else
+			pattern_y = 7;
+
+		for(y=0;y<=s3.rect_height;y++)
+		{
+			for(x=0;x<=s3.rect_width;x++)
+			{
+				if(data & 0x0020)
+				{
+					s3_write(off+x,src+pattern_x);
+					pattern_x++;
+					if(pattern_x >= 8)
+						pattern_x = 0;
+				}
+				else
+				{
+					s3_write(off-x,src-pattern_x);
+					pattern_x--;
+					if(pattern_x < 0)
+						pattern_x = 7;
+				}
+			}
+
+			// for now, presume that INC_X and INC_Y affect both src and dest, at is would for a bitblt.
 			if(data & 0x0020)
 				pattern_x = 0;
 			else
 				pattern_x = 7;
 			if(data & 0x0080)
-				pattern_y = 0;
-			else
-				pattern_y = 7;
-
-			for(y=0;y<=s3.rect_height;y++)
 			{
-				for(x=0;x<=s3.rect_width;x++)
+				pattern_y++;
+				src += VGA_LINE_LENGTH;
+				if(pattern_y >= 8)
 				{
-					if(data & 0x0020)
-					{
-						s3_write(offset+x,src+pattern_x);
-						pattern_x++;
-						if(pattern_x >= 8)
-							pattern_x = 0;
-					}
-					else
-					{
-						s3_write(offset-x,src-pattern_x);
-						pattern_x--;
-						if(pattern_x < 0)
-							pattern_x = 7;
-					}
+					pattern_y = 0;
+					src -= (VGA_LINE_LENGTH * 8);  // move src pointer back to top of pattern
 				}
-
-				// for now, presume that INC_X and INC_Y affect both src and dest, at is would for a bitblt.
-				if(data & 0x0020)
-					pattern_x = 0;
-				else
-					pattern_x = 7;
-				if(data & 0x0080)
-				{
-					pattern_y++;
-					src += VGA_LINE_LENGTH;
-					if(pattern_y >= 8)
-					{
-						pattern_y = 0;
-						src -= (VGA_LINE_LENGTH * 8);  // move src pointer back to top of pattern
-					}
-					offset += VGA_LINE_LENGTH;
-				}
-				else
-				{
-					pattern_y--;
-					src -= VGA_LINE_LENGTH;
-					if(pattern_y < 0)
-					{
-						pattern_y = 7;
-						src += (VGA_LINE_LENGTH * 8);  // move src pointer back to bottom of pattern
-					}
-					offset -= VGA_LINE_LENGTH;
-				}
+				off += VGA_LINE_LENGTH;
 			}
-			s3.state = S3_IDLE;
-			s3.gpbusy = false;
-			break;
-		default:
-			s3.state = S3_IDLE;
-			s3.gpbusy = false;
-			logerror("S3: Unknown command: %04x\n",data);
+			else
+			{
+				pattern_y--;
+				src -= VGA_LINE_LENGTH;
+				if(pattern_y < 0)
+				{
+					pattern_y = 7;
+					src += (VGA_LINE_LENGTH * 8);  // move src pointer back to bottom of pattern
+				}
+				off -= VGA_LINE_LENGTH;
+			}
 		}
+		ibm8514.state = IBM8514_IDLE;
+		ibm8514.gpbusy = false;
+		break;
+	default:
+		ibm8514.state = IBM8514_IDLE;
+		ibm8514.gpbusy = false;
+		logerror("S3: Unknown command: %04x\n",data);
 	}
-	else
-		logerror("S3: Write to 8514/A port 9ae8 while disabled.\n");
 }
 
+WRITE16_HANDLER(s3_cmd_w)
+{
+	if(s3.enable_8514 != 0)
+		ibm8514_cmd_w(space,offset,data,mem_mask);
+}
 /*
 8AE8h W(R/W):  Destination Y Position & Axial Step Constant Register
                (DESTY_AXSTP)
@@ -3711,6 +3840,228 @@ WRITE16_HANDLER( s3_8ee8_w )
 }
 
 /*
+9EE8h W(R/W):  Short Stroke Vector Transfer Register (SHORT_STROKE)
+bit   0-3  Length of vector projected onto the major axis.
+           This is also the number of pixels drawn.
+        4  Must be set for pixels to be written.
+      5-7  VECDIR. The angle measured counter-clockwise from horizontal
+           right) at which the line is drawn,
+             0 = 000 degrees
+             1 = 045 degrees
+             2 = 090 degrees
+             3 = 135 degrees
+             4 = 180 degrees
+             5 = 225 degrees
+             6 = 270 degrees
+             7 = 315 degrees
+     8-15  The lower 8 bits are duplicated in the upper 8 bits so two
+           short stroke vectors can be drawn with one command.
+Note: The upper byte must be written for the SSV command to be executed.
+      Thus if a byte is written to 9EE8h another byte must be written to
+      9EE9h before execution starts. A single 16bit write will do.
+      If only one SSV is desired the other byte can be set to 0.
+ */
+static void ibm8514_wait_draw_ssv()
+{
+	UINT8 len = ibm8514.wait_vector_len;
+	UINT8 dir = ibm8514.wait_vector_dir;
+	bool draw = ibm8514.wait_vector_draw;
+	UINT8 count = ibm8514.wait_vector_count;
+	UINT32 offset;
+	int x;
+	int data_size;
+
+	switch(s3.bus_size)
+	{
+	case 0:
+		data_size = 8;
+		break;
+	case 1:
+		data_size = 16;
+		break;
+	case 2:
+		data_size = 32;
+		break;
+	default:
+		data_size = 8;
+		break;
+	}
+
+	for(x=0;x<data_size;x++)
+	{
+		if(len > count)
+		{
+			if(ibm8514.state == IBM8514_DRAWING_SSV_1)
+			{
+				ibm8514.state = IBM8514_DRAWING_SSV_2;
+				ibm8514.wait_vector_len = (ibm8514.ssv & 0x0f00) >> 8;
+				ibm8514.wait_vector_dir = (ibm8514.ssv & 0xe000) >> 13;
+				ibm8514.wait_vector_draw = (ibm8514.ssv & 0x1000) ? true : false;
+				ibm8514.wait_vector_count = 0;
+				return;
+			}
+			else if(ibm8514.state == IBM8514_DRAWING_SSV_2)
+			{
+				ibm8514.state = IBM8514_IDLE;
+				ibm8514.gpbusy = false;
+				ibm8514.data_avail = false;
+				return;
+			}
+		}
+
+		if(ibm8514.state == IBM8514_DRAWING_SSV_1 || ibm8514.state == IBM8514_DRAWING_SSV_2)
+		{
+			offset = (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x;
+			if(draw)
+				s3_write(offset,offset);
+			switch(dir)
+			{
+			case 0:  // 0 degrees
+				s3.curr_x++;
+				break;
+			case 1:  // 45 degrees
+				s3.curr_x++;
+				s3.curr_y--;
+				break;
+			case 2:  // 90 degrees
+				s3.curr_y--;
+				break;
+			case 3:  // 135 degrees
+				s3.curr_y--;
+				s3.curr_x--;
+				break;
+			case 4:  // 180 degrees
+				s3.curr_x--;
+				break;
+			case 5:  // 225 degrees
+				s3.curr_x--;
+				s3.curr_y++;
+				break;
+			case 6:  // 270 degrees
+				s3.curr_y++;
+				break;
+			case 7:  // 315 degrees
+				s3.curr_y++;
+				s3.curr_x++;
+				break;
+			}
+		}
+	}
+}
+
+static void ibm8514_draw_ssv(UINT8 data)
+{
+	UINT8 len = data & 0x0f;
+	UINT8 dir = (data & 0xe0) >> 5;
+	bool draw = (data & 0x10) ? true : false;
+
+	ibm8514_draw_vector(len,dir,draw);
+}
+
+READ16_HANDLER(ibm8514_ssv_r)
+{
+	return ibm8514.ssv;
+}
+
+WRITE16_HANDLER(ibm8514_ssv_w)
+{
+	ibm8514.ssv = data;
+
+	if(s3.current_cmd & 0x0100)
+	{
+		ibm8514.state = IBM8514_DRAWING_SSV_1;
+		ibm8514.data_avail = true;
+		ibm8514.wait_vector_len = ibm8514.ssv & 0x0f;
+		ibm8514.wait_vector_dir = (ibm8514.ssv & 0xe0) >> 5;
+		ibm8514.wait_vector_draw = (ibm8514.ssv & 0x10) ? true : false;
+		ibm8514.wait_vector_count = 0;
+		return;
+	}
+
+	if(s3.current_cmd & 0x1000)  // byte sequence
+	{
+		ibm8514_draw_ssv(data & 0xff);
+		ibm8514_draw_ssv(data >> 8);
+	}
+	else
+	{
+		ibm8514_draw_ssv(data >> 8);
+		ibm8514_draw_ssv(data & 0xff);
+	}
+	logerror("8514/A: Short Stroke Vector write %04x\n",data);
+}
+
+static void ibm8514_wait_draw_vector()
+{
+	UINT8 len = ibm8514.wait_vector_len;
+	UINT8 dir = ibm8514.wait_vector_dir;
+	bool draw = ibm8514.wait_vector_draw;
+	UINT8 count = ibm8514.wait_vector_count;
+	UINT32 offset;
+	UINT8 data_size;
+	int x;
+
+	if(s3.bus_size == 0)  // 8-bit
+		data_size = 8;
+	if(s3.bus_size == 1)  // 16-bit
+		data_size = 16;
+	if(s3.bus_size == 2)  // 32-bit
+		data_size = 32;
+
+	for(x=0;x<data_size;x++)
+	{
+		if(len > count)
+		{
+			if(ibm8514.state == IBM8514_DRAWING_LINE)
+			{
+				ibm8514.state = IBM8514_IDLE;
+				ibm8514.gpbusy = false;
+				ibm8514.data_avail = false;
+				return;
+			}
+		}
+
+		if(ibm8514.state == IBM8514_DRAWING_LINE)
+		{
+			offset = (s3.curr_y * VGA_LINE_LENGTH) + s3.curr_x;
+			if(draw)
+				s3_write(offset,offset);
+			switch(dir)
+			{
+			case 0:  // 0 degrees
+				s3.curr_x++;
+				break;
+			case 1:  // 45 degrees
+				s3.curr_x++;
+				s3.curr_y--;
+				break;
+			case 2:  // 90 degrees
+				s3.curr_y--;
+				break;
+			case 3:  // 135 degrees
+				s3.curr_y--;
+				s3.curr_x--;
+				break;
+			case 4:  // 180 degrees
+				s3.curr_x--;
+				break;
+			case 5:  // 225 degrees
+				s3.curr_x--;
+				s3.curr_y++;
+				break;
+			case 6:  // 270 degrees
+				s3.curr_y++;
+				break;
+			case 7:  // 315 degrees
+				s3.curr_y++;
+				s3.curr_x++;
+				break;
+			}
+		}
+	}
+}
+
+/*
 96E8h W(R/W):  Major Axis Pixel Count/Rectangle Width Register (MAJ_AXIS_PCNT)
 bit  0-10  (911/924)  RECTANGLE WIDTH/LINE PARAMETER MAX. For BITBLT and
             rectangle commands this is the width of the area. For Line Drawing
@@ -3726,7 +4077,7 @@ READ16_HANDLER( s3_width_r )
 
 WRITE16_HANDLER( s3_width_w )
 {
-	s3.rect_width = data & 0x0fff;
+	s3.rect_width = data & 0x1fff;
 	logerror("S3: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
@@ -3921,8 +4272,9 @@ static void s3_wait_draw()
 						s3.curr_y++;
 						if(s3.curr_y > s3.prev_y + s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.data_avail = false;
+							ibm8514.gpbusy = false;
 						}
 					}
 					else
@@ -3930,8 +4282,9 @@ static void s3_wait_draw()
 						s3.curr_y--;
 						if(s3.curr_y < s3.prev_y - s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.data_avail = false;
+							ibm8514.gpbusy = false;
 						}
 					}
 					return;
@@ -3950,8 +4303,9 @@ static void s3_wait_draw()
 						s3.curr_y++;
 						if(s3.curr_y > s3.prev_y + s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.gpbusy = false;
+							ibm8514.data_avail = false;
 						}
 					}
 					else
@@ -3959,8 +4313,9 @@ static void s3_wait_draw()
 						s3.curr_y--;
 						if(s3.curr_y < s3.prev_y - s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.gpbusy = false;
+							ibm8514.data_avail = false;
 						}
 					}
 					return;
@@ -3988,8 +4343,9 @@ static void s3_wait_draw()
 						s3.curr_y++;
 						if(s3.curr_y > s3.prev_y + s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.gpbusy = false;
+							ibm8514.data_avail = false;
 						}
 					}
 					else
@@ -3997,8 +4353,9 @@ static void s3_wait_draw()
 						s3.curr_y--;
 						if(s3.curr_y < s3.prev_y - s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.gpbusy = false;
+							ibm8514.data_avail = false;
 						}
 					}
 					return;
@@ -4017,8 +4374,9 @@ static void s3_wait_draw()
 						s3.curr_y++;
 						if(s3.curr_y > s3.prev_y + s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.gpbusy = false;
+							ibm8514.data_avail = false;
 						}
 					}
 					else
@@ -4026,8 +4384,9 @@ static void s3_wait_draw()
 						s3.curr_y--;
 						if(s3.curr_y < s3.prev_y - s3.rect_height)
 						{
-							s3.state = S3_IDLE;
-							s3.gpbusy = false;
+							ibm8514.state = IBM8514_IDLE;
+							ibm8514.gpbusy = false;
+							ibm8514.data_avail = false;
 						}
 					}
 					return;
@@ -4101,10 +4460,14 @@ WRITE16_HANDLER(s3_pixel_xfer_w)
 	else
 		s3.pixel_xfer = (s3.pixel_xfer & 0xffff0000) | data;
 
-	if(s3.state == S3_DRAWING_RECT)
-	{
+	if(ibm8514.state == IBM8514_DRAWING_RECT)
 		s3_wait_draw();
-	}
+
+	if(ibm8514.state == IBM8514_DRAWING_SSV_1 || ibm8514.state == IBM8514_DRAWING_SSV_2)
+		ibm8514_wait_draw_ssv();
+
+	if(ibm8514.state == IBM8514_DRAWING_LINE)
+		ibm8514_wait_draw_vector();
 
 	logerror("S3: Pixel Transfer = %08x\n",s3.pixel_xfer);
 }
@@ -4314,22 +4677,22 @@ WRITE8_HANDLER( s3_mem_w )
 			break;
 		case 0x8150:
 			s3.pixel_xfer = (s3.pixel_xfer & 0xffffff00) | data;
-			if(s3.state == S3_DRAWING_RECT)
+			if(ibm8514.state == IBM8514_DRAWING_RECT)
 				s3_wait_draw();
 			break;
 		case 0x8151:
 			s3.pixel_xfer = (s3.pixel_xfer & 0xffff00ff) | (data << 8);
-			if(s3.state == S3_DRAWING_RECT)
+			if(ibm8514.state == IBM8514_DRAWING_RECT)
 				s3_wait_draw();
 			break;
 		case 0x8152:
 			s3.pixel_xfer = (s3.pixel_xfer & 0xff00ffff) | (data << 16);
-			if(s3.state == S3_DRAWING_RECT)
+			if(ibm8514.state == IBM8514_DRAWING_RECT)
 				s3_wait_draw();
 			break;
 		case 0x8153:
 			s3.pixel_xfer = (s3.pixel_xfer & 0x00ffffff) | (data << 24);
-			if(s3.state == S3_DRAWING_RECT)
+			if(ibm8514.state == IBM8514_DRAWING_RECT)
 				s3_wait_draw();
 			break;
 		case 0xbee8:
@@ -4489,5 +4852,420 @@ void pc_vga_gamtor_io_init(running_machine &machine, address_space *mem_space, o
 	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_gamtor_03d0_r), FUNC(vga_port_gamtor_03d0_w), mask);
 
 	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_gamtor_mem_r), FUNC(vga_gamtor_mem_w), mask);
+}
+
+static void ati_define_video_mode(running_machine &machine)
+{
+	int clock;
+	UINT8 clock_type;
+	int div = ((ati.ext_reg[0x38] & 0xc0) >> 6) + 1;
+
+	svga.rgb8_en = 0;
+	svga.rgb15_en = 0;
+	svga.rgb16_en = 0;
+	svga.rgb32_en = 0;
+
+	if(ati.ext_reg[0x30] & 0x20)
+		svga.rgb8_en = 1;
+
+	clock_type = ((ati.ext_reg[0x3e] & 0x10)>>1) | ((ati.ext_reg[0x39] & 0x02)<<1) | ((vga.miscellaneous_output & 0x0c)>>2);
+	switch(clock_type)
+	{
+	case 0:
+		clock = XTAL_42_9545MHz;
+		break;
+	case 1:
+		clock = 48771000;
+		break;
+	case 2:
+		clock = 16657000;
+		break;
+	case 3:
+		clock = XTAL_36MHz;
+		break;
+	case 4:
+		clock = 50350000;
+		break;
+	case 5:
+		clock = 56640000;
+		break;
+	case 6:
+		clock = 28322000;
+		break;
+	case 7:
+		clock = 44900000;
+		break;
+	case 8:
+		clock = 30240000;
+		break;
+	case 9:
+		clock = XTAL_32MHz;
+		break;
+	case 10:
+		clock = 37500000;
+		break;
+	case 11:
+		clock = 39000000;
+		break;
+	case 12:
+		clock = XTAL_40MHz;
+		break;
+	case 13:
+		clock = 56644000;
+		break;
+	case 14:
+		clock = 75000000;
+		break;
+	case 15:
+		clock = 65000000;
+		break;
+	default:
+		clock = XTAL_42_9545MHz;
+		logerror("Invalid dot clock %i selected.\n",clock_type);
+	}
+
+	recompute_params_clock(machine,1,clock / div);
+}
+
+READ8_HANDLER( ati_mem_r )
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		offset &= 0xffff;
+		return vga.memory[(offset+svga.bank_r*0x10000)];
+	}
+
+	return vga_mem_r(space,offset);
+}
+
+WRITE8_HANDLER( ati_mem_w )
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		offset &= 0xffff;
+		vga.memory[(offset+svga.bank_w*0x10000)] = data;
+	}
+	else
+		vga_mem_w(space,offset,data);
+}
+
+
+READ8_DEVICE_HANDLER(ati_port_ext_r)
+{
+	UINT8 ret = 0xff;
+
+	switch(offset)
+	{
+	case 0:
+		break;
+	case 1:
+		switch(ati.ext_reg_select)
+		{
+		case 0x20:
+			ret = 0x10;  // 512kB memory
+			break;
+		case 0x2a:
+			ret = 0x06;  // Chip revision (6 for the 28800-6, 5 for the 28800-5)
+			break;
+		case 0x37:
+			{
+				eeprom_device* eep = device->subdevice<eeprom_device>("ati_eeprom");
+				ret = 0x00;
+				ret |= eep->read_bit() << 3;
+			}
+			break;
+		default:
+			ret = ati.ext_reg[ati.ext_reg_select];
+		}
+		break;
+	}
+
+	return ret;
+}
+
+WRITE8_DEVICE_HANDLER(ati_port_ext_w)
+{
+	switch(offset)
+	{
+	case 0:
+		ati.ext_reg_select = data & 0x3f;
+		break;
+	case 1:
+		ati.ext_reg[ati.ext_reg_select] = data;
+		switch(ati.ext_reg_select)
+		{
+		case 0x2d:
+			if(data & 0x08)
+			{
+				vga.crtc.horz_total = (vga.crtc.horz_total & 0x00ff) | (data & 0x01) << 8;
+				// bit 1 = bit 8 of horizontal blank start
+				// bit 2 = bit 8 of horizontal retrace start
+				logerror("ATI: ATI2D (extensions) write %02x\n",data);
+			}
+			break;
+		case 0x32:  // memory page select
+			svga.bank_r = ((data & 0x01) << 3) | ((data & 0xe0) >> 5);
+			svga.bank_w = ((data & 0x1e) >> 1);
+			//logerror("ATI: Memory Page Select write %02x\n",data);
+			break;
+		case 0x33:  // EEPROM
+			if(data & 0x04)
+			{
+				eeprom_device* eep = device->subdevice<eeprom_device>("ati_eeprom");
+				if(eep != NULL)
+				{
+					eep->write_bit((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+					eep->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+					eep->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+				}
+			}
+			break;
+		default:
+			logerror("ATI: Extended VGA register 0x01CE index %02x write %02x\n",ati.ext_reg_select,data);
+		}
+		break;
+	}
+	ati_define_video_mode(device->machine());
+}
+
+/*
+02E8h W(R):  Display Status Register
+bit     0  SENSE is the result of a wired-OR of 3 comparators, one
+           for each of the RGB video signal.
+           By programming the RAMDAC for various values
+           and patterns and then reading the SENSE, the monitor type
+           (color, monochrome or none) can be determined.
+        1  VBLANK. Vertical Blank State
+           If Vertical Blank is active this bit is set.
+        2  HORTOG. Horizontal Toggle
+           This bit toggles every time a HSYNC pulse starts
+     3-15  Reserved(0)
+ */
+READ16_HANDLER(mach8_status_r)
+{
+	return vga_vblank(space->machine()) << 1;
+}
+
+WRITE16_HANDLER(mach8_htotal_w)
+{
+	ibm8514.htotal = data & 0x01ff;
+	//vga.crtc.horz_total = data & 0x01ff;
+	logerror("8514/A: Horizontal total write %04x\n",data);
+}
+
+/*
+42E8h W(R):  Subsystem Status Register (SUBSYS_STAT)
+bit   0-3  Interrupt requests. These bits show the state of internal interrupt
+           requests. An interrupt will only occur if the corresponding bit(s)
+           in SUBSYS_CNTL is set. Interrupts can only be reset by writing a 1
+           to the corresponding Interrupt Clear bit in SUBSYS_CNTL.
+             Bit 0: VBLNKFLG
+                 1: PICKFLAG
+                 2: INVALIDIO
+                 3: GPIDLE
+      4-6  MONITORID.
+              1: IBM 8507 (1024x768) Monochrome
+              2: IBM 8514 (1024x768) Color
+              5: IBM 8503 (640x480) Monochrome
+              6: IBM 8512/13 (640x480) Color
+        7  8PLANE.
+           (CT82c480) This bit is latched on reset from pin P4D7.
+     8-11  CHIP_REV. Chip revision number.
+    12-15  (CT82c480) CHIP_ID. 0=CT 82c480.
+ */
+READ16_HANDLER(mach8_substatus_r)
+{
+	// TODO:
+	if(vga_vblank(space->machine()) != 0)  // not correct, but will do for now
+		ibm8514.substatus |= 0x01;
+	return ibm8514.substatus;
+}
+
+/*
+42E8h W(W):  Subsystem Control Register (SUBSYS_CNTL)
+bit   0-3  Interrupt Reset. Write 1 to a bit to reset the interrupt.
+           Bit 0  RVBLNKFLG   Write 1 to reset Vertical Blank interrupt.
+               1  RPICKFLAG   Write 1 to reset PICK interrupt.
+               2  RINVALIDIO  Write 1 to reset Queue Overflow/Data
+                              Underflow interrupt.
+               3  RGPIDLE     Write 1 to reset GPIDLE interrupt.
+      4-7  Reserved(0)
+        8  IBLNKFLG.   If set Vertical Blank Interrupts are enabled.
+        9  IPICKFLAG.  If set PICK Interrupts are enabled.
+       10  IINVALIDIO. If set Queue Overflow/Data Underflow Interrupts are
+                       enabled.
+       11  IGPIDLE.    If set Graphics Engine Idle Interrupts are enabled.
+    12-13  CHPTEST. Used for chip testing.
+    14-15  Graphics Processor Control (GPCTRL).
+ */
+WRITE16_HANDLER(mach8_subcontrol_w)
+{
+	ibm8514.subctrl = data;
+	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
+//	logerror("8514/A: Subsystem control write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_subcontrol_r)
+{
+	return ibm8514.subctrl;
+}
+
+READ16_HANDLER(mach8_htotal_r)
+{
+	return ibm8514.htotal;
+}
+
+READ16_HANDLER(mach8_vtotal_r)
+{
+	return ibm8514.vtotal;
+}
+
+WRITE16_HANDLER(mach8_vtotal_w)
+{
+	ibm8514.vtotal = data;
+//	vga.crtc.vert_total = data;
+	logerror("8514/A: Vertical total write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_vdisp_r)
+{
+	return ibm8514.vdisp;
+}
+
+WRITE16_HANDLER(mach8_vdisp_w)
+{
+	ibm8514.vdisp = data;
+//	vga.crtc.vert_disp_end = data >> 3;
+	logerror("8514/A: Vertical Displayed write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_vsync_r)
+{
+	return ibm8514.vsync;
+}
+
+WRITE16_HANDLER(mach8_vsync_w)
+{
+	ibm8514.vsync = data;
+	logerror("8514/A: Vertical Sync write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_ec0_r)
+{
+	return ibm8514.ec0;
+}
+
+WRITE16_HANDLER(mach8_ec0_w)
+{
+	ibm8514.ec0 = data;
+	logerror("8514/A: Extended configuration 0 write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_ec1_r)
+{
+	return ibm8514.ec1;
+}
+
+WRITE16_HANDLER(mach8_ec1_w)
+{
+	ibm8514.ec1 = data;
+	logerror("8514/A: Extended configuration 1 write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_ec2_r)
+{
+	return ibm8514.ec2;
+}
+
+WRITE16_HANDLER(mach8_ec2_w)
+{
+	ibm8514.ec2 = data;
+	logerror("8514/A: Extended configuration 2 write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_ec3_r)
+{
+	return ibm8514.ec3;
+}
+
+WRITE16_HANDLER(mach8_ec3_w)
+{
+	ibm8514.ec3 = data;
+	logerror("8514/A: Extended configuration 3 write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_ext_fifo_r)
+{
+	return 0x00;  // for now, report all FIFO slots at free
+}
+
+WRITE16_HANDLER(mach8_linedraw_index_w)
+{
+	ati.linedraw = data & 0x07;
+	logerror("Mach8: Line Draw Index write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_bresenham_count_r)
+{
+	return s3.rect_width & 0x1fff;
+}
+
+WRITE16_HANDLER(mach8_bresenham_count_w)
+{
+	s3.rect_width = data & 0x1fff;
+	logerror("Mach8: Bresenham count write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_scratch0_r)
+{
+	return ati.scratch0;
+}
+
+WRITE16_HANDLER(mach8_scratch0_w)
+{
+	ati.scratch0 = data;
+	logerror("Mach8: Scratch Pad 0 write %04x\n",data);
+}
+
+READ16_HANDLER(mach8_scratch1_r)
+{
+	return ati.scratch1;
+}
+
+WRITE16_HANDLER(mach8_scratch1_w)
+{
+	ati.scratch1 = data;
+	logerror("Mach8: Scratch Pad 1 write %04x\n",data);
+}
+
+/*
+12EEh W(R):  Configuration Status 1 Register                           (Mach8)
+bit    0  CLK_MODE. Set to use clock chip, clear to use crystals.
+       1  BUS_16. Set for 16bit bus, clear for 8bit bus
+       2  MC_BUS. Set for MicroChannel bus, clear for ISA/EISA bus
+       3  EEPROM_ENA. EEPROM enabled if set
+       4  DRAM_ENA. Set for DRAM, clear for VRAM.
+     5-6  MEM_INSTALLED. Video memory. 0: 512K, 1: 1024K
+       7  ROM_ENA. Set is ROM is enabled
+       8  ROM_PAGE_ENA. Set if ROM paging enabled
+    9-15  ROM_LOCATION. If bit 2 and 3 are 0 the ROM will be at this location:
+           0: C000h, 1: C080h, 2: C100h, .. 127: FF80h (unlikely)
+ */
+READ16_HANDLER(mach8_config1_r)
+{
+	return 0x0082;
+}
+
+/*
+16EEh (R):  Configuration Status 2 Register                            (Mach8)
+bit    0  SHARE_CLOCK. If set the Mach8 shares clock with the VGA
+       1  HIRES_BOOT. Boot in hi-res mode if set
+       2  EPROM_16_ENA. Adapter configured for 16bit ROM if set
+       3  WRITE_PER_BIT. Write masked VRAM operations supported if set
+       4  FLASH_ENA. Flash page writes supported if set
+ */
+READ16_HANDLER(mach8_config2_r)
+{
+	return 0x0002;
 }
 

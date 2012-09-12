@@ -12,6 +12,7 @@
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_vga_isa );
 MACHINE_CONFIG_EXTERN( pcvideo_s3_isa );
+MACHINE_CONFIG_EXTERN( pcvideo_ati_isa );
 
 VIDEO_START( vga );
 
@@ -68,6 +69,8 @@ READ8_HANDLER(s3_port_03d0_r);
 WRITE8_HANDLER(s3_port_03d0_w);
 READ16_HANDLER(s3_gpstatus_r);
 WRITE16_HANDLER(s3_cmd_w);
+READ16_HANDLER(ibm8514_ssv_r);
+WRITE16_HANDLER(ibm8514_ssv_w);
 READ16_HANDLER(s3_8ae8_r);
 WRITE16_HANDLER(s3_8ae8_w);
 READ16_HANDLER(s3_8ee8_r);
@@ -94,6 +97,44 @@ READ16_HANDLER(s3_pixel_xfer_r);
 WRITE16_HANDLER(s3_pixel_xfer_w);
 READ8_HANDLER(s3_mem_r);
 WRITE8_HANDLER(s3_mem_w);
+
+READ8_DEVICE_HANDLER(ati_port_ext_r);
+WRITE8_DEVICE_HANDLER(ati_port_ext_w);
+READ16_HANDLER(ibm8514_gpstatus_r);
+WRITE16_HANDLER(ibm8514_cmd_w);
+READ16_HANDLER(mach8_ext_fifo_r);
+WRITE16_HANDLER(mach8_linedraw_index_w);
+READ16_HANDLER(mach8_bresenham_count_r);
+WRITE16_HANDLER(mach8_bresenham_count_w);
+READ16_HANDLER(mach8_scratch0_r);
+WRITE16_HANDLER(mach8_scratch0_w);
+READ16_HANDLER(mach8_scratch1_r);
+WRITE16_HANDLER(mach8_scratch1_w);
+READ16_HANDLER(mach8_config1_r);
+READ16_HANDLER(mach8_config2_r);
+READ16_HANDLER(mach8_status_r);
+READ16_HANDLER(mach8_substatus_r);
+WRITE16_HANDLER(mach8_subcontrol_w);
+READ16_HANDLER(mach8_subcontrol_r);
+READ16_HANDLER(mach8_htotal_r);
+WRITE16_HANDLER(mach8_htotal_w);
+READ16_HANDLER(mach8_vtotal_r);
+WRITE16_HANDLER(mach8_vtotal_w);
+READ16_HANDLER(mach8_vdisp_r);
+WRITE16_HANDLER(mach8_vdisp_w);
+READ16_HANDLER(mach8_vsync_r);
+WRITE16_HANDLER(mach8_vsync_w);
+READ16_HANDLER(mach8_ec0_r);
+WRITE16_HANDLER(mach8_ec0_w);
+READ16_HANDLER(mach8_ec1_r);
+WRITE16_HANDLER(mach8_ec1_w);
+READ16_HANDLER(mach8_ec2_r);
+WRITE16_HANDLER(mach8_ec2_w);
+READ16_HANDLER(mach8_ec3_r);
+WRITE16_HANDLER(mach8_ec3_w);
+READ8_HANDLER(ati_mem_r);
+WRITE8_HANDLER(ati_mem_w);
+
 
 /*
   pega notes (paradise)

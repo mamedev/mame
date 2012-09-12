@@ -85,6 +85,7 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install16_device(0x92e8, 0x92eb, 0, 0, FUNC(s3_line_error_r), FUNC(s3_line_error_w));
 	m_isa->install16_device(0x96e8, 0x96eb, 0, 0, FUNC(s3_width_r), FUNC(s3_width_w));
 	m_isa->install16_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_gpstatus_r), FUNC(s3_cmd_w));
+	m_isa->install16_device(0x9ee8, 0x9eeb, 0, 0, FUNC(ibm8514_ssv_r), FUNC(ibm8514_ssv_w));
 	m_isa->install16_device(0xa2e8, 0xa2eb, 0, 0, FUNC(s3_bgcolour_r), FUNC(s3_bgcolour_w));
 	m_isa->install16_device(0xa6e8, 0xa6eb, 0, 0, FUNC(s3_fgcolour_r), FUNC(s3_fgcolour_w));
 	m_isa->install16_device(0xb6e8, 0xb6eb, 0, 0, FUNC(s3_backmix_r), FUNC(s3_backmix_w));

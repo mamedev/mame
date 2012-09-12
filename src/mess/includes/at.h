@@ -27,6 +27,7 @@
 #include "video/isa_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_vga.h"
+#include "video/isa_vga_ati.h"
 #include "video/isa_svga_cirrus.h"
 #include "video/isa_svga_s3.h"
 #include "video/isa_svga_tseng.h"
