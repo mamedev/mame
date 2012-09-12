@@ -60,11 +60,6 @@ public:
 };
 
 
-/*----------- defined in drivers/cinemat.c -----------*/
-
-MACHINE_RESET( cinemat );
-
-
 /*----------- defined in audio/cinemat.c -----------*/
 
 

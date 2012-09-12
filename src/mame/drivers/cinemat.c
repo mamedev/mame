@@ -58,7 +58,7 @@ static MACHINE_START( cinemat )
 }
 
 
-MACHINE_RESET( cinemat )
+static MACHINE_RESET( cinemat )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* reset the coin states */
