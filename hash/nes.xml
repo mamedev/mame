@@ -57782,6 +57782,21 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+	<software name="lionkleg" cloneof="lionking">
+		<description>The Lion King Legend (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="the lion king legeng (unl)(ch).chr" size="262144" crc="f384df96" sha1="9da6944d2f226e200d45d25483271bab712fb941" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="the lion king legeng (unl)(ch).prg" size="262144" crc="70c5bd33" sha1="c8629384c1e5a384cb2c0cc7aae5c44ae19538bd" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="narrow">
 		<description>Night Arrow (Asia)</description>
 		<year>19??</year>
@@ -58652,6 +58667,22 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<!-- This runs on a different hardware -->
+	<software name="bublbfdsb" cloneof="bublbfds" supported="no">
+		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-BB -->
+			<dataarea name="chr" size="32768">
+				<rom name="bubble bobble (fds conversion, chr-rom version)(unl)[u][!].chr" size="32768" crc="a0f6ee8e" sha1="01e2ebbc9636bfd43876383bde3b1cb2c478f885" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="bubble bobble (fds conversion, chr-rom version)(unl)[u][!].prg" size="65536" crc="ef9ea440" sha1="8ac973af9e0aae763c2d61484c6c5bf5e808891f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- FIXME: which board should use this game?? -->
 	<software name="cluclud" supported="no">
 		<description>Clu Clu Land D (Asia, FDS conversion)</description>
@@ -58683,6 +58714,21 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="falsnfds" supported="no">
+		<description>Falsion (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WHIRLWIND-2706" />
+			<dataarea name="prg" size="131072">
+				<rom name="falsion (fds conversion, whirlwind manu)(unl)[!].prg" size="131072" crc="80589df6" sha1="12ddd9edb8894c200c9d89b9ee5673f1202aba19" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fuunsfds" supported="no">
 		<description>Fuuun Shaolin Kyo (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -58691,6 +58737,22 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="UNL-LH10" />
 			<dataarea name="prg" size="131072">
 				<rom name="fuuun shaolin kyo (fds conversion) (unl).prg" size="131072" crc="120d5a6c" sha1="4c499a857087e6c121522435786792a2e4105ac1" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbertfds" supported="no">
+		<description>Green Beret (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-AC08 -->
+			<dataarea name="prg" size="163840">
+				<rom name="green beret (fds conversion, whirlwind manu)(unl)[u][!].prg0" size="131072" crc="2a57c5a1" sha1="b33fff06b70a6d8772eacd26b6d0ca12d90c2d60" offset="00000" status="baddump" />
+				<rom name="green beret (fds conversion, whirlwind manu)(unl)[u][!].prg1" size="32768" crc="5ed32c27" sha1="a63894c0706ef6ac260dab01e93c899dcbd2b5e0" offset="0x20000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -58774,6 +58836,21 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="montyfds" supported="no">
+		<description>Monty no Doki Doki Daidassou (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-LH32 -->
+			<dataarea name="prg" size="131072">
+				<rom name="monty no doki doki daidassou (fds conversion)(unl)[u][!].prg" size="131072" crc="09e3dcb4" sha1="ffb4706e49b826c6cdd12e502e8ae94fc9810b7f" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="othelfds" supported="no">
 		<description>Othello (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -58785,6 +58862,21 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="othello (j) (fds conversion).prg" size="32768" crc="55976042" sha1="6f7f626d3666c9890b62e64b3b5b40fd65ccc208" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prowrfds" supported="no">
+		<description>ProWres - Famicom Wrestling Association (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-BB -->
+			<dataarea name="chr" size="16384">
+				<rom name="prowres (fds conversion, le05 simplified)(unl)[u][!].chr" size="16384" crc="58d4719f" sha1="372c4873696578ab56bdc8ec8133099194a864b7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="prowres (fds conversion, le05 simplified)(unl)[u][!].prg" size="32768" crc="7d219257" sha1="d46a9d1752204069cb4e0cc04338b5aa4ca54568" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -68463,9 +68555,9 @@ be better to redump them properly. -->
 				<!-- whole image -->
 				<!--rom name="4-in-1 1993 (ck-001)[u][!].prg" size="524288" crc="4ae9ee7d" sha1="40c7e4da72269c2eea052bbca82d038678245649" offset="00000" status="baddump" /-->
 				<rom name="4-in-1 1993 (ck-001)[u][!].prg0" size="131072" crc="038ff909" sha1="b8f225b6b932a568e5fb7a24e7899f7d499d931e" offset="00000" status="baddump" />
-				<rom name="4-in-1 1993 (ck-001)[u][!].prg1" size="131072" crc="1fe6ac0b" sha1="cb6578c2ba1444df1d8ba6aab9561a9abcf785ac" offset="00000" status="baddump" />
-				<rom name="4-in-1 1993 (ck-001)[u][!].prg2" size="131072" crc="63052e95" sha1="1531d700c9ed0053505d1826f1b217a44b7d8467" offset="00000" status="baddump" />
-				<rom name="4-in-1 1993 (ck-001)[u][!].prg3" size="131072" crc="2b5db515" sha1="0c7db5d601c6599f00a86dcffe1e7689460d8184" offset="00000" status="baddump" />
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg1" size="131072" crc="1fe6ac0b" sha1="cb6578c2ba1444df1d8ba6aab9561a9abcf785ac" offset="0x20000" status="baddump" />
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg2" size="131072" crc="63052e95" sha1="1531d700c9ed0053505d1826f1b217a44b7d8467" offset="0x40000" status="baddump" />
+				<rom name="4-in-1 1993 (ck-001)[u][!].prg3" size="131072" crc="2b5db515" sha1="0c7db5d601c6599f00a86dcffe1e7689460d8184" offset="0x60000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -69879,10 +69971,10 @@ to check why this is different -->
 				<!-- whole image -->
 				<!--rom name="super 24-in-1 [u][p1].prg" size="2621440" crc="7b766bc1" sha1="de1effb82aba548165ae70844733445c7584fdb7" offset="00000" status="baddump" /-->
 				<rom name="super 24-in-1 [u][p1].prg0" size="524288" crc="6476086a" sha1="316e099ed759c1c4442de8a2723e4a5f58857188" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].prg1" size="524288" crc="e3526d8b" sha1="38d6b94e1cbb1272188acf8ca383fc6069c35867" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].prg2" size="524288" crc="c6286aa6" sha1="7903e75b97155fd38226016c8bd43e5b89d61452" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].prg3" size="524288" crc="93fd4c1a" sha1="fc7c7f7c6466e7596ea1a4718df93fa3b044edb8" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].prg4" size="524288" crc="6476086a" sha1="316e099ed759c1c4442de8a2723e4a5f58857188" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg1" size="524288" crc="e3526d8b" sha1="38d6b94e1cbb1272188acf8ca383fc6069c35867" offset="0x080000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg2" size="524288" crc="c6286aa6" sha1="7903e75b97155fd38226016c8bd43e5b89d61452" offset="0x100000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg3" size="524288" crc="93fd4c1a" sha1="fc7c7f7c6466e7596ea1a4718df93fa3b044edb8" offset="0x180000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].prg4" size="524288" crc="6476086a" sha1="316e099ed759c1c4442de8a2723e4a5f58857188" offset="0x200000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

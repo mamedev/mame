@@ -19050,10 +19050,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="zhwsj">
-		<!-- Alt. Title: 最終幻想 無盡沙加 (Final Fantasy Endless Saga), Crystal Age (Official English Name by Sintax) -->
 		<description>Zuizhong Huanxiang - Wujin Sha Jia (Chi)</description>
 		<year>2002?</year>
 		<publisher>Sintax</publisher>
+		<info name="alt_title" value="最終幻想 無盡沙加 (Final Fantasy Endless Saga), Crystal Age (Official English Name by Sintax)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="saishuu gensou (unl).bin" size="2097152" crc="44484cfc" sha1="4dbbfce9cc1b57c53bc3a51344720a85e008988e" offset="000000" />
@@ -19062,10 +19062,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="zzqb">
-		<!-- Alt. Title: 重裝機兵 , Metal Max (Official English Name by Sintax) -->
 		<description>Zhong Zhuan Qi Bing (Chi)</description>
 		<year>2003?</year>
 		<publisher>Sintax</publisher>
+		<info name="alt_title" value="重裝機兵 , Metal Max (Official English Name by Sintax)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="zhong zhuan qi bing (unl).bin" size="2097152" crc="7175f80a" sha1="bd326d3a83928bb2972623b0e590ab0f11ee8638" offset="000000" />
@@ -19075,6 +19075,31 @@ Undumped Pirates:
 
 
 <!-- Other Asian Pirate dumps -->
+
+<!-- 1byte difference between this and the hacked version... check what is about! -->
+	<software name="chongwu" supported="no">
+		<description>Chong Wu Xiao Jing Ling - Jie Jin Ta Zhi Wang (Chi)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="宠物小精灵 结金塔之王"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="chong wu xiao jing ling - jie jin ta zhi wang (unlicensed, chinese) [raw dump].bin" size="1048576" crc="620e785d" sha1="74da832c2eeb27a4260fe6f42514539473f48b11" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chongwuh" cloneof="chongwu">
+		<description>Chong Wu Xiao Jing Ling - Jie Jin Ta Zhi Wang (Chi, Hacked)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="宠物小精灵 结金塔之王"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="chong wu xiao jing ling - jie jin ta zhi wang (unlicensed, chinese) [fixed].bin" size="1048576" crc="24ee5c85" sha1="9fc1a8a1a75fd535980aee8966f4d5f8609e5ef5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="jyqxc2">
 		<description>Jin Yong Qun Xia Chuan II (Chi)</description>
@@ -19158,10 +19183,10 @@ Undumped Pirates:
 
 <!-- This is a title hack of the undumped 'Zook Hero 2' -->
 	<software name="rockmnd3">
-		<!-- Alt. Title: Rockman DX3 (Box) -->
 		<description>Rockman X3 (Chi)</description>
 		<year>20??</year>
 		<publisher>V.Fame ~ Guangzhou Li Cheng</publisher>
+		<info name="alt_title" value="Rockman DX3 (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="rockman x3 (chi).bin" size="524288" crc="7f4112a3" sha1="6c1d24162f2682bb6e82fb09639f2e311fda5aff" offset="000000" />
@@ -19251,11 +19276,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="shjmlwc">
-		<!-- Alt Title: 聖火降魔錄 (Box) -->
 		<description>Sheng Huo Jiang Mo Lu Wai Chuan - Guang Yu An De Lun Hui (Chi)</description>
 		<year>20??</year>
 		<publisher>SKOB</publisher>
-		<info name="alt_title" value="聖火降魔錄外傳 - 光與暗的輪迴"/>
+		<info name="alt_title" value="聖火降魔錄外傳 - 光與暗的輪迴, 聖火降魔錄 (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="fire emblem akaneia senki (unl).bin" size="2097152" crc="808f19d7" sha1="62620a2cb01fe93388adc42da0b7cbaf53c11ba8" offset="000000" />
@@ -19360,10 +19384,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="sanguoas">
-		<!-- Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box) -->
 		<description>San Guo Zhi - Ao Shi Tian Jia (Chi)</description>
 		<year>20??</year>
 		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="san guo zhi - ao shi tian jia (unl).bin" size="2097152" crc="6e3fde3a" sha1="a1d3de40a8d98488072f2c49b53bb58e7a69ba33" offset="000000" />
@@ -19372,10 +19396,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="sanguoasa" cloneof="sanguoas">
-		<!-- Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box) -->
 		<description>San Guo Zhi - Ao Shi Tian Jia (Chi, Alt)</description>
 		<year>20??</year>
 		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="san guo zhi - ao shi tian jia (unl) (alt).bin" size="2097152" crc="daaf8a92" sha1="684edb0f22f36ce9df2a9eba2a5b89ba7d37fab8" offset="000000" />
@@ -19385,10 +19409,10 @@ Undumped Pirates:
 
 <!-- This has the 1st half identical to the second, but it's slightly different from the dumps above... -->
 	<software name="sanguoasb" cloneof="sanguoas">
-		<!-- Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box) -->
 		<description>San Guo Zhi - Ao Shi Tian Jia (Chi, Alt Bad?)</description>
 		<year>20??</year>
 		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="san guo zhi - ao shi tian jia (unl) (bad maybe).bin" size="2097152" crc="5c30be34" sha1="7bb4b81d67be72d66faeadf86126b1a278172b07" offset="000000" />

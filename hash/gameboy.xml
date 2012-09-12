@@ -21204,7 +21204,6 @@
 <!--
   Other games (which could coincide with some of the games below without serial)
   * GS-01 - ??
-  * GS-04 - Story of Lasama
   * GS-07 - Lost Trip
   * GS-08 - Binary Monsters
   * GS-09 - ??
@@ -21225,6 +21224,30 @@
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="fire dragon (unl).bin" size="65536" crc="275947f5" sha1="a76c8c75fda78516d9b2960717ef6d4eda5efaef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasama" supported="no">
+		<description>La Sa Ma Chuan Qi - Story of Lasama (Tw)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<info name="serial" value="GS-04"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [raw dump].bin" size="4194304" crc="46362c48" sha1="c1d399edc676127be438541a5ce4a7e096e86c39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasamah" cloneof="lasama" supported="no">
+		<description>La Sa Ma Chuan Qi - Story of Lasama (Tw, Hacked)</description>
+		<year>19??</year>
+		<publisher>GOWIN</publisher>
+		<info name="serial" value="GS-04"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [fixed].bin" size="65536" crc="985fcc24" sha1="de0fed7673c525bbcdcc484067dddebba7684462" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
