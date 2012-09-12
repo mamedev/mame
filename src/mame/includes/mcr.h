@@ -59,11 +59,15 @@ public:
 	DECLARE_READ8_MEMBER(solarfox_ip0_r);
 	DECLARE_READ8_MEMBER(solarfox_ip1_r);
 	DECLARE_READ8_MEMBER(dpoker_ip0_r);
-	DECLARE_WRITE8_MEMBER(dpoker_p2c_w);
-	DECLARE_WRITE8_MEMBER(dpoker_p30_w);
-	DECLARE_WRITE8_MEMBER(dpoker_p34_w);
-	DECLARE_WRITE8_MEMBER(dpoker_p3c_w);
+	DECLARE_WRITE8_MEMBER(dpoker_lamps1_w);
+	DECLARE_WRITE8_MEMBER(dpoker_lamps2_w);
+	DECLARE_WRITE8_MEMBER(dpoker_output_w);
+	DECLARE_WRITE8_MEMBER(dpoker_meters_w);
 	DECLARE_READ8_MEMBER(kick_ip1_r);
+
+	DECLARE_WRITE8_MEMBER(dpoker_burp_w);
+	DECLARE_READ8_MEMBER(dpoker_burp_r);
+
 	DECLARE_WRITE8_MEMBER(wacko_op4_w);
 	DECLARE_READ8_MEMBER(wacko_ip1_r);
 	DECLARE_READ8_MEMBER(wacko_ip2_r);

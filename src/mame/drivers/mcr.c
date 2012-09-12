@@ -292,7 +292,7 @@ static UINT8 input_mux;
 static UINT8 last_op4;
 
 static UINT8 dpoker_coin_status;
-static UINT8 dpoker_output_34;
+static UINT8 dpoker_output;
 
 static UINT8 nflfoot_serial_out_active;
 static UINT8 nflfoot_serial_out_bits;
@@ -379,7 +379,7 @@ TIMER_DEVICE_CALLBACK( dpoker_hopper_callback )
 {
 	mcr_state *state = timer.machine().driver_data<mcr_state>();
 
-	if (dpoker_output_34 & 0x40)
+	if (dpoker_output & 0x40)
 	{
 		// hopper timing is a guesstimate
 		dpoker_coin_status ^= 8;
@@ -424,7 +424,7 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 }
 
 
-WRITE8_MEMBER(mcr_state::dpoker_p2c_w)
+WRITE8_MEMBER(mcr_state::dpoker_lamps1_w)
 {
 	// cpanel button lamps
 	output_set_lamp_value(0, data >> 0 & 1); // hold 0
@@ -437,7 +437,7 @@ WRITE8_MEMBER(mcr_state::dpoker_p2c_w)
 	output_set_lamp_value(7, data >> 3 & 1); // stand
 }
 
-WRITE8_MEMBER(mcr_state::dpoker_p30_w)
+WRITE8_MEMBER(mcr_state::dpoker_lamps2_w)
 {
 	// d5: button lamp: service or change
 	output_set_lamp_value(8, data >> 1 & 1);
@@ -449,7 +449,7 @@ WRITE8_MEMBER(mcr_state::dpoker_p30_w)
 	// d6, d7: unused?
 }
 
-WRITE8_MEMBER(mcr_state::dpoker_p34_w)
+WRITE8_MEMBER(mcr_state::dpoker_output_w)
 {
 	// d0: ? coin return
 	// d1: ? divertor (active low)
@@ -457,15 +457,15 @@ WRITE8_MEMBER(mcr_state::dpoker_p34_w)
 	
 	// d6: assume hopper coin flow
 	// d7: assume hopper motor
-	if (data & 0x40 & ~dpoker_output_34)
+	if (data & 0x40 & ~dpoker_output)
 		m_dpoker_hopper_timer->adjust(attotime::from_msec(500));
 	
 	// other bits: unused?
 
-	dpoker_output_34 = data;
+	dpoker_output = data;
 }
 
-WRITE8_MEMBER(mcr_state::dpoker_p3c_w)
+WRITE8_MEMBER(mcr_state::dpoker_meters_w)
 {
 	// meters?
 }
@@ -2798,23 +2798,23 @@ DRIVER_INIT_MEMBER(mcr_state,dpoker)
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_state::dpoker_ip0_r),this));
 
 	// meter ram, is it battery backed?
-	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x8000, 0x81ff, 0, 0x0200);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x8000, 0x81ff);
 
 	// extra I/O
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, 0, 0x03, "P24");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, 0, 0x03, "P28");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, 0, 0x03, "P2C");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, "P24");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, "P28");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, "P2C");
 
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2c, 0x2c, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p2c_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p30_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p34_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x3c, 0x3c, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p3c_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_state::dpoker_lamps1_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_lamps2_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_output_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_state::dpoker_meters_w),this));
 	
 	dpoker_coin_status = 0;
-	dpoker_output_34 = 0;
+	dpoker_output = 0;
 
 	state_save_register_global(machine(), dpoker_coin_status);
-	state_save_register_global(machine(), dpoker_output_34);
+	state_save_register_global(machine(), dpoker_output);
 }
 
 
