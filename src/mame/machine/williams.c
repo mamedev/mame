@@ -298,14 +298,14 @@ static void williams_main_irq(device_t *device, int state)
 	int combined_state = pia_1->irq_a_state() | pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void williams_main_firq(device_t *device, int state)
 {
 	/* FIRQ to the main CPU */
-	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -315,7 +315,7 @@ static void williams_snd_irq(device_t *device, int state)
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
-	cputag_set_input_line(device->machine(), "soundcpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Same as above, but for second sound board */
 static void williams_snd_irq_b(device_t *device, int state)
@@ -324,7 +324,7 @@ static void williams_snd_irq_b(device_t *device, int state)
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
-	cputag_set_input_line(device->machine(), "soundcpu_b", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu_b")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -342,7 +342,7 @@ static void mysticm_main_irq(device_t *device, int state)
 	int combined_state = pia_0->irq_b_state() | pia_1->irq_a_state() | pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -353,7 +353,7 @@ static void tshoot_main_irq(device_t *device, int state)
 	int combined_state = pia_0->irq_a_state() | pia_0->irq_b_state() | pia_1->irq_a_state() | pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -1875,7 +1875,7 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 	{
 		mz2500_reset(state, WRAM_RESET);
 		/* correct? */
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 2 is speaker */
@@ -2042,7 +2042,7 @@ static WRITE_LINE_DEVICE_HANDLER( pit8253_clk0_irq )
 {
 	mz2500_state *drvstate = device->machine().driver_data<mz2500_state>();
 	if(drvstate->m_irq_mask[1]/* && state & 1*/)
-		cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE,drvstate->m_irq_vector[1]);
+		device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,drvstate->m_irq_vector[1]);
 }
 
 static const struct pit8253_config mz2500_pit8253_intf =
@@ -2071,7 +2071,7 @@ static WRITE_LINE_DEVICE_HANDLER( mz2500_rtc_alarm_irq )
 	//mz2500_state *drvstate = device->machine().driver_data<mz2500_state>();
 	/* TODO: doesn't work yet */
 //  if(drvstate->m_irq_mask[3] && state & 1)
-//      cputag_set_input_line_and_vector(device, "maincpu", 0, HOLD_LINE,drvstate->m_irq_vector[3]);
+//      device.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,drvstate->m_irq_vector[3]);
 }
 
 static RP5C15_INTERFACE( rtc_intf )

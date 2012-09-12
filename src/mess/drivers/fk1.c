@@ -391,7 +391,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	if (timer.machine().root_device().ioport("LINE0")->read())
 	{
 		state->m_int_vector = 6;
-		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -419,7 +419,7 @@ static TIMER_DEVICE_CALLBACK( vsync_callback )
 	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
 	state->m_int_vector = 3;
-	cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

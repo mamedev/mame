@@ -333,10 +333,10 @@ static TIMER_DEVICE_CALLBACK( psychic5_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -646,7 +646,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

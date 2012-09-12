@@ -2426,7 +2426,7 @@ TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 			state->x1_sub_io_w(*space,0,0xe6);
 			state->m_irq_vector = state->m_key_irq_vector;
 			state->m_key_irq_flag = 1;
-			cputag_set_input_line(timer.machine(),"x1_cpu",0,ASSERT_LINE);
+			timer.machine().device("x1_cpu")->execute().set_input_line(0,ASSERT_LINE);
 			state->m_old_key1 = key1;
 			state->m_old_key2 = key2;
 			state->m_old_key3 = key3;

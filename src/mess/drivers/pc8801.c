@@ -1314,7 +1314,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 		m_vrtc_irq_latch = 0;
 
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
 
 //  IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
 
@@ -1362,11 +1362,11 @@ WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 		m_sound_irq_latch = 0;
 
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
 
 	if(m_sound_irq_mask && m_sound_irq_pending)
 	{
-		cputag_set_input_line(machine(),"maincpu",0,HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
 		m_sound_irq_latch = 1;
 		m_sound_irq_pending = 0;
 	}
@@ -1714,11 +1714,11 @@ WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 			m_sound_irq_latch = 0;
 
 		if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-			cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
 
 		if(m_sound_irq_mask && m_sound_irq_pending)
 		{
-			cputag_set_input_line(machine(),"maincpu",0,HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
 			m_sound_irq_latch = 1;
 			m_sound_irq_pending = 0;
 		}
@@ -2282,13 +2282,13 @@ void pc8801_raise_irq(running_machine &machine,UINT8 irq,UINT8 state)
 
 		drvstate->m_pic->r_w(~irq);
 
-		cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0,ASSERT_LINE);
 	}
 	else
 	{
 		//drvstate->m_int_state &= ~irq;
 
-		//cputag_set_input_line(machine,"maincpu",0,CLEAR_LINE);
+		//machine.device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
 	}
 }
 
@@ -2318,7 +2318,7 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 	UINT8 vector = (7 - state->m_pic->a_r());
 
 	state->m_int_state &= ~(1<<vector);
-	cputag_set_input_line(device->machine(),"maincpu",0,CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
 
 	return vector << 1;
 }
@@ -2386,7 +2386,7 @@ static void pc8801_sound_irq( device_t *device, int irq )
 			state->m_sound_irq_latch = 1;
 			state->m_sound_irq_pending = 0;
 			//IRQ_LOG(("sound\n"));
-			cputag_set_input_line(device->machine(),"maincpu",0,HOLD_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
 		}
 		else
 			state->m_sound_irq_pending = 1;
@@ -2400,7 +2400,7 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 	{
 		state->m_timer_irq_latch = 1;
 		//IRQ_LOG(("timer\n"));
-		cputag_set_input_line(timer.machine(),"maincpu",0,HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
 	}
 }
 

@@ -859,7 +859,7 @@ READ32_MEMBER(seibuspi_state::sound_fifo_status_r)
 
 READ32_MEMBER(seibuspi_state::spi_int_r)
 {
-	cputag_set_input_line(machine(), "maincpu", 0,CLEAR_LINE );
+	machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -907,9 +907,9 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
 			m_z80_prg_fifo_pos = 0;
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE );
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }
@@ -1098,9 +1098,9 @@ WRITE8_MEMBER(seibuspi_state::flashrom_write)
 static void irqhandler(device_t *device, int state)
 {
 	if (state)
-		cputag_set_input_line_and_vector(device->machine(), "soundcpu", 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		device->machine().device("soundcpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cputag_set_input_line(device->machine(), "soundcpu", 0, CLEAR_LINE);
+		device->machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE32_MEMBER(seibuspi_state::sys386f2_eeprom_w)
@@ -1816,7 +1816,7 @@ static MACHINE_RESET( spi )
 	UINT8 *rombase = state->memregion("user1")->base();
 	UINT8 flash_data = rombase[0x1ffffc];
 
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
+	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sound_fifo_r),state));

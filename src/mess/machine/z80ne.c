@@ -173,7 +173,7 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
 	if (!m_nmi_delay_counter)
 	{
 		machine().device("z80ne")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
-		cputag_set_input_line(machine(), "z80ne", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("z80ne")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
 }
@@ -389,7 +389,7 @@ INPUT_CHANGED( z80ne_nmi )
 
 	if ( ! BIT(nmi, 0))
 	{
-		cputag_set_input_line(field.machine(), "z80ne", INPUT_LINE_NMI, PULSE_LINE);
+		field.machine().device("z80ne")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

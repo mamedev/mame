@@ -1505,7 +1505,7 @@ static WRITE_LINE_DEVICE_HANDLER(adam_vdp_interrupt)
 
 	if (state && !driver_state->m_vdp_nmi)
 	{
-		cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_NMI, PULSE_LINE);
+		device->machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	driver_state->m_vdp_nmi = state;

@@ -263,7 +263,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 1, data >> 8);
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -277,7 +277,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", offset ^ 3, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(offset ^ 3, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
@@ -331,7 +331,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 			state->m_raster_scanline = (state->m_raster_scanline + 1) % 240;
 			if (state->m_raster_scanline > 0)
 				timer.machine().primary_screen->update_partial(state->m_raster_scanline - 1);
-			cputag_set_input_line(timer.machine(), "maincpu", 1, ASSERT_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 		}
 	}
 
@@ -342,7 +342,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		{
 			if (scanline > 0)
 				timer.machine().primary_screen->update_partial(scanline - 1);
-			cputag_set_input_line(timer.machine(), "maincpu", 2, ASSERT_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 		}
 	}
 
@@ -352,7 +352,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		if (scanline == 248)
 		{
 			timer.machine().primary_screen->update_partial(scanline - 1);
-			cputag_set_input_line(timer.machine(), "maincpu", 3, ASSERT_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 		}
 	}
 }
@@ -546,7 +546,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

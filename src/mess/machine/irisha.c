@@ -121,7 +121,7 @@ I8255A_INTERFACE( irisha_ppi8255_interface )
 
 static WRITE_LINE_DEVICE_HANDLER( irisha_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 const struct pic8259_interface irisha_pic8259_config =

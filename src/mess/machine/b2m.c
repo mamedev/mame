@@ -273,7 +273,7 @@ I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 
 static WRITE_LINE_DEVICE_HANDLER( b2m_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ?  HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
 }
 
 /* Driver initialization */

@@ -59,7 +59,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 
 static WRITE_LINE_DEVICE_HANDLER( snd_interrupt )
 {
-	cputag_set_input_line(device->machine(), "audiocpu", M6809_IRQ_LINE, state);
+	device->machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, state);
 }
 
 
@@ -144,5 +144,5 @@ WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
 	riot6532_porta_in_set(m_riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }

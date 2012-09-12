@@ -229,7 +229,7 @@ static MACHINE_START( ccastles )
 static MACHINE_RESET( ccastles )
 {
 	ccastles_state *state = machine.driver_data<ccastles_state>();
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	state->m_irq_state = 0;
 }
 

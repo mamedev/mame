@@ -410,7 +410,7 @@ WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, param);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, param);
 }
 
 static void voodoo_vblank_1(device_t *device, int param)
@@ -546,7 +546,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			adc1213x_di_w(adc12138, 0, (data >> 1) & 0x1);
 			adc1213x_sclk_w(adc12138, 0, data & 0x1);
 
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -581,9 +581,9 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
                 0x01 = EXRGB
             */
 			if (data & 0x80)
-				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
-				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
@@ -621,7 +621,7 @@ WRITE32_MEMBER(hornet_state::gun_w)
 	if (mem_mask == 0xffff0000)
 	{
 		m_gn680_latch = data>>16;
-		cputag_set_input_line(machine(), "gn680", M68K_IRQ_6, HOLD_LINE);
+		machine().device("gn680")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }
 
@@ -672,7 +672,7 @@ WRITE16_MEMBER(hornet_state::gn680_sysctrl)
 
 READ16_MEMBER(hornet_state::gn680_latch_r)
 {
-	cputag_set_input_line(machine(), "gn680", M68K_IRQ_6, CLEAR_LINE);
+	machine().device("gn680")->execute().set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return m_gn680_latch;
 }
@@ -909,7 +909,7 @@ static MACHINE_RESET( hornet )
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
 
-	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 		machine.root_device().membank("bank5")->set_base(usr5);
@@ -933,7 +933,7 @@ static const adc12138_interface hornet_adc_interface = {
 
 static TIMER_CALLBACK( irq_off )
 {
-	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )
@@ -941,7 +941,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	hornet_state *state = machine.driver_data<hornet_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
-	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
     state->m_sound_irq_timer->adjust(attotime::from_usec(1), line);
 }
 
@@ -1046,8 +1046,8 @@ static MACHINE_RESET( hornet_2board )
 		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		machine.root_device().membank("bank1")->set_entry(0);
 	}
-	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 	{

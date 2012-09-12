@@ -134,7 +134,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(sidepckt_state::sidepckt_i8751_r)
@@ -148,7 +148,7 @@ WRITE8_MEMBER(sidepckt_state::sidepckt_i8751_w)
 	static const int table_2[]={0x8e,0x42,0xad,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa2,0xff};
 	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
 
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (m_in_math==1) {
@@ -188,7 +188,7 @@ WRITE8_MEMBER(sidepckt_state::sidepctj_i8751_w)
 	static const int table_2[]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
 	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (m_in_math==1) {

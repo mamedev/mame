@@ -102,7 +102,7 @@ static TIMER_CALLBACK( nmi_callback	)
 	machine.watchdog_enable(machine.root_device().ioport("IN0")->read() & 0x40);
 
 	if (machine.root_device().ioport("IN0")->read() & 0x40)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
 }

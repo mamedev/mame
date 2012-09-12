@@ -324,7 +324,7 @@ static MACHINE_START( tempest )
 
 WRITE8_MEMBER(tempest_state::wdclr_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	machine().watchdog_reset();
 }
 

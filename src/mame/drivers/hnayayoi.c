@@ -505,7 +505,7 @@ INPUT_PORTS_END
 static void irqhandler(device_t *device, int irq)
 {
 	popmessage("irq");
-//  cputag_set_input_line(device->machine(), "maincpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  device->machine().device("maincpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

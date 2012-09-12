@@ -94,7 +94,7 @@ static MACHINE_RESET(mod8)
 WRITE8_MEMBER( mod8_state::kbd_put )
 {
 	m_tty_key_data = data ^ 0xff;
-	cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 static GENERIC_TELEPRINTER_INTERFACE( teleprinter_intf )

@@ -333,7 +333,7 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 	if (state->m_allowNMI)
 	{
 		state->m_allowNMI = 0;
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
 	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }
@@ -341,15 +341,15 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 static TIMER_DEVICE_CALLBACK( update_nmi_r5 )
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }
 
 static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
-	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
-	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }

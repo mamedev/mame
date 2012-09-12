@@ -45,8 +45,8 @@
 static void update_irq_state(running_machine &machine)
 {
 	artmagic_state *state = machine.driver_data<artmagic_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->m_tms_irq  ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, state->m_hack_irq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_tms_irq  ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(5, state->m_hack_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

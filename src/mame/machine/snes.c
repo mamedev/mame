@@ -1591,14 +1591,14 @@ static void snes_init_ram( running_machine &machine )
 	// if we have a DSP, halt it for the moment
 	if (state->m_upd7725)
 	{
-		cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+		machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	// ditto for a uPD96050 (Seta ST-010 or ST-011)
 	state->m_upd96050 = machine.device<upd96050_device>("setadsp");
 	if (state->m_upd96050)
 	{
-		cputag_set_input_line(machine, "setadsp", INPUT_LINE_RESET, ASSERT_LINE);
+		machine.device("setadsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	switch (state->m_has_addon_chip)
@@ -1610,7 +1610,7 @@ static void snes_init_ram( running_machine &machine )
 			// cartridge uses the DSP, let 'er rip
 			if (state->m_upd7725)
 			{
-				cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
+				machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			else
 			{
@@ -1636,7 +1636,7 @@ static void snes_init_ram( running_machine &machine )
 			// cartridge uses the DSP, let 'er rip
 			if (state->m_upd96050)
 			{
-				cputag_set_input_line(machine, "setadsp", INPUT_LINE_RESET, CLEAR_LINE);
+				machine.device("setadsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			else
 			{

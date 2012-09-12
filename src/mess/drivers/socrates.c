@@ -905,7 +905,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( clear_irq_cb )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	state->m_vblankstate = 0;
 }
 

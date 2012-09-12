@@ -196,7 +196,7 @@ static INPUT_CHANGED( online_switch )
 	ex800_state *state = field.machine().driver_data<ex800_state>();
 	if (newval)
 	{
-		cputag_set_input_line(field.machine(), "maincpu", UPD7810_INTF1, state->m_irq_state);
+		field.machine().device("maincpu")->execute().set_input_line(UPD7810_INTF1, state->m_irq_state);
 		state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }

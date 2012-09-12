@@ -146,7 +146,7 @@ WRITE8_MEMBER(poo_state::unk_w)
 WRITE8_MEMBER(poo_state::sound_cmd_w)
 {
 	soundlatch_byte_w(space, 0, (data & 0xff));
-	cputag_set_input_line(machine(), "subcpu", 0, HOLD_LINE);
+	machine().device("subcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(poo_state::poo_vregs_w)

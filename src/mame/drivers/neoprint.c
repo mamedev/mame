@@ -164,13 +164,13 @@ READ16_MEMBER(neoprint_state::neoprint_audio_result_r)
 
 static void audio_cpu_assert_nmi(running_machine &machine)
 {
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(neoprint_state::audio_command_w)
@@ -448,7 +448,7 @@ GFXDECODE_END
 
 static void audio_cpu_irq(device_t *device, int assert)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

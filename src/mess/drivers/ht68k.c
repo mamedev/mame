@@ -91,7 +91,7 @@ static MACHINE_RESET(ht68k)
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

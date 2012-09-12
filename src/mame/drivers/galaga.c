@@ -742,13 +742,13 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 		case 0x00:	/* IRQ1 */
 			m_main_irq_mask = data & 1;
 			if (!m_main_irq_mask)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
 			m_sub_irq_mask = data & 1;
 			if (!m_sub_irq_mask)
-				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
+				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
@@ -756,8 +756,8 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 			break;
 
 		case 0x03:	/* RESET */
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-			cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */

@@ -273,7 +273,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 static void gladiator_ym_irq(device_t *device, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cputag_set_input_line(device->machine(), "sub", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
@@ -293,12 +293,12 @@ WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
 WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
 {
 	soundlatch_byte_w(space,0,data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(gladiatr_state::glad_cpu_sound_command_r)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_byte_r(space,0);
 }
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 {
-	cputag_set_input_line(machine(), "sub", 0, HOLD_LINE);
+	machine().device("sub")->execute().set_input_line(0, HOLD_LINE);
 }
 #endif
 

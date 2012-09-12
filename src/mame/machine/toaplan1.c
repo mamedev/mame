@@ -121,7 +121,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 	if (data == 0) {
 		if (m_dsp_execute) {
 			logerror("Turning 68000 on\n");
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
 		}
 		m_dsp_BIO = ASSERT_LINE;
@@ -143,15 +143,15 @@ static void demonwld_dsp(running_machine &machine, int enable)
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
-		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
-		cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+		machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine.device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		logerror("Turning DSP off\n");
-		cputag_set_input_line(machine, "dsp", 0, CLEAR_LINE); /* TMS32010 INT */
-		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
+		machine.device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+		machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 

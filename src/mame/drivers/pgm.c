@@ -516,7 +516,7 @@ MACHINE_START( pgm )
 
 MACHINE_RESET( pgm )
 {
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 

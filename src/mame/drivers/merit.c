@@ -281,7 +281,7 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 
 WRITE_LINE_MEMBER(merit_state::vsync_changed)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

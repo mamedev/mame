@@ -50,9 +50,9 @@ static void cage_irq_callback(running_machine &machine, int reason);
 static void update_interrupts(running_machine &machine)
 {
 	atarigt_state *state = machine.driver_data<atarigt_state>();
-	cputag_set_input_line(machine, "maincpu", 3, state->m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, state->m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(6, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

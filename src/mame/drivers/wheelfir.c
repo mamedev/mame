@@ -376,7 +376,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 	if(offset==0xf && data==0xffff)
 	{
 
-		cputag_set_input_line(machine(), "maincpu", 1, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 		{
 			UINT8 *rom = memregion("gfx1")->base();
@@ -644,7 +644,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 WRITE16_MEMBER(wheelfir_state::wheelfir_snd_w)
 {
 	COMBINE_DATA(&m_soundlatch);
-	cputag_set_input_line(machine(), "subcpu", 1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
+	machine().device("subcpu")->execute().set_input_line(1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
 	machine().scheduler().synchronize();
 }
 
@@ -749,7 +749,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 		if(state->m_scanline_cnt==0) //<=0 ?
 		{
-			cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE); // raster IRQ, changes scroll values for road
+			timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
 
 	}
@@ -758,7 +758,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 		if(state->m_current_scanline==NUM_SCANLINES) /* vblank */
 		{
 			state->m_toggle_bit = 0x8000;
-			cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 		}
 	}
 }

@@ -55,7 +55,7 @@ static TIMER_CALLBACK( soundirqline_callback )
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
 		if ((param & 1) == 0)
-			cputag_set_input_line(machine, "sub", 0, HOLD_LINE);
+			machine.device("sub")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

@@ -97,7 +97,7 @@ WRITE32_MEMBER(konamigq_state::soundr3k_w)
 		m_sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
-			cputag_set_input_line(machine(), "soundcpu", 1, HOLD_LINE );
+			machine().device("soundcpu")->execute().set_input_line(1, HOLD_LINE );
 		}
 	}
 	if( ACCESSING_BITS_0_15 )
@@ -150,7 +150,7 @@ static const UINT16 konamigq_def_eeprom[64] =
 WRITE32_MEMBER(konamigq_state::eeprom_w)
 {
 	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 

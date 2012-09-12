@@ -61,7 +61,7 @@ PALETTE_INIT( playch10 )
 static void ppu_irq( device_t *device, int *ppu_regs )
 {
 	playch10_state *state = device->machine().driver_data<playch10_state>();
-	cputag_set_input_line(device->machine(), "cart", INPUT_LINE_NMI, PULSE_LINE );
+	device->machine().device("cart")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	state->m_pc10_int_detect = 1;
 }
 

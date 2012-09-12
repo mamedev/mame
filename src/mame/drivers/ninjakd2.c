@@ -214,7 +214,7 @@ WRITE8_MEMBER(ninjakd2_state::robokid_bankselect_w)
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 {
 	// bit 4 resets sound CPU
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);
@@ -905,7 +905,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

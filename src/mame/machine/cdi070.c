@@ -84,7 +84,7 @@ TIMER_CALLBACK( scc68070_timer0_callback )
         if(interrupt)
         {
         	device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-        	cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+        	machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
     }
 
@@ -171,7 +171,7 @@ TIMER_CALLBACK( scc68070_rx_callback )
 			if(interrupt)
 			{
 				device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-				cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+				machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 			}
 
 			scc68070->uart.status_register |= USR_RXRDY;
@@ -382,7 +382,7 @@ TIMER_CALLBACK( scc68070_tx_callback )
 		if(interrupt)
 		{
 			device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-			cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
 
 		if(scc68070->uart.transmit_pointer > -1)
@@ -480,12 +480,12 @@ READ16_HANDLER( scc68070_periphs_r )
 
 			if((scc68070->picr2 >> 4) & 7)
 			{
-				cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_1 + (((scc68070->picr2 >> 4) & 7) - 1), ASSERT_LINE);
+				space->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (((scc68070->picr2 >> 4) & 7) - 1), ASSERT_LINE);
 			}
 
 			if(scc68070->picr2 & 7)
 			{
-				cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_1 + ((scc68070->picr2 & 7) - 1), ASSERT_LINE);
+				space->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + ((scc68070->picr2 & 7) - 1), ASSERT_LINE);
 			}
 
             return scc68070->uart.status_register;
@@ -531,7 +531,7 @@ READ16_HANDLER( scc68070_periphs_r )
 			}
 			if((scc68070->picr2 >> 4) & 7)
 			{
-				cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_1 + (((scc68070->picr2 >> 4) & 7) - 1), CLEAR_LINE);
+				space->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (((scc68070->picr2 >> 4) & 7) - 1), CLEAR_LINE);
 			}
 
 			scc68070->uart.receive_holding_register = scc68070->uart.receive_buffer[0];
@@ -840,7 +840,7 @@ WRITE16_HANDLER( scc68070_periphs_w )
                 if(!scc68070->timers.timer_status_register)
                 {
                     UINT8 interrupt = scc68070->picr1 & 7;
-                    cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
+                    space->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
                 }
             }
             break;

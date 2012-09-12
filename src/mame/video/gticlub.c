@@ -353,18 +353,18 @@ READ32_HANDLER( K001005_r )
 			{
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
-					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 					sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
 				}
 				else
 				{
-					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 					sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
-				//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
@@ -406,18 +406,18 @@ WRITE32_HANDLER( K001005_w )
 			{
 				if (K001005_fifo_write_ptr < 0x400)
 				{
-					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 					sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 				}
 				else
 				{
-					//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 					sharc_set_flag_input(space->machine().device("dsp"), 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
-				//cputag_set_input_line(space->machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//space->machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 				sharc_set_flag_input(space->machine().device("dsp"), 1, ASSERT_LINE);
 			}
 
@@ -1559,7 +1559,7 @@ SCREEN_UPDATE_RGB32( gticlub )
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
 
-	//cputag_set_input_line(screen.machine(), "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
+	//screen.machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 	sharc_set_flag_input(screen.machine().device("dsp"), 1, ASSERT_LINE);
 	return 0;
 }

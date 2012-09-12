@@ -93,14 +93,14 @@ static TIMER_CALLBACK( trigger_gun_interrupt )
 	state->m_gunx[which] = beamx;
 
 	/* fire the IRQ at the correct moment */
-	cputag_set_input_line(machine, "maincpu", param, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(param, ASSERT_LINE);
 }
 
 
 static TIMER_CALLBACK( clear_gun_interrupt )
 {
 	/* clear the IRQ on the next scanline? */
-	cputag_set_input_line(machine, "maincpu", param, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 

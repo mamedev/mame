@@ -122,13 +122,13 @@ WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
-			cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);
+			machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 		if ((old & 0x40) && (m_CPUA_register & 0x40) == 0)
 			twin16_spriteram_process(machine());
 
 		if ((old & 0x10) == 0 && (m_CPUA_register & 0x10))
-			cputag_set_input_line(machine(), "sub", M68K_IRQ_6, HOLD_LINE);
+			machine().device("sub")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
 		coin_counter_w(machine(), 1, m_CPUA_register & 0x02);
@@ -149,7 +149,7 @@ WRITE16_MEMBER(twin16_state::twin16_CPUB_register_w)
 	if( m_CPUB_register!=old )
 	{
 		if ((old & 0x01) == 0 && (m_CPUB_register & 0x01))
-			cputag_set_input_line(machine(), "maincpu", M68K_IRQ_6, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }
 
@@ -165,7 +165,7 @@ WRITE16_MEMBER(twin16_state::fround_CPU_register_w)
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
-			cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);
+			machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
 		coin_counter_w(machine(), 1, m_CPUA_register & 0x02);

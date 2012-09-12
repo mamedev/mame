@@ -549,7 +549,7 @@ static void amstrad_plus_dma_parse(running_machine &machine, int channel)
 		{
 			state->m_plus_irq_cause = channel * 2;
 			state->m_asic.ram[0x2c0f] |= (0x40 >> channel);
-			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			logerror("DMA %i: INT\n",channel);
 		}
 		if (command & 0x20)  // Stop processing on this channel
@@ -857,7 +857,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_hsync_changed )
 			{
 				if (drvstate->m_gate_array.hsync_counter >= 32)
 				{
-					cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+					device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 				}
 				drvstate->m_gate_array.hsync_counter = 0;
 			}
@@ -866,7 +866,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_hsync_changed )
 		if ( drvstate->m_gate_array.hsync_counter >= 52 )
 		{
 			drvstate->m_gate_array.hsync_counter = 0;
-			cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		}
 	}
 	drvstate->m_gate_array.hsync = state ? 1 : 0;
@@ -903,7 +903,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 				{
 					if( drvstate->m_asic.pri == 0 || drvstate->m_asic.enabled == 0)
 					{
-						cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+						device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 					}
 				}
 				drvstate->m_gate_array.hsync_counter = 0;
@@ -915,7 +915,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 			drvstate->m_gate_array.hsync_counter = 0;
 			if ( drvstate->m_asic.pri == 0 || drvstate->m_asic.enabled == 0 )
 			{
-				cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+				device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 		}
 
@@ -927,7 +927,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 				if ( drvstate->m_asic.pri == drvstate->m_asic.vpos - 1 )
 				{
 					logerror("PRI: triggered, scanline %d\n",drvstate->m_asic.pri);
-					cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+					device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 					drvstate->m_plus_irq_cause = 0x06;  // raster interrupt vector
 					drvstate->m_gate_array.hsync_counter &= ~0x20;  // ASIC PRI resets the MSB of the raster counter
 				}
@@ -1139,12 +1139,12 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 
 WRITE_LINE_DEVICE_HANDLER(cpc_irq_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 WRITE_LINE_DEVICE_HANDLER(cpc_nmi_w)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state);
 }
 
 WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
@@ -1490,21 +1490,21 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 			if(data & 0x40)
 			{
 				logerror("ASIC: DMA 0 IRQ acknowledge\n");
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 				m_plus_irq_cause = 0x06;
 				m_asic.ram[0x2c0f] &= ~0x40;
 			}
 			if(data & 0x20)
 			{
 				logerror("ASIC: DMA 1 IRQ acknowledge\n");
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 				m_plus_irq_cause = 0x06;
 				m_asic.ram[0x2c0f] &= ~0x20;
 			}
 			if(data & 0x10)
 			{
 				logerror("ASIC: DMA 2 IRQ acknowledge\n");
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 				m_plus_irq_cause = 0x06;
 				m_asic.ram[0x2c0f] &= ~0x10;
 			}
@@ -1710,7 +1710,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		if ( state->m_gate_array.mrer & 0x10 )
 		{
 			state->m_gate_array.hsync_counter = 0;
-			cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 		}
 
 		/* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
@@ -2693,7 +2693,7 @@ static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
 		state->m_asic.ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
 		return (state->m_asic.ram[0x2805] & 0xf8) | state->m_plus_irq_cause;
 	}
-	cputag_set_input_line(device->machine(),"maincpu", 0, CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	state->m_gate_array.hsync_counter &= 0x1F;
 	if ( state->m_asic.enabled )
 	{

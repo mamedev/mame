@@ -600,7 +600,7 @@ static IRQ_CALLBACK(z100_irq_callback)
 
 WRITE_LINE_MEMBER( z100_state::z100_pic_irq )
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 

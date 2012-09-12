@@ -623,7 +623,7 @@ static MACHINE_RESET( seattle )
 
 static void ide_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", IDE_IRQ_NUM, state);
+	device->machine().device("maincpu")->execute().set_input_line(IDE_IRQ_NUM, state);
 }
 
 
@@ -642,7 +642,7 @@ static void ethernet_interrupt_machine(running_machine &machine, int state)
 	{
 		UINT8 assert = drvstate->m_ethernet_irq_state && (*drvstate->m_interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
 		if (drvstate->m_ethernet_irq_num != 0)
-			cputag_set_input_line(machine, "maincpu", drvstate->m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(drvstate->m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else if (drvstate->m_board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq(machine);
@@ -663,7 +663,7 @@ static void ethernet_interrupt(device_t *device, int state)
 
 static void ioasic_irq(running_machine &machine, int state)
 {
-	cputag_set_input_line(machine, "maincpu", IOASIC_IRQ_NUM, state);
+	machine.device("maincpu")->execute().set_input_line(IOASIC_IRQ_NUM, state);
 }
 
 
@@ -698,7 +698,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (m_vblank_irq_num != 0)
-		cputag_set_input_line(machine(), "maincpu", m_vblank_irq_num, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(m_vblank_irq_num, CLEAR_LINE);
 
 	/* VBLANK: compute the new IRQ vector */
 	irq = (*m_interrupt_config >> (2*VBLANK_IRQ_SHIFT)) & 3;
@@ -709,7 +709,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 	{
 		/* Widget: clear anything pending on the old IRQ */
 		if (m_widget.irq_num != 0)
-			cputag_set_input_line(machine(), "maincpu", m_widget.irq_num, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(m_widget.irq_num, CLEAR_LINE);
 
 		/* Widget: compute the new IRQ vector */
 		irq = (*m_interrupt_config >> (2*WIDGET_IRQ_SHIFT)) & 3;
@@ -721,7 +721,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 	{
 		/* Ethernet: clear anything pending on the old IRQ */
 		if (m_ethernet_irq_num != 0)
-			cputag_set_input_line(machine(), "maincpu", m_ethernet_irq_num, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(m_ethernet_irq_num, CLEAR_LINE);
 
 		/* Ethernet: compute the new IRQ vector */
 		irq = (*m_interrupt_config >> (2*ETHERNET_IRQ_SHIFT)) & 3;
@@ -767,7 +767,7 @@ static void update_vblank_irq(running_machine &machine)
 	/* if the VBLANK has been latched, and the interrupt is enabled, assert */
 	if (drvstate->m_vblank_latch && (*drvstate->m_interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
 		state = ASSERT_LINE;
-	cputag_set_input_line(machine, "maincpu", drvstate->m_vblank_irq_num, state);
+	machine.device("maincpu")->execute().set_input_line(drvstate->m_vblank_irq_num, state);
 }
 
 
@@ -936,7 +936,7 @@ static void update_galileo_irqs(running_machine &machine)
 	/* if any unmasked interrupts are live, we generate */
 	if (drvstate->m_galileo.reg[GREG_INT_STATE] & drvstate->m_galileo.reg[GREG_INT_MASK])
 		state = ASSERT_LINE;
-	cputag_set_input_line(machine, "maincpu", GALILEO_IRQ_NUM, state);
+	machine.device("maincpu")->execute().set_input_line(GALILEO_IRQ_NUM, state);
 
 	if (LOG_GALILEO)
 		logerror("Galileo IRQ %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared");
@@ -1567,7 +1567,7 @@ static void update_widget_irq(running_machine &machine)
 
 	/* update the IRQ state */
 	if (drvstate->m_widget.irq_num != 0)
-		cputag_set_input_line(machine, "maincpu", drvstate->m_widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(drvstate->m_widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

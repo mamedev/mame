@@ -641,12 +641,12 @@ WRITE8_MEMBER(_5clown_state::trigsnd_w)
 
 	if ( (data & 0x0f) == 0x07 )
 	{
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE );
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
 	}
 
 	else
 	{
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE );
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 	}
 
 }

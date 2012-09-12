@@ -223,7 +223,7 @@ void vectrex_configuration(running_machine &machine)
 
 void vectrex_via_irq(device_t *device, int level)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, level);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, level);
 }
 
 

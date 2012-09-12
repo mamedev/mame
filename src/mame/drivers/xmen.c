@@ -357,10 +357,10 @@ static TIMER_DEVICE_CALLBACK( xmen_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_vblank_irq_mask) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 
 	if(scanline == 0) // sprite DMA irq?
-		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 }
 

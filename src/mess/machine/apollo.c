@@ -574,7 +574,7 @@ static WRITE_LINE_DEVICE_HANDLER( apollo_dma_1_hrq_changed ) {
 
 static WRITE_LINE_DEVICE_HANDLER( apollo_dma_2_hrq_changed ) {
 	// DLOG2(("dma 2 hrq changed state %02x", state));
-	cputag_set_input_line(device->machine(), MAINCPU, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device(MAINCPU)->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w(device, state);
@@ -713,7 +713,7 @@ static WRITE_LINE_DEVICE_HANDLER( apollo_pic8259_master_set_int_line ) {
 		apollo_set_cache_status_register(0x10, state ? 0x10 : 0x00);
 	}
 
-	cputag_set_input_line_and_vector(device->machine(), MAINCPU, M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	device->machine().device(MAINCPU)->execute().set_input_line_and_vector(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apollo_pic8259_slave_set_int_line ) {

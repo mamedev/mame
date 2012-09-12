@@ -173,7 +173,7 @@ static INTERRUPT_GEN( supertnk_interrupt )
 
 WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

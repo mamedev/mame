@@ -129,8 +129,8 @@ static TIMER_CALLBACK( generate_interrupt )
 	int scanline = param;
 
 	/* IRQ is set by /32V */
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine, "audiocpu", M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* set up for the next */
 	scanline += 32;
@@ -142,7 +142,7 @@ static TIMER_CALLBACK( generate_interrupt )
 
 WRITE8_MEMBER(jedi_state::main_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 

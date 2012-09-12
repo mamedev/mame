@@ -87,8 +87,8 @@ static WRITE8_DEVICE_HANDLER( pes_kbd_input )
 	fprintf(stderr,"kb input fifo fullness: %d\n",(state->m_infifo_head_ptr-state->m_infifo_tail_ptr)&0x1F);
 #endif
 	// todo: following two should be set so clear happens after one cpu cycle
-	cputag_set_input_line(device->machine(), "maincpu", MCS51_RX_LINE, ASSERT_LINE);
-	cputag_set_input_line(device->machine(), "maincpu", MCS51_RX_LINE, CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
@@ -217,7 +217,7 @@ void pes_state::machine_reset()
 	m_rsstate = 1;
 
 	m_port3_state = 0; // reset the openbus state of port 3
-	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
+	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
 	devtag_reset(machine(), "tms5220"); // reset the 5220
 }
 

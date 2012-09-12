@@ -150,7 +150,7 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_bio_w)
 	if (data == 0) {
 		if (m_dsp_execute) {
 			LOG(("Turning the main CPU on\n"));
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
 		}
 		m_dsp_BIO = ASSERT_LINE;
@@ -188,14 +188,14 @@ static void twincobr_dsp(running_machine &machine, int enable)
 	state->m_dsp_on = enable;
 	if (enable) {
 		LOG(("Turning DSP on and main CPU off\n"));
-		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
-		cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+		machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine.device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else {
 		LOG(("Turning DSP off\n"));
-		cputag_set_input_line(machine, "dsp", 0, CLEAR_LINE); /* TMS32010 INT */
-		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
+		machine.device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+		machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -277,14 +277,14 @@ static void toaplan0_coin_dsp_w(address_space *space, int offset, int data)
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
-					cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_HALT, CLEAR_LINE);
-					cputag_set_input_line(space->machine(), "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
-					cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+					space->machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					space->machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+					space->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:	/* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
-					cputag_set_input_line(space->machine(), "dsp", 0, CLEAR_LINE); /* TMS32010 INT */
-					cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_HALT, ASSERT_LINE);
+					space->machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+					space->machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 	}
 }

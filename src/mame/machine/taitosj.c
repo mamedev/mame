@@ -48,7 +48,7 @@ MACHINE_RESET( taitosj )
 	state->m_zready = 0;
 	state->m_busreq = 0;
 	if (machine.device("mcu") != NULL)
-		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+		machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 	state->m_spacecr_prot_value = 0;
 }
@@ -108,7 +108,7 @@ static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
 	state->m_zready = 1;
-	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
+	machine.device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 	state->m_fromz80 = param;
 }
 
@@ -196,7 +196,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 	{
 		/* 68705 is going to read data from the Z80 */
 		machine().scheduler().synchronize(FUNC(taitosj_mcu_data_real_r));
-		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 		m_portA_in = m_fromz80;
 		LOG(("%04x: 68705 <- Z80 %02x\n", space.device().safe_pc(), m_portA_in));
 	}

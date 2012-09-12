@@ -69,13 +69,13 @@ write:
 static MACHINE_RESET( vastar )
 {
 	/* we must start with the second CPU halted */
-	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(vastar_state::vastar_hold_cpu2_w)
 {
 	/* I'm not sure that this works exactly like this */
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ8_MEMBER(vastar_state::vastar_sharedram_r)

@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(re900_state::vdp_interrupt)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

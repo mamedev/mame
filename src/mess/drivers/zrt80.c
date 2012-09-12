@@ -53,7 +53,7 @@ public:
 READ8_MEMBER( zrt80_state::zrt80_10_r )
 {
 	UINT8 ret = m_term_data;
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return ret;
 }
 
@@ -255,7 +255,7 @@ static const ins8250_interface zrt80_com_interface =
 WRITE8_MEMBER( zrt80_state::kbd_put )
 {
 	m_term_data = data;
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )

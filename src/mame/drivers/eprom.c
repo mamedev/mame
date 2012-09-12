@@ -41,12 +41,12 @@ static void update_interrupts(running_machine &machine)
 {
 	eprom_state *state = machine.driver_data<eprom_state>();
 
-	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (machine.device("extra") != NULL)
-		cputag_set_input_line(machine, "extra", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("extra")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
-	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -110,9 +110,9 @@ WRITE16_MEMBER(eprom_state::eprom_latch_w)
 	{
 		/* bit 0: reset extra CPU */
 		if (data & 1)
-			cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
+			machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, ASSERT_LINE);
+			machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 1-4: screen intensity */
 		m_screen_intensity = (data & 0x1e) >> 1;

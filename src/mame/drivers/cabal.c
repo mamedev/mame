@@ -111,7 +111,7 @@ WRITE16_MEMBER(cabal_state::cabal_sound_irq_trigger_word_w)
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
@@ -468,7 +468,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface cabalbl_ym2151_interface =

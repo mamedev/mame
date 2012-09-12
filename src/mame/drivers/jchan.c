@@ -392,7 +392,7 @@ WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
 {
 
 	COMBINE_DATA(&m_mainsub_shared_ram[0x03ffe/2]);
-	cputag_set_input_line(machine(), "sub", 4, HOLD_LINE);
+	machine().device("sub")->execute().set_input_line(4, HOLD_LINE);
 }
 
 // is this called?
@@ -400,7 +400,7 @@ WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 {
 
 	COMBINE_DATA(&m_mainsub_shared_ram[0x0000/2]);
-	cputag_set_input_line(machine(), "maincpu", 3, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */

@@ -275,28 +275,28 @@ READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
 	if(!space.debugger_access())
 	{
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
 WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
 	if(!space.debugger_access())
 	{
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
 WRITE8_MEMBER(snk_state::snk_cpuB_nmi_ack_w)
 {
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*********************************************************************/
@@ -319,7 +319,7 @@ WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 
 	m_marvins_sound_busy_flag = 1;
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(snk_state::marvins_soundlatch_r)
@@ -337,7 +337,7 @@ CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
 
 READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -362,7 +362,7 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 			break;
 	}
 
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, (state->m_sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (state->m_sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -386,7 +386,7 @@ READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
 
 READ8_MEMBER(snk_state::sgladiat_sound_irq_ack_r)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -449,7 +449,7 @@ static TIMER_CALLBACK( sndirq_update_callback )
 			break;
 	}
 
-	cputag_set_input_line(machine, "audiocpu", 0, (state->m_sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(0, (state->m_sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

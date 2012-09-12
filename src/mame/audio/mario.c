@@ -400,7 +400,7 @@ static void set_ea(address_space &space, int ea)
 {
 	mario_state	*state = space.machine().driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
-	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	//machine.device("audiocpu")->execute().set_input_line(MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->m_eabank != NULL)
 		state->membank(state->m_eabank)->set_entry(ea);
 }
@@ -520,7 +520,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 	if (m_last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);
+		machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
 	m_last = data;
@@ -553,9 +553,9 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
 	{
 		case 0: /* death */
 			if (data)
-				cputag_set_input_line(machine(), "audiocpu",0,ASSERT_LINE);
+				machine().device("audiocpu")->execute().set_input_line(0,ASSERT_LINE);
 			else
-				cputag_set_input_line(machine(), "audiocpu",0,CLEAR_LINE);
+				machine().device("audiocpu")->execute().set_input_line(0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
 			I8035_T_W_AH(space, 0,data & 1);

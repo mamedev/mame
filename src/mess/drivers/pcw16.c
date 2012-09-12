@@ -125,11 +125,11 @@ void pcw16_state::pcw16_refresh_ints()
 	/* any bits set excluding vsync */
 	if ((m_system_status & (~0x04))!=0)
 	{
-		cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	}
 }
 
@@ -1108,7 +1108,7 @@ static void pcw16_trigger_fdc_int(running_machine &machine)
 				{
 					/* I'll pulse it because if I used hold-line I'm not sure
                     it would clear - to be checked */
-					cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+					machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				}
 			}
 		}

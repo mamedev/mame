@@ -1560,7 +1560,7 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 

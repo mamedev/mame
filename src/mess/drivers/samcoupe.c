@@ -333,7 +333,7 @@ static TIMER_CALLBACK( irq_off )
 
 	/* clear interrupt */
 	if ((state->m_status & 0x1f) == 0x1f)
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
 }
 

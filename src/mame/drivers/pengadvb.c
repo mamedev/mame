@@ -232,7 +232,7 @@ static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 
 WRITE_LINE_MEMBER(pengadvb_state::vdp_interrupt)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, (state ? ASSERT_LINE : CLEAR_LINE));
+	machine().device("maincpu")->execute().set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(pengadvb_tms9928a_interface)

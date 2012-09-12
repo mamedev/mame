@@ -70,7 +70,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 	/* D7 is also connected to the NMI input of the CPU -
        the NMI is actually toggled by a 74121 */
 	if ((data & 0x80) == 0x00)
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -155,7 +155,7 @@ static SOUND_START( redalert_audio )
 WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
 {
 	soundlatch2_byte_w(space, 0, (data & 0x78) >> 3);
-	cputag_set_input_line(machine(), "voice", I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("voice")->execute().set_input_line(I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 {
 	/* the byte is connected to port A of the AY8910 */
 	soundlatch_byte_w(space, 0, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

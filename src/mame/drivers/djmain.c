@@ -199,7 +199,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 		if (m_pending_vb_int && !(!(m_v_ctrl & 0x8000))) // #define DISABLE_VB_INT  (!(state->m_v_ctrl & 0x8000))
 		{
 			m_pending_vb_int = 0;
-			cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 		}
 	}
 }
@@ -417,12 +417,12 @@ static void ide_interrupt(device_t *device, int state)
 	if (state != CLEAR_LINE)
 	{
 		//logerror("IDE interrupt asserted\n");
-		cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_1, HOLD_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
 	}
 	else
 	{
 		//logerror("IDE interrupt cleared\n");
-		cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_1, CLEAR_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	}
 }
 

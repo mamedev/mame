@@ -1403,7 +1403,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 ------------------------------*/
 static TIMER_CALLBACK( uPD71054_timer_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE );
+	machine.device("maincpu")->execute().set_input_line(4, HOLD_LINE );
 	uPD71054_update_timer( machine, NULL, param );
 }
 
@@ -1490,7 +1490,7 @@ static const x1_010_interface seta_sound_intf2 =
 
 static void utoukond_ym3438_interrupt(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, linestate);
+	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface utoukond_ym3438_intf =
@@ -1548,7 +1548,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			{
 
 				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
-					cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, PULSE_LINE);
+					machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				m_sub_ctrl_data = data;
 			}
 			break;
@@ -1708,7 +1708,7 @@ WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_word_w(space, 0, data, mem_mask);
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
 	}
 }
@@ -2772,7 +2772,7 @@ WRITE16_MEMBER(seta_state::wiggie_soundlatch_w)
 {
 
 	m_wiggie_soundlatch = data >> 8;
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -2838,7 +2838,7 @@ WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }

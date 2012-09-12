@@ -701,7 +701,7 @@ static INTERRUPT_GEN(paradise_irq)
 	if (state->irq_count<300)
 		state->irq_count++;
 	else
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( paradise, paradise_state )

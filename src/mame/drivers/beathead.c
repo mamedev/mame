@@ -154,7 +154,7 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -222,7 +222,7 @@ void beathead_state::update_interrupts()
 	{
 		m_irq_line_state = gen_int;
 		//if (m_irq_line_state != CLEAR_LINE)
-			cputag_set_input_line(machine(), "maincpu", ASAP_IRQ0, m_irq_line_state);
+			machine().device("maincpu")->execute().set_input_line(ASAP_IRQ0, m_irq_line_state);
 		//else
 			//asap_set_irq_line(ASAP_IRQ0, m_irq_line_state);
 	}
@@ -317,7 +317,7 @@ WRITE32_MEMBER( beathead_state::sound_data_w )
 WRITE32_MEMBER( beathead_state::sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cputag_set_input_line(machine(), "jsa", INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

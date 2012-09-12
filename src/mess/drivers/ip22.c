@@ -204,7 +204,7 @@ static void int3_raise_local0_irq(running_machine &machine, UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (state->m_int3_regs[1] & source_mask)
 	{
-		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -225,7 +225,7 @@ static void int3_raise_local1_irq(running_machine &machine, UINT8 source_mask)
 	// if it's not masked, also assert it now at the CPU
 	if (state->m_int3_regs[2] & source_mask)
 	{
-		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 	}
 }
 
@@ -374,21 +374,21 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		// if no local0 interrupts now, clear the input to the CPU
 		if ((m_int3_regs[0] & m_int3_regs[1]) == 0)
 		{
-			cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ0, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ0, CLEAR_LINE);
 		}
 		else
 		{
-			cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ0, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 		}
 
 		// if no local1 interrupts now, clear the input to the CPU
 		if ((m_int3_regs[2] & m_int3_regs[3]) == 0)
 		{
-			cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);
 		}
 		else
 		{
-			cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 		}
 		break;
 	case 0xb0/4:

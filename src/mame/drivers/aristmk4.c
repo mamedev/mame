@@ -1521,7 +1521,7 @@ static const ay8910_interface ay8910_config2 =
 
 WRITE8_MEMBER(aristmk4_state::firq)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const via6522_interface via_interface =
@@ -1672,7 +1672,7 @@ static TIMER_DEVICE_CALLBACK( aristmk4_pf )
 
 	if(timer.machine().root_device().ioport("powerfail")->read()) // send NMI signal if L pressed
 	{
-	cputag_set_input_line( timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
+	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
 	}
 }
 

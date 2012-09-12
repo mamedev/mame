@@ -103,7 +103,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 static TIMER_CALLBACK( irq5_gen )
 {
-	cputag_set_input_line(machine, "maincpu", R3000_IRQ5, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(R3000_IRQ5, ASSERT_LINE);
 }
 
 

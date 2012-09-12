@@ -433,8 +433,8 @@ WRITE8_MEMBER(mac_state::oss_w)
 
 READ32_MEMBER(mac_state::buserror_r)
 {
-	cputag_set_input_line(machine(), "maincpu", M68K_LINE_BUSERROR, ASSERT_LINE);
-	cputag_set_input_line(machine(), "maincpu", M68K_LINE_BUSERROR, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	return 0;
 }
 

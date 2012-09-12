@@ -596,7 +596,7 @@ INTERRUPT_GEN( vc4000_video_line )
 
 	if (state->m_irq_pause>10)
 	{
-		cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 		state->m_irq_pause = 0;
 	}
 
@@ -642,7 +642,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		(state->m_video.sprites[1].finished_now) |
 		(state->m_video.sprites[0].finished_now)) && (!state->m_irq_pause))
 		{
-			cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, ASSERT_LINE, 3);
+			device->machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);
 			state->m_irq_pause=1;
 		}
 }

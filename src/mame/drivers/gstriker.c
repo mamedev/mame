@@ -195,7 +195,7 @@ WRITE16_MEMBER(gstriker_state::sound_command_w)
 	{
 		m_pending_command = 1;
 		soundlatch_byte_w(space, offset, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -262,9 +262,9 @@ GFXDECODE_END
 static void gs_ym2610_irq(device_t *device, int irq)
 {
 	if (irq)
-		cputag_set_input_line(device->machine(), "audiocpu", 0, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

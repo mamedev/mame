@@ -54,7 +54,7 @@
 
 static TIMER_CALLBACK( gunbustr_interrupt5 )
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gunbustr_interrupt )

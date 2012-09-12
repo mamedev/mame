@@ -95,7 +95,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 /* presumably communication with T11 */
 READ8_MEMBER( vt240_state::test_r )
 {
-	//cputag_set_input_line(machine(), "maincpu", I8085_RST65_LINE, CLEAR_LINE);
+	//machine().device("maincpu")->execute().set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 
 	return rand();
 }

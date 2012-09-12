@@ -174,7 +174,7 @@ WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
 
 WRITE16_MEMBER(umipoker_state::umipoker_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
 
 	/* shouldn't happen */
 	if(data)

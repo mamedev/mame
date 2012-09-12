@@ -329,7 +329,7 @@ WRITE8_MEMBER(tourvision_state::tourvision_i8155_c_w)
 
 WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 {
-	cputag_set_input_line(machine(), "subcpu", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	machine().device("subcpu")->execute().set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
 }
 

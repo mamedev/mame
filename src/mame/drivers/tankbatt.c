@@ -139,7 +139,7 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_sh_fire_w)
 WRITE8_MEMBER(tankbatt_state::tankbatt_irq_ack_w)
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tankbatt_state::tankbatt_coin_counter_w)
@@ -187,7 +187,7 @@ static INTERRUPT_GEN( tankbatt_interrupt )
 
 INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )

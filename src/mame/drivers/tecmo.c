@@ -68,12 +68,12 @@ WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
 WRITE8_MEMBER(tecmo_state::tecmo_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
 {
-	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_start_w)
@@ -606,7 +606,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", 0, linestate);
+	device->machine().device("soundcpu")->execute().set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

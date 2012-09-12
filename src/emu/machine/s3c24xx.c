@@ -1191,7 +1191,7 @@ static void s3c24xx_check_pending_irq( device_t *device)
 			if (s3c24xx->irq.line_irq != ASSERT_LINE)
 			{
 				verboselog( device->machine(), 5, "ARM7_IRQ_LINE -> ASSERT_LINE\n");
-				cputag_set_input_line( device->machine(), "maincpu", ARM7_IRQ_LINE, ASSERT_LINE);
+				device->machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 				s3c24xx->irq.line_irq = ASSERT_LINE;
 			}
 		}
@@ -1201,7 +1201,7 @@ static void s3c24xx_check_pending_irq( device_t *device)
 			{
 				verboselog( device->machine(), 5, "srcpnd %08X intmsk %08X intmod %08X\n", s3c24xx->irq.regs.srcpnd, s3c24xx->irq.regs.intmsk, s3c24xx->irq.regs.intmod);
 				verboselog( device->machine(), 5, "ARM7_IRQ_LINE -> CLEAR_LINE\n");
-				cputag_set_input_line( device->machine(), "maincpu", ARM7_IRQ_LINE, CLEAR_LINE);
+				device->machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 				s3c24xx->irq.line_irq = CLEAR_LINE;
 			}
 		}
@@ -1220,7 +1220,7 @@ static void s3c24xx_check_pending_irq( device_t *device)
 		if (s3c24xx->irq.line_fiq != ASSERT_LINE)
 		{
 			verboselog( device->machine(), 5, "ARM7_FIRQ_LINE -> ASSERT_LINE\n");
-			cputag_set_input_line( device->machine(), "maincpu", ARM7_FIRQ_LINE, ASSERT_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 			s3c24xx->irq.line_fiq = ASSERT_LINE;
 		}
 	}
@@ -1229,7 +1229,7 @@ static void s3c24xx_check_pending_irq( device_t *device)
 		if (s3c24xx->irq.line_fiq != CLEAR_LINE)
 		{
 			verboselog( device->machine(), 5, "ARM7_FIRQ_LINE -> CLEAR_LINE\n");
-			cputag_set_input_line( device->machine(), "maincpu", ARM7_FIRQ_LINE, CLEAR_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
 			s3c24xx->irq.line_fiq = CLEAR_LINE;
 		}
 	}

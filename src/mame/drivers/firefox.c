@@ -253,7 +253,7 @@ static TIMER_DEVICE_CALLBACK( video_timer_callback )
 {
 	timer.machine().primary_screen->update_now();
 
-	cputag_set_input_line( timer.machine(), "maincpu", M6809_IRQ_LINE, ASSERT_LINE );
+	timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
 }
 
 static void set_rgba( running_machine &machine, int start, int index, unsigned char *palette_ram )
@@ -311,12 +311,12 @@ WRITE8_MEMBER(firefox_state::main_to_sound_w)
 {
 	m_main_to_sound_flag = 1;
 	soundlatch_byte_w(space, 0, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(firefox_state::sound_reset_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if ((data & 0x80) != 0)
 		m_sound_to_main_flag = m_main_to_sound_flag = 0;
 }
@@ -369,7 +369,7 @@ WRITE8_MEMBER(firefox_state::riot_porta_w)
 
 WRITE_LINE_MEMBER(firefox_state::riot_irq)
 {
-	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -441,17 +441,17 @@ WRITE8_MEMBER(firefox_state::rom_bank_w)
 
 WRITE8_MEMBER(firefox_state::main_irq_clear_w)
 {
-    cputag_set_input_line( machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE );
+    machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(firefox_state::main_firq_clear_w)
 {
-    cputag_set_input_line( machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE );
+    machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(firefox_state::self_reset_w)
 {
-	cputag_set_input_line( machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE );
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
 }
 
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdisc, int state)
 {
 	if (state)
-	    cputag_set_input_line( machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
+	    machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 

@@ -12,7 +12,7 @@
 INTERRUPT_GEN( esripsys_vblank_irq )
 {
 	esripsys_state *state = device->machine().driver_data<esripsys_state>();
-	cputag_set_input_line(device->machine(), "game_cpu", M6809_IRQ_LINE, ASSERT_LINE);
+	device->machine().device("game_cpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 	state->m_frame_vbl = 0;
 }
 
@@ -24,14 +24,14 @@ static TIMER_CALLBACK( hblank_start_callback )
 	if (state->m_video_firq)
 	{
 		state->m_video_firq = 0;
-		cputag_set_input_line(machine, "game_cpu", M6809_FIRQ_LINE, CLEAR_LINE);
+		machine.device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	}
 
 	/* Not sure if this is totally accurate - I couldn't find the circuit that generates the FIRQs! */
 	if (!(v % 6) && v && state->m_video_firq_en && v < ESRIPSYS_VBLANK_START)
 	{
 		state->m_video_firq = 1;
-		cputag_set_input_line(machine, "game_cpu", M6809_FIRQ_LINE, ASSERT_LINE);
+		machine.device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* Adjust for next scanline */

@@ -654,7 +654,7 @@ MACHINE_RESET( intvecs )
 static TIMER_CALLBACK(intv_interrupt_complete)
 {
 	intv_state *state = machine.driver_data<intv_state>();
-	cputag_set_input_line(machine, "maincpu", CP1610_INT_INTRM, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(CP1610_INT_INTRM, CLEAR_LINE);
 	state->m_bus_copy_mode = 0;
 }
 
@@ -675,7 +675,7 @@ static TIMER_CALLBACK(intv_btb_fill)
 INTERRUPT_GEN( intv_interrupt )
 {
 	intv_state *state = device->machine().driver_data<intv_state>();
-	cputag_set_input_line(device->machine(), "maincpu", CP1610_INT_INTRM, ASSERT_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(CP1610_INT_INTRM, ASSERT_LINE);
 	state->m_sr1_int_pending = 1;
 	state->m_bus_copy_mode = 1;
 	state->m_backtab_row = 0;

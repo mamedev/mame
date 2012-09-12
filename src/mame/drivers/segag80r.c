@@ -149,7 +149,7 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -286,7 +286,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
 WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 

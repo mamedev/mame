@@ -46,7 +46,7 @@ for now. Even at 12 this slowdown still happens a little.
 WRITE16_MEMBER(toki_state::tokib_soundcommand16_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(toki_state::pip16_r)
@@ -65,7 +65,7 @@ static void toki_adpcm_int (device_t *device)
 
 	state->m_toggle ^= 1;
 	if (state->m_toggle)
-		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(toki_state::toki_adpcm_control_w)

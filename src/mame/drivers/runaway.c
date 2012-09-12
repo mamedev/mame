@@ -23,7 +23,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	/* assume Centipede-style interrupt timing */
 	int scanline = param;
 
-	cputag_set_input_line(machine, "maincpu", 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	scanline += 32;
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER(runaway_state::runaway_led_w)
 
 WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

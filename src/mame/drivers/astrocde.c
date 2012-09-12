@@ -522,7 +522,7 @@ static const ay8910_interface ay8912_interface =
 WRITE8_MEMBER(astrocde_state::tenpindx_sound_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

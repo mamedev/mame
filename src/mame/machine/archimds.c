@@ -64,7 +64,7 @@ void archimedes_request_irq_a(running_machine &machine, int mask)
 
 	if (ioc_regs[IRQ_MASK_A] & mask)
 	{
-		cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
@@ -592,7 +592,7 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 			//if (ioc_regs[IRQ_STATUS_A] == 0)
 			{
 				//printf("IRQ clear A\n");
-				cputag_set_input_line(space->machine(), "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
+				space->machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 			}
 			break;
 

@@ -192,7 +192,7 @@ ADDRESS_MAP_END
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 };
 
 static UINT8 duart_input(device_t *device)

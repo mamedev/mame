@@ -180,7 +180,7 @@ static void update_irq_state(running_machine &machine)
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
 
-	cputag_set_input_line(machine, "maincpu", 0, (state->m_requested_int & state->m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, (state->m_requested_int & state->m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 static IRQ_CALLBACK(ssv_irq_callback)

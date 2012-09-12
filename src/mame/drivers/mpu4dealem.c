@@ -132,7 +132,7 @@ static SCREEN_UPDATE_IND16(dealem)
 
 static WRITE_LINE_DEVICE_HANDLER( dealem_vsync_changed )
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, state);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state);
 }
 
 

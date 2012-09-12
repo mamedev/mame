@@ -526,7 +526,7 @@ static const struct pit8253_config qx10_pit8253_2_config =
 
 WRITE_LINE_MEMBER( qx10_state::qx10_pic8259_master_set_int_line )
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( qx10_state::get_slave_ack )

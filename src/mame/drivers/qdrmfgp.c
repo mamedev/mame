@@ -285,9 +285,9 @@ static void ide_interrupt(device_t *device, int state)
 	if (drvstate->m_control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			cputag_set_input_line(device->machine(), "maincpu", 4, HOLD_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 		else
-			cputag_set_input_line(device->machine(), "maincpu", 4, CLEAR_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 	}
 }
 
@@ -297,7 +297,7 @@ static TIMER_CALLBACK( gp2_timer_callback )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
 	if (state->m_control & 0x0004)
-		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
@@ -318,11 +318,11 @@ static void gp2_ide_interrupt(device_t *device, int state)
 			if (drvstate->m_gp2_irq_control)
 				drvstate->m_gp2_irq_control = 0;
 			else
-				cputag_set_input_line(device->machine(), "maincpu", 5, HOLD_LINE);
+				device->machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 		}
 		else
 		{
-			cputag_set_input_line(device->machine(), "maincpu", 5, CLEAR_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
 		}
 	}
 }
@@ -570,7 +570,7 @@ static void sound_irq(device_t *device)
 {
 	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	if (state->m_control & 0x0001)
-		cputag_set_input_line(device->machine(), "maincpu", 1, HOLD_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 }
 
 static const k054539_interface k054539_config =
@@ -607,12 +607,12 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 
 WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq3_ack_w)
 {
-//  cputag_set_input_line(machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
+//  machine().device("maincpu")->execute().set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq4_ack_w)
 {
-//  cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+//  machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 static const k053252_interface qdrmfgp_k053252_intf =

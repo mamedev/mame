@@ -179,7 +179,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
 {
 	soundlatch_byte_w(space,offset,data);
-	if (!m_sndnmi_disable) cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_sndnmi_disable) machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

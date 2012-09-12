@@ -87,7 +87,7 @@ static IRQ_CALLBACK(amiga_ar1_irqack)
 static TIMER_CALLBACK( amiga_ar1_delayed_nmi )
 {
 	(void)param;
-	cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
+	machine.device("maincpu")->execute().set_input_line(7, PULSE_LINE);
 }
 
 static void amiga_ar1_nmi( running_machine &machine )
@@ -286,7 +286,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->m_chip_ram.bytes() - 1, FUNC(amiga_ar23_chipmem_w));
 
 		/* trigger NMI irq */
-		cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
+		machine.device("maincpu")->execute().set_input_line(7, PULSE_LINE);
 	}
 }
 

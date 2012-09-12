@@ -154,12 +154,12 @@ void macpci_state::machine_reset()
 
     m_via_cycles = -256;    // for a 66 MHz PowerMac
 
-    cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
+    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(macpci_state::cuda_reset_w)
 {
-    cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, state);
+    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
 }
 
 static void mac_driver_init(running_machine &machine, model_t model)

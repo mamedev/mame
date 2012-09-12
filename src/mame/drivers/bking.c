@@ -169,7 +169,7 @@ WRITE8_MEMBER(bking_state::bking3_68705_port_b_w)
 	if (~data & 0x02)
 	{
 		m_port_a_in = from_main;
-		if (main_sent) cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+		if (main_sent) machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 		main_sent = 0;
 	}
 
@@ -457,7 +457,7 @@ static MACHINE_RESET( bking3 )
 {
 	bking_state *state = machine.driver_data<bking_state>();
 
-	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 	MACHINE_RESET_CALL(bking);
 

@@ -1786,7 +1786,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 				}
 
 
-				cputag_set_input_line(machine(), "maincpu", 10, ASSERT_LINE);
+				machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 
 
 			}
@@ -2001,14 +2001,14 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				state->m_current_table_address = real_source;
 			}
-			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 		}
 		else if  ((dat1 & 0x00e00000) == 0x00400000)
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( machine, real_source, real_destination, real_length );
-			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 
 		}
 		else if  ((dat1 & 0x00e00000) == 0x00600000)
@@ -2016,7 +2016,7 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
-			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2074,12 +2074,12 @@ WRITE32_MEMBER(cps3_state::cps3_characterdma_w)
 
 WRITE32_MEMBER(cps3_state::cps3_irq10_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 10, CLEAR_LINE); return;
+	machine().device("maincpu")->execute().set_input_line(10, CLEAR_LINE); return;
 }
 
 WRITE32_MEMBER(cps3_state::cps3_irq12_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 12, CLEAR_LINE); return;
+	machine().device("maincpu")->execute().set_input_line(12, CLEAR_LINE); return;
 }
 
 WRITE32_MEMBER(cps3_state::cps3_unk_vidregs_w)

@@ -203,7 +203,7 @@ static MACHINE_RESET( kangaroo )
 	/* the copy protection. */
 	/* Anyway, what I do here is just immediately generate the NMI, so the game */
 	/* properly starts. */
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	state->m_clock = 0;
 }

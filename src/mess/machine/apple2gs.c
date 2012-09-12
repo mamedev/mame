@@ -261,7 +261,7 @@ void apple2gs_add_irq(running_machine &machine, UINT16 irq_mask)
 			logerror("apple2gs_add_irq(): adding %s\n", apple2gs_irq_name(irq_mask));
 
 		state->m_pending_irqs |= irq_mask;
-		cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, state->m_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, state->m_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -276,7 +276,7 @@ void apple2gs_remove_irq(running_machine &machine, UINT16 irq_mask)
 			logerror("apple2gs_remove_irq(): removing %s\n", apple2gs_irq_name(irq_mask));
 
 		state->m_pending_irqs &= ~irq_mask;
-		cputag_set_input_line(machine, "maincpu", G65816_LINE_IRQ, state->m_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, state->m_pending_irqs ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

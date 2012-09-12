@@ -259,7 +259,7 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 
 static TIMER_CALLBACK( int_timer_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 }
 
 

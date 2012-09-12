@@ -126,7 +126,7 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 {
 	if (!(m_control_data & 0x40))
 	{
-		cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
 		return m_adc_data << m_adc_shift;
 	}
 	else
@@ -137,7 +137,7 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 
 static TIMER_CALLBACK( adc_ready )
 {
-	cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 }
 
 

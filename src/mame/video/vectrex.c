@@ -83,7 +83,7 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 	if (state->m_lightpen_port & 2)
 	{
-		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, PULSE_LINE);
+		machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, PULSE_LINE);
 	}
 }
 

@@ -1157,8 +1157,8 @@ static TIMER_DEVICE_CALLBACK( system_h1_sub )
 
 static MACHINE_RESET ( coolridr )
 {
-//  cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+//  machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( coolridr, coolridr_state )

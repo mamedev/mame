@@ -502,7 +502,7 @@ WRITE16_MEMBER( vii_state::vii_video_w )
 			VII_VIDEO_IRQ_STATUS &= ~data;
 			if(!VII_VIDEO_IRQ_STATUS)
 			{
-				cputag_set_input_line(machine(), "maincpu", UNSP_IRQ0_LINE, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(UNSP_IRQ0_LINE, CLEAR_LINE);
 			}
 			break;
 
@@ -743,7 +743,7 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
 			if(!VII_CTLR_IRQ_ENABLE)
 			{
-				cputag_set_input_line(machine(), "maincpu", UNSP_IRQ3_LINE, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
 			}
 			break;
 
@@ -752,7 +752,7 @@ WRITE16_MEMBER( vii_state::vii_io_w )
 			m_io_regs[0x22] &= ~data;
 			if(!m_io_regs[0x22])
 			{
-				cputag_set_input_line(machine(), "maincpu", UNSP_IRQ3_LINE, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
 			}
 			break;
 
@@ -1045,17 +1045,17 @@ static INTERRUPT_GEN( vii_vblank )
 	if(state->VII_VIDEO_IRQ_STATUS)
 	{
 		verboselog(device->machine(), 0, "Video IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ0_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
 	}
 
 //  {
 //      verboselog(device->machine(), 0, "audio 1 IRQ\n");
-//      cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ1_LINE, ASSERT_LINE);
+//      device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
 //  }
     if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x0c00)
 	{
 		verboselog(device->machine(), 0, "timerA, timer B IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ2_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
 	}
 
     //if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x2100)
@@ -1063,27 +1063,27 @@ static INTERRUPT_GEN( vii_vblank )
 	if(state->VII_CTLR_IRQ_ENABLE)
 	{
 		verboselog(device->machine(), 0, "UART, ADC IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ3_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
 //  {
 //      verboselog(device->machine(), 0, "audio 4 IRQ\n");
-//      cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ4_LINE, ASSERT_LINE);
+//      device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
 //  }
 
     if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x1200)
 	{
 		verboselog(device->machine(), 0, "External IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ5_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ5_LINE, ASSERT_LINE);
 	}
     if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x0070)
 	{
 		verboselog(device->machine(), 0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ6_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ6_LINE, ASSERT_LINE);
 	}
     if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x008b)
 	{
 		verboselog(device->machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
-		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ7_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);
 	}
 
 }

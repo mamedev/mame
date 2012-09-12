@@ -65,13 +65,13 @@ WRITE8_MEMBER(toypop_state::toypop_main_interrupt_enable_w)
 WRITE8_MEMBER(toypop_state::toypop_main_interrupt_disable_w)
 {
 	m_main_irq_mask = 0;
-//  cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+//  machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_sound_interrupt_enable_acknowledge_w)
 {
 	m_sound_irq_mask = 1;
-//  cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+//  machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_sound_interrupt_disable_w)
@@ -130,22 +130,22 @@ static INTERRUPT_GEN( toypop_sound_timer_irq )
 
 WRITE8_MEMBER(toypop_state::toypop_sound_clear_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_sound_assert_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_m68000_clear_w)
 {
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_m68000_assert_w)
 {
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_RESET( toypop )
@@ -153,10 +153,10 @@ static MACHINE_RESET( toypop )
 	toypop_state *state = machine.driver_data<toypop_state>();
 
 	state->m_main_irq_mask = 0;
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
 	state->m_sound_irq_mask = 0;
-	cputag_set_input_line(machine, "audiocpu", 0, CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 
 	state->m_interrupt_enable_68k = 0;
 }

@@ -990,7 +990,7 @@ static INTERRUPT_GEN( luckgrln_irq )
 {
 	luckgrln_state *state = device->machine().driver_data<luckgrln_state>();
 	if(state->m_nmi_enable)
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( luckgrln, luckgrln_state )

@@ -93,7 +93,7 @@ WRITE8_MEMBER(speedspn_state::speedspn_banked_rom_change)
 WRITE8_MEMBER(speedspn_state::speedspn_sound_w)
 {
 	soundlatch_byte_w(space, 1, data);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(speedspn_state::oki_banking_w)

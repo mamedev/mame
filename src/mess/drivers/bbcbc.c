@@ -98,7 +98,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER(tms_interrupt)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TMS9928A_INTERFACE(tms9129_interface)

@@ -272,7 +272,7 @@ static void thom_set_irq ( running_machine &machine, int line, int state )
 	if ( old && !thom_irq )
 		LOG_IRQ(( "%f thom_set_irq: irq line down %i\n", machine.time().as_double(), line ));
 
-	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, thom_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -291,7 +291,7 @@ static void thom_set_firq ( running_machine &machine, int line, int state )
 	if ( old && !thom_firq )
 		LOG_IRQ(( "%f thom_set_firq: firq line down %i\n", machine.time().as_double(), line ));
 
-	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, thom_firq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -300,8 +300,8 @@ static void thom_irq_reset ( running_machine &machine )
 {
 	thom_irq = 0;
 	thom_firq = 0;
-	cputag_set_input_line( machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE );
-	cputag_set_input_line( machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE );
+	machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
+	machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 

@@ -1558,7 +1558,7 @@ WRITE16_MEMBER(namcos23_state::s23_c417_w)
 		break;
 	case 7:
 		logerror("c417_w: ack IRQ 2 (%x)\n", data);
-		cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ2, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ2, CLEAR_LINE);
 		break;
 	default:
 		logerror("c417_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
@@ -1748,7 +1748,7 @@ static TIMER_CALLBACK( c361_timer_cb )
 
 	if (c361.scanline != 511)
 	{
-		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 		c361.timer->adjust(attotime::never);
 	}
 }
@@ -1770,7 +1770,7 @@ WRITE16_MEMBER(namcos23_state::s23_c361_w)
 		c361.scanline = data;
 		if (data == 0x1ff)
 		{
-			cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);
 			c361.timer->adjust(attotime::never);
 		}
 		else
@@ -1809,12 +1809,12 @@ WRITE16_MEMBER(namcos23_state::s23_c422_w)
 			if (data == 0xfffb)
 			{
 				logerror("c422_w: raise IRQ 3\n");
-				cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ3, ASSERT_LINE);
+				machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ3, ASSERT_LINE);
 			}
 			else if (data == 0x000f)
 			{
 				logerror("c422_w: ack IRQ 3\n");
-				cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ3, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ3, CLEAR_LINE);
 			}
 			break;
 
@@ -1840,16 +1840,16 @@ WRITE32_MEMBER(namcos23_state::s23_mcuen_w)
 			// Panic Park: writing 1 when it's already running means reboot?
 			if (m_s23_subcpu_running)
 			{
-				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			m_s23_subcpu_running = 1;
 		}
 		else
 		{
 			logerror("S23: stopping H8/3002\n");
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			m_s23_subcpu_running = 0;
 		}
 	}
@@ -1874,7 +1874,7 @@ WRITE32_MEMBER(namcos23_state::gorgon_sharedram_w)
 	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
 	{
 		logerror("S23: Final Furlong hack stopping H8/3002\n");
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -2199,7 +2199,7 @@ WRITE32_MEMBER(namcos23_state::p3d_w)
 			p3d_dma(&space, m_p3d_address, m_p3d_size);
 		return;
 	case 0x17:
-		cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);
 		m_c361.timer->adjust(attotime::never);
 		return;
 	}
@@ -2512,7 +2512,7 @@ ADDRESS_MAP_END
 READ32_MEMBER(namcos23_state::gmen_trigger_sh2)
 {
 	logerror("gmen_trigger_sh2: booting SH-2\n");
-	cputag_set_input_line(machine(), "gmen", INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("gmen")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	return 0;
 }
@@ -2542,7 +2542,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET(gmen)
 {
 	// halt the SH-2 until we need it
-	cputag_set_input_line(machine, "gmen", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("gmen")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
@@ -2572,7 +2572,7 @@ WRITE16_MEMBER(namcos23_state::sub_interrupt_main_w)
 {
 	if  ((mem_mask == 0xffff) && (data == 0x3170))
 	{
-		cputag_set_input_line(machine(), "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 	}
 	else
 	{
@@ -2716,12 +2716,12 @@ READ8_MEMBER(namcos23_state::s23_mcu_iob_r)
 
 	if (m_im_rd == m_im_wr)
 	{
-		cputag_set_input_line(machine(), "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine(), "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
-		cputag_set_input_line(machine(), "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, ASSERT_LINE);
 	}
 
 	return ret;
@@ -2732,7 +2732,7 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_iob_w)
 	m_maintoio[m_mi_wr++] = data;
 	m_mi_wr &= 0x7f;
 
-	cputag_set_input_line(machine(), "ioboard", H8_SCI_0_RX, ASSERT_LINE);
+	machine().device("ioboard")->execute().set_input_line(H8_SCI_0_RX, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( gorgon )
@@ -2964,7 +2964,7 @@ READ8_MEMBER(namcos23_state::s23_iob_mcu_r)
 
 	if (m_mi_rd == m_mi_wr)
 	{
-		cputag_set_input_line(machine(), "ioboard", H8_SCI_0_RX, CLEAR_LINE);
+		machine().device("ioboard")->execute().set_input_line(H8_SCI_0_RX, CLEAR_LINE);
 	}
 
 	return ret;
@@ -2975,7 +2975,7 @@ WRITE8_MEMBER(namcos23_state::s23_iob_mcu_w)
 	m_iotomain[m_im_wr++] = data;
 	m_im_wr &= 0x7f;
 
-	cputag_set_input_line(machine(), "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(H8_SCI_0_RX, ASSERT_LINE);
 }
 
 

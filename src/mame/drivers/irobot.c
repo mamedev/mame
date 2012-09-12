@@ -107,13 +107,13 @@ WRITE8_MEMBER(irobot_state::irobot_nvram_w)
 
 WRITE8_MEMBER(irobot_state::irobot_clearirq_w)
 {
-    cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
+    machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
 WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
 {
-    cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
+    machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 

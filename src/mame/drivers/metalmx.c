@@ -493,7 +493,7 @@ WRITE32_MEMBER(metalmx_state::host_vram_w)
 
 static void tms_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 4, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(4, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

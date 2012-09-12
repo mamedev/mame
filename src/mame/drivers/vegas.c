@@ -906,12 +906,12 @@ static void update_nile_irqs(running_machine &machine)
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0 + i, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			cputag_set_input_line(machine, "maincpu", MIPS3_IRQ0 + i, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");

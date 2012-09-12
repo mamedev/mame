@@ -109,11 +109,11 @@ TIMER_DEVICE_CALLBACK( ecoinfr_irq_timer )
 
 	if (state->irq_toggle==0)
 	{
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xe4);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xe4);
 	}
 	else
 	{
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xe0);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xe0);
 	}
 
 

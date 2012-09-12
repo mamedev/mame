@@ -27,7 +27,7 @@ TODO:
 
 WRITE8_MEMBER(xyonix_state::xyonix_irqack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

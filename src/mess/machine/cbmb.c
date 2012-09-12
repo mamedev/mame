@@ -242,7 +242,7 @@ WRITE_LINE_DEVICE_HANDLER( cbmb_irq )
 	if (state != driver_state->m_old_level)
 	{
 		DBG_LOG(device->machine(), 3, "mos6509", ("irq %s\n", state ? "start" : "end"));
-		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, state);
+		device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, state);
 		driver_state->m_old_level = state;
 	}
 }

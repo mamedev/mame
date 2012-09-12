@@ -826,7 +826,7 @@ MACHINE_RESET( dc )
 	dc_state *state = machine.driver_data<dc_state>();
 
 	/* halt the ARM7 */
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(state->dc_sysctrl_regs, 0, sizeof(state->dc_sysctrl_regs));
 
@@ -863,12 +863,12 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+			device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+			device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
     }
 

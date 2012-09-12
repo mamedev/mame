@@ -611,7 +611,7 @@ WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 WRITE8_MEMBER(bfm_sc1_state::vid_uart_tx_w)
 {
 	adder2_send(data);
-	cputag_set_input_line(machine(), "adder2", M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
+	machine().device("adder2")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -256,7 +256,7 @@ INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (oldval)
-		cputag_set_input_line(machine(), "maincpu", 0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -335,7 +335,7 @@ WRITE8_MEMBER(exidy440_state::bankram_w)
 READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	return ioport("IN3")->read();
 }
 
@@ -370,7 +370,7 @@ WRITE8_MEMBER(exidy440_state::sound_command_w)
 WRITE8_MEMBER(exidy440_state::exidy440_input_port_3_w)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

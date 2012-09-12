@@ -280,7 +280,7 @@ static PALETTE_INIT( cham24 )
 
 static void ppu_irq( device_t *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */

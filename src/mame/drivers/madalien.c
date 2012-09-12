@@ -19,7 +19,7 @@
 INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -54,14 +54,14 @@ WRITE8_MEMBER(madalien_state::madalien_output_w)
 
 WRITE8_MEMBER(madalien_state::madalien_sound_command_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 	soundlatch_byte_w(space, offset, data);
 }
 
 
 READ8_MEMBER(madalien_state::madalien_sound_command_r)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, offset);
 }
 

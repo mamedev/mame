@@ -151,7 +151,7 @@ READ8_MEMBER(odyssey2_state::odyssey2_video_r)
         case 0xa1:
 			data = m_control_status;
 			m_iff = 0;
-			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			m_control_status &= ~ 0x08;
 			if ( machine().primary_screen->hpos() < I824X_START_ACTIVE_SCAN || machine().primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
 			{
@@ -538,7 +538,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		state->m_control_status |= 0x08;
 		if ( ! state->m_iff )
 		{
-			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			state->m_iff = 1;
 		}
 	}
@@ -659,7 +659,7 @@ STREAM_UPDATE( odyssey2_sh_update )
 			/* Throw an interrupt if enabled */
 			if( state->m_o2_vdc.s.control & 0x4 )
 			{
-				cputag_set_input_line(device->machine(), "maincpu", 1, HOLD_LINE); /* Is this right? */
+				device->machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE); /* Is this right? */
 			}
 
 			/* Adjust volume */

@@ -184,7 +184,7 @@ WRITE16_MEMBER(mystwarr_state::sound_cmd2_msb_w)
 
 WRITE16_MEMBER(mystwarr_state::sound_irq_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(mystwarr_state::sound_status_r)

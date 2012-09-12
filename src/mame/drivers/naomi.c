@@ -1817,7 +1817,7 @@ ADDRESS_MAP_END
  */
 static void aica_irq(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

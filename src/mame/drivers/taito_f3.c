@@ -110,12 +110,12 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_reset_0_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
@@ -392,7 +392,7 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( f3_interrupt3 )
 {
-	cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);	// some signal from video hardware?
+	machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);	// some signal from video hardware?
 }
 
 static INTERRUPT_GEN( f3_interrupt2 )
@@ -404,7 +404,7 @@ static INTERRUPT_GEN( f3_interrupt2 )
 static SOUND_RESET( f3 )
 {
 	SOUND_RESET_CALL( taito_en_soundsystem_reset );
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

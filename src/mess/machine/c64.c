@@ -55,7 +55,7 @@ static void c64_nmi( running_machine &machine )
 
 	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 
 		state->m_nmilevel = (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
@@ -104,7 +104,7 @@ static void c64_irq( running_machine &machine, int level )
 	if (level != state->m_old_level)
 	{
 		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
-		cputag_set_input_line(machine, "maincpu", M6510_IRQ_LINE, level);
+		machine.device("maincpu")->execute().set_input_line(M6510_IRQ_LINE, level);
 		state->m_old_level = level;
 	}
 }

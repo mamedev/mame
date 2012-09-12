@@ -83,10 +83,10 @@ static TIMER_DEVICE_CALLBACK( espial_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_main_nmi_enabled) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	if(scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
-		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

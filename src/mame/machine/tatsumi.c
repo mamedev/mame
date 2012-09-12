@@ -41,18 +41,18 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 	if (m_control_word & 0x7f00)
 	{
 		logerror("Unknown control Word: %04x\n",m_control_word);
-		cputag_set_input_line(machine(), "sub2", INPUT_LINE_HALT, CLEAR_LINE); // ?
+		machine().device("sub2")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE); // ?
 	}
 
 	if (m_control_word & 0x10)
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (m_control_word & 0x80)
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	m_last_control=m_control_word;
 }
@@ -61,7 +61,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 // D0 = /GRDACC - Allow 68000 access to road pattern RAM
 WRITE16_MEMBER(tatsumi_state::apache3_z80_ctrl_w)
 {
-	cputag_set_input_line(machine(), "sub2", INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("sub2")->execute().set_input_line(INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
@@ -171,14 +171,14 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 	COMBINE_DATA(&m_control_word);
 
 	if (m_control_word & 0x10)
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (m_control_word & 0x4)
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
 //      logerror("%08x:  Changed bank to %04x (%d)\n", space.device().safe_pc(), tatsumi_control_w,offset);
@@ -204,7 +204,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
     */
 
 	if ((m_control_word & 0x8) == 0 && !(m_last_control & 0x8))
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ4, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
 //  if (tatsumi_control_w&0x200)
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //  else
@@ -237,7 +237,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
     */
 
 	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
 //  logerror("d_68k_e0000_w %06x %04x\n", space.device().safe_pc(), data);
 }
@@ -269,13 +269,13 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
 	if ((m_control_word & 4) == 4 && (m_last_control & 4) == 0)
 	{
 //      logerror("68k 2 halt\n");
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	if ((m_control_word & 4) == 0 && (m_last_control & 4) == 4)
 	{
 //      logerror("68k 2 irq go\n");
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 

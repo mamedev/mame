@@ -133,10 +133,10 @@ static void concept_set_interrupt(running_machine &machine, int level, int state
 
 	if (final_level)
 		/* assert interrupt */
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 INLINE void post_in_KeyQueue(concept_state *state, int keycode)

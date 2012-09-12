@@ -126,7 +126,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 			{
 				state->m_keyboard_int = 1;
 				state->m_key_code = i | bit_sel(code);
-				cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+				timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 				break;
 			}
 		}

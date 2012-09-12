@@ -128,7 +128,7 @@ enum int_levels
 
 static void tms_interrupt(running_machine &machine, int state)
 {
-	cputag_set_input_line(machine, "maincpu", INT_TMS34061, state);
+	machine.device("maincpu")->execute().set_input_line(INT_TMS34061, state);
 }
 
 static const struct tms34061_interface tms34061intf =
@@ -547,7 +547,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
 {
-	cputag_set_input_line(machine(), "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
@@ -585,7 +585,7 @@ static const ptm6840_interface ptm_intf =
 
 WRITE_LINE_MEMBER(jpmsys5_state::acia_irq)
 {
-	cputag_set_input_line(machine(), "maincpu", INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Clocks are incorrect */

@@ -582,10 +582,10 @@ static TIMER_DEVICE_CALLBACK( equites_scanline )
 	int scanline = param;
 
 	if(scanline == 232) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline == 24) // vblank-in irq
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( splndrbt_scanline )
@@ -593,10 +593,10 @@ static TIMER_DEVICE_CALLBACK( splndrbt_scanline )
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline == 32) // vblank-in irq
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 WRITE8_MEMBER(equites_state::equites_8155_w)

@@ -84,16 +84,16 @@ READ16_HANDLER( namcos2_flap_prot_r )
 static void
 ResetAllSubCPUs( running_machine &machine, int state )
 {
-	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, state);
-	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, state);
+	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, state);
+	machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, state);
 	switch( machine.driver_data<namcos2_shared_state>()->m_gametype )
 	{
 	case NAMCOS21_SOLVALOU:
 	case NAMCOS21_STARBLADE:
 	case NAMCOS21_AIRCOMBAT:
 	case NAMCOS21_CYBERSLED:
-		cputag_set_input_line(machine, "dspmaster", INPUT_LINE_RESET, state);
-		cputag_set_input_line(machine, "dspslave", INPUT_LINE_RESET, state);
+		machine.device("dspmaster")->execute().set_input_line(INPUT_LINE_RESET, state);
+		machine.device("dspslave")->execute().set_input_line(INPUT_LINE_RESET, state);
 		break;
 
 //  case NAMCOS21_WINRUN91:
@@ -123,7 +123,7 @@ MACHINE_RESET( namcos2 )
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(space, 0, 0); /* Page in bank 0 */
 
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE );
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	ResetAllSubCPUs( machine, ASSERT_LINE );
@@ -577,13 +577,13 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 			if (data & 0x01)
 			{
 				/* Resume execution */
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+				space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				device_yield(&space->device());
 			}
 			else
 			{
 				/* Suspend execution */
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+				space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			if (namcos2_kickstart != NULL)
 			{
@@ -666,15 +666,15 @@ static TIMER_CALLBACK( namcos2_posirq_tick )
 	if (state->is_system21()) {
 		if (namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
 			machine.primary_screen->update_partial(param);
-			cputag_set_input_line(machine, "gpu", namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+			machine.device("gpu")->execute().set_input_line(namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		}
 		return;
 	}
 
 	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
 		machine.primary_screen->update_partial(param);
-		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "maincpu", namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
-		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) cputag_set_input_line(machine, "slave", namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) machine.device("maincpu")->execute().set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) machine.device("slave")->execute().set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 	}
 }
 

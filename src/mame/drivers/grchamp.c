@@ -131,7 +131,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			/* bit 6: FOG OUT */
 			/* bit 7: RADARON */
 			if ((diff & 0x01) && !(data & 0x01))
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
 				m_collide = m_collmode = 0;
 			break;
@@ -190,7 +190,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 		case 0x0e:	/* OUT14 */
 			/* O-21 connector */
 			soundlatch_byte_w(space, 0, data);
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }
@@ -269,7 +269,7 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 		case 0x04:	/* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
-				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
+				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x05:	/* OUT5 - unused */

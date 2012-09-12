@@ -45,7 +45,7 @@ WRITE8_MEMBER(sidearms_state::sidearms_c804_w)
 	/* bit 4 resets the sound CPU */
 	if (data & 0x10)
 	{
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 5 enables starfield */

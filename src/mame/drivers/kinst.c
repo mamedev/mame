@@ -277,7 +277,7 @@ static SCREEN_UPDATE_IND16( kinst )
 
 static TIMER_CALLBACK( irq0_stop )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -290,7 +290,7 @@ static INTERRUPT_GEN( irq0_start )
 
 static void ide_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 1, state);
+	device->machine().device("maincpu")->execute().set_input_line(1, state);
 }
 
 

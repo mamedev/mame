@@ -111,14 +111,14 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cputag_set_input_line(machine(), "mcu", M6805_IRQ_LINE, CLEAR_LINE );
+		machine().device("mcu")->execute().set_input_line(M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
 	machine().sound().system_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
@@ -260,7 +260,7 @@ static MACHINE_RESET(supervisor_board)
 INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
 {
 	if (!newval)
-		cputag_set_input_line(machine(), "mcu", M6805_IRQ_LINE, HOLD_LINE );
+		machine().device("mcu")->execute().set_input_line(M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int atari_input_disabled(running_machine &machine)

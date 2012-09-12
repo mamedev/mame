@@ -62,7 +62,7 @@ void svision_irq(running_machine &machine)
 	int irq = state->m_svision.timer_shot && (state->BANK & 2);
 	irq = irq || (*state->m_dma_finished && (state->BANK & 4));
 
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK(svision_timer)

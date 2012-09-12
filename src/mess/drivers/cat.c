@@ -291,12 +291,12 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK(keyboard_callback)
 {
-	cputag_set_input_line(machine, "maincpu", M68K_IRQ_1, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK(cat_int_ack)
 {
-	cputag_set_input_line(device->machine(), "maincpu",M68K_IRQ_1,CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1,CLEAR_LINE);
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 

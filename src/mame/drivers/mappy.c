@@ -588,13 +588,13 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 		case 0x00:	/* INT ON 2 */
 			m_sub_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
+				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -610,7 +610,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -632,19 +632,19 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 		case 0x00:
 			m_sub_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
+				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:
 			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x04:
 			m_sub2_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "sub2", 0, CLEAR_LINE);
+				machine().device("sub2")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x06:
@@ -657,11 +657,11 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 			break;
 
 		case 0x0a:
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:
-			cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0e:
@@ -680,13 +680,13 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 		case 0x00:	/* INT ON 2 */
 			m_sub_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
+				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* FLIP */
@@ -703,7 +703,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -773,7 +773,7 @@ static INTERRUPT_GEN( superpac_main_vblank_irq )
 	device_t *namcoio_2 = device->machine().device("namcoio_2");
 
 	if (state->m_main_irq_mask)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(superpac_io_run));
@@ -805,7 +805,7 @@ static INTERRUPT_GEN( pacnpal_main_vblank_irq )
 	device_t *namcoio_2 = device->machine().device("namcoio_2");
 
 	if (state->m_main_irq_mask)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(pacnpal_io_run));
@@ -837,7 +837,7 @@ static INTERRUPT_GEN( phozon_main_vblank_irq )
 	device_t *namcoio_2 = device->machine().device("namcoio_2");
 
 	if (state->m_main_irq_mask)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(phozon_io_run));
@@ -869,7 +869,7 @@ static INTERRUPT_GEN( mappy_main_vblank_irq )
 	device_t *namcoio_2 = device->machine().device("namcoio_2");
 
 	if(state->m_main_irq_mask)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(mappy_io_run));
@@ -883,7 +883,7 @@ static INTERRUPT_GEN( sub_vblank_irq )
 	mappy_state *state = device->machine().driver_data<mappy_state>();
 
 	if(state->m_sub_irq_mask)
-		cputag_set_input_line(device->machine(), "sub", 0, ASSERT_LINE);
+		device->machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( sub2_vblank_irq )
@@ -891,7 +891,7 @@ static INTERRUPT_GEN( sub2_vblank_irq )
 	mappy_state *state = device->machine().driver_data<mappy_state>();
 
 	if(state->m_sub2_irq_mask)
-		cputag_set_input_line(device->machine(), "sub2", 0, ASSERT_LINE);
+		device->machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )

@@ -282,18 +282,18 @@ static void gapnit_interrupt(running_machine &machine)
 	if (px4->m_ier & px4->m_isr & INT0_7508)
 	{
 		px4->m_isr &= ~INT0_7508;
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf0);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	}
 	else if (px4->m_ier & px4->m_isr & INT1_ART)
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf2);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf2);
 	else if (px4->m_ier & px4->m_isr & INT2_ICF)
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf4);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf4);
 	else if (px4->m_ier & px4->m_isr & INT3_OVF)
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf6);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf6);
 	else if (px4->m_ier & px4->m_isr & INT4_EXT)
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0xf8);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf8);
 	else
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 /* external cassette or barcode reader input */

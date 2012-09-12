@@ -158,7 +158,7 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
 	coin_counter_w( machine(), 0, data & 0x08 );
 	coin_counter_w( machine(), 1, data & 0x04 );

@@ -271,8 +271,8 @@ int apollo_instruction_hook(device_t *device, offs_t curpc)
 
 static void apollo_bus_error(running_machine &machine)
 {
-    cputag_set_input_line(machine, MAINCPU, M68K_LINE_BUSERROR, ASSERT_LINE);
-    cputag_set_input_line(machine, MAINCPU, M68K_LINE_BUSERROR, CLEAR_LINE);
+    machine.device(MAINCPU)->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+    machine.device(MAINCPU)->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 
     apollo_csr_set_status_register(APOLLO_CSR_SR_CPU_TIMEOUT, APOLLO_CSR_SR_CPU_TIMEOUT);
 }
@@ -280,7 +280,7 @@ static void apollo_bus_error(running_machine &machine)
 static IRQ_CALLBACK(apollo_irq_acknowledge) {
 	int result = M68K_INT_ACK_AUTOVECTOR;
 
-	cputag_set_input_line(device->machine(), MAINCPU, irqline, CLEAR_LINE);
+	device->machine().device(MAINCPU)->execute().set_input_line(irqline, CLEAR_LINE);
 
 	DLOG2(("apollo_irq_acknowledge: interrupt level=%d", irqline));
 
@@ -455,7 +455,7 @@ READ32_MEMBER(apollo_state::ram_with_parity_r){
 		if (apollo_csr_get_control_register() & APOLLO_CSR_CR_INTERRUPT_ENABLE) {
 			// force parity error (if NMI is enabled)
 //          cpu_set_input_line_and_vector(&space.device(), 7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-			cputag_set_input_line_and_vector(machine(), MAINCPU, 7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+			machine().device(MAINCPU)->execute().set_input_line_and_vector(7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 
 		}
 	}

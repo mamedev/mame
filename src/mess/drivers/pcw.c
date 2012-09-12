@@ -142,24 +142,24 @@ static void pcw_update_irqs(running_machine &machine)
 	pcw_state *state = machine.driver_data<pcw_state>();
 	// set NMI line, remains set until FDC interrupt type is changed
 	if(state->m_nmi_flag != 0)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	// set IRQ line, timer pulses IRQ line, all other devices hold it as necessary
 	if(state->m_fdc_interrupt_code == 1 && (state->m_system_status & 0x20))
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		return;
 	}
 
 	if(state->m_timer_irq_flag != 0)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		return;
 	}
 
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK(pcw_timer_pulse)
@@ -436,7 +436,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* reboot */
 		case 1:
 		{
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			popmessage("SYS: Reboot");
 		}
 		break;

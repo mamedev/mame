@@ -115,12 +115,12 @@ static TIMER_CALLBACK( super80_halfspeed )
 	if (!go_fast)
 	{
 		if (!state->m_int_sw)
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);	// if going, stop it
 
 		state->m_int_sw++;
 		if (state->m_int_sw > 1)
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);		// if stopped, start it
 			state->m_int_sw = 0;
 		}
 	}
@@ -128,7 +128,7 @@ static TIMER_CALLBACK( super80_halfspeed )
 	{
 		if (state->m_int_sw < 8)								// @2MHz, reset just once
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			state->m_int_sw = 8;							// ...not every time
 		}
 	}

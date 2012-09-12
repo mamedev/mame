@@ -405,8 +405,8 @@ void spectrum_setup_sp(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
     LOAD_REG(cpu, Z80_IFF2, data);
 
     intr = BIT(status, 4) ? ASSERT_LINE : CLEAR_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     data = BIT(status, 5);
     state->m_flash_invert = data;
@@ -583,8 +583,8 @@ void spectrum_setup_sna(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
     intr = BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     if (snapsize == SNA48_SIZE)
         /* 48K Snapshot */
@@ -796,8 +796,8 @@ void spectrum_setup_ach(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, data);
 
     intr = snapdata[ACH_OFFSET + 191] ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     logerror("Skipping the 16K ROM dump at offset:%04X\n", ACH_OFFSET + 256);
 
@@ -928,8 +928,8 @@ void spectrum_setup_prg(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
     intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     data = space->read_byte(addr + 1);
     LOAD_REG(cpu, Z80_R, data);
@@ -1130,8 +1130,8 @@ void spectrum_setup_plusd(running_machine &machine, UINT8 *snapdata, UINT32 snap
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
     intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     data = space->read_byte(addr + 1);
     LOAD_REG(cpu, Z80_R, data);
@@ -1267,8 +1267,8 @@ void spectrum_setup_sem(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 0));
 
     intr = BIT(snapdata[SEM_OFFSET + 30], 0) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
@@ -1385,8 +1385,8 @@ void spectrum_setup_sit(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, data);
 
     intr = data ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* Memory dump */
     logerror("Skipping the 16K ROM dump at offset:%04X\n", SIT_OFFSET + 28);
@@ -1530,8 +1530,8 @@ void spectrum_setup_zx(running_machine &machine, UINT8 *snapdata, UINT32 snapsiz
     LOAD_REG(cpu, Z80_IFF2, data);
 
     intr = BIT(snapdata[ZX_OFFSET + 142], 0) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
@@ -1648,8 +1648,8 @@ void spectrum_setup_snp(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, data);
 
     intr = BIT(snapdata[SNP_OFFSET + 19], 0) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
@@ -1878,8 +1878,8 @@ void spectrum_setup_snx(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
     intr = BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* Memory dump */
     logerror("Uncompressing %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
@@ -2035,8 +2035,8 @@ void spectrum_setup_frz(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
 
     intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, intr);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* Memory dump */
     addr = 0;
@@ -2301,9 +2301,9 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
         /* machine.device("maincpu")->state().set_state_int(Z80_IRQ_STATE, 1); */
     }
 
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
-//  cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, data);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+//  machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, data);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
     /* IFF2 */
     if (snapdata[28] != 0)

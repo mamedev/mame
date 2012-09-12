@@ -90,15 +90,15 @@ static TIMER_DEVICE_CALLBACK( gberet_interrupt_tick )
 
 	// NMI on d0
 	if (ticks_mask & state->m_interrupt_mask & 1)
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// IRQ on d3 (used by mrgoemon)
 	if (ticks_mask & state->m_interrupt_mask<<2 & 8)
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	// IRQ on d4 (used by gberet)
 	if (ticks_mask & state->m_interrupt_mask<<2 & 16)
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -132,10 +132,10 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 	UINT8 ack_mask = ~data & m_interrupt_mask; // 1->0
 
 	if (ack_mask & 1)
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (ack_mask & 6)
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
 	m_interrupt_mask = data & 7;
 
@@ -197,13 +197,13 @@ WRITE8_MEMBER(gberet_state::gberetb_flipscreen_w)
 
 READ8_MEMBER(gberet_state::gberetb_irq_ack_r)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
 WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )

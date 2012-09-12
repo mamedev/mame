@@ -180,8 +180,8 @@ Measurements -
 static void update_interrupts(running_machine &machine)
 {
 	badlands_state *state = machine.driver_data<badlands_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -678,7 +678,7 @@ GFXDECODE_END
 static void update_interrupts_bootleg(running_machine &machine)
 {
 	badlands_state *state = machine.driver_data<badlands_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

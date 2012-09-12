@@ -272,12 +272,12 @@ WRITE32_MEMBER( glasgow_state::write_beeper32 )
 
 static TIMER_DEVICE_CALLBACK( update_nmi )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", 7, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(7, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( update_nmi32 )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 static MACHINE_START( glasgow )

@@ -472,7 +472,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(cosmic_state::cosmica_coin_inserted)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( cosmica )
@@ -527,7 +527,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
 {
-	cputag_set_input_line_and_vector(machine(), "maincpu", 0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
 }
 
 static INPUT_PORTS_START( cosmicg )
@@ -574,12 +574,12 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_irq0)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, newval ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, newval ? HOLD_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_nmi)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( magspot )
@@ -1007,10 +1007,10 @@ static TIMER_DEVICE_CALLBACK( panic_scanline )
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xd7); /* RST 10h */
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf); /* RST 08h */
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
 

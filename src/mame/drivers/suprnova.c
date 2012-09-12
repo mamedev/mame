@@ -418,7 +418,7 @@ READ32_MEMBER(skns_state::skns_hit_r)
 
 static TIMER_DEVICE_CALLBACK( interrupt_callback )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", param, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(param, HOLD_LINE);
 }
 
 static MACHINE_RESET(skns)
@@ -625,21 +625,21 @@ WRITE32_MEMBER(skns_state::skns_io_w)
 		if(ACCESSING_BITS_8_15)
 		{ /* Interrupt Clear, do we need these? */
 /*          if(data&0x01)
-                cputag_set_input_line(machine(), "maincpu",1,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(1,CLEAR_LINE);
             if(data&0x02)
-                cputag_set_input_line(machine(), "maincpu",3,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(3,CLEAR_LINE);
             if(data&0x04)
-                cputag_set_input_line(machine(), "maincpu",5,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(5,CLEAR_LINE);
             if(data&0x08)
-                cputag_set_input_line(machine(), "maincpu",7,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(7,CLEAR_LINE);
             if(data&0x10)
-                cputag_set_input_line(machine(), "maincpu",9,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(9,CLEAR_LINE);
             if(data&0x20)
-                cputag_set_input_line(machine(), "maincpu",0xb,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(0xb,CLEAR_LINE);
             if(data&0x40)
-                cputag_set_input_line(machine(), "maincpu",0xd,CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(0xd,CLEAR_LINE);
             if(data&0x80)
-                cputag_set_input_line(machine(), "maincpu",0xf,CLEAR_LINE);*/
+                machine().device("maincpu")->execute().set_input_line(0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
 			if (space.device().safe_pc()==0x04013B42)

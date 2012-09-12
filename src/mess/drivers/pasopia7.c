@@ -538,7 +538,7 @@ void pasopia7_state::pasopia_nmi_trap()
 		m_nmi_trap |= 2;
 
 		if(m_nmi_mask == 0)
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -867,7 +867,7 @@ WRITE8_MEMBER( pasopia7_state::nmi_mask_w )
 	{
 		m_nmi_reset &= ~4;
 		m_nmi_trap &= ~2;
-		//cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE); //guess
+		//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE); //guess
 	}
 
 }

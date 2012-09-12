@@ -79,10 +79,10 @@ static TIMER_DEVICE_CALLBACK( c1942_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 

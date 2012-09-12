@@ -31,7 +31,7 @@
 
 void micro3d_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 3, state, vector);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(3, state, vector);
 };
 
 void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
@@ -47,9 +47,9 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
 	else
 	{
 		state->m_m68681_tx0 = data;
-		cputag_set_input_line(device->machine(), "audiocpu", MCS51_RX_LINE, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 		// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
-		cputag_set_input_line(device->machine(), "audiocpu", MCS51_RX_LINE, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 	}
 };
 
@@ -84,7 +84,7 @@ UINT8 micro3d_duart_input_r(device_t *device)
 */
 void micro3d_duart_output_w(device_t *device, UINT8 data)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -262,7 +262,7 @@ static TIMER_CALLBACK( mac_done_callback )
 {
 	micro3d_state *state = machine.driver_data<micro3d_state>();
 
-	cputag_set_input_line(machine, "drmath", AM29000_INTR0, ASSERT_LINE);
+	machine.device("drmath")->execute().set_input_line(AM29000_INTR0, ASSERT_LINE);
 	state->m_mac_stat = 0;
 }
 
@@ -302,7 +302,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 	mac_sram = m_mac_sram;
 
 	if (data & (1 << 14))
-		cputag_set_input_line(machine(), "drmath", AM29000_INTR0, CLEAR_LINE);
+		machine().device("drmath")->execute().set_input_line(AM29000_INTR0, CLEAR_LINE);
 
 	switch (inst)
 	{
@@ -557,14 +557,14 @@ READ16_MEMBER(micro3d_state::botss_180000_r)
 WRITE16_MEMBER(micro3d_state::micro3d_reset_w)
 {
 	data >>= 8;
-	cputag_set_input_line(machine(), "drmath", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "vgb", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("drmath")->execute().set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("vgb")->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 	/* TODO: Joystick reset? */
 }
 
 WRITE16_MEMBER(micro3d_state::host_drmath_int_w)
 {
-	cputag_set_input_line(machine(), "drmath", AM29000_INTR2, ASSERT_LINE);
+	machine().device("drmath")->execute().set_input_line(AM29000_INTR2, ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
@@ -588,12 +588,12 @@ READ32_MEMBER(micro3d_state::micro3d_shared_r)
 
 WRITE32_MEMBER(micro3d_state::drmath_int_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 5, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
 {
-	cputag_set_input_line(machine(), "drmath", AM29000_INTR2, CLEAR_LINE);
+	machine().device("drmath")->execute().set_input_line(AM29000_INTR2, CLEAR_LINE);
 }
 
 
@@ -639,7 +639,7 @@ MACHINE_RESET( micro3d )
 
 	state->m_ti_uart[STATUS] = 1;
 
-	cputag_set_input_line(machine, "vgb", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "drmath", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("vgb")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("drmath")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

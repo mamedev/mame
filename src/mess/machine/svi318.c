@@ -39,7 +39,7 @@ static WRITE_LINE_DEVICE_HANDLER( svi318_ins8250_interrupt )
 	svi318_state *drvstate = device->machine().driver_data<svi318_state>();
 	if (drvstate->m_svi.bankLow != SVI_CART)
 	{
-		cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
+		device->machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 	}
 }
 #if 0
@@ -408,7 +408,7 @@ MACHINE_RESET( svi328_806 )
 
 void svi318_vdp_interrupt(running_machine &machine, int i)
 {
-	cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	machine.device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 

@@ -34,7 +34,7 @@
 static TIMER_CALLBACK( interrupt_callback )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	cputag_set_input_line_and_vector(machine, "main_cpu", 0, HOLD_LINE, 0xff);
+	machine.device("main_cpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
@@ -2901,7 +2901,7 @@ WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
 		}
 		case 0xe0:
 		{
-			cputag_set_input_line(machine(), "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
+			machine().device("math_cpu")->execute().set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 			vregs.flags = data;
 			break;
 		}

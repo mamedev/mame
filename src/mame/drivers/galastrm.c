@@ -57,7 +57,7 @@ static INTERRUPT_GEN( galastrm_interrupt )
 
 static TIMER_CALLBACK( galastrm_interrupt6 )
 {
-	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 

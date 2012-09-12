@@ -1325,7 +1325,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_f0_w)
 		/* reset POR bit, TODO: is there any other way? */
 		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
 		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	if(offset == 0x02)
@@ -2194,7 +2194,7 @@ ir7
 static WRITE_LINE_DEVICE_HANDLER( pc9801_master_set_int_line )
 {
 	//printf("%02x\n",interrupt);
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( get_slave_ack )
@@ -2271,7 +2271,7 @@ static const struct pit8253_config pc9801rs_pit8253_config =
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );

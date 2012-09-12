@@ -37,9 +37,9 @@
 static void update_interrupts(running_machine &machine)
 {
 	toobin_state *state = machine.driver_data<toobin_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->m_scanline_int_state && state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, state->m_scanline_int_state && state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -299,7 +299,7 @@ static void ml_msm5205_vck(device_t *device)
 		if(state->m_trigger == 0)
 		{
 			state->m_adpcm_pos++;
-			//cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			/*TODO: simplify this */
 			if(ROM[state->m_adpcm_pos] == 0x00 && ROM[state->m_adpcm_pos+1] == 0x00 && ROM[state->m_adpcm_pos+2] == 0x00 && ROM[state->m_adpcm_pos+3] == 0x00
 		       && ROM[state->m_adpcm_pos+4] == 0x00 && ROM[state->m_adpcm_pos+5] == 0x00 && ROM[state->m_adpcm_pos+6] == 0x00 && ROM[state->m_adpcm_pos+7] == 0x00
@@ -331,13 +331,13 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 	}
 
 	if(!(data & 0x40)) // unknown line used
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	//data & 0x20 sound cpu?
 
 	if(!(data & 0x80)) // unknown line used
 	{
-		cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		m_dsp_HOLD_signal = data & 0x80;
 	}
 }
@@ -349,7 +349,7 @@ WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
 		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		//cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
 	}
 }
@@ -361,7 +361,7 @@ WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 		tc0140syt_slave_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		//cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		tc0140syt_slave_comm_w(tc0140syt, 0, data & 0xff);
 	}
 }
@@ -457,7 +457,7 @@ READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 
 WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)
 {
-//  cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+//  machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ16_MEMBER(mlanding_state::ml_mecha_ram_r)
@@ -730,7 +730,7 @@ INPUT_PORTS_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -753,9 +753,9 @@ static const tc0140syt_interface mlanding_tc0140syt_intf =
 static MACHINE_RESET( mlanding )
 {
 	mlanding_state *state = machine.driver_data<mlanding_state>();
-	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	state->m_adpcm_pos = 0;
 	state->m_adpcm_data = -1;
 	state->m_adpcm_idle = 1;

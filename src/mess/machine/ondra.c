@@ -79,7 +79,7 @@ static TIMER_CALLBACK(nmi_check_callback)
 {
 	if ((machine.root_device().ioport("NMI")->read() & 1) == 1)
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

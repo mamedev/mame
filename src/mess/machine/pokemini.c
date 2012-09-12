@@ -155,11 +155,11 @@ static void pokemini_check_irqs( running_machine &machine )
 	{
 		//logerror("Triggering IRQ with vector %02x\n", vector );
 		/* Trigger interrupt and set vector */
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, ASSERT_LINE, vector );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, vector );
 	}
 	else
 	{
-		cputag_set_input_line( machine, "maincpu", 0, CLEAR_LINE );
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE );
 	}
 }
 

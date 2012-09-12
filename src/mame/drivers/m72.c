@@ -160,14 +160,14 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	if (scanline < 256 && scanline == state->m_raster_irq_position - 128)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->m_irq_base + 2);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->m_irq_base + 0);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_irq_base + 0);
 	}
 
 	/* adjust for next scanline */
@@ -185,19 +185,19 @@ static TIMER_CALLBACK( kengo_scanline_interrupt )
 	if (scanline < 256 && scanline == state->m_raster_irq_position - 128)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line(machine, "maincpu", NEC_INPUT_LINE_INTP2, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP2, ASSERT_LINE);
 	}
 	else
-		cputag_set_input_line(machine, "maincpu", NEC_INPUT_LINE_INTP2, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP2, CLEAR_LINE);
 
 	/* VBLANK interrupt */
 	if (scanline == 256)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line(machine, "maincpu", NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
 	}
 	else
-		cputag_set_input_line(machine, "maincpu", NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= machine.primary_screen->height())
@@ -238,7 +238,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_mcu_snd_cmd_latch = data;
-		cputag_set_input_line(machine(), "mcu", 1, ASSERT_LINE);
+		machine().device("mcu")->execute().set_input_line(1, ASSERT_LINE);
 	}
 }
 
@@ -255,7 +255,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_w)
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
 		m_protection_ram[offset] = val;
-		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
+		machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
 		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
 		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
@@ -279,7 +279,7 @@ READ8_MEMBER(m72_state::m72_mcu_data_r)
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
-		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 	}
 
 	if (offset&1) ret = (m_protection_ram[offset/2] & 0xff00)>>8;
@@ -305,7 +305,7 @@ READ8_MEMBER(m72_state::m72_mcu_sample_r)
 
 WRITE8_MEMBER(m72_state::m72_mcu_ack_w)
 {
-	cputag_set_input_line(machine(), "mcu", 1, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(1, CLEAR_LINE);
 	m_mcu_snd_cmd_latch = 0;
 }
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER(m72_state::m72_mcu_port_w)
 	if (offset == 1)
 	{
 		m_mcu_sample_latch = data;
-		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		logerror("port: %02x %02x\n", offset, data);

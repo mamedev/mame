@@ -44,18 +44,18 @@ TIMER_DEVICE_CALLBACK( battles_nmi_generate )
 	{
 		if( battles_customio_command_count == 0 )
 		{
-			cputag_set_input_line(timer.machine(), "sub3", INPUT_LINE_NMI, PULSE_LINE);
+			timer.machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 		{
-			cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-			cputag_set_input_line(timer.machine(), "sub3", INPUT_LINE_NMI, PULSE_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			timer.machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else
 	{
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-		cputag_set_input_line(timer.machine(), "sub3", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("sub3")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }

@@ -77,7 +77,7 @@ static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 	// every other PRD triggers a DMAOUT request
 	if (driver_state->m_dma)
 	{
-		cputag_set_input_line(device->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
+		device->machine().device(CDP1802_TAG)->execute().set_input_line(COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 
 	driver_state->m_dma = !driver_state->m_dma;

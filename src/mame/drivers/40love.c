@@ -1034,7 +1034,7 @@ static MACHINE_RESET( common )
 
 static MACHINE_RESET( 40love )
 {
-	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 	MACHINE_RESET_CALL(common);
 }

@@ -24,7 +24,7 @@ MACHINE_RESET( slapfight )
 	state->m_getstar_sh_intenabled = 0;	/* disable sound cpu interrupts */
 
 	/* SOUND CPU */
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* MCU */
 	state->m_mcu_val = 0;
@@ -39,14 +39,14 @@ MACHINE_RESET( slapfight )
 /* Reset and hold sound CPU */
 WRITE8_MEMBER(slapfght_state::slapfight_port_00_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_getstar_sh_intenabled = 0;
 }
 
 /* Release reset on sound CPU */
 WRITE8_MEMBER(slapfght_state::slapfight_port_01_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /* Disable and clear hardware interrupt */
@@ -118,7 +118,7 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
 		m_portA_in = m_from_main;
 
 		if (m_main_sent)
-			cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+			machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 		m_main_sent = 0;
 	}
@@ -170,7 +170,7 @@ WRITE8_MEMBER(slapfght_state::slapfight_mcu_w)
 {
 	m_from_main = data;
 	m_main_sent = 1;
-	cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(slapfght_state::slapfight_mcu_r)
@@ -811,7 +811,7 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
 		m_portA_in = m_from_main;
-		if (m_main_sent) cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+		if (m_main_sent) machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 	}
 	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
@@ -852,7 +852,7 @@ WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 	m_from_main = data;
 	m_main_sent = 1;
 	m_mcu_sent = 0;
-	cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(slapfght_state::tigerh_mcu_r)

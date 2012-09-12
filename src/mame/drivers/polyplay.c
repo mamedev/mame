@@ -349,7 +349,7 @@ ROM_END
 
 static TIMER_DEVICE_CALLBACK( polyplay_timer_callback )
 {
-	cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0x4c);
+	timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c);
 }
 
 /* game driver */

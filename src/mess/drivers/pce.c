@@ -503,7 +503,7 @@ UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 static WRITE_LINE_DEVICE_HANDLER( pce_irq_changed )
 {
-	cputag_set_input_line( device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 

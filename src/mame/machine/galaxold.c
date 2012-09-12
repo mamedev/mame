@@ -18,7 +18,7 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 	/* for some reason a call to cputag_set_input_line
      * is significantly delayed ....
      *
-     * cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
+     * device->machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
      *
      * Therefore we reset the line without any detour ....
      */
@@ -39,7 +39,7 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 {
 	galaxold_state *drvstate = device->machine().driver_data<galaxold_state>();
 	/* Q goes to the NMI line */
-	cputag_set_input_line(device->machine(), "maincpu", drvstate->m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(drvstate->m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)

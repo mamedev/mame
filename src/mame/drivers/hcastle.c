@@ -158,7 +158,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int linestate)
 {
 //  hcastle_state *state = device->machine().driver_data<hcastle_state>();
-//  cputag_set_input_line(state->m_audiocpu, 0, linestate);
+//  state->m_audiocpu.device(0)->execute().set_input_line(linestate);
 }
 
 static void volume_callback(device_t *device, int v)

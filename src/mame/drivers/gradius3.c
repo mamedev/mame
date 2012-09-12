@@ -113,10 +113,10 @@ static TIMER_DEVICE_CALLBACK( gradius3_sub_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_irqBmask & 1) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "sub", 1, HOLD_LINE);
+		timer.machine().device("sub")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline ==  16 && state->m_irqBmask & 2) // sprite end DMA irq
-		cputag_set_input_line(timer.machine(), "sub", 2, HOLD_LINE);
+		timer.machine().device("sub")->execute().set_input_line(2, HOLD_LINE);
 }
 
 WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
@@ -307,7 +307,7 @@ static MACHINE_RESET( gradius3 )
 	gradius3_state *state = machine.driver_data<gradius3_state>();
 
 	/* start with cpu B halted */
-	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	state->m_irqAen = 0;
 	state->m_irqBmask = 0;
 	state->m_priority = 0;

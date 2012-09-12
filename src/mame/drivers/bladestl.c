@@ -42,10 +42,10 @@ static TIMER_DEVICE_CALLBACK( bladestl_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && k007342_is_int_enabled(state->m_k007342)) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", HD6309_FIRQ_LINE, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or timer irq
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*************************************

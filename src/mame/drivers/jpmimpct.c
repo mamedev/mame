@@ -113,8 +113,8 @@
 static void update_irqs(running_machine &machine)
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	cputag_set_input_line(machine, "maincpu", 2, state->m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, state->m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, state->m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(5, state->m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

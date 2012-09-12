@@ -248,9 +248,9 @@ static void update_interrupts( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
-	cputag_set_input_line(machine, "maincpu", 1, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -775,7 +775,7 @@ static void _set_audio_cpu_rom_source( address_space *space )
 	{
 		state->m_audio_cpu_rom_source_last = state->m_audio_cpu_rom_source;
 
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", space->device().safe_pc(), state->m_audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}

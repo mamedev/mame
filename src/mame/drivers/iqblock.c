@@ -90,7 +90,7 @@ static TIMER_DEVICE_CALLBACK( iqblock_irq )
 
 WRITE8_MEMBER(iqblock_state::iqblock_irqack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(iqblock_state::extrarom_r)

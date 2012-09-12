@@ -46,7 +46,7 @@ WRITE8_MEMBER(trucocl_state::irq_enable_w)
 
 static TIMER_CALLBACK( dac_irq )
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)

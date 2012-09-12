@@ -138,7 +138,7 @@ INLINE beezer_sound_state *get_safe_token(device_t *device)
 /*static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
     beezer_sound_state *sndstate = get_safe_token(device);
-    cputag_set_input_line(device->machine(), "audiocpu", M6809_IRQ_LINE, (sndstate->ptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+    device->machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, (sndstate->ptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }*/
 
 

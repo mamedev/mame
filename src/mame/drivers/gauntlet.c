@@ -138,8 +138,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -210,7 +210,7 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 
 		if ((oldword ^ m_sound_reset_val) & 1)
 		{
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset(machine());
 			if (m_sound_reset_val & 1)
 			{

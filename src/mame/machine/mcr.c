@@ -134,7 +134,7 @@ Z80PIO_INTERFACE( nflfoot_pio_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
 {
-	cputag_set_input_line(device->machine(), "ipu", 0, state);
+	device->machine().device("ipu")->execute().set_input_line(0, state);
 }
 
 
@@ -253,7 +253,7 @@ WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
 static TIMER_CALLBACK( ipu_watchdog_reset )
 {
 	logerror("ipu_watchdog_reset\n");
-	cputag_set_input_line(machine, "ipu", INPUT_LINE_RESET, PULSE_LINE);
+	machine.device("ipu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	devtag_reset(machine, "ipu_ctc");
 	devtag_reset(machine, "ipu_pio0");
 	devtag_reset(machine, "ipu_pio1");

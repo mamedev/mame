@@ -428,7 +428,7 @@ WRITE8_MEMBER(tubep_state::tubep_background_c000_w)
 
 static TIMER_CALLBACK( sprite_timer_callback )
 {
-	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
+	machine.device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -558,7 +558,7 @@ WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
             /SINT line will be reasserted in m_XSize * m_YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
-			cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+			machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
 			machine().scheduler().timer_set( attotime::from_hz(19968000/8) * ((m_XSize+1)*(m_YSize+1)), FUNC(sprite_timer_callback));

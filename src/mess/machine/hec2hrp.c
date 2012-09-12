@@ -246,7 +246,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
-		  cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		  if (isHectorHR(machine())) /* aviable for HR and up */
 			{
 				m_hector_flag_hr=1;
@@ -871,15 +871,15 @@ void hector_reset(running_machine &machine, int hr, int with_D2 )
 	state->m_hector_flag_hr = hr;
 	state->m_flag_clk = 0;
 	state->m_write_cassette = 0;
-	cputag_set_input_line(machine, "maincpu" , INPUT_LINE_RESET, PULSE_LINE);
+	machine.device("maincpu" )->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// Initialization Disc II
 	if (with_D2==1)
 
 	{
-		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
+		machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		device_t *fdc = machine.device("upd765");
-		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_RESET, PULSE_LINE);
+		machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		upd765_reset(fdc, 1);
 		upd765_reset_w(fdc, 1);
 	}

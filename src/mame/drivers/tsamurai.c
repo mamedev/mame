@@ -80,19 +80,19 @@ READ8_MEMBER(tsamurai_state::unknown_d938_r)
 WRITE8_MEMBER(tsamurai_state::sound_command1_w)
 {
 	m_sound_command1 = data;
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE );
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE );
 }
 
 WRITE8_MEMBER(tsamurai_state::sound_command2_w)
 {
 	m_sound_command2 = data;
-	cputag_set_input_line(machine(), "audio2", 0, HOLD_LINE );
+	machine().device("audio2")->execute().set_input_line(0, HOLD_LINE );
 }
 
 WRITE8_MEMBER(tsamurai_state::sound_command3_w)
 {
 	m_sound_command3 = data;
-	cputag_set_input_line(machine(), "audio3", 0, HOLD_LINE );
+	machine().device("audio3")->execute().set_input_line(0, HOLD_LINE );
 }
 
 WRITE8_MEMBER(tsamurai_state::flip_screen_w)
@@ -300,7 +300,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8, tsamurai_state )

@@ -341,34 +341,34 @@ static INTERRUPT_GEN( looping_interrupt )
 WRITE8_MEMBER(looping_state::level2_irq_set)
 {
 	if (!(data & 1))
-		cputag_set_input_line_and_vector(machine(), "maincpu", 0, ASSERT_LINE, 4);
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
 }
 
 
 WRITE8_MEMBER(looping_state::main_irq_ack_w)
 {
 	if (data == 0)
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
 WRITE8_MEMBER(looping_state::looping_souint_clr)
 {
 	if (data == 0)
-		cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
 WRITE_LINE_MEMBER(looping_state::looping_spcint)
 {
-	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, !state, 6);
+	machine().device("audiocpu")->execute().set_input_line_and_vector(0, !state, 6);
 }
 
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, ASSERT_LINE, 4);
+	machine().device("audiocpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
 }
 
 

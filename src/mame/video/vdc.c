@@ -404,7 +404,7 @@ static void vdc_advance_line(running_machine &machine, int which)
 	}
 
 	if (ret)
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 VIDEO_START( pce )
@@ -604,7 +604,7 @@ static UINT8 vdc_r( running_machine &machine, int which, offs_t offset )
 		case 0x00:
 			temp = vdc[which].status;
 			vdc[which].status &= ~(VDC_VD | VDC_DV | VDC_DS | VDC_RR | VDC_OR | VDC_CR);
-			cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:
@@ -880,7 +880,7 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 				{
 					/* note: flag is set only if irq is taken, Mizubaku Daibouken relies on this behaviour */
 					vdc[which].status |= VDC_OR;
-					cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+					machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 				}
 				continue;  /* Should cause an interrupt */
 			}
@@ -923,7 +923,7 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 							else if (drawn[pixel_x] == 2)
 							{
 								if(vdc[which].vdc_data[CR].w & CR_CC)
-									cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+									machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 								vdc[which].status |= VDC_CR;
 							}
 						}
@@ -973,7 +973,7 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 							else if ( drawn[pixel_x] == 2 )
 							{
 								if(vdc[which].vdc_data[CR].w & CR_CC)
-									cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+									machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 								vdc[which].status |= VDC_CR;
 							}
 						}
@@ -998,7 +998,7 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 					{
 						/* note: flag is set only if irq is taken, Mizubaku Daibouken relies on this behaviour */
 						vdc[which].status |= VDC_OR;
-						cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+						machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 					}
 				}
 				else
@@ -1032,7 +1032,7 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 								else if ( drawn[pixel_x] == 2 )
 								{
 									if(vdc[which].vdc_data[CR].w & CR_CC)
-										cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+										machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 									vdc[which].status |= VDC_CR;
 								}
 							}
@@ -1087,7 +1087,7 @@ static void vdc_do_dma(running_machine &machine, int which)
 	vdc[which].vdc_data[LENR].w = len;
 	if(dvc)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 }

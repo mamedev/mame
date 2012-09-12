@@ -1538,13 +1538,13 @@ static TIMER_DEVICE_CALLBACK( bigrun_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "cpu1", 4, HOLD_LINE);
+		timer.machine().device("cpu1")->execute().set_input_line(4, HOLD_LINE);
 
 	if(scanline == 154)
-		cputag_set_input_line(timer.machine(), "cpu1", 2, HOLD_LINE);
+		timer.machine().device("cpu1")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 69)
-		cputag_set_input_line(timer.machine(), "cpu1", 1, HOLD_LINE);
+		timer.machine().device("cpu1")->execute().set_input_line(1, HOLD_LINE);
 }
 
 
@@ -1696,10 +1696,10 @@ static TIMER_DEVICE_CALLBACK( scudhamm_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 
 	if(scanline == 120) // timer irq (clears a flag, presumably sprite DMA end)
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( scudhamm, cischeat_state )
@@ -1746,10 +1746,10 @@ static TIMER_DEVICE_CALLBACK( armchamp2_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 120) // timer irq (TODO: timing)
-		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )

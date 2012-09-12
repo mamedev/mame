@@ -528,7 +528,7 @@ static SCREEN_UPDATE_IND16(rbmk)
 
 static INTERRUPT_GEN( mcu_irq )
 {
-	cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_NMI, PULSE_LINE);
+	device->machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( rbmk, rbmk_state )

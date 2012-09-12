@@ -308,7 +308,7 @@ static TIMER_CALLBACK( delayed_speech_w )
 	state->latch = data;
 
 	/* the high bit goes directly to the INT line */
-	cputag_set_input_line(machine, "audiocpu", 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* a clock on the high bit clocks a 1 into T0 */
 	if (!(old & 0x80) && (data & 0x80))

@@ -151,9 +151,9 @@ static void update_irq_state(running_machine &machine)
 {
 	sandscrp_state *state = machine.driver_data<sandscrp_state>();
 	if (state->m_vblank_irq || state->m_sprite_irq || state->m_unknown_irq)
-		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 }
 
 
@@ -254,7 +254,7 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
 	{
 		m_latch1_full = 1;
 		soundlatch_byte_w(space, 0, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space.device(), attotime::from_usec(100));	// Allow the other cpu to reply
 	}
 }
@@ -471,7 +471,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_intf_sandscrp =

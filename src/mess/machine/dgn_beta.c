@@ -698,7 +698,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 			HALT_DMA = CLEAR_LINE;
 
 		LOG_HALT(("DMA_CPU HALT=%d\n", HALT_DMA));
-		cputag_set_input_line(device->machine(), DMACPU_TAG, INPUT_LINE_HALT, HALT_DMA);
+		device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_DMA);
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
@@ -735,7 +735,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 			HALT_CPU = ASSERT_LINE;
 
 		LOG_HALT(("MAIN_CPU HALT=%d\n", HALT_CPU));
-		cputag_set_input_line(device->machine(), MAINCPU_TAG, INPUT_LINE_HALT, HALT_CPU);
+		device->machine().device(MAINCPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_CPU);
 
 		state->m_d_pia1_pb_last = data & 0x02;
 
@@ -787,13 +787,13 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		LOG_INTS(("cpu1 NMI : %d\n", NMI));
 		if(!NMI)
 		{
-			cputag_set_input_line(device->machine(), DMACPU_TAG, INPUT_LINE_NMI, ASSERT_LINE);
+			device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("device_yield()\n");
 			device_yield(device->machine().device(DMACPU_TAG));	/* Let DMA CPU run */
 		}
 		else
 		{
-			cputag_set_input_line(device->machine(), DMACPU_TAG, INPUT_LINE_NMI, CLEAR_LINE);
+			device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		}
 
 		state->m_DMA_NMI_LAST = NMI;	/* Save it for next time */
@@ -875,7 +875,7 @@ static void cpu0_recalc_irq(running_machine &machine, int state)
 	else
 		IRQ = CLEAR_LINE;
 
-	cputag_set_input_line(machine, MAINCPU_TAG, M6809_IRQ_LINE, IRQ);
+	machine.device(MAINCPU_TAG)->execute().set_input_line(M6809_IRQ_LINE, IRQ);
 	LOG_INTS(("cpu0 IRQ : %d\n", IRQ));
 }
 
@@ -890,7 +890,7 @@ static void cpu0_recalc_firq(running_machine &machine, int state)
 	else
 		FIRQ = CLEAR_LINE;
 
-	cputag_set_input_line(machine, MAINCPU_TAG, M6809_FIRQ_LINE, FIRQ);
+	machine.device(MAINCPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, FIRQ);
 
 	LOG_INTS(("cpu0 FIRQ : %d\n", FIRQ));
 }
@@ -899,7 +899,7 @@ static void cpu0_recalc_firq(running_machine &machine, int state)
 
 static void cpu1_recalc_firq(running_machine &machine, int state)
 {
-	cputag_set_input_line(machine, DMACPU_TAG, M6809_FIRQ_LINE, state);
+	machine.device(DMACPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, state);
 	LOG_INTS(("cpu1 FIRQ : %d\n",state));
 }
 
@@ -1066,7 +1066,7 @@ static void dgnbeta_reset(running_machine &machine)
 	state->m_system_rom = state->memregion(MAINCPU_TAG)->base();
 
 	/* Make sure CPU 1 is started out halted ! */
-	cputag_set_input_line(machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */

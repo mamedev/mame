@@ -202,7 +202,7 @@ static const pia6821_interface pia1_intf =
 
 static TIMER_CALLBACK( interrupt_gen )
 {
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(interrupt_gen));
 }
 

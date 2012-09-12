@@ -979,7 +979,7 @@ const struct pit8253_config pk8020_pit8253_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( pk8020_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 const struct pic8259_interface pk8020_pic8259_config =

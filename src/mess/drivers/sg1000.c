@@ -519,7 +519,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER(sg1000_vdp_interrupt)
 {
-	cputag_set_input_line(device->machine(), Z80_TAG, INPUT_LINE_IRQ0, state);
+	device->machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static TMS9928A_INTERFACE(sg1000_tms9918a_interface)

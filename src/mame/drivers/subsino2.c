@@ -873,7 +873,7 @@ static TIMER_DEVICE_CALLBACK( am188em_timer2_irq )
 {
 	subsino2_state *state = timer.machine().driver_data<subsino2_state>();
 	if ((state->m_am188em_regs[AM188EM_IMASK+0] & 0x01) == 0)	// TMR mask
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0x4c/4);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c/4);
 }
 
 /***************************************************************************
@@ -883,7 +883,7 @@ static TIMER_DEVICE_CALLBACK( am188em_timer2_irq )
 // To be removed when cpu core is updated
 static TIMER_DEVICE_CALLBACK( h8_timer_irq )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", H8_METRO_TIMER_HACK, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 

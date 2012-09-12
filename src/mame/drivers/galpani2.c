@@ -115,7 +115,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 		mcu_data	=	srcspace->read_byte(mcu_address );
 		dstspace->write_byte(mcu_address-0x10, mcu_data);
 	}
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
 static void galpani2_mcu_nmi1(running_machine &machine)

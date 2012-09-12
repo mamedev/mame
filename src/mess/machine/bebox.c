@@ -249,7 +249,7 @@ WRITE64_HANDLER( bebox_crossproc_interrupts_w )
                     */
 			}
 
-			cputag_set_input_line(space->machine(), cputags[crossproc_map[i].cpunum], crossproc_map[i].inputline, line);
+			space->machine().device(cputags[crossproc_map[i].cpunum])->execute().set_input_line(crossproc_map[i].inputline, line);
 		}
 	}
 }
@@ -260,7 +260,7 @@ WRITE64_HANDLER( bebox_processor_resets_w )
 
 	if (b & 0x20)
 	{
-		cputag_set_input_line(space->machine(), "ppc2", INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		space->machine().device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -282,7 +282,7 @@ static void bebox_update_interrupts(running_machine &machine)
 				state->m_interrupts, state->m_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
-		cputag_set_input_line(machine, cputags[cpunum], INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		machine.device(cputags[cpunum])->execute().set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -670,7 +670,7 @@ READ8_HANDLER(bebox_80000480_r)
 
 static WRITE_LINE_DEVICE_HANDLER( bebox_dma_hrq_changed )
 {
-	cputag_set_input_line(device->machine(), "ppc1", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("ppc1")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( device, state );
@@ -993,8 +993,8 @@ MACHINE_RESET( bebox )
 
 	machine.scheduler().timer_set(attotime::zero, FUNC(bebox_get_devices));
 
-	cputag_set_input_line(machine, "ppc1", INPUT_LINE_RESET, CLEAR_LINE);
-	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("ppc1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	machine.device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	memcpy(machine.device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),state->memregion("user1")->base(),0x200000);
 }

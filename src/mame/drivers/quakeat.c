@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(quakeat_state::quakeat_pic8259_1_set_int_line)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(quakeat_state::get_slave_ack)

@@ -75,9 +75,9 @@ static void victory_update_irq(running_machine &machine)
 {
 	victory_state *state = machine.driver_data<victory_state>();
 	if (state->m_vblank_irq || state->m_fgcoll || (state->m_bgcoll && (state->m_video_control & 0x20)))
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

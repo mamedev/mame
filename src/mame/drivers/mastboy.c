@@ -673,7 +673,7 @@ static void mastboy_adpcm_int(device_t *device)
 
 	state->m_m5205_part ^= 1;
 	if(!state->m_m5205_part)
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -689,7 +689,7 @@ WRITE8_MEMBER(mastboy_state::mastboy_irq0_ack_w)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mastboy_interrupt )

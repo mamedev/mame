@@ -30,7 +30,7 @@ static void update_grudge_steering(running_machine &machine);
 
 static TIMER_CALLBACK( irq_off )
 {
-	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -45,7 +45,7 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 		state->m_scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cputag_set_input_line(timer.machine(), "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), FUNC(irq_off));
@@ -398,12 +398,12 @@ static void m6850_update_io(running_machine &machine)
 	/* apply the change */
 	if (new_state && !(state->m_m6850_status & 0x80))
 	{
-		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 		state->m_m6850_status |= 0x80;
 	}
 	else if (!new_state && (state->m_m6850_status & 0x80))
 	{
-		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 		state->m_m6850_status &= ~0x80;
 	}
 
@@ -416,12 +416,12 @@ static void m6850_update_io(running_machine &machine)
 	/* apply the change */
 	if (new_state && !(state->m_m6850_sound_status & 0x80))
 	{
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+		machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		state->m_m6850_sound_status |= 0x80;
 	}
 	else if (!new_state && (state->m_m6850_sound_status & 0x80))
 	{
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		state->m_m6850_sound_status &= ~0x80;
 	}
 }
@@ -716,7 +716,7 @@ void balsente_state::counter_set_out(int which, int out)
 {
 	/* OUT on counter 2 is hooked to the /INT line on the Z80 */
 	if (which == 2)
-		cputag_set_input_line(machine(), "audiocpu", 0, out ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, out ? ASSERT_LINE : CLEAR_LINE);
 
 	/* OUT on counter 0 is hooked to the GATE line on counter 1 */
 	else if (which == 0)

@@ -1338,7 +1338,7 @@ static void irq_init(running_machine &machine)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 	state->m_irqreq = 0;
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 }
 
@@ -1346,7 +1346,7 @@ static void irq_raise(running_machine &machine, int level)
 {
 	bnstars_state *state = machine.driver_data<bnstars_state>();
 	state->m_irqreq |= (1<<level);
-	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 /* TODO: fix this arrangement (derived from old deprecat lib) */

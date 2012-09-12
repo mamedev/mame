@@ -61,12 +61,12 @@ void psxirq_device::psx_irq_update( void )
 	if( ( n_irqdata & n_irqmask ) != 0 )
 	{
 		verboselog( machine(), 2, "psx irq assert\n" );
-		cputag_set_input_line( machine(), "maincpu", PSXCPU_IRQ0, ASSERT_LINE );
+		machine().device("maincpu")->execute().set_input_line(PSXCPU_IRQ0, ASSERT_LINE );
 	}
 	else
 	{
 		verboselog( machine(), 2, "psx irq clear\n" );
-		cputag_set_input_line( machine(), "maincpu", PSXCPU_IRQ0, CLEAR_LINE );
+		machine().device("maincpu")->execute().set_input_line(PSXCPU_IRQ0, CLEAR_LINE );
 	}
 }
 

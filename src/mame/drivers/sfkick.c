@@ -431,7 +431,7 @@ INPUT_PORTS_END
 
 static void sfkick_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static MACHINE_RESET(sfkick)
@@ -457,7 +457,7 @@ static TIMER_DEVICE_CALLBACK( sfkick_interrupt )
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line_and_vector(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	device->machine().device("soundcpu")->execute().set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2203_interface ym2203_config =

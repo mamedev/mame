@@ -166,7 +166,7 @@ WRITE8_MEMBER( fp1100_state::main_bank_w )
 WRITE8_MEMBER( fp1100_state::irq_mask_w )
 {
 	//if((irq_mask & 0x80) != (data & 0x80))
-	//  cputag_set_input_line(machine(), "sub", UPD7810_INTF2, HOLD_LINE);
+	//  machine().device("sub")->execute().set_input_line(UPD7810_INTF2, HOLD_LINE);
 
 	irq_mask = data;
 	///printf("%02x\n",data);
@@ -178,14 +178,14 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 {
 	machine().scheduler().synchronize(); // force resync
-	cputag_set_input_line(machine(), "sub", UPD7810_INTF2, ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(UPD7810_INTF2, ASSERT_LINE);
 	m_sub_latch = data;
 }
 
 READ8_MEMBER( fp1100_state::sub_to_main_r )
 {
 	machine().scheduler().synchronize(); // force resync
-//  cputag_set_input_line_and_vector(machine(), "maincpu", 0, CLEAR_LINE, 0xf0);
+//  machine().device("maincpu")->execute().set_input_line_and_vector(0, CLEAR_LINE, 0xf0);
 	return m_main_latch;
 }
 
@@ -230,14 +230,14 @@ WRITE8_MEMBER( fp1100_state::fp1100_vram_w )
 READ8_MEMBER( fp1100_state::main_to_sub_r )
 {
 	machine().scheduler().synchronize(); // force resync
-	cputag_set_input_line(machine(), "sub", UPD7810_INTF2, CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(UPD7810_INTF2, CLEAR_LINE);
 	return m_sub_latch;
 }
 
 WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 {
 	machine().scheduler().synchronize(); // force resync
-//  cputag_set_input_line_and_vector(machine(), "maincpu", 0, ASSERT_LINE, 0xf0);
+//  machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	m_main_latch = data;
 }
 
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER( fp1100_state::portc_w )
 {
 	if((!(m_upd7801.portc & 8)) && data & 8)
-		cputag_set_input_line_and_vector(machine(), "maincpu", 0, HOLD_LINE,0xf8); // TODO
+		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xf8); // TODO
 
 	m_upd7801.portc = data;
 }
@@ -398,7 +398,7 @@ static INTERRUPT_GEN( fp1100_vblank_irq )
 	fp1100_state *state = device->machine().driver_data<fp1100_state>();
 
 	if(state->irq_mask & 0x10)
-		cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, 0xf0);
+		device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xf0);
 }
 
 static MACHINE_CONFIG_START( fp1100, fp1100_state )

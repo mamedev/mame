@@ -299,7 +299,7 @@ static TIMER_DEVICE_CALLBACK( model2_timer_cb )
 	state->m_intreq |= (1<<bit);
 	if (state->m_intena & (1<<bit))
 	{
-		cputag_set_input_line(timer.machine(), "maincpu", I960_IRQ2, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
 	}
 
 	state->m_timervals[tnum] = 0;
@@ -348,7 +348,7 @@ static MACHINE_RESET(model2o)
 	MACHINE_RESET_CALL(model2_common);
 
 	// hold TGP in halt until we have code
-	cputag_set_input_line(machine, "tgp", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	state->m_dsp_type = DSP_TYPE_TGP;
 }
@@ -372,7 +372,7 @@ static MACHINE_RESET(model2)
 	MACHINE_RESET_CALL(model2_scsp);
 
 	// hold TGP in halt until we have code
-	cputag_set_input_line(machine, "tgp", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	state->m_dsp_type = DSP_TYPE_TGP;
 }
@@ -383,12 +383,12 @@ static MACHINE_RESET(model2b)
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
-	cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG0, ASSERT_LINE);
+	machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
-	cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
+	machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 
 	state->m_dsp_type = DSP_TYPE_SHARC;
 }
@@ -578,7 +578,7 @@ WRITE32_MEMBER(model2_state::srallyc_devices_w)
 	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
 	{
 		m_driveio_comm_data = data & 0xff;
-		cputag_set_input_line(machine(), "drivecpu", 0, HOLD_LINE);
+		machine().device("drivecpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -620,9 +620,9 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 			if (m_dsp_type != DSP_TYPE_TGPX4)
 			{
 				if (m_dsp_type == DSP_TYPE_SHARC)
-					cputag_set_input_line(machine(), "dsp", INPUT_LINE_HALT, CLEAR_LINE);
+					machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				else
-					cputag_set_input_line(machine(), "tgp", INPUT_LINE_HALT, CLEAR_LINE);
+					machine().device("tgp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -746,7 +746,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
         else
         {
             logerror("Boot geo, %d dwords\n", m_geocnt);
-            cputag_set_input_line(machine(), "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
+            machine().device("dsp2")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
             //device_spin_until_time(&space.device(), attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
@@ -993,7 +993,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 
 	state->m_to_68k = data;
 
-	cputag_set_input_line(space->machine(), "audiocpu", 2, HOLD_LINE);
+	space->machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 
 	// give the 68k time to notice
 	device_spin_until_time(&space->device(), attotime::from_usec(40));
@@ -1884,10 +1884,10 @@ static void scsp_irq(device_t *device, int irq)
 	if (irq > 0)
 	{
 		state->m_scsp_last_line = irq;
-		cputag_set_input_line(device->machine(), "audiocpu", irq, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
 	}
 	else
-		cputag_set_input_line(device->machine(), "audiocpu", -irq, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(-irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

@@ -372,31 +372,31 @@ static void update_irqs(running_machine &machine)
 	if (CUSTOM_REG(REG_INTENA) & 0x4000)
 	{
 		/* Serial transmit buffer empty, disk block finished, software interrupts */
-		cputag_set_input_line(machine, "maincpu", 1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* I/O ports and timer interrupts */
-		cputag_set_input_line(machine, "maincpu", 2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Copper, VBLANK, blitter interrupts */
-		cputag_set_input_line(machine, "maincpu", 3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Audio interrupts */
-		cputag_set_input_line(machine, "maincpu", 4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Serial receive buffer full, disk sync match */
-		cputag_set_input_line(machine, "maincpu", 5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* External interrupts */
-		cputag_set_input_line(machine, "maincpu", 6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 5, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 6, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
 	}
 }
 

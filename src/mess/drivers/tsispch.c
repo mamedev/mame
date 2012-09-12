@@ -170,7 +170,7 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 *****************************************************************************/
 static WRITE_LINE_DEVICE_HANDLER( pic8259_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_config =
@@ -210,7 +210,7 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
     */
 	tsispch_state *state = machine().driver_data<tsispch_state>();
 	state->m_paramReg = data;
-	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
 #ifdef DEBUG_PARAM
 	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
@@ -320,7 +320,7 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
             dspprg++;
         }
     m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
-    cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
+    machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
 /******************************************************************************

@@ -19,12 +19,12 @@ PALETTE_INIT( vsdual )
 
 static void ppu_irq_1( device_t *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE );
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static void ppu_irq_2( device_t *device, int *ppu_regs )
 {
-	cputag_set_input_line(device->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE );
+	device->machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

@@ -21,7 +21,7 @@
 
 static TIMER_CALLBACK( cchasm_refresh_end )
 {
-    cputag_set_input_line (machine, "maincpu", 2, ASSERT_LINE);
+    machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 }
 
 static void cchasm_refresh (running_machine &machine)
@@ -113,7 +113,7 @@ WRITE16_MEMBER(cchasm_state::cchasm_refresh_control_w)
 			cchasm_refresh(machine());
 			break;
 		case 0xf7:
-			cputag_set_input_line (machine(), "maincpu", 2, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 			break;
 		}
 	}

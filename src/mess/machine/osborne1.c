@@ -186,7 +186,7 @@ DIRECT_UPDATE_MEMBER(osborne1_state::osborne1_opbase)
 WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 {
 	m_pia_0_irq_state = state;
-	cputag_set_input_line(machine(), "maincpu", 0, ( m_pia_1_irq_state ) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ( m_pia_1_irq_state ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -297,7 +297,7 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
 {
 	m_pia_1_irq_state = state;
-	cputag_set_input_line(machine(), "maincpu", 0, ( m_pia_1_irq_state ) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ( m_pia_1_irq_state ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

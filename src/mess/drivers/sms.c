@@ -308,7 +308,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( sms_int_callback )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 static const sega315_5124_interface _315_5124_ntsc_intf =

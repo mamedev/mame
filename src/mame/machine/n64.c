@@ -35,11 +35,11 @@ static TIMER_CALLBACK(reset_timer_callback)
 void n64_periphs::reset_tick()
 {
 	reset_timer->adjust(attotime::never);
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ2, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 	machine().device("maincpu")->reset();
 	machine().device("rsp")->reset();
 	machine().device("rcp")->reset();
-	cputag_set_input_line(machine(), "rsp", INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("rsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	reset_held = false;
 }
 
@@ -49,7 +49,7 @@ void n64_periphs::poll_reset_button(bool button)
 	reset_held = button;
 	if(!old_held && reset_held)
 	{
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ2, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 	}
 	else if(old_held && reset_held)
 	{
@@ -365,12 +365,12 @@ void n64_periphs::check_interrupts()
 	if (mi_intr_mask & mi_interrupt)
 	{
 		//printf("Asserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt); fflush(stdout);
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
 		//printf("Deasserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt); fflush(stdout);
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -2295,7 +2295,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 					dd_data_reg = (convert_to_bcd(systime.local_time.year % 100) << 24) | (convert_to_bcd(systime.local_time.month + 1) << 16);
 
-					cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 					dd_status_reg |= DD_STATUS_INTR;
 					break;
 				}
@@ -2309,7 +2309,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 					dd_data_reg = (convert_to_bcd(systime.local_time.mday) << 24) | (convert_to_bcd(systime.local_time.hour) << 16);
 
-					cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 					dd_status_reg |= DD_STATUS_INTR;
 					break;
 				}
@@ -2323,7 +2323,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 					dd_data_reg = (convert_to_bcd(systime.local_time.minute) << 24) | (convert_to_bcd(systime.local_time.second) << 16);
 
-					cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 					dd_status_reg |= DD_STATUS_INTR;
 					break;
 				}
@@ -2337,7 +2337,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 		case 0x10/4: // Interrupt Clear
 			logerror("dd interrupt clear\n");
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			dd_status_reg &= ~DD_STATUS_INTR;
 			break;
 
@@ -2420,5 +2420,5 @@ MACHINE_START( n64 )
 
 MACHINE_RESET( n64 )
 {
-	cputag_set_input_line(machine, "rsp", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("rsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }

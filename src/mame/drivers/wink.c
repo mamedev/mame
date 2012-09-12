@@ -107,7 +107,7 @@ READ8_MEMBER(wink_state::player_inputs_r)
 
 WRITE8_MEMBER(wink_state::sound_irq_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
 	//machine().scheduler().synchronize();
 }

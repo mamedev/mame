@@ -411,10 +411,10 @@ static TIMER_CALLBACK( scv_vb_callback )
 	switch( vpos )
 	{
 	case 240:
-		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(UPD7810_INTF2, ASSERT_LINE);
 		break;
 	case 0:
-		cputag_set_input_line(machine, "maincpu", UPD7810_INTF2, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(UPD7810_INTF2, CLEAR_LINE);
 		break;
 	}
 
@@ -741,7 +741,7 @@ static SCREEN_UPDATE_IND16( scv )
 
 WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 {
-	cputag_set_input_line(machine(), "maincpu", UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

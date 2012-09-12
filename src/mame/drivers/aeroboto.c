@@ -51,7 +51,7 @@ static INTERRUPT_GEN( aeroboto_interrupt )
 
 READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
 {
-	cputag_set_input_line(machine(),"maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 

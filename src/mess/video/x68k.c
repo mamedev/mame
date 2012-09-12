@@ -1277,7 +1277,7 @@ SCREEN_UPDATE_IND16( x68000 )
 		state->m_mfp.isra = 0;
 		state->m_mfp.isrb = 0;
 //      mfp_trigger_irq(MFP_IRQ_GPIP6);
-//      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
+//      machine.device("maincpu")->execute().set_input_line_and_vector(6,ASSERT_LINE,0x43);
 	}
 	if(screen.machine().input().code_pressed(KEYCODE_9))
 	{

@@ -581,7 +581,7 @@ READ16_MEMBER(blitz68k_state::test_r)
 WRITE16_MEMBER(blitz68k_state::irq_callback_w)
 {
 //  popmessage("%02x",data);
-	cputag_set_input_line(machine(), "maincpu", 3, HOLD_LINE );
+	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE );
 }
 
 WRITE16_MEMBER(blitz68k_state::sound_write_w)
@@ -1647,17 +1647,17 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 
 WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq1)
 {
-	cputag_set_input_line(machine(), "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq3)
 {
-	cputag_set_input_line(machine(), "maincpu", 3, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 {
-	cputag_set_input_line(machine(), "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 const mc6845_interface mc6845_intf_irq1 =

@@ -126,7 +126,7 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 static void z80daisy_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, state);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static const z80sio_interface sio_intf =

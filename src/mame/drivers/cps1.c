@@ -3186,7 +3186,7 @@ static void m5205_int1(device_t *device)
 //  sample_buffer1 >>= 4;
 //  sample_select1 ^= 1;
 //  if (sample_select1 == 0)
-//      cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+//      machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void m5205_int2(device_t *device)

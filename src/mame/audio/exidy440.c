@@ -377,7 +377,7 @@ static READ8_DEVICE_HANDLER( sound_command_r )
 {
 	exidy440_audio_state *state = get_safe_token(device);
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	cputag_set_input_line(device->machine(), "audiocpu", 1, CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
 	state->sound_command_ack = 1;
 
 	return state->sound_command;
@@ -389,7 +389,7 @@ void exidy440_sound_command(device_t *device, UINT8 param)
 	exidy440_audio_state *state = get_safe_token(device);
 	state->sound_command = param;
 	state->sound_command_ack = 0;
-	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
@@ -436,7 +436,7 @@ static WRITE8_DEVICE_HANDLER( sound_volume_w )
 
 static WRITE8_DEVICE_HANDLER( sound_interrupt_clear_w )
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

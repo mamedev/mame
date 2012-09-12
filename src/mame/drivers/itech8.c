@@ -583,16 +583,16 @@ void itech8_update_interrupts(running_machine &machine, int periodic, int tms340
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", 2, state->m_blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 3, state->m_periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, state->m_blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, state->m_periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -623,13 +623,13 @@ static INTERRUPT_GEN( generate_nmi )
 WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
 static void generate_sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -784,7 +784,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	itech8_state *state = machine.driver_data<itech8_state>();
 	state->m_sound_data = param;
-	cputag_set_input_line(machine, "soundcpu", M6809_IRQ_LINE, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -807,7 +807,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 
 READ8_MEMBER(itech8_state::sound_data_r)
 {
-	cputag_set_input_line(machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 

@@ -154,7 +154,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 0, (data & 0xff00) >> 8 );
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

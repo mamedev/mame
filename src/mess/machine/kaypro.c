@@ -15,7 +15,7 @@
 
 static void kaypro_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 READ8_MEMBER( kaypro_state::pio_system_r )
@@ -281,7 +281,7 @@ WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 static TIMER_CALLBACK( kaypro_timer_callback )
 {
 	if (machine.device("maincpu")->state().state_int(Z80_HALT))
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
@@ -289,7 +289,7 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 	if (state)
 		machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
 	else
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 	if (state)
 		machine().scheduler().timer_set(attotime::from_usec(25), FUNC(kaypro_timer_callback));
 	else
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 }
 

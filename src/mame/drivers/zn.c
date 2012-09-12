@@ -716,7 +716,7 @@ static INTERRUPT_GEN( qsound_interrupt )
 WRITE32_MEMBER(zn_state::zn_qsound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 DRIVER_INIT_MEMBER(zn_state,coh1000c)
@@ -1259,7 +1259,7 @@ ADDRESS_MAP_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -1695,7 +1695,7 @@ WRITE32_MEMBER(zn_state::coh1002e_bank_w)
 WRITE32_MEMBER(zn_state::coh1002e_latch_w)
 {
 	if (offset)
-		cputag_set_input_line(machine(), "audiocpu", 2, HOLD_LINE);	// irq 2 on the 68k
+		machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);	// irq 2 on the 68k
 	else
 		soundlatch_byte_w(space, 0, data);
 }

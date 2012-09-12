@@ -41,12 +41,12 @@ static TIMER_CALLBACK( scanline_timer_cb )
 
 	if (scanline != -1)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline + 1), scanline);
 		machine.scheduler().timer_set(attotime::from_hz(25000000), FUNC(scanline_timer_cb), -1);
 	}
 	else
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

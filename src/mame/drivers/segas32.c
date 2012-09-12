@@ -396,7 +396,7 @@ static MACHINE_RESET( system32 )
 	state->m_v60_irq_timer[1] = machine.device<timer_device>("v60_irq1");
 
 	/* clear IRQ lines */
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -418,13 +418,13 @@ static void update_irq_state(running_machine &machine)
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, vector);
+			machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -703,7 +703,7 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 		case 0x1c/2:
 			state->m_system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				space->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -1056,13 +1056,13 @@ static void update_sound_irq_state(running_machine &machine)
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			cputag_set_input_line_and_vector(machine, "soundcpu", 0, ASSERT_LINE, 2 * vector);
+			machine.device("soundcpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
+		machine.device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

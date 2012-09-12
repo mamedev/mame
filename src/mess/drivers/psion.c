@@ -27,7 +27,7 @@ static TIMER_DEVICE_CALLBACK( nmi_timer )
 	psion_state *state = timer.machine().driver_data<psion_state>();
 
 	if (state->m_enable_nmi)
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 UINT8 psion_state::kb_read(running_machine &machine)

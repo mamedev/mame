@@ -101,7 +101,7 @@ static TIMER_CALLBACK( subcpu_suspend )
 static TIMER_CALLBACK( subcpu_resume )
 {
     machine.device<cpu_device>("sub")->resume(SUSPEND_REASON_HALT);
-    cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+    machine.device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(sothello_state::subcpu_halt_set)
@@ -185,7 +185,7 @@ WRITE8_MEMBER(sothello_state::soundcpu_busyflag_reset_w)
 
 WRITE8_MEMBER(sothello_state::soundcpu_int_clear_w)
 {
-    cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE );
+    machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( soundcpu_mem_map, AS_PROGRAM, 8, sothello_state )
@@ -313,12 +313,12 @@ INPUT_PORTS_END
 
 static void irqhandler(device_t *device, int irq)
 {
-    cputag_set_input_line(device->machine(), "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+    device->machine().device("sub")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sothello_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-    cputag_set_input_line(device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+    device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static TIMER_DEVICE_CALLBACK( sothello_interrupt )
@@ -332,7 +332,7 @@ static void adpcm_int(device_t *device)
 	sothello_state *state = device->machine().driver_data<sothello_state>();
     /* only 4 bits are used */
     msm5205_data_w( device, state->m_msm_data & 0x0f );
-    cputag_set_input_line(device->machine(), "soundcpu", 0, ASSERT_LINE );
+    device->machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE );
 }
 
 

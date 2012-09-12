@@ -93,7 +93,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 
 	if (!(m_out & 0x2000) && m_interrupt_line_active)
 	{
-	    cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	    machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 		m_interrupt_line_active = 0;
 	}
 
@@ -217,14 +217,14 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	if (param == interrupt_scanline)
 	{
     	if (state->m_out & 0x2000)
-    		cputag_set_input_line(timer.machine(), "maincpu", 1, ASSERT_LINE);
+    		timer.machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 		timer.adjust(timer.machine().primary_screen->time_until_pos(param + 1), param+1);
 		state->m_interrupt_line_active = 1;
 	}
 	else
 	{
 		if (state->m_interrupt_line_active)
-	    	cputag_set_input_line(timer.machine(), "maincpu", 1, CLEAR_LINE);
+	    	timer.machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 		timer.adjust(timer.machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		state->m_interrupt_line_active = 0;
 	}
@@ -270,7 +270,7 @@ static void irqhandler(device_t *device, int irq)
 {
 	pkscram_state *state = device->machine().driver_data<pkscram_state>();
 	if(state->m_out & 0x10)
-		cputag_set_input_line(device->machine(), "maincpu", 2, irq ? ASSERT_LINE : CLEAR_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(2, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

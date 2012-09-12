@@ -879,7 +879,7 @@ static void update_irqs(running_machine &machine)
 	if (newstate != state->m_irq_state)
 	{
 		state->m_irq_state = newstate;
-		cputag_set_input_line(machine, "maincpu", 0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1657,7 +1657,7 @@ WRITE_LINE_MEMBER(bfcobra_state::m6809_acia_tx_w)
 
 WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
 {
-	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )

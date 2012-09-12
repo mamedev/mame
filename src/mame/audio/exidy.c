@@ -132,7 +132,7 @@ INLINE exidy_sound_state *get_safe_token(device_t *device)
 static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
-	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, (sndstate->m_pia1->irq_b_state() | sndstate->m_riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, (sndstate->m_pia1->irq_b_state() | sndstate->m_riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -529,7 +529,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->m_cvsd != NULL)
-		cputag_set_input_line(device->machine(), "cvsdcpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		device->machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (state->m_tms != NULL)
 	{

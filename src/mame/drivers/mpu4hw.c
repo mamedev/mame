@@ -490,12 +490,12 @@ WRITE_LINE_MEMBER(mpu4_state::cpu0_irq)
 
 	if (!m_link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
-		cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
 	}
 	else
 	{
-		cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 fint%d \n", combined_state));
 	}
 }

@@ -280,9 +280,9 @@ static void swap_linecpu_banks(running_machine &machine)
 */
 WRITE16_MEMBER(cubeqst_state::reset_w)
 {
-	cputag_set_input_line(machine(), "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("rotate_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("line_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("sound_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
 	if (!BIT(m_reset_latch, 0) && BIT(data, 0))
@@ -451,9 +451,9 @@ static MACHINE_RESET( cubeqst )
 	state->m_reset_latch = 0;
 
 	/* Auxillary CPUs are held in reset */
-	cputag_set_input_line(machine, "sound_cpu", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "rotate_cpu", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "line_cpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("sound_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("rotate_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("line_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

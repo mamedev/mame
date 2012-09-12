@@ -176,7 +176,7 @@ static MACHINE_START( enigma2 )
 static MACHINE_RESET( enigma2 )
 {
 	enigma2_state *state = machine.driver_data<enigma2_state>();
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	state->m_last_sound_data = 0;
 	state->m_flip_screen = 0;

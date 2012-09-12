@@ -55,7 +55,7 @@ static void acefruit_update_irq(running_machine &machine, int vpos )
 		switch( color )
 		{
 		case 0x0c:
-			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE );
+			machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE );
 			break;
 		}
 	}

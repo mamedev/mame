@@ -196,7 +196,7 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
 WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)
 {
 	// Clear IRQ Latch          (Address Strobe)
-	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 }
 
 READ16_MEMBER(tomcat_state::tomcat_inputs2_r)

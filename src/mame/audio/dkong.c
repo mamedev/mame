@@ -1273,9 +1273,9 @@ static WRITE8_DEVICE_HANDLER( dkong_p1_w )
 WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
 {
 	if (data)
-		cputag_set_input_line(machine(), "soundcpu", 0, ASSERT_LINE);
+		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE);
+		machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

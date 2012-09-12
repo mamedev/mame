@@ -54,7 +54,7 @@ WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -63,7 +63,7 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	// give the z80 time to see it
@@ -223,7 +223,7 @@ WRITE16_MEMBER(splash_state::spr_write)
 WRITE16_MEMBER(splash_state::funystrp_sh_irqtrigger_w)
 {
 	soundlatch_byte_w(space, 0, data>>8);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )

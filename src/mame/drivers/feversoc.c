@@ -247,7 +247,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( feversoc_irq )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 8, HOLD_LINE );
+	device->machine().device("maincpu")->execute().set_input_line(8, HOLD_LINE );
 }
 
 static MACHINE_CONFIG_START( feversoc, feversoc_state )

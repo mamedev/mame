@@ -230,12 +230,12 @@ WRITE32_MEMBER(policetr_state::policetr_video_w)
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					cputag_set_input_line(machine(), "maincpu", R3000_IRQ4, CLEAR_LINE);
+					machine().device("maincpu")->execute().set_input_line(R3000_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					cputag_set_input_line(machine(), "maincpu", R3000_IRQ5, CLEAR_LINE);
+					machine().device("maincpu")->execute().set_input_line(R3000_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */

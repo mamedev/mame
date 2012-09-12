@@ -343,7 +343,7 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 
 WRITE8_MEMBER(bwidow_state::irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

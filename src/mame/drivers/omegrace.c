@@ -328,7 +328,7 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
 {
 	soundlatch_byte_w (space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

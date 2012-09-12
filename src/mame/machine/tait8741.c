@@ -498,7 +498,7 @@ static void josvolly_8741_w(address_space *space, int num, int offset, int data)
 		{
 			if(josvolly_nmi_enable)
 			{
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				josvolly_nmi_enable = 0;
 			}
 		}

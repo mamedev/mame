@@ -114,7 +114,7 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 
 static void skeetsht_tms_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "68hc11", MC68HC11_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("68hc11")->execute().set_input_line(MC68HC11_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

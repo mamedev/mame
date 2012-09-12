@@ -229,9 +229,9 @@ static void exidy440_update_firq(running_machine &machine)
 {
 	exidy440_state *state = machine.driver_data<exidy440_state>();
 	if (state->m_firq_vblank || (state->m_firq_enable && state->m_firq_beam))
-		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 }
 
 

@@ -212,7 +212,7 @@ WRITE16_MEMBER(tmaster_state::tmaster_oki_bank_w)
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 4, state, vector);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(4, state, vector);
 };
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
@@ -509,7 +509,7 @@ WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
 	{
 		case 0x0e:
 			tmaster_draw(machine());
-			cputag_set_input_line(machine(), "maincpu", 2, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 			break;
 	}
 }

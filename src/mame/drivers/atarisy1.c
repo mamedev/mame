@@ -210,10 +210,10 @@ RoadBlasters (aka Future Vette):005*
 static void update_interrupts(running_machine &machine)
 {
 	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	cputag_set_input_line(machine, "maincpu", 2, state->m_joystick_int && state->m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, state->m_joystick_int && state->m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

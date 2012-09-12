@@ -113,7 +113,7 @@ WRITE8_MEMBER(stfight_state::stfight_bank_w)
 static TIMER_CALLBACK( stfight_interrupt_1 )
 {
     // Do a RST08
-    cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xcf);
+    machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
 }
 
 INTERRUPT_GEN( stfight_vb_interrupt )

@@ -132,7 +132,7 @@ static MACHINE_START( imago )
 
 WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)

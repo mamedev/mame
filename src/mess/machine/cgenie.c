@@ -419,7 +419,7 @@ INTERRUPT_GEN( cgenie_timer_interrupt )
 	if( (state->m_irq_status & IRQ_TIMER) == 0 )
 	{
 		state->m_irq_status |= IRQ_TIMER;
-		cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -435,7 +435,7 @@ static WRITE_LINE_DEVICE_HANDLER( cgenie_fdc_intrq_w )
 		if( (drvstate->m_irq_status & IRQ_FDC) == 0 )
 		{
 			drvstate->m_irq_status |= IRQ_FDC;
-			cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 	else

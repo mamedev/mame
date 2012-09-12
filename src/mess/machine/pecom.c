@@ -169,7 +169,7 @@ static COSMAC_SC_WRITE( pecom64_sc_w )
 
 	case COSMAC_STATE_CODE_S2_DMA:
 		// DMA acknowledge clears the DMAOUT request
-		cputag_set_input_line(device->machine(), CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		device->machine().device(CDP1802_TAG)->execute().set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		break;

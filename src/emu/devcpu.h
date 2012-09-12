@@ -292,11 +292,6 @@ const device_type name = &legacy_device_creator<basename##_device>
 #define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, entry, string)
 
 
-// helpers for using machine/cputag instead of cpu objects
-#define cputag_set_input_line(mach, tag, line, state)					device_execute((mach).device(tag))->set_input_line(line, state)
-#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach).device(tag))->set_input_line_and_vector(line, state, vec)
-
-
 // this template function creates a stub which constructs a device
 template<class _DeviceClass>
 device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

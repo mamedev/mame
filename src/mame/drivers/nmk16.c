@@ -206,7 +206,7 @@ WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -264,7 +264,7 @@ WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
        every time music changes Z80 is resetted */
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(nmk16_state::macross2_sound_command_w)
@@ -303,7 +303,7 @@ WRITE16_MEMBER(nmk16_state::afega_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data&0xff);
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -3499,7 +3499,7 @@ static const ym2203_interface ym2203_nmk004_interface =
 
 static void ym2203_irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -3517,12 +3517,12 @@ static TIMER_DEVICE_CALLBACK( nmk16_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
        cpu_getiloops function implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
 	if(scanline == 0)
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 /* bee-oh board, almost certainly it has different timings */
@@ -3531,11 +3531,11 @@ static TIMER_DEVICE_CALLBACK( manybloc_scanline )
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete */
 	if(scanline == 0)
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -4801,7 +4801,7 @@ GFXDECODE_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface afega_ym2151_intf =

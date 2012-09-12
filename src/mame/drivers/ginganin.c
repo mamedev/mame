@@ -247,7 +247,7 @@ static MACHINE_RESET( ginganin )
 
 WRITE8_MEMBER(ginganin_state::ptm_irq)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =

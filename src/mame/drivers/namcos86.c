@@ -247,12 +247,12 @@ READ8_MEMBER(namcos86_state::dsw1_r)
 
 WRITE8_MEMBER(namcos86_state::int_ack1_w)
 {
-	cputag_set_input_line(machine(), "cpu1", 0, CLEAR_LINE);
+	machine().device("cpu1")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(namcos86_state::int_ack2_w)
 {
-	cputag_set_input_line(machine(), "cpu2", 0, CLEAR_LINE);
+	machine().device("cpu2")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

@@ -1373,7 +1373,7 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	{
 		state->m_io_status &= ~io_st_tyi;
 		if (USE_SBS)
-			cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, CLEAR_LINE, 0);	/* interrupt it, baby */
+			device->machine().device("maincpu")->execute().set_input_line_and_vector(0, CLEAR_LINE, 0);	/* interrupt it, baby */
 	}
 }
 
@@ -1735,7 +1735,7 @@ static void pdp1_keyboard(running_machine &machine)
 			state->m_typewriter.tb = (i << 4) + j;
 			state->m_io_status |= io_st_tyi;
 			#if USE_SBS
-				cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, 0);	/* interrupt it, baby */
+				machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0);	/* interrupt it, baby */
 			#endif
 			machine.device("maincpu")->state().set_state_int(PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(machine, state->m_typewriter.tb);	/* we want to echo input */

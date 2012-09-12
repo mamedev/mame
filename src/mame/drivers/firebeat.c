@@ -640,7 +640,7 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
-				cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case 0x30:
@@ -907,12 +907,12 @@ static WRITE32_HANDLER(soundflash_w)
 
 static void atapi_cause_irq(running_machine &machine)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
 static void atapi_clear_irq(running_machine &machine)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
 static void atapi_init(running_machine &machine)
@@ -1322,7 +1322,7 @@ static WRITE32_HANDLER( comm_uart_w )
 static void comm_uart_irq_callback(running_machine &machine, int channel, int value)
 {
 	// TODO
-	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ2, ASSERT_LINE);
+	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1397,20 +1397,20 @@ static void midi_uart_irq_callback(running_machine &machine, int channel, int va
 		if ((state->m_extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
 		{
 			state->m_extend_board_irq_active |= 0x02;
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 	else
 	{
 		if ((state->m_extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
 		{
 			state->m_extend_board_irq_active |= 0x01;
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 }
 

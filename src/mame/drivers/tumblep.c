@@ -78,7 +78,7 @@ WRITE16_MEMBER(tumblep_state::tumblep_sound_w)
 WRITE16_MEMBER(tumblep_state::jumppop_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(m_audiocpu, 0, ASSERT_LINE );
+	m_audiocpu.device(0)->execute().set_input_line(ASSERT_LINE );
 }
 #endif
 

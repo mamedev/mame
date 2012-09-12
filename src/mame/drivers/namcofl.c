@@ -524,14 +524,14 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( network_interrupt_callback )
 {
-	cputag_set_input_line(machine, "maincpu", I960_IRQ0, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(I960_IRQ0, ASSERT_LINE);
 	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(network_interrupt_callback));
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
 	machine.scheduler().timer_set(machine.primary_screen->frame_period(), FUNC(vblank_interrupt_callback));
 }
 
@@ -540,7 +540,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	namcofl_state *state = machine.driver_data<namcofl_state>();
 	machine.primary_screen->update_partial(machine.primary_screen->vpos());
-	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(I960_IRQ1, ASSERT_LINE);
 	state->m_raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
 }
 

@@ -262,7 +262,7 @@ WRITE8_MEMBER(mirax_state::nmi_mask_w)
 WRITE8_MEMBER(mirax_state::mirax_sound_cmd_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

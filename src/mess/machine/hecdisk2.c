@@ -86,7 +86,7 @@ static void valid_interrupt( running_machine &machine)
 	/* Take NMI only if RNMI ok*/
 	if ((state->m_hector_disc2_RNMI==1) &&  (state->m_NMI_current_state==1))
 	{
-		cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_NMI, CLEAR_LINE); // Clear NMI...
+		machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // Clear NMI...
 		state->m_DMA_timer->adjust(attotime::from_usec(6) );//a little time to let the Z80 terminate he's previous job !
 		state->m_NMI_current_state=0;
 	}
@@ -103,21 +103,21 @@ static TIMER_CALLBACK( Callback_DMA_irq )
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	/* To generate the NMI signal (late) when uPD DMA request*/
-	cputag_set_input_line(machine, "disc2cpu", INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
+	machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);  //NMI...
 	state->m_hector_nb_cde =0; // clear the cde length
 }
 
 static TIMER_CALLBACK( Callback_INT_irq )
 {
 	/* To generate the INT signal (late) when uPD DMA request*/
-	cputag_set_input_line(/*device->*/machine, "disc2cpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+	/*device->*/machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 /* upd765 INT is connected to interrupt of Z80 within a RNMI hardware authorization*/
 static WRITE_LINE_DEVICE_HANDLER( disc2_fdc_interrupt )
 {
 	hec2hrp_state *drvstate = device->machine().driver_data<hec2hrp_state>();
-	cputag_set_input_line(device->machine(), "disc2cpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	device->machine().device("disc2cpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	if (state)
 		drvstate->m_INT_timer->adjust(attotime::from_usec(500) );//a little time to let the Z80 terminate he's previous job !
 }
@@ -144,7 +144,7 @@ void hector_disc2_reset(running_machine &machine)
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	// Initialization Disc2 unit
-	cputag_set_input_line(machine, "disc2cpu" , INPUT_LINE_RESET, PULSE_LINE);
+	machine.device("disc2cpu" )->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	//switch ON and OFF the reset line uPD
 	upd765_reset_w(machine.device("upd765"), 1);
 	upd765_reset_w(machine.device("upd765"), 0);

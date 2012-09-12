@@ -420,7 +420,7 @@ WRITE32_MEMBER(konamigx_state::esc_w)
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cputag_set_input_line(machine(), "maincpu", 4, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 		}
 	}
 	else
@@ -510,13 +510,13 @@ WRITE32_MEMBER(konamigx_state::control_w)
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, PULSE_LINE);
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -579,14 +579,14 @@ WRITE32_MEMBER(konamigx_state::ccu_w)
 		// vblank interrupt ACK
 		if (ACCESSING_BITS_24_31)
 		{
-			cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (ACCESSING_BITS_8_15)
 		{
-			cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -616,7 +616,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// lower OBJINT-REQ flag and trigger interrupt
 		gx_rdport1_3 &= ~0x80;
-		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 	}
 }
 
@@ -840,7 +840,7 @@ INLINE void write_snd_020(running_machine &machine, int reg, int val)
 
 	if (reg == 7)
 	{
-		cputag_set_input_line(machine, "soundcpu", 1, HOLD_LINE);
+		machine.device("soundcpu")->execute().set_input_line(1, HOLD_LINE);
 	}
 }
 
@@ -1133,7 +1133,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cputag_set_input_line(machine(), "maincpu", 4, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command
@@ -1283,7 +1283,7 @@ WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 	{
 		machine().device<tms57002_device>("dasp")->pload_w(space, 0, data & 4);
 		machine().device<tms57002_device>("dasp")->cload_w(space, 0, data & 8);
-		cputag_set_input_line(machine(), "dasp", INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("dasp")->execute().set_input_line(INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -3645,8 +3645,8 @@ static MACHINE_RESET(konamigx)
 	memset(sndto020, 0, 16);
 
 	// sound CPU initially disabled?
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
-	cputag_set_input_line(machine, "dasp", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("dasp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (!strcmp(machine.system().name, "tkmmpzdm"))
 	{

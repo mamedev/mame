@@ -99,7 +99,7 @@ static void poly17_init(running_machine &machine);
 
 static TIMER_CALLBACK( irq_off_tick )
 {
-	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -113,7 +113,7 @@ static TIMER_CALLBACK( irq_timer_tick )
 		state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	state->m_irq_off->adjust(machine.primary_screen->time_until_pos(param, GRIDLEE_HBSTART));
@@ -122,7 +122,7 @@ static TIMER_CALLBACK( irq_timer_tick )
 
 static TIMER_CALLBACK( firq_off_tick )
 {
-	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( firq_timer_tick )
 	state->m_firq_timer->adjust(machine.primary_screen->time_until_pos(FIRQ_SCANLINE));
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
-	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	state->m_firq_off->adjust(machine.primary_screen->time_until_pos(FIRQ_SCANLINE, GRIDLEE_HBSTART));

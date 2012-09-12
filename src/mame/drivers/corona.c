@@ -490,12 +490,12 @@ static SCREEN_UPDATE_IND16(luckyrlt)
 WRITE8_MEMBER(corona_state::sound_latch_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "soundcpu", 0, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(corona_state::sound_latch_r)
 {
-	cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
 }
 

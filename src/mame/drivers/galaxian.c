@@ -457,7 +457,7 @@ static INTERRUPT_GEN( fakechange_interrupt_gen )
 		state->m_tenspot_current_game++;
 		state->m_tenspot_current_game%=10;
 		tenspot_set_game_bank(device->machine(), state->m_tenspot_current_game, 1);
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -545,7 +545,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
 	machine().sound().system_mute(data & 0x10);
@@ -750,13 +750,13 @@ static I8255A_INTERFACE( scramble_ppi8255_1_intf )
 
 WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
 READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(*machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
 }
 
@@ -793,7 +793,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_control_w)
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		cputag_set_input_line(machine(), "audio2", 0, HOLD_LINE);
+		machine().device("audio2")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -837,7 +837,7 @@ static void monsterz_set_latch(running_machine &machine)
 	state->m_protection_result = rom[0x2000 | (state->m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
 
 	// and an irq on the main z80 afterwards
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE );
+	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE );
 }
 
 
@@ -932,7 +932,7 @@ READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 
 WRITE8_MEMBER(galaxian_state::froggrmc_sound_control_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1079,7 +1079,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 	galaxian_stars_enable_w(*space, 0, 0);
 
 	/* reset the CPU */
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -1259,13 +1259,13 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
 {
-	cputag_set_input_line(timer.machine(), "audiocpu", 0, HOLD_LINE);
+	timer.machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

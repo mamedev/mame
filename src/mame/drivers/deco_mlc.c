@@ -171,7 +171,7 @@ static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
 	deco_mlc_state *state = timer.machine().driver_data<deco_mlc_state>();
 //  logerror("hit scanline IRQ %d (%08x)\n", machine.primary_screen->vpos(), info.i);
-	cputag_set_input_line(timer.machine(), "maincpu", state->m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(state->m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
@@ -182,7 +182,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cputag_set_input_line(machine(), "maincpu", m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
 		m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(m_irq_ram[0x14/4]));

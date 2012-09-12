@@ -586,7 +586,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 				{
 					state->m_keyb_press = scancode;
 					state->m_keyb_press_flag = 1;
-					cputag_set_input_line(timer.machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+					timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 					return;
 				}
 			}
@@ -599,7 +599,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 #if 0
 static INTERRUPT_GEN( bml3_irq )
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 #endif
 

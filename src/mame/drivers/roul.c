@@ -168,7 +168,7 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 WRITE8_MEMBER(roul_state::sound_latch_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(roul_state::ball_w)

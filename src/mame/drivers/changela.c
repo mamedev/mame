@@ -407,9 +407,9 @@ TIMER_DEVICE_CALLBACK( changela_scanline )
 	int scanline = param;
 
 	if(scanline == 256) // vblank irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xdf);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xdf);
 	else if(((scanline % 64) == 0)) // timer irq, 3 times per given vblank field
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf);
 }
 
 static INTERRUPT_GEN( chl_mcu_irq )

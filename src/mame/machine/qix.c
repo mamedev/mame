@@ -282,26 +282,26 @@ WRITE8_MEMBER(qix_state::zookeep_bankswitch_w)
 
 WRITE8_MEMBER(qix_state::qix_data_firq_w)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(qix_state::qix_data_firq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 READ8_MEMBER(qix_state::qix_data_firq_r)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
 READ8_MEMBER(qix_state::qix_data_firq_ack_r)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -315,26 +315,26 @@ READ8_MEMBER(qix_state::qix_data_firq_ack_r)
 
 WRITE8_MEMBER(qix_state::qix_video_firq_w)
 {
-	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	machine().device("videocpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(qix_state::qix_video_firq_ack_w)
 {
-	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	machine().device("videocpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 READ8_MEMBER(qix_state::qix_video_firq_r)
 {
-	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, ASSERT_LINE);
+	machine().device("videocpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
 READ8_MEMBER(qix_state::qix_video_firq_ack_r)
 {
-	cputag_set_input_line(machine(), "videocpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	machine().device("videocpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -373,13 +373,13 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 	/* if (!(data & 0x04)) */
 	if (data & 0x04)
 	{
-		cputag_set_input_line(device->machine(), "mcu", M68705_IRQ_LINE, ASSERT_LINE);
+		device->machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
 		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 	}
 	else
-		cputag_set_input_line(device->machine(), "mcu", M68705_IRQ_LINE, CLEAR_LINE);
+		device->machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */

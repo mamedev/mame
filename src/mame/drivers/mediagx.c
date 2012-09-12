@@ -873,7 +873,7 @@ WRITE8_MEMBER(mediagx_state::at_page8_w)
 
 WRITE_LINE_MEMBER(mediagx_state::pc_dma_hrq_changed)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( m_dma8237_1, state );
@@ -1091,7 +1091,7 @@ static MACHINE_RESET(mediagx)
 
 WRITE_LINE_MEMBER(mediagx_state::mediagx_pic8259_1_set_int_line)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(mediagx_state::get_slave_ack)
@@ -1213,7 +1213,7 @@ MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine &machine, int a20)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine &machine, int _state)

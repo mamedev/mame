@@ -144,7 +144,7 @@ WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 	set_led_status(machine(), 6,		data & 0x40);	// led for coin out / hopper active
 
 	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
 

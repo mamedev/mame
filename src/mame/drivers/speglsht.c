@@ -222,7 +222,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 
 READ32_MEMBER(speglsht_state::irq_ack_clear)
 {
-	cputag_set_input_line(machine(), "sub", R3000_IRQ4, CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(R3000_IRQ4, CLEAR_LINE);
 	return 0;
 }
 

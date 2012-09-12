@@ -468,7 +468,7 @@ static MACHINE_RESET( msisaac )
 	state->m_snd_ctrl1 = 0;
 
 #ifdef USE_MCU
-	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 #else
 	state->m_mcu_val = 0;
 	state->m_direction = 0;

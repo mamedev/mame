@@ -121,7 +121,7 @@ static IRQ_CALLBACK(multi16_irq_callback)
 WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
 {
 	//printf("%02x\n",interrupt);
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface multi16_pic8259_config =

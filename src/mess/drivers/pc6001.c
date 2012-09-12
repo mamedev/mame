@@ -759,7 +759,7 @@ WRITE8_MEMBER(pc6001_state::pc6001_system_latch_w)
 		//machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		//machine().device(CASSETTE_TAG )->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//m_irq_vector = 0x00;
-		//cputag_set_input_line(machine(),"maincpu", 0, ASSERT_LINE);
+		//machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 	m_sys_latch = data;
@@ -1245,7 +1245,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_system_latch_w)
 		//machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		//machine().device(CASSETTE_TAG )->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//m_irq_vector = 0x00;
-		//cputag_set_input_line(machine(),"maincpu", 0, ASSERT_LINE);
+		//machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 	m_sys_latch = data;
@@ -1355,7 +1355,7 @@ static TIMER_CALLBACK(audio_callback)
 	{
 		if(IRQ_LOG) printf("Timer IRQ called %02x\n",state->m_timer_irq_vector);
 		state->m_irq_vector = state->m_timer_irq_vector;
-		cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -1591,7 +1591,7 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_system_latch_w)
 		//machine().device(CASSETTE_TAG )->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		//machine().device(CASSETTE_TAG )->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//m_irq_vector = 0x00;
-		//cputag_set_input_line(machine(),"maincpu", 0, ASSERT_LINE);
+		//machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 
 	m_sys_latch = data;
@@ -2032,7 +2032,7 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 			cas_data_i = 0x80;
 			/* data ready, poll irq */
 			state->m_irq_vector = 0x08;
-			cputag_set_input_line(timer.machine(),"maincpu", 0, ASSERT_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 		}
 		else
 			cas_data_i>>=1;
@@ -2047,13 +2047,13 @@ static TIMER_DEVICE_CALLBACK(cassette_callback)
 				state->m_cas_switch = 0;
 				if(IRQ_LOG) printf("Tape-E IRQ 0x12\n");
 				state->m_irq_vector = 0x12;
-				cputag_set_input_line(timer.machine(),"maincpu", 0, ASSERT_LINE);
+				timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 			else
 			{
 				if(IRQ_LOG) printf("Tape-D IRQ 0x08\n");
 				state->m_irq_vector = 0x08;
-				cputag_set_input_line(timer.machine(),"maincpu", 0, ASSERT_LINE);
+				timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 		#endif
 	}
@@ -2075,7 +2075,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 			state->m_cur_keycode = check_keyboard_press(space->machine());
 			if(IRQ_LOG) printf("KEY IRQ 0x02\n");
 			state->m_irq_vector = 0x02;
-			cputag_set_input_line(timer.machine(),"maincpu", 0, ASSERT_LINE);
+			timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			state->m_old_key1 = key1;
 			state->m_old_key2 = key2;
 			state->m_old_key3 = key3;
@@ -2087,7 +2087,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 			if(state->m_cur_keycode)
 			{
 				state->m_irq_vector = 0x16;
-				cputag_set_input_line(timer.machine(),"maincpu", 0, ASSERT_LINE);
+				timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			}
 		}
 		#endif

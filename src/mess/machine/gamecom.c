@@ -10,7 +10,7 @@ static TIMER_CALLBACK(gamecom_clock_timer_callback)
 	UINT8 * RAM = machine.root_device().memregion("maincpu")->base();
 	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
-	cputag_set_input_line(machine, "maincpu", CK_INT, ASSERT_LINE );
+	machine.device("maincpu")->execute().set_input_line(CK_INT, ASSERT_LINE );
 }
 
 MACHINE_RESET( gamecom )
@@ -498,7 +498,7 @@ void gamecom_handle_dma( device_t *device, int cycles )
 		state->m_dma.dest_current = state->m_dma.dest_line;
 	}
 	state->m_dma.enabled = 0;
-	cputag_set_input_line(device->machine(), "maincpu", DMA_INT, ASSERT_LINE );
+	device->machine().device("maincpu")->execute().set_input_line(DMA_INT, ASSERT_LINE );
 }
 
 void gamecom_update_timers( device_t *device, int cycles )
@@ -515,7 +515,7 @@ void gamecom_update_timers( device_t *device, int cycles )
 			if ( RAM[SM8521_TM0D] >= state->m_timer[0].check_value )
 			{
 				RAM[SM8521_TM0D] = 0;
-				cputag_set_input_line(device->machine(), "maincpu", TIM0_INT, ASSERT_LINE );
+				device->machine().device("maincpu")->execute().set_input_line(TIM0_INT, ASSERT_LINE );
 			}
 		}
 	}
@@ -529,7 +529,7 @@ void gamecom_update_timers( device_t *device, int cycles )
 			if ( RAM[SM8521_TM1D] >= state->m_timer[1].check_value )
 			{
 				RAM[SM8521_TM1D] = 0;
-				cputag_set_input_line(device->machine(), "maincpu", TIM1_INT, ASSERT_LINE );
+				device->machine().device("maincpu")->execute().set_input_line(TIM1_INT, ASSERT_LINE );
 			}
 		}
 	}

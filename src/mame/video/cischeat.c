@@ -375,9 +375,9 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 		case 0x2208/2   : break;	// watchdog reset
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	cputag_set_input_line(machine(), "cpu2", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -463,13 +463,13 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 
 		case 0x2300/2   :	/* Sound CPU: reads latch during int 4, and stores command */
 							soundlatch_word_w(space, 0, new_data, 0xffff);
-							cputag_set_input_line(machine(), "soundcpu", 4, HOLD_LINE);
+							machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);
 							break;
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	cputag_set_input_line(machine(), "cpu2", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -578,7 +578,7 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 
 		/* Usually written in sequence, but not always */
 		case 0x0008/2   :	soundlatch_word_w(space, 0, new_data, 0xffff);	break;
-		case 0x0018/2   :	cputag_set_input_line(machine(), "soundcpu", 4, HOLD_LINE);	break;
+		case 0x0018/2   :	machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);	break;
 
 		case 0x0010/2   :	break;
 
@@ -598,9 +598,9 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x2208/2   : break;	// watchdog reset
 
 		/* Not sure about this one. Values: $10 then 0, $7 then 0 */
-		case 0x2308/2   :	cputag_set_input_line(machine(), "cpu2", INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(machine(), "cpu3", INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -621,9 +621,9 @@ WRITE16_MEMBER(cischeat_state::f1gpstr2_vregs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				if((old_data & 4) && ((new_data & 4) == 0))
-					cputag_set_input_line(machine(), "cpu5", 4, HOLD_LINE);
+					machine().device("cpu5")->execute().set_input_line(4, HOLD_LINE);
 				if((old_data & 2) && ((new_data & 2) == 0))
-					cputag_set_input_line(machine(), "cpu5", 2, HOLD_LINE);
+					machine().device("cpu5")->execute().set_input_line(2, HOLD_LINE);
 			}
 			break;
 

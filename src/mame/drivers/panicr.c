@@ -494,10 +494,10 @@ static TIMER_DEVICE_CALLBACK( panicr_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc4/4);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc4/4);
 
 	if(scanline == 0) // <unknown>
-		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xc8/4);
+		timer.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
 static MACHINE_CONFIG_START( panicr, panicr_state )

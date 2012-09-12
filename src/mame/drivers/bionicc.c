@@ -128,10 +128,10 @@ static TIMER_DEVICE_CALLBACK( bionicc_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or i8751 related irq
-		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 

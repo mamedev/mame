@@ -234,7 +234,7 @@ SOUND_RESET( taito_en_soundsystem_reset )
 
 	/* reset CPU to catch any banking of startup vectors */
 	machine.device("audiocpu")->reset();
-	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	//machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	snd_shared_ram = (UINT32 *)machine.root_device().memshare("snd_shared")->ptr();
 }

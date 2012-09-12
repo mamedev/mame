@@ -697,7 +697,7 @@ static void irq_raise(running_machine &machine, int level)
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	state->m_last_irq = level;
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -721,7 +721,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static void irq_init(running_machine &machine)
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 }
 
@@ -741,7 +741,7 @@ static TIMER_DEVICE_CALLBACK( model1_interrupt )
 		// if the FIFO has something in it, signal the 68k too
 		if (state->m_fifo_rptr != state->m_fifo_wptr)
 		{
-			cputag_set_input_line(timer.machine(), "audiocpu", 2, HOLD_LINE);
+			timer.machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 		}
 	}
 }
@@ -873,7 +873,7 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
     }
 
 	// signal the 68000 that there's data waiting
-	cputag_set_input_line(machine(), "audiocpu", 2, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 	// give the 68k time to reply
 	device_spin_until_time(&space.device(), attotime::from_usec(40));
 }

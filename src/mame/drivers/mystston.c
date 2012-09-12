@@ -39,13 +39,13 @@
 
 void mystston_on_scanline_interrupt(running_machine &machine)
 {
-	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(mystston_state::irq_clear_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -59,7 +59,7 @@ WRITE8_MEMBER(mystston_state::irq_clear_w)
 INPUT_CHANGED_MEMBER(mystston_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

@@ -298,7 +298,7 @@ READ8_MEMBER(pcxt_state::port_a_r)
 	}
 	else//keyboard emulation
 	{
-		//cputag_set_input_line(machine(), "maincpu", 1, PULSE_LINE);
+		//machine().device("maincpu")->execute().set_input_line(1, PULSE_LINE);
 		return 0x00;//Keyboard is disconnected
 		//return 0xaa;//Keyboard code
 	}
@@ -352,7 +352,7 @@ WRITE8_MEMBER(pcxt_state::wss_2_w)
 
 WRITE8_MEMBER(pcxt_state::sys_reset_w)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static I8255A_INTERFACE( ppi8255_0_intf )
@@ -423,7 +423,7 @@ DMA8237 Controller
 
 WRITE_LINE_MEMBER(pcxt_state::pc_dma_hrq_changed)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( m_dma8237_1, state );
@@ -517,7 +517,7 @@ static I8237_INTERFACE( dma8237_1_config )
 
 WRITE_LINE_MEMBER(pcxt_state::pic8259_1_set_int_line)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(pcxt_state::get_slave_ack)

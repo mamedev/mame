@@ -33,7 +33,7 @@ WRITE16_MEMBER(darkseal_state::darkseal_control_w)
 		return;
     case 8: /* Sound CPU write */
 		soundlatch_byte_w(space, 0, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
     	return;
 	case 0xa: /* IRQ Ack (VBL) */
 		return;
@@ -224,7 +224,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 1, state); /* IRQ 2 */
+	device->machine().device("audiocpu")->execute().set_input_line(1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

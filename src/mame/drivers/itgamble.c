@@ -194,7 +194,7 @@ GFXDECODE_END
 void itgamble_state::machine_reset()
 {
 	/* stop the CPU, we have no code for it anyway */
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 

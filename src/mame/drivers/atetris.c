@@ -72,7 +72,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	int scanline = param;
 
 	/* assert/deassert the interrupt */
-	cputag_set_input_line(machine, "maincpu", 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* set the next timer */
 	scanline += 32;
@@ -84,7 +84,7 @@ static TIMER_CALLBACK( interrupt_gen )
 
 WRITE8_MEMBER(atetris_state::irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

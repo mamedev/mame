@@ -36,8 +36,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	atarigx2_state *state = machine.driver_data<atarigx2_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(5, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -123,7 +123,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		cputag_set_input_line(machine(), "jsa", INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

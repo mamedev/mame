@@ -351,7 +351,7 @@ static MACHINE_RESET( lynx128k )
 
 WRITE8_MEMBER( camplynx_state::lynx128k_irq )
 {
-	cputag_set_input_line(machine(), "maincpu", 0, data);
+	machine().device("maincpu")->execute().set_input_line(0, data);
 }
 
 

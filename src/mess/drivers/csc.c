@@ -175,8 +175,8 @@ READ_LINE_MEMBER( csc_state::pia1_cb1_r )
 
 static TIMER_DEVICE_CALLBACK( irq_timer )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
-	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /* Address maps */

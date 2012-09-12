@@ -1220,6 +1220,6 @@ SCREEN_VBLANK( samesame )
 
 		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 		memcpy(state->m_buffered_spritesizeram16, state->m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
-		cputag_set_input_line(screen.machine(), "maincpu", M68K_IRQ_2, HOLD_LINE);	/* Frame done */
+		screen.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, HOLD_LINE);	/* Frame done */
 	}
 }

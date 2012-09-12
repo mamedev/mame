@@ -107,17 +107,17 @@ static SCREEN_VBLANK( snowbros )
 
 WRITE16_MEMBER(snowbros_state::snowbros_irq4_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(snowbros_state::snowbros_irq3_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(snowbros_state::snowbros_irq2_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( snowbros_irq )
@@ -184,7 +184,7 @@ WRITE16_MEMBER(snowbros_state::snowbros_68000_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -330,7 +330,7 @@ WRITE16_MEMBER(snowbros_state::twinadv_68000_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1496,7 +1496,7 @@ GFXDECODE_END
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* SnowBros Sound */

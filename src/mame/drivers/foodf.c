@@ -107,9 +107,9 @@ WRITE16_MEMBER(foodf_state::nvram_recall_w)
 static void update_interrupts(running_machine &machine)
 {
 	foodf_state *state = machine.driver_data<foodf_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->m_scanline_int_state && state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(2, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, state->m_scanline_int_state && state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

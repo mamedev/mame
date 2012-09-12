@@ -279,7 +279,7 @@ static const deco16ic_interface fghthist_deco16ic_tilegen2_intf =
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", ARM_IRQ_LINE, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 READ32_MEMBER(deco32_state::deco32_irq_controller_r)
@@ -289,7 +289,7 @@ READ32_MEMBER(deco32_state::deco32_irq_controller_r)
 	switch (offset)
 	{
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cputag_set_input_line(machine(), "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 		return 0;
 
 	case 3: /* Irq controller
@@ -345,7 +345,7 @@ WRITE32_MEMBER(deco32_state::deco32_irq_controller_w)
 WRITE32_MEMBER(deco32_state::deco32_sound_w)
 {
 	soundlatch_byte_w(space,0,data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ32_MEMBER(deco32_state::deco32_71_r)
@@ -674,7 +674,7 @@ WRITE32_MEMBER(deco32_state::nslasher_prot_w)
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 		soundlatch_byte_w(space,0,(data>>16)&0xff);
 		m_nslasher_sound_irq |= 0x02;
-		cputag_set_input_line(machine(), "audiocpu", 0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1017,7 +1017,7 @@ READ8_MEMBER(deco32_state::latch_r)
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_nslasher_sound_irq &= ~0x02;
-	cputag_set_input_line(machine(), "audiocpu", 0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	return soundlatch_byte_r(space,0);
 }
 
@@ -1623,7 +1623,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 1, state); /* IRQ 2 */
+	device->machine().device("audiocpu")->execute().set_input_line(1, state); /* IRQ 2 */
 }
 
 static void sound_irq_nslasher(device_t *device, int state)
@@ -1634,7 +1634,7 @@ static void sound_irq_nslasher(device_t *device, int state)
 		drvstate->m_nslasher_sound_irq |= 0x01;
 	else
 		drvstate->m_nslasher_sound_irq &= ~0x01;
-	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, (drvstate->m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)

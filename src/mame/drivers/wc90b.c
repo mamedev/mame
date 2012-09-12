@@ -117,7 +117,7 @@ WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
 WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(wc90b_state::adpcm_control_w)
@@ -327,7 +327,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -348,7 +348,7 @@ static void adpcm_int(device_t *device)
 	if(state->m_toggle)
 	{
 		msm5205_data_w(device, (state->m_msm5205next & 0xf0) >> 4);
-		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		msm5205_data_w(device, (state->m_msm5205next & 0x0f) >> 0);

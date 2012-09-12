@@ -370,7 +370,7 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 		if (data & 0x800000)
 		{
 //          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
+			machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		m_unk20004 = (UINT32)(data);
@@ -464,7 +464,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			m_unk3 = 0;
 		}
 	}

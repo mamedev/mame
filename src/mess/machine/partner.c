@@ -360,7 +360,7 @@ WRITE8_MEMBER(partner_state::partner_mem_page_w)
 static WRITE_LINE_DEVICE_HANDLER( hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state);
+	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	i8257_hlda_w(device, state);

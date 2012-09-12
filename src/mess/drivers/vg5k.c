@@ -276,13 +276,13 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( z80_irq_clear )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
 static TIMER_DEVICE_CALLBACK( z80_irq )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	timer.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(z80_irq_clear));
 }

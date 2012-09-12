@@ -28,9 +28,9 @@ static TIMER_DEVICE_CALLBACK( finalizr_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_irq_enable) // vblank irq
-		cputag_set_input_line(timer.machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	else if(((scanline % 32) == 0) && state->m_nmi_enable) // timer irq
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

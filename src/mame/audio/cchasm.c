@@ -47,7 +47,7 @@ WRITE8_MEMBER(cchasm_state::cchasm_soundlatch4_w)
 {
 	m_sound_flags |= 0x40;
 	soundlatch4_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "maincpu", 1, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 }
 
 WRITE16_MEMBER(cchasm_state::cchasm_io_w)
@@ -66,7 +66,7 @@ WRITE16_MEMBER(cchasm_state::cchasm_io_w)
 			m_sound_flags |= 0x80;
 			soundlatch2_byte_w(space, offset, data);
 			m_ctc->trg2(1);
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
 			//led = data;

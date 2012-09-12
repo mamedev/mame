@@ -300,9 +300,9 @@ static WRITE16_HANDLER( bwb_characteriser16_w );
 static void update_mpu68_interrupts(running_machine &machine)
 {
 	mpu4vid_state *state = machine.driver_data<mpu4vid_state>();
-	cputag_set_input_line(machine, "video", 1, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "video", 2, state->m_m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine, "video", 3, state->m_scn2674->get_irq_state() ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("video")->execute().set_input_line(1, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("video")->execute().set_input_line(2, state->m_m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
+	machine.device("video")->execute().set_input_line(3, state->m_scn2674->get_irq_state() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -341,7 +341,7 @@ static WRITE_LINE_DEVICE_HANDLER( m6809_acia_irq )
 {
 	mpu4vid_state *drvstate = device->machine().driver_data<mpu4vid_state>();
 	drvstate->m_m68k_acia_cts = !state;
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )

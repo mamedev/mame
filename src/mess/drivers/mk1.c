@@ -168,7 +168,7 @@ static void mk1_interrupt( device_t *device, UINT16 addr, int level )
 {
 	device_set_input_line_vector(device->machine().device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
 
-	cputag_set_input_line(device->machine(),"maincpu", F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
+	device->machine().device("maincpu")->execute().set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

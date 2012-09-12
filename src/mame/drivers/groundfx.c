@@ -100,7 +100,7 @@ WRITE32_MEMBER(groundfx_state::color_ram_w)
 
 static TIMER_CALLBACK( groundfx_interrupt5 )
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE); //from 5... ADC port
+	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE); //from 5... ADC port
 }
 
 

@@ -804,13 +804,13 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 
 static TIMER_DEVICE_CALLBACK( cause_nmi )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( cause_M6502_irq )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
-	cputag_set_input_line(timer.machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 }
 
@@ -974,19 +974,19 @@ WRITE32_MEMBER(polgar_state::write_1000000)
 
 static TIMER_DEVICE_CALLBACK( timer_update_irq6 )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( timer_update_irq2 )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 
 static TIMER_DEVICE_CALLBACK( timer_update_irq_academy )
 {
 	if (academyallowNMI) {
-		cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 	}
 }
 

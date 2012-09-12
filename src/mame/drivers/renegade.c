@@ -260,7 +260,7 @@ WRITE8_MEMBER(renegade_state::adpcm_play_w)
 WRITE8_MEMBER(renegade_state::sound_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -359,7 +359,7 @@ WRITE8_MEMBER(renegade_state::renegade_68705_port_b_w)
 		m_port_a_in = m_from_main;
 
 		if (m_main_sent)
-			cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+			machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 		m_main_sent = 0;
 	}
@@ -416,7 +416,7 @@ READ8_MEMBER(renegade_state::mcu_reset_r)
 	}
 	else
 	{
-		cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 	return 0;
 }
@@ -446,7 +446,7 @@ WRITE8_MEMBER(renegade_state::mcu_w)
 	{
 		m_from_main = data;
 		m_main_sent = 1;
-		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
+		machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 

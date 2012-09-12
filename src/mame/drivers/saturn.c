@@ -1643,15 +1643,15 @@ static void scsp_irq(device_t *device, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cputag_set_input_line(device->machine(), "audiocpu", irq, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cputag_set_input_line(device->machine(), "audiocpu", -irq, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(-irq, CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(device->machine(), "audiocpu", scsp_last_line, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(scsp_last_line, CLEAR_LINE);
 	}
 }
 
@@ -2037,8 +2037,8 @@ static MACHINE_RESET( saturn )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	// don't let the slave cpu and the 68k go anywhere
-	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	state->m_smpc.SR = 0x40;	// this bit is always on according to docs
 
@@ -2118,8 +2118,8 @@ static MACHINE_RESET( stv )
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	// don't let the slave cpu and the 68k go anywhere
-	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	state->m_en_68k = 0;
 	state->m_NMI_reset = 0;

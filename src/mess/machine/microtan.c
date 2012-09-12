@@ -150,7 +150,7 @@ static void microtan_set_irq_line(running_machine &machine)
     /* The 6502 IRQ line is active low and probably driven
        by open collector outputs (guess). Since MAME/MESS use
        a non-0 value for ASSERT_LINE we OR the signals here */
-    cputag_set_input_line(machine, "maincpu", 0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
+    machine.device("maincpu")->execute().set_input_line(0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
 }
 
 static cassette_image_device *cassette_device_image(running_machine &machine)
@@ -384,7 +384,7 @@ READ8_MEMBER(microtan_state::microtan_bffx_r)
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
 static TIMER_CALLBACK(microtan_pulse_nmi)
 {
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+    machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(microtan_state::microtan_bffx_w)

@@ -186,10 +186,10 @@ WRITE16_MEMBER(_2mindril_state::drill_irq_w)
     ---- ---- -??- -??? connected to the other levels?
     */
 	if(((irq_reg & 8) == 0) && data & 8)
-		cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 
 	if(((irq_reg & 0x10) == 0) && data & 0x10)
-		cputag_set_input_line(machine(), "maincpu", 5, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
 
 	if(data & 0xffe7)
 		printf("%04x\n",data);

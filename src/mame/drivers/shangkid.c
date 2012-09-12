@@ -63,18 +63,18 @@ WRITE8_MEMBER(shangkid_state::shangkid_maincpu_bank_w)
 
 WRITE8_MEMBER(shangkid_state::shangkid_bbx_enable_w)
 {
-	cputag_set_input_line(machine(), "bbx", INPUT_LINE_HALT, data?0:1 );
+	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, data?0:1 );
 }
 
 WRITE8_MEMBER(shangkid_state::shangkid_cpu_reset_w)
 {
 	if( data == 0 )
 	{
-		cputag_set_input_line(machine(), "bbx", INPUT_LINE_RESET, PULSE_LINE);
+		machine().device("bbx")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -89,7 +89,7 @@ WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE );
+			machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE );
 	}
 }
 
@@ -99,7 +99,7 @@ WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE );
+			machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE );
 	}
 	else
 		membank("bank2")->set_entry(data ? 0 : 1);
@@ -137,12 +137,12 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 
 static MACHINE_RESET( chinhero )
 {
-	cputag_set_input_line(machine, "bbx", INPUT_LINE_HALT, 1 );
+	machine.device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
 }
 
 static MACHINE_RESET( shangkid )
 {
-	cputag_set_input_line(machine, "bbx", INPUT_LINE_HALT, 1 );
+	machine.device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
 
 	machine.root_device().membank("bank1")->set_entry(0);
 	machine.root_device().membank("bank2")->set_entry(0);

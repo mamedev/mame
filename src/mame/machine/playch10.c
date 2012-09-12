@@ -129,12 +129,12 @@ WRITE8_MEMBER(playch10_state::pc10_DOGDI_w)
 
 WRITE8_MEMBER(playch10_state::pc10_GAMERES_w)
 {
-	cputag_set_input_line(machine(), "cart", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
+	machine().device("cart")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_MEMBER(playch10_state::pc10_GAMESTOP_w)
 {
-	cputag_set_input_line(machine(), "cart", INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
+	machine().device("cart")->execute().set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_MEMBER(playch10_state::pc10_PPURES_w)

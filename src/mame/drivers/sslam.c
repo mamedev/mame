@@ -374,7 +374,7 @@ WRITE16_MEMBER(sslam_state::sslam_snd_w)
 WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", MCS51_INT1_LINE, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(MCS51_INT1_LINE, HOLD_LINE);
 }
 
 /* Memory Maps */

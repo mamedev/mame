@@ -13,7 +13,7 @@ static TIMER_CALLBACK( periodic_callback )
 {
 	int scanline = param;
 
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	scanline += 64;
 

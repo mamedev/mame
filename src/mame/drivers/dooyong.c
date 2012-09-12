@@ -776,21 +776,21 @@ READ8_MEMBER(dooyong_state::unk_r)
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void irqhandler_2203_1(device_t *device, int irq)
 {
 	dooyong_state *state = device->machine().driver_data<dooyong_state>();
 	state->m_interrupt_line_1=irq;
-	cputag_set_input_line(device->machine(), "audiocpu", 0, (state->m_interrupt_line_1 | state->m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, (state->m_interrupt_line_1 | state->m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void irqhandler_2203_2(device_t *device, int irq)
 {
 	dooyong_state *state = device->machine().driver_data<dooyong_state>();
 	state->m_interrupt_line_2=irq;
-	cputag_set_input_line(device->machine(), "audiocpu", 0, (state->m_interrupt_line_1 | state->m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, (state->m_interrupt_line_1 | state->m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -1068,10 +1068,10 @@ static TIMER_DEVICE_CALLBACK( rshark_scanline )
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 	if(scanline == 120) // timer irq?
-		cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 

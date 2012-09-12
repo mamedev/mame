@@ -61,7 +61,7 @@ public:
 
 static void tonton_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 

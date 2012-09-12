@@ -100,7 +100,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	r.set(r1.min_x, r1.max_x, state->m_ula_scanline_count, state->m_ula_scanline_count);
 	bitmap.fill(1, r);
 //  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) machine.device("maincpu")->state().state_int(Z80_R), (unsigned) machine.device("maincpu")->state().state_int(Z80_PC));
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	if (++state->m_ula_scanline_count == height)
 		state->m_ula_scanline_count = 0;
 }
@@ -119,7 +119,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 //      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) machine.device("maincpu")->state().state_int(Z80_R), (unsigned) machine.device("maincpu")->state().state_int(Z80_PC));
 
 		state->m_ula_irq_active = 0;
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 

@@ -366,7 +366,7 @@ GFXDECODE_END
 
 static TIMER_DEVICE_CALLBACK( set_irq )
 {
-	cputag_set_input_line(timer.machine(), Z80_TAG, INPUT_LINE_IRQ0, ASSERT_LINE);
+	timer.machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
@@ -376,7 +376,7 @@ static TIMER_DEVICE_CALLBACK( set_irq )
 
 static TIMER_DEVICE_CALLBACK( clear_irq )
 {
-	cputag_set_input_line(timer.machine(), Z80_TAG, INPUT_LINE_IRQ0, CLEAR_LINE);
+	timer.machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 

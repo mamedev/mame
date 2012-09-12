@@ -162,13 +162,13 @@ static TIMER_DEVICE_CALLBACK( megasys1A_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0)
-		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 	if(scanline == 128)
-		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
@@ -198,13 +198,13 @@ static TIMER_DEVICE_CALLBACK( megasys1B_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
-		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 
 	if(scanline == 128)
-		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 }
 
 
@@ -249,7 +249,7 @@ READ16_MEMBER(megasys1_state::ip_select_r)
 WRITE16_MEMBER(megasys1_state::ip_select_w)
 {
 	COMBINE_DATA(&m_ip_select);
-	cputag_set_input_line(machine(), "maincpu", 2, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 static void megasys1_sound_irq(device_t *device, int irq)
 {
 	if (irq)
-		cputag_set_input_line(device->machine(), "soundcpu", 4, HOLD_LINE);
+		device->machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 READ8_MEMBER(megasys1_state::oki_status_1_r)
@@ -1398,7 +1398,7 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 		}
 	}
 
-	cputag_set_input_line(machine(), "maincpu", 4, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 /*************************************
@@ -1647,7 +1647,7 @@ MACHINE_CONFIG_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

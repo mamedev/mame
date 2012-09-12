@@ -147,7 +147,7 @@ WRITE16_MEMBER(spbactn_state::soundcommand_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -336,7 +336,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
+	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

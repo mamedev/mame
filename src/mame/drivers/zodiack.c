@@ -109,10 +109,10 @@ static TIMER_DEVICE_CALLBACK( zodiack_scanline )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_nmi_enable) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	if(scanline == 0 ) // vblank-in irq
-		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( zodiack_sound_nmi_gen )

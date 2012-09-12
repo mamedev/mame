@@ -255,7 +255,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	if (ACCESSING_BITS_0_7)		soundlatch_byte_w (space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)	soundlatch2_byte_w(space, 0, (data >> 8) & 0xff);
 
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
@@ -646,7 +646,7 @@ static I8255A_INTERFACE( aliencha_ppi8255_1_intf )
 
 static void soundirq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_IRQ0, state);
+	device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static const ym3812_interface lordgun_ym3812_interface =

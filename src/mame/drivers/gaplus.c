@@ -173,7 +173,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_1_ctrl_w)
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit & 1;
 	if (!bit)
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(gaplus_state::gaplus_irq_2_ctrl_w)
@@ -181,7 +181,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_2_ctrl_w)
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
 	if (!bit)
-		cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
+		machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
@@ -189,14 +189,14 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
 	if (!bit)
-		cputag_set_input_line(machine(), "sub2", 0, CLEAR_LINE);
+		machine().device("sub2")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
 {
 	int bit = !BIT(offset, 11);
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	mappy_sound_enable(machine().device("namco"), bit);
 }
 
@@ -232,7 +232,7 @@ static MACHINE_RESET( gaplus )
 	gaplus_state *state = machine.driver_data<gaplus_state>();
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
 	state->m_sub_irq_mask = 0;
-	cputag_set_input_line(machine, "sub", 0, CLEAR_LINE);
+	machine.device("sub")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( namcoio_run )
@@ -259,7 +259,7 @@ static INTERRUPT_GEN( gaplus_vblank_main_irq )
 	device_t *io56xx = device->machine().device("56xx");
 
 	if(state->m_main_irq_mask)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(io58xx))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
@@ -273,7 +273,7 @@ static INTERRUPT_GEN( gaplus_vblank_sub_irq )
 	gaplus_state *state = device->machine().driver_data<gaplus_state>();
 
 	if(state->m_sub_irq_mask)
-		cputag_set_input_line(device->machine(), "sub", 0, ASSERT_LINE);
+		device->machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( gaplus_vblank_sub2_irq )
@@ -281,7 +281,7 @@ static INTERRUPT_GEN( gaplus_vblank_sub2_irq )
 	gaplus_state *state = device->machine().driver_data<gaplus_state>();
 
 	if(state->m_sub2_irq_mask)
-		cputag_set_input_line(device->machine(), "sub2", 0, ASSERT_LINE);
+		device->machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

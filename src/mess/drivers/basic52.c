@@ -103,8 +103,8 @@ static MACHINE_RESET( basic52 )
 
 WRITE8_MEMBER( basic52_state::kbd_put )
 {
-	cputag_set_input_line(machine(), "maincpu", MCS51_RX_LINE, ASSERT_LINE);
-	cputag_set_input_line(machine(), "maincpu", MCS51_RX_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 	m_term_data = data;
 }
 

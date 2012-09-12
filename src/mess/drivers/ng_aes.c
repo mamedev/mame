@@ -153,15 +153,15 @@ static void update_interrupts( running_machine &machine )
 
 	if(strcmp((char*)machine.system().name,"aes") != 0)
 	{  // raster and vblank IRQs are swapped on the NeoCD.
-		cputag_set_input_line(machine, "maincpu", 2, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 1, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", 1, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 2, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -696,7 +696,7 @@ static void _set_audio_cpu_rom_source( address_space *space )
 	{
 		state->m_audio_cpu_rom_source_last = state->m_audio_cpu_rom_source;
 
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", space->device().safe_pc(), state->m_audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
@@ -977,7 +977,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 	case 0x142/2:  // end PCM transfer
 		break;
 	case 0x146/2:  // end Z80 transfer
-		cputag_set_input_line(machine(),"audiocpu",INPUT_LINE_RESET,PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 		break;
 	case 0x148/2:  // end FIX transfer
 		video_reset_neogeo(machine());

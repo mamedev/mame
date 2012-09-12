@@ -57,14 +57,14 @@ static TIMER_DEVICE_CALLBACK( m107_scanline_interrupt )
 	if (scanline == state->m_raster_irq_position)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_2);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == machine.primary_screen->visible_area().max_y + 1)
 	{
 		machine.primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_0);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_0);
 	}
 }
 
@@ -91,7 +91,7 @@ WRITE16_MEMBER(m107_state::m107_bankswitch_w)
 
 WRITE16_MEMBER(m107_state::m107_soundlatch_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 	soundlatch_byte_w(space, 0, data & 0xff);
 //      logerror("soundlatch_byte_w %02x\n",data);
 }
@@ -103,24 +103,24 @@ READ16_MEMBER(m107_state::m107_sound_status_r)
 
 READ16_MEMBER(m107_state::m107_soundlatch_r)
 {
-	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 	return soundlatch_byte_r(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m107_state::m107_sound_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m107_state::m107_sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	cputag_set_input_line_and_vector(machine(), "maincpu", 0, HOLD_LINE, M107_IRQ_3);
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_3);
 }
 
 WRITE16_MEMBER(m107_state::m107_sound_reset_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -756,7 +756,7 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "soundcpu", NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

@@ -1589,7 +1589,7 @@ GFXDECODE_END
 
 static void soundirq(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, state);
+	device->machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used

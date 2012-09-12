@@ -162,9 +162,9 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data);
 WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 {
 	if (state)
-		cputag_set_input_line(machine(), "maincpu", 6, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
 }
 
 
@@ -220,7 +220,7 @@ static MACHINE_RESET( common )
 	state->membank("bank1")->set_entry(0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
-	cputag_set_input_line(machine, "tms", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("tms")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	for (i = 0; i < SOUND_CHANNELS; i++)
 	{
@@ -263,7 +263,7 @@ static INTERRUPT_GEN( vblank_gen )
 
 WRITE16_MEMBER(gaelco3d_state::irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 }
 
 WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
@@ -371,7 +371,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	if (LOG)
 		logerror("delayed_sound_w(%02X)\n", param);
 	state->m_sound_data = param;
-	cputag_set_input_line(machine, "adsp", ADSP2115_IRQ2, ASSERT_LINE);
+	machine.device("adsp")->execute().set_input_line(ADSP2115_IRQ2, ASSERT_LINE);
 }
 
 
@@ -388,7 +388,7 @@ READ16_MEMBER(gaelco3d_state::sound_data_r)
 {
 	if (LOG)
 		logerror("sound_data_r(%02X)\n", m_sound_data);
-	cputag_set_input_line(machine(), "adsp", ADSP2115_IRQ2, CLEAR_LINE);
+	machine().device("adsp")->execute().set_input_line(ADSP2115_IRQ2, CLEAR_LINE);
 	return m_sound_data;
 }
 
@@ -509,7 +509,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
 	/* it does not ever appear to be touched after that */
 	if (LOG)
 		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-		cputag_set_input_line(machine(), "tms", INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+		machine().device("tms")->execute().set_input_line(INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -520,7 +520,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
 	if (LOG)
 		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		cputag_set_input_line(machine(), "tms", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		machine().device("tms")->execute().set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

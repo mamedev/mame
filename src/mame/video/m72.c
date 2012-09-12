@@ -370,9 +370,9 @@ WRITE16_MEMBER(m72_state::m72_port02_w)
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bit 5 = "bank"? */
 	}

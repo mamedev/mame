@@ -95,7 +95,7 @@ static SCREEN_UPDATE_IND16( sm1800 )
 static INTERRUPT_GEN( sm1800_vblank_interrupt )
 {
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	cputag_set_input_line(device->machine(), "maincpu", 0, state->m_irq_state ?  HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state->m_irq_state ?  HOLD_LINE : CLEAR_LINE);
 	state->m_irq_state ^= 1;
 }
 

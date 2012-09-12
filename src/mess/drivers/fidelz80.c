@@ -1010,7 +1010,7 @@ void fidelz80_state::machine_reset()
 
 static TIMER_DEVICE_CALLBACK( nmi_timer )
 {
-	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************

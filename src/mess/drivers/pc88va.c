@@ -984,7 +984,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
         */
 		case 0x00: // FDC mode register
 			m_fdc_mode = data & 1;
-			cputag_set_input_line(machine(), "fdccpu", INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
+			machine().device("fdccpu")->execute().set_input_line(INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 		/*
         --x- ---- CLK: FDC clock selection (0) 4.8MHz (1) 8 MHz
@@ -1499,7 +1499,7 @@ static IRQ_CALLBACK(pc88va_irq_callback)
 
 static WRITE_LINE_DEVICE_HANDLER( pc88va_pic_irq )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
@@ -1626,7 +1626,7 @@ static WRITE_LINE_DEVICE_HANDLER(pc88va_upd765_interrupt)
 	if(drvstate->m_fdc_mode)
 		pic8259_ir3_w(device->machine().device( "pic8259_slave"), state);
 	else
-		cputag_set_input_line(device->machine(), "fdccpu", 0, HOLD_LINE);
+		device->machine().device("fdccpu")->execute().set_input_line(0, HOLD_LINE);
 };
 
 static const struct upd765_interface pc88va_upd765_interface =

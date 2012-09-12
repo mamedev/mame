@@ -1553,7 +1553,7 @@ int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
 
 static WRITE_LINE_DEVICE_HANDLER( chihiro_pic8259_1_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( get_slave_ack )

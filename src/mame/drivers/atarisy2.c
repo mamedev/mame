@@ -160,24 +160,24 @@ static void update_interrupts(running_machine &machine)
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
 	if (state->m_video_int_state)
-		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
 
 	if (state->m_scanline_int_state)
-		cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 
 	if (state->m_p2portwr_state)
-		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 
 	if (state->m_p2portrd_state)
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -283,7 +283,7 @@ WRITE16_MEMBER(atarisy2_state::int1_ack_w)
 {
 	/* reset sound CPU */
 	if (ACCESSING_BITS_0_7)
-		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

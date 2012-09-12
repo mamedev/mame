@@ -292,7 +292,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 		case 0x00:	/* IRQON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -313,11 +313,11 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 			break;
 
 		case 0x04:	/* RESB */
-			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -451,12 +451,12 @@ static TIMER_DEVICE_CALLBACK( polepos_scanline )
 	int scanline = param;
 
 	if (((scanline == 64) || (scanline == 192)) && state->m_main_irq_mask)	// 64V
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
 	if (scanline == 240 && state->m_sub_irq_mask)	// VBLANK
 	{
-		cputag_set_input_line(timer.machine(), "sub", 0, ASSERT_LINE);
-		cputag_set_input_line(timer.machine(), "sub2", 0, ASSERT_LINE);
+		timer.machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
+		timer.machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 

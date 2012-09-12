@@ -424,7 +424,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( vblank_callback_gpworld )

@@ -369,7 +369,7 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
 ***************************************************************************/
 static TIMER_CALLBACK( bublbobl_m68705_irq_ack )
 {
-	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN( bublbobl_m68705_interrupt )

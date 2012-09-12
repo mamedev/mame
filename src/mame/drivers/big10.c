@@ -86,7 +86,7 @@ public:
 
 static void big10_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? ASSERT_LINE : CLEAR_LINE));
+	device.machine().device("maincpu")->execute().set_input_line(0, (i ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TIMER_DEVICE_CALLBACK( big10_interrupt )

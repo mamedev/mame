@@ -316,7 +316,7 @@ READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 
 READ8_MEMBER(superqix_state::nmi_ack_r)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return sqix_system_status_r(space, 0);
 }
 
@@ -370,7 +370,7 @@ static TIMER_CALLBACK( delayed_z80_mcu_w )
 //  logerror("Z80 sends command %02x\n",param);
 	state->m_from_z80 = param;
 	state->m_from_mcu_pending = 0;
-	cputag_set_input_line(machine, "mcu", 0, HOLD_LINE);
+	machine.device("mcu")->execute().set_input_line(0, HOLD_LINE);
 	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 }
 

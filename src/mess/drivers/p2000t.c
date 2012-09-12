@@ -204,7 +204,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( p2000_interrupt )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

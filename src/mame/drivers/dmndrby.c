@@ -84,7 +84,7 @@ public:
 WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
 	soundlatch_byte_w(space,0,data);
-	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -499,12 +499,12 @@ static PALETTE_INIT( dmnderby )
 /*Main Z80 is IM 0,HW-latched irqs. */
 static INTERRUPT_GEN( dderby_irq )
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, 0xd7); /* RST 10h */
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 static INTERRUPT_GEN( dderby_timer_irq )
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( dderby, dmndrby_state )

@@ -241,8 +241,8 @@ INTERRUPT_GEN( mcr68_interrupt )
 static void update_mcr68_interrupts(running_machine &machine)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	cputag_set_input_line(machine, "maincpu", state->m_v493_irq_vector, state->m_v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", state->m_m6840_irq_vector, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(state->m_v493_irq_vector, state->m_v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(state->m_m6840_irq_vector, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -70,7 +70,7 @@ WRITE8_MEMBER(tbowl_state::shared_w)
 WRITE8_MEMBER(tbowl_state::tbowl_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(tbowl_state::tbowl_trigger_nmi)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
@@ -421,7 +421,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
+	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

@@ -312,7 +312,7 @@ static int sound_nmi_enabled;
 
 static void sound_nmi_callback( int param )
 {
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	sound_nmi_enabled = 0;
 }

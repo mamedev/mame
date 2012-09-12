@@ -85,8 +85,8 @@ static void hp48_apply_modules(hp48_state *state);
 
 static void hp48_pulse_irq( running_machine &machine, int irq_line)
 {
-	cputag_set_input_line(machine, "maincpu", irq_line, ASSERT_LINE );
-	cputag_set_input_line(machine, "maincpu", irq_line, CLEAR_LINE );
+	machine.device("maincpu")->execute().set_input_line(irq_line, ASSERT_LINE );
+	machine.device("maincpu")->execute().set_input_line(irq_line, CLEAR_LINE );
 }
 
 

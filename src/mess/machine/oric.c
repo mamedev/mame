@@ -64,9 +64,9 @@ static void oric_refresh_ints(running_machine &machine)
 
 	/* any irq set? */
 	if (state->m_irqs & 0x0f)
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

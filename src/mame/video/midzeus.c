@@ -678,9 +678,9 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
                 we simply assert immediately if this is enabled. invasn needs this for proper
                 operations */
 			if (zeusbase[0x80] & 0x02000000)
-				cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
+				machine.device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
 			else
-				cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
+				machine.device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 			break;
 
 		case 0x84:

@@ -96,24 +96,24 @@ static void check_interrupt(running_machine &machine)
 	thayers_state *state = machine.driver_data<thayers_state>();
 	if (!state->m_timer_int || !state->m_data_rdy_int || !state->m_ssi_data_request)
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
 static TIMER_CALLBACK( intrq_tick )
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(thayers_state::intrq_w)
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 
 	machine().scheduler().timer_set(attotime::from_usec(8250), FUNC(intrq_tick));
 }
@@ -353,7 +353,7 @@ WRITE8_MEMBER(thayers_state::control2_w)
 
 	if ((!BIT(data, 2)) & m_cart_present)
 	{
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 

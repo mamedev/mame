@@ -53,7 +53,7 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 READ8_MEMBER(circus_state::circus_paddle_r)
 {
 	// also clears irq
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	return ioport("PADDLE")->read();
 }
 
@@ -360,7 +360,7 @@ static TIMER_DEVICE_CALLBACK( crash_scanline )
 	int scanline = param;
 
 	if(scanline == 256 || scanline == 0) // vblank-out / in irq
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( crash, circus_state )

@@ -238,7 +238,7 @@ GFXDECODE_END
 static MACHINE_RESET( itgambl2 )
 {
 	/* stop the CPU, we have no code for it anyway */
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 /* default 444 palette for debug purpose*/

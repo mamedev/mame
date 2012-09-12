@@ -224,13 +224,13 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
-			//cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG0, ASSERT_LINE);
+			//machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 			sharc_set_flag_input(space->machine().device("dsp"), 0, ASSERT_LINE);
 
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_IRQ2, ASSERT_LINE);
+					space->machine().device("dsp")->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}

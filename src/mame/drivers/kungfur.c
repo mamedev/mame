@@ -156,7 +156,7 @@ WRITE8_MEMBER(kungfur_state::kungfur_control_w)
 	// d0-d3: N/C
 	// d4: irq ack
 	if (~data & 0x10)
-		cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
 	// d5: ?
 	// d6-d7: sound trigger (edge)

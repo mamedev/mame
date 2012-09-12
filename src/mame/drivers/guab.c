@@ -106,7 +106,7 @@ public:
 
 WRITE_LINE_MEMBER(guab_state::ptm_irq)
 {
-	cputag_set_input_line(machine(), "maincpu", INT_6840PTM, state);
+	machine().device("maincpu")->execute().set_input_line(INT_6840PTM, state);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -130,7 +130,7 @@ static const ptm6840_interface ptm_intf =
 
 static void tms_interrupt(running_machine &machine, int state)
 {
-	cputag_set_input_line(machine, "maincpu", INT_TMS34061, state);
+	machine.device("maincpu")->execute().set_input_line(INT_TMS34061, state);
 }
 
 static const struct tms34061_interface tms34061intf =
@@ -380,7 +380,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 	}
 
 	fdc.status |= DATA_REQUEST;
-	cputag_set_input_line(machine, "maincpu", INT_FLOPPYCTRL, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(INT_FLOPPYCTRL, ASSERT_LINE);
 }
 
 
@@ -475,7 +475,7 @@ WRITE16_MEMBER(guab_state::wd1770_w)
 															fdc.sector));
 
 					/* Trigger a DRQ interrupt on the CPU */
-					cputag_set_input_line(machine(), "maincpu", INT_FLOPPYCTRL, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(INT_FLOPPYCTRL, ASSERT_LINE);
 					fdc.status |= DATA_REQUEST;
 					break;
 				}
@@ -520,7 +520,7 @@ WRITE16_MEMBER(guab_state::wd1770_w)
 			fdc.data = data;
 
 			/* Clear the DRQ */
-			cputag_set_input_line(machine(), "maincpu", INT_FLOPPYCTRL, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(INT_FLOPPYCTRL, CLEAR_LINE);
 
 			/* Queue an event to write the data if write command was specified */
 			if (fdc.cmd & 0x20)
@@ -558,7 +558,7 @@ READ16_MEMBER(guab_state::wd1770_r)
 			retval = fdc.data;
 
 			/* Clear the DRQ */
-			cputag_set_input_line(machine(), "maincpu", INT_FLOPPYCTRL, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(INT_FLOPPYCTRL, CLEAR_LINE);
 			fdc.status &= ~DATA_REQUEST;
 			break;
 		}

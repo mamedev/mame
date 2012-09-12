@@ -199,9 +199,9 @@ public:
 /* Devices */
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-	//cputag_set_input_line_and_vector(device->machine(), "maincpu", M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	//cputag_set_input_line_and_vector(device->machine(), "maincpu", M68K_IRQ_6, HOLD_LINE, vector);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	//device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	//device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
 };
 
 static UINT8 duart_input(device_t *device)
@@ -249,9 +249,9 @@ static void dectalk_outfifo_check (running_machine &machine)
 	dectalk_state *state = machine.driver_data<dectalk_state>();
 	// check if output fifo is full; if it isn't, set the int on the dsp
 	if (((state->m_outfifo_head_ptr-1)&0xF) != state->m_outfifo_tail_ptr)
-	cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); // TMS32010 INT
+	machine.device("dsp")->execute().set_input_line(0, ASSERT_LINE); // TMS32010 INT
 	else
-	cputag_set_input_line(machine, "dsp", 0, CLEAR_LINE); // TMS32010 INT
+	machine.device("dsp")->execute().set_input_line(0, CLEAR_LINE); // TMS32010 INT
 }
 
 static void dectalk_clear_all_fifos( running_machine &machine )
@@ -300,10 +300,10 @@ static void dectalk_semaphore_w ( running_machine &machine, UINT16 data )
 #ifdef VERBOSE
 		logerror("speech int fired!\n");
 #endif
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
-	cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 // read the output fifo and set the interrupt line active on the dsp
@@ -336,7 +336,7 @@ static void dectalk_reset(device_t *device)
 	dectalk_clear_all_fifos(device->machine()); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	dectalk_semaphore_w(device->machine(), 0); // on the original state->m_dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	state->m_spc_error_latch = 0; // spc error latch is cleared on /reset
-	cputag_set_input_line(device->machine(), "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+	device->machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	state->m_tlc_tonedetect = 0; // TODO, needed for selftest pass
 	state->m_tlc_ringdetect = 0; // TODO
 	state->m_tlc_dtmf = 0; // TODO
@@ -432,7 +432,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
 		dectalk_clear_all_fifos(machine());
-		cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
 		m_spc_error_latch = 0;
 		dectalk_semaphore_w(machine(), 0);
@@ -442,7 +442,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01 = 0: initialize speech off, dsp running\n");
 #endif
-		cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
+		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
 	}
 	if ((data&0x2) == 0x2) // bit 1 - clear error and semaphore latches
 	{
@@ -463,7 +463,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
 #endif
-			cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
+			machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
 		}
 	}
 	else // data&0x40 == 0
@@ -471,7 +471,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40 = 0: speech int disabled\n");
 #endif
-		cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 }
 
@@ -503,7 +503,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
 		}
 	}
 	else // data&0x40 == 0
@@ -512,7 +512,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x40 = 0: tone detect int disabled\n");
 #endif
 	if (((data&0x4000)!=0x4000) || (m_tlc_ringdetect == 0)) // check to be sure we don't disable int if both ints fired at once
-		cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 	if ((data&0x100) == 0x100) // bit 8: answer phone relay enable
 	{
@@ -536,7 +536,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
 		}
 	}
 	else // data&0x4000 == 0
@@ -545,7 +545,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x4000 = 0: ring detect int disabled\n");
 #endif
 	if (((data&0x40)!=0x40) || (m_tlc_tonedetect == 0)) // check to be sure we don't disable int if both ints fired at once
-		cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 }
 
@@ -593,7 +593,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 #ifdef SPC_LOG_DSP
 	logerror("dsp: SPC outfifo write, data = %04X, fifo head was: %02X; fifo tail: %02X\n", data, m_outfifo_head_ptr, m_outfifo_tail_ptr);
 #endif
-	cputag_set_input_line(machine(), "dsp", 0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
+	machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
 	if (((m_outfifo_tail_ptr-1)&0xF) == m_outfifo_head_ptr)
 	{

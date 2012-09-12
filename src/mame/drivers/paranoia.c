@@ -154,7 +154,7 @@ WRITE8_MEMBER(paranoia_state::paranoia_i8155_c_w)
 
 WRITE_LINE_MEMBER(paranoia_state::paranoia_i8155_timer_out)
 {
-	//cputag_set_input_line(machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	//machine().device("sub")->execute().set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
 }
 

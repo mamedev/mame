@@ -346,7 +346,7 @@ WRITE8_MEMBER(funkball_state::at_dma8237_2_w)
 
 WRITE_LINE_MEMBER(funkball_state::pc_dma_hrq_changed)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( m_dma8237_1, state );

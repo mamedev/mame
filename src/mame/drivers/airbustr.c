@@ -553,11 +553,11 @@ static TIMER_DEVICE_CALLBACK( airbustr_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xff);
+		timer.machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xfd);
+		timer.machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */

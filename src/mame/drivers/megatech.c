@@ -231,16 +231,16 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 		printf("enabling SMS Z80\n");
 		state->m_current_game_is_sms = 1;
 		megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
-		//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
-		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
+		//machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
 		printf("disabling SMS Z80\n");
 		state->m_current_game_is_sms = 0;
 		megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
-		//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -254,10 +254,10 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	sprintf(tempname, "game%d", param);
 	game_region = machine.root_device().memregion(tempname)->base();
 
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
-	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
-	//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	//machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	devtag_reset(machine, "ymsnd");
 
 	megadriv_stop_scanline_timer(machine);// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed

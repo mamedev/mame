@@ -340,7 +340,7 @@ READ8_MEMBER(jackie_state::igs_irqack_r)
 
 WRITE8_MEMBER(jackie_state::igs_irqack_w)
 {
-//  cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+//  machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	m_out[2] = data;
 	show_out();
 }

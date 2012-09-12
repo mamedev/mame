@@ -74,7 +74,7 @@ static MACHINE_RESET( starwars )
 
 WRITE8_MEMBER(starwars_state::irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 

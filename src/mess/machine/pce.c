@@ -1112,11 +1112,11 @@ static void pce_cd_set_irq_line( running_machine &machine, int num, int state )
 
 	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY | PCE_CD_IRQ_SAMPLE_HALF_PLAY | PCE_CD_IRQ_SAMPLE_FULL_PLAY) )
 	{
-		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE );
+		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE );
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE );
+		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE );
 	}
 }
 
@@ -1348,7 +1348,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 		pce_cd.adpcm_dma_timer->adjust(attotime::never); // stop ADPCM DMA here
 		/* any write here clears CD transfer irqs */
 		pce_cd.regs[0x03] &= ~0x70;
-		cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE );
+		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE );
 		break;
 	case 0x01:	/* CDC command / status / data */
 		break;

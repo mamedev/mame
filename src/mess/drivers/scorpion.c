@@ -278,7 +278,7 @@ static TIMER_DEVICE_CALLBACK(nmi_check_callback)
 	{
 		state->m_port_1ffd_data |= 0x02;
 		scorpion_update_memory(timer.machine());
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

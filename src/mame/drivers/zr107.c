@@ -335,7 +335,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
                 0x01 = EEPDI
             */
 			ioport("EEPROMOUT")->write(data & 0x07, 0xff);
-			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -351,9 +351,9 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
                 0x01 = ADDSCLK (ADC SCLK)
             */
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			ioport("OUT4")->write(data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
@@ -675,14 +675,14 @@ static const adc083x_interface zr107_adc_interface = {
 
 static TIMER_CALLBACK( irq_off )
 {
-	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
-	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
 	machine.scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
 }
 
@@ -720,7 +720,7 @@ static INTERRUPT_GEN( zr107_vblank )
 
 static MACHINE_RESET( zr107 )
 {
-	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( zr107, zr107_state )

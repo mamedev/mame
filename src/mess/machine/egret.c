@@ -185,7 +185,7 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					}
 				}
 
-				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (reset_line & 8) ? ASSERT_LINE : CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, (reset_line & 8) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 	}

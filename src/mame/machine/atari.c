@@ -53,7 +53,7 @@ void atari_interrupt_cb(pokey_device *device, int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 /**************************************************************

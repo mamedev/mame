@@ -167,7 +167,7 @@ static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
 static void set_gate_a20(running_machine &machine, int a20)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine &machine, int state)

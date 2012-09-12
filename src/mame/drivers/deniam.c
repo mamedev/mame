@@ -76,7 +76,7 @@ WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
 
 WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )

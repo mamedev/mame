@@ -401,15 +401,15 @@ void itech32_update_interrupts(running_machine &machine, int vint, int xint, int
 
 	if (state->m_is_drivedge)
 	{
-		cputag_set_input_line(machine, "maincpu", 3, state->m_vint_state ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 4, state->m_xint_state ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 5, state->m_qint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, state->m_vint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(4, state->m_xint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(5, state->m_qint_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", 1, state->m_vint_state ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 2, state->m_xint_state ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 3, state->m_qint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(1, state->m_vint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(2, state->m_xint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, state->m_qint_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -449,8 +449,8 @@ static MACHINE_RESET( drivedge )
 {
 	MACHINE_RESET_CALL(itech32);
 
-	cputag_set_input_line(machine, "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	STOP_TMS_SPINNING(machine, 0);
 	STOP_TMS_SPINNING(machine, 1);
 }
@@ -641,7 +641,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 	itech32_state *state = machine.driver_data<itech32_state>();
 	state->m_sound_data = param;
 	state->m_sound_int_state = 1;
-	cputag_set_input_line(machine, "soundcpu", M6809_IRQ_LINE, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -667,7 +667,7 @@ WRITE32_MEMBER(itech32_state::sound_data32_w)
 
 READ8_MEMBER(itech32_state::sound_data_r)
 {
-	cputag_set_input_line(machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_sound_int_state = 0;
 	return m_sound_data;
 }
@@ -764,7 +764,7 @@ static const via6522_interface drivedge_via_interface =
 
 WRITE8_MEMBER(itech32_state::firq_clear_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -777,8 +777,8 @@ WRITE8_MEMBER(itech32_state::firq_clear_w)
 
 WRITE32_MEMBER(itech32_state::tms_reset_assert_w)
 {
-	cputag_set_input_line(machine(), "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine(), "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -787,12 +787,12 @@ WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
 	/* kludge to prevent crash on first boot */
 	if ((m_tms1_ram[0] & 0xff000000) == 0)
 	{
-		cputag_set_input_line(machine(), "dsp1", INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine(), 0);
 	}
 	if ((m_tms2_ram[0] & 0xff000000) == 0)
 	{
-		cputag_set_input_line(machine(), "dsp2", INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine(), 1);
 	}
 }

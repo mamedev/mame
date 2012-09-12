@@ -314,7 +314,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 WRITE16_MEMBER(sliver_state::sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", MCS51_INT0_LINE, HOLD_LINE);
+	machine().device("audiocpu")->execute().set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16, sliver_state )

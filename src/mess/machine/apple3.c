@@ -499,8 +499,8 @@ static void apple2_via_1_irq_func(device_t *device, int state)
 	apple3_state *drvstate = device->machine().driver_data<apple3_state>();
 	if (!drvstate->m_via_1_irq && state)
 	{
-		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
-		cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
 	drvstate->m_via_1_irq = state;
 }

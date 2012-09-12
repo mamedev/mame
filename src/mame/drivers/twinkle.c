@@ -662,7 +662,7 @@ static void ide_interrupt(device_t *device, int state_)
 
 	if ((state_) && (state->m_spu_ctrl & 0x0400))
 	{
-		cputag_set_input_line(device->machine(), "audiocpu", M68K_IRQ_6, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	}
 }
 

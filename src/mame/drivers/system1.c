@@ -481,7 +481,7 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 	/* bit 6 = feedback from sound board that read occurrred */
 
 	/* bit 7 controls the sound CPU's NMI line */
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
 	system1_videoram_bank_w(device, offset, data);
@@ -524,7 +524,7 @@ WRITE8_MEMBER(system1_state::soundport_w)
 static TIMER_DEVICE_CALLBACK( soundirq_gen )
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
-	cputag_set_input_line(timer.machine(), "soundcpu", 0, HOLD_LINE);
+	timer.machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -548,8 +548,8 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
         Bit 0 -> Directly connected to Z80 /INT line
     */
 	m_mcu_control = data;
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine(), "maincpu", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -659,7 +659,7 @@ READ8_MEMBER(system1_state::nob_maincpu_latch_r)
 WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 {
 	m_nob_maincpu_latch = data;
-	cputag_set_input_line(machine(), "mcu", MCS51_INT0_LINE, ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

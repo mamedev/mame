@@ -183,7 +183,7 @@ WRITE32_MEMBER(polygonet_state::sound_w)
 
 WRITE32_MEMBER(polygonet_state::sound_irq_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 /* DSP communications */
@@ -253,16 +253,16 @@ WRITE32_MEMBER(polygonet_state::dsp_w_lines)
 	if ((data >> 24) & 0x01)
 	{
 //      logerror("RESET CLEARED\n");
-		cputag_set_input_line(machine(), "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
+		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
 //      logerror("RESET ASSERTED\n");
-		cputag_set_input_line(machine(), "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
+		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
-		cputag_set_input_line(machine(), "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
-		cputag_set_input_line(machine(), "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
+		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
+		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
 	/* 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020 */
@@ -608,9 +608,9 @@ static MACHINE_START(polygonet)
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	/* TODO: This should work, but the MAME core appears to do something funny.
              Not a big deal - it's hacked in dsp_w_lines. */
-	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
-	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
-	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
+	//machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//machine.device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
+	//machine.device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
 }
 
 static const k053936_interface polygonet_k053936_intf =

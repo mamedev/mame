@@ -380,7 +380,7 @@ READ32_MEMBER(tmmjprd_state::randomtmmjprds)
 #if 0
 static TIMER_CALLBACK( tmmjprd_blit_done )
 {
-	cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 static void tmmjprd_do_blit(running_machine &machine)
@@ -737,10 +737,10 @@ static TIMER_DEVICE_CALLBACK( tmmjprd_scanline )
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 	if(scanline == 736) // blitter irq?
-		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 
 }
 

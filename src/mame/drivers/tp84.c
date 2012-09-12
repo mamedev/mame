@@ -120,7 +120,7 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 
 WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
 {
-	cputag_set_input_line_and_vector(machine(), "audiocpu",0,HOLD_LINE,0xff);
+	machine().device("audiocpu")->execute().set_input_line_and_vector(0,HOLD_LINE,0xff);
 }
 
 

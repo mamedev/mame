@@ -133,7 +133,7 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_dint )
 	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	/* DINT is connected to the data CPU's IRQ line */
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -143,7 +143,7 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
 	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	cputag_set_input_line(device->machine(), "audiocpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

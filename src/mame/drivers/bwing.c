@@ -193,12 +193,12 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(bwing_state::coin_inserted)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(bwing_state::tilt_pressed)
 {
-	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( bwing )

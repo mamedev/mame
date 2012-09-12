@@ -161,13 +161,13 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( mekd2_trace )
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
 {
 	if (state)
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	else
 		machine().scheduler().timer_set(attotime::from_usec(18), FUNC(mekd2_trace));
 }

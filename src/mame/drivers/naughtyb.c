@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(naughtyb_state::coin_inserted)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )

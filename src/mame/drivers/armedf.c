@@ -332,7 +332,7 @@ WRITE16_MEMBER(armedf_state::terrafb_io_w)
 {
 
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		cputag_set_input_line(machine(), "extra", 0, HOLD_LINE);
+		machine().device("extra")->execute().set_input_line(0, HOLD_LINE);
 
 	COMBINE_DATA(&m_vreg);
 
@@ -372,12 +372,12 @@ READ8_MEMBER(armedf_state::soundlatch_clear_r)
 
 WRITE16_MEMBER(armedf_state::irq_lv1_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
 }
 
 

@@ -227,7 +227,7 @@ WRITE32_MEMBER(undrfire_state::color_ram_w)
 
 static TIMER_CALLBACK( interrupt5 )
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -452,7 +452,7 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
 	output_set_value("Lamp_6", (data >> 5) & 1 );
 	output_set_value("Wheel_vibration", (data >> 6) & 1 );
 
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ32_MEMBER(undrfire_state::cbombers_adc_r)

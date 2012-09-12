@@ -104,12 +104,12 @@ if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 
 WRITE_LINE_MEMBER(hexion_state::hexion_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(hexion_state::hexion_nmi_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
@@ -205,9 +205,9 @@ static TIMER_DEVICE_CALLBACK( hexion_scanline )
 	int scanline = param;
 
 	if(scanline == 256)
-		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	else if ((scanline == 85) || (scanline == 170)) //TODO
-		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static const k053252_interface hexion_k053252_intf =

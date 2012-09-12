@@ -520,8 +520,8 @@ static TIMER_DEVICE_CALLBACK( update_artwork )
 
 static TIMER_CALLBACK( update_irq )
 {
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
-	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /* Save state call backs */

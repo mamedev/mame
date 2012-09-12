@@ -655,7 +655,7 @@ static void laserdisc_audio_process(device_t *dummy, laserdisc_device &device, i
 
 static TIMER_CALLBACK( nmi_clear )
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

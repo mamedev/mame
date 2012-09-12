@@ -450,7 +450,7 @@ static SCREEN_UPDATE_IND16( pasogo )
 
 static INTERRUPT_GEN( pasogo_interrupt )
 {
-//  cputag_set_input_line(machine, "maincpu", UPD7810_INTFE1, PULSE_LINE);
+//  machine.device("maincpu")->execute().set_input_line(UPD7810_INTFE1, PULSE_LINE);
 }
 
 static IRQ_CALLBACK(pasogo_irq_callback)
@@ -487,7 +487,7 @@ static const struct pit8253_config pc_pit8254_config =
 
 static WRITE_LINE_DEVICE_HANDLER( pasogo_pic8259_set_int_line )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pasogo_pic8259_config =

@@ -80,8 +80,8 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) cputag_set_input_line(machine(), "maincpu", 3, HOLD_LINE); /* Guess */
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		if (data&0x8000) machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -182,7 +182,7 @@ WRITE32_MEMBER(superchs_state::superchs_stick_w)
         different byte in this long word before the RTE.  I assume all but the last
         (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
 	if (mem_mask != 0xff000000)
-		cputag_set_input_line(machine(), "maincpu", 3, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
 /***********************************************************

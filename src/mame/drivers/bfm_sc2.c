@@ -620,7 +620,7 @@ WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
 			MechMtr_update(i, data & (1 << i) );
 		}
 	}
-	if ( data & 0x1F ) cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(bfm_sc2_state::uart2data_w)
 WRITE8_MEMBER(bfm_sc2_state::vid_uart_tx_w)
 {
 	adder2_send(data);
-	cputag_set_input_line(machine(), "adder2", M6809_IRQ_LINE, HOLD_LINE );
+	machine().device("adder2")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }

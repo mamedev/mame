@@ -554,7 +554,7 @@ void cdicdic_device::sample_trigger()
         // Set the CDIC interrupt line
         verboselog(machine(), 0, "Setting CDIC interrupt line for soundmap decode\n" );
         device_set_input_line_vector(machine().device("maincpu"), M68K_IRQ_4, 128);
-        cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE);
+        machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
     }
     else
     {
@@ -708,7 +708,7 @@ void cdicdic_device::process_delayed_command()
                     //printf( "Setting CDIC interrupt line\n" );
                     verboselog(machine(), 0, "Setting CDIC interrupt line for audio sector\n" );
                     device_set_input_line_vector(machine().device("maincpu"), M68K_IRQ_4, 128);
-                    cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE);
+                    machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
                 }
                 else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
                 {
@@ -727,7 +727,7 @@ void cdicdic_device::process_delayed_command()
                         //printf( "Setting CDIC interrupt line\n" );
                         verboselog(machine(), 0, "Setting CDIC interrupt line for message sector\n" );
                         device_set_input_line_vector(machine().device("maincpu"), M68K_IRQ_4, 128);
-                        cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE);
+                        machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
                     }
                     else
                     {
@@ -747,7 +747,7 @@ void cdicdic_device::process_delayed_command()
                     //printf( "Setting CDIC interrupt line\n" );
                     verboselog(machine(), 0, "Setting CDIC interrupt line for data sector\n" );
                     device_set_input_line_vector(machine().device("maincpu"), M68K_IRQ_4, 128);
-                    cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE);
+                    machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
                 }
 
                 if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
@@ -842,7 +842,7 @@ void cdicdic_device::process_delayed_command()
 
             verboselog(machine(), 0, "Setting CDIC interrupt line for CDDA sector\n" );
             device_set_input_line_vector(machine().device("maincpu"), M68K_IRQ_4, 128);
-            cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE);
+            machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
 		case 0x2c: // Seek
@@ -893,7 +893,7 @@ void cdicdic_device::process_delayed_command()
 
             verboselog(machine(), 0, "Setting CDIC interrupt line for Seek sector\n" );
             device_set_input_line_vector(machine().device("maincpu"), M68K_IRQ_4, 128);
-            cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE);
+            machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
 	}
@@ -944,7 +944,7 @@ UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
             m_audio_buffer &= 0x7fff;
             if(!((m_audio_buffer | m_x_buffer) & 0x8000))
             {
-                cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
                 verboselog(machine(), 0, "Clearing CDIC interrupt line\n" );
                 ////printf("Clearing CDIC interrupt line\n" );
             }
@@ -958,7 +958,7 @@ UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
             m_x_buffer &= 0x7fff;
             if(!((m_audio_buffer | m_x_buffer) & 0x8000))
             {
-                cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+                machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
                 verboselog(machine(), 0, "Clearing CDIC interrupt line\n" );
                 ////printf("Clearing CDIC interrupt line\n" );
             }

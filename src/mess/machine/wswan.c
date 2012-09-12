@@ -87,23 +87,23 @@ static void wswan_handle_irqs( running_machine &machine )
 {
 	wswan_state *state = machine.driver_data<wswan_state>();
 	if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_HBLTMR );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_HBLTMR );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_VBL );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_VBL );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_VBLTMR );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_VBLTMR );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_LCMP ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_LCMP );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_LCMP );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_SRX ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_SRX );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_SRX );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_RTC ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_RTC );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_RTC );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_KEY ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_KEY );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_KEY );
 	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_STX ) {
-		cputag_set_input_line_and_vector( machine, "maincpu", 0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_STX );
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_STX );
 	} else {
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE );
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE );
 	}
 }
 

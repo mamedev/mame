@@ -25,7 +25,7 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 		state->m_alpha_irq_clock++;
 		if ((state->m_alpha_irq_clock & 0x0c) == 0x0c)
 		{
-			cputag_set_input_line(timer.machine(), "alpha", 0, ASSERT_LINE);
+			timer.machine().device("alpha")->execute().set_input_line(0, ASSERT_LINE);
 			state->m_alpha_irq_clock_enable = 0;
 		}
 	}
@@ -34,7 +34,7 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 	if (state->m_has_gamma_cpu)
 	{
 		state->m_gamma_irq_clock++;
-		cputag_set_input_line(timer.machine(), "gamma", 0, (state->m_gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		timer.machine().device("gamma")->execute().set_input_line(0, (state->m_gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -42,7 +42,7 @@ TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_irq_ack_w)
 {
 	/* clear the line and reset the clock */
-	cputag_set_input_line(machine(), "alpha", 0, CLEAR_LINE);
+	machine().device("alpha")->execute().set_input_line(0, CLEAR_LINE);
 	m_alpha_irq_clock = 0;
 	m_alpha_irq_clock_enable = 1;
 }
@@ -51,7 +51,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_irq_ack_w)
 WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
 {
 	/* clear the line and reset the clock */
-	cputag_set_input_line(machine(), "gamma", 0, CLEAR_LINE);
+	machine().device("gamma")->execute().set_input_line(0, CLEAR_LINE);
 	m_gamma_irq_clock = 0;
 }
 
@@ -131,7 +131,7 @@ static TIMER_CALLBACK( delayed_gamma_w )
 	state->m_alpha_data = param;
 
 	/* signal with an NMI pulse */
-	cputag_set_input_line(machine, "gamma", INPUT_LINE_NMI, PULSE_LINE);
+	machine.device("gamma")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
 	machine.scheduler().timer_set(attotime::from_usec(250), FUNC_NULL);
@@ -256,7 +256,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 	m_player_1 = (data >> 5) & 1;
 
 	/* Bit 3 = Gamma reset */
-	cputag_set_input_line(machine(), "gamma", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("gamma")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x08))
 	{
 		logerror("\t\t\t\t*** resetting gamma processor. ***\n");

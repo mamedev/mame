@@ -400,7 +400,7 @@ static PALETTE_INIT( vtech2 )
 
 static INTERRUPT_GEN( vtech2_interrupt )
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 static const cassette_interface laser_cassette_interface =

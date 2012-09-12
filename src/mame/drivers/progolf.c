@@ -202,12 +202,12 @@ WRITE8_MEMBER(progolf_state::progolf_flip_screen_w)
 WRITE8_MEMBER(progolf_state::audio_command_w)
 {
 	m_sound_cmd = data;
-	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(progolf_state::audio_command_r)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 	return m_sound_cmd;
 }
 
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(progolf_state::coin_inserted)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* verified from M6502 code */

@@ -102,9 +102,9 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 {
 	beezer_state *state = device->machine().driver_data<beezer_state>();
 	if ((data & 0x08) == 0)
-		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{

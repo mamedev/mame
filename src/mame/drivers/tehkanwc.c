@@ -98,9 +98,9 @@ TO DO :
 WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
 {
 	if (data)
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -141,12 +141,12 @@ WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_1_reset_w)
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static TIMER_CALLBACK( reset_callback )
 {
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)

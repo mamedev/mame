@@ -35,9 +35,9 @@
 static void update_interrupts(running_machine &machine)
 {
 	thunderj_state *state = machine.driver_data<thunderj_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "extra", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("extra")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -88,9 +88,9 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
+			machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, ASSERT_LINE);
+			machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
 		if (m_alpha_tile_bank != ((data >> 2) & 7))

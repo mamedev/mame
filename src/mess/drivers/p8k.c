@@ -201,7 +201,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 static void p8k_daisy_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 /* Z80 DMA */

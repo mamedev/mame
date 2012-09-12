@@ -28,7 +28,7 @@ void triplhnt_set_collision(running_machine &machine, int code)
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	state->m_hit_code = code;
 
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 

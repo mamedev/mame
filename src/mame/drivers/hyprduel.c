@@ -640,7 +640,7 @@ static MACHINE_RESET( hyprduel )
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
 	/* start with cpu2 halted */
-	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	state->m_subcpu_resetline = 1;
 	state->m_cpu_trigger = 0;
 

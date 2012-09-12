@@ -175,7 +175,7 @@ WRITE8_MEMBER( junior_state::junior_riot_b_w )
 
 WRITE_LINE_MEMBER( junior_state::junior_riot_irq )
 {
-	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

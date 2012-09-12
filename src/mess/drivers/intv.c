@@ -798,12 +798,12 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(intv_interrupt2_complete)
 {
-	cputag_set_input_line(machine, "keyboard", 0, CLEAR_LINE);
+	machine.device("keyboard")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( intv_interrupt2 )
 {
-	cputag_set_input_line(device->machine(), "keyboard", 0, ASSERT_LINE);
+	device->machine().device("keyboard")->execute().set_input_line(0, ASSERT_LINE);
 	device->machine().scheduler().timer_set(device->machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), FUNC(intv_interrupt2_complete));
 }
 

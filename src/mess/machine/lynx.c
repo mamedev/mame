@@ -604,7 +604,7 @@ static TIMER_CALLBACK(lynx_blitter_timer)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
 	state->m_blitter.busy=0; // blitter finished
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 /*
@@ -1409,8 +1409,8 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 	if ( ( state->m_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) // if interrupts are enabled and timer != 4
 	{
 		state->m_mikey.data[0x81] |= ( 1 << which ); // set interupt poll register
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
 	switch ( which ) // count down linked timers
 	{
@@ -1640,16 +1640,16 @@ static TIMER_CALLBACK(lynx_uart_timer)
 		if (state->m_uart.serctl & 0x40)
 		{
 			state->m_mikey.data[0x81] |= 0x10;
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 
 	if (state->m_uart.serctl & 0x80)
 	{
 		state->m_mikey.data[0x81] |= 0x10;
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
@@ -1806,7 +1806,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[0x81] &= ~data; // clear interrupt source
 		// logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!m_mikey.data[0x81])
-			cputag_set_input_line(machine(), "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */ // Notes say writing to register will result in interupt being triggered.
@@ -1814,8 +1814,8 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[0x81] |= data;
 		if (data)
 		{
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(machine(), "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 			logerror("direct write to interupt register\n");
 		}
 		break;
@@ -1869,7 +1869,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[offset] = data;
 		if (!data && m_blitter.busy)
 		{
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			/* A write of '0' to this address will reset the CPU bus request flip flop */
 		}
 		break;
@@ -1929,8 +1929,8 @@ static void lynx_reset(running_machine &machine)
 	lynx_state *state = machine.driver_data<lynx_state>();
 	state->lynx_memory_config_w(*machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&state->m_suzy, 0, sizeof(state->m_suzy));
 	memset(&state->m_mikey, 0, sizeof(state->m_mikey));

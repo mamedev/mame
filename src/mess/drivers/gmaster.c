@@ -208,7 +208,7 @@ static SCREEN_UPDATE_IND16( gmaster )
 
 static INTERRUPT_GEN( gmaster_interrupt )
 {
-	cputag_set_input_line(device->machine(), "maincpu", UPD7810_INTFE1, ASSERT_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(UPD7810_INTFE1, ASSERT_LINE);
 }
 
 static const UPD7810_CONFIG config = {

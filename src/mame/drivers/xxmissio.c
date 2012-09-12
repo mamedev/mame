@@ -35,7 +35,7 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_status_m_w)
 
 		case 0x40:
 			m_status &= ~0x08;
-			cputag_set_input_line_and_vector(machine(), "sub", 0, HOLD_LINE, 0x10);
+			machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:
@@ -58,7 +58,7 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_status_s_w)
 
 		case 0x80:
 			m_status &= ~0x04;
-			cputag_set_input_line_and_vector(machine(), "maincpu", 0, HOLD_LINE, 0x10);
+			machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x10);
 			break;
 	}
 }

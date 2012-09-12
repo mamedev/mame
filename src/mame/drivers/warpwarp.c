@@ -217,7 +217,7 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 		case 6:
 			m_ball_on = data & 1;
 			if (~data & 1)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 		case 7:
 			flip_screen_set(data & 1);
@@ -301,7 +301,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
 		case 6:
 			m_ball_on = data & 1;
 			if (~data & 1)
-				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 			break;
 		case 7:
 			flip_screen_set(data & 1);

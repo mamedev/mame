@@ -112,7 +112,7 @@ static MACHINE_RESET( midzeus )
 
 static TIMER_CALLBACK( display_irq_off )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( display_irq )
@@ -487,9 +487,9 @@ static void update_gun_irq(running_machine &machine)
 {
 	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
-		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
 }
 
 

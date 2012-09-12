@@ -188,7 +188,7 @@ static TIMER_CALLBACK( irq_callback )
 
 	/* set the IRQ line if enabled */
 	if (state->m_irq_enabled)
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xfc);
+		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -268,7 +268,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 	/* pulse the NMI line if enabled */
 	if (state->m_nmi_enabled)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;

@@ -423,7 +423,7 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_writeB)
 
 static void irqhandler(device_t *device, int irq)
 {
-	//cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -449,7 +449,7 @@ static void adpcm_int(device_t *device)
 		if(state->m_toggle)
 		{
 			msm5205_data_w(device, (state->m_msm5205next & 0xf0) >> 4);
-			if(state->m_msm_nmi_mask) { cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
+			if(state->m_msm_nmi_mask) { device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 		}
 		else
 		{

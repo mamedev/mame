@@ -1517,7 +1517,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate);
+	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

@@ -147,7 +147,7 @@ static const UINT8 led_map[16] =
 
 static void dleuro_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, state);
+	device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 

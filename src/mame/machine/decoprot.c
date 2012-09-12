@@ -112,7 +112,7 @@ WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 	if (offset == (0x150 / 2))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
@@ -232,7 +232,7 @@ WRITE16_HANDLER( deco16_60_prot_w ) /* Edward Randy */
 	if (offset == (0x64 / 2))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
@@ -423,7 +423,7 @@ WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 	if (offset == (0x64 / 2))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
@@ -611,7 +611,7 @@ WRITE16_HANDLER( deco16_104_cninja_prot_w )
 	if (offset == (0xa8 / 2))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
@@ -675,7 +675,7 @@ WRITE16_HANDLER( deco16_146_funkyjet_prot_w )
 	if (offset == (0x10a >> 1))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 }
@@ -795,7 +795,7 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 	if (offset == (0xa8 / 2))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
@@ -1226,7 +1226,7 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 	if (writeport == sndport)
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 
@@ -1756,7 +1756,7 @@ WRITE16_HANDLER( dietgo_104_prot_w )
 	if (offset == (0x380 / 2))
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 		return;
 	}
 	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n", space->device().safe_pc(), offset << 1, data);

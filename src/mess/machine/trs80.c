@@ -38,7 +38,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 		{
 			state->m_cassette_data = 0;
 			state->m_irq |= CASS_FALL;
-			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 	else
@@ -48,7 +48,7 @@ static TIMER_CALLBACK( cassette_data_callback )
 		{
 			state->m_cassette_data = 1;
 			state->m_irq |= CASS_RISE;
-			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 
@@ -79,7 +79,7 @@ READ8_MEMBER( trs80_state::trs80m4_e0_r )
     d1 Cass 1500 baud Falling
     d0 Cass 1500 baud Rising */
 
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	return ~(m_mask & m_irq);
 }
 
@@ -95,7 +95,7 @@ READ8_MEMBER( trs80_state::trs80m4_e4_r )
     d6 status of Motor Timeout (0=true)
     d5 status of Reset signal (0=true - this will reboot the computer) */
 
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	return ~(m_nmi_mask & m_nmi_data);
 }
@@ -654,13 +654,13 @@ static void trs80_fdc_interrupt_internal(running_machine &machine)
 		if (state->m_nmi_mask & 0x80)	// Model 4 does a NMI
 		{
 			state->m_nmi_data = 0x80;
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else		// Model 1 does a IRQ
 	{
 		state->m_irq |= IRQ_M1_FDC;
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -752,7 +752,7 @@ READ8_MEMBER( trs80_state::trs80_irq_status_r )
     which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
 	int result = m_irq;
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	m_irq = 0;
 	return result;
 }

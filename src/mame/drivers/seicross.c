@@ -76,7 +76,7 @@ static NVRAM_HANDLER( seicross )
 static MACHINE_RESET( friskyt )
 {
 	/* start with the protection mcu halted */
-	cputag_set_input_line(machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("mcu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -100,8 +100,8 @@ WRITE8_MEMBER(seicross_state::friskyt_portB_w)
 	if (((m_portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
-		cputag_set_input_line(machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */

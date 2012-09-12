@@ -53,7 +53,7 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 
 		if (nb1413m3_nmi_enable)
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			nb1413m3_nmi_count++;
 		}
 

@@ -560,7 +560,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 static TIMER_CALLBACK( rabbit_blit_done )
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
-	cputag_set_input_line(machine, "maincpu", state->m_bltirqlevel, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(state->m_bltirqlevel, HOLD_LINE);
 }
 
 static void rabbit_do_blit(running_machine &machine)
@@ -872,7 +872,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( rabbit_vblank_interrupt )
 {
 	rabbit_state *state = device->machine().driver_data<rabbit_state>();
-	cputag_set_input_line(device->machine(), "maincpu", state->m_vblirqlevel, HOLD_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(state->m_vblirqlevel, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )

@@ -425,7 +425,7 @@ static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 )
 	mz_state *mz = device->machine().driver_data<mz_state>();
 
 	if (!mz->m_intmsk)
-		cputag_set_input_line(device->machine(), "maincpu", 0, state);
+		device->machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 
@@ -541,7 +541,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
 
 static void mz800_z80pio_irq(device_t *device, int which)
 {
-	cputag_set_input_line(device->machine(), "maincpu", 0, which);
+	device->machine().device("maincpu")->execute().set_input_line(0, which);
 }
 
 static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )

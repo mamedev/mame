@@ -1250,23 +1250,23 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( rockn_timer_level4_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( rockn_timer_sub_level4_callback )
 {
-	cputag_set_input_line(machine, "sub", 4, HOLD_LINE);
+	machine.device("sub")->execute().set_input_line(4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( rockn_timer_level1_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 {
-	cputag_set_input_line(machine, "sub", 1, HOLD_LINE);
+	machine.device("sub")->execute().set_input_line(1, HOLD_LINE);
 }
 
 static void init_rockn_timer(running_machine &machine)

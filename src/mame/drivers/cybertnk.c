@@ -531,7 +531,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
 	else if (offset == 1)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -572,7 +572,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 	}
 	else if (offset == 1)
 	{
-		cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 	}
 }
 

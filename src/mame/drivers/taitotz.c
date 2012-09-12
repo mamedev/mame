@@ -1821,24 +1821,24 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 		{
 			m_io_share_ram[0xfff] = 0x0000;
 			m_io_share_ram[0xe00] = 0xffff;
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 		else if (m_io_share_ram[0xfff] == 0x4004 || m_io_share_ram[0xfff] == 0x4000)
 		{
 			m_io_share_ram[0xfff] = 0x0000;
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 		else if (m_io_share_ram[0xfff] == 0x7004)
 		{
 			// this command seems to turn off interrupts on TLCS...
 			m_io_share_ram[0xfff] = 0x0000;
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 		else
 		{
 			// normally just raise INT0 on TLCS and let it handle the command
-			cputag_set_input_line(machine(), "iocpu", TLCS900_INT0, ASSERT_LINE);
-			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+			machine().device("iocpu")->execute().set_input_line(TLCS900_INT0, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// The PPC always goes to busy loop waiting for TLCS here, so we can free up the timeslice.
 			// Only do it for HDD access and backup RAM for now...
@@ -1924,10 +1924,10 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 		}
 #endif
 
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
-		cputag_set_input_line(machine(), "iocpu", TLCS900_INT0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		machine().device("iocpu")->execute().set_input_line(TLCS900_INT0, CLEAR_LINE);
 
-		cputag_set_input_line(machine(), "iocpu", TLCS900_INT3, CLEAR_LINE);
+		machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, CLEAR_LINE);
 
 		// The PPC is now free to continue running
 		//machine().scheduler().trigger(PPC_TLCS_COMM_TRIGGER);
@@ -2447,12 +2447,12 @@ static MACHINE_START( taitotz )
 
 static INTERRUPT_GEN( taitotz_vbi )
 {
-	cputag_set_input_line(device->machine(), "iocpu", TLCS900_INT3, ASSERT_LINE);
+	device->machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
 static void ide_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "iocpu", TLCS900_INT2, state);
+	device->machine().device("iocpu")->execute().set_input_line(TLCS900_INT2, state);
 }
 
 static const powerpc_config ppc603e_config =

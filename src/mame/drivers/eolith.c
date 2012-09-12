@@ -1435,7 +1435,7 @@ ROM_END
 
 static MACHINE_RESET( eolith )
 {
-	cputag_set_input_line(machine, "soundcpu", MCS51_INT1_LINE, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
 DRIVER_INIT_MEMBER(eolith_state,eolith)

@@ -118,7 +118,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	suprridr_state *state = machine.driver_data<suprridr_state>();
 	state->m_sound_data = param;
-	cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -136,7 +136,7 @@ READ8_MEMBER(suprridr_state::sound_data_r)
 
 WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

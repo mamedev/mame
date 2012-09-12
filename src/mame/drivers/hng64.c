@@ -1048,14 +1048,14 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 		if (cmd==0x55AA)
 		{
 			printf("soundcpu ON\n");
-			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
-			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else if (cmd==0xAA55)
 		{
 			printf("soundcpu OFF\n");
-			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
-			cputag_set_input_line(space.machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
@@ -1796,8 +1796,8 @@ static MACHINE_RESET(hyperneo)
 	UINT8 *RAM = (UINT8*)state->m_soundram;
 	state->membank("bank1")->set_base(&RAM[0x1f0000]); // allows us to boot
 	state->membank("bank2")->set_base(&RAM[0x1f0000]); // seems to be the right default for most games (initial area jumps to a DI here)
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Comm CPU */
 	KL5C80_init(state);
@@ -1811,8 +1811,8 @@ static MACHINE_RESET(hyperneo)
 	address_space *space = machine.device<z80_device>("comm")->space(AS_PROGRAM);
 	space->set_direct_update_handler(direct_update_delegate(FUNC(hng64_state::KL5C80_direct_handler), state));
 
-	cputag_set_input_line(machine, "comm", INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-//  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+	machine.device("comm")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  machine.device("comm")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	// "Display List" init - ugly
 	state->m_activeBuffer = 0;

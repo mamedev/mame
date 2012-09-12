@@ -379,7 +379,7 @@ static MACHINE_RESET( buggychl )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 
-	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+	machine.device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 	state->m_sound_nmi_enable = 0;
 	state->m_pending_nmi = 0;

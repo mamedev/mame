@@ -1715,7 +1715,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 		case (0x740/2):
 		{
 			state->soundlatch_byte_w(*space, 0, data & 0xff);
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+			space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
 	}

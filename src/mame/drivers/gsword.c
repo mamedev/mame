@@ -324,7 +324,7 @@ WRITE8_MEMBER(gsword_state::gsword_adpcm_data_w)
 WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )

@@ -2857,7 +2857,7 @@ void sega_genesis_vdp_device::vdp_handle_eof(running_machine &machine)
 	m_sprite_collision=0;//? when to reset this ..
 	megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 	m_imode_odd_frame^=1;
-//      cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
+//      machine.device("genesis_snd_z80")->execute().set_input_line(0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
 
 

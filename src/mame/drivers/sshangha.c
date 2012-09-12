@@ -358,7 +358,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, state);
+	device->machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =

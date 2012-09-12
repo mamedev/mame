@@ -202,7 +202,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 	{
 		if(space.device().safe_pcbase()==0x29e9)// || space.device().safe_pcbase()==0x1b3f) //29f5
 		{
-			cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 //      else
 //          logerror("%x \n", space.device().safe_pcbase());

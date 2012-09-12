@@ -59,7 +59,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				state->m_key_irq_vector = 0xBC;
 			}
-			cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 			break;
 		}
 	}

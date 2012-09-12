@@ -674,7 +674,7 @@ static void mapper4_irq( device_t *device, int scanline, int vblank, int blanked
 
 		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && priorCount)
 		{
-			cputag_set_input_line(device->machine(), "maincpu", 0, HOLD_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 }
@@ -969,7 +969,7 @@ DRIVER_INIT_MEMBER(vsnes_state,platoon)
 WRITE8_MEMBER(vsnes_state::set_bnglngby_irq_w)
 {
 	m_ret = data;
-	cputag_set_input_line(machine(), "maincpu", 0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
 	/* other values ??? */
 	/* 0, 4, 84 */
 }

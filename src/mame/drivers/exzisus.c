@@ -109,7 +109,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_sharedram_ac_w)
 // is it ok that cpub_reset refers to cpuc?
 WRITE8_MEMBER(exzisus_state::exzisus_cpub_reset_w)
 {
-	cputag_set_input_line(machine(), "cpuc", INPUT_LINE_RESET, PULSE_LINE);
+	machine().device("cpuc")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0
@@ -254,7 +254,7 @@ GFXDECODE_END
 
 static void irqhandler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

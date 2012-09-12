@@ -159,7 +159,7 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( clear_irq_cb )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( assert_irq )

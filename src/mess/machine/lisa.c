@@ -164,27 +164,27 @@ static void lisa_field_interrupts(running_machine &machine)
 #if 0
 	if (RSIR)
 		// serial interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int0)
 		// external interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int1)
 		// external interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int2)
 		// external interrupt
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 #endif
 	if (state->m_KBIR)
 		/* COPS VIA interrupt */
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (state->m_FDIR || state->m_VTIR)
 		/* floppy disk or VBl */
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static void set_parity_error_pending(running_machine &machine, int value)
@@ -195,18 +195,18 @@ static void set_parity_error_pending(running_machine &machine, int value)
 	state->m_parity_error_pending = value;
 	if (state->m_parity_error_pending)
 	{
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(M68K_IRQ_7, CLEAR_LINE);
 	}
 #else
 	/* work-around... */
 	if ((! state->m_parity_error_pending) && value)
 	{
 		state->m_parity_error_pending = 1;
-		cputag_set_input_line_and_vector(machine, "maincpu", M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else if (state->m_parity_error_pending && (! value))
 	{
@@ -327,7 +327,7 @@ static void scan_keyboard(running_machine &machine)
 #if 0
 						if (keycode == state->m_NMIcode)
 						{	/* generate NMI interrupt */
-							cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, PULSE_LINE);
+							machine.device("maincpu")->execute().set_input_line(M68K_IRQ_7, PULSE_LINE);
 							device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif

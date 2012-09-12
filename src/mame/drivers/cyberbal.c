@@ -39,8 +39,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "extra", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("extra")->execute().set_input_line(1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -71,15 +71,15 @@ static MACHINE_RESET( cyberbal )
 	cyberbal_sound_reset(machine);
 
 	/* Extra CPU (second M68k) doesn't run until reset */
-	cputag_set_input_line(machine, "extra", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
 static void cyberbal2p_update_interrupts(running_machine &machine)
 {
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(3, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -134,7 +134,7 @@ READ16_MEMBER(cyberbal_state::sound_state_r)
 
 WRITE16_MEMBER(cyberbal_state::p2_reset_w)
 {
-	cputag_set_input_line(machine(), "extra", INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

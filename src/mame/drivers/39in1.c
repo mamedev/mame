@@ -724,8 +724,8 @@ static void pxa255_update_interrupts(running_machine& machine)
 
 	intc_regs->icfp = (intc_regs->icpr & intc_regs->icmr) & intc_regs->iclr;
 	intc_regs->icip = (intc_regs->icpr & intc_regs->icmr) & (~intc_regs->iclr);
-	cputag_set_input_line(machine, "maincpu", ARM7_FIRQ_LINE, intc_regs->icfp ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, intc_regs->icfp ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void pxa255_set_irq_line(running_machine& machine, UINT32 line, int irq_state)

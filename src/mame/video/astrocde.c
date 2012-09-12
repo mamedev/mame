@@ -379,7 +379,7 @@ SCREEN_UPDATE_IND16( profpac )
 
 static TIMER_CALLBACK( interrupt_off )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -393,14 +393,14 @@ static void astrocade_trigger_lightpen(running_machine &machine, UINT8 vfeedback
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((state->m_interrupt_enabl & 0x01) == 0)
 		{
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->m_interrupt_vector & 0xf0);
+			machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_interrupt_vector & 0xf0);
 			state->m_intoff_timer->adjust(machine.primary_screen->time_until_pos(vfeedback));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, state->m_interrupt_vector & 0xf0);
+			machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, state->m_interrupt_vector & 0xf0);
 			state->m_intoff_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1));
 		}
 
@@ -434,14 +434,14 @@ static TIMER_CALLBACK( scanline_callback )
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((state->m_interrupt_enabl & 0x04) == 0)
 		{
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->m_interrupt_vector);
+			machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_interrupt_vector);
 			machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_end(), FUNC(interrupt_off));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, state->m_interrupt_vector);
+			machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, state->m_interrupt_vector);
 			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
 		}
 	}

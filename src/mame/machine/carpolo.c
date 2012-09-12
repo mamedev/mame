@@ -60,7 +60,7 @@
 
 void carpolo_74148_3s_cb(device_t *device)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, ttl74148_output_valid_r(device) ? CLEAR_LINE : ASSERT_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ttl74148_output_valid_r(device) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

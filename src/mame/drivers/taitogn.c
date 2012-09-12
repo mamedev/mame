@@ -893,7 +893,7 @@ static MACHINE_RESET( coh3002t )
 	ide_set_gnet_readlock(machine.device(":card"), 1);
 
 	// halt sound CPU since it has no valid program at start
-	cputag_set_input_line(machine, "mn10200",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	machine.device("mn10200")->execute().set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )

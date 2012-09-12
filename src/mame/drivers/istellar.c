@@ -109,7 +109,7 @@ WRITE8_MEMBER(istellar_state::z80_0_latch2_write)
 	if (m_z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
 		m_z80_2_nmi_enable = 0;
 	}
 }
@@ -320,7 +320,7 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 	device_set_input_line(device, 0, HOLD_LINE);
 
 	/* Interrupt presumably comes from the LDP's status strobe */
-	cputag_set_input_line(device->machine(), "sub", 0, ASSERT_LINE);
+	device->machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

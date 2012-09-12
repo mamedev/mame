@@ -674,7 +674,7 @@ WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 
 	// Active low
 	if (!(m_vsync_latch_preset))
-		cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
@@ -931,8 +931,8 @@ INPUT_PORTS_END
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 5, state, vector);
-//  cputag_set_input_line(device->machine(), "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(5, state, vector);
+//  device->machine().device("maincpu")->execute().set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 
 
@@ -942,7 +942,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 	if (channel == 0)
 	{
 		state->m_d68681_val = data;
-		cputag_set_input_line(device->machine(), "soundcpu", MCS51_RX_LINE, ASSERT_LINE);  // ?
+		device->machine().device("soundcpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 	}
 
 };
@@ -1028,7 +1028,7 @@ static INTERRUPT_GEN( vsync_interrupt )
 {
 	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
 	if (state->m_vsync_latch_preset)
-		cputag_set_input_line(device->machine(), "maincpu", 3, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
 }
 
 

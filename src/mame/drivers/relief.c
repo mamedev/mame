@@ -35,7 +35,7 @@
 static void update_interrupts(running_machine &machine)
 {
 	relief_state *state = machine.driver_data<relief_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

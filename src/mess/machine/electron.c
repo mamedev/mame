@@ -302,12 +302,12 @@ void electron_interrupt_handler(running_machine &machine, int mode, int interrup
 	if ( state->m_ula.interrupt_status & state->m_ula.interrupt_control & ~0x83 )
 	{
 		state->m_ula.interrupt_status |= 0x01;
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE );
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE );
 	}
 	else
 	{
 		state->m_ula.interrupt_status &= ~0x01;
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE );
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE );
 	}
 }
 

@@ -245,7 +245,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(sub_state::subm_to_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(sub_state::nmi_mask_w)
@@ -421,7 +421,7 @@ static INTERRUPT_GEN( subm_sound_irq )
 	sub_state *state = device->machine().driver_data<sub_state>();
 
 	if(state->m_nmi_en)
-		cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( sub, sub_state )

@@ -185,7 +185,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( casloopy )
 {
-	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
+	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
 
 }
 

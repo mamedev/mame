@@ -155,7 +155,7 @@ WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
 
 WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 

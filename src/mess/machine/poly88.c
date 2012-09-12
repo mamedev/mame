@@ -119,7 +119,7 @@ static TIMER_CALLBACK(keyboard_callback)
 	}
 	if (key_code==0 && state->m_last_code !=0){
 		state->m_int_vector = 0xef;
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	} else {
 		state->m_last_code = key_code;
 	}
@@ -247,14 +247,14 @@ const i8251_interface poly88_usart_interface=
 READ8_MEMBER(poly88_state::poly88_keyboard_r)
 {
 	UINT8 retVal = m_last_code;
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	m_last_code = 0x00;
 	return retVal;
 }
 
 WRITE8_MEMBER(poly88_state::poly88_intr_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( poly88 )

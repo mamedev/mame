@@ -287,12 +287,12 @@ static void nc_update_interrupts(running_machine &machine)
 	{
 		logerror("int set %02x\n", state->m_irq_status & state->m_irq_mask);
 		/* set int */
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 	}
 	else
 	{
 		/* clear int */
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	}
 }
 
@@ -515,7 +515,7 @@ static TIMER_DEVICE_CALLBACK(dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 			        LOG(("nmi triggered\n"));
-				    cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+				    timer.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 

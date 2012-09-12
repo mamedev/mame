@@ -91,7 +91,7 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 {
 	soundlatch_byte_w(space,0,data&0xff);
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 

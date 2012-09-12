@@ -1429,7 +1429,7 @@ WRITE16_MEMBER( supracan_state::supracan_sound_w )
 				{
 					/* Reset and enable the sound cpu */
 #if !(SOUNDCPU_BOOT_HACK)
-					cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
+					machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					machine().device("soundcpu")->reset();
 #endif
 				}
@@ -1438,7 +1438,7 @@ WRITE16_MEMBER( supracan_state::supracan_sound_w )
 			else
 			{
 				/* Halt the sound cpu */
-				cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+				machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			}
 			verboselog("maincpu", machine(), 0, "sound cpu ctrl: %04x\n", data);
 			break;
@@ -1783,7 +1783,7 @@ static MACHINE_RESET( supracan )
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
-	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	state->m_video_timer->adjust( machine.primary_screen->time_until_pos( 0, 0 ) );
 	state->m_irq_mask = 0;

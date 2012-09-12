@@ -291,13 +291,13 @@ void mac_state::field_interrupts()
 
 	if (m_last_taken_interrupt > -1)
 	{
-		cputag_set_input_line(machine(), "maincpu", m_last_taken_interrupt, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(m_last_taken_interrupt, CLEAR_LINE);
 		m_last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt > -1)
 	{
-		cputag_set_input_line(machine(), "maincpu", take_interrupt, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(take_interrupt, ASSERT_LINE);
 		m_last_taken_interrupt = take_interrupt;
 	}
 }
@@ -1958,7 +1958,7 @@ WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
         set_memory_overlay(1);
     }
 
-    cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, state);
+    machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
 }
 
 static void mac_state_load(mac_state *mac)

@@ -482,7 +482,7 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 			gpu.mcr = data;
 
 			if (~data & 0x08)
-				cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
+				machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
 
 			break;
 		}
@@ -517,7 +517,7 @@ READ16_MEMBER(atarisy4_state::gpu_r)
 static INTERRUPT_GEN( vblank_int )
 {
 	if (gpu.mcr & 0x08)
-		cputag_set_input_line(device->machine(), "maincpu", 6, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
 }
 
 
@@ -562,8 +562,8 @@ READ16_MEMBER(atarisy4_state::dsp0_status_r)
 
 WRITE16_MEMBER(atarisy4_state::dsp0_control_w)
 {
-	cputag_set_input_line(machine(), "dsp0", INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "dsp0", 0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("dsp0")->execute().set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 
 	m_csr[0] = data;
 }
@@ -596,8 +596,8 @@ READ16_MEMBER(atarisy4_state::dsp1_status_r)
 
 WRITE16_MEMBER(atarisy4_state::dsp1_control_w)
 {
-	cputag_set_input_line(machine(), "dsp1", INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "dsp1", 0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("dsp1")->execute().set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 
 	m_csr[1] = data;
 }
@@ -1001,13 +1001,13 @@ DRIVER_INIT_MEMBER(atarisy4_state,airrace)
 
 static MACHINE_RESET( atarisy4 )
 {
-	cputag_set_input_line(machine, "dsp0", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_RESET( airrace )
 {
-	cputag_set_input_line(machine, "dsp0", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(machine, "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

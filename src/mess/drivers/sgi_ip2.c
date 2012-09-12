@@ -412,7 +412,7 @@ ADDRESS_MAP_END
 static void duarta_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	verboselog(device->machine(), 0, "duarta_irq_handler\n");
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 };
 
 static UINT8 duarta_input(device_t *device)
@@ -444,7 +444,7 @@ static const duart68681_config sgi_ip2_duart68681a_config =
 static void duartb_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	verboselog(device->machine(), 0, "duartb_irq_handler\n");
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 };
 
 static UINT8 duartb_input(device_t *device)

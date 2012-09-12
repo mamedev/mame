@@ -673,13 +673,13 @@ static void update_irq_state(running_machine &machine)
 	if ((state->m_irq_enable & state->m_irq_state) || state->m_scsi_irq_state)
 	{
 //      printf("IRQ set: state %x enable %x scsi %x\n", state->m_irq_state, state->m_irq_enable, state->m_scsi_irq_state);
-		cputag_set_input_line(machine, "maincpu", PPC_IRQ, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(PPC_IRQ, ASSERT_LINE);
 		state->m_scsi_irq_state = 0;
 	}
 	else
 	{
 //      printf("IRQ clear: state %x enable %x scsi %x\n", state->m_irq_state, state->m_irq_enable, state->m_scsi_irq_state);
-		cputag_set_input_line(machine, "maincpu", PPC_IRQ, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(PPC_IRQ, CLEAR_LINE);
 	}
 }
 
@@ -5226,10 +5226,10 @@ static void scsp_irq(device_t *device, int irq)
 	if (irq > 0)
 	{
 		state->m_scsp_last_line = irq;
-		cputag_set_input_line(device->machine(), "audiocpu", irq, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
 	}
 	else
-		cputag_set_input_line(device->machine(), "audiocpu", -irq, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(-irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

@@ -426,7 +426,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
-	cputag_set_input_line(machine, "master", 0, HOLD_LINE);
+	machine.device("master")->execute().set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	scanline += 16;
@@ -442,7 +442,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	int scanline = param;
 
 	/* interrupts generated according to the interrupt control register */
-	cputag_set_input_line(machine, "master", 0, HOLD_LINE);
+	machine.device("master")->execute().set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	state->m_master_int_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
@@ -1102,7 +1102,7 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 		case 0x02:	/* /GIN2 */
 		case 0x12:
-			cputag_set_input_line(machine(), "master", INPUT_LINE_NMI, CLEAR_LINE);
+			machine().device("master")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 0x03:	/* /IGID */
@@ -1134,10 +1134,10 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 	switch (offset)
 	{
 		case 0x09:	/* /MCONT */
-			cputag_set_input_line(machine(), "slave", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			m_wcol_enable = (data & 0x02);
-			cputag_set_input_line(machine(), "slave", INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cputag_set_input_line(machine(), "slave", 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("slave")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("slave")->execute().set_input_line(0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 			eeprom = machine().device<eeprom_device>("eeprom");
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", space.device().safe_pc(),
@@ -1210,9 +1210,9 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 			break;
 
 		case 0x05:	/* /SLV0 */
-			cputag_set_input_line(machine(), "slave", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			cputag_set_input_line(machine(), "slave", INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cputag_set_input_line(machine(), "slave", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("slave")->execute().set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("slave")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x08:	/*  */

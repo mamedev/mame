@@ -187,7 +187,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
-				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 
@@ -196,7 +196,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
-			cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
+			machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
 			break;
 
 		case 0xa: /* Mix Psel(?). */
@@ -226,7 +226,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
-				cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
+				machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 			}
 			break;
 
@@ -259,7 +259,7 @@ WRITE16_MEMBER(dec0_state::slyspy_control_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
-				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -273,7 +273,7 @@ WRITE16_MEMBER(dec0_state::midres_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1287,12 +1287,12 @@ GFXDECODE_END
 
 static void sound_irq(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, linestate); /* IRQ */
+	device->machine().device("audiocpu")->execute().set_input_line(0, linestate); /* IRQ */
 }
 
 static void sound_irq2(device_t *device, int linestate)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 1, linestate); /* IRQ2 */
+	device->machine().device("audiocpu")->execute().set_input_line(1, linestate); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =
@@ -1385,7 +1385,7 @@ static void automat_vclk_cb(device_t *device)
 	else
 	{
 		msm5205_data_w(device, state->m_automat_adpcm_byte >> 4);
-		//cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
+		//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
 	}
 
 	state->m_automat_msm5205_vclk_toggle ^= 1;

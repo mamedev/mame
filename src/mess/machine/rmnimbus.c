@@ -345,7 +345,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	state->m_i186.intr.poll_status = 0x8000 | new_vector;
 	if (!state->m_i186.intr.pending)
-		cputag_set_input_line(machine, MAINCPU_TAG, 0, ASSERT_LINE);
+		machine.device(MAINCPU_TAG)->execute().set_input_line(0, ASSERT_LINE);
 	state->m_i186.intr.pending = 1;
 	machine.scheduler().trigger(CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");

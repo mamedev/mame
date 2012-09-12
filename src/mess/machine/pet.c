@@ -728,14 +728,14 @@ MACHINE_RESET( pet )
 		state->m_spet.rom = 0;
 		if (machine.root_device().ioport("CFG")->read() & 0x04)
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 1);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 0);
 			state->m_font = 2;
 		}
 		else
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 0);
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, 1);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 0);
+			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, 1);
 			state->m_font = 0;
 		}
 	}

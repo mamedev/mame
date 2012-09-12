@@ -785,7 +785,7 @@ WRITE_LINE_DEVICE_HANDLER( sms_pause_callback )
 	{
 		if (!driver_state->m_paused)
 		{
-			cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 		driver_state->m_paused = 1;
 	}

@@ -691,7 +691,7 @@ static WRITE8_DEVICE_HANDLER( mz2000_portc_w )
 	{
 		state->m_ipl_enable = 0;
 		/* correct? */
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	beep_set_state(device->machine().device(BEEPER_TAG),data & 0x04);

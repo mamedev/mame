@@ -665,11 +665,11 @@ static void epic_update_interrupts(running_machine &machine)
 			printf("vector = %02X\n", epic.iack);
 #endif
 
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 

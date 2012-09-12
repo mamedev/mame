@@ -174,7 +174,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 
 static void sym1_irq(device_t *device, int level)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, level);
+	device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, level);
 }
 
 

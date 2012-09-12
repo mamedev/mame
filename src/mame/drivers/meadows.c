@@ -198,7 +198,7 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
 
 INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 {
-	cputag_set_input_line_and_vector(machine(), "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	machine().device("maincpu")->execute().set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
 
 

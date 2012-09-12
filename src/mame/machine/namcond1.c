@@ -48,7 +48,7 @@ MACHINE_RESET( namcond1 )
     state->m_h8_irq5_enabled = 0;
 
     // halt the MCU
-    cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+    machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 // instance of the shared ram pointer
@@ -96,7 +96,7 @@ WRITE16_MEMBER(namcond1_state::namcond1_cuskey_w)
             // this is a kludge until we emulate the h8
 	    if ((m_h8_irq5_enabled == 0) && (data != 0x0000))
 	    {
-	    	cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
+	    	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	    }
             m_h8_irq5_enabled = ( data != 0x0000 );
             break;

@@ -83,7 +83,7 @@ enum COMPIS_INTERRUPT_REQUESTS
 void compis_irq_set(UINT8 irq)
 {
 	cputag_set_input_line_vector(machine, "maincpu", 0, irq);
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 #endif
 
@@ -523,7 +523,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	state->m_i186.intr.poll_status = 0x8000 | new_vector;
 	if (!state->m_i186.intr.pending)
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 	state->m_i186.intr.pending = 1;
 	machine.scheduler().trigger(CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
@@ -1325,7 +1325,7 @@ static void compis_cpu_init(running_machine &machine)
 
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_master_set_int_line )
 {
-	cputag_set_input_line(machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )

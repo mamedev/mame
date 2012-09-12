@@ -387,7 +387,7 @@ INPUT_PORTS_END
 
 static void bigbord2_interrupt(device_t *device, int state)
 {
-	cputag_set_input_line(device->machine(), Z80_TAG, 0, state);
+	device->machine().device(Z80_TAG)->execute().set_input_line(0, state);
 }
 
 const z80sio_interface sio_intf =

@@ -3933,7 +3933,7 @@ MACHINE_CONFIG_END
 
 static void sound_irq(device_t *device, int state)
 {
-//   cputag_set_input_line(machine, "maincpu", 3, state);
+//   machine.device("maincpu")->execute().set_input_line(3, state);
 }
 
 static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )

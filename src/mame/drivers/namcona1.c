@@ -719,7 +719,7 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_68k)
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		cputag_set_input_line(machine(), "mcu", M37710_LINE_IRQ0, HOLD_LINE);
+		machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&m_mcu_mailbox[offset%8]);
 
@@ -847,7 +847,7 @@ WRITE8_MEMBER(namcona1_state::port4_w)
 		logerror("launching 68k, PC=%x\n", space.device().safe_pc());
 
 		// reset and launch the 68k
-		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	m_mcu_port4 = data;
@@ -924,7 +924,7 @@ static MACHINE_START( namcona1 )
 static MACHINE_RESET( namcona1_mcu )
 {
 	namcona1_state *state = machine.driver_data<namcona1_state>();
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	state->m_mcu_port5 = 1;
 }

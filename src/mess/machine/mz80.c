@@ -69,7 +69,7 @@ WRITE_LINE_MEMBER( mz80_state::pit_out0_changed )
 
 WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )
 {
-	cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 I8255_INTERFACE( mz80k_8255_int )

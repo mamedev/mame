@@ -43,7 +43,7 @@
 
 WRITE_LINE_MEMBER(esripsys_state::ptm_irq)
 {
-	cputag_set_input_line(machine(), "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("sound_cpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -111,14 +111,14 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
 	membank("bank1")->set_base(&rom[bankaddress]);
 
-	cputag_set_input_line(machine(), "frame_cpu", M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine(), "frame_cpu", INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("frame_cpu")->execute().set_input_line(M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("frame_cpu")->execute().set_input_line(INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
 
-	cputag_set_input_line(machine(), "video_cpu", INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("video_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /VBLANK IRQ acknowledge */
 	if (!(data & 0x20))
-		cputag_set_input_line(machine(), "game_cpu", M6809_IRQ_LINE, CLEAR_LINE);
+		machine().device("game_cpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -347,7 +347,7 @@ WRITE8_MEMBER(esripsys_state::g_ioadd_w)
 			}
 			case 0x02:
 			{
-				cputag_set_input_line(machine(), "sound_cpu", INPUT_LINE_NMI, m_g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
+				machine().device("sound_cpu")->execute().set_input_line(INPUT_LINE_NMI, m_g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
 
 				if (!(m_g_to_s_latch2 & 1) && (m_g_iodata & 1))
 				{
@@ -355,7 +355,7 @@ WRITE8_MEMBER(esripsys_state::g_ioadd_w)
 					m_u56a = 1;
 
 					/*...causing a sound CPU /IRQ */
-					cputag_set_input_line(machine(), "sound_cpu", M6809_IRQ_LINE, ASSERT_LINE);
+					machine().device("sound_cpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 				}
 
 				if (m_g_iodata & 2)
@@ -408,7 +408,7 @@ INPUT_CHANGED_MEMBER(esripsys_state::keypad_interrupt)
 	{
 		m_io_firq_status |= 2;
 		m_keypad_status |= 0x20;
-		cputag_set_input_line(machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
+		machine().device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -418,7 +418,7 @@ INPUT_CHANGED_MEMBER(esripsys_state::coin_interrupt)
 	{
 		m_io_firq_status |= 2;
 		m_coin_latch = ioport("COINS")->read() << 2;
-		cputag_set_input_line(machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
+		machine().device("game_cpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -499,7 +499,7 @@ WRITE8_MEMBER(esripsys_state::s_200f_w)
 	if (m_s_to_g_latch2 & 0x40)
 	{
 		m_u56a = 0;
-		cputag_set_input_line(machine(), "sound_cpu", M6809_IRQ_LINE, CLEAR_LINE);
+		machine().device("sound_cpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	}
 
 	if (!(m_s_to_g_latch2 & 0x80) && (data & 0x80))

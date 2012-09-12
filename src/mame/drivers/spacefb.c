@@ -132,7 +132,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	/* compute vector and set the interrupt line */
 	int vpos = machine.primary_screen->vpos();
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, vector);
+	machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)

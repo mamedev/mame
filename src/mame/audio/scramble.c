@@ -115,18 +115,18 @@ WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback )
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
 	if (device->machine().device("audiocpu"))
-		cputag_set_input_line(device->machine(), "audiocpu", 0, !state ? ASSERT_LINE : CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(0, !state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
 	driver_device *drvstate = device->machine().driver_data<driver_device>();
-	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 	return drvstate->soundlatch_byte_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
 }
 

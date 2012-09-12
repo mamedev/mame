@@ -117,7 +117,7 @@ static TIMER_CALLBACK( setvector_callback )
 	if (state->irqvector == 0)
 		logerror("You didn't call m72_init_sound()\n");
 
-	cputag_set_input_line_and_vector(machine, "soundcpu", 0, (state->irqvector == 0xff) ? CLEAR_LINE : ASSERT_LINE, state->irqvector);
+	machine.device("soundcpu")->execute().set_input_line_and_vector(0, (state->irqvector == 0xff) ? CLEAR_LINE : ASSERT_LINE, state->irqvector);
 }
 
 static DEVICE_START( m72_audio )

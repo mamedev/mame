@@ -213,7 +213,7 @@ void ti_fdc_device::handle_hold()
 		state = CLEAR_LINE;
 
 	m_slot->set_ready((state==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
-//  cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state);
+//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
 }
 
 /*

@@ -286,7 +286,7 @@ WRITE8_MEMBER(kingdrby_state::hopper_io_w)
 
 WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 {
-	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// soundlatch_byte_w(space,0, data);

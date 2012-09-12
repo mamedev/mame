@@ -438,14 +438,14 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 							if (machine().device("soundcpu"))
 							{
 								if (new_data & 0x10)
-									cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+									machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 								else
-									cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+									machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 							}
 							break;
 
 		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);
-							cputag_set_input_line(machine(), "soundcpu", 4, HOLD_LINE);
+							machine().device("soundcpu")->execute().set_input_line(4, HOLD_LINE);
 							break;
 
 		default		 :	SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -490,14 +490,14 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_C_w)
 
 		case 0x2308/2   :	m_screen_flag = new_data;
 							if (new_data & 0x10)
-								cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+								machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+								machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
 							soundlatch_word_w(space, 0, new_data, 0xffff);
-							cputag_set_input_line(machine(), "soundcpu", 2, HOLD_LINE);
+							machine().device("soundcpu")->execute().set_input_line(2, HOLD_LINE);
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X", offset * 2, data);

@@ -67,10 +67,10 @@ static TIMER_DEVICE_CALLBACK( dbz_scanline )
 	int scanline = param;
 
 	if(scanline == 256) // vblank-out irq
-		cputag_set_input_line(timer.machine(), "maincpu", M68K_IRQ_2, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, ASSERT_LINE);
 
 	if(scanline == 0 && k053246_is_irq_enabled(state->m_k053246)) // vblank-in irq
-		cputag_set_input_line(timer.machine(), "maincpu", M68K_IRQ_4, HOLD_LINE); //auto-acks apparently
+		timer.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, HOLD_LINE); //auto-acks apparently
 }
 
 #if 0
@@ -333,7 +333,7 @@ static const k053936_interface dbz_k053936_intf =
 
 WRITE_LINE_MEMBER(dbz_state::dbz_irq2_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", M68K_IRQ_2, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
 
 

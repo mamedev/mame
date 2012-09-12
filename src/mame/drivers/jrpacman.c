@@ -119,7 +119,7 @@ public:
 WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
 {
 	device_set_input_line_vector(machine().device("maincpu"), 0, data);
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(jrpacman_state::irq_mask_w)

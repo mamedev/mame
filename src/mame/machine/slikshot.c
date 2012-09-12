@@ -496,7 +496,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
 	if ((data & 0x10) || machine.device("sub")->state().state_int(Z80_PC) == 0x13a)
 	{
-		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* on the rising edge, make the crosshair visible again */
 		if ((data & 0x10) && !(state->m_z80_ctrl & 0x10))

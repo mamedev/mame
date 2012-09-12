@@ -97,7 +97,7 @@ CUSTOM_INPUT_MEMBER(ultrsprt_state::analog_ctrl_r)
 
 WRITE32_MEMBER(ultrsprt_state::int_ack_w)
 {
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 static MACHINE_START( ultrsprt )
@@ -213,7 +213,7 @@ static void sound_irq_callback(running_machine &machine, int irq)
 	if (irq == 0)
 		/*generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ5, 1)*/;
 	else
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
+		machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
 static const k056800_interface ultrsprt_k056800_interface =

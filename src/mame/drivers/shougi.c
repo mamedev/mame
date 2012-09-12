@@ -246,13 +246,13 @@ WRITE8_MEMBER(shougi_state::shougi_watchdog_reset_w)
 WRITE8_MEMBER(shougi_state::shougi_mcu_halt_off_w)
 {
 	/* logerror("mcu HALT OFF"); */
-	cputag_set_input_line(machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+	machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(shougi_state::shougi_mcu_halt_on_w)
 {
 	/* logerror("mcu HALT ON"); */
-	cputag_set_input_line(machine(), "mcu", INPUT_LINE_HALT,ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 
@@ -262,8 +262,8 @@ WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
 	m_nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(shougi_state::nmi_enable_w)
@@ -279,8 +279,8 @@ static INTERRUPT_GEN( shougi_vblank_nmi )
 	if ( state->m_nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-		cputag_set_input_line(device->machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		device->machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 

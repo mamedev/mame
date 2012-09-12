@@ -352,7 +352,7 @@ C - uses sub board with support for player 3 and 4 controls
 
 WRITE8_MEMBER(namcos1_state::namcos1_sub_firq_w)
 {
-	cputag_set_input_line(machine(), "sub", M6809_FIRQ_LINE, ASSERT_LINE);
+	machine().device("sub")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(namcos1_state::irq_ack_w)
@@ -1058,7 +1058,7 @@ GFXDECODE_END
 
 static void namcos1_sound_interrupt( device_t *device, int irq )
 {
-	cputag_set_input_line(device->machine(), "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

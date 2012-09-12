@@ -194,7 +194,7 @@ static MACHINE_START( cloud9 )
 static MACHINE_RESET( cloud9 )
 {
 	cloud9_state *state = machine.driver_data<cloud9_state>();
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	state->m_irq_state = 0;
 }
 

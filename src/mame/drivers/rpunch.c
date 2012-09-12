@@ -126,7 +126,7 @@ static void ym2151_irq_gen(device_t *device, int state)
 {
 	rpunch_state *drvstate = device->machine().driver_data<rpunch_state>();
 	drvstate->m_ym2151_irq = state;
-	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->m_ym2151_irq | drvstate->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, (drvstate->m_ym2151_irq | drvstate->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -161,7 +161,7 @@ static TIMER_CALLBACK( sound_command_w_callback )
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	state->m_sound_busy = 1;
 	state->m_sound_data = param;
-	cputag_set_input_line(machine, "audiocpu", 0, (state->m_ym2151_irq | state->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("audiocpu")->execute().set_input_line(0, (state->m_ym2151_irq | state->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -175,7 +175,7 @@ WRITE16_MEMBER(rpunch_state::sound_command_w)
 READ8_MEMBER(rpunch_state::sound_command_r)
 {
 	m_sound_busy = 0;
-	cputag_set_input_line(machine(), "audiocpu", 0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 	return m_sound_data;
 }
 

@@ -64,7 +64,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 
 WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)

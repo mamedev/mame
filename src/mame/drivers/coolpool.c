@@ -225,7 +225,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 
 	/* bits 10-15 are counted down over time */
 
-	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
@@ -251,7 +251,7 @@ READ16_MEMBER(coolpool_state::amerdart_iop_r)
 {
 
 //  logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
-	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 
 	return m_iop_answer;
 }
@@ -277,7 +277,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
 
 //  logerror("%08x:DSP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
-	cputag_set_input_line(machine(), "maincpu", 1, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 }
 
 
@@ -444,7 +444,7 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 	coin_counter_w(machine(), 0, ~data & 0x0001);
 	coin_counter_w(machine(), 1, ~data & 0x0002);
 
-	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -462,7 +462,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 
 	state->m_iop_cmd = param;
 	state->m_cmd_pending = 1;
-	cputag_set_input_line(machine, "dsp", 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
+	machine.device("dsp")->execute().set_input_line(0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
 	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
@@ -480,7 +480,7 @@ READ16_MEMBER(coolpool_state::coolpool_iop_r)
 {
 
 	logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
-	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 
 	return m_iop_answer;
 }
@@ -508,7 +508,7 @@ WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 
 	logerror("%08x:IOP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
-	cputag_set_input_line(machine(), "maincpu", 1, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 }
 
 

@@ -743,7 +743,7 @@ READ8_MEMBER(videopkr_state::videopkr_t0_latch)
 WRITE8_MEMBER(videopkr_state::prog_w)
 {
 	if (!data)
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);	/* clear interrupt FF */
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);	/* clear interrupt FF */
 }
 
 /*************************
@@ -935,7 +935,7 @@ static TIMER_DEVICE_CALLBACK(sound_t1_callback)
 
 		if (state->m_dc_40103 == 0)
 		{
-			cputag_set_input_line(timer.machine(), "soundcpu", 0, ASSERT_LINE);
+			timer.machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 		}
 	}
 }

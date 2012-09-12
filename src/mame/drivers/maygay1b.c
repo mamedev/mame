@@ -550,7 +550,7 @@ static MACHINE_RESET( m1 )
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, state);
+	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state);
 	LOG(("6809 irq%d \n",state));
 }
 
@@ -564,7 +564,7 @@ static void cpu0_firq(int state)
 
 static void cpu0_nmi(running_machine &machine, int state)
 {
-	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 nmi%d \n",state));
 }
 

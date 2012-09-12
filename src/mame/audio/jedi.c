@@ -60,7 +60,7 @@ static SOUND_RESET( jedi )
 
 WRITE8_MEMBER(jedi_state::irq_ack_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -73,7 +73,7 @@ WRITE8_MEMBER(jedi_state::irq_ack_w)
 
 WRITE8_MEMBER(jedi_state::jedi_audio_reset_w)
 {
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

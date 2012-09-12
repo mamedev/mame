@@ -973,7 +973,7 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	state->m_n7751_command = data & 0x07;
-	cputag_set_input_line(device->machine(), "audiocpu", 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

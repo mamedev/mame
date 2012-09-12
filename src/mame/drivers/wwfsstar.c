@@ -209,7 +209,7 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_scrollwrite)
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_soundwrite)
 {
 	soundlatch_byte_w(space, 1, data & 0xff);
-	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_flipscreen_w)
@@ -220,10 +220,10 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_flipscreen_w)
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_irqack_w)
 {
 	if (offset == 0)
-		cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
 
 	else
-		cputag_set_input_line(machine(), "maincpu", 5, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
 }
 
 /*
@@ -260,14 +260,14 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 	{
 		if (scanline > 0)
 			timer.machine().primary_screen->update_partial(scanline - 1);
-		cputag_set_input_line(timer.machine(), "maincpu", 5, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 240 */
 	if (scanline == 240)
 	{
 		timer.machine().primary_screen->update_partial(scanline - 1);
-		cputag_set_input_line(timer.machine(), "maincpu", 6, ASSERT_LINE);
+		timer.machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
 	}
 }
 
@@ -409,7 +409,7 @@ GFXDECODE_END
 
 static void wwfsstar_ymirq_handler(device_t *device, int irq)
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	device->machine().device("audiocpu")->execute().set_input_line(0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

@@ -181,7 +181,7 @@ Notes:
 WRITE8_MEMBER(pacland_state::pacland_subreset_w)
 {
 	int bit = !BIT(offset,11);
-	cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(pacland_state::pacland_flipscreen_w)
@@ -222,7 +222,7 @@ WRITE8_MEMBER(pacland_state::pacland_irq_1_ctrl_w)
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
 	if (!bit)
-		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(pacland_state::pacland_irq_2_ctrl_w)
@@ -230,7 +230,7 @@ WRITE8_MEMBER(pacland_state::pacland_irq_2_ctrl_w)
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;
 	if (!bit)
-		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
+		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -401,7 +401,7 @@ static INTERRUPT_GEN( main_vblank_irq )
 	pacland_state *state = device->machine().driver_data<pacland_state>();
 
 	if(state->m_main_irq_mask)
-		cputag_set_input_line(device->machine(), "maincpu", 0, ASSERT_LINE);
+		device->machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( mcu_vblank_irq )
@@ -409,7 +409,7 @@ static INTERRUPT_GEN( mcu_vblank_irq )
 	pacland_state *state = device->machine().driver_data<pacland_state>();
 
 	if(state->m_mcu_irq_mask)
-		cputag_set_input_line(device->machine(), "mcu", 0, ASSERT_LINE);
+		device->machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( pacland, pacland_state )

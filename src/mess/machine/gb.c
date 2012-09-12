@@ -1915,7 +1915,7 @@ static TIMER_CALLBACK(gb_serial_timer_proc)
 	{
 		state->SIOCONT &= 0x7F;
 		state->m_gb_serial_timer->enable( 0 );
-		cputag_set_input_line(machine, "maincpu", SIO_INT, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(SIO_INT, ASSERT_LINE);
 	}
 }
 
@@ -1929,7 +1929,7 @@ INLINE void gb_timer_check_irq( running_machine &machine )
 		if ( state->TIMECNT == 0 )
 		{
 			state->TIMECNT = state->TIMEMOD;
-			cputag_set_input_line(machine, "maincpu", TIM_INT, ASSERT_LINE );
+			machine.device("maincpu")->execute().set_input_line(TIM_INT, ASSERT_LINE );
 			state->m_reloading = 1;
 		}
 	}

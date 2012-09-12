@@ -91,7 +91,7 @@ READ8_MEMBER(poolshrk_state::poolshrk_input_r)
 
 READ8_MEMBER(poolshrk_state::poolshrk_irq_reset_r)
 {
-	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 
 	return 0;
 }

@@ -1248,7 +1248,7 @@ INPUT_PORTS_END
 static void  segac2_irq2_interrupt(device_t *device, int state)
 {
 	//printf("sound irq %d\n", state);
-	cputag_set_input_line(device->machine(), "maincpu", 2, state ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {
@@ -1343,7 +1343,7 @@ static SCREEN_UPDATE_RGB32(segac2_new)
 void genesis_vdp_sndirqline_callback_segac2(running_machine &machine, bool state)
 {
 	if (state==true)
-		cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
@@ -1356,9 +1356,9 @@ void genesis_vdp_lv6irqline_callback_segac2(running_machine &machine, bool state
 void genesis_vdp_lv4irqline_callback_segac2(running_machine &machine, bool state)
 {
 	if (state==true)
-		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+		machine.device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 	else
-		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
 }
 
 static const sega315_5124_interface sms_vdp_ntsc_intf =

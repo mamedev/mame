@@ -68,7 +68,7 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 	if ((data & 0x80) == 0)
 		drvstate->soundlatch_byte_w(*space, 0, data & 0x7f);
 	else
-		cputag_set_input_line(space->machine(), "iremsound", 0, ASSERT_LINE);
+		space->machine().device("iremsound")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -182,7 +182,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cputag_set_input_line(space->machine(), "iremsound", 0, CLEAR_LINE);
+	space->machine().device("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -223,7 +223,7 @@ static void adpcm_int(device_t *device)
 {
 	device_t *adpcm2 = device->machine().device("msm2");
 
-	cputag_set_input_line(device->machine(), "iremsound", INPUT_LINE_NMI, PULSE_LINE);
+	device->machine().device("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (adpcm2 != NULL)

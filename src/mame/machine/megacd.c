@@ -153,31 +153,31 @@ segacd_t segacd;
 #define CHECK_SCD_LV5_INTERRUPT \
 	if (segacd_irq_mask & 0x20) \
 	{ \
-		cputag_set_input_line(machine, "segacd_68k", 5, HOLD_LINE); \
+		machine.device("segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV4_INTERRUPT \
 	if (segacd_irq_mask & 0x10) \
 	{ \
-		cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE); \
+		machine.device("segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV3_INTERRUPT \
 	if (segacd_irq_mask & 0x08) \
 	{ \
-		cputag_set_input_line(machine, "segacd_68k", 3, HOLD_LINE); \
+		machine.device("segacd_68k")->execute().set_input_line(3, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV2_INTERRUPT \
 	if (segacd_irq_mask & 0x04) \
 	{ \
-		cputag_set_input_line(machine, "segacd_68k", 2, HOLD_LINE); \
+		machine.device("segacd_68k")->execute().set_input_line(2, HOLD_LINE); \
 	} \
 
 #define CHECK_SCD_LV1_INTERRUPT \
 	if (segacd_irq_mask & 0x02) \
 	{ \
-		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE); \
+		machine.device("segacd_68k")->execute().set_input_line(1, HOLD_LINE); \
 	} \
 
 #define CURRENT_TRACK_IS_DATA \
@@ -1174,24 +1174,24 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 		// reset line
 		if (a12000_halt_reset_reg&0x0001)
 		{
-			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
+			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			if (!(old_halt&0x0001)) printf("clear reset slave\n");
 		}
 		else
 		{
-			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
+			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			if ((old_halt&0x0001)) printf("assert reset slave\n");
 		}
 
 		// request BUS
 		if (a12000_halt_reset_reg&0x0002)
 		{
-			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
+			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			if (!(old_halt&0x0002)) printf("halt slave\n");
 		}
 		else
 		{
-			cputag_set_input_line(space->machine(), "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
+			space->machine().device("segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			if ((old_halt&0x0002)) printf("resume slave\n");
 		}
 	}
@@ -1480,7 +1480,7 @@ static IRQ_CALLBACK(segacd_sub_int_callback)
 	{
 		// clear this bit
 		a12000_halt_reset_reg &= ~0x0100;
-		cputag_set_input_line(device->machine(), "segacd_68k", 2, CLEAR_LINE);
+		device->machine().device("segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
 	}
 
 	return (0x60+irqline*4)/4; // vector address
