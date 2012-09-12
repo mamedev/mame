@@ -27,7 +27,9 @@ public:
 		m_chip_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
 		m_turbo_chip_squeak(*this, "tcs"),
-		m_squawk_n_talk(*this, "snt")
+		m_squawk_n_talk(*this, "snt"),
+		m_dpoker_coin_in_timer(*this, "dp_coinin"),
+		m_dpoker_hopper_timer(*this, "dp_hopper")
 	{ }
 
 	// these should be required but can't because mcr68 shares with us
@@ -41,6 +43,8 @@ public:
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
 	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
+	optional_device<timer_device> m_dpoker_coin_in_timer;
+	optional_device<timer_device> m_dpoker_hopper_timer;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);
@@ -54,6 +58,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mcr_91490_videoram_w);
 	DECLARE_READ8_MEMBER(solarfox_ip0_r);
 	DECLARE_READ8_MEMBER(solarfox_ip1_r);
+	DECLARE_READ8_MEMBER(dpoker_ip0_r);
+	DECLARE_WRITE8_MEMBER(dpoker_p2c_w);
+	DECLARE_WRITE8_MEMBER(dpoker_p30_w);
+	DECLARE_WRITE8_MEMBER(dpoker_p34_w);
 	DECLARE_READ8_MEMBER(kick_ip1_r);
 	DECLARE_WRITE8_MEMBER(wacko_op4_w);
 	DECLARE_READ8_MEMBER(wacko_ip1_r);
@@ -69,9 +77,13 @@ public:
 	DECLARE_READ8_MEMBER(demoderb_ip2_r);
 	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(dpoker_coin_in_hit);
+
 	DECLARE_DRIVER_INIT(mcr_91490);
 	DECLARE_DRIVER_INIT(kroozr);
+	DECLARE_DRIVER_INIT(solarfox);
 	DECLARE_DRIVER_INIT(kick);
+	DECLARE_DRIVER_INIT(dpoker);
 	DECLARE_DRIVER_INIT(twotiger);
 	DECLARE_DRIVER_INIT(demoderb);
 	DECLARE_DRIVER_INIT(wacko);
@@ -79,8 +91,6 @@ public:
 	DECLARE_DRIVER_INIT(dotrone);
 	DECLARE_DRIVER_INIT(nflfoot);
 	DECLARE_DRIVER_INIT(journey);
-	DECLARE_DRIVER_INIT(solarfox);
-	DECLARE_DRIVER_INIT(dpoker);
 
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);

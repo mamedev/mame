@@ -21,9 +21,6 @@
         * Demolition Derby (Turbo Chip Squeak)
         * Draw Poker
 
-    Known bugs:
-        * dpoker needs coincounters and hopper
-
 ****************************************************************************
 
     Early MCR systems have three PCBs, which can be intermixed to a certain
@@ -294,6 +291,9 @@
 static UINT8 input_mux;
 static UINT8 last_op4;
 
+static UINT8 dpoker_coin_status;
+static UINT8 dpoker_output_34;
+
 static UINT8 nflfoot_serial_out_active;
 static UINT8 nflfoot_serial_out_bits;
 static UINT8 nflfoot_serial_out_numbits;
@@ -327,7 +327,7 @@ WRITE8_MEMBER(mcr_state::mcr_control_port_w)
 
 /*************************************
  *
- *  Solar Fox input ports
+ *  Solar Fox I/O ports
  *
  *************************************/
 
@@ -358,7 +358,7 @@ READ8_MEMBER(mcr_state::solarfox_ip1_r)
 
 /*************************************
  *
- *  Kick input ports
+ *  Kick I/O ports
  *
  *************************************/
 
@@ -371,7 +371,103 @@ READ8_MEMBER(mcr_state::kick_ip1_r)
 
 /*************************************
  *
- *  Wacko input ports
+ *  Draw Poker I/O ports
+ *
+ *************************************/
+
+TIMER_DEVICE_CALLBACK( dpoker_hopper_callback )
+{
+	mcr_state *state = timer.machine().driver_data<mcr_state>();
+
+	if (dpoker_output_34 & 0x40)
+	{
+		// hopper timing is a guesstimate
+		dpoker_coin_status ^= 8;
+		state->m_dpoker_hopper_timer->adjust(attotime::from_msec((dpoker_coin_status & 8) ? 100 : 250));
+	}
+	else
+	{
+		dpoker_coin_status &= ~8;
+	}
+	
+	coin_counter_w(timer.machine(), 0, dpoker_output_34 & 8);
+}
+
+TIMER_DEVICE_CALLBACK( dpoker_coin_in_callback )
+{
+	dpoker_coin_status &= ~2;
+}
+
+INPUT_CHANGED_MEMBER(mcr_state::dpoker_coin_in_hit)
+{
+	if (newval)
+	{
+		// The game waits for coin release before it accepts another.
+		// It probably does this to prevent tampering, good old coin-on-a-string won't work here.
+		dpoker_coin_status |= 2;
+		m_dpoker_coin_in_timer->adjust(attotime::from_msec(100));
+	}
+}
+
+READ8_MEMBER(mcr_state::dpoker_ip0_r)
+{
+	// d0: Coin-in Hit
+	// d1: Coin-in Release
+	// d2: Coin-out Up
+	// d3: Coin-out Down
+	// d6: Coin-drop Hit
+	// d7: Coin-drop Release
+	UINT8 p0 = ioport("ssio:IP0")->read();
+	p0 |= (dpoker_coin_status >> 1 & 1);
+	p0 ^= (p0 << 1 & 0x80) | dpoker_coin_status;
+	return p0;
+}
+
+
+WRITE8_MEMBER(mcr_state::dpoker_p2c_w)
+{
+	// cpanel button lamps
+	output_set_lamp_value(0, data >> 0 & 1); // hold 0
+	output_set_lamp_value(1, data >> 4 & 1); // hold 1
+	output_set_lamp_value(2, data >> 5 & 1); // hold 2
+	output_set_lamp_value(3, data >> 6 & 1); // hold 3
+	output_set_lamp_value(4, data >> 7 & 1); // hold 4
+	output_set_lamp_value(5, data >> 1 & 1); // deal
+	output_set_lamp_value(6, data >> 2 & 1); // cancel
+	output_set_lamp_value(7, data >> 3 & 1); // stand
+}
+
+WRITE8_MEMBER(mcr_state::dpoker_p30_w)
+{
+	// d5: button lamp: service or change
+	output_set_lamp_value(8, data >> 1 & 1);
+	
+	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
+	for (int i = 0; i < 5; i++)
+		output_set_lamp_value(9 + i, data >> i & 1);
+	
+	// d6, d7: unused?
+}
+
+WRITE8_MEMBER(mcr_state::dpoker_p34_w)
+{
+	// d0: ? coin return
+	// d1: ? divertor (active low)
+	// d3: coin counter?
+	
+	// d6: assume hopper coin flow
+	// d7: assume hopper motor
+	if (data & 0x40 & ~dpoker_output_34)
+		m_dpoker_hopper_timer->adjust(attotime::from_msec(500));
+	
+	// other bits: unused?
+}
+
+
+
+/*************************************
+ *
+ *  Wacko I/O ports
  *
  *************************************/
 
@@ -402,7 +498,7 @@ READ8_MEMBER(mcr_state::wacko_ip2_r)
 
 /*************************************
  *
- *  Kozmik Krooz'r input ports
+ *  Kozmik Krooz'r I/O ports
  *
  *************************************/
 
@@ -897,14 +993,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dpoker )
 	PORT_START("ssio:IP0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin-in Hit - cursor down in testmode
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin-in Release (to register a coin for now, press 5 and 6 is succession)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin-out Up
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin-out Down
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mcr_state, dpoker_coin_in_hit, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) // see dpoker_ip0_r
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Coin-drop Hit - select item in testmode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin-drop Release
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin-drop")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
 
 	PORT_START("ssio:IP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
@@ -917,10 +1013,10 @@ static INPUT_PORTS_START( dpoker )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
 
 	PORT_START("ssio:IP2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // only in test mode input test
 
 	// 10-position DIP switch on the sound pcb
-	// settings and defaults are from a sticker inside the cabinet, I don't know where 9 or 10 are connected
+	// settings and defaults are verified from a sticker inside the cabinet, I don't know where 9 or 10 are connected
 	PORT_START("ssio:IP3")
 	PORT_DIPNAME( 0x01, 0x01, "Hopper" )			PORT_DIPLOCATION("B3:1")
 	PORT_DIPSETTING(    0x01, "Relay Pulse" )
@@ -957,12 +1053,12 @@ static INPUT_PORTS_START( dpoker )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ssio:DIP")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // only in test mode input test
 
 	PORT_START("P24")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // Hopper Full
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // Hopper Full (not implemented)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin Return
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Coin Return
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 1 Open") PORT_CODE(KEYCODE_A) // CAM OPEN
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 1 Lock") PORT_CODE(KEYCODE_S) // CAM LOCK
@@ -970,7 +1066,7 @@ static INPUT_PORTS_START( dpoker )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2 Lock") PORT_CODE(KEYCODE_F) // HNG LOCK
 
 	PORT_START("P28")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? ARM HIT
@@ -1751,6 +1847,15 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_MIDWAY_SSIO_ADD("ssio")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+
+/* as above, but in a casino cabinet */
+static MACHINE_CONFIG_DERIVED( mcr_90009_dp, mcr_90009 )
+
+	/* basic machine hardware */
+	MCFG_TIMER_ADD("dp_coinin", dpoker_coin_in_callback)
+	MCFG_TIMER_ADD("dp_hopper", dpoker_hopper_callback)
 MACHINE_CONFIG_END
 
 
@@ -2662,33 +2767,42 @@ static void mcr_init(running_machine &machine, int cpuboard, int vidboard, int s
 DRIVER_INIT_MEMBER(mcr_state,solarfox)
 {
 	mcr_init(machine(), 90009, 91399, 90908);
+	mcr12_sprite_xoffs = 16;
 
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),this));
-
-	mcr12_sprite_xoffs = 16;
 }
 
 
 DRIVER_INIT_MEMBER(mcr_state,kick)
 {
 	mcr_init(machine(), 90009, 91399, 90908);
+	mcr12_sprite_xoffs_flip = 16;
 
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),this));
-
-	mcr12_sprite_xoffs_flip = 16;
 }
 
 
 DRIVER_INIT_MEMBER(mcr_state,dpoker)
 {
 	mcr_init(machine(), 90009, 91399, 90908);
+	mcr12_sprite_xoffs_flip = 16;
+
+	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_state::dpoker_ip0_r),this));
 
 	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, "P24");
 	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, "P28");
 	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, "P2C");
 
-	mcr12_sprite_xoffs_flip = 16;
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_state::dpoker_p2c_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_p30_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_p34_w),this));
+	
+	dpoker_coin_status = 0;
+	dpoker_output_34 = 0;
+
+	state_save_register_global(machine(), dpoker_coin_status);
+	state_save_register_global(machine(), dpoker_output_34);
 }
 
 
@@ -2792,7 +2906,7 @@ GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state, solarfox,  R
 GAME( 1981, kick,     0,        mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickman,  kick,     mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickc,    kick,     mcr_90009,     kickc, mcr_state,    kick,      ROT90,                      "Midway", "Kick (cocktail)", GAME_SUPPORTS_SAVE )
-GAME( 1985, dpoker,   0,        mcr_90009,     dpoker, mcr_state,   dpoker,    0,                          "Bally",  "Draw Poker (Bally, 03-20)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", GAME_SUPPORTS_SAVE )
