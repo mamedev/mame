@@ -161,9 +161,9 @@ struct _SHARC_REGS
 
 	INT32 interrupt_active;
 
-	INT32 iop_latency_cycles;
-	INT32 iop_latency_reg;
-	UINT32 iop_latency_data;
+	UINT32 iop_delayed_reg;
+	UINT32 iop_delayed_data;
+	emu_timer *delayed_iop_timer;
 
 	UINT32 delay_slot1, delay_slot2;
 
@@ -212,24 +212,15 @@ INLINE void CHANGE_PC_DELAYED(SHARC_REGS *cpustate, UINT32 newpc)
 	cpustate->delay_slot2 = cpustate->daddr;
 }
 
-
-
-static void add_iop_write_latency_effect(SHARC_REGS *cpustate, int iop_reg, UINT32 data, int latency)
+static TIMER_CALLBACK(sharc_iop_delayed_write_callback)
 {
-	cpustate->iop_latency_cycles = latency+1;
-	cpustate->iop_latency_reg = iop_reg;
-	cpustate->iop_latency_data = data;
-}
+	SHARC_REGS *cpustate = (SHARC_REGS *)ptr;
 
-static void iop_write_latency_effect(SHARC_REGS *cpustate)
-{
-	UINT32 data = cpustate->iop_latency_data;
-
-	switch (cpustate->iop_latency_reg)
+	switch (cpustate->iop_delayed_reg)
 	{
 		case 0x1c:
 		{
-			if (data & 0x1)
+			if (cpustate->iop_delayed_data & 0x1)
 			{
 				sharc_dma_exec(cpustate, 6);
 			}
@@ -238,17 +229,26 @@ static void iop_write_latency_effect(SHARC_REGS *cpustate)
 
 		case 0x1d:
 		{
-			if (data & 0x1)
+			if (cpustate->iop_delayed_data & 0x1)
 			{
 				sharc_dma_exec(cpustate, 7);
 			}
 			break;
 		}
 
-		default:	fatalerror("SHARC: iop_write_latency_effect: unknown IOP register %02X\n", cpustate->iop_latency_reg);
+		default:	fatalerror("SHARC: sharc_iop_delayed_write: unknown IOP register %02X\n", cpustate->iop_delayed_reg);
 	}
+
+	cpustate->delayed_iop_timer->adjust(attotime::never, 0);
 }
 
+static void sharc_iop_delayed_w(SHARC_REGS *cpustate, UINT32 reg, UINT32 data, int cycles)
+{
+	cpustate->iop_delayed_reg = reg;
+	cpustate->iop_delayed_data = data;
+
+	cpustate->delayed_iop_timer->adjust(cpustate->device->cycles_to_attotime(cycles), 0);
+}
 
 
 /* IOP registers */
@@ -292,7 +292,8 @@ static void sharc_iop_w(SHARC_REGS *cpustate, UINT32 address, UINT32 data)
 		case 0x1c:
 		{
 			cpustate->dma[6].control = data;
-			add_iop_write_latency_effect(cpustate, 0x1c, data, 1);
+			//add_iop_write_latency_effect(cpustate, 0x1c, data, 1);
+			sharc_iop_delayed_w(cpustate, 0x1c, data, 1);
 			break;
 		}
 
@@ -311,7 +312,8 @@ static void sharc_iop_w(SHARC_REGS *cpustate, UINT32 address, UINT32 data)
 		case 0x1d:
 		{
 			cpustate->dma[7].control = data;
-			add_iop_write_latency_effect(cpustate, 0x1d, data, 30);
+			//add_iop_write_latency_effect(cpustate, 0x1d, data, 30);
+			sharc_iop_delayed_w(cpustate, 0x1d, data, 30);
 			break;
 		}
 
@@ -434,6 +436,8 @@ static CPU_INIT( sharc )
 	cpustate->internal_ram_block0 = &cpustate->internal_ram[0];
 	cpustate->internal_ram_block1 = &cpustate->internal_ram[0x20000/2];
 
+	cpustate->delayed_iop_timer = device->machine().scheduler().timer_alloc(FUNC(sharc_iop_delayed_write_callback), cpustate);
+
 	device->save_item(NAME(cpustate->pc));
 	device->save_pointer(NAME(&cpustate->r[0].r), ARRAY_LENGTH(cpustate->r));
 	device->save_pointer(NAME(&cpustate->reg_alt[0].r), ARRAY_LENGTH(cpustate->reg_alt));
@@ -533,9 +537,8 @@ static CPU_INIT( sharc )
 
 	device->save_item(NAME(cpustate->interrupt_active));
 
-	device->save_item(NAME(cpustate->iop_latency_cycles));
-	device->save_item(NAME(cpustate->iop_latency_reg));
-	device->save_item(NAME(cpustate->iop_latency_data));
+	device->save_item(NAME(cpustate->iop_delayed_reg));
+	device->save_item(NAME(cpustate->iop_delayed_data));
 
 	device->save_item(NAME(cpustate->delay_slot1));
 	device->save_item(NAME(cpustate->delay_slot2));
@@ -784,16 +787,6 @@ static CPU_EXECUTE( sharc )
 			if (cpustate->systemreg_latency_cycles <= 0)
 			{
 				systemreg_write_latency_effect(cpustate);
-			}
-		}
-
-		// IOP register latency effect
-		if (cpustate->iop_latency_cycles > 0)
-		{
-			--cpustate->iop_latency_cycles;
-			if (cpustate->iop_latency_cycles <= 0)
-			{
-				iop_write_latency_effect(cpustate);
 			}
 		}
 
