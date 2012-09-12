@@ -6,13 +6,17 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_workram(*this,"workram"),
 		m_psacram(*this,"psacram"),
-		m_subpaletteram32(*this,"subpaletteram")
+		m_subpaletteram32(*this,"subpaletteram"),
+		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
+		m_k053936_0_linectrl(*this,"k053936_0_line",32)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT32> m_workram;
+	optional_shared_ptr<UINT32> m_workram;
 	optional_shared_ptr<UINT32> m_psacram;
 	optional_shared_ptr<UINT32> m_subpaletteram32;
+	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
+	optional_shared_ptr<UINT16> m_k053936_0_linectrl;
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);

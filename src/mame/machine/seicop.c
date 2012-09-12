@@ -1411,7 +1411,7 @@ Miscellaneous registers:
 #define seibu_cop_log logerror
 #define LOG_CMDS 1
 
-UINT16 *cop_mcu_ram;
+static UINT16 *cop_mcu_ram;
 
 static UINT16 copd2_table[0x100];
 static UINT16 copd2_table_2[0x100/8];
@@ -1664,8 +1664,15 @@ No known explanation to this so far ...
 
  *******************************************************************************************/
 
+// temporary hack until this is a proper device
+inline void get_ram(running_machine &machine)
+{
+	if (cop_mcu_ram == NULL) cop_mcu_ram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("cop_mcu_ram")->ptr());
+}
+
 READ16_HANDLER( copdxbl_0_r )
 {
+	get_ram(space->machine());
 	UINT16 retvalue = cop_mcu_ram[offset];
 
 	switch(offset)
@@ -1692,6 +1699,7 @@ READ16_HANDLER( copdxbl_0_r )
 WRITE16_HANDLER( copdxbl_0_w )
 {
 	legionna_state *state = space->machine().driver_data<legionna_state>();
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	switch(offset)
@@ -1814,6 +1822,7 @@ static UINT8 cop_calculate_collsion_detection(running_machine &machine)
 static READ16_HANDLER( generic_cop_r )
 {
 	UINT16 retvalue;
+	get_ram(space->machine());
 	retvalue = cop_mcu_ram[offset];
 
 
@@ -1883,6 +1892,7 @@ static UINT32 cop_sprite_dma_param;
 static WRITE16_HANDLER( generic_cop_w )
 {
 	UINT32 temp32;
+	get_ram(space->machine());
 
 	switch (offset)
 	{
@@ -2716,6 +2726,7 @@ READ16_HANDLER( heatbrl_mcu_r )
 
 WRITE16_HANDLER( heatbrl_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	/* external pin register, used for banking */
@@ -2771,6 +2782,7 @@ READ16_HANDLER( cupsoc_mcu_r )
 
 WRITE16_HANDLER( cupsoc_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
@@ -2813,6 +2825,7 @@ READ16_HANDLER( cupsocs_mcu_r )
 
 WRITE16_HANDLER( cupsocs_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
@@ -2860,6 +2873,7 @@ READ16_HANDLER( godzilla_mcu_r )
 
 WRITE16_HANDLER( godzilla_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	if(offset == 0x070/2)
@@ -2912,6 +2926,7 @@ READ16_HANDLER( denjinmk_mcu_r )
 
 WRITE16_HANDLER( denjinmk_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
@@ -2965,6 +2980,7 @@ READ16_HANDLER( grainbow_mcu_r )
 
 WRITE16_HANDLER( grainbow_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
@@ -3007,6 +3023,7 @@ READ16_HANDLER( legionna_mcu_r )
 
 WRITE16_HANDLER( legionna_mcu_w )
 {
+	get_ram(space->machine());
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	if(offset == 0x070/2) //external pin: puts bit 13 high, delay, reads 0x748, writes bit 13 low

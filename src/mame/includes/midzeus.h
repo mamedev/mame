@@ -11,9 +11,18 @@ class midzeus_state : public driver_device
 public:
 	midzeus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_ram_base(*this, "ram_base"),
+		  m_linkram(*this, "linkram"),
+		  m_tms32031_control(*this, "tms32031_ctl"),
+		  m_zeusbase(*this, "zeusbase") { }
 
 	required_shared_ptr<UINT32>	m_nvram;
+	required_shared_ptr<UINT32>	m_ram_base;
+	optional_shared_ptr<UINT32>	m_linkram;
+	required_shared_ptr<UINT32>	m_tms32031_control;
+	required_shared_ptr<UINT32>	m_zeusbase;
+
 	DECLARE_WRITE32_MEMBER(cmos_w);
 	DECLARE_READ32_MEMBER(cmos_r);
 	DECLARE_WRITE32_MEMBER(cmos_protect_w);
@@ -47,8 +56,6 @@ public:
 
 
 /*----------- defined in video/midzeus.c -----------*/
-
-extern UINT32 *zeusbase;
 
 VIDEO_START( midzeus );
 SCREEN_UPDATE_IND16( midzeus );

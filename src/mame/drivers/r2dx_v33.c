@@ -30,7 +30,12 @@ class r2dx_v33_state : public driver_device
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_bg_vram(*this, "bg_vram"),
+		m_md_vram(*this, "md_vram"),
+		m_fg_vram(*this, "fg_vram"),
+		m_tx_vram(*this, "tx_vram")
+		{ }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
@@ -55,16 +60,21 @@ public:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+
+	required_shared_ptr<UINT16> m_bg_vram;
+	required_shared_ptr<UINT16> m_md_vram;
+	required_shared_ptr<UINT16> m_fg_vram;
+	required_shared_ptr<UINT16> m_tx_vram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_md_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_tx_tilemap;
 };
 
 
-static UINT16 *seibu_crtc_regs;
-static UINT16 *bg_vram,*md_vram,*fg_vram,*tx_vram;
-static tilemap_t *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
-
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_bg_tile_info)
 {
-	int tile = bg_vram[tile_index];
+	int tile = m_bg_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -74,7 +84,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
 {
-	int tile = md_vram[tile_index];
+	int tile = m_md_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -84,7 +94,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
 {
-	int tile = fg_vram[tile_index];
+	int tile = m_fg_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -94,7 +104,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
 {
-	int tile = tx_vram[tile_index];
+	int tile = m_tx_vram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -192,28 +202,29 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 static VIDEO_START( rdx_v33 )
 {
 	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
-	bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
-	tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS,8, 8, 64,32);
+	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_md_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_fg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,16,16,32,32);
+	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),state), TILEMAP_SCAN_ROWS,8, 8, 64,32);
 
-	bg_tilemap->set_transparent_pen(15);
-	md_tilemap->set_transparent_pen(15);
-	fg_tilemap->set_transparent_pen(15);
-	tx_tilemap->set_transparent_pen(15);
+	state->m_bg_tilemap->set_transparent_pen(15);
+	state->m_md_tilemap->set_transparent_pen(15);
+	state->m_fg_tilemap->set_transparent_pen(15);
+	state->m_tx_tilemap->set_transparent_pen(15);
 }
 
 static SCREEN_UPDATE_IND16( rdx_v33 )
 {
+	r2dx_v33_state *state = screen.machine().driver_data<r2dx_v33_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	md_tilemap->draw(bitmap, cliprect, 0, 0);
-	fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_md_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(screen.machine(),bitmap,cliprect,0);
 
-	tx_tilemap->draw(bitmap, cliprect, 0, 0);
+	state->m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* debug DMA processing */
 	if(0)
@@ -247,7 +258,7 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 			}
 
 			popmessage("%08x 1",src_addr);
-			bg_tilemap->mark_all_dirty();
+			state->m_bg_tilemap->mark_all_dirty();
 			frame = 0;
 			src_addr+=0x800;
 		}
@@ -312,26 +323,26 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_bg_vram_w)
 {
-	COMBINE_DATA(&bg_vram[offset]);
-	bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_vram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_md_vram_w)
 {
-	COMBINE_DATA(&md_vram[offset]);
-	md_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_md_vram[offset]);
+	m_md_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_fg_vram_w)
 {
-	COMBINE_DATA(&fg_vram[offset]);
-	fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_vram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(r2dx_v33_state::rdx_tx_vram_w)
 {
-	COMBINE_DATA(&tx_vram[offset]);
-	tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_vram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
@@ -385,7 +396,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_SHARE("crtc_regs")
 	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
@@ -413,10 +424,10 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE_LEGACY(&fg_vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE_LEGACY(&tx_vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_SHARE("bg_vram")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_SHARE("md_vram")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_SHARE("fg_vram")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_SHARE("tx_vram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -462,7 +473,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
 	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_SHARE("crtc_regs")
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
@@ -486,10 +497,10 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE_LEGACY(&fg_vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE_LEGACY(&tx_vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_SHARE("bg_vram")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_SHARE("md_vram")
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_SHARE("fg_vram")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_SHARE("tx_vram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")

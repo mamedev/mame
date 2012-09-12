@@ -99,9 +99,6 @@ Bit 5+6  LED 1-8 enable
 #include "machine/nvram.h"
 
 //static UINT16 unknown2_data = 0;
-static UINT16 *save_ram;
-static UINT32 *save_ram32;
-
 // Berlin Pro 68020
 static UINT32 BPL32latch_data = 0;
 
@@ -1005,9 +1002,6 @@ static MACHINE_START( van32 )
 			rom[0x870] = 0x38;
 		}
 	}
-
-	machine.device<nvram_device>("nvram")->set_base(save_ram32, 0x8000);
-
 }
 
 
@@ -1046,7 +1040,6 @@ static MACHINE_START( van16 )
 {
 
 	mboard_savestate_register(machine);
-	machine.device<nvram_device>("nvram")->set_base(save_ram, 0x4000);
 
 }
 
@@ -1148,7 +1141,7 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x40000000, 0x4007ffff )  AM_RAM      /* 512KB */
 	AM_RANGE( 0x80000000, 0x8003ffff )  AM_RAM      /* 256KB */
-	AM_RANGE( 0xe8000000, 0xe8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
+	AM_RANGE( 0xe8000000, 0xe8007fff )  AM_RAM AM_SHARE("nvram")
 
  ADDRESS_MAP_END
 
@@ -1161,7 +1154,7 @@ static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE(write_LCD_data_32 )
 	AM_RANGE( 0xb00000 , 0xb00003 )  AM_WRITE(write_IOenables_32 )
 	AM_RANGE( 0x400000 , 0x4fffff )  AM_RAM      /* 1024KB */
-	AM_RANGE( 0xd00000 , 0xd07fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
+	AM_RANGE( 0xd00000 , 0xd07fff )  AM_RAM AM_SHARE("nvram")
 
  ADDRESS_MAP_END
 
@@ -1180,7 +1173,7 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM      /* 1024KB */
-	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
+	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_SHARE("nvram")
 
  ADDRESS_MAP_END
 
@@ -1200,7 +1193,7 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM
-	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
+	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_SHARE("nvram")
 
  ADDRESS_MAP_END
 
@@ -1228,7 +1221,7 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ(read_unknown3 )
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
-	AM_RANGE( 0x800000, 0x803fff )  AM_RAM AM_BASE_LEGACY(&save_ram) AM_SHARE("nvram")
+	AM_RANGE( 0x800000, 0x803fff )  AM_RAM AM_SHARE("nvram")
 
  ADDRESS_MAP_END
 
@@ -1248,7 +1241,7 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
-	AM_RANGE( 0x800000, 0x803fff )  AM_RAM  AM_BASE_LEGACY(&save_ram) AM_SHARE("nvram")
+	AM_RANGE( 0x800000, 0x803fff )  AM_RAM  AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 

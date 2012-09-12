@@ -56,15 +56,10 @@ static UINT8			crusnexo_leds_select;
 static UINT8			keypad_select;
 static UINT8			bitlatch[10];
 
-static UINT32 *ram_base;
 static UINT8 cmos_protected;
 
-static UINT32 *linkram;
 
 static emu_timer *timer[2];
-
-static UINT32 *tms32031_control;
-
 
 static TIMER_CALLBACK( invasn_gun_callback );
 
@@ -95,8 +90,10 @@ static MACHINE_START( midzeus )
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, machine.root_device().memregion("user1")->base(), 0x40000*4);
-	*ram_base <<= 1;
+	midzeus_state *state = machine.driver_data<midzeus_state>();
+
+	memcpy(state->m_ram_base, machine.root_device().memregion("user1")->base(), 0x40000*4);
+	*state->m_ram_base <<= 1;
 	machine.device("maincpu")->reset();
 
 	cmos_protected = TRUE;
@@ -362,13 +359,13 @@ READ32_MEMBER(midzeus_state::linkram_r)
 		return 0x30313042;
 	else if (offset == 0x3c)
 		return 0xffffffff;
-	return linkram[offset];
+	return m_linkram[offset];
 }
 
 WRITE32_MEMBER(midzeus_state::linkram_w)
 {
 	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", space.device().safe_pc(),  offset, data);
-	COMBINE_DATA(&linkram[offset]);
+	COMBINE_DATA(&m_linkram[offset]);
 }
 
 
@@ -394,13 +391,13 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 	if (offset != 0x64)
 		logerror("%06X:tms32031_control_r(%02X)\n", space.device().safe_pc(), offset);
 
-	return tms32031_control[offset];
+	return m_tms32031_control[offset];
 }
 
 
 WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 {
-	COMBINE_DATA(&tms32031_control[offset]);
+	COMBINE_DATA(&m_tms32031_control[offset]);
 
 	/* ignore changes to the memory control register */
 	if (offset == 0x64)
@@ -567,10 +564,10 @@ READ32_MEMBER(midzeus_state::invasn_gun_r)
 
 static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
-	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE_LEGACY(&zeusbase)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
+	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_SHARE("zeusbase")
 	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
@@ -582,11 +579,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
-	AM_RANGE(0x880000, 0x88007f) AM_READWRITE_LEGACY(zeus2_r, zeus2_w) AM_BASE_LEGACY(&zeusbase)
-	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_BASE_LEGACY(&linkram)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
+	AM_RANGE(0x880000, 0x88007f) AM_READWRITE_LEGACY(zeus2_r, zeus2_w) AM_SHARE("zeusbase")
+	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_SHARE("linkram")
 	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)

@@ -370,7 +370,8 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 	/* normal update case */
 	if (!screen.machine().input().code_pressed(KEYCODE_W))
 	{
-		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0x38]);
+		midzeus_state *state = screen.machine().driver_data<midzeus_state>();
+		const void *base = waveram1_ptr_from_expanded_addr(state->m_zeusbase[0x38]);
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
@@ -419,7 +420,8 @@ if (screen.machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 READ32_HANDLER( zeus2_r )
 {
 	int logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
-	UINT32 result = zeusbase[offset];
+	midzeus_state *state = space->machine().driver_data<midzeus_state>();
+	UINT32 result = state->m_zeusbase[offset];
 
 #if TRACK_REG_USAGE
 	regread_count[offset]++;
@@ -486,7 +488,8 @@ WRITE32_HANDLER( zeus2_w )
 
 static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 data, int logit)
 {
-	UINT32 oldval = zeusbase[offset];
+	midzeus_state *state = machine.driver_data<midzeus_state>();
+	UINT32 oldval = state->m_zeusbase[offset];
 
 #if TRACK_REG_USAGE
 regwrite_count[offset]++;
@@ -512,7 +515,7 @@ if (regdata_count[offset] < 256)
 //      machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* always write to low word? */
-	zeusbase[offset] = data;
+	state->m_zeusbase[offset] = data;
 
 	/* log appropriately */
 	if (logit)
@@ -533,10 +536,11 @@ if (regdata_count[offset] < 256)
 static void zeus_register_update(running_machine &machine, offs_t offset, UINT32 oldval, int logit)
 {
 	/* handle the writes; only trigger on low accesses */
+	midzeus_state *state = machine.driver_data<midzeus_state>();
 	switch (offset)
 	{
 		case 0x08:
-			zeus_fifo[zeus_fifo_words++] = zeusbase[0x08];
+			zeus_fifo[zeus_fifo_words++] = state->m_zeusbase[0x08];
 			if (zeus_fifo_process(machine, zeus_fifo, zeus_fifo_words))
 				zeus_fifo_words = 0;
 
@@ -547,12 +551,12 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 		case 0x20:
 			/* toggles between two values based on the page:
 
-                Page #      zeusbase[0x20]      zeusbase[0x38]
+                Page #      state->m_zeusbase[0x20]      state->m_zeusbase[0x38]
                 ------      --------------      --------------
                    0          $04000190           $00000000
                    1          $04000000           $01900000
             */
-            zeus_pointer_write(zeusbase[0x20] >> 24, zeusbase[0x20]);
+            zeus_pointer_write(state->m_zeusbase[0x20] >> 24, state->m_zeusbase[0x20]);
 			break;
 
 		case 0x33:
@@ -562,10 +566,10 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 		case 0x37:
 			machine.primary_screen->update_partial(machine.primary_screen->vpos());
 			{
-				int vtotal = zeusbase[0x37] & 0xffff;
-				int htotal = zeusbase[0x34] >> 16;
+				int vtotal = state->m_zeusbase[0x37] & 0xffff;
+				int htotal = state->m_zeusbase[0x34] >> 16;
 
-				rectangle visarea(zeusbase[0x33] >> 16, (zeusbase[0x34] & 0xffff) - 1, 0, zeusbase[0x35] & 0xffff);
+				rectangle visarea(state->m_zeusbase[0x33] >> 16, (state->m_zeusbase[0x34] & 0xffff) - 1, 0, state->m_zeusbase[0x35] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
 					machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 4.0 / (htotal * vtotal)));
@@ -578,28 +582,28 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 
 		case 0x38:
 			{
-				UINT32 temp = zeusbase[0x38];
-				zeusbase[0x38] = oldval;
+				UINT32 temp = state->m_zeusbase[0x38];
+				state->m_zeusbase[0x38] = oldval;
 				machine.primary_screen->update_partial(machine.primary_screen->vpos());
 				log_fifo = machine.input().code_pressed(KEYCODE_L);
-				zeusbase[0x38] = temp;
+				state->m_zeusbase[0x38] = temp;
 			}
 			break;
 
 		case 0x41:
 			/* this is the address, except in read mode, where it latches values */
-			if (zeusbase[0x4e] & 0x10)
+			if (state->m_zeusbase[0x4e] & 0x10)
 			{
 				const void *src = waveram0_ptr_from_expanded_addr(oldval);
-				zeusbase[0x41] = oldval;
-				zeusbase[0x48] = WAVERAM_READ32(src, 0);
-				zeusbase[0x49] = WAVERAM_READ32(src, 1);
+				state->m_zeusbase[0x41] = oldval;
+				state->m_zeusbase[0x48] = WAVERAM_READ32(src, 0);
+				state->m_zeusbase[0x49] = WAVERAM_READ32(src, 1);
 
-				if (zeusbase[0x4e] & 0x40)
+				if (state->m_zeusbase[0x4e] & 0x40)
 				{
-					zeusbase[0x41]++;
-					zeusbase[0x41] += (zeusbase[0x41] & 0x400) << 6;
-					zeusbase[0x41] &= ~0xfc00;
+					state->m_zeusbase[0x41]++;
+					state->m_zeusbase[0x41] += (state->m_zeusbase[0x41] & 0x400) << 6;
+					state->m_zeusbase[0x41] &= ~0xfc00;
 				}
 			}
 			break;
@@ -607,113 +611,113 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 		case 0x48:
 		case 0x49:
 			/* if we're in write mode, process it */
-			if (zeusbase[0x40] == 0x00890000)
+			if (state->m_zeusbase[0x40] == 0x00890000)
 			{
 				/*
-                    zeusbase[0x4e]:
+                    state->m_zeusbase[0x4e]:
                         bit 0-1: which register triggers write through
                         bit 3:   enable write through via these registers
                         bit 4:   seems to be set during reads, when 0x41 is used for latching
                         bit 6:   enable autoincrement on write through
                 */
-				if ((zeusbase[0x4e] & 0x08) && (offset & 3) == (zeusbase[0x4e] & 3))
+				if ((state->m_zeusbase[0x4e] & 0x08) && (offset & 3) == (state->m_zeusbase[0x4e] & 3))
 				{
-					void *dest = waveram0_ptr_from_expanded_addr(zeusbase[0x41]);
-					WAVERAM_WRITE32(dest, 0, zeusbase[0x48]);
-					WAVERAM_WRITE32(dest, 1, zeusbase[0x49]);
+					void *dest = waveram0_ptr_from_expanded_addr(state->m_zeusbase[0x41]);
+					WAVERAM_WRITE32(dest, 0, state->m_zeusbase[0x48]);
+					WAVERAM_WRITE32(dest, 1, state->m_zeusbase[0x49]);
 
-					if (zeusbase[0x4e] & 0x40)
+					if (state->m_zeusbase[0x4e] & 0x40)
 					{
-						zeusbase[0x41]++;
-						zeusbase[0x41] += (zeusbase[0x41] & 0x400) << 6;
-						zeusbase[0x41] &= ~0xfc00;
+						state->m_zeusbase[0x41]++;
+						state->m_zeusbase[0x41] += (state->m_zeusbase[0x41] & 0x400) << 6;
+						state->m_zeusbase[0x41] &= ~0xfc00;
 					}
 				}
 			}
 
 			/* make sure we log anything else */
 			else if (logit)
-				logerror("\t[40]=%08X [4E]=%08X\n", zeusbase[0x40], zeusbase[0x4e]);
+				logerror("\t[40]=%08X [4E]=%08X\n", state->m_zeusbase[0x40], state->m_zeusbase[0x4e]);
 			break;
 
 		case 0x51:
 
 			/* in this mode, crusnexo expects the reads to immediately latch */
-			if (zeusbase[0x50] == 0x00a20000)
-				oldval = zeusbase[0x51];
+			if (state->m_zeusbase[0x50] == 0x00a20000)
+				oldval = state->m_zeusbase[0x51];
 
 			/* this is the address, except in read mode, where it latches values */
-			if ((zeusbase[0x5e] & 0x10) || (zeusbase[0x50] == 0x00a20000))
+			if ((state->m_zeusbase[0x5e] & 0x10) || (state->m_zeusbase[0x50] == 0x00a20000))
 			{
 				const void *src = waveram1_ptr_from_expanded_addr(oldval);
-				zeusbase[0x51] = oldval;
-				zeusbase[0x58] = WAVERAM_READ32(src, 0);
-				zeusbase[0x59] = WAVERAM_READ32(src, 1);
-				zeusbase[0x5a] = WAVERAM_READ32(src, 2);
+				state->m_zeusbase[0x51] = oldval;
+				state->m_zeusbase[0x58] = WAVERAM_READ32(src, 0);
+				state->m_zeusbase[0x59] = WAVERAM_READ32(src, 1);
+				state->m_zeusbase[0x5a] = WAVERAM_READ32(src, 2);
 
-				if (zeusbase[0x5e] & 0x40)
+				if (state->m_zeusbase[0x5e] & 0x40)
 				{
-					zeusbase[0x51]++;
-					zeusbase[0x51] += (zeusbase[0x51] & 0x200) << 7;
-					zeusbase[0x51] &= ~0xfe00;
+					state->m_zeusbase[0x51]++;
+					state->m_zeusbase[0x51] += (state->m_zeusbase[0x51] & 0x200) << 7;
+					state->m_zeusbase[0x51] &= ~0xfe00;
 				}
 			}
 			break;
 
 		case 0x57:
 			/* thegrid uses this to write either left or right halves of pixels */
-			if (zeusbase[0x50] == 0x00e90000)
+			if (state->m_zeusbase[0x50] == 0x00e90000)
 			{
-				void *dest = waveram1_ptr_from_expanded_addr(zeusbase[0x51]);
-				if (zeusbase[0x57] & 1)
-					WAVERAM_WRITE32(dest, 0, zeusbase[0x58]);
-				if (zeusbase[0x57] & 4)
-					WAVERAM_WRITE32(dest, 1, zeusbase[0x59]);
+				void *dest = waveram1_ptr_from_expanded_addr(state->m_zeusbase[0x51]);
+				if (state->m_zeusbase[0x57] & 1)
+					WAVERAM_WRITE32(dest, 0, state->m_zeusbase[0x58]);
+				if (state->m_zeusbase[0x57] & 4)
+					WAVERAM_WRITE32(dest, 1, state->m_zeusbase[0x59]);
 			}
 
 			/* make sure we log anything else */
 			else if (logit)
-				logerror("\t[50]=%08X [5E]=%08X\n", zeusbase[0x50], zeusbase[0x5e]);
+				logerror("\t[50]=%08X [5E]=%08X\n", state->m_zeusbase[0x50], state->m_zeusbase[0x5e]);
 			break;
 
 		case 0x58:
 		case 0x59:
 		case 0x5a:
 			/* if we're in write mode, process it */
-			if (zeusbase[0x50] == 0x00890000)
+			if (state->m_zeusbase[0x50] == 0x00890000)
 			{
 				/*
-                    zeusbase[0x5e]:
+                    state->m_zeusbase[0x5e]:
                         bit 0-1: which register triggers write through
                         bit 3:   enable write through via these registers
                         bit 4:   seems to be set during reads, when 0x51 is used for latching
                         bit 5:   unknown, currently used to specify ordering, but this is suspect
                         bit 6:   enable autoincrement on write through
                 */
-				if ((zeusbase[0x5e] & 0x08) && (offset & 3) == (zeusbase[0x5e] & 3))
+				if ((state->m_zeusbase[0x5e] & 0x08) && (offset & 3) == (state->m_zeusbase[0x5e] & 3))
 				{
-					void *dest = waveram1_ptr_from_expanded_addr(zeusbase[0x51]);
-					WAVERAM_WRITE32(dest, 0, zeusbase[0x58]);
-					if (zeusbase[0x5e] & 0x20)
-						WAVERAM_WRITE32(dest, 1, zeusbase[0x5a]);
+					void *dest = waveram1_ptr_from_expanded_addr(state->m_zeusbase[0x51]);
+					WAVERAM_WRITE32(dest, 0, state->m_zeusbase[0x58]);
+					if (state->m_zeusbase[0x5e] & 0x20)
+						WAVERAM_WRITE32(dest, 1, state->m_zeusbase[0x5a]);
 					else
 					{
-						WAVERAM_WRITE32(dest, 1, zeusbase[0x59]);
-						WAVERAM_WRITE32(dest, 2, zeusbase[0x5a]);
+						WAVERAM_WRITE32(dest, 1, state->m_zeusbase[0x59]);
+						WAVERAM_WRITE32(dest, 2, state->m_zeusbase[0x5a]);
 					}
 
-					if (zeusbase[0x5e] & 0x40)
+					if (state->m_zeusbase[0x5e] & 0x40)
 					{
-						zeusbase[0x51]++;
-						zeusbase[0x51] += (zeusbase[0x51] & 0x200) << 7;
-						zeusbase[0x51] &= ~0xfe00;
+						state->m_zeusbase[0x51]++;
+						state->m_zeusbase[0x51] += (state->m_zeusbase[0x51] & 0x200) << 7;
+						state->m_zeusbase[0x51] &= ~0xfe00;
 					}
 				}
 			}
 
 			/* make sure we log anything else */
 			else if (logit)
-				logerror("\t[50]=%08X [5E]=%08X\n", zeusbase[0x50], zeusbase[0x5e]);
+				logerror("\t[50]=%08X [5E]=%08X\n", state->m_zeusbase[0x50], state->m_zeusbase[0x5e]);
 			break;
 	}
 }
@@ -1038,6 +1042,7 @@ static void zeus_draw_model(running_machine &machine, UINT32 baseaddr, UINT16 co
 
 static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, UINT32 texoffs, int logit)
 {
+	midzeus_state *state = machine.driver_data<midzeus_state>();
 	poly_draw_scanline_func callback;
 	poly_extra_data *extra;
 	poly_vertex clipvert[8];
@@ -1249,12 +1254,12 @@ In memory:
 		}
 	}
 
-	extra->solidcolor = 0;//zeusbase[0x00] & 0x7fff;
-	extra->zoffset = 0;//zeusbase[0x7e] >> 16;
-	extra->alpha = 0;//zeusbase[0x4e];
+	extra->solidcolor = 0;//state->m_zeusbase[0x00] & 0x7fff;
+	extra->zoffset = 0;//state->m_zeusbase[0x7e] >> 16;
+	extra->alpha = 0;//state->m_zeusbase[0x4e];
 	extra->transcolor = 0x100;//((databuffer[1] >> 16) & 1) ? 0 : 0x100;
 	extra->texbase = WAVERAM_BLOCK0(zeus_texbase);
-	extra->palbase = waveram0_ptr_from_expanded_addr(zeusbase[0x41]);
+	extra->palbase = waveram0_ptr_from_expanded_addr(state->m_zeusbase[0x41]);
 
 	poly_render_quad_fan(poly, NULL, zeus_cliprect, callback, 4, numverts, &clipvert[0]);
 }

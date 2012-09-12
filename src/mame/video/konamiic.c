@@ -1510,8 +1510,6 @@ int K053246_is_IRQ_enabled(void)
 
 #define K053936_MAX_CHIPS 2
 
-UINT16 *K053936_0_ctrl,*K053936_0_linectrl;
-UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
 static int K053936_offset[K053936_MAX_CHIPS][2];
 static int K053936_wraparound[K053936_MAX_CHIPS];
 
@@ -1641,7 +1639,9 @@ if (machine.input().code_pressed(KEYCODE_D))
 
 void K053936_0_zoom_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,UINT32 priority, int glfgreat_hack)
 {
-	K053936_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
+	UINT16 *ctrl = reinterpret_cast<UINT16 *>(tmap->machine().root_device().memshare("k053936_0_ctrl")->ptr());
+	UINT16 *linectrl = reinterpret_cast<UINT16 *>(tmap->machine().root_device().memshare("k053936_0_line")->ptr());
+	K053936_zoom_draw(0,ctrl,linectrl,bitmap,cliprect,tmap,flags,priority, glfgreat_hack);
 }
 
 void K053936_wraparound_enable(int chip, int status)
