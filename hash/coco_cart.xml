@@ -52,7 +52,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 -->
 <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
 
-	<!--software name="alphazoo">
+	<software name="alphazoo">
 		<description>Alphabet Zoo</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
@@ -64,7 +64,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 				<rom name="alphabet zoo (1984)(26-3170)(spinnaker).rom" size="32768" crc="a8a83f53" sha1="b6c8048549c60909c6a9e8e808df342d6491eae2" status="baddump" offset="0" />
 			</dataarea>
 		</part>
-	</software-->
+	</software>
 
 	<software name="amazing">
 		<description>A Mazing World of Malcom Mortar</description>
