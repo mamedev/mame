@@ -7,7 +7,8 @@
 class rltennis_state : public driver_device
 {
 public:
-	rltennis_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+	rltennis_state(const machine_config &mconfig, device_type type, const char *tag)
+	  : driver_device(mconfig, type, tag),
 		m_data760000(0), m_data740000(0), m_dac_counter(0), m_sample_rom_offset_1(0), m_sample_rom_offset_2(0),
 		m_offset_shift(0){ }
 
