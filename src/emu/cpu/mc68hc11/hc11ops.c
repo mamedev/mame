@@ -1,7 +1,7 @@
 #define SET_Z8(r)			(cpustate->ccr |= ((UINT8)r == 0) ? CC_Z : 0)
 #define SET_Z16(r)			(cpustate->ccr |= ((UINT16)r == 0) ? CC_Z : 0)
 #define SET_N8(r)			(cpustate->ccr |= (r & 0x80) ? CC_N : 0)
-#define SET_N16(r)			(cpustate->ccr |= (r & 0x80) ? CC_N : 0)
+#define SET_N16(r)			(cpustate->ccr |= (r & 0x8000) ? CC_N : 0)
 #define SET_V_ADD8(r,s,d)	(cpustate->ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x80) ? CC_V : 0)
 #define SET_V_SUB8(r,s,d)	(cpustate->ccr |= (((d) ^ (s)) & ((d) ^ (r)) & 0x80) ? CC_V : 0)
 #define SET_V_ADD16(r,s,d)	(cpustate->ccr |= (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? CC_V : 0)
