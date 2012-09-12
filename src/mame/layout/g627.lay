@@ -141,6 +141,12 @@
 		<bezel name="digit54" element="digit">
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</bezel>
+		<bezel name="digit53" element="digit">
+			<bounds left="98" top="345" right="132" bottom="384" />
+		</bezel>
+		<bezel name="digit52" element="digit">
+			<bounds left="142" top="345" right="176" bottom="384" />
+		</bezel>
 
 		<!-- Match / Balls Left -->
 		<bezel name="digit51" element="digit">
