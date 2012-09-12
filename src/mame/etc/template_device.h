@@ -6,8 +6,8 @@ Template for skeleton device
 
 #pragma once
 
-#ifndef __seibu_copDEV_H__
-#define __seibu_copDEV_H__
+#ifndef __xxxDEV_H__
+#define __xxxDEV_H__
 
 
 
@@ -15,21 +15,21 @@ Template for skeleton device
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SEIBU_COP_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, SEIBU_COP, _freq) \
+#define MCFG_XXX_ADD(_tag,_freq) \
+	MCFG_DEVICE_ADD(_tag, XXX, _freq) \
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> seibu_cop_device
+// ======================> xxx_device
 
-class seibu_cop_device :	public device_t
+class xxx_device : public device_t
 {
 public:
 	// construction/destruction
-	seibu_cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -44,7 +44,7 @@ protected:
 
 
 // device type definition
-extern const device_type SEIBU_COP;
+extern const device_type XXX;
 
 
 
