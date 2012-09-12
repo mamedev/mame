@@ -1461,6 +1461,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_VIDEO)/crtc_ega.o	\
 	$(MESS_VIDEO)/isa_ega.o		\
 	$(MESS_VIDEO)/isa_vga.o		\
+	$(MESS_VIDEO)/isa_vga_ati.o	\
 	$(MESS_VIDEO)/isa_svga_tseng.o		\
 	$(MESS_VIDEO)/isa_svga_s3.o	\
 	$(MESS_VIDEO)/isa_svga_cirrus.o	\
