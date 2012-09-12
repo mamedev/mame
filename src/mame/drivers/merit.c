@@ -1924,7 +1924,7 @@ ROM_START( dodgectya )
 	ROM_LOAD( "dodg_u37.u37", 0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
 
 	ROM_REGION( 0x0800, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD( "ctr-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+	ROM_LOAD( "crt-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
 ROM_END
 
 ROM_START( dodgectyb )
@@ -1937,7 +1937,7 @@ ROM_START( dodgectyb )
 	ROM_LOAD( "dodg_u37.u37", 0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
 
 	ROM_REGION( 0x0800, "gfx2", ROMREGION_ERASEFF )
-	ROM_LOAD( "ctr-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
+	ROM_LOAD( "crt-209_2131-82", 0x00000, 0x0800, NO_DUMP ) /* 2816 EEPROM in Z80 epoxy CPU module */
 ROM_END
 
 

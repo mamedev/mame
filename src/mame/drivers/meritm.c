@@ -1187,7 +1187,7 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 MACHINE_CONFIG_END
 
 
-ROM_START( dodgecty ) /* Use small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
+ROM_START( dodgecty ) /* Uses a small daughter card CRT-255 & Dallas DS1225Y NV SRAM */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9131-02_u9-2t.u9",  0x00000, 0x10000, CRC(22e73039) SHA1(368f03b31f7c3cb81a95b20d1cb954e8557d2017) ) /* 9131-02 U9-2T  880111 */
 	ROM_LOAD( "9131-02_u10-0.u10", 0x10000, 0x10000, CRC(bc3391f3) SHA1(4df46f31489bc5e3de3f6fc917e23b9bb5231e5a) )
