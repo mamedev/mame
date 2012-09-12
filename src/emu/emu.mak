@@ -250,6 +250,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/scsidev.o		\
 	$(EMUMACHINE)/scsihd.o		\
 	$(EMUMACHINE)/secflash.o	\
+	$(EMUMACHINE)/seibu_cop.o	\
 	$(EMUMACHINE)/smc91c9x.o	\
 	$(EMUMACHINE)/tc009xlvc.o	\
 	$(EMUMACHINE)/timekpr.o		\
