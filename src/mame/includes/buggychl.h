@@ -36,7 +36,7 @@ public:
 	int         m_pending_nmi;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);

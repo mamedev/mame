@@ -23,7 +23,7 @@ static INTERRUPT_GEN( parodius_interrupt )
 {
 	parodius_state *state = device->machine().driver_data<parodius_state>();
 	if (k052109_is_irq_enabled(state->m_k052109))
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(parodius_state::bankedram_r)
@@ -108,7 +108,7 @@ READ8_MEMBER(parodius_state::parodius_sound_r)
 
 WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 #if 0
@@ -116,7 +116,7 @@ WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
 static void sound_nmi_callback( running_machine &machine, int param )
 {
 	parodius_state *state = machine.driver_data<parodius_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ( state->m_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ( state->m_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	nmi_enabled = 0;
 }
@@ -125,13 +125,13 @@ static void sound_nmi_callback( running_machine &machine, int param )
 static TIMER_CALLBACK( nmi_callback )
 {
 	parodius_state *state = machine.driver_data<parodius_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 {
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -257,8 +257,8 @@ static MACHINE_START( parodius )
 
 	state->m_generic_paletteram_8.allocate(0x1000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053260 = machine.device("k053260");
 	state->m_k053245 = machine.device("k053245");
 	state->m_k053251 = machine.device("k053251");

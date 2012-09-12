@@ -33,8 +33,8 @@ public:
 	int          m_nmi_enable;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(mnchmobl_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mnchmobl_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);

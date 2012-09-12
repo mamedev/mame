@@ -58,21 +58,21 @@ WRITE16_MEMBER(cninja_state::cninja_sound_w)
 {
 
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE16_MEMBER(cninja_state::stoneage_sound_w)
 {
 
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
 	cninja_state *state = timer.machine().driver_data<cninja_state>();
 
-	device_set_input_line(state->m_maincpu, (state->m_irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
+	state->m_maincpu->set_input_line((state->m_irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
 	state->m_raster_irq_timer->reset();
 }
 
@@ -86,8 +86,8 @@ READ16_MEMBER(cninja_state::cninja_irq_r)
 		return m_scanline;
 
 	case 2: /* Raster IRQ ACK - value read is not used */
-		device_set_input_line(m_maincpu, 3, CLEAR_LINE);
-		device_set_input_line(m_maincpu, 4, CLEAR_LINE);
+		m_maincpu->set_input_line(3, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 		return 0;
 	}
 
@@ -712,13 +712,13 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	cninja_state *driver_state = device->machine().driver_data<cninja_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
+	driver_state->m_audiocpu->set_input_line(1, state); /* IRQ 2 */
 }
 
 static void sound_irq2(device_t *device, int state)
 {
 	cninja_state *driver_state = device->machine().driver_data<cninja_state>();
-	device_set_input_line(driver_state->m_audiocpu, 0, state);
+	driver_state->m_audiocpu->set_input_line(0, state);
 }
 
 WRITE8_MEMBER(cninja_state::sound_bankswitch_w)

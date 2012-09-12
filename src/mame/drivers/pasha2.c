@@ -477,7 +477,7 @@ READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 {
 
 	if(space.device().safe_pc() == 0x8302)
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 
 	return m_wram[(0x95744 / 2) + offset];
 }

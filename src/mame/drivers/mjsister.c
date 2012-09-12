@@ -43,7 +43,7 @@ public:
 	UINT32 m_dac_busy;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	dac_device *m_dac;
 
 	/* memory */
@@ -453,7 +453,7 @@ static MACHINE_START( mjsister )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_dac = machine.device<dac_device>("dac");
 
 	state->save_item(NAME(state->m_dac_busy));

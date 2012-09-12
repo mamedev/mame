@@ -572,12 +572,12 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0a)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0b)
 {
-	device_set_input_line(m_audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(laserbat_state::zaccaria_port0a_r)
@@ -650,7 +650,7 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x0a);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )

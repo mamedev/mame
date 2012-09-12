@@ -85,7 +85,7 @@ public:
 	UINT8    m_prot_addr;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_WRITE8_MEMBER(char_bank_w);
 	DECLARE_WRITE8_MEMBER(ddayjlc_bgram_w);
@@ -212,7 +212,7 @@ WRITE8_MEMBER(ddayjlc_state::sound_w)
 {
 
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(ddayjlc_state::i8257_CH0_w)
@@ -436,14 +436,14 @@ static INTERRUPT_GEN( ddayjlc_interrupt )
 {
 	ddayjlc_state *state = device->machine().driver_data<ddayjlc_state>();
 	if(state->m_main_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 {
 	ddayjlc_state *state = device->machine().driver_data<ddayjlc_state>();
 	if(state->m_sound_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -451,7 +451,7 @@ static MACHINE_START( ddayjlc )
 {
 	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_char_bank));
 	state->save_item(NAME(state->m_bgadr));

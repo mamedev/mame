@@ -74,8 +74,8 @@ public:
 	UINT8 m_sound_irq;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(dblewing_prot_r);
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
@@ -245,7 +245,7 @@ WRITE16_MEMBER(dblewing_state::dblewing_prot_w)
 		case 0x380: // sound write
 			soundlatch_byte_w(space, 0, data & 0xff);
 			m_sound_irq |= 0x02;
-			device_set_input_line(m_audiocpu, 0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+			m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
 		case 0x384:
 			m_384_data = data;
@@ -341,7 +341,7 @@ READ8_MEMBER(dblewing_state::irq_latch_r)
 
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
 	m_sound_irq &= ~0x02;
-	device_set_input_line(m_audiocpu, 0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	return m_sound_irq;
 }
 
@@ -536,7 +536,7 @@ static void sound_irq( device_t *device, int state )
 		driver_state->m_sound_irq |= 0x01;
 	else
 		driver_state->m_sound_irq &= ~0x01;
-	device_set_input_line(driver_state->m_audiocpu, 0, (driver_state->m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	driver_state->m_audiocpu->set_input_line(0, (driver_state->m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -565,8 +565,8 @@ static MACHINE_START( dblewing )
 {
 	dblewing_state *state = machine.driver_data<dblewing_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
 
 	state->save_item(NAME(state->m_008_data));

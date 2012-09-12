@@ -154,7 +154,7 @@ static PALETTE_INIT( jubileep )
 static INTERRUPT_GEN( jubileep_interrupt )
 {
 	/* doesn't seems to work properly. need to set level1 interrupts */
-	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 }
 
 

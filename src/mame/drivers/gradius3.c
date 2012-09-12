@@ -82,7 +82,7 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 		m_priority = data & 0x04;
 
 		/* bit 3 enables cpu B */
-		device_set_input_line(m_subcpu, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
 		m_irqAen = data & 0x20;
@@ -103,7 +103,7 @@ static INTERRUPT_GEN( cpuA_interrupt )
 {
 	gradius3_state *state = device->machine().driver_data<gradius3_state>();
 	if (state->m_irqAen)
-		device_set_input_line(device, 2, HOLD_LINE);
+		device->execute().set_input_line(2, HOLD_LINE);
 }
 
 
@@ -125,7 +125,7 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 	if (m_irqBmask & 4)
 	{
 		logerror("%04x trigger cpu B irq 4 %02x\n",space.device().safe_pc(),data);
-		device_set_input_line(m_subcpu, 4, HOLD_LINE);
+		m_subcpu->set_input_line(4, HOLD_LINE);
 	}
 	else
 		logerror("%04x MISSED cpu B irq 4 %02x\n",space.device().safe_pc(),data);
@@ -139,7 +139,7 @@ WRITE16_MEMBER(gradius3_state::sound_command_w)
 
 WRITE16_MEMBER(gradius3_state::sound_irq_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(gradius3_state::sound_bank_w)
@@ -290,9 +290,9 @@ static MACHINE_START( gradius3 )
 {
 	gradius3_state *state = machine.driver_data<gradius3_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_k007232 = machine.device("k007232");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");

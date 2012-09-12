@@ -43,7 +43,7 @@ public:
 	int       m_pending_command;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(turbofrc_sound_command_w);
 	DECLARE_WRITE16_MEMBER(aerfboot_soundlatch_w);

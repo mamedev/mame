@@ -1604,7 +1604,7 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 		if (state->m_parallel_drum.wc)
 			delay = delay + PARALLEL_DRUM_WORD_TIME;
 	} while (state->m_parallel_drum.wc);
-	device_adjust_icount(device->machine().device("maincpu"),-device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(delay));
+	device->machine().device("maincpu")->execute().adjust_icount(-device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(delay));
 	/* if no error, skip */
 	device->machine().device("maincpu")->state().set_state_int(PDP1_PC, device->machine().device("maincpu")->state().state_int(PDP1_PC)+1);
 }

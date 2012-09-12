@@ -39,7 +39,7 @@ public:
 	UINT8      m_clear_tv;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	pia6821_device *m_pia_u1;
 	pia6821_device *m_pia_u2;
 	pia6821_device *m_pia_u3;
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
 	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	logerror("GEN IRQ: %x\n", combined_state);
-	device_set_input_line(m_maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -425,7 +425,7 @@ static MACHINE_START( toratora )
 {
 	toratora_state *state = machine.driver_data<toratora_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_pia_u1 = machine.device<pia6821_device>("pia_u1");
 	state->m_pia_u2 = machine.device<pia6821_device>("pia_u2");
 	state->m_pia_u3 = machine.device<pia6821_device>("pia_u3");

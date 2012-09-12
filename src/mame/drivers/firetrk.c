@@ -53,7 +53,7 @@ static INTERRUPT_GEN( firetrk_interrupt )
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!state->m_in_service_mode)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

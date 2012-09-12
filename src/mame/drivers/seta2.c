@@ -2168,10 +2168,10 @@ static TIMER_DEVICE_CALLBACK( funcube_interrupt )
 	int scanline = param;
 
 	if(scanline == 368)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( funcube_sub_timer_irq )
@@ -2180,7 +2180,7 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 
 	if ( state->m_funcube_serial_count )
 	{
-		device_set_input_line(device, H8_SCI_1_RX, HOLD_LINE);
+		device->execute().set_input_line(H8_SCI_1_RX, HOLD_LINE);
 	}
 	else
 	{
@@ -2199,7 +2199,7 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 		state->m_funcube_press = press;
 	}
 
-	device_set_input_line(device, H8_METRO_TIMER_HACK, HOLD_LINE);
+	device->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static MACHINE_RESET( funcube )

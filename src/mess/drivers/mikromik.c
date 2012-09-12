@@ -491,7 +491,7 @@ static I8212_INTERFACE( iop_intf )
 
 WRITE_LINE_MEMBER( mm1_state::dma_hrq_changed )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// Assert HLDA
 	m_dmac->hack_w(state);

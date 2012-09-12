@@ -537,7 +537,7 @@ static const cassette_interface elwro800jr_cassette_interface =
 
 static INTERRUPT_GEN( elwro800jr_interrupt )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static const floppy_interface elwro800jr_floppy_interface =

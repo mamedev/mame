@@ -1810,7 +1810,7 @@ static MACHINE_START( chihiro )
 	chst->smbus_register_device(0x10,smbus_callback_pic16lc);
 	chst->smbus_register_device(0x45,smbus_callback_cx25871);
 	chst->smbus_register_device(0x54,smbus_callback_eeprom);
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 	chst->chihiro_devs.pic8259_1 = machine.device( "pic8259_1" );
 	chst->chihiro_devs.pic8259_2 = machine.device( "pic8259_2" );
 	chst->chihiro_devs.ide = machine.device( "ide" );

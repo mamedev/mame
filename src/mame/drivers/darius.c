@@ -145,7 +145,7 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	darius_state *state = machine.driver_data<darius_state>();
-	device_set_input_line(state->m_cpub, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_cpub->execute().set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(darius_state::cpua_ctrl_w)
@@ -504,7 +504,7 @@ static void darius_adpcm_int( device_t *device )
 	darius_state *state = device->machine().driver_data<darius_state>();
 
 	if (state->m_nmi_enable)
-		device_set_input_line(state->m_adpcm, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_adpcm->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -785,7 +785,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	darius_state *state = device->machine().driver_data<darius_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -844,8 +844,8 @@ static MACHINE_START( darius )
 	state->membank("bank1")->configure_entry(4, state->memregion("audiocpu")->base());
 	state->membank("bank1")->set_entry(4);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_cpub = machine.device("cpub");
 	state->m_adpcm = machine.device("adpcm");
 	state->m_pc080sn = machine.device("pc080sn");

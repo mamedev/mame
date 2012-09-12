@@ -33,7 +33,7 @@ public:
 	int       m_last_snd_ctrl;
 
 	/* devices */
-	device_t *m_subcpu;
+	cpu_device *m_subcpu;
 	DECLARE_READ8_MEMBER(sharedram_r);
 	DECLARE_WRITE8_MEMBER(sharedram_w);
 	DECLARE_WRITE8_MEMBER(subirqtrigger_w);

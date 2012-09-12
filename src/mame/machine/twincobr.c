@@ -19,7 +19,7 @@ INTERRUPT_GEN( twincobr_interrupt )
 	twincobr_state *state = device->machine().driver_data<twincobr_state>();
 	if (state->m_intenable) {
 		state->m_intenable = 0;
-		device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+		device->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
@@ -28,7 +28,7 @@ INTERRUPT_GEN( wardner_interrupt )
 	twincobr_state *state = device->machine().driver_data<twincobr_state>();
 	if (state->m_intenable) {
 		state->m_intenable = 0;
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 

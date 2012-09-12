@@ -48,8 +48,8 @@ public:
 	required_shared_ptr<UINT8> m_comms_ram;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 
 	/* memory */
 	UINT8      m_blit_buffer[256*256];
@@ -246,7 +246,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 						count++;
 				}
 			}
-			//device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE );
+			//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -322,7 +322,7 @@ master-slave algorithm
 #ifdef UNUSED_CODE
 WRITE8_MEMBER(nightgal_state::nsc_latch_w)
 {
-	device_set_input_line(m_subcpu, 0, HOLD_LINE );
+	m_subcpu->set_input_line(0, HOLD_LINE );
 }
 
 READ8_MEMBER(nightgal_state::nsc_latch_r)
@@ -369,14 +369,14 @@ WRITE8_MEMBER(nightgal_state::royalqn_blitter_1_w)
 WRITE8_MEMBER(nightgal_state::royalqn_blitter_2_w)
 {
 	m_blit_raw_data[2] = data;
-	device_set_input_line(m_subcpu, 0, ASSERT_LINE );
+	m_subcpu->set_input_line(0, ASSERT_LINE );
 }
 
 READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 {
 
 	if(offset == 2)
-		device_set_input_line(m_subcpu, 0, CLEAR_LINE );
+		m_subcpu->set_input_line(0, CLEAR_LINE );
 
 	return m_blit_raw_data[offset];
 }
@@ -834,8 +834,8 @@ static MACHINE_START( nightgal )
 {
 	nightgal_state *state = machine.driver_data<nightgal_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_nsc_latch));
 	state->save_item(NAME(state->m_z80_latch));

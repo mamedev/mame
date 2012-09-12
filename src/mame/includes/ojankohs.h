@@ -35,7 +35,7 @@ public:
 	int       m_vclk_left;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_msm;
 	DECLARE_WRITE8_MEMBER(ojankohs_rombank_w);
 	DECLARE_WRITE8_MEMBER(ojankoy_rombank_w);

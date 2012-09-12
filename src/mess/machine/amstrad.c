@@ -1446,7 +1446,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 			if ( m_asic.enabled )
 			{
 				vector = (data & 0xf8) + (m_plus_irq_cause);
-				device_set_input_line_vector(m_maincpu, 0, vector);
+				m_maincpu->set_input_line_vector(0, vector);
 				logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
 			}
 			m_asic.dma_clear = data & 0x01;
@@ -2888,9 +2888,9 @@ static void amstrad_common_init(running_machine &machine)
 
 	state->m_maincpu->reset();
 	if ( state->m_system_type == SYSTEM_CPC || state->m_system_type == SYSTEM_ALESTE )
-		device_set_input_line_vector(state->m_maincpu, 0, 0xff);
+		state->m_maincpu->set_input_line_vector(0, 0xff);
 	else
-		device_set_input_line_vector(state->m_maincpu, 0, 0x00);
+		state->m_maincpu->set_input_line_vector(0, 0x00);
 
 	/* The opcode timing in the Amstrad is different to the opcode
     timing in the core for the Z80 CPU.
@@ -2911,7 +2911,7 @@ static void amstrad_common_init(running_machine &machine)
 		(const UINT8*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
-	device_set_irq_callback(state->m_maincpu, amstrad_cpu_acknowledge_int);
+	state->m_maincpu->set_irq_acknowledge_callback(amstrad_cpu_acknowledge_int);
 }
 
 static TIMER_CALLBACK( cb_set_resolution )

@@ -599,9 +599,9 @@ WRITE_LINE_MEMBER( xerox820_state::intrq_w )
 	m_fdc_irq = state;
 
 	if (halt && state)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( xerox820_state::drq_w )
@@ -611,9 +611,9 @@ WRITE_LINE_MEMBER( xerox820_state::drq_w )
 	m_fdc_drq = state;
 
 	if (halt && state)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static const wd17xx_interface fdc_intf =

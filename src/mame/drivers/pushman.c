@@ -74,8 +74,8 @@ WRITE16_MEMBER(pushman_state::pushman_68705_w)
 
 	if (offset == 1)
 	{
-		device_set_input_line(m_mcu, M68705_IRQ_LINE, HOLD_LINE);
-		device_spin(&space.device());
+		m_mcu->execute().set_input_line(M68705_IRQ_LINE, HOLD_LINE);
+		space.device().execute().spin();
 		m_new_latch = 0;
 	}
 }
@@ -386,7 +386,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	pushman_state *state = device->machine().driver_data<pushman_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -404,8 +404,8 @@ static MACHINE_START( pushman )
 {
 	pushman_state *state = machine.driver_data<pushman_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->m_control));

@@ -40,8 +40,8 @@ public:
 	int           m_coin_command_pending;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_msm;
 	DECLARE_WRITE8_MEMBER(firetrap_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bankselect_w);

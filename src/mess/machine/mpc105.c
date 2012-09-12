@@ -40,7 +40,7 @@ mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, dev
 
 void mpc105_device::device_start()
 {
-	m_maincpu = machine().device(m_cputag);
+	m_maincpu = machine().device<cpu_device>(m_cputag);
 }
 
 //-------------------------------------------------
@@ -94,7 +94,7 @@ void mpc105_device::update_memory()
 
 	if (m_bank_base > 0)
 	{
-		address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+		address_space *space = m_maincpu->space(AS_PROGRAM);
 
 		/* first clear everything out */
 		space->nop_read(0x00000000, 0x3FFFFFFF);

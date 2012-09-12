@@ -217,8 +217,8 @@ static INTERRUPT_GEN( statriv2_interrupt )
 	state->m_latched_coin |= new_coin & (new_coin ^ state->m_last_coin);
 	state->m_last_coin = new_coin;
 
-	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	device->execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+	device->execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
 

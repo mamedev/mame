@@ -1160,7 +1160,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
 	after(machine, antic.steal_cycles, FUNC(antic_line_done));
     antic.steal_cycles = 0;
-	device_spin_until_trigger( machine.device("maincpu"), TRIGGER_STEAL );
+	machine.device("maincpu")->execute().spin_until_trigger(TRIGGER_STEAL );
 }
 
 

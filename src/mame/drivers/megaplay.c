@@ -87,7 +87,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 			segae_hintpending = 1;
 
 			if  ((segae_vdp_regs[0][0] & 0x10)) {
-				device_set_input_line(device, 0, HOLD_LINE);
+				device->execute().set_input_line(0, HOLD_LINE);
 				return;
 			}
 
@@ -100,7 +100,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 		hintcount = segae_vdp_regs[0][10];
 
 		if ( (sline<0xe0) && (segae_vintpending) ) {
-			device_set_input_line(device, 0, HOLD_LINE);
+			device->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 

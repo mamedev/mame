@@ -80,20 +80,20 @@ WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
 
-	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
+	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
 {
 
-	device_set_input_line(m_maincpu, 5, CLEAR_LINE);
+	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
 /*************************************
@@ -263,7 +263,7 @@ INPUT_PORTS_END
 static void blockout_irq_handler(device_t *device, int irq)
 {
 	blockout_state *state = device->machine().driver_data<blockout_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	state->m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2151_interface ym2151_config =
@@ -282,8 +282,8 @@ static MACHINE_START( blockout )
 {
 	blockout_state *state = machine.driver_data<blockout_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_color));
 }
@@ -301,10 +301,10 @@ static TIMER_DEVICE_CALLBACK( blockout_scanline )
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		device_set_input_line(state->m_maincpu, 6, ASSERT_LINE);
+		state->m_maincpu->set_input_line(6, ASSERT_LINE);
 
 	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
-		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
+		state->m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( blockout, blockout_state )

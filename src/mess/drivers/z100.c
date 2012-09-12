@@ -750,7 +750,7 @@ static MACHINE_START(z100)
 {
 	z100_state *state = machine.driver_data<z100_state>();
 
-	device_set_irq_callback(machine.device("maincpu"), z100_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(z100_irq_callback);
 	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 }
 

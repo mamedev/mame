@@ -23,8 +23,8 @@ public:
 	UINT16    m_priority[2];
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 	required_device<buffered_spriteram16_device> m_spriteram;

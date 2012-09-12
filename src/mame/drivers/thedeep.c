@@ -232,15 +232,15 @@ WRITE8_MEMBER(thedeep_state::thedeep_p3_w)
 
 	/* bit 0 0->1 transition IRQ0 to main */
 	if((!(m_mcu_p3_reg & 0x01)) && data & 0x01)
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 
 	/* bit 6 0->1 transition INT1 IRQ ACK */
 	if((!(m_mcu_p3_reg & 0x40)) && data & 0x40)
-		device_set_input_line(m_mcu, MCS51_INT1_LINE, CLEAR_LINE);
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 
 	/* bit 7 0->1 transition INT0 IRQ ACK */
 	if((!(m_mcu_p3_reg & 0x80)) && data & 0x80)
-		device_set_input_line(m_mcu, MCS51_INT0_LINE, CLEAR_LINE);
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	m_mcu_p3_reg = data;
 	logerror("P3 %02x\n",data);
@@ -426,14 +426,14 @@ static TIMER_DEVICE_CALLBACK( thedeep_interrupt )
 				state->m_protection_irq = 1;
 		}
 		if (state->m_protection_irq)
-			device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+			state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if(scanline == 0)
 	{
 		if (state->m_nmi_enable)
 		{
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }
@@ -442,7 +442,7 @@ static INTERRUPT_GEN( thedeep_mcu_irq )
 {
 	thedeep_state *state = device->machine().driver_data<thedeep_state>();
 
-	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
+	state->m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( thedeep, thedeep_state )

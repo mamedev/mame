@@ -106,7 +106,7 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	snes_state *state = machine.driver_data<snes_state>();
 
 	// pull NMI
-	device_set_input_line(state->m_maincpu, G65816_LINE_NMI, ASSERT_LINE);
+	state->m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
 
 	// don't happen again
 	state->m_nmi_timer->adjust(attotime::never);
@@ -120,7 +120,7 @@ static void snes_hirq_tick( running_machine &machine )
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occurred */
-	device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, ASSERT_LINE);
+	state->m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 
 	// don't happen again
 	state->m_hirq_timer->adjust(attotime::never);
@@ -180,7 +180,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
 			snes_latch_counters(machine);
-			device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, ASSERT_LINE );
+			state->m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
 	/* Horizontal IRQ timer */
@@ -244,7 +244,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		snes_ram[STAT78] ^= 0x80;		/* Toggle field flag */
 		snes_ppu.stat77_flags &= 0x3f;	/* Clear Time Over and Range Over bits */
 
-		device_set_input_line(state->m_maincpu, G65816_LINE_NMI, CLEAR_LINE );
+		state->m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE );
 	}
 
 	state->m_scanline_timer->adjust(attotime::never);
@@ -511,7 +511,7 @@ READ8_HANDLER( snes_r_io )
 			return value | 2; //CPU version number
 		case TIMEUP:		/* IRQ flag by H/V count timer */
 			value = (snes_open_bus_r(space, 0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
-			device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, CLEAR_LINE );
+			state->m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
 			snes_ram[TIMEUP] = 0;	// flag is cleared on both read and write
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
@@ -688,7 +688,7 @@ WRITE8_HANDLER( snes_w_io )
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
 			if((data & 0x30) == 0x00)
 			{
-				device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, CLEAR_LINE );
+				state->m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
 				snes_ram[TIMEUP] = 0;	// clear pending IRQ if irq is disabled here, 3x3 Eyes - Seima Korin Den behaves on this
 			}
 			break;
@@ -726,7 +726,7 @@ WRITE8_HANDLER( snes_w_io )
 				space->machine().scheduler().timer_set(space->machine().primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
 			break;
 		case TIMEUP:	// IRQ Flag is cleared on both read and write
-			device_set_input_line(state->m_maincpu, G65816_LINE_IRQ, CLEAR_LINE );
+			state->m_maincpu->set_input_line(G65816_LINE_IRQ, CLEAR_LINE );
 			snes_ram[TIMEUP] = 0;
 			return;
 		/* Following are read-only */
@@ -759,7 +759,7 @@ WRITE8_HANDLER( snes_w_io )
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w )
 {
 	snes_state *driver_state = device->machine().driver_data<snes_state>();
-	device_set_input_line(driver_state->m_maincpu, G65816_LINE_IRQ, state);
+	driver_state->m_maincpu->set_input_line(G65816_LINE_IRQ, state);
 }
 
 /*************************************

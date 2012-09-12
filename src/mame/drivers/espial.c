@@ -58,8 +58,8 @@ static MACHINE_START( espial )
 {
 	espial_state *state = machine.driver_data<espial_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	//state_save_register_global_array(machine, mcu_out[1]);
 	state->save_item(NAME(state->m_sound_nmi_enabled));
@@ -102,7 +102,7 @@ INTERRUPT_GEN( espial_sound_nmi_gen )
 WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 

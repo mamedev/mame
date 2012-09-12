@@ -88,7 +88,7 @@ static IRQ_CALLBACK ( mod8_irq_callback )
 
 static MACHINE_RESET(mod8)
 {
-	device_set_irq_callback(machine.device("maincpu"), mod8_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(mod8_irq_callback);
 }
 
 WRITE8_MEMBER( mod8_state::kbd_put )

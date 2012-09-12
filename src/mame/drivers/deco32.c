@@ -1673,7 +1673,7 @@ static MACHINE_RESET( deco32 )
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 UINT16 captaven_pri_callback(UINT16 x)
@@ -2000,13 +2000,13 @@ static TIMER_DEVICE_CALLBACK( lockload_vbl_irq )
 	if(scanline == 31*8)
 	{
 		state->m_irq_source = 0;
-		device_set_input_line(state->m_maincpu, ARM_IRQ_LINE, HOLD_LINE);
+		state->m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 	}
 
 	if(scanline == 0)
 	{
 		state->m_irq_source = 1;
-		device_set_input_line(state->m_maincpu, ARM_IRQ_LINE, HOLD_LINE);
+		state->m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 	}
 }
 

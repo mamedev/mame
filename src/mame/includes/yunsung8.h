@@ -23,7 +23,7 @@ public:
 	int         m_toggle;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 	/* memory */
 	UINT8      m_videoram[0x4000];

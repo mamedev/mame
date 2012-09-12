@@ -37,7 +37,7 @@ public:
 	int			m_addr_l;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 #if 0
 	/* 68705 */

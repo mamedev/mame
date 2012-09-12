@@ -29,7 +29,7 @@ public:
 	int        m_counter;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);

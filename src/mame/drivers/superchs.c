@@ -438,7 +438,7 @@ ROM_END
 READ32_MEMBER(superchs_state::main_cycle_r)
 {
 	if (space.device().safe_pc()==0x702)
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 
 	return m_ram[0];
 }
@@ -446,7 +446,7 @@ READ32_MEMBER(superchs_state::main_cycle_r)
 READ16_MEMBER(superchs_state::sub_cycle_r)
 {
 	if (space.device().safe_pc()==0x454)
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 
 	return m_ram[2]&0xffff;
 }

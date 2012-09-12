@@ -112,7 +112,7 @@ static TIMER_CALLBACK( nmi_callback )
 	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->m_pending_nmi = 1;
 	state->m_sound_state &= ~1;
@@ -140,7 +140,7 @@ WRITE8_MEMBER(bigevglf_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		m_pending_nmi = 0;
 	}
 }
@@ -420,7 +420,7 @@ static MACHINE_START( bigevglf )
 {
 	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->m_vidram_bank));

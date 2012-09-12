@@ -215,13 +215,13 @@ static TIMER_DEVICE_CALLBACK( bmc_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 64)
-		device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+		state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 static const gfx_layout tilelayout =

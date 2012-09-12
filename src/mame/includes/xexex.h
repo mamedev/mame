@@ -35,8 +35,8 @@ public:
 	int        m_frame;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k054539;
 	device_t *m_filter1l;
 	device_t *m_filter1r;

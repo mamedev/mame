@@ -2706,7 +2706,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 
 	mfp_init(machine());
 
-	device_set_irq_callback(machine().device("maincpu"), x68k_int_ack);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(x68k_int_ack);
 
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200

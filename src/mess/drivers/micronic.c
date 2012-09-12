@@ -348,7 +348,7 @@ void micronic_state::machine_reset()
 
 WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 {
-	device_set_input_line(m_maincpu, 0, !state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, !state ? HOLD_LINE : CLEAR_LINE);
 }
 
 const struct mc146818_interface micronic_mc146818_config =

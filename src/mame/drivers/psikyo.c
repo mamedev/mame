@@ -148,7 +148,7 @@ static TIMER_CALLBACK( psikyo_soundlatch_callback )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 	state->m_soundlatch = param;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	state->m_z80_nmi = 1;
 }
 
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 static void sound_irq( device_t *device, int irq )
 {
 	psikyo_state *state = device->machine().driver_data<psikyo_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(psikyo_state::psikyo_soundlatch_r)
@@ -392,7 +392,7 @@ READ8_MEMBER(psikyo_state::psikyo_soundlatch_r)
 
 WRITE8_MEMBER(psikyo_state::psikyo_clear_nmi_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_z80_nmi = 0;
 }
 
@@ -1017,7 +1017,7 @@ static MACHINE_START( psikyo )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_soundlatch));
 	state->save_item(NAME(state->m_z80_nmi));
@@ -1178,7 +1178,7 @@ MACHINE_CONFIG_END
 static void irqhandler( device_t *device, int linestate )
 {
 	psikyo_state *state = device->machine().driver_data<psikyo_state>();
-	device_set_input_line(state->m_audiocpu, 0, linestate ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =

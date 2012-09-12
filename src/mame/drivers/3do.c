@@ -133,7 +133,7 @@ static MACHINE_RESET( 3do )
 {
 	_3do_state *state = machine.driver_data<_3do_state>();
 
-	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
+	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("maincpu") );
 
 	state->membank("bank2")->set_base(state->memregion("user1")->base());
 

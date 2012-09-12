@@ -44,7 +44,7 @@ INTERRUPT_GEN( toaplan1_interrupt )
 	toaplan1_state *state = device->machine().driver_data<toaplan1_state>();
 
 	if (state->m_intenable)
-		device_set_input_line(device, 4, HOLD_LINE);
+		device->execute().set_input_line(4, HOLD_LINE);
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)
@@ -317,7 +317,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound)
 		devtag_reset(machine(), "ymsnd");
 		device_t *audiocpu = machine().device("audiocpu");
 		if (audiocpu != NULL && audiocpu->type() == Z80)
-			device_set_input_line(audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+			audiocpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

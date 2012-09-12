@@ -565,12 +565,12 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
 	{
 		// BnB Arcade
-		device_spin_until_time(&space.device(), attotime::from_usec(20));
+		space.device().execute().spin_until_time(attotime::from_usec(20));
 	}
 	else if (pc == 0x3002b580 || pc == 0x3002b550)
 	{
 		// Happy Tour
-		device_spin_until_time(&space.device(), attotime::from_usec(20));
+		space.device().execute().spin_until_time(attotime::from_usec(20));
 	}
 	//else
 	//  printf("speedup %08x %08x\n", pc, ret);

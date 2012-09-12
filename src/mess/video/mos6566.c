@@ -330,7 +330,7 @@ inline void mos6566_device::vic2_suspend_cpu()
 		m_first_ba_cycle = m_cycles_counter;
 		if (m_in_rdy_workaround_func(0) != 7 )
 		{
-//          device_suspend(machine.firstcpu, SUSPEND_REASON_SPIN, 0);
+//          machine.firstcpu->suspend(SUSPEND_REASON_SPIN, 0);
 		}
 		m_device_suspended = 1;
 	}
@@ -341,7 +341,7 @@ inline void mos6566_device::vic2_resume_cpu()
 {
 	if (m_device_suspended == 1)
 	{
-	//  device_resume(machine.firstcpu, SUSPEND_REASON_SPIN);
+	//  machine.firstcpu->resume(SUSPEND_REASON_SPIN);
 		m_device_suspended = 0;
 	}
 }
@@ -2025,7 +2025,7 @@ void mos6569_device::execute_run()
 
 		if ((cpu_cycles == vic_cycles) && (m_rdy_cycles > 0))
 		{
-			device_spin_until_time (m_cpu, m_cpu->cycles_to_attotime(m_rdy_cycles));
+			m_cpu->spin_until_time(m_cpu->cycles_to_attotime(m_rdy_cycles));
 			m_rdy_cycles = 0;
 		}
 

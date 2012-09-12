@@ -30,8 +30,8 @@ public:
 	UINT16        m_realpunc_video_ctrl;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mb87078;
 	device_t *m_ym;
 	device_t *m_tc0180vcu;

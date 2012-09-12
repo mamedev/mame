@@ -22,7 +22,7 @@ WRITE8_MEMBER(suprloco_state::suprloco_soundport_w)
 	soundlatch_byte_w(space, 0, data);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	device_spin_until_time(&space.device(), attotime::from_usec(50));
+	space.device().execute().spin_until_time(attotime::from_usec(50));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )

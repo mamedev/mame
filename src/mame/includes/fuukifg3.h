@@ -40,8 +40,8 @@ public:
 	UINT8       m_shared_ram[16];
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
 	DECLARE_READ32_MEMBER(snd_020_r);
 	DECLARE_WRITE32_MEMBER(snd_020_w);

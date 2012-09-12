@@ -3827,7 +3827,7 @@ static TIMER_DEVICE_CALLBACK ( lev5_timer_irq_cb )
 {
 	igs011_state *state = timer.machine().driver_data<igs011_state>();
 
-	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+	state->m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
@@ -3853,7 +3853,7 @@ static INTERRUPT_GEN( lhb_vblank_irq )
 	if (!state->m_lhb_irq_enable)
 		return;
 
-	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+	state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK ( lhb_timer_irq_cb )
@@ -3862,7 +3862,7 @@ static TIMER_DEVICE_CALLBACK ( lhb_timer_irq_cb )
 	if (!state->m_lhb_irq_enable)
 		return;
 
-	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+	state->m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
@@ -3879,7 +3879,7 @@ static TIMER_DEVICE_CALLBACK ( lev3_timer_irq_cb )
 {
 	igs011_state *state = timer.machine().driver_data<igs011_state>();
 
-	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+	state->m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 

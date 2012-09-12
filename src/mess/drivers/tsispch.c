@@ -272,7 +272,7 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) m_infifo[i] = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
-	device_set_irq_callback(machine().device("maincpu"), irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 	fprintf(stderr,"machine reset\n");
 }
 

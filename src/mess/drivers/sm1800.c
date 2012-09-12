@@ -74,7 +74,7 @@ static IRQ_CALLBACK(sm1800_irq_callback)
 
 MACHINE_RESET_MEMBER(sm1800_state)
 {
-	device_set_irq_callback(m_maincpu, sm1800_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(sm1800_irq_callback);
 }
 
 void sm1800_state::video_start()

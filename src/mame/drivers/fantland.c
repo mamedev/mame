@@ -76,7 +76,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
@@ -835,12 +835,12 @@ static INTERRUPT_GEN( fantland_irq )
 {
 	fantland_state *state = device->machine().driver_data<fantland_state>();
 	if (state->m_nmi_enable & 8)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( fantland_sound_irq )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80 / 4);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
 }
 
 static MACHINE_CONFIG_START( fantland, fantland_state )
@@ -888,7 +888,7 @@ MACHINE_CONFIG_END
 static void galaxygn_sound_irq( device_t *device, int line )
 {
 	fantland_state *state = device->machine().driver_data<fantland_state>();
-	device_set_input_line_and_vector(state->m_audio_cpu, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	state->m_audio_cpu->execute().set_input_line_and_vector(0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static const ym2151_interface galaxygn_ym2151_interface =

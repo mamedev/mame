@@ -178,7 +178,7 @@ READ16_MEMBER(dassault_state::dassault_sub_control_r)
 WRITE16_MEMBER(dassault_state::dassault_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE); /* IRQ1 */
+	m_audiocpu->set_input_line(0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
@@ -186,8 +186,8 @@ READ16_MEMBER(dassault_state::dassault_irq_r)
 {
 	switch (offset)
 	{
-	case 0: device_set_input_line(m_maincpu, 5, CLEAR_LINE); break;
-	case 1: device_set_input_line(m_subcpu, 6, CLEAR_LINE); break;
+	case 0: m_maincpu->set_input_line(5, CLEAR_LINE); break;
+	case 1: m_subcpu->set_input_line(6, CLEAR_LINE); break;
 	}
 	return m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
@@ -196,8 +196,8 @@ WRITE16_MEMBER(dassault_state::dassault_irq_w)
 {
 	switch (offset)
 	{
-	case 0: device_set_input_line(m_maincpu, 5, ASSERT_LINE); break;
-	case 1: device_set_input_line(m_subcpu, 6, ASSERT_LINE); break;
+	case 0: m_maincpu->set_input_line(5, ASSERT_LINE); break;
+	case 1: m_subcpu->set_input_line(6, ASSERT_LINE); break;
 	}
 
 	COMBINE_DATA(&m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
@@ -448,7 +448,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	dassault_state *driver_state = device->machine().driver_data<dassault_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state);
+	driver_state->m_audiocpu->set_input_line(1, state);
 }
 
 WRITE8_MEMBER(dassault_state::sound_bankswitch_w)

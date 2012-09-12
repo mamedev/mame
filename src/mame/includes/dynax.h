@@ -154,8 +154,8 @@ public:
 
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_soundcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_soundcpu;
 	device_t *m_rtc;
 	device_t *m_ymsnd;
 	okim6295_device *m_oki;

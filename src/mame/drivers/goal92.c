@@ -20,7 +20,7 @@ WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
-		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -213,7 +213,7 @@ static void irqhandler( device_t *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
 	//goal92_state *state = device->machine().driver_data<goal92_state>();
-	//device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//state->m_audiocpu->set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -234,7 +234,7 @@ static void goal92_adpcm_int( device_t *device )
 	state->m_adpcm_toggle^= 1;
 
 	if (state->m_adpcm_toggle)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -296,7 +296,7 @@ static MACHINE_START( goal92 )
 
 	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_fg_bank));
 	state->save_item(NAME(state->m_msm5205next));

@@ -48,7 +48,7 @@ READ8_MEMBER(tnzs_state::mcu_tnzs_r)
 	UINT8 data;
 
 	data = upi41_master_r(m_mcu, offset & 1);
-	device_yield(&space.device());
+	space.device().execute().yield();
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
 
@@ -636,7 +636,7 @@ INTERRUPT_GEN( arknoid2_interrupt )
 			break;
 	}
 
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_RESET( tnzs )
@@ -687,7 +687,7 @@ MACHINE_START( jpopnics )
 	state->membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
 	state->membank("subbank")->set_entry(state->m_bank2);
 
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_mcu = NULL;
 
 	state->m_bank1 = 2;
@@ -707,7 +707,7 @@ MACHINE_START( tnzs )
 
 	MACHINE_START_CALL( jpopnics );
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->m_kageki_csport_sel));
@@ -733,9 +733,9 @@ WRITE8_MEMBER(tnzs_state::tnzs_ramrom_bankswitch_w)
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	m_bank1 = data & 0x07;
@@ -753,7 +753,7 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 				if (data & 0x04)
 				{
 					if (m_mcu != NULL && m_mcu->type() == I8742)
-						device_set_input_line(m_mcu, INPUT_LINE_RESET, PULSE_LINE);
+						m_mcu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

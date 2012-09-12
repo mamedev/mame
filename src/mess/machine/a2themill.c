@@ -108,8 +108,8 @@ void a2bus_themill_device::device_reset()
     m_flipAddrSpace = false;
     m_6809Mode = false;
     m_status = 0xc0;    // OS9 loader relies on this
-    device_set_input_line(m_6809, INPUT_LINE_HALT, ASSERT_LINE);
-    device_set_input_line(m_6809, INPUT_LINE_RESET, ASSERT_LINE);
+    m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+    m_6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 UINT8 a2bus_themill_device::read_c0nx(address_space &space, UINT8 offset)
@@ -141,15 +141,15 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
                 m_6502space = &space;
                 m_6809->reset();
 
-                device_set_input_line(m_6809, INPUT_LINE_HALT, CLEAR_LINE);
-                device_set_input_line(m_6809, INPUT_LINE_RESET, CLEAR_LINE);
+                m_6809->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+                m_6809->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
                 m_bEnabled = true;
                 m_status &= ~0x04;
             }
             else
             {
-                device_set_input_line(m_6809, INPUT_LINE_HALT, ASSERT_LINE);
+                m_6809->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
                 m_bEnabled = false;
                 m_status |= 0x04;
             }
@@ -170,12 +170,12 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
         case 3: // 6809 NMI
             if (data & 0x80)
             {
-                device_set_input_line(m_6809, INPUT_LINE_NMI, CLEAR_LINE);
+                m_6809->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
                 m_status |= 0x08;
             }
             else
             {
-                device_set_input_line(m_6809, INPUT_LINE_NMI, ASSERT_LINE);
+                m_6809->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
                 m_status &= ~0x08;
             }
             break;
@@ -183,12 +183,12 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
         case 4: // 6809 FIRQ
             if (data & 0x80)
             {
-                device_set_input_line(m_6809, M6809_FIRQ_LINE, CLEAR_LINE);
+                m_6809->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
                 m_status |= 0x10;
             }
             else
             {
-                device_set_input_line(m_6809, M6809_FIRQ_LINE, ASSERT_LINE);
+                m_6809->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
                 m_status &= ~0x10;
             }
             break;
@@ -196,12 +196,12 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
         case 5: // 6809 IRQ
             if (data & 0x80)
             {
-                device_set_input_line(m_6809, M6809_IRQ_LINE, CLEAR_LINE);
+                m_6809->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
                 m_status |= 0x20;
             }
             else
             {
-                device_set_input_line(m_6809, M6809_IRQ_LINE, ASSERT_LINE);
+                m_6809->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
                 m_status &= ~0x20;
             }
             break;

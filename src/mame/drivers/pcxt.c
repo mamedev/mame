@@ -719,7 +719,7 @@ static MACHINE_RESET( filetto )
 	device_t *speaker = machine.device("speaker");
 	state->m_bank = -1;
 	state->m_lastvalue = -1;
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	state->m_pc_spkrdata = 0;
 	state->m_pc_input = 0;

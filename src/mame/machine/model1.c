@@ -2152,7 +2152,7 @@ READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
 	if ( m_ram_adr == 0 && m_copro_fifoin_num != 0 )
 	{
 		/* spin the main cpu and let the TGP catch up */
-		device_spin_until_time(&space.device(), attotime::from_usec(100));
+		space.device().execute().spin_until_time(attotime::from_usec(100));
 	}
 
 	return m_ram_adr;
@@ -2178,7 +2178,7 @@ READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
 		if ( m_ram_adr == 0 && r == 0xffff )
 		{
 			/* if the TGP is busy, spin some more */
-			device_spin_until_time(&space.device(), attotime::from_usec(100));
+			space.device().execute().spin_until_time(attotime::from_usec(100));
 		}
 
 		if ( m_ram_adr & 0x8000 )

@@ -150,7 +150,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( via_irq_delayed )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
-	device_set_input_line(state->m_maincpu, 0, param);
+	state->m_maincpu->set_input_line(0, param);
 }
 
 static void via_irq( device_t *device, int state )
@@ -187,7 +187,7 @@ static MACHINE_START( trvquest )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	/* register for save states */
 	state->save_item(NAME(state->m_video_x));

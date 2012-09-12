@@ -1150,7 +1150,7 @@ READ32_MEMBER(seattle_state::galileo_r)
 			}
 
 			/* eat some time for those which poll this register */
-			device_eat_cycles(&space.device(), 100);
+			space.device().execute().eat_cycles(100);
 
 			if (LOG_TIMERS)
 				logerror("%08X:hires_timer_r = %08X\n", space.device().safe_pc(), result);
@@ -1371,7 +1371,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 	m_cpu_stalled_mem_mask = mem_mask;
 
 	/* spin until we send the magic trigger */
-	device_spin_until_trigger(&space.device(), 45678);
+	space.device().execute().spin_until_trigger(45678);
 	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", space.device().safe_pc());
 }
 
@@ -1393,7 +1393,7 @@ static void voodoo_stall(device_t *device, int stall)
 		else
 		{
 			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", device->machine().device("maincpu")->safe_pc());
-			device_spin_until_trigger(device->machine().device("maincpu"), 45678);
+			device->machine().device("maincpu")->execute().spin_until_trigger(45678);
 		}
 	}
 
@@ -1672,7 +1672,7 @@ READ32_MEMBER(seattle_state::cmos_protect_r)
 
 WRITE32_MEMBER(seattle_state::seattle_watchdog_w)
 {
-	device_eat_cycles(&space.device(), 100);
+	space.device().execute().eat_cycles(100);
 }
 
 
@@ -1786,7 +1786,7 @@ READ32_MEMBER(seattle_state::seattle_ide_r)
 	device_t *device = machine().device("ide");
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
-		device_eat_cycles(machine().device("maincpu"), 100);
+		machine().device("maincpu")->execute().eat_cycles(100);
 	return ide_controller32_r(device, offset, mem_mask);
 }
 

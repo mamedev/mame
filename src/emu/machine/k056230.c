@@ -96,7 +96,7 @@ void k056230_device::network_irq_clear()
 {
 	if(m_cpu)
 	{
-		device_set_input_line(m_cpu, INPUT_LINE_IRQ2, CLEAR_LINE);
+		m_cpu->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 	}
 }
 
@@ -118,13 +118,13 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
 				{
 					if(m_cpu)
 					{
-						device_set_input_line(m_cpu, INPUT_LINE_IRQ2, ASSERT_LINE);
+						m_cpu->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 					}
 					machine().scheduler().timer_set(attotime::from_usec(10), FUNC(network_irq_clear_callback), 0, (void*)this);
 				}
 			}
 //          else
-//              device_set_input_line(k056230->cpu, INPUT_LINE_IRQ2, CLEAR_LINE);
+//              k056230->cpu->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register

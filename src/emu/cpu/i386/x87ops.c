@@ -292,7 +292,7 @@ int x87_check_exceptions(i386_state *cpustate)
 
 	if ((cpustate->x87_sw & ~cpustate->x87_cw) & 0x3f)
 	{
-		// device_set_input_line(cpustate->device, INPUT_LINE_FERR, RAISE_LINE);
+		// cpustate->device->execute().set_input_line(INPUT_LINE_FERR, RAISE_LINE);
 		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", cpustate->x87_cw, cpustate->x87_sw);
 		if (cpustate->cr[0] & 0x20) // FIXME: 486 and up only
 		{

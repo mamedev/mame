@@ -103,7 +103,7 @@ class towns_state : public driver_device
 	{ }
 
 	/* devices */
-	device_t* m_maincpu;
+	cpu_device* m_maincpu;
 	device_t* m_dma_1;
 	device_t* m_dma_2;
 	device_t* m_fdc;

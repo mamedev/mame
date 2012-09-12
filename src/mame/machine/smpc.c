@@ -215,14 +215,14 @@ static void smpc_master_on(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( smpc_slave_enable )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line(state->m_slave, INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+	state->m_slave->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	state->m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
 	state->m_smpc.SF = 0x00; //clear hand-shake flag
 }
@@ -231,7 +231,7 @@ static TIMER_CALLBACK( smpc_sound_enable )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	state->m_en_68k = param ^ 1;
 	state->m_smpc.OREG[31] = param + 0x06; //read-back for last command issued
 	state->m_smpc.SF = 0x00; //clear hand-shake flag
@@ -253,7 +253,7 @@ static void smpc_system_reset(running_machine &machine)
 	memset(state->m_vdp1_vram,0x00,0x100000);
 	//A-Bus
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, PULSE_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static TIMER_CALLBACK( smpc_change_clock )
@@ -272,8 +272,8 @@ static TIMER_CALLBACK( smpc_change_clock )
 	stv_vdp2_dynamic_res_change(machine);
 
 	if(!state->m_NMI_reset)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
-	device_set_input_line(state->m_slave, INPUT_LINE_RESET, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	state->m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* put issued command in OREG31 */
 	state->m_smpc.OREG[31] = 0x0e + param;
@@ -316,7 +316,7 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	//  /*This is for RTC,cartridge code and similar stuff...*/
 	//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 	if(!(state->m_scu.ism & IRQ_SMPC))
-		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
+		state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
 	else
 		state->m_scu.ist |= (IRQ_SMPC);
 
@@ -515,7 +515,7 @@ static TIMER_CALLBACK( intback_peripheral )
 	}
 
 	if(!(state->m_scu.ism & IRQ_SMPC))
-		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
+		state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
 	else
 		state->m_scu.ist |= (IRQ_SMPC);
 
@@ -563,7 +563,7 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 		state->m_smpc.pmode = state->m_smpc.IREG[0]>>4;
 
 		if(!(state->m_scu.ism & IRQ_SMPC))
-			device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
+			state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
 		else
 			state->m_scu.ist |= (IRQ_SMPC);
 
@@ -609,7 +609,7 @@ static void smpc_nmi_req(running_machine &machine)
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	/*NMI is unconditionally requested */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void smpc_nmi_set(running_machine &machine,UINT8 cmd)
@@ -810,7 +810,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 
 		if(LOG_SMPC) printf("SMPC: M68k %s\n",(data & 0x10) ? "off" : "on");
 		//space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),(state->m_smpc_ram[0x77] & 0x10) >> 4);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		state->m_en_68k = ((data & 0x10) >> 4) ^ 1;
 
 		//if(LOG_SMPC) printf("SMPC: ram [0x77] = %02x\n",data);

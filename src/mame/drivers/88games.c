@@ -70,7 +70,7 @@ WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 
 WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
@@ -309,7 +309,7 @@ static MACHINE_START( 88games )
 {
 	_88games_state *state = machine.driver_data<_88games_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");
 	state->m_k051316 = machine.device("k051316");

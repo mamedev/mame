@@ -293,7 +293,7 @@ static INTERRUPT_GEN( m72_mcu_int )
 	m72_state *state = device->machine().driver_data<m72_state>();
 	//state->m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	state->m_mcu_snd_cmd_latch = 0x11;// | (machine.rand() & 1); /* 0x10 is special as well - FIXME */
-	device_set_input_line(device, 1, ASSERT_LINE);
+	device->execute().set_input_line(1, ASSERT_LINE);
 }
 
 READ8_MEMBER(m72_state::m72_mcu_sample_r)

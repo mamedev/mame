@@ -56,7 +56,7 @@ public:
 WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( kingpin_program_map, AS_PROGRAM, 8, kingpin_state )
@@ -144,7 +144,7 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 
 WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)
 {
-	device_set_input_line(m_maincpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TMS9928A_INTERFACE(kingpin_tms9928a_interface)

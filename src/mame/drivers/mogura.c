@@ -21,7 +21,7 @@ public:
 	tilemap_t *m_tilemap;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	dac_device *m_dac1;
 	dac_device *m_dac2;
 	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
@@ -192,7 +192,7 @@ static MACHINE_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_dac1 = machine.device<dac_device>("dac1");
 	state->m_dac2 = machine.device<dac_device>("dac2");
 }

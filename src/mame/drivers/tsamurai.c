@@ -49,7 +49,7 @@ WRITE8_MEMBER(tsamurai_state::nmi_enable_w)
 static INTERRUPT_GEN( samurai_interrupt )
 {
 	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
-	if (state->m_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_nmi_enabled) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(tsamurai_state::unknown_d803_r)
@@ -270,7 +270,7 @@ WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
 static INTERRUPT_GEN( vsgongf_sound_interrupt )
 {
 	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
-	if (state->m_vsgongf_sound_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_vsgongf_sound_nmi_enabled) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */

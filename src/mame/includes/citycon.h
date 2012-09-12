@@ -27,7 +27,7 @@ public:
 	int            m_bg_image;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(citycon_in_r);
 	DECLARE_READ8_MEMBER(citycon_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(citycon_videoram_w);

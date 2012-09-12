@@ -83,7 +83,7 @@ TIMER_CALLBACK( scc68070_timer0_callback )
         scc68070->timers.timer_status_register |= TSR_OV0;
         if(interrupt)
         {
-        	device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+        	machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
         	machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
     }
@@ -170,7 +170,7 @@ TIMER_CALLBACK( scc68070_rx_callback )
 			UINT8 interrupt = (scc68070->picr2 >> 4) & 7;
 			if(interrupt)
 			{
-				device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+				machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 				machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 			}
 
@@ -381,7 +381,7 @@ TIMER_CALLBACK( scc68070_tx_callback )
 		UINT8 interrupt = scc68070->picr2 & 7;
 		if(interrupt)
 		{
-			device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+			machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 			machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
 

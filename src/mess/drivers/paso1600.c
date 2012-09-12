@@ -292,7 +292,7 @@ static const struct pic8259_interface paso1600_pic8259_config =
 static MACHINE_START(paso1600)
 {
 	paso1600_state *state = machine.driver_data<paso1600_state>();
-	device_set_irq_callback(state->m_maincpu, paso1600_irq_callback);
+	state->m_maincpu->set_irq_acknowledge_callback(paso1600_irq_callback);
 }
 
 

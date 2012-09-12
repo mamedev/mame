@@ -39,8 +39,8 @@ void hdsnd_init(running_machine &machine)
 static void update_68k_interrupts(running_machine &machine)
 {
 	harddriv_state *state = machine.driver_data<harddriv_state>();
-	device_set_input_line(state->m_soundcpu, 1, state->m_mainflag ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->m_soundcpu, 3, state->m_irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	state->m_soundcpu->set_input_line(1, state->m_mainflag ? ASSERT_LINE : CLEAR_LINE);
+	state->m_soundcpu->set_input_line(3, state->m_irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -83,8 +83,8 @@ WRITE16_MEMBER(harddriv_state::hd68k_snd_data_w)
 
 WRITE16_MEMBER(harddriv_state::hd68k_snd_reset_w)
 {
-	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
-	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, CLEAR_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_mainflag = m_soundflag = 0;
 	update_68k_interrupts(machine());
 	logerror("%06X:Reset sound\n", space.device().safe_pcbase());
@@ -188,7 +188,7 @@ WRITE16_MEMBER(harddriv_state::hdsnd68k_latches_w)
 		case 4:	/* RES320 */
 			logerror("%06X:RES320=%d\n", space.device().safe_pcbase(), data);
 			if (m_sounddsp != NULL)
-				device_set_input_line(m_sounddsp, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+				m_sounddsp->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 7:	/* LED */
@@ -277,7 +277,7 @@ READ16_MEMBER(harddriv_state::hdsnddsp_get_bio)
 	/* if we're not at the next BIO yet, advance us there */
 	if (cycles_until_bio > 0)
 	{
-		device_adjust_icount(&space.device(), -cycles_until_bio);
+		space.device().execute().adjust_icount(-cycles_until_bio);
 		m_last_bio_cycles += CYCLES_PER_BIO;
 	}
 	else

@@ -39,8 +39,8 @@ public:
 	UINT8    m_track_enable;	/* used by wwjgtin */
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	optional_device<sn76489_new_device> m_sn_1;
 	optional_device<sn76489_new_device> m_sn_2;
 	DECLARE_WRITE8_MEMBER(sound_command_w);

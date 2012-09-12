@@ -32,7 +32,7 @@ public:
 	UINT8      m_snd_data;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);

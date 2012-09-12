@@ -37,7 +37,7 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
+		m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -499,7 +499,7 @@ static MACHINE_START( gaelco )
 {
 	gaelco_state *state = machine.driver_data<gaelco_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( bigkarnk, gaelco_state )

@@ -75,8 +75,8 @@ static MACHINE_START( crgolf )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	/* configure the banking */
 	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x2000);
@@ -153,7 +153,7 @@ static TIMER_CALLBACK( main_to_sound_callback )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	state->m_main_to_sound_data = param;
 }
 
@@ -167,7 +167,7 @@ WRITE8_MEMBER(crgolf_state::main_to_sound_w)
 READ8_MEMBER(crgolf_state::main_to_sound_r)
 {
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_main_to_sound_data;
 }
 
@@ -183,7 +183,7 @@ static TIMER_CALLBACK( sound_to_main_callback )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	state->m_sound_to_main_data = param;
 }
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(crgolf_state::sound_to_main_w)
 READ8_MEMBER(crgolf_state::sound_to_main_r)
 {
 
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_sound_to_main_data;
 }
 

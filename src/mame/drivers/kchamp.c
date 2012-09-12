@@ -82,7 +82,7 @@ WRITE8_MEMBER(kchamp_state::control_w)
 WRITE8_MEMBER(kchamp_state::sound_reset_w)
 {
 	if (!(data & 1))
-		device_set_input_line(m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 WRITE8_MEMBER(kchamp_state::sound_control_w)
@@ -95,7 +95,7 @@ WRITE8_MEMBER(kchamp_state::sound_control_w)
 WRITE8_MEMBER(kchamp_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(kchamp_state::sound_msm_w)
@@ -144,7 +144,7 @@ ADDRESS_MAP_END
 ********************/
 READ8_MEMBER(kchamp_state::sound_reset_r)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -344,7 +344,7 @@ static INTERRUPT_GEN( kc_interrupt )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 	if (state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void msmint( device_t *device )
@@ -361,7 +361,7 @@ static void msmint( device_t *device )
 	if (!(state->m_counter ^= 1))
 	{
 		if (state->m_sound_nmi_enable)
-			device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+			state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -379,7 +379,7 @@ static INTERRUPT_GEN( sound_int )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -387,7 +387,7 @@ static MACHINE_START( kchamp )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_nmi_enable));
 	state->save_item(NAME(state->m_sound_nmi_enable));

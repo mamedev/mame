@@ -237,8 +237,8 @@ READ8_MEMBER( sfcbox_state::port_81_r )
 
 WRITE8_MEMBER( sfcbox_state::port_81_w )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	ioport("OSD_CS")->write(data, 0xff);
 }
@@ -478,8 +478,8 @@ static MACHINE_RESET( sfcbox )
 	MACHINE_RESET_CALL( snes );
 
 	/* start with both CPUs disabled */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-	device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( sfcbox, snes )

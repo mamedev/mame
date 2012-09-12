@@ -33,8 +33,8 @@ public:
 	UINT8 m_ddr_b;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(lsasquad_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(lsasquad_sh_nmi_disable_w);

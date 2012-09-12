@@ -19,8 +19,8 @@ public:
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
 	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);

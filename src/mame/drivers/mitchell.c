@@ -394,7 +394,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
@@ -1105,7 +1105,7 @@ static TIMER_DEVICE_CALLBACK( mitchell_irq )
 
 	if (scanline == 240 || scanline == 0)
 	{
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 
 		state->m_irq_source = (scanline == 240);
 	}
@@ -1211,7 +1211,7 @@ static void spangbl_adpcm_int( device_t *device )
 	state->m_sample_buffer >>= 4;
 	state->m_sample_select ^= 1;
 	if(state->m_sample_select == 0)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

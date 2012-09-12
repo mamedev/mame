@@ -110,8 +110,8 @@ public:
 	int          m_hopper;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	required_device<timer_device> m_int_timer;
 	int m_rasflag;
 	int m_old_rasflag;

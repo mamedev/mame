@@ -1743,9 +1743,9 @@ static TIMER_DEVICE_CALLBACK( brickzn_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	if(scanline == 112)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	// TODO: NMI enable
 }
@@ -1826,9 +1826,9 @@ static TIMER_DEVICE_CALLBACK( hardhea2_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	if(scanline == 112)
-		if (state->m_nmi_enable)	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_nmi_enable)	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_RESET( hardhea2 )

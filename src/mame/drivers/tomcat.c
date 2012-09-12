@@ -182,7 +182,7 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresl_w)
 {
 	// 320 Reset Low         (Address Strobe)
 	// Reset TMS320
-	device_set_input_line(machine().device("dsp"), INPUT_LINE_RESET, ASSERT_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
@@ -190,7 +190,7 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
 	m_dsp_BIO = 0;
-	device_set_input_line(machine().device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)

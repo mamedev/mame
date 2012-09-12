@@ -165,10 +165,10 @@ static TIMER_DEVICE_CALLBACK( sbw_interrupt )
 	int scanline = param;
 
 	if(scanline == 256)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xcf); /* RST 08h */
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 
 	if(scanline == 128)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xd7); /* RST 10h */
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 
 }
 

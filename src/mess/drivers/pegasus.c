@@ -90,7 +90,7 @@ public:
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
 	device_t *cpu = timer.machine().device( "maincpu" );
-	device_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
+	cpu->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )

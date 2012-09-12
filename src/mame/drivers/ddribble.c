@@ -22,14 +22,14 @@ static INTERRUPT_GEN( ddribble_interrupt_0 )
 {
 	ddribble_state *state = device->machine().driver_data<ddribble_state>();
 	if (state->m_int_enable_0)
-		device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( ddribble_interrupt_1 )
 {
 	ddribble_state *state = device->machine().driver_data<ddribble_state>();
 	if (state->m_int_enable_1)
-		device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 

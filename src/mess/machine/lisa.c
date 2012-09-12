@@ -328,7 +328,7 @@ static void scan_keyboard(running_machine &machine)
 						if (keycode == state->m_NMIcode)
 						{	/* generate NMI interrupt */
 							machine.device("maincpu")->execute().set_input_line(M68K_IRQ_7, PULSE_LINE);
-							device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
 						COPS_queue_data(machine, & keycode, 1);

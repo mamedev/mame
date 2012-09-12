@@ -169,7 +169,7 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
 	if (state->m_irq5_mask)
-		device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+		device->execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( punkshot_interrupt )
@@ -210,7 +210,7 @@ WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 	k053260_w(device, offset, data);
 
 	if (offset)
-		device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 READ16_MEMBER(tmnt_state::prmrsocr_sound_r)
@@ -232,7 +232,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_sound_cmd_w)
 
 WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
@@ -321,13 +321,13 @@ static void sound_nmi_callback( int param )
 static TIMER_CALLBACK( nmi_callback )
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
 {
 //  sound_nmi_enabled = 1;
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -518,7 +518,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (m_last == 0 && (data & 0x20) != 0)
-			device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 		m_last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -666,7 +666,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
 
 	/* I think this is more than just a trigger */
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
@@ -2036,7 +2036,7 @@ static void cuebrick_irq_handler( device_t *device, int state )
 {
 	tmnt_state *tmnt = device->machine().driver_data<tmnt_state>();
 
-	device_set_input_line(tmnt->m_maincpu, M68K_IRQ_6, (state) ? ASSERT_LINE : CLEAR_LINE);
+	tmnt->m_maincpu->set_input_line(M68K_IRQ_6, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_interface_cbj =
@@ -2207,8 +2207,8 @@ static MACHINE_START( common )
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007232 = machine.device("k007232");
 	state->m_k053260 = machine.device("k053260");
 	state->m_k054539 = machine.device("k054539");
@@ -2249,7 +2249,7 @@ static INTERRUPT_GEN( tmnt_vblank_irq )
 	tmnt_state *state = device->machine().driver_data<tmnt_state>();
 
 	if(state->m_irq5_mask)
-		device_set_input_line(device, 5, HOLD_LINE);
+		device->execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -2594,7 +2594,7 @@ MACHINE_CONFIG_END
 static void sound_nmi( device_t *device )
 {
 	tmnt_state *state = device->machine().driver_data<tmnt_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const k054539_interface k054539_config =

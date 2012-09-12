@@ -363,7 +363,7 @@ static void sound_irq_gen(device_t *device, int state)
 {
 	bishi_state *bishi = device->machine().driver_data<bishi_state>();
 
-	device_set_input_line(bishi->m_maincpu, M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
+	bishi->m_maincpu->set_input_line(M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =
@@ -392,7 +392,7 @@ static MACHINE_START( bishi )
 {
 	bishi_state *state = machine.driver_data<bishi_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_k056832 = machine.device("k056832");
 	state->m_k054338 = machine.device("k054338");
 	state->m_k055555 = machine.device("k055555");

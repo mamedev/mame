@@ -141,8 +141,8 @@ public:
 	int          m_cps_version;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	msm5205_device *m_msm_1;	// fcrash
 	msm5205_device *m_msm_2;	// fcrash
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);

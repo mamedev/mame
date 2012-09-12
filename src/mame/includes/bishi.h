@@ -25,8 +25,8 @@ public:
 	UINT16     m_cur_control2;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k007232;
 	device_t *m_k056832;
 	device_t *m_k054338;

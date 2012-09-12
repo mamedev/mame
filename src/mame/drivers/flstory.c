@@ -38,7 +38,7 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->m_pending_nmi = 1;
 }
@@ -60,7 +60,7 @@ WRITE8_MEMBER(flstory_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		m_pending_nmi = 0;
 	}
 }
@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 {
-	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 
 	return (victnine_mcu_status_r(*space, 0) & 3);
 }
@@ -1006,8 +1006,8 @@ static MACHINE_START( flstory )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 
 	/* video */

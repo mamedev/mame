@@ -323,7 +323,7 @@ static INTERRUPT_GEN( vblank_irq )
 	tankbust_state *state = device->machine().driver_data<tankbust_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( tankbust, tankbust_state )

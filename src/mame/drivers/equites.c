@@ -398,7 +398,7 @@ D                                                                               
 static TIMER_CALLBACK( equites_nmi_callback )
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	device_set_input_line(state->m_audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
@@ -430,7 +430,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			device_set_input_line(m_audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+			m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
@@ -440,7 +440,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			device_set_input_line(m_audio_cpu, I8085_INTR_LINE, HOLD_LINE);
+			m_audio_cpu->execute().set_input_line(I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -692,12 +692,12 @@ WRITE16_MEMBER(equites_state::mcu_w)
 
 WRITE16_MEMBER(equites_state::mcu_halt_assert_w)
 {
-	device_set_input_line(m_mcu, INPUT_LINE_HALT, ASSERT_LINE);
+	m_mcu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(equites_state::mcu_halt_clear_w)
 {
-	device_set_input_line(m_mcu, INPUT_LINE_HALT, CLEAR_LINE);
+	m_mcu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

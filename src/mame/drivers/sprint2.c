@@ -111,7 +111,7 @@ static INTERRUPT_GEN( sprint2 )
 	device->machine().watchdog_enable(!service_mode(device->machine()));
 
 	if (!service_mode(device->machine()))
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

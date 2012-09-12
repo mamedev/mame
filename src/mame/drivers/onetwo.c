@@ -64,8 +64,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(onetwo_fgram_w);
 	DECLARE_WRITE8_MEMBER(onetwo_cpubank_w);
 	DECLARE_WRITE8_MEMBER(onetwo_coin_counters_w);
@@ -133,7 +133,7 @@ WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void set_color(running_machine &machine, int offset)
@@ -331,7 +331,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int linestate)
 {
 	onetwo_state *state = device->machine().driver_data<onetwo_state>();
-	device_set_input_line(state->m_audiocpu, 0, linestate);
+	state->m_audiocpu->set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -352,8 +352,8 @@ static MACHINE_START( onetwo )
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( onetwo, onetwo_state )

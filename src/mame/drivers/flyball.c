@@ -43,7 +43,7 @@ public:
 	UINT8    m_potsense;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(flyball_input_r);
 	DECLARE_READ8_MEMBER(flyball_scanline_r);
 	DECLARE_READ8_MEMBER(flyball_potsense_r);
@@ -373,7 +373,7 @@ static MACHINE_START( flyball )
 {
 	flyball_state *state = machine.driver_data<flyball_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_pitcher_vert));
 	state->save_item(NAME(state->m_pitcher_horz));

@@ -48,9 +48,9 @@ public:
 	UINT8 *m_bwp123_membase[3];
 
 	/* device */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(bwp12_sharedram1_w);
 	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
 	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);

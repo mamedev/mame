@@ -39,26 +39,26 @@ WRITE8_MEMBER(mouser_state::mouser_sound_interrupt_w)
 {
 	//logerror("int %02x\n", data);
 	m_sound_byte = data;
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(mouser_state::mouser_sound_byte_r)
 {
 	//logerror("sound r\n");
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;
 }
 
 WRITE8_MEMBER(mouser_state::mouser_sound_nmi_clear_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mouser_sound_nmi_assert )
 {
 	mouser_state *state = device->machine().driver_data<mouser_state>();
 	if (BIT(state->m_nmi_enable, 0))
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
@@ -187,8 +187,8 @@ static MACHINE_START( mouser )
 {
 	mouser_state *state = machine.driver_data<mouser_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_sound_byte));
 	state->save_item(NAME(state->m_nmi_enable));

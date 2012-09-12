@@ -907,9 +907,9 @@ static TIMER_DEVICE_CALLBACK( tm3k_interrupt )
 	int scanline = param;
 
 	if(scanline == 0) // vblank, FIXME
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 	else if((scanline % 16) == 0)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	// lev 2 triggered at the end of the blit
 }

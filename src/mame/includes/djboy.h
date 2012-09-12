@@ -39,7 +39,7 @@ public:
 	UINT8		m_beast_p3;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_cpu1;
 	device_t *m_cpu2;
 	device_t *m_pandora;

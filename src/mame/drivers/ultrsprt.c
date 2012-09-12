@@ -205,7 +205,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( ultrsprt_vblank )
 {
-	device_set_input_line(device, INPUT_LINE_IRQ1, ASSERT_LINE);
+	device->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static void sound_irq_callback(running_machine &machine, int irq)

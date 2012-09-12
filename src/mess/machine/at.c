@@ -155,7 +155,7 @@ WRITE8_MEMBER( at_state::at_page8_w )
 
 WRITE_LINE_MEMBER( at_state::pc_dma_hrq_changed )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	m_dma8237_2->hack_w(state);
@@ -354,7 +354,7 @@ static IRQ_CALLBACK(at_irq_callback)
 
 MACHINE_START( at )
 {
-	device_set_irq_callback(machine.device("maincpu"), at_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
 }
 
 MACHINE_RESET( at )

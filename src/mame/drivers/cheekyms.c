@@ -17,7 +17,7 @@ INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -112,7 +112,7 @@ static MACHINE_START( cheekyms )
 {
 	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_dac = machine.device<dac_device>("dac");
 }
 
@@ -121,7 +121,7 @@ static INTERRUPT_GEN( vblank_irq )
 	cheekyms_state *state = device->machine().driver_data<cheekyms_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 

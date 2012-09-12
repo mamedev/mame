@@ -59,8 +59,8 @@ public:
 	int       m_int_num;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 	DECLARE_READ16_MEMBER(hyprduel_irq_cause_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_irq_cause_w);
 	DECLARE_WRITE16_MEMBER(hyprduel_subcpu_control_w);

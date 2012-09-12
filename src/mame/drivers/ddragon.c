@@ -130,11 +130,11 @@ static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		state->m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -152,7 +152,7 @@ static MACHINE_START( ddragon )
 	/* configure banks */
 	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_sub_cpu = machine.device("sub");
 	state->m_snd_cpu = machine.device("soundcpu");
 	state->m_adpcm_1 = machine.device("adpcm1");
@@ -201,7 +201,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 	if (data & 0x10)
 		m_dd_sub_cpu_busy = 0;
 	else if (m_dd_sub_cpu_busy == 0)
-		device_set_input_line(m_sub_cpu, m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		m_sub_cpu->execute().set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	membank("bank1")->set_entry((data & 0xe0) >> 5);
 }
@@ -276,7 +276,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 	if (data & 0x10)
 		m_dd_sub_cpu_busy = 0;
 	else if (m_dd_sub_cpu_busy == 0)
-		device_set_input_line(m_sub_cpu, m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		m_sub_cpu->execute().set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
@@ -298,20 +298,20 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
-			device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: /* 380c - FIRQ ack */
-			device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 2: /* 380d - IRQ ack */
-			device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 380e - SND irq */
 			soundlatch_byte_w(space, 0, data);
-			device_set_input_line(m_snd_cpu, m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			m_snd_cpu->execute().set_input_line(m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -323,20 +323,20 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 
 WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_ack_w)
 {
-	device_set_input_line(m_sub_cpu, m_sprite_irq, CLEAR_LINE );
+	m_sub_cpu->execute().set_input_line(m_sprite_irq, CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
 {
-	device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static void irq_handler( device_t *device, int irq )
 {
 	ddragon_state *state = device->machine().driver_data<ddragon_state>();
-	device_set_input_line(state->m_snd_cpu, state->m_ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	state->m_snd_cpu->execute().set_input_line(state->m_ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -378,8 +378,8 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
         it's quite obvious from the Double Dragon 2 code, below). */
 		if (data & 3)
 		{
-			device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
-			device_set_input_line(m_sub_cpu, m_sprite_irq, CLEAR_LINE);
+			m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+			m_sub_cpu->execute().set_input_line(m_sprite_irq, CLEAR_LINE);
 		}
 	}
 }
@@ -561,8 +561,8 @@ ADDRESS_MAP_END
 /* might not be 100% accurate, check bits written */
 WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
 {
-	device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
-	device_set_input_line(m_sub_cpu, m_sprite_irq, CLEAR_LINE );
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_sub_cpu->execute().set_input_line(m_sprite_irq, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8, ddragon_state )

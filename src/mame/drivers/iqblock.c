@@ -82,9 +82,9 @@ static TIMER_DEVICE_CALLBACK( iqblock_irq )
 		return;
 
 	if((scanline % 32) == 16)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	else if	((scanline % 32) == 0)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

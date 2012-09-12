@@ -132,13 +132,13 @@ WRITE8_MEMBER(champbas_state::irq_enable_w)
 	m_irq_mask = data & 1;
 
 	if (!m_irq_mask)
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	state->m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 // Champion Baseball has only one DAC
@@ -180,7 +180,7 @@ WRITE8_MEMBER(champbas_state::champbas_mcu_halt_w)
 		return;
 
 	data &= 1;
-	device_set_input_line(m_mcu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->execute().set_input_line(INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -580,7 +580,7 @@ static MACHINE_START( champbas )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_mcu = machine.device(CPUTAG_MCU);
 
 	state->save_item(NAME(state->m_watchdog_count));
@@ -591,7 +591,7 @@ static MACHINE_START( champbas )
 static MACHINE_START( exctsccr )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	// FIXME
 	machine.scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
@@ -613,7 +613,7 @@ static INTERRUPT_GEN( vblank_irq )
 	champbas_state *state = device->machine().driver_data<champbas_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

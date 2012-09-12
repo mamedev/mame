@@ -24,7 +24,7 @@ static INTERRUPT_GEN( aliens_interrupt )
 	aliens_state *state = device->machine().driver_data<aliens_state>();
 
 	if (k051960_is_irq_enabled(state->m_k051960))
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(aliens_state::bankedram_r)
@@ -70,7 +70,7 @@ WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 {
 
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(aliens_state::aliens_snd_bankswitch_w)
@@ -234,8 +234,8 @@ static MACHINE_START( aliens )
 	state->membank("bank1")->configure_entries(0, 20, &ROM[0x10000], 0x2000);
 	state->membank("bank1")->set_entry(0);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007232 = machine.device("k007232");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");

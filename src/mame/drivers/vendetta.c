@@ -201,24 +201,24 @@ WRITE8_MEMBER(vendetta_state::vendetta_5fe0_w)
 static TIMER_CALLBACK( z80_nmi_callback )
 {
 	vendetta_state *state = machine.driver_data<vendetta_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(vendetta_state::z80_arm_nmi_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	machine().scheduler().timer_set(attotime::from_usec(25), FUNC(z80_nmi_callback));
 }
 
 WRITE8_MEMBER(vendetta_state::z80_irq_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 READ8_MEMBER(vendetta_state::vendetta_sound_interrupt_r)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	return 0x00;
 }
 
@@ -408,7 +408,7 @@ static INTERRUPT_GEN( vendetta_irq )
 {
 	vendetta_state *state = device->machine().driver_data<vendetta_state>();
 	if (state->m_irq_enabled)
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static const k052109_interface vendetta_k052109_intf =
@@ -467,8 +467,8 @@ static MACHINE_START( vendetta )
 
 	state->m_generic_paletteram_8.allocate(0x1000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053246 = machine.device("k053246");
 	state->m_k053251 = machine.device("k053251");
 	state->m_k052109 = machine.device("k052109");

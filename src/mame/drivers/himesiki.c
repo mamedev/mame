@@ -100,7 +100,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /****************************************************************************/
@@ -273,7 +273,7 @@ static MACHINE_START( himesiki )
 
 	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_scrollx));
 	state->save_item(NAME(state->m_flipscreen));

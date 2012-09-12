@@ -29,8 +29,8 @@ public:
 	int m_palette_bank2;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_soundcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_soundcpu;
 	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(mcat_coin_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);

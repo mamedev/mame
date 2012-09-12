@@ -699,7 +699,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	bublbobl_state *state = device->machine().driver_data<bublbobl_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -724,9 +724,9 @@ static MACHINE_START( common )
 {
 	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_mcu = machine.device("mcu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_slave = machine.device("slave");
 
 	state->save_item(NAME(state->m_sound_nmi_enable));

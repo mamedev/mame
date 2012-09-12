@@ -419,11 +419,11 @@ void nakajies_state::nakajies_update_irqs( running_machine &machine )
 
 	if ( vector >= 0xf8 )
 	{
-		device_set_input_line_and_vector( m_maincpu, 0, ASSERT_LINE, vector );
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector );
 	}
 	else
 	{
-		device_set_input_line( m_maincpu, 0, CLEAR_LINE );
+		m_maincpu->set_input_line(0, CLEAR_LINE );
 	}
 }
 

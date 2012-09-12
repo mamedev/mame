@@ -70,7 +70,7 @@ WRITE8_MEMBER(mikie_state::mikie_sh_irqtrigger_w)
 	if (m_last_irq == 0 && data == 1)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
-		device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
 	m_last_irq = data;
@@ -271,7 +271,7 @@ static INTERRUPT_GEN( vblank_irq )
 	mikie_state *state = device->machine().driver_data<mikie_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( mikie, mikie_state )

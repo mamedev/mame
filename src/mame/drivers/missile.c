@@ -440,7 +440,7 @@ static TIMER_CALLBACK( clock_irq )
 
 	/* assert the IRQ if not already asserted */
 	state->m_irq_state = (~curv >> 5) & 1;
-	device_set_input_line(state->m_maincpu, 0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
 	machine.primary_screen->update_partial(v_to_scanline(state, curv));
@@ -540,7 +540,7 @@ static MACHINE_START( missile )
 static MACHINE_RESET( missile )
 {
 	missile_state *state = machine.driver_data<missile_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	state->m_maincpu->set_input_line(0, CLEAR_LINE);
 	state->m_irq_state = 0;
 }
 
@@ -617,7 +617,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		device_adjust_icount(&space->device(), -1);
+		space->device().execute().adjust_icount(-1);
 	}
 }
 
@@ -653,7 +653,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		device_adjust_icount(&space->device(), -1);
+		space->device().execute().adjust_icount(-1);
 	}
 	return result;
 }
@@ -759,7 +759,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 	{
 		if (m_irq_state)
 		{
-			device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+			m_maincpu->set_input_line(0, CLEAR_LINE);
 			m_irq_state = 0;
 		}
 	}

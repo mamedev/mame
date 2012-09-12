@@ -48,7 +48,7 @@ public:
 	int        m_ty;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(fcombat_protection_r);
 	DECLARE_READ8_MEMBER(fcombat_port01_r);
 	DECLARE_WRITE8_MEMBER(e900_w);

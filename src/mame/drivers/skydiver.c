@@ -156,7 +156,7 @@ static INTERRUPT_GEN( skydiver_interrupt )
 	discrete_sound_w(discrete, SKYDIVER_NOISE_DATA,  state->m_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
 
 	if (state->m_nmion)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

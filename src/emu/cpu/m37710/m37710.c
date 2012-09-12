@@ -269,7 +269,7 @@ static TIMER_CALLBACK( m37710_timer_cb )
 	cpustate->timers[which]->adjust(cpustate->reload[which], param);
 
 	m37710_set_irq_line(cpustate, curirq, HOLD_LINE);
-	device_triggerint(cpustate->device);
+	cpustate->device->signal_interrupt_trigger();
 }
 
 static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int state)

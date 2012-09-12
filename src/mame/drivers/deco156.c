@@ -315,7 +315,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static int deco156_bank_callback(const int bank)

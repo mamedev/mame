@@ -151,7 +151,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_vreg_w)
 WRITE8_MEMBER(combatsc_state::combatscb_sh_irqtrigger_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(combatsc_state::combatscb_io_r)
@@ -322,7 +322,7 @@ WRITE8_MEMBER(combatsc_state::protection_clock_w)
 
 WRITE8_MEMBER(combatsc_state::combatsc_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 READ8_MEMBER(combatsc_state::combatsc_busy_r)

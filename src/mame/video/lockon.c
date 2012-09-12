@@ -67,7 +67,7 @@ static TIMER_CALLBACK( cursor_callback )
 	lockon_state *state = machine.driver_data<lockon_state>();
 
 	if (state->m_main_inten)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xff);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 	state->m_cursor_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
@@ -284,8 +284,8 @@ WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 static TIMER_CALLBACK( bufend_callback )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
-	device_set_input_line_and_vector(state->m_ground, 0, HOLD_LINE, 0xff);
-	device_set_input_line(state->m_object, NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	state->m_ground->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	state->m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 /* Get data for a each 8x8x3 ground tile */
@@ -618,7 +618,7 @@ WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 READ16_MEMBER(lockon_state::lockon_obj_4000_r)
 {
 
-	device_set_input_line(m_object, NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 

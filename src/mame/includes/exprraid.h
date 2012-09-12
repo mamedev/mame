@@ -30,7 +30,7 @@ public:
 	//int          m_coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_slave;
 	DECLARE_READ8_MEMBER(exprraid_protection_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);

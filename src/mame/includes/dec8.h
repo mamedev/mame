@@ -10,9 +10,9 @@ public:
 		m_bg_data(*this, "bg_data"){ }
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mcu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 

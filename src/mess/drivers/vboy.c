@@ -616,7 +616,7 @@ WRITE32_MEMBER( vboy_state::io_w )
             */
             if (!(data & 0x08))
             {
-                device_set_input_line(m_maincpu, 1, CLEAR_LINE);
+                m_maincpu->set_input_line(1, CLEAR_LINE);
             }
 
             if (data & 1)
@@ -1201,7 +1201,7 @@ void vboy_state::m_timer_tick()
         m_vboy_regs.tcr |= 0x02;
         if(m_vboy_regs.tcr & 8)
         {
-            device_set_input_line(m_maincpu, 1, ASSERT_LINE);
+            m_maincpu->set_input_line(1, ASSERT_LINE);
         }
     }
 
@@ -1227,7 +1227,7 @@ static TIMER_DEVICE_CALLBACK( timer_pad_tick )
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
 	if((state->m_vboy_regs.kcr & 0x80) == 0)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 static PALETTE_INIT( vboy )
@@ -1243,10 +1243,10 @@ void vboy_state::m_set_irq(UINT16 irq_vector)
 	m_vip_regs.INTPND |= irq_vector;
 
 	if(m_vip_regs.INTENB & m_vip_regs.INTPND)
-		device_set_input_line(m_maincpu, 4, ASSERT_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 
 	if((m_vip_regs.INTENB & m_vip_regs.INTPND) == 0)
-		device_set_input_line(m_maincpu, 4, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 /* TODO: obviously all of this needs clean-ups and better implementation ... */

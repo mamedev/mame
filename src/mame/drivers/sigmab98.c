@@ -1690,7 +1690,7 @@ const eeprom_interface eeprom_intf =
 
 static INTERRUPT_GEN( gegege_vblank_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
 
 static MACHINE_CONFIG_START( gegege, sigmab98_state )
@@ -1788,13 +1788,13 @@ static TIMER_DEVICE_CALLBACK( sammymd1_irq )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line_and_vector(state->m_maincpu,0,HOLD_LINE, state->m_vblank_vector);
+		state->m_maincpu->set_input_line_and_vector(0,HOLD_LINE, state->m_vblank_vector);
 
 	if(scanline == 128)
-		device_set_input_line_and_vector(state->m_maincpu,0,HOLD_LINE, state->m_timer0_vector);
+		state->m_maincpu->set_input_line_and_vector(0,HOLD_LINE, state->m_timer0_vector);
 
 	if(scanline == 32)
-		device_set_input_line_and_vector(state->m_maincpu,0,HOLD_LINE, state->m_timer1_vector);
+		state->m_maincpu->set_input_line_and_vector(0,HOLD_LINE, state->m_timer1_vector);
 }
 
 static MACHINE_CONFIG_DERIVED( animalc, sammymdl )

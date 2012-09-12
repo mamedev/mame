@@ -21,11 +21,11 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	/* bit 3 n.c. */
 
 	/* bit 4 resets second Z80 */
-	device_set_input_line(m_slave, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_slave->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
 	if (m_mcu != NULL) // only if we have a MCU
-		device_set_input_line(m_mcu, INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	m_video_enable = data & 0x40;
@@ -52,7 +52,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 {
-	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -91,7 +91,7 @@ static TIMER_CALLBACK( nmi_callback )
 	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->m_pending_nmi = 1;
 }
@@ -113,14 +113,14 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		m_pending_nmi = 0;
 	}
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_soundcpu_reset_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(bublbobl_state::bublbobl_sound_status_r)
@@ -203,8 +203,8 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	if ((m_port1_out & 0x40) && (~data & 0x40))
 	{
 		// logerror("triggering IRQ on main CPU\n");
-		device_set_input_line_vector(m_maincpu, 0, m_mcu_sharedram[0]);
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
@@ -374,7 +374,7 @@ static TIMER_CALLBACK( bublbobl_m68705_irq_ack )
 
 INTERRUPT_GEN( bublbobl_m68705_interrupt )
 {
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 
 	device->machine().scheduler().timer_set(attotime::from_msec(1000/60), FUNC(bublbobl_m68705_irq_ack)); /* TODO: understand how this is ack'ed */
 }
@@ -474,8 +474,8 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
 
-		device_set_input_line_vector(m_maincpu, 0, m_mcu_sharedram[0]);
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	if ((m_ddr_b & 0x40) && (~data & 0x40) && (m_port_b_out & 0x40))
 	{

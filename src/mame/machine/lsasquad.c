@@ -13,7 +13,7 @@ static TIMER_CALLBACK( nmi_callback )
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->m_pending_nmi = 1;
 }
@@ -29,7 +29,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		m_pending_nmi = 0;
 	}
 }
@@ -142,7 +142,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_68705_port_b_w)
 	{
 		m_port_a_in = m_from_main;
 		if (m_main_sent)
-			device_set_input_line(m_mcu, 0, CLEAR_LINE);
+			m_mcu->execute().set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 		//logerror("read command %02x from main cpu\n", m_port_a_in);
 	}
@@ -168,7 +168,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_mcu_w)
 	//logerror("%04x: mcu_w %02x\n", space.device().safe_pc(), data);
 	m_from_main = data;
 	m_main_sent = 1;
-	device_set_input_line(m_mcu, 0, ASSERT_LINE);
+	m_mcu->execute().set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(lsasquad_state::lsasquad_mcu_r)

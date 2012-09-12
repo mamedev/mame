@@ -163,10 +163,10 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 	{
 		switch (ipl)
 		{
-		case 0:	device_set_input_line(m_maincpu, M68K_IRQ_7, ASSERT_LINE);	break;
-		case 1:	device_set_input_line(m_maincpu, M68K_IRQ_5, ASSERT_LINE);	break; // CTRL-ALT-7 pressed
-		case 2:	device_set_input_line(m_maincpu, M68K_IRQ_2, ASSERT_LINE);	break;
-		case 3:	device_set_input_line(m_maincpu, M68K_IRQ_7, CLEAR_LINE);	break;
+		case 0:	m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);	break;
+		case 1:	m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);	break; // CTRL-ALT-7 pressed
+		case 2:	m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);	break;
+		case 3:	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);	break;
 		}
 
 		m_ipl = ipl;
@@ -208,7 +208,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
 //  int irq = (m_ser2_rxd | m_ser1_txd);
 
-//  device_set_input_line(m_ipc, INPUT_LINE_IRQ0, irq);
+//  m_ipc->execute().set_input_line(INPUT_LINE_IRQ0, irq);
 
 	return (m_comdata << 7);
 }

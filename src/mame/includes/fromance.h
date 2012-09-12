@@ -50,7 +50,7 @@ public:
 	UINT8    m_sound_command;
 
 	/* devices */
-	device_t *m_subcpu;
+	cpu_device *m_subcpu;
 	DECLARE_READ8_MEMBER(fromance_commanddata_r);
 	DECLARE_WRITE8_MEMBER(fromance_commanddata_w);
 	DECLARE_READ8_MEMBER(fromance_busycheck_main_r);

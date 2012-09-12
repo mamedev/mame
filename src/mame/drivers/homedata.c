@@ -227,12 +227,12 @@ static INTERRUPT_GEN( homedata_irq )
 {
 	homedata_state *state = device->machine().driver_data<homedata_state>();
 	state->m_vblank = 1;
-	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( upd7807_irq )
 {
-	device_set_input_line(device, UPD7810_INTF1, HOLD_LINE);
+	device->execute().set_input_line(UPD7810_INTF1, HOLD_LINE);
 }
 
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
 WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -1144,8 +1144,8 @@ static MACHINE_START( homedata )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_ym = machine.device("ymsnd");
 	state->m_sn = machine.device<sn76489a_new_device>("snsnd");
 	state->m_dac = machine.device<dac_device>("dac");

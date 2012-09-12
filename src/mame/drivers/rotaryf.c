@@ -45,11 +45,11 @@ static TIMER_DEVICE_CALLBACK( rotaryf_interrupt )
 	int scanline = param;
 
 	if (scanline == 256)
-		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);
+		state->m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
 	else if((scanline % 64) == 0)
 	{
-		device_set_input_line(state->m_maincpu, I8085_RST75_LINE, ASSERT_LINE);
-		device_set_input_line(state->m_maincpu, I8085_RST75_LINE, CLEAR_LINE);
+		state->m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+		state->m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 	}
 }
 

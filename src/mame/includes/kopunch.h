@@ -25,7 +25,7 @@ public:
 	int        m_gfxbank;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(kopunch_in_r);
 	DECLARE_WRITE8_MEMBER(kopunch_lamp_w);
 	DECLARE_WRITE8_MEMBER(kopunch_coin_w);

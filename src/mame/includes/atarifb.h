@@ -57,7 +57,7 @@ public:
 	int m_counter_y_in2b;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
 	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
 	DECLARE_WRITE8_MEMBER(abaseb_out1_w);

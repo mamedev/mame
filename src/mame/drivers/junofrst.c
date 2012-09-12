@@ -240,7 +240,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
 	if (m_last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line_and_vector(m_soundcpu, 0, HOLD_LINE, 0xff);
+		m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
 	m_last_irq = data;
@@ -250,7 +250,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
 WRITE8_MEMBER(junofrst_state::junofrst_i8039_irq_w)
 {
 
-	device_set_input_line(m_i8039, 0, ASSERT_LINE);
+	m_i8039->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -259,7 +259,7 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(m_i8039, 0, CLEAR_LINE);
+		m_i8039->execute().set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
@@ -283,7 +283,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_irq_enable_w)
 
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
@@ -425,7 +425,7 @@ static INTERRUPT_GEN( junofrst_30hz_irq )
 	/* flip flops cause the interrupt to be signalled every other frame */
 	state->m_irq_toggle ^= 1;
 	if (state->m_irq_toggle && state->m_irq_enable)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( junofrst, junofrst_state )

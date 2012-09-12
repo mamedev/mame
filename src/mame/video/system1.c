@@ -250,7 +250,7 @@ INLINE void videoram_wait_states(cpu_device *cpu)
 	const UINT32 fixst_offset = 2 * 4;
 	UINT32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu->total_cycles() - fixst_offset) % cpu_cycles_per_fixst);
 
-	device_adjust_icount(cpu, -cycles_until_next_fixst);
+	cpu->adjust_icount(-cycles_until_next_fixst);
 }
 
 READ8_MEMBER(system1_state::system1_videoram_r)

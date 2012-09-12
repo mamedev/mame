@@ -264,7 +264,7 @@ DRIVER_INIT_MEMBER(apricot_state,apricot)
 	prg->unmap_readwrite(0x40000, 0xeffff);
 	prg->install_ram(0x00000, ram_size - 1, ram);
 
-	device_set_irq_callback(m_maincpu, apricot_irq_ack);
+	m_maincpu->set_irq_acknowledge_callback(apricot_irq_ack);
 
 	m_video_mode = 0;
 	m_display_on = 1;

@@ -702,19 +702,19 @@ WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 
 	if ((!(data & 0x0080)) && (m_spu_ctrl & 0x0080))
 	{
-		device_set_input_line(&space.device(), M68K_IRQ_1, CLEAR_LINE);
+		space.device().execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0100)) && (m_spu_ctrl & 0x0100))
 	{
-		device_set_input_line(&space.device(), M68K_IRQ_2, CLEAR_LINE);
+		space.device().execute().set_input_line(M68K_IRQ_2, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0200)) && (m_spu_ctrl & 0x0200))
 	{
-		device_set_input_line(&space.device(), M68K_IRQ_4, CLEAR_LINE);
+		space.device().execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0400)) && (m_spu_ctrl & 0x0400))
 	{
-		device_set_input_line(&space.device(), M68K_IRQ_6, CLEAR_LINE);
+		space.device().execute().set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 
 	m_spu_ctrl = data;

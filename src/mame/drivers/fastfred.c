@@ -632,7 +632,7 @@ static INTERRUPT_GEN( vblank_irq )
 	fastfred_state *state = device->machine().driver_data<fastfred_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( sound_timer_irq )
@@ -640,7 +640,7 @@ static INTERRUPT_GEN( sound_timer_irq )
 	fastfred_state *state = device->machine().driver_data<fastfred_state>();
 
 	if(state->m_sound_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( fastfred, fastfred_state )

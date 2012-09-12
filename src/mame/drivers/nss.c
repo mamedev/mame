@@ -556,10 +556,10 @@ WRITE8_MEMBER(nss_state::port_01_w)
 
 	m_cart_sel = (data & 0xc) >> 2;
 
-	device_set_input_line(m_maincpu, INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(m_soundcpu, INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(m_maincpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_HALT, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	/* also reset the device */
 	if((data & 1) == 0)
 		spc700_reset(machine().device("spc700"));
@@ -821,7 +821,7 @@ static INTERRUPT_GEN ( nss_vblank_irq )
 	nss_state *state = device->machine().driver_data<nss_state>();
 
 	if(state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_RESET( nss )
@@ -831,8 +831,8 @@ static MACHINE_RESET( nss )
 	MACHINE_RESET_CALL( snes );
 
 	/* start with both CPUs disabled */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-	device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	state->m_game_over_flag = 1;
 	state->m_joy_flag = 1;

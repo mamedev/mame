@@ -246,7 +246,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	{
 		m_i8751_current_command = 0;
 		m_i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
-		device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0xff);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 		return;
 	}
 
@@ -297,14 +297,14 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	}
 
 	/* Signal main cpu task is complete */
-	device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0xff);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	m_i8751_current_command=data;
 }
 
 WRITE8_MEMBER(firetrap_state::firetrap_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(firetrap_state::firetrap_sound_2400_w)
@@ -327,7 +327,7 @@ static void firetrap_adpcm_int( device_t *device )
 
 	state->m_adpcm_toggle ^= 1;
 	if (state->m_sound_irq_enable && state->m_adpcm_toggle)
-		device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+		state->m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(firetrap_state::firetrap_adpcm_data_w)
@@ -418,7 +418,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 		if (m_coin_command_pending && !m_i8751_current_command)
 		{
 			m_i8751_return = m_coin_command_pending;
-			device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0xff);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 			m_coin_command_pending = 0;
 		}
 	}
@@ -586,7 +586,7 @@ static INTERRUPT_GEN( firetrap_irq )
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
 	if (state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -596,8 +596,8 @@ static MACHINE_START( firetrap )
 	UINT8 *MAIN = state->memregion("maincpu")->base();
 	UINT8 *SOUND = state->memregion("audiocpu")->base();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_msm = machine.device("msm");
 
 	state->membank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);

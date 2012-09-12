@@ -1138,7 +1138,7 @@ INPUT_PORTS_END
 // IRQs 4, 6 (& 8?) are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-	device_set_input_line(device, 4, HOLD_LINE);
+	device->execute().set_input_line(4, HOLD_LINE);
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
@@ -1149,9 +1149,9 @@ static TIMER_DEVICE_CALLBACK( system_h1_sub )
 
 	switch(scanline)
 	{
-    	case 512:device_set_input_line(state->m_subcpu, 0xa, HOLD_LINE); break;
-        case 256:device_set_input_line(state->m_subcpu, 0xc, HOLD_LINE); break;
-        case 0:device_set_input_line(state->m_subcpu, 0xe, HOLD_LINE); break;
+    	case 512:state->m_subcpu->set_input_line(0xa, HOLD_LINE); break;
+        case 256:state->m_subcpu->set_input_line(0xc, HOLD_LINE); break;
+        case 0:state->m_subcpu->set_input_line(0xe, HOLD_LINE); break;
 	}
 }
 

@@ -60,7 +60,7 @@ WRITE8_DEVICE_HANDLER(pc_page_w)
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	m_dma8237->hack_w(state);
@@ -665,7 +665,7 @@ IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
 
 void ibm5160_mb_device::device_reset()
 {
-	device_set_irq_callback(m_maincpu, pc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined

@@ -256,15 +256,15 @@ WRITE16_MEMBER(vcombat_state::wiggle_i860p1_pins_w)
 READ16_MEMBER(vcombat_state::main_irqiack_r)
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	device_set_input_line(machine().device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
-	//device_set_input_line(machine().device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//device_set_input_line(machine().device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
+	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -559,7 +559,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(vcombat_state::sound_update)
 {
 	/* Seems reasonable */
-	device_set_input_line(machine().device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

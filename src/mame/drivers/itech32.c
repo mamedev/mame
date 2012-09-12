@@ -363,7 +363,7 @@ Notes:
 
 
 
-#define START_TMS_SPINNING(n)			do { device_spin_until_trigger(&space.device(), 7351 + n); m_tms_spinning[n] = 1; } while (0)
+#define START_TMS_SPINNING(n)			do { space.device().execute().spin_until_trigger(7351 + n); m_tms_spinning[n] = 1; } while (0)
 #define STOP_TMS_SPINNING(machine, n)	do { (machine).scheduler().trigger(7351 + n); (machine).driver_data<itech32_state>()->m_tms_spinning[n] = 0; } while (0)
 
 

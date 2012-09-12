@@ -273,7 +273,7 @@ GFXDECODE_END
 static void ym2203_irq_handler( device_t *device, int irq )
 {
 	ashnojoe_state *state = device->machine().driver_data<ashnojoe_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
@@ -314,7 +314,7 @@ static void ashnojoe_vclk_cb( device_t *device )
 	else
 	{
 		msm5205_data_w(device, state->m_adpcm_byte & 0xf);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	state->m_msm5205_vclk_toggle ^= 1;
@@ -331,7 +331,7 @@ static MACHINE_START( ashnojoe )
 {
 	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_adpcm_byte));
 	state->save_item(NAME(state->m_soundlatch_status));

@@ -1823,7 +1823,7 @@ static INTERRUPT_GEN( mz2500_vbl )
 {
 	mz2500_state *state = device->machine().driver_data<mz2500_state>();
 	if(state->m_irq_mask[0])
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, state->m_irq_vector[0]);
+		device->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[0]);
 
 	state->m_cg_clear_flag = 0;
 }

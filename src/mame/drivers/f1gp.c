@@ -72,7 +72,7 @@ WRITE16_MEMBER(f1gp_state::sound_command_w)
 	{
 		m_pending_command = 1;
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -394,7 +394,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	f1gp_state *state = device->machine().driver_data<f1gp_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -431,7 +431,7 @@ static MACHINE_START( f1gp )
 
 	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053936 = machine.device("k053936");
 
 	MACHINE_START_CALL(f1gpb);

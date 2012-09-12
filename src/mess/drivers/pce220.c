@@ -618,7 +618,7 @@ static INPUT_CHANGED( kb_irq )
 
 	if (state->m_irq_mask & IRQ_FLAG_KEY)
 	{
-		device_set_input_line( state->m_maincpu, 0, newval ? ASSERT_LINE : CLEAR_LINE );
+		state->m_maincpu->set_input_line(0, newval ? ASSERT_LINE : CLEAR_LINE );
 
 		state->m_irq_flag = (state->m_irq_flag & 0xfe) | (newval & 0x01);
 	}
@@ -630,7 +630,7 @@ static INPUT_CHANGED( on_irq )
 
 	if (state->m_irq_mask & IRQ_FLAG_ON)
 	{
-		device_set_input_line( state->m_maincpu, 0, newval ? ASSERT_LINE : CLEAR_LINE );
+		state->m_maincpu->set_input_line(0, newval ? ASSERT_LINE : CLEAR_LINE );
 
 		state->m_irq_flag = (state->m_irq_flag & 0xfd) | ((newval & 0x01)<<1);
 	}
@@ -907,7 +907,7 @@ static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
 
 	if (state->m_irq_mask & IRQ_FLAG_TIMER)
 	{
-		device_set_input_line( state->m_maincpu, 0, HOLD_LINE );
+		state->m_maincpu->set_input_line(0, HOLD_LINE );
 
 		state->m_irq_flag = (state->m_irq_flag & 0xfb) | (state->m_timer_status<<2);
 	}

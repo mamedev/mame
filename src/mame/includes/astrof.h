@@ -36,7 +36,7 @@ public:
 	UINT8      m_astrof_bosskill_playing;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	samples_device *m_samples;	// astrof & abattle
 	device_t *m_sn;	// tomahawk
 	DECLARE_READ8_MEMBER(irq_clear_r);

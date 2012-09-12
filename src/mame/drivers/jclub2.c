@@ -674,13 +674,13 @@ static TIMER_DEVICE_CALLBACK( darkhors_irq )
 	int scanline = param;
 
 	if(scanline == 248)
-		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+		state->m_maincpu->set_input_line(5, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( darkhors, darkhors_state )

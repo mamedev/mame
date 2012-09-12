@@ -237,14 +237,14 @@ static TIMER_DEVICE_CALLBACK( m92_scanline_interrupt )
 	if (scanline == state->m_raster_irq_position)
 	{
 		machine.primary_screen->update_partial(scanline);
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, M92_IRQ_2);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == machine.primary_screen->visible_area().max_y + 1)
 	{
 		machine.primary_screen->update_partial(scanline);
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, M92_IRQ_0);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_0);
 	}
 }
 
@@ -297,7 +297,7 @@ CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
 WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 {
 	if (m_soundcpu)
-		device_set_input_line(m_soundcpu, NEC_INPUT_LINE_INTP1, ASSERT_LINE);
+		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 
 	soundlatch_byte_w(space, 0, data & 0xff);
 }
@@ -311,7 +311,7 @@ READ16_MEMBER(m92_state::m92_sound_status_r)
 READ16_MEMBER(m92_state::m92_soundlatch_r)
 {
 	if (m_soundcpu)
-		device_set_input_line(m_soundcpu, NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 
 	return soundlatch_byte_r(space, offset) | 0xff00;
 }
@@ -319,20 +319,20 @@ READ16_MEMBER(m92_state::m92_soundlatch_r)
 WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
 {
 	if (m_soundcpu)
-		device_set_input_line(m_soundcpu, NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
-	device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, M92_IRQ_3);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_3);
 
 }
 
 WRITE16_MEMBER(m92_state::m92_sound_reset_w)
 {
 	if (m_soundcpu)
-		device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -916,7 +916,7 @@ static void sound_irq(device_t *device, int pinstate)
 {
 	m92_state *state = device->machine().driver_data<m92_state>();
 
-	device_set_input_line(state->m_soundcpu, NEC_INPUT_LINE_INTP0, pinstate ? ASSERT_LINE : CLEAR_LINE);
+	state->m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP0, pinstate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -930,7 +930,7 @@ void m92_sprite_interrupt(running_machine &machine)
 {
 	m92_state *state = machine.driver_data<m92_state>();
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, M92_IRQ_1);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_CONFIG_START( m92, m92_state )

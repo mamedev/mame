@@ -423,10 +423,10 @@ static TIMER_DEVICE_CALLBACK(st0016_int)
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+		state->m_maincpu->set_input_line(0,HOLD_LINE);
 	else if((scanline % 64) == 0)
 		if(state->m_maincpu->state_int(Z80_IFF1)) /* dirty hack ... */
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE );
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static const st0016_interface st0016_config =

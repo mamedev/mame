@@ -719,7 +719,7 @@ READ8_MEMBER(pc9801_state::pc9801_40_r)
 			printf("Read to undefined port [%02x]\n",offset+0x40);
 		else
 		{
-			//printf("Read to 8251 kbd port [%02x] %08x\n",offset+0x40,m_maincpu->safe_pc());
+			//printf("Read to 8251 kbd port [%02x] %08x\n",offset+0x40,m_maincpu->pc());
 			if(offset == 1)
 			{
 				UINT8 res;
@@ -2525,7 +2525,7 @@ static MACHINE_START(pc9801)
 {
 	pc9801_state *state = machine.driver_data<pc9801_state>();
 
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	state->m_rtc->cs_w(1);
 	state->m_rtc->oe_w(1);

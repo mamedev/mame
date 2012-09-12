@@ -47,8 +47,8 @@ public:
 	INT32      m_banknum;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_tc0140syt;
 	device_t *m_tc0480scp;
 	device_t *m_tc0360pri;

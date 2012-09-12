@@ -41,7 +41,7 @@ public:
 	int            m_noise;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(destroyr_misc_w);
 	DECLARE_WRITE8_MEMBER(destroyr_cursor_load_w);
 	DECLARE_WRITE8_MEMBER(destroyr_interrupt_ack_w);
@@ -134,7 +134,7 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 
 	if (state->m_potmask[dial])
 	{
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -194,7 +194,7 @@ WRITE8_MEMBER(destroyr_state::destroyr_cursor_load_w)
 
 WRITE8_MEMBER(destroyr_state::destroyr_interrupt_ack_w)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -435,7 +435,7 @@ static MACHINE_START( destroyr )
 {
 	destroyr_state *state = machine.driver_data<destroyr_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_cursor));
 	state->save_item(NAME(state->m_wavemod));

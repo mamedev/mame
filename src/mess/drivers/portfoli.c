@@ -114,7 +114,7 @@ void portfolio_state::check_interrupt()
 {
 	int level = (m_ip & m_ie) ? ASSERT_LINE : CLEAR_LINE;
 
-	device_set_input_line(m_maincpu, INPUT_LINE_INT0, level);
+	m_maincpu->set_input_line(INPUT_LINE_INT0, level);
 }
 
 //-------------------------------------------------
@@ -766,7 +766,7 @@ void portfolio_state::machine_start()
 	address_space *program = m_maincpu->space(AS_PROGRAM);
 
 	/* set CPU interrupt vector callback */
-	device_set_irq_callback(m_maincpu, portfolio_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(portfolio_int_ack);
 
 	/* memory expansions */
 	switch (machine().device<ram_device>(RAM_TAG)->size())

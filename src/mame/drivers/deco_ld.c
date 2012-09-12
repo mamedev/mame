@@ -249,7 +249,7 @@ WRITE8_MEMBER(deco_ld_state::laserdisc_w)
 WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* same as Burger Time HW */
@@ -297,7 +297,7 @@ WRITE8_MEMBER(deco_ld_state::nmimask_w)
 static INTERRUPT_GEN ( sound_interrupt )
 {
 	deco_ld_state *state = device->machine().driver_data<deco_ld_state>();
-	if (!state->m_nmimask) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->m_nmimask) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -318,7 +318,7 @@ CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
 
 INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( begas )

@@ -75,10 +75,10 @@ static TIMER_CALLBACK( interrupt_callback )
 	int scanline;
 	int coin = (state->ioport("IN1")->read() & 2);
 
-	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+	state->m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!coin && state->m_prev_coin)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	state->m_prev_coin = coin;
 
@@ -113,7 +113,7 @@ CUSTOM_INPUT_MEMBER(fgoal_state::fgoal_80_r)
 
 READ8_MEMBER(fgoal_state::fgoal_nmi_reset_r)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -121,7 +121,7 @@ READ8_MEMBER(fgoal_state::fgoal_nmi_reset_r)
 
 READ8_MEMBER(fgoal_state::fgoal_irq_reset_r)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return 0;
 }
@@ -332,7 +332,7 @@ static MACHINE_START( fgoal )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_mb14241 = machine.device("mb14241");
 
 	state->save_item(NAME(state->m_xpos));

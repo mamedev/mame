@@ -987,7 +987,7 @@ static INTERRUPT_GEN( vblank_irq )
 	superqix_state *state = device->machine().driver_data<superqix_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( sqix_timer_irq )
@@ -995,7 +995,7 @@ static INTERRUPT_GEN( sqix_timer_irq )
 	superqix_state *state = device->machine().driver_data<superqix_state>();
 
 	if (state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 

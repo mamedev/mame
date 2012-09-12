@@ -138,7 +138,7 @@ static const via6522_interface via_1_interface =
 WRITE8_MEMBER(gameplan_state::audio_reset_w)
 {
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
 	{
@@ -179,7 +179,7 @@ static const via6522_interface via_2_interface =
 
 WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 {
-	device_set_input_line(m_audiocpu, 0, state);
+	m_audiocpu->set_input_line(0, state);
 	if (state == ASSERT_LINE)
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
@@ -977,8 +977,8 @@ static MACHINE_START( gameplan )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_riot = machine.device("riot");
 
 	/* register for save states */

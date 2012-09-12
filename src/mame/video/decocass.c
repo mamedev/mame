@@ -524,7 +524,7 @@ SCREEN_UPDATE_IND16( decocass )
 	rectangle clip;
 
 	if (0xc0 != (screen.machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (state->m_watchdog_flip & 0x04))
 		screen.machine().watchdog_reset();

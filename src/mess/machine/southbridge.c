@@ -209,7 +209,7 @@ void southbridge_device::device_start()
 
 
 	m_at_offset1 = 0xff;
-	//device_set_irq_callback(machine().device(":maincpu"), at_irq_callback);
+	//machine().device(":maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
 }
 
 //-------------------------------------------------
@@ -330,7 +330,7 @@ WRITE8_MEMBER( southbridge_device::at_page8_w )
 
 WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( m_dma8237_2, state );

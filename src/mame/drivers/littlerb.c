@@ -587,7 +587,7 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 //  logerror("IRQ\n");
 	if(scanline == 288)
 	{
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 }
 

@@ -65,7 +65,7 @@ static MACHINE_START( marineb )
 {
 	marineb_state *state = machine.driver_data<marineb_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_audiocpu = NULL;
 
 	state->save_item(NAME(state->m_marineb_active_low_flipscreen));
@@ -531,7 +531,7 @@ static INTERRUPT_GEN( marineb_vblank_irq )
 	marineb_state *state = device->machine().driver_data<marineb_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( wanted_vblank_irq )
@@ -539,7 +539,7 @@ static INTERRUPT_GEN( wanted_vblank_irq )
 	marineb_state *state = device->machine().driver_data<marineb_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 

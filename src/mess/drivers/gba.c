@@ -98,8 +98,8 @@ static void gba_request_irq(running_machine &machine, UINT32 int_type)
 		// master enable?
 		if (state->m_IME & 1)
 		{
-			device_set_input_line(machine.device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
-			device_set_input_line(machine.device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+			machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+			machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -1889,7 +1889,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 					m_HALTCNT = data & 0x000000ff;
 
 					// either way, wait for an IRQ
-					device_spin_until_interrupt(machine().device("maincpu"));
+					machine().device("maincpu")->execute().spin_until_interrupt();
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )

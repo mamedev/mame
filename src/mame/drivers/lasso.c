@@ -40,7 +40,7 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 {
 
 	/* coin insertion causes an NMI */
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -48,13 +48,13 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 WRITE8_MEMBER(lasso_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	generic_pulse_irq_line(m_audiocpu->execute(), 0, 1);
+	generic_pulse_irq_line(*m_audiocpu, 0, 1);
 }
 
 WRITE8_MEMBER(lasso_state::pinbo_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(lasso_state::sound_status_r)
@@ -479,8 +479,8 @@ static MACHINE_START( lasso )
 {
 	lasso_state *state = machine.driver_data<lasso_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	
 	state->save_item(NAME(state->m_gfxbank));
 }

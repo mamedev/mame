@@ -449,13 +449,13 @@ WRITE32_HANDLER( K001005_w )
 			if (space->device().safe_pc() == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				device_spin_until_trigger(&space->device(), 10000);
+				space->device().execute().spin_until_trigger(10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
 			if (space->device().safe_pc() == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				device_spin_until_trigger(&space->device(), 10000);
+				space->device().execute().spin_until_trigger(10000);
 			}
 
 			break;

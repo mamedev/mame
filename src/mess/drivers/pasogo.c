@@ -460,7 +460,7 @@ static IRQ_CALLBACK(pasogo_irq_callback)
 
 static MACHINE_RESET( pasogo )
 {
-	device_set_irq_callback(machine.device("maincpu"), pasogo_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;

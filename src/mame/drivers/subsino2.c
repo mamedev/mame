@@ -866,7 +866,7 @@ static INTERRUPT_GEN( am188em_int0_irq )
 	subsino2_state *state = device->machine().driver_data<subsino2_state>();
 	if ( ((state->m_am188em_regs[AM188EM_IMASK+0] & 0x10) == 0) ||	// IMASK.I0 mask
 		 ((state->m_am188em_regs[AM188EM_I0CON+0] & 0x08) == 0) )	// I0CON.MSK mask
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x0c);	// INT0 (background scrolling in xplan)
+		device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x0c);	// INT0 (background scrolling in xplan)
 }
 
 static TIMER_DEVICE_CALLBACK( am188em_timer2_irq )

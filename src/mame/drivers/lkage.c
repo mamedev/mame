@@ -99,7 +99,7 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->m_pending_nmi = 1;
 }
@@ -122,7 +122,7 @@ WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
 	if (m_pending_nmi)
 	{
 		/* probably wrong but commands may go lost otherwise */
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		m_pending_nmi = 0;
 	}
 }
@@ -479,7 +479,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	lkage_state *state = device->machine().driver_data<lkage_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -496,8 +496,8 @@ static MACHINE_START( lkage )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->m_bg_tile_bank));

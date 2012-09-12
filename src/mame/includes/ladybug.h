@@ -43,7 +43,7 @@ public:
 	UINT8      m_sraider_0x38;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(sraider_sound_low_r);
 	DECLARE_READ8_MEMBER(sraider_sound_high_r);
 	DECLARE_WRITE8_MEMBER(sraider_sound_low_w);

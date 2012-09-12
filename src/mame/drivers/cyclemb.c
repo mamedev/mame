@@ -379,7 +379,7 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
 
@@ -393,7 +393,7 @@ READ8_MEMBER(cyclemb_state::mcu_status_r)
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
 
@@ -419,7 +419,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 {
 	if(offset == 1) //status port
 	{
-		//printf("STATUS PC=%04x\n",m_maincpu->safe_pc());
+		//printf("STATUS PC=%04x\n",m_maincpu->pc());
 
 		return 1;
 	}
@@ -427,14 +427,14 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 	{
 		UINT8 i,pt;
 
-		//printf("%04x\n",m_maincpu->safe_pc());
+		//printf("%04x\n",m_maincpu->pc());
 
 		/* TODO: internal state of this */
 		if(m_maincpu->pc() == m_dsw_pc_hack)
 			m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 		else if(m_mcu[0].rst)
 		{
-			//printf("READ PC=%04x\n",m_maincpu->safe_pc());
+			//printf("READ PC=%04x\n",m_maincpu->pc());
 			{
 
 				switch(m_mcu[0].state)
@@ -500,7 +500,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 {
 	if(offset == 1) //command port
 	{
-		//printf("%02x CMD PC=%04x\n",data,m_maincpu->safe_pc());
+		//printf("%02x CMD PC=%04x\n",data,m_maincpu->pc());
 		switch(data)
 		{
 			case 0:
@@ -535,7 +535,7 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 	}
 	else
 	{
-		//printf("%02x DATA PC=%04x\n",data,m_maincpu->safe_pc());
+		//printf("%02x DATA PC=%04x\n",data,m_maincpu->pc());
 
 		m_mcu[0].txd = data;
 

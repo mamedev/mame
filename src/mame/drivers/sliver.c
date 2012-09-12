@@ -467,7 +467,7 @@ static TIMER_DEVICE_CALLBACK ( obj_irq_cb )
 {
 	sliver_state *state = timer.machine().driver_data<sliver_state>();
 
-	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+	state->m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( sliver, sliver_state )

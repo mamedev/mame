@@ -70,7 +70,7 @@ READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
@@ -279,7 +279,7 @@ static MACHINE_START( blueprnt )
 {
 	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_dipsw));
 }

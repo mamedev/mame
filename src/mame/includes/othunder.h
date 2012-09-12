@@ -37,8 +37,8 @@ public:
 	int        m_pan[4];
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	eeprom_device *m_eeprom;
 	device_t *m_tc0220ioc;
 	device_t *m_tc0100scn;

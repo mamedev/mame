@@ -83,7 +83,7 @@ public:
     m_fdc(*this, "wd1772")
     { }
 
-    required_device<device_t> m_maincpu;
+    required_device<m6809e_device> m_maincpu;
     required_device<wd1772_t> m_fdc;
 
 	virtual void machine_reset();
@@ -107,7 +107,7 @@ SLOT_INTERFACE_END
 
 void mirage_state::fdc_intrq_w(bool state)
 {
-    device_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
+    m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 static void mirage_doc_irq(device_t *device, int state)

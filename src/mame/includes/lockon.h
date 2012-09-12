@@ -64,8 +64,8 @@ public:
 	UINT32      m_main_inten;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_ground;
 	device_t *m_object;
 	device_t *m_f2203_1l;

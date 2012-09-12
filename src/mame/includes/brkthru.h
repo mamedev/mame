@@ -27,8 +27,8 @@ public:
 	//UINT8 *m_brkthru_nmi_enable; /* needs to be tracked down */
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 
 	UINT8   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(brkthru_1803_w);

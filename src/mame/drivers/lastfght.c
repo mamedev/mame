@@ -529,7 +529,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 {
 	lastfght_state *state = device->machine().driver_data<lastfght_state>();
 
-	device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
+	state->m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static MACHINE_START( lastfght )

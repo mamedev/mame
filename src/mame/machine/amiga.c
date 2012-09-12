@@ -995,7 +995,7 @@ static void blitter_setup(address_space *space)
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
-		device_adjust_icount( &space->device(), -(blittime/2) );
+		space->device().execute().adjust_icount(-(blittime/2) );
 
 		blittime = BLITTER_NASTY_DELAY;
 	}

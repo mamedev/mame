@@ -91,7 +91,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 	overdriv_state *state = device->machine().driver_data<overdriv_state>();
 
 	if (k053246_is_irq_enabled(state->m_k053246))
-		device_set_input_line(device, 4, HOLD_LINE);
+		device->execute().set_input_line(4, HOLD_LINE);
 }
 
 
@@ -101,7 +101,7 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		device_set_input_line(m_subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
@@ -148,17 +148,17 @@ READ8_MEMBER(overdriv_state::overdriv_2_sound_r)
 
 WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 {
-	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq5_w)
 {
-	device_set_input_line(m_subcpu, 5, HOLD_LINE);
+	m_subcpu->set_input_line(5, HOLD_LINE);
 }
 
 WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq6_w)
 {
-	device_set_input_line(m_subcpu, 6, HOLD_LINE);
+	m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
@@ -284,9 +284,9 @@ static MACHINE_START( overdriv )
 {
 	overdriv_state *state = machine.driver_data<overdriv_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_k051316_1 = machine.device("k051316_1");
 	state->m_k051316_2 = machine.device("k051316_2");
 	state->m_k053260_1 = machine.device("k053260_1");

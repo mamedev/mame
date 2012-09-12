@@ -418,7 +418,7 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
 	if( state->m_maria_dli )
 	{
 		state->m_maria_dli = 0;
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }
@@ -481,7 +481,7 @@ WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
 			m_maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			device_spin_until_trigger(machine().device("maincpu"), TRIGGER_HSYNC);
+			machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_HSYNC);
 			m_maria_wsync=1;
 			break;
 

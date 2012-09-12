@@ -132,7 +132,7 @@ READ8_MEMBER(chqflag_state::analog_read_r)
 WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
 {
 	soundlatch2_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 static void chqflag_ym2151_irq_w( device_t *device, int data )
 {
 	chqflag_state *state = device->machine().driver_data<chqflag_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -327,8 +327,8 @@ static MACHINE_START( chqflag )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k051316_1 = machine.device("k051316_1");
 	state->m_k051316_2 = machine.device("k051316_2");
 	state->m_k051960 = machine.device("k051960");

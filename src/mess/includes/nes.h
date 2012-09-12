@@ -126,7 +126,7 @@ public:
 	nes_chr_callback    m_mmc3_chr_cb;
 
 	/* devices */
-	device_t      *m_maincpu;
+	cpu_device      *m_maincpu;
 	ppu2c0x_device      *m_ppu;
 	device_t      *m_sound;
 	device_t      *m_cart;

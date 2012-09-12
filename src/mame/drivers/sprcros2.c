@@ -253,12 +253,12 @@ static TIMER_DEVICE_CALLBACK( sprcros2_m_interrupt )
 	if (scanline == 240)
 	{
 		if(state->m_port7&0x01)
-			device_set_input_line(state->m_master, INPUT_LINE_NMI, PULSE_LINE);
+			state->m_master->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else if(scanline == 0)
 	{
 		if(state->m_port7&0x08)
-			device_set_input_line(state->m_master, 0, HOLD_LINE);
+			state->m_master->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -267,7 +267,7 @@ static INTERRUPT_GEN( sprcros2_s_interrupt )
 	sprcros2_state *state = device->machine().driver_data<sprcros2_state>();
 
 	if(state->m_s_port3&0x01)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( sprcros2 )

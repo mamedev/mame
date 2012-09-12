@@ -47,13 +47,13 @@ The driver has been updated accordingly.
 WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -300,8 +300,8 @@ static MACHINE_START( matmania )
 {
 	matmania_state *state = machine.driver_data<matmania_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 }
 

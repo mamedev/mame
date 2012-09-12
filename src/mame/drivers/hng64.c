@@ -1751,10 +1751,10 @@ void hng64_state::m_set_irq(UINT32 irq_vector)
 			}
 		}
 
-		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( hng64_irq )

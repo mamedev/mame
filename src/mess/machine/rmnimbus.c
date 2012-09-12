@@ -203,7 +203,7 @@ static IRQ_CALLBACK(int_callback)
 		logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine().time().as_double(), state->m_i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	device_set_input_line(device, 0, CLEAR_LINE);
+	device->execute().set_input_line(0, CLEAR_LINE);
 	state->m_i186.intr.pending = 0;
 
 	oldreq=state->m_i186.intr.request;
@@ -1178,7 +1178,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 			/* we need to do this at a time when the I86 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			device_set_irq_callback(&space.device(), int_callback);
+			space.device().execute().set_irq_acknowledge_callback(int_callback);
 			break;
 
 		case 0x60:

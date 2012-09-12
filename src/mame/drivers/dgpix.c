@@ -197,7 +197,7 @@ WRITE32_MEMBER(dgpix_state::coin_w)
 READ32_MEMBER(dgpix_state::vblank_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	device_eat_cycles(&space.device(), 100);
+	space.device().execute().eat_cycles(100);
 	return ioport("VBLANK")->read();
 }
 

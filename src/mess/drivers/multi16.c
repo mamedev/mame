@@ -133,7 +133,7 @@ static const struct pic8259_interface multi16_pic8259_config =
 
 static MACHINE_START(multi16)
 {
-	device_set_irq_callback(machine.device("maincpu"), multi16_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(multi16_irq_callback);
 }
 
 

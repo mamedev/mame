@@ -239,7 +239,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( raiden_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static MACHINE_CONFIG_START( raiden, raiden_state )
@@ -560,11 +560,11 @@ READ16_MEMBER(raiden_state::sub_cpu_spin_r)
 
 	// main set
 	if (pc==0xfcde6 && ret!=0x40)
-		device_spin(&space.device());
+		space.device().execute().spin();
 
 	// alt sets
 	if (pc==0xfcde8 && ret!=0x40)
-		device_spin(&space.device());
+		space.device().execute().spin();
 
 	return ret;
 }

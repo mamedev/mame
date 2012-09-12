@@ -45,7 +45,7 @@ public:
 	int         m_msm5205_vclk_toggle;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_READ16_MEMBER(fake_4a00a_r);
 	DECLARE_WRITE16_MEMBER(ashnojoe_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);

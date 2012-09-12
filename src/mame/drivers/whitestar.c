@@ -110,7 +110,7 @@ WRITE8_MEMBER(whitestar_state::dmd_bank_w)
 READ8_MEMBER(whitestar_state::dmd_latch_r)
 {
 	m_dmd_busy = 0;
-	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	m_dmdcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	return m_dmd_latch;
 }
 
@@ -118,8 +118,8 @@ WRITE8_MEMBER(whitestar_state::dmd_latch_w)
 {
 	m_dmd_latch = data;
 	m_dmd_busy = 1;
-	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE);
-	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	m_dmdcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_dmdcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 READ8_MEMBER(whitestar_state::dmd_ctrl_r)
@@ -130,7 +130,7 @@ READ8_MEMBER(whitestar_state::dmd_ctrl_r)
 WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
 {
 	m_dmd_ctrl = data;
-	device_set_input_line(m_dmdcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	m_dmdcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	if (data!=0) {
 		bank_w(space,0,0);
 		m_dmdcpu->reset();
@@ -182,7 +182,7 @@ DRIVER_INIT_MEMBER(whitestar_state,whitestar)
 // the appropriate device is passed in, so we can share this routine
 static INTERRUPT_GEN( whitestar_firq_interrupt )
 {
-	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 #define DMD_CHUNK_SIZE 10

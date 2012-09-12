@@ -161,15 +161,15 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 					k033906_set_reg(k033906, (data & 0x20000000) ? 1 : 0);
 
 				if (data & 0x10000000)
-					device_set_input_line(dsp, INPUT_LINE_RESET, CLEAR_LINE);
+					dsp->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				else
-					device_set_input_line(dsp, INPUT_LINE_RESET, ASSERT_LINE);
+					dsp->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 				if (data & 0x02000000)
-					device_set_input_line(dsp, INPUT_LINE_IRQ0, ASSERT_LINE);
+					dsp->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 				if (data & 0x04000000)
-					device_set_input_line(dsp, INPUT_LINE_IRQ1, ASSERT_LINE);
+					dsp->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 
 			if (ACCESSING_BITS_0_7)

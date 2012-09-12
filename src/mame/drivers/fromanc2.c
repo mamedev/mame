@@ -33,7 +33,7 @@
 
 static INTERRUPT_GEN( fromanc2_interrupt )
 {
-	device_set_input_line(device, 1, HOLD_LINE);
+	device->execute().set_input_line(1, HOLD_LINE);
 }
 
 
@@ -43,7 +43,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 	soundlatch_byte_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
 	soundlatch2_byte_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sndcpu_nmi_flag = 0;
 }
 
@@ -110,13 +110,13 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
 {
 	m_datalatch1 = data;
 
-	device_set_input_line(m_subcpu, 0, HOLD_LINE);
+	m_subcpu->set_input_line(0, HOLD_LINE);
 	m_subcpu_int_flag = 0;
 }
 
 READ16_MEMBER(fromanc2_state::fromanc2_subcpu_r)
 {
-	device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_subcpu_nmi_flag = 0;
 
 	return (m_datalatch_2h << 8) | m_datalatch_2l;
@@ -486,7 +486,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	fromanc2_state *state = device->machine().driver_data<fromanc2_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -505,8 +505,8 @@ static MACHINE_START( fromanc4 )
 {
 	fromanc2_state *state = machine.driver_data<fromanc2_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_eeprom = machine.device("eeprom");
 	state->m_left_screen = machine.device("lscreen");
 	state->m_right_screen = machine.device("rscreen");

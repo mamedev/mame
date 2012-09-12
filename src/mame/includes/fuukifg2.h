@@ -26,8 +26,8 @@ public:
 	emu_timer   *m_raster_interrupt_timer;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(fuuki16_vregs_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_sound_command_w);
 	DECLARE_WRITE8_MEMBER(fuuki16_sound_rombank_w);

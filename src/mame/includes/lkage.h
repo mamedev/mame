@@ -49,8 +49,8 @@ public:
 	int m_mcu_ready;	/* cpu data/mcu ready status */
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(lkage_sound_command_w);
 	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);

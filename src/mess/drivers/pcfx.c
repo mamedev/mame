@@ -375,11 +375,11 @@ inline void pcfx_state::check_irqs()
 
 	if ( highest_prio >= 0 )
 	{
-		device_set_input_line( m_maincpu, 8 + highest_prio, ASSERT_LINE );
+		m_maincpu->set_input_line(8 + highest_prio, ASSERT_LINE );
 	}
 	else
 	{
-		device_set_input_line( m_maincpu, 0, CLEAR_LINE );
+		m_maincpu->set_input_line(0, CLEAR_LINE );
 	}
 }
 

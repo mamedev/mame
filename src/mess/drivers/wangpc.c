@@ -1165,7 +1165,7 @@ SLOT_INTERFACE_END
 void wangpc_state::machine_start()
 {
 	// register CPU IRQ callback
-	device_set_irq_callback(m_maincpu, wangpc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(wangpc_irq_callback);
 
 	// connect serial keyboard
 	m_uart->connect(m_kb);

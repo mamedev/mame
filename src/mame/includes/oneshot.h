@@ -32,8 +32,8 @@ public:
 	int m_p2_wobble;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_READ16_MEMBER(oneshot_in0_word_r);
 	DECLARE_READ16_MEMBER(oneshot_gun_x_p1_r);
 	DECLARE_READ16_MEMBER(oneshot_gun_y_p1_r);

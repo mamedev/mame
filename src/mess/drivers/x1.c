@@ -1942,7 +1942,7 @@ static INPUT_CHANGED( ipl_reset )
 	//address_space *space = field.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	x1_state *state = field.machine().driver_data<x1_state>();
 
-	device_set_input_line(state->m_x1_cpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	state->m_ram_bank = 0x00;
 	if(state->m_is_turbo) { state->m_ex_bank = 0x10; }
@@ -1954,7 +1954,7 @@ static INPUT_CHANGED( nmi_reset )
 {
 	x1_state *state = field.machine().driver_data<x1_state>();
 
-	device_set_input_line(state->m_x1_cpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_PORTS_START( x1 )
@@ -2391,14 +2391,14 @@ static IRQ_CALLBACK(x1_irq_callback)
     {
         state->m_ctc_irq_flag = 0;
         if(state->m_key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-            device_set_input_line(device, 0, CLEAR_LINE);
+            device->execute().set_input_line(0, CLEAR_LINE);
         return state->m_irq_vector;
     }
     if(state->m_key_irq_flag != 0)
     {
         state->m_key_irq_flag = 0;
         if(state->m_ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-            device_set_input_line(device, 0, CLEAR_LINE);
+            device->execute().set_input_line(0, CLEAR_LINE);
         return state->m_key_irq_vector;
     }
     return state->m_irq_vector;
@@ -2483,7 +2483,7 @@ MACHINE_RESET( x1 )
 
 	state->m_io_bank_mode = 0;
 
-	//device_set_irq_callback(machine.device("x1_cpu"), x1_irq_callback);
+	//machine.device("x1_cpu")->execute().set_irq_acknowledge_callback(x1_irq_callback);
 
 	state->m_cmt_current_cmd = 0;
 	state->m_cmt_test = 0;

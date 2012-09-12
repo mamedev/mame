@@ -267,7 +267,7 @@ static INTERRUPT_GEN( vblank_irq )
 	wiping_state *state = device->machine().driver_data<wiping_state>();
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( sound_timer_irq )
@@ -275,7 +275,7 @@ static INTERRUPT_GEN( sound_timer_irq )
 	wiping_state *state = device->machine().driver_data<wiping_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 

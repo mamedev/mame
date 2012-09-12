@@ -47,7 +47,7 @@ WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
 
 INTERRUPT_GEN( galaxy_interrupt )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK ( galaxy_irq_callback )
@@ -123,8 +123,8 @@ static void galaxy_setup_snapshot (running_machine &machine, const UINT8 * data,
 			break;
 	}
 
-	device_set_input_line(cpu, INPUT_LINE_NMI, CLEAR_LINE);
-	device_set_input_line(cpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	cpu->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 SNAPSHOT_LOAD( galaxy )
@@ -185,7 +185,7 @@ MACHINE_RESET( galaxy )
 	if (machine.root_device().ioport("ROM2")->read())
 		state->membank("bank10")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
-	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
 	state->m_interrupts_enabled = TRUE;
 }
 
@@ -200,7 +200,7 @@ MACHINE_RESET( galaxyp )
 	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;

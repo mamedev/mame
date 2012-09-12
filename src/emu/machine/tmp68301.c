@@ -47,7 +47,7 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 		tmp68301_irq_vector[level]	=	IVNR & 0x00e0;
 		tmp68301_irq_vector[level]	+=	4+i;
 
-		device_set_input_line(machine.firstcpu,level,HOLD_LINE);
+		machine.firstcpu->set_input_line(level,HOLD_LINE);
 	}
 
 	if (TCR & 0x0080)	// N/1
@@ -120,7 +120,7 @@ MACHINE_RESET( tmp68301 )
 	for (i = 0; i < 3; i++)
 		tmp68301_IE[i] = 0;
 
-	device_set_irq_callback(machine.firstcpu, tmp68301_irq_callback);
+	machine.firstcpu->set_irq_acknowledge_callback(tmp68301_irq_callback);
 }
 
 /* Update the IRQ state based on all possible causes */
@@ -150,7 +150,7 @@ static void update_irq_state(running_machine &machine)
 
 			tmp68301_IE[i] = 0;		// Interrupts are edge triggerred
 
-			device_set_input_line(machine.firstcpu,level,HOLD_LINE);
+			machine.firstcpu->set_input_line(level,HOLD_LINE);
 		}
 	}
 }

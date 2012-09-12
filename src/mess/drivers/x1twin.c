@@ -110,7 +110,7 @@ static INPUT_CHANGED( ipl_reset )
 	//address_space *space = field.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	x1twin_state *state = field.machine().driver_data<x1twin_state>();
 
-	device_set_input_line(state->m_x1_cpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	state->m_ram_bank = 0x00;
 	if(state->m_is_turbo) { state->m_ex_bank = 0x10; }
@@ -122,7 +122,7 @@ static INPUT_CHANGED( nmi_reset )
 {
 	x1twin_state *state = field.machine().driver_data<x1twin_state>();
 
-	device_set_input_line(state->m_x1_cpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_PORTS_START( x1twin )

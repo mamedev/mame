@@ -825,7 +825,7 @@ WRITE8_MEMBER( victor9k_state::via6_pb_w )
     */
 
 	// motor speed controller reset
-	device_set_input_line(m_fdc_cpu, INPUT_LINE_RESET, BIT(data, 2));
+	m_fdc_cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 2));
 
 	// stepper enable A
 	m_se[0] = BIT(data, 6);
@@ -923,7 +923,7 @@ static IRQ_CALLBACK( victor9k_irq_callback )
 void victor9k_state::machine_start()
 {
 	// set interrupt callback
-	device_set_irq_callback(m_maincpu, victor9k_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(victor9k_irq_callback);
 
 	// memory banking
 	address_space *program = m_maincpu->space(AS_PROGRAM);

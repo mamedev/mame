@@ -17,21 +17,21 @@ INTERRUPT_GEN( asteroid_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (!(device->machine().root_device().ioport("IN0")->read() & 0x80))
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( asterock_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
 	if ((device->machine().root_device().ioport("IN0")->read() & 0x80))
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( llander_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (device->machine().root_device().ioport("IN0")->read() & 0x02)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(asteroid_state::asteroid_IN0_r)

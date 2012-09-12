@@ -109,7 +109,7 @@ static TIMER_CALLBACK( irq5_gen )
 
 static INTERRUPT_GEN( irq4_gen )
 {
-	device_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
+	device->execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
 	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(irq5_gen));
 }
 
@@ -214,7 +214,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 			/* more than 2 in a row and we spin */
 			if (m_loop_count > 2)
-				device_spin_until_interrupt(&space.device());
+				space.device().execute().spin_until_interrupt();
 		}
 		else
 			m_loop_count = 0;

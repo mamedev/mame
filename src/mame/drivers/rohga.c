@@ -118,7 +118,7 @@
 READ16_MEMBER(rohga_state::rohga_irq_ack_r)
 {
 
-	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
+	m_maincpu->set_input_line(6, CLEAR_LINE);
 	return 0;
 }
 
@@ -127,7 +127,7 @@ WRITE16_MEMBER(rohga_state::wizdfire_irq_ack_w)
 	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
        except when a credit is inserted (writes 6 twice).
        Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
-	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
+	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 /**********************************************************************************/
@@ -720,7 +720,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	rohga_state *driver_state = device->machine().driver_data<rohga_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
+	driver_state->m_audiocpu->set_input_line(1, state); /* IRQ 2 */
 }
 
 WRITE8_MEMBER(rohga_state::sound_bankswitch_w)

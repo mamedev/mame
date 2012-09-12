@@ -118,7 +118,7 @@ public:
 
 WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
 {
-	device_set_input_line_vector(machine().device("maincpu"), 0, data);
+	machine().device("maincpu")->execute().set_input_line_vector(0, data);
 	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
@@ -285,7 +285,7 @@ static INTERRUPT_GEN( vblank_irq )
 	jrpacman_state *state = device->machine().driver_data<jrpacman_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( jrpacman, jrpacman_state )

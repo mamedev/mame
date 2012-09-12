@@ -510,7 +510,7 @@ READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
 static void irqhandler( device_t *device, int irq )
 {
 	angelkds_state *state = device->machine().driver_data<angelkds_state>();
-	device_set_input_line(state->m_subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_subcpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -572,7 +572,7 @@ static MACHINE_START( angelkds )
 {
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_layer_ctrl));
 	state->save_item(NAME(state->m_txbank));

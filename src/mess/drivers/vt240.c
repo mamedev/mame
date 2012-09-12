@@ -142,7 +142,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 
 static INTERRUPT_GEN( vt240_irq )
 {
-	//device_set_input_line(device, I8085_RST65_LINE, ASSERT_LINE);
+	//device->execute().set_input_line(I8085_RST65_LINE, ASSERT_LINE);
 }
 
 static const gfx_layout vt240_chars_8x8 =

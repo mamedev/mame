@@ -82,7 +82,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 READ8_MEMBER(mainevt_state::mainevt_sh_busy_r)
@@ -418,8 +418,8 @@ static MACHINE_START( mainevt )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_upd = machine.device("upd");
 	state->m_k007232 = machine.device("k007232");
 	state->m_k052109 = machine.device("k052109");
@@ -440,7 +440,7 @@ static INTERRUPT_GEN( mainevt_sound_timer_irq )
 	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( devstors_sound_timer_irq )
@@ -448,7 +448,7 @@ static INTERRUPT_GEN( devstors_sound_timer_irq )
 	mainevt_state *state = device->machine().driver_data<mainevt_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( mainevt, mainevt_state )

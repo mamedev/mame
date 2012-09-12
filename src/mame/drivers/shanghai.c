@@ -122,7 +122,7 @@ static SCREEN_UPDATE_IND16( shanghai )
 
 static INTERRUPT_GEN( shanghai_interrupt )
 {
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0x80);
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
 }
 
 WRITE16_MEMBER(shanghai_state::shanghai_coin_w)

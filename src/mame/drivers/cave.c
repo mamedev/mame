@@ -108,9 +108,9 @@ static void update_irq_state( running_machine &machine )
 {
 	cave_state *state = machine.driver_data<cave_state>();
 	if (state->m_vblank_irq || state->m_sound_irq || state->m_unknown_irq)
-		device_set_input_line(state->m_maincpu, state->m_irq_level, ASSERT_LINE);
+		state->m_maincpu->set_input_line(state->m_irq_level, ASSERT_LINE);
 	else
-		device_set_input_line(state->m_maincpu, state->m_irq_level, CLEAR_LINE);
+		state->m_maincpu->set_input_line(state->m_irq_level, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( cave_vblank_end )
@@ -233,8 +233,8 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 //  m_sound_flag1 = 1;
 //  m_sound_flag2 = 1;
 	soundlatch_word_w(space, offset, data, mem_mask);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	space.device().execute().spin_until_time(attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -1797,8 +1797,8 @@ static MACHINE_START( cave )
 {
 	cave_state *state = machine.driver_data<cave_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_soundbuf_len));
 	state->save_item(NAME(state->m_soundbuf_data));

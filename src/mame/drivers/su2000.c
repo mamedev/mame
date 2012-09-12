@@ -279,7 +279,7 @@ static MACHINE_START( su2000 )
 	space->install_write_bank(0x100000, ram_limit - 1, "hma_bank");
 	state->membank("hma_bank")->set_base(state->m_pc_ram + 0xa0000);
 
-	device_set_irq_callback(machine.device("maincpu"), pc_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
 

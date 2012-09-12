@@ -131,8 +131,8 @@ public:
 	UINT8     m_mux_data;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mcu;
 	device_t *m_cassette;
 	DECLARE_DRIVER_INIT(decocass);

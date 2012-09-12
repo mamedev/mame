@@ -636,13 +636,13 @@ INTERRUPT_GEN( trs80_rtc_interrupt )
 		if (state->m_mask & IRQ_M4_RTC)
 		{
 			state->m_irq |= IRQ_M4_RTC;
-			device_set_input_line(device, 0, HOLD_LINE);
+			device->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 	else		// Model 1
 	{
 		state->m_irq |= IRQ_M1_RTC;
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 

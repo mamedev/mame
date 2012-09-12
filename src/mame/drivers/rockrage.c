@@ -61,7 +61,7 @@ static INTERRUPT_GEN( rockrage_interrupt )
 {
 	rockrage_state *state = device->machine().driver_data<rockrage_state>();
 	if (k007342_is_int_enabled(state->m_k007342))
-		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
@@ -79,7 +79,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(rockrage_state::rockrage_VLM5030_busy_r)
@@ -243,7 +243,7 @@ static MACHINE_START( rockrage )
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007342 = machine.device("k007342");
 	state->m_k007420 = machine.device("k007420");
 

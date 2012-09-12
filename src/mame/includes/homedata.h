@@ -36,8 +36,8 @@ public:
 	int      m_from_cpu;
 
 	/* device */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	dac_device *m_dac;
 	device_t *m_ym;
 	sn76489a_new_device *m_sn;

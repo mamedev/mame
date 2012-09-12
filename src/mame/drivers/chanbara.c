@@ -78,7 +78,7 @@ public:
 	UINT8    m_scrollhi;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
 	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
 	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
@@ -366,7 +366,7 @@ WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
 static void sound_irq( device_t *device, int linestate )
 {
 	chanbara_state *state = device->machine().driver_data<chanbara_state>();
-	device_set_input_line(state->m_maincpu, 0, linestate);
+	state->m_maincpu->set_input_line(0, linestate);
 }
 
 
@@ -388,7 +388,7 @@ static MACHINE_START( chanbara )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_scroll));
 	state->save_item(NAME(state->m_scrollhi));

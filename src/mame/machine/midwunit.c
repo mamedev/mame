@@ -190,7 +190,7 @@ WRITE16_MEMBER(midwunit_state::umk3_palette_hack_w)
         without significantly impacting the rest of the system.
     */
 	COMBINE_DATA(&m_umk3_palette[offset]);
-	device_adjust_icount(&space.device(), -100);
+	space.device().execute().adjust_icount(-100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", m_umk3_palette[3], m_umk3_palette[2], m_umk3_palette[1], m_umk3_palette[0]); */
 }
 

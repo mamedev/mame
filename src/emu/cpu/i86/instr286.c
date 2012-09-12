@@ -111,7 +111,7 @@ static void i80286_trap2(i80286_state *cpustate,UINT32 error)
 		// this is supposed to triggered by support hardware
 		// create a shutdown output line that causes a reset
 		// NMI can wake processor without reset
-		device_set_input_line(cpustate->device, INPUT_LINE_RESET, PULSE_LINE);
+		cpustate->device->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	cpustate->trap_level = 0;
 }
 

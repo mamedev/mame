@@ -61,7 +61,7 @@ public:
 	int                 m_last;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_ic8j1;
 	device_t *m_ic8j2;
 	samples_device *m_samples;

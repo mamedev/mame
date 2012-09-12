@@ -28,12 +28,12 @@ WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
 {
 	/* bit 0 used but unknown */
 	if (data & 0x04)
-		device_set_input_line(m_subcpu, 0, ASSERT_LINE);
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
 {
-	device_set_input_line(m_subcpu, 0, CLEAR_LINE);
+	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_soundlatch_w)
@@ -210,7 +210,7 @@ static MACHINE_START( dogfgt )
 {
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_bm_plane));
 	state->save_item(NAME(state->m_lastflip));

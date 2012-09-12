@@ -48,7 +48,7 @@ public:
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
-	device_t *m_soundcpu;
+	cpu_device *m_soundcpu;
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 };
@@ -57,7 +57,7 @@ public:
 WRITE16_MEMBER(go2000_state::sound_cmd_w)
 {
 	soundlatch_byte_w(space, offset, data & 0xff);
-	device_set_input_line(m_soundcpu, 0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
@@ -318,7 +318,7 @@ static MACHINE_START( go2000 )
 
 	state->membank("bank1")->set_entry(0);
 
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 }
 
 static MACHINE_CONFIG_START( go2000, go2000_state )

@@ -381,7 +381,7 @@ WRITE8_MEMBER( bml3_state::bml3_firq_mask_w)
 	if(m_firq_mask)
 	{
 		m_firq_status = 0; // clear pending firq
-		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -389,7 +389,7 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 {
 	UINT8 res = m_firq_status << 7;
 	m_firq_status = 0;
-	device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
 }
 
@@ -610,7 +610,7 @@ static INTERRUPT_GEN( bml3_timer_firq )
 
 	if(!state->m_firq_mask)
 	{
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		state->m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 		state->m_firq_status = 1;
 	}
 }

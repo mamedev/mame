@@ -163,7 +163,7 @@ WRITE8_MEMBER( zac_1_state::ctrl_w )
 
 WRITE8_MEMBER( zac_1_state::reset_int_w )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 READ8_MEMBER( zac_1_state::serial_r )
@@ -199,7 +199,7 @@ static TIMER_DEVICE_CALLBACK( zac_1_inttimer )
 	if (state->m_t_c > 0x40)
 	{
 		UINT8 vector = (state->ioport("TEST")->read() ) ? 0x10 : 0x18;
-		device_set_input_line_and_vector(state->m_maincpu, INPUT_LINE_IRQ0, ASSERT_LINE, vector);
+		state->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector);
 	}
 	else
 		state->m_t_c++;
@@ -253,7 +253,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( zac_1_state::reset_int_r )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0;
 }
 

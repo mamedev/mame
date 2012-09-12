@@ -28,7 +28,7 @@ TODO:
 static WRITE8_HANDLER( irqack_w )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	state->m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, ladybug_state )
@@ -79,13 +79,13 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER( ladybug_state::left_coin_inserted )
 {
 	if(newval)
-		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER( ladybug_state::right_coin_inserted )
 {
 	if(newval)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( redclash )
@@ -328,7 +328,7 @@ static MACHINE_START( redclash )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_star_speed));
 	state->save_item(NAME(state->m_gfxbank));

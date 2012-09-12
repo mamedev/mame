@@ -92,7 +92,7 @@ static INTERRUPT_GEN( lwings_interrupt )
 	lwings_state *state = device->machine().driver_data<lwings_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7); /* RST 10h */
+		device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 static INTERRUPT_GEN( avengers_interrupt )
@@ -100,7 +100,7 @@ static INTERRUPT_GEN( avengers_interrupt )
 	lwings_state *state = device->machine().driver_data<lwings_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

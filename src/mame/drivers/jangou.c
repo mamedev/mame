@@ -306,12 +306,12 @@ READ8_MEMBER(jangou_state::input_system_r)
 WRITE8_MEMBER(jangou_state::sound_latch_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
+	m_cpu_1->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(jangou_state::sound_latch_r)
 {
-	device_set_input_line(m_cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
+	m_cpu_1->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
 }
 
@@ -331,7 +331,7 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 
 	/* Trigger an IRQ for every 8 shifted bits */
 	if ((++state->m_cvsd_shift_cnt & 7) == 0)
-		device_set_input_line(state->m_cpu_1, 0, HOLD_LINE);
+		state->m_cpu_1->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -350,7 +350,7 @@ static void jngolady_vclk_cb( device_t *device )
 	else
 	{
 		msm5205_data_w(device, state->m_adpcm_byte & 0xf);
-		device_set_input_line(state->m_cpu_1, 0, HOLD_LINE);
+		state->m_cpu_1->execute().set_input_line(0, HOLD_LINE);
 	}
 
 	state->m_msm5205_vclk_toggle ^= 1;
@@ -371,7 +371,7 @@ READ8_MEMBER(jangou_state::master_com_r)
 WRITE8_MEMBER(jangou_state::master_com_w)
 {
 
-	device_set_input_line(m_nsc, 0, HOLD_LINE);
+	m_nsc->execute().set_input_line(0, HOLD_LINE);
 	m_nsc_latch = data;
 }
 

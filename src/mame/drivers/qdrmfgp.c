@@ -271,12 +271,12 @@ static TIMER_DEVICE_CALLBACK(qdrmfgp_interrupt)
 
 	if(scanline == 0)
 		if (state->m_control & 0x0001)
-			device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+			state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	/* trigger V-blank interrupt */
 	if(scanline == 240)
 		if (state->m_control & 0x0004)
-			device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+			state->m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static void ide_interrupt(device_t *device, int state)
@@ -305,7 +305,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
 	if (state->m_control & 0x0008)
-		device_set_input_line(device, 4, HOLD_LINE);
+		device->execute().set_input_line(4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)

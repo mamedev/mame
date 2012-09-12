@@ -34,7 +34,7 @@ public:
 	UINT8      m_layer_ctrl;
 
 	/* devices */
-	device_t *m_subcpu;
+	cpu_device *m_subcpu;
 	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
 	DECLARE_READ8_MEMBER(angelkds_input_r);
 	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);

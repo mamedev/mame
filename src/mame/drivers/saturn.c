@@ -272,7 +272,7 @@ static void scu_test_pending_irq(running_machine &machine)
 		{
 			if(irq_level[i] != -1) /* TODO: cheap check for undefined irqs */
 			{
-				device_set_input_line_and_vector(state->m_maincpu, irq_level[i], HOLD_LINE, 0x40 + i);
+				state->m_maincpu->set_input_line_and_vector(irq_level[i], HOLD_LINE, 0x40 + i);
 				state->m_scu.ist &= ~(1 << i);
 				return; /* avoid spurious irqs, correct? */
 			}
@@ -408,7 +408,7 @@ static TIMER_CALLBACK( dma_lv0_ended )
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	if(!(state->m_scu.ism & IRQ_DMALV0))
-		device_set_input_line_and_vector(state->m_maincpu, 5, HOLD_LINE, 0x4b);
+		state->m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x4b);
 	else
 		state->m_scu.ist |= (IRQ_DMALV0);
 
@@ -421,7 +421,7 @@ static TIMER_CALLBACK( dma_lv1_ended )
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	if(!(state->m_scu.ism & IRQ_DMALV1))
-		device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x4a);
+		state->m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x4a);
 	else
 		state->m_scu.ist |= (IRQ_DMALV1);
 
@@ -434,7 +434,7 @@ static TIMER_CALLBACK( dma_lv2_ended )
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	if(!(state->m_scu.ism & IRQ_DMALV2))
-		device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
+		state->m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x49);
 	else
 		state->m_scu.ist |= (IRQ_DMALV2);
 
@@ -901,7 +901,7 @@ INPUT_CHANGED_MEMBER(saturn_state::nmi_reset)
 
 	/* TODO: NMI doesn't stay held on SH-2 core so we can't use ASSERT_LINE/CLEAR_LINE with that yet */
 	if(newval)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INPUT_CHANGED_MEMBER(saturn_state::tray_open)
@@ -1661,7 +1661,7 @@ static WRITE_LINE_DEVICE_HANDLER( scsp_to_main_irq )
 
 	if(!(drvstate->m_scu.ism & IRQ_SOUND_REQ))
 	{
-		device_set_input_line_and_vector(drvstate->m_maincpu, 9, HOLD_LINE, 0x46);
+		drvstate->m_maincpu->set_input_line_and_vector(9, HOLD_LINE, 0x46);
 		scu_do_transfer(device->machine(),5);
 	}
 	else
@@ -1751,9 +1751,9 @@ static MACHINE_START( stv )
 	system_time systime;
 	machine.base_datetime(systime);
 
-	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
+	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("maincpu") );
 	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
-	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device("audiocpu") );
+	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("audiocpu") );
 
 	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
 
@@ -1795,9 +1795,9 @@ static MACHINE_START( saturn )
 	system_time systime;
 	machine.base_datetime(systime);
 
-	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
+	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("maincpu") );
 	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
-	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device("audiocpu") );
+	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device<cpu_device>("audiocpu") );
 
 	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
 
@@ -1883,7 +1883,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 
 		if(!(state->m_scu.ism & IRQ_VDP1_END))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0x2, HOLD_LINE, 0x4d);
+			state->m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
 			scu_do_transfer(timer.machine(),6);
 		}
 		else
@@ -1894,7 +1894,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	{
 		if(!(state->m_scu.ism & IRQ_VBLANK_OUT))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0xe, HOLD_LINE, 0x41);
+			state->m_maincpu->set_input_line_and_vector(0xe, HOLD_LINE, 0x41);
 			scu_do_transfer(timer.machine(),1);
 		}
 		else
@@ -1905,7 +1905,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	{
 		if(!(state->m_scu.ism & IRQ_VBLANK_IN))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0xf, HOLD_LINE ,0x40);
+			state->m_maincpu->set_input_line_and_vector(0xf, HOLD_LINE ,0x40);
 			scu_do_transfer(timer.machine(),0);
 		}
 		else
@@ -1915,7 +1915,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	{
 		if(!(state->m_scu.ism & IRQ_HBLANK_IN))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0xd, HOLD_LINE, 0x42);
+			state->m_maincpu->set_input_line_and_vector(0xd, HOLD_LINE, 0x42);
 			scu_do_transfer(timer.machine(),2);
 		}
 		else
@@ -1926,7 +1926,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	{
 		if(!(state->m_scu.ism & IRQ_TIMER_0))
 		{
-			device_set_input_line_and_vector(state->m_maincpu, 0xc, HOLD_LINE, 0x43 );
+			state->m_maincpu->set_input_line_and_vector(0xc, HOLD_LINE, 0x43 );
 			scu_do_transfer(timer.machine(),3);
 		}
 		else
@@ -1941,7 +1941,7 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		{
 			if(!(state->m_scu.ism & IRQ_TIMER_1))
 			{
-				device_set_input_line_and_vector(state->m_maincpu, 0xb, HOLD_LINE, 0x44 );
+				state->m_maincpu->set_input_line_and_vector(0xb, HOLD_LINE, 0x44 );
 				scu_do_transfer(timer.machine(),4);
 			}
 			else
@@ -1965,9 +1965,9 @@ static TIMER_DEVICE_CALLBACK( saturn_slave_scanline )
 	vblank_line = (state->m_vdp2.pal) ? 288 : 240;
 
 	if(scanline == vblank_line*y_step)
-		device_set_input_line_and_vector(state->m_slave, 0x6, HOLD_LINE, 0x43);
+		state->m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43);
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		device_set_input_line_and_vector(state->m_slave, 0x2, HOLD_LINE, 0x41);
+		state->m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41);
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */

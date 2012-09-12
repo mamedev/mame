@@ -72,17 +72,17 @@ static TIMER_DEVICE_CALLBACK( scregg_interrupt )
 {
 	// assume that the irq generator is similar to burgertime hw
 	scregg_state *state = timer.machine().driver_data<scregg_state>();
-	device_set_input_line(state->m_maincpu, 0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(scregg_state::scregg_irqack_w)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(scregg_state::scregg_irqack_r)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
@@ -235,7 +235,7 @@ static MACHINE_START( scregg )
 {
 	scregg_state *state = machine.driver_data<scregg_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_audiocpu = NULL;
 
 	state->save_item(NAME(state->m_btime_palette));

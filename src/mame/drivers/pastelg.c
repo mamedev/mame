@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 {
-	device_set_input_line(&space.device(), 0, CLEAR_LINE);
+	space.device().execute().set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 

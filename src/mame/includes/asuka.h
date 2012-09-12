@@ -30,8 +30,8 @@ public:
 	int         m_adpcm_data;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_pc090oj;
 	device_t *m_tc0100scn;
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

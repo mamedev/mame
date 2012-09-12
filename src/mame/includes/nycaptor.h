@@ -46,9 +46,9 @@ public:
 	int m_mask;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_subcpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(from_snd_r);

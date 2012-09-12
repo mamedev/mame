@@ -116,7 +116,7 @@ static void mrokumei_handleblit( address_space *space, int rom_base )
 	} /* for(;;) */
 
 finish:
-	device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void reikaids_handleblit( address_space *space, int rom_base )
@@ -214,7 +214,7 @@ static void reikaids_handleblit( address_space *space, int rom_base )
 	}
 
 finish:
-	device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void pteacher_handleblit( address_space *space, int rom_base )
@@ -301,7 +301,7 @@ static void pteacher_handleblit( address_space *space, int rom_base )
 	} /* for(;;) */
 
 finish:
-	device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 

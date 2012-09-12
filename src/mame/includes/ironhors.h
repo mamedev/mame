@@ -31,8 +31,8 @@ public:
 	int        m_spriterambank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_soundcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_soundcpu;
 	DECLARE_WRITE8_MEMBER(ironhors_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(ironhors_videoram_w);
 	DECLARE_WRITE8_MEMBER(ironhors_colorram_w);

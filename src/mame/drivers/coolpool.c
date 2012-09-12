@@ -136,7 +136,7 @@ static MACHINE_RESET( amerdart )
 {
 	coolpool_state *state = machine.driver_data<coolpool_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_dsp = machine.device("dsp");
 
 	state->m_nvram_write_enable = 0;
@@ -211,8 +211,8 @@ static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
 {
 	coolpool_state *state = timer.machine().driver_data<coolpool_state>();
 
-	device_set_input_line(state->m_dsp, 0, ASSERT_LINE);
-	device_set_input_line(state->m_dsp, 0, CLEAR_LINE);
+	state->m_dsp->execute().set_input_line(0, ASSERT_LINE);
+	state->m_dsp->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -240,7 +240,7 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 	if (m_same_cmd_count >= 5)
 	{
 		m_same_cmd_count = 5;
-		device_spin(&space.device());
+		space.device().execute().spin();
 	}
 	m_old_cmd = m_cmd_pending;
 

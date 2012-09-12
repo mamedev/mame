@@ -33,8 +33,8 @@ public:
 	UINT16      m_tilebank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_oki;
 	UINT8 m_semicom_prot_offset;
 	UINT16 m_protbase;

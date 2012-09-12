@@ -124,7 +124,7 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 	{
 		m_snd_command = (data & 0xff);
 		m_snd_flag = 1;
-		device_yield(&space.device());
+		space.device().execute().yield();
 	}
 }
 

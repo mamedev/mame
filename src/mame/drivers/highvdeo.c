@@ -921,7 +921,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4);
 }
 
 static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )

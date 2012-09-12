@@ -107,7 +107,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( ondra_interrupt )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static const cassette_interface ondra_cassette_interface =

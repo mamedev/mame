@@ -127,7 +127,7 @@ INTERRUPT_GEN( vector06_interrupt )
 	vector06_state *state = device->machine().driver_data<vector06_state>();
 	state->m_vblank_state++;
 	if (state->m_vblank_state>1) state->m_vblank_state=0;
-	device_set_input_line(device,0,state->m_vblank_state ? HOLD_LINE : CLEAR_LINE);
+	device->execute().set_input_line(0,state->m_vblank_state ? HOLD_LINE : CLEAR_LINE);
 
 }
 
@@ -173,7 +173,7 @@ MACHINE_RESET( vector06 )
 	vector06_state *state = machine.driver_data<vector06_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	device_set_irq_callback(machine.device("maincpu"), vector06_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(vector06_irq_callback);
 	space->install_read_bank (0x0000, 0x7fff, "bank1");
 	space->install_write_bank(0x0000, 0x7fff, "bank2");
 	space->install_read_bank (0x8000, 0xffff, "bank3");

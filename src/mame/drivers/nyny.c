@@ -107,8 +107,8 @@ public:
 	UINT16   m_star_shift_reg;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_audiocpu2;
 	device_t *m_ic48_1;
 	mc6845_device *m_mc6845;
@@ -150,13 +150,13 @@ WRITE_LINE_MEMBER(nyny_state::main_cpu_irq)
 {
 	int combined_state = m_pia1->irq_a_state() | m_pia1->irq_b_state() | m_pia2->irq_b_state();
 
-	device_set_input_line(m_maincpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 WRITE_LINE_MEMBER(nyny_state::main_cpu_firq)
 {
-	device_set_input_line(m_maincpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 	m_star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(*m_maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
+	audio_2_command_w(*m_maincpu->space(AS_PROGRAM), 0, data & 0xe0);
 }
 
 
@@ -448,7 +448,7 @@ WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
 
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, M6800_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -456,7 +456,7 @@ WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 {
 
 	soundlatch3_byte_w(space, 0, data);
-	device_set_input_line(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -501,7 +501,7 @@ WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
 
 	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
-	device_set_input_line(m_audiocpu2, M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu2->execute().set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -677,8 +677,8 @@ static MACHINE_START( nyny )
 {
 	nyny_state *state = machine.driver_data<nyny_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_audiocpu2 = machine.device("audio2");
 	state->m_ic48_1 = machine.device("ic48_1");
 	state->m_mc6845 = machine.device<mc6845_device>("crtc");

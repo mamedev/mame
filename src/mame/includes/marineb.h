@@ -21,8 +21,8 @@ public:
 	UINT8     m_marineb_active_low_flipscreen;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 
 	UINT8     m_irq_mask;
 	DECLARE_WRITE8_MEMBER(irq_mask_w);

@@ -214,8 +214,8 @@ public:
 	UINT8 m_leds_mux_data;
 	UINT8 m_outdata;			/* Muxed with the sound latch. Output to a sign? */
 
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 
 	required_device<v9938_device> m_v9938;
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -257,8 +257,8 @@ static TIMER_DEVICE_CALLBACK( kas89_interrupt )
 static MACHINE_START( kas89 )
 {
 	kas89_state *state = machine.driver_data<kas89_state>();
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	output_set_lamp_value(37, 0);	/* turning off the operator led */
 }
@@ -315,14 +315,14 @@ static TIMER_DEVICE_CALLBACK ( kas89_nmi_cb )
 	kas89_state *state = timer.machine().driver_data<kas89_state>();
 
 	if (state->m_main_nmi_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK ( kas89_sound_nmi_cb )
 {
 	kas89_state *state = timer.machine().driver_data<kas89_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -379,13 +379,13 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 	else
 	{
 		soundlatch_byte_w(space, 0, data);
-		device_set_input_line(m_audiocpu, 0, ASSERT_LINE );
+		m_audiocpu->set_input_line(0, ASSERT_LINE );
 	}
 }
 
 WRITE8_MEMBER(kas89_state::int_ack_w)
 {
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE );
+	m_audiocpu->set_input_line(0, CLEAR_LINE );
 }
 
 

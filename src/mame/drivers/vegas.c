@@ -1452,7 +1452,7 @@ static WRITE32_HANDLER( analog_port_w )
 
 static WRITE32_HANDLER( vegas_watchdog_w )
 {
-	device_eat_cycles(&space->device(), 100);
+	space->device().execute().eat_cycles(100);
 }
 
 

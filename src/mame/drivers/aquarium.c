@@ -63,7 +63,7 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 //  popmessage("sound write %04x",data);
 
 	soundlatch_byte_w(space, 1, data & 0xff);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
@@ -291,7 +291,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	aquarium_state *state = device->machine().driver_data<aquarium_state>();
-	device_set_input_line(state->m_audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -304,7 +304,7 @@ static MACHINE_START( aquarium )
 {
 	aquarium_state *state = machine.driver_data<aquarium_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_aquarium_snd_ack));
 }

@@ -148,7 +148,7 @@ WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
 {
 
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -416,7 +416,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int irq )
 {
 	mcatadv_state *state = device->machine().driver_data<mcatadv_state>();
-	device_set_input_line(state->m_soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_soundcpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface mcatadv_ym2610_interface =
@@ -433,8 +433,8 @@ static MACHINE_START( mcatadv )
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank1")->set_entry(1);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 
 	state->save_item(NAME(state->m_palette_bank1));
 	state->save_item(NAME(state->m_palette_bank2));

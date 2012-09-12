@@ -22,7 +22,7 @@ public:
 	int        m_last_track[4];
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k007342;
 	device_t *m_k007420;
 	DECLARE_READ8_MEMBER(trackball_r);

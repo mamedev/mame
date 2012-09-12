@@ -140,7 +140,7 @@ CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
 INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -381,7 +381,7 @@ static MACHINE_START( exerion )
 {
 	exerion_state *state = machine.driver_data<exerion_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_porta));
 	state->save_item(NAME(state->m_portb));

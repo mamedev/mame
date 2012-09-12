@@ -374,7 +374,7 @@ INTERRUPT_GEN( orionz80_interrupt )
 	orion_state *state = device->machine().driver_data<orion_state>();
 	if ((state->m_orionz80_dispatcher & 0x40)==0x40)
 	{
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 

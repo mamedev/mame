@@ -198,7 +198,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
 	driver_state->m_pia0_irq = state;
 	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	device_set_input_line(device->machine().firstcpu, INPUT_LINE_IRQ0, level);
+	device->machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia0 =
@@ -249,7 +249,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
 	driver_state->m_pia1_irq = state;
 	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	device_set_input_line(device->machine().firstcpu, INPUT_LINE_IRQ0, level);
+	device->machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
 
 const pia6821_interface pet_pia1 =
@@ -382,7 +382,7 @@ static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 	driver_state->m_via_irq = state;
 	int level = (driver_state->m_pia0_irq | driver_state->m_pia1_irq | driver_state->m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
-	device_set_input_line(device->machine().firstcpu, INPUT_LINE_IRQ0, level);
+	device->machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
 
 const via6522_interface pet_via =
@@ -770,14 +770,14 @@ INTERRUPT_GEN( pet_frame_interrupt )
 	{
 		if (state->ioport("CFG")->read() & 0x04)
 		{
-			device_set_input_line(device, INPUT_LINE_HALT, 1);
-			device_set_input_line(device, INPUT_LINE_HALT, 0);
+			device->execute().set_input_line(INPUT_LINE_HALT, 1);
+			device->execute().set_input_line(INPUT_LINE_HALT, 0);
 			state->m_font |= 2;
 		}
 		else
 		{
-			device_set_input_line(device, INPUT_LINE_HALT, 0);
-			device_set_input_line(device, INPUT_LINE_HALT, 1);
+			device->execute().set_input_line(INPUT_LINE_HALT, 0);
+			device->execute().set_input_line(INPUT_LINE_HALT, 1);
 			state->m_font &= ~2;
 		}
 	}

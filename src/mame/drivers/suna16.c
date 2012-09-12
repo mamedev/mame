@@ -760,10 +760,10 @@ static TIMER_DEVICE_CALLBACK( bssoccer_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE); // does RAM to sprite buffer copy here
+		state->m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
 static MACHINE_CONFIG_START( bssoccer, suna16_state )

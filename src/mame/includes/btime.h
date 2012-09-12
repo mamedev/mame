@@ -52,8 +52,8 @@ public:
 	int      m_protection_ret;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(lnc_w);

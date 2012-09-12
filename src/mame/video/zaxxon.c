@@ -288,7 +288,7 @@ WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
 		int count = m_congo_custom[2];
 
 		/* count cycles (just a guess) */
-		device_adjust_icount(&space.device(), -count * 5);
+		space.device().execute().adjust_icount(-count * 5);
 
 		/* this is just a guess; the chip is hardwired to the spriteram */
 		while (count-- >= 0)

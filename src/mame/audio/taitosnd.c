@@ -59,7 +59,7 @@ static void interrupt_controller( device_t *device )
 
 	if (tc0140syt->nmi_req && tc0140syt->nmi_enabled)
 	{
-		device_set_input_line(tc0140syt->slavecpu, INPUT_LINE_NMI, PULSE_LINE);
+		tc0140syt->slavecpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		tc0140syt->nmi_req = 0;
 	}
 }
@@ -113,11 +113,11 @@ WRITE8_DEVICE_HANDLER( tc0140syt_comm_w )
 			//logerror("taitosnd: Master issued control value %02x (PC = %08x) \n",data, space->device().safe_pc() );
 			/* this does a hi-lo transition to reset the sound cpu */
 			if (data)
-				device_set_input_line(tc0140syt->slavecpu, INPUT_LINE_RESET, ASSERT_LINE);
+				tc0140syt->slavecpu->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			else
 			{
-				device_set_input_line(tc0140syt->slavecpu, INPUT_LINE_RESET, CLEAR_LINE);
-				device_spin(tc0140syt->mastercpu); /* otherwise no sound in driftout */
+				tc0140syt->slavecpu->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				tc0140syt->mastercpu->execute().spin(); /* otherwise no sound in driftout */
 			}
 			break;
 
@@ -191,7 +191,7 @@ WRITE8_DEVICE_HANDLER( tc0140syt_slave_comm_w )
 			tc0140syt->masterdata[tc0140syt->submode ++] = data;
 			tc0140syt->status |= TC0140SYT_PORT01_FULL_MASTER;
 			//logerror("taitosnd: Slave cpu sends 0/1 : %01x%01x\n" , tc0140syt->masterdata[1] , tc0140syt->masterdata[0]);
-			device_spin(tc0140syt->slavecpu); /* writing should take longer than emulated, so spin */
+			tc0140syt->slavecpu->execute().spin(); /* writing should take longer than emulated, so spin */
 			break;
 
 		case 0x02:		// mode #2
@@ -203,7 +203,7 @@ WRITE8_DEVICE_HANDLER( tc0140syt_slave_comm_w )
 			tc0140syt->masterdata[tc0140syt->submode ++] = data;
 			tc0140syt->status |= TC0140SYT_PORT23_FULL_MASTER;
 			//logerror("taitosnd: Slave cpu sends 2/3 : %01x%01x\n" , tc0140syt->masterdata[3] , tc0140syt->masterdata[2]);
-			device_spin(tc0140syt->slavecpu); /* writing should take longer than emulated, so spin */
+			tc0140syt->slavecpu->execute().spin(); /* writing should take longer than emulated, so spin */
 			break;
 
 		case 0x04:		// port status

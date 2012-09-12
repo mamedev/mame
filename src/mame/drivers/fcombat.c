@@ -38,7 +38,7 @@ INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
 {
 
 	/* coin insertion causes an NMI */
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -261,7 +261,7 @@ static MACHINE_START( fcombat )
 {
 	fcombat_state *state = machine.driver_data<fcombat_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_cocktail_flip));
 	state->save_item(NAME(state->m_char_palette));

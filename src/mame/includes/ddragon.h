@@ -59,7 +59,7 @@ public:
 #endif
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_snd_cpu;
 	device_t *m_sub_cpu;
 	device_t *m_adpcm_1;

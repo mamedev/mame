@@ -499,7 +499,7 @@ READ32_MEMBER( beathead_state::speedup_r )
 {
 	int result = *m_speedup_data;
 	if ((space.device().safe_pcbase() & 0xfffff) == 0x006f0 && result == space.device().state().state_int(ASAP_R3))
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 	return result;
 }
 
@@ -512,7 +512,7 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
 	{
 		UINT32 temp = (INT16)result + m_movie_speedup_data[4] * 262;
 		if (temp - (UINT32)space.device().state().state_int(ASAP_R15) < (UINT32)space.device().state().state_int(ASAP_R23))
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 	}
 	return result;
 }

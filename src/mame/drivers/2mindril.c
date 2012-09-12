@@ -54,7 +54,7 @@ public:
 	UINT16		  irq_reg;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ16_MEMBER(drill_io_r);
 	DECLARE_WRITE16_MEMBER(drill_io_w);
 	DECLARE_WRITE16_MEMBER(sensors_w);
@@ -399,13 +399,13 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( drill_vblank_irq )
 {
-	device_set_input_line(device, 4, ASSERT_LINE);
+	device->execute().set_input_line(4, ASSERT_LINE);
 }
 
 #if 0
 static INTERRUPT_GEN( drill_device_irq )
 {
-	device_set_input_line(device, 5, ASSERT_LINE);
+	device->execute().set_input_line(5, ASSERT_LINE);
 }
 #endif
 
@@ -413,7 +413,7 @@ static INTERRUPT_GEN( drill_device_irq )
 static void irqhandler(device_t *device, int irq)
 {
 //  _2mindril_state *state = machine.driver_data<_2mindril_state>();
-//  device_set_input_line(state->m_maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
+//  state->m_maincpu->set_input_line(5, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -426,7 +426,7 @@ static MACHINE_START( drill )
 {
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_defender_sensor));
 	state->save_item(NAME(state->m_shutter_sensor));

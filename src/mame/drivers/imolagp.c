@@ -108,7 +108,7 @@ public:
 	int   m_oldsteer;
 
 	/* devices */
-	device_t *m_slavecpu;
+	cpu_device *m_slavecpu;
 
 	/* memory */
 	UINT8  m_videoram[3][0x4000];
@@ -155,7 +155,7 @@ WRITE8_MEMBER(imolagp_state::transmit_data_w)
 }
 READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 {
-	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
@@ -486,7 +486,7 @@ static TIMER_DEVICE_CALLBACK ( imolagp_nmi_cb )
 			{
 				state->m_oldsteer = (state->m_oldsteer + 1) & 0xf;
 			}
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -499,7 +499,7 @@ static INTERRUPT_GEN( vblank_irq )
 	memcpy(&state->m_slave_workram[0x80], state->m_mComData, state->m_mComCount);
 	state->m_mComCount = 0;
 #endif
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 } /* master_interrupt */
 
 
@@ -518,7 +518,7 @@ static MACHINE_START( imolagp )
 {
 	imolagp_state *state = machine.driver_data<imolagp_state>();
 
-	state->m_slavecpu = machine.device("slave");
+	state->m_slavecpu = machine.device<cpu_device>("slave");
 
 	state->save_item(NAME(state->m_control));
 	state->save_item(NAME(state->m_scroll));

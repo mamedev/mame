@@ -508,7 +508,7 @@ static MACHINE_START( atarifb )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_CTRLD));
 	state->save_item(NAME(state->m_sign_x_1));

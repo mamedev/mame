@@ -73,7 +73,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0x00);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
 }
 
 WRITE8_MEMBER(pbaction_state::nmi_mask_w)
@@ -251,7 +251,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( pbaction_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
 }
 
 
@@ -259,8 +259,8 @@ static MACHINE_START( pbaction )
 {
 	pbaction_state *state = machine.driver_data<pbaction_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_scroll));
 }
@@ -277,7 +277,7 @@ static INTERRUPT_GEN( vblank_irq )
 	pbaction_state *state = device->machine().driver_data<pbaction_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( pbaction, pbaction_state )

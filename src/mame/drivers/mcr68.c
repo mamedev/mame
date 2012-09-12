@@ -86,7 +86,7 @@ READ16_MEMBER(mcr68_state::zwackery_6840_r)
 	/* It expects D1 to end up between 0 and 5; in order to */
 	/* make this happen, we must assume that reads from the */
 	/* 6840 take 14 additional cycles                       */
-	device_adjust_icount(&space.device(), -14);
+	space.device().execute().adjust_icount(-14);
 	return mcr68_6840_upper_r(space,offset,0xffff);
 }
 

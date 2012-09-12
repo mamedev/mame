@@ -349,7 +349,7 @@ READ32_MEMBER(psikyosh_state::psh_eeprom_r)
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	device_set_input_line(device, 4, ASSERT_LINE);
+	device->execute().set_input_line(4, ASSERT_LINE);
 }
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
@@ -358,7 +358,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
 {
 	if (!(data & 0x00c00000))
 	{
-		device_set_input_line(m_maincpu, 4, CLEAR_LINE);
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 	}
 }
 
@@ -785,7 +785,7 @@ INPUT_PORTS_END
 static void irqhandler(device_t *device, int linestate)
 {
 	psikyosh_state *state = device->machine().driver_data<psikyosh_state>();
-	device_set_input_line(state->m_maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -798,7 +798,7 @@ static MACHINE_START( psikyosh )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->membank("bank2")->configure_entries(0, 0x1000, state->memregion("gfx1")->base(), 0x20000);
 }

@@ -62,7 +62,7 @@ WRITE8_MEMBER(kyugo_state::kyugo_nmi_mask_w)
 
 WRITE8_MEMBER(kyugo_state::kyugo_sub_cpu_control_w)
 {
-	device_set_input_line(m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
@@ -498,8 +498,8 @@ static MACHINE_START( kyugo )
 {
 	kyugo_state *state = machine.driver_data<kyugo_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_scroll_x_lo));
 	state->save_item(NAME(state->m_scroll_x_hi));
@@ -530,7 +530,7 @@ static INTERRUPT_GEN( vblank_irq )
 	kyugo_state *state = device->machine().driver_data<kyugo_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

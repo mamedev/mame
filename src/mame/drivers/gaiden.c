@@ -143,7 +143,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 		soundlatch_byte_w(space, 0, data & 0xff);	/* Ninja Gaiden */
 	if (ACCESSING_BITS_8_15)
 		soundlatch_byte_w(space, 0, data >> 8);	/* Tecmo Knight */
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
@@ -152,7 +152,7 @@ WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 0, data >> 8);
-		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -312,7 +312,7 @@ static MACHINE_RESET( raiga )
 static MACHINE_START( raiga )
 {
 	gaiden_state *state = machine.driver_data<gaiden_state>();
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_prot));
 	state->save_item(NAME(state->m_jumpcode));
@@ -748,7 +748,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	gaiden_state *state = device->machine().driver_data<gaiden_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

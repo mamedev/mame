@@ -9346,18 +9346,18 @@ READ32_DEVICE_HANDLER( k001005_r )
 			{
 				if (k001005->fifo_read_ptr < 0x3ff)
 				{
-					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//k001005->dsp->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, CLEAR_LINE);
 				}
 				else
 				{
-					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//k001005->dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
-				//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//k001005->dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 			}
 
@@ -9401,18 +9401,18 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 			{
 				if (k001005->fifo_write_ptr < 0x400)
 				{
-					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//k001005->dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 				}
 				else
 				{
-					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//k001005->dsp->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
-				//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//k001005->dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 			}
 
@@ -9427,13 +9427,13 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 			if (k001005->cpu->safe_pc() == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				device_spin_until_trigger(k001005->cpu, 10000);
+				k001005->cpu->execute().spin_until_trigger(10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
 			if (k001005->cpu->safe_pc() == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				device_spin_until_trigger(k001005->cpu, 10000);
+				k001005->cpu->execute().spin_until_trigger(10000);
 			}
 
 			break;

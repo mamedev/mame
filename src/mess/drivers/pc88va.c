@@ -1528,7 +1528,7 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 static MACHINE_START( pc88va )
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
-	device_set_irq_callback(machine.device("maincpu"), pc88va_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc88va_irq_callback);
 
 	state->m_t3_mouse_timer = machine.scheduler().timer_alloc(FUNC(t3_mouse_callback));
 	state->m_t3_mouse_timer->adjust(attotime::never);
@@ -1558,7 +1558,7 @@ static MACHINE_RESET( pc88va )
 	state->m_fdc_mode = 0;
 	state->m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
-	device_set_input_line_vector(machine.device("fdccpu"), 0, 0);
+	machine.device("fdccpu")->execute().set_input_line_vector(0, 0);
 }
 
 static INTERRUPT_GEN( pc88va_vrtc_irq )

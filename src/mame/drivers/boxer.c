@@ -37,7 +37,7 @@ public:
 	UINT8 m_pot_latch;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(boxer_input_r);
 	DECLARE_READ8_MEMBER(boxer_misc_r);
 	DECLARE_WRITE8_MEMBER(boxer_bell_w);
@@ -60,7 +60,7 @@ static TIMER_CALLBACK( pot_interrupt )
 	int mask = param;
 
 	if (state->m_pot_latch & mask)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	state->m_pot_state |= mask;
 }
@@ -71,7 +71,7 @@ static TIMER_CALLBACK( periodic_callback )
 	boxer_state *state = machine.driver_data<boxer_state>();
 	int scanline = param;
 
-	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+	state->m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (scanline == 0)
 	{
@@ -262,13 +262,13 @@ WRITE8_MEMBER(boxer_state::boxer_pot_w)
 
 	m_pot_latch = data & 0x3f;
 
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 WRITE8_MEMBER(boxer_state::boxer_irq_reset_w)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -426,7 +426,7 @@ static MACHINE_START( boxer )
 {
 	boxer_state *state = machine.driver_data<boxer_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_pot_state));
 	state->save_item(NAME(state->m_pot_latch));

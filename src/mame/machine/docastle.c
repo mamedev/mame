@@ -68,7 +68,7 @@ WRITE8_MEMBER(docastle_state::docastle_shared1_w)
 				data, (UINT32)m_maincpu->total_cycles());
 
 		/* freeze execution of the master CPU until the slave has used the shared memory */
-		device_spin_until_trigger(&space.device(), 500);
+		space.device().execute().spin_until_trigger(500);
 	}
 }
 
@@ -76,5 +76,5 @@ WRITE8_MEMBER(docastle_state::docastle_shared1_w)
 
 WRITE8_MEMBER(docastle_state::docastle_nmitrigger_w)
 {
-	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

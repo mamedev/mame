@@ -56,9 +56,9 @@ WRITE16_MEMBER(lockon_state::adrst_w)
 	m_ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
-	device_set_input_line(m_ground, INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(m_object, INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(m_audiocpu, INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	m_ground->execute().set_input_line(INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	m_object->execute().set_input_line(INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ16_MEMBER(lockon_state::main_gnd_r)
@@ -115,13 +115,13 @@ WRITE16_MEMBER(lockon_state::tst_w)
 
 READ16_MEMBER(lockon_state::main_z80_r)
 {
-	address_space *sndspace = m_audiocpu->memory().space(AS_PROGRAM);
+	address_space *sndspace = m_audiocpu->space(AS_PROGRAM);
 	return 0xff00 | sndspace->read_byte(offset);
 }
 
 WRITE16_MEMBER(lockon_state::main_z80_w)
 {
-	address_space *sndspace = m_audiocpu->memory().space(AS_PROGRAM);
+	address_space *sndspace = m_audiocpu->space(AS_PROGRAM);
 	sndspace->write_byte(offset, data);
 }
 
@@ -418,7 +418,7 @@ WRITE8_MEMBER(lockon_state::sound_vol)
 static void ym2203_irq(device_t *device, int irq)
 {
 	lockon_state *state = device->machine().driver_data<lockon_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
@@ -455,8 +455,8 @@ static MACHINE_START( lockon )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_ground = machine.device("ground");
 	state->m_object = machine.device("object");
 	state->m_f2203_1l = machine.device("f2203.1l");

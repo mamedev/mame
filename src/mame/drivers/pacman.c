@@ -405,7 +405,7 @@ static INTERRUPT_GEN( vblank_irq )
 	pacman_state *state = device->machine().driver_data<pacman_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( vblank_nmi )
@@ -413,7 +413,7 @@ static INTERRUPT_GEN( vblank_nmi )
 	pacman_state *state = device->machine().driver_data<pacman_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(pacman_state::irq_mask_w)
@@ -423,8 +423,8 @@ WRITE8_MEMBER(pacman_state::irq_mask_w)
 
 WRITE8_MEMBER(pacman_state::pacman_interrupt_vector_w)
 {
-	device_set_input_line_vector(m_maincpu, 0, data);
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line_vector(0, data);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -488,7 +488,7 @@ WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	device_set_input_line_vector(m_maincpu, 0, data );
+	m_maincpu->set_input_line_vector(0, data );
 }
 
 
@@ -497,7 +497,7 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	device_set_input_line_vector(m_maincpu, 0, data );
+	m_maincpu->set_input_line_vector(0, data );
 }
 
 
@@ -697,7 +697,7 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)

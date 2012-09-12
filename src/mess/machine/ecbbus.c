@@ -144,7 +144,7 @@ ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, dev
 
 void ecbbus_device::device_start()
 {
-	m_maincpu = machine().device(m_cputag);
+	m_maincpu = machine().device<cpu_device>(m_cputag);
 
 	// resolve callbacks
 	m_out_int_func.resolve(m_out_int_cb, *this);

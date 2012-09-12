@@ -35,7 +35,7 @@ public:
 	int         m_adpcm_toggle;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(goal92_sound_command_w);
 	DECLARE_READ16_MEMBER(goal92_inputs_r);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);

@@ -128,13 +128,13 @@ static TIMER_DEVICE_CALLBACK( galpani3_vblank ) // 2, 3, 5 ?
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 5, HOLD_LINE); // timer, related to sound chip?
+		state->m_maincpu->set_input_line(5, HOLD_LINE); // timer, related to sound chip?
 }
 
 

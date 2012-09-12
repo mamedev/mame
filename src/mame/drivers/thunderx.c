@@ -26,13 +26,13 @@ static INTERRUPT_GEN( scontra_interrupt )
 	thunderx_state *state = device->machine().driver_data<thunderx_state>();
 
 	if (k052109_is_irq_enabled(state->m_k052109))
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( thunderx_firq_callback )
 {
 	thunderx_state *state = machine.driver_data<thunderx_state>();
-	device_set_input_line(state->m_maincpu, KONAMI_FIRQ_LINE, HOLD_LINE);
+	state->m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(thunderx_state::scontra_bankedram_r)
@@ -353,7 +353,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_videobank_w)
 
 WRITE8_MEMBER(thunderx_state::thunderx_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(thunderx_state::scontra_snd_bankswitch_w)
@@ -609,8 +609,8 @@ static MACHINE_START( scontra )
 
 	state->m_generic_paletteram_8.allocate(0x800);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007232 = machine.device("k007232");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");

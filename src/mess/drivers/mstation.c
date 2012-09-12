@@ -262,9 +262,9 @@ WRITE8_MEMBER( mstation_state::port2_w )
 void mstation_state::refresh_ints()
 {
 	if (m_irq != 0)
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	else
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER( mstation_state::irq_r )

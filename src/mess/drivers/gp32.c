@@ -492,11 +492,11 @@ static void s3c240x_check_pending_irq( running_machine &machine)
 		}
 		state->m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		state->m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		device_set_input_line( machine.device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		machine.device( "maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line( machine.device( "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		machine.device( "maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -509,7 +509,7 @@ static void s3c240x_request_irq( running_machine &machine, UINT32 int_type)
 		state->m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		state->m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		state->m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		device_set_input_line( machine.device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		machine.device( "maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{

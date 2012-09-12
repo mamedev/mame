@@ -97,7 +97,7 @@ protected:
 	virtual void device_config_complete();
 
 	// internal state
-	device_t   *m_maincpu;
+	cpu_device   *m_maincpu;
 
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;

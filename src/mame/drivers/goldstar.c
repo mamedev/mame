@@ -6251,7 +6251,7 @@ static INTERRUPT_GEN( lucky8_irq )
 	goldstar_state *state = device->machine().driver_data<goldstar_state>();
 
 	if(state->m_lucky8_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( lucky8, goldstar_state )

@@ -72,14 +72,14 @@ static INTERRUPT_GEN( homelab_frame )
 {
 	homelab_state *state = device->machine().driver_data<homelab_state>();
 	if (state->m_nmi)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 {
 	if (offset == 0x38) // 0x3838
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		return 0;
 	}
 

@@ -258,7 +258,7 @@ WRITE8_MEMBER(fromance_state::fromance_scroll_w)
 static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
-	device_set_input_line(state->m_subcpu, 0, HOLD_LINE);
+	state->m_subcpu->set_input_line(0, HOLD_LINE);
 	if (param != 0)
 		state->m_crtc_timer->adjust(machine.primary_screen->frame_period() / param, 0, machine.primary_screen->frame_period() / param);
 }

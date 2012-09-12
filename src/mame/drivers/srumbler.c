@@ -57,10 +57,10 @@ static TIMER_DEVICE_CALLBACK( srumbler_interrupt )
 	int scanline = param;
 
 	if (scanline == 248)
-		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+		state->m_maincpu->set_input_line(0,HOLD_LINE);
 
 	if (scanline == 0)
-		device_set_input_line(state->m_maincpu,M6809_FIRQ_LINE,HOLD_LINE);
+		state->m_maincpu->set_input_line(M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 /*

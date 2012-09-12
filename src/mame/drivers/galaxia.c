@@ -69,7 +69,7 @@ TODO:
 
 static INTERRUPT_GEN( galaxia_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 	cvs_scroll_stars(device->machine());
 }
 

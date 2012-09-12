@@ -89,8 +89,8 @@ inline void c64_cpm_cartridge_device::update_signals()
 {
 	if (m_enabled)
 	{
-        device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
-        device_set_input_line(machine().firstcpu, INPUT_LINE_HALT, ASSERT_LINE);
+        m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+        machine().firstcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
         if (m_reset)
         {
@@ -101,8 +101,8 @@ inline void c64_cpm_cartridge_device::update_signals()
 	}
 	else
 	{
-        device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
-        device_set_input_line(machine().firstcpu, INPUT_LINE_HALT, CLEAR_LINE);
+        m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+        machine().firstcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 /*

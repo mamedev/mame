@@ -211,7 +211,7 @@ static SCREEN_VBLANK( hvyunit )
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	device_set_input_line(m_slave_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_slave_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
@@ -228,7 +228,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
 	m_data_to_mermaid = data;
 	m_z80_to_mermaid_full = 1;
 	m_mermaid_int0_l = 0;
-	device_set_input_line(m_mermaid, INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_mermaid->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_data_r)
@@ -255,7 +255,7 @@ WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 {
 
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
@@ -358,7 +358,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
 	if (data == 0xff)
 	{
 		m_mermaid_int0_l = 1;
-		device_set_input_line(m_mermaid, INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_mermaid->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
 	m_mermaid_p[1] = data;
@@ -404,7 +404,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
 {
 
 	m_mermaid_p[3] = data;
-	device_set_input_line(m_slave_cpu, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_slave_cpu->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -630,11 +630,11 @@ static TIMER_DEVICE_CALLBACK( hvyunit_scanline )
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		device_set_input_line_and_vector(state->m_master_cpu, 0, HOLD_LINE, 0xfd);
+		state->m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		device_set_input_line_and_vector(state->m_master_cpu, 0, HOLD_LINE, 0xff);
+		state->m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface hvyunit_pandora_config =

@@ -204,7 +204,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( m79amb_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);  /* RST 08h */
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( m79amb, m79amb_state )

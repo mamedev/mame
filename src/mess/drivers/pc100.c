@@ -331,7 +331,7 @@ static MACHINE_START(pc100)
 {
 	pc100_state *state = machine.driver_data<pc100_state>();
 
-	device_set_irq_callback(machine.device("maincpu"), pc100_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc100_irq_callback);
 	state->m_kanji_rom = (UINT16 *)(*machine.root_device().memregion("kanji"));
 	state->m_vram = (UINT16 *)(*state->memregion("vram"));
 }

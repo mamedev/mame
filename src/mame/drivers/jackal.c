@@ -313,8 +313,8 @@ static INTERRUPT_GEN( jackal_interrupt )
 
 	if (state->m_irq_enable)
 	{
-		device_set_input_line(device, 0, HOLD_LINE);
-		device_set_input_line(state->m_slavecpu, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
+		state->m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -334,8 +334,8 @@ static MACHINE_START( jackal )
 	state->membank("bank1")->configure_entry(1, &ROM[0x14000]);
 	state->membank("bank1")->set_entry(0);
 
-	state->m_mastercpu = machine.device("master");
-	state->m_slavecpu = machine.device("slave");
+	state->m_mastercpu = machine.device<cpu_device>("master");
+	state->m_slavecpu = machine.device<cpu_device>("slave");
 
 	state->save_item(NAME(state->m_irq_enable));
 }

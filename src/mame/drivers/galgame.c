@@ -295,7 +295,7 @@ static PALETTE_INIT( galaxygame )
 
 static IRQ_CALLBACK(galaxygame_irq_callback)
 {
-	device_set_input_line(device, 0, CLEAR_LINE);
+	device->execute().set_input_line(0, CLEAR_LINE);
 	return 0x40;
 }
 
@@ -304,7 +304,7 @@ static INTERRUPT_GEN(galaxygame_irq)
 	galaxygame_state *state = device->machine().driver_data<galaxygame_state>();
 	if ( state->m_clk & 0x40 )
 	{
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 		state->m_interrupt = 1;
 	}
 }
@@ -317,7 +317,7 @@ static MACHINE_RESET( galaxygame )
 	state->m_point_display_list_index = 0;
 	state->m_interrupt = 0;
 
-	device_set_irq_callback(machine.device("maincpu"), galaxygame_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(galaxygame_irq_callback);
 }
 
 static const struct t11_setup t11_data =

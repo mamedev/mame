@@ -30,7 +30,7 @@ public:
 	int          m_speech_chip;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k052109;
 	device_t *m_k051960;
 	device_t *m_k051316;

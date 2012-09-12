@@ -64,7 +64,7 @@ READ8_MEMBER(jack_state::timer_r)
 WRITE8_MEMBER(jack_state::jack_sh_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -856,7 +856,7 @@ static INTERRUPT_GEN( joinem_vblank_irq )
 {
 	 /* TODO: looks hackish to me ... */
 	if (!(device->machine().root_device().ioport("IN2")->read() & 0x80))
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( joinem, jack )

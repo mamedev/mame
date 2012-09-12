@@ -84,13 +84,13 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(by133_state::video_test)
 {
 	if(newval)
-		device_set_input_line(m_videocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_videocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INPUT_CHANGED_MEMBER(by133_state::sound_test)
 {
 	if(newval)
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( by133 )
@@ -115,13 +115,13 @@ static TMS9928A_INTERFACE(byvid_tms9928a_interface)
 
 WRITE_LINE_MEMBER(by133_state::by133_firq)
 {
-	device_set_input_line(m_videocpu, M6809_FIRQ_LINE, (m_videopia->irq_a_state() || m_videopia->irq_b_state()) ? ASSERT_LINE : CLEAR_LINE);
+	m_videocpu->set_input_line(M6809_FIRQ_LINE, (m_videopia->irq_a_state() || m_videopia->irq_b_state()) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(by133_state::by133_cb2)
 {
 	// to M6803 port 2 d0?
-//  device_set_input_line(m_audiocpu, M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+//  m_audiocpu->set_input_line(M6801_TIN_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(by133_state::by133_portb_r)

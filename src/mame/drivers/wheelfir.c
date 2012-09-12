@@ -231,8 +231,8 @@ public:
 	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 	device_t *m_screen;
 	device_t *m_eeprom;
 
@@ -772,8 +772,8 @@ static MACHINE_START( wheelfir )
 {
 	wheelfir_state *state = machine.driver_data<wheelfir_state>();
 
-	state->m_maincpu = machine.device( "maincpu");
-	state->m_subcpu = machine.device(  "subcpu");
+	state->m_maincpu = machine.device<cpu_device>( "maincpu");
+	state->m_subcpu = machine.device<cpu_device>(  "subcpu");
 	state->m_screen = machine.device(  "screen");
 	state->m_eeprom = machine.device(  "eeprom");
 

@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_pic8259;
 	device_t *m_dma8237;
 	device_t *m_pit8253;

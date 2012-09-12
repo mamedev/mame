@@ -28,8 +28,8 @@ public:
 	UINT8       m_current_bank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_pc080sn;
 	device_t *m_pc090oj;
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);

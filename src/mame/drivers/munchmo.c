@@ -46,29 +46,29 @@ static INTERRUPT_GEN( mnchmobl_vblank_irq )
 	munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
 	if (state->m_nmi_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	state->m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
 {
 	//munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
-	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
 {
 
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE );
+	m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
 
 WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_MEMBER(munchmo_state::munchmo_ay1reset_r)
@@ -310,8 +310,8 @@ static MACHINE_START( munchmo )
 {
 	munchmo_state *state = machine.driver_data<munchmo_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_palette_bank));
 	state->save_item(NAME(state->m_flipscreen));

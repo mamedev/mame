@@ -85,7 +85,7 @@ void a2bus_softcard_device::device_reset()
     m_bEnabled = false;
     m_6502space = NULL;
     m_FirstZ80Boot = true;
-    device_set_input_line(m_z80, INPUT_LINE_HALT, ASSERT_LINE);
+    m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
@@ -97,8 +97,8 @@ void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8
         // steal the 6502's address space
         m_6502space = &space;
 
-        device_set_input_line(m_z80, INPUT_LINE_HALT, CLEAR_LINE);
-        device_set_input_line(state->m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+        m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+        state->m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
         if (m_FirstZ80Boot)
         {
@@ -110,8 +110,8 @@ void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8
     }
     else
     {
-        device_set_input_line(m_z80, INPUT_LINE_HALT, ASSERT_LINE);
-        device_set_input_line(state->m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+        m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+        state->m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
         m_bEnabled = false;
     }
 }

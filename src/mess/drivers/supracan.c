@@ -1142,11 +1142,11 @@ READ8_MEMBER( supracan_state::supracan_6502_soundmem_r )
 			{
 				if(m_sound_irq_enable_reg & m_sound_irq_source_reg)
 				{
-					device_set_input_line(machine().device("soundcpu"), 0, ASSERT_LINE);
+					machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 				}
 				else
 				{
-					device_set_input_line(machine().device("soundcpu"), 0, CLEAR_LINE);
+					machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 				}
 			}
 			break;
@@ -1156,7 +1156,7 @@ READ8_MEMBER( supracan_state::supracan_6502_soundmem_r )
 			if(!mem->debugger_access()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", machine(), 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
 			if(!mem->debugger_access())
 			{
-				device_set_input_line(machine().device("soundcpu"), 0, CLEAR_LINE);
+				machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 			}
 			break;
 		case 0x420:
@@ -1190,7 +1190,7 @@ WRITE8_MEMBER( supracan_state::supracan_6502_soundmem_w )
 			if(m_sound_cpu_68k_irq_reg &~ data)
 			{
 				verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", machine(), 0, "supracan_soundreg_w: sound_cpu_68k_irq_reg: %04x: Triggering M68k IRQ\n", data);
-				device_set_input_line(m_maincpu, 7, HOLD_LINE);
+				m_maincpu->set_input_line(7, HOLD_LINE);
 			}
 			else
 			{
@@ -1420,7 +1420,7 @@ WRITE16_MEMBER( supracan_state::supracan_sound_w )
 	switch ( offset )
 	{
 		case 0x000a/2:  /* Sound cpu IRQ request. */
-			device_set_input_line(machine().device("soundcpu"), 0, ASSERT_LINE);
+			machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 			break;
 		case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
 			if(data & 0x01)
@@ -1460,7 +1460,7 @@ READ16_MEMBER( supracan_state::supracan_video_r )
 			if(!mem->debugger_access())
 			{
 				//verboselog("maincpu", machine(), 0, "read video IRQ flags (%04x)\n", data);
-				device_set_input_line(m_maincpu, 7, CLEAR_LINE);
+				m_maincpu->set_input_line(7, CLEAR_LINE);
 			}
 			break;
 		case 0x02/2: // Current scanline
@@ -1489,7 +1489,7 @@ static TIMER_CALLBACK( supracan_hbl_callback )
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
-	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+	state->m_maincpu->set_input_line(3, HOLD_LINE);
 
 	state->m_hbl_timer->adjust(attotime::never);
 }
@@ -1498,7 +1498,7 @@ static TIMER_CALLBACK( supracan_line_on_callback )
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
-	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+	state->m_maincpu->set_input_line(5, HOLD_LINE);
 
 	state->m_line_on_timer->adjust(attotime::never);
 }
@@ -1507,7 +1507,7 @@ static TIMER_CALLBACK( supracan_line_off_callback )
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
-	device_set_input_line(state->m_maincpu, 5, CLEAR_LINE);
+	state->m_maincpu->set_input_line(5, CLEAR_LINE);
 
 	state->m_line_on_timer->adjust(attotime::never);
 }
@@ -1541,7 +1541,7 @@ static TIMER_CALLBACK( supracan_video_callback )
 		if(state->m_irq_mask & 1)
 		{
 			verboselog("maincpu", machine, 0, "Triggering VBL IRQ\n\n");
-			device_set_input_line(state->m_maincpu, 7, HOLD_LINE);
+			state->m_maincpu->set_input_line(7, HOLD_LINE);
 		}
 		break;
 	}
@@ -1724,7 +1724,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 #if 0
 			if(!m_irq_mask && !m_hbl_mask)
 			{
-				device_set_input_line(m_maincpu, 7, CLEAR_LINE);
+				m_maincpu->set_input_line(7, CLEAR_LINE);
 			}
 #endif
 			verboselog("maincpu", machine(), 3, "irq_mask = %04x\n", data);
@@ -1878,7 +1878,7 @@ static INTERRUPT_GEN( supracan_irq )
 
 	if(state->m_irq_mask)
 	{
-		device_set_input_line(device, 7, HOLD_LINE);
+		device->execute().set_input_line(7, HOLD_LINE);
 	}
 #endif
 }
@@ -1891,11 +1891,11 @@ static INTERRUPT_GEN( supracan_sound_irq )
 
 	if(state->m_sound_irq_enable_reg & state->m_sound_irq_source_reg)
 	{
-		device_set_input_line(device->machine().device("soundcpu"), 0, ASSERT_LINE);
+		device->machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line(device->machine().device("soundcpu"), 0, CLEAR_LINE);
+		device->machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 	}
 }
 

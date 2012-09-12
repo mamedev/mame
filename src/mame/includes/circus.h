@@ -17,7 +17,7 @@ public:
 	int m_clown_z;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	samples_device *m_samples;
 	device_t *m_discrete;
 

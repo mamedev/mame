@@ -710,7 +710,7 @@ WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
 
 static INTERRUPT_GEN( qsound_interrupt )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE32_MEMBER(zn_state::zn_qsound_w)

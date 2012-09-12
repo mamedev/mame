@@ -19,7 +19,7 @@ public:
 	int        m_vreg;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k007342;
 	device_t *m_k007420;
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);

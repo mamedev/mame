@@ -245,8 +245,8 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	if (data == 0x5050)
 	{
 		m_ics->reset();
-		device_set_input_line(m_soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
-		device_set_input_line(m_soundcpu, INPUT_LINE_RESET, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		if(0)
 		{
 			FILE *out;
@@ -259,7 +259,7 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		device_set_input_line(m_soundcpu, INPUT_LINE_HALT, ASSERT_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -277,7 +277,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, space.device().safe_pc());
 		soundlatch_byte_w(space, 0, data);
-		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE );
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
@@ -291,7 +291,7 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 void pgm_sound_irq( device_t *device, int level )
 {
 	pgm_state *state = device->machine().driver_data<pgm_state>();
-	device_set_input_line(state->m_soundcpu, 0, level);
+	state->m_soundcpu->set_input_line(0, level);
 }
 
 /*static const ics2115_interface pgm_ics2115_interface =
@@ -497,10 +497,10 @@ TIMER_DEVICE_CALLBACK( pgm_interrupt )
 	int scanline = param;
 
 	if(scanline == 224)
-		device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+		state->m_maincpu->set_input_line(6, HOLD_LINE);
 
 	if(scanline == 0)
-		if (!state->m_irq4_disabled) device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		if (!state->m_irq4_disabled) state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 MACHINE_START( pgm )

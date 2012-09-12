@@ -43,7 +43,7 @@ public:
 	unsigned    m_game_id;	// see below
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	UINT8       m_sound_nmi_mask;
 	UINT8       m_sound_pa_latch;
 	DECLARE_WRITE16_MEMBER(tnextspc_coin_counters_w);

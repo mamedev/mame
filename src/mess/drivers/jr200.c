@@ -281,7 +281,7 @@ WRITE8_MEMBER(jr200_state::jr200_border_col_w)
 
 static TIMER_CALLBACK(timer_d_callback)
 {
-	device_set_input_line(machine.firstcpu, 0, HOLD_LINE);
+	machine.firstcpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(jr200_state::mn1271_io_r)

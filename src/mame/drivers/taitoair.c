@@ -238,7 +238,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 
 	m_dsp_hold_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	device_set_input_line(m_dsp, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_dsp->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
@@ -635,7 +635,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	taitoair_state *state = device->machine().driver_data<taitoair_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface airsys_ym2610_interface =
@@ -674,7 +674,7 @@ static MACHINE_START( taitoair )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_dsp = machine.device("dsp");
 	state->m_tc0080vco = machine.device("tc0080vco");
 

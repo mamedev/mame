@@ -35,7 +35,7 @@ static INTERRUPT_GEN( blockhl_interrupt )
 	blockhl_state *state = device->machine().driver_data<blockhl_state>();
 
 	if (k052109_is_irq_enabled(state->m_k052109) && state->m_rombank == 0)	/* kludge to prevent crashes */
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(blockhl_state::bankedram_r)
@@ -58,7 +58,7 @@ WRITE8_MEMBER(blockhl_state::bankedram_w)
 
 WRITE8_MEMBER(blockhl_state::blockhl_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
@@ -193,8 +193,8 @@ static MACHINE_START( blockhl )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");
 

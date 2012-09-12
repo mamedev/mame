@@ -36,8 +36,8 @@ public:
 	const UINT8 *m_color_codes;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 
 	UINT8       m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);

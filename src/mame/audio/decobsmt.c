@@ -29,13 +29,13 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( decobsmt_firq_interrupt )
 {
-	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void bsmt_ready_callback(bsmt2000_device &device)
 {
 	decobsmt_device *decobsmt = device.machine().device<decobsmt_device>(DECOBSMT_TAG);
-	device_set_input_line(decobsmt->m_ourcpu, M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
+	decobsmt->m_ourcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
 }
 
 MACHINE_CONFIG_FRAGMENT( decobsmt )
@@ -119,7 +119,7 @@ WRITE8_MEMBER(decobsmt_device::bsmt1_w)
 {
 	m_bsmt->write_reg(offset ^ 0xff);
 	m_bsmt->write_data((m_bsmt_latch << 8) | data);
-	device_set_input_line(m_ourcpu, M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
+	m_ourcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
 }
 
 READ8_MEMBER(decobsmt_device::bsmt_status_r)
@@ -139,6 +139,6 @@ WRITE8_MEMBER(decobsmt_device::bsmt_comms_w)
 
 WRITE_LINE_MEMBER(decobsmt_device::bsmt_reset_line)
 {
-    device_set_input_line(m_ourcpu, INPUT_LINE_RESET, state);
+    m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
 }
 

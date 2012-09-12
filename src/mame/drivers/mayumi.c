@@ -89,7 +89,7 @@ static INTERRUPT_GEN( mayumi_interrupt )
 	mayumi_state *state = device->machine().driver_data<mayumi_state>();
 
 	if (state->m_int_enable)
-		 device_set_input_line(device, 0, HOLD_LINE);
+		 device->execute().set_input_line(0, HOLD_LINE);
 }
 
 /*************************************

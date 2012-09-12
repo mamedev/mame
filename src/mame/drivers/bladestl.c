@@ -91,7 +91,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 {
 
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
@@ -308,7 +308,7 @@ static MACHINE_START( bladestl )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007342 = machine.device("k007342");
 	state->m_k007420 = machine.device("k007420");
 

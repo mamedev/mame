@@ -131,7 +131,7 @@ static MACHINE_RESET( ti99_2 )
 static INTERRUPT_GEN( ti99_2_vblank_interrupt )
 {
 	ti99_2_state *state = device->machine().driver_data<ti99_2_state>();
-	device_set_input_line(device, 1, state->m_irq_state);
+	device->execute().set_input_line(1, state->m_irq_state);
 	state->m_irq_state = (state->m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 }
 

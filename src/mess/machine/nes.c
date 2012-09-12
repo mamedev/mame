@@ -222,7 +222,7 @@ MACHINE_RESET( nes )
 static TIMER_CALLBACK( nes_irq_callback )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	device_set_input_line(state->m_maincpu, M6502_IRQ_LINE, HOLD_LINE);
+	state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	state->m_irq_timer->adjust(attotime::never);
 }
 
@@ -296,7 +296,7 @@ MACHINE_START( nes )
 	init_nes_core(machine);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine));
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_sound = machine.device("nessound");
 	state->m_cart = machine.device("cart");
 
@@ -1538,13 +1538,13 @@ static void fds_irq( device_t *device, int scanline, int vblank, int blanked )
 	nes_state *state = device->machine().driver_data<nes_state>();
 
 	if (state->m_IRQ_enable_latch)
-		device_set_input_line(state->m_maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 
 	if (state->m_IRQ_enable)
 	{
 		if (state->m_IRQ_count <= 114)
 		{
-			device_set_input_line(state->m_maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			state->m_IRQ_enable = 0;
 			state->m_fds_status0 |= 0x01;
 		}

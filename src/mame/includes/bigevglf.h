@@ -48,7 +48,7 @@ public:
 	UINT8    m_port_select;     /* for muxed controls */
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(beg_banking_w);
 	DECLARE_WRITE8_MEMBER(beg_fromsound_w);

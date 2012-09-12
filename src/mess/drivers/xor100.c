@@ -191,7 +191,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	if (!m_fdc_irq && !m_fdc_drq)
 	{
 		/* TODO: this is really connected to the Z80 _RDY line */
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	return !m_fdc_irq << 7;
@@ -493,7 +493,7 @@ WRITE_LINE_MEMBER( xor100_state::fdc_irq_w )
 	if (state)
 	{
 		/* TODO: this is really connected to the Z80 _RDY line */
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -504,7 +504,7 @@ WRITE_LINE_MEMBER( xor100_state::fdc_drq_w )
 	if (state)
 	{
 		/* TODO: this is really connected to the Z80 _RDY line */
-		device_set_input_line(m_maincpu, INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 

@@ -46,7 +46,7 @@ public:
 	UINT8 m_portb;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(exerion_protection_r);
 	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
 	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);

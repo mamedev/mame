@@ -442,7 +442,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	lastduel_state *state = device->machine().driver_data<lastduel_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -459,14 +459,14 @@ static TIMER_DEVICE_CALLBACK( lastduel_timer_cb )
 {
 	lastduel_state *state = timer.machine().driver_data<lastduel_state>();
 
-	device_set_input_line(state->m_maincpu, 4, HOLD_LINE); /* Controls */
+	state->m_maincpu->set_input_line(4, HOLD_LINE); /* Controls */
 }
 
 static TIMER_DEVICE_CALLBACK( madgear_timer_cb )
 {
 	lastduel_state *state = timer.machine().driver_data<lastduel_state>();
 
-	device_set_input_line(state->m_maincpu, 6, HOLD_LINE); /* Controls */
+	state->m_maincpu->set_input_line(6, HOLD_LINE); /* Controls */
 }
 
 static MACHINE_START( lastduel )

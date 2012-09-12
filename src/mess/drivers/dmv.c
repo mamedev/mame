@@ -271,7 +271,7 @@ static const upd765_interface dmv_interface =
 
 WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// Assert HLDA
 	i8237_hlda_w(m_dmac, state);

@@ -18,11 +18,11 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 	/* for some reason a call to cputag_set_input_line
      * is significantly delayed ....
      *
-     * device->machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+     * device->machine().device("maincpu")->set_input_line(0, CLEAR_LINE);
      *
      * Therefore we reset the line without any detour ....
      */
-	device_set_input_line(device->machine().firstcpu, 0, CLEAR_LINE);
+	device->machine().firstcpu->set_input_line(0, CLEAR_LINE);
 	//cpu_set_info(device->machine().firstcpu, CPUINFO_INT_INPUT_STATE + state->m_irq_line, CLEAR_LINE);
 	return 0x03;
 }
@@ -98,7 +98,7 @@ MACHINE_RESET( devilfsg )
 MACHINE_RESET( hunchbkg )
 {
 	machine_reset_common(machine, 0);
-	device_set_irq_callback(machine.device("maincpu"), hunchbkg_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(hunchbkg_irq_callback);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)

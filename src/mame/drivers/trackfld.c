@@ -890,7 +890,7 @@ static INTERRUPT_GEN( vblank_irq )
 	trackfld_state *state = device->machine().driver_data<trackfld_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( vblank_nmi )
@@ -898,7 +898,7 @@ static INTERRUPT_GEN( vblank_nmi )
 	trackfld_state *state = device->machine().driver_data<trackfld_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 //-------------------------------------------------
@@ -960,7 +960,7 @@ static INTERRUPT_GEN( yieartf_timer_irq )
 	trackfld_state *state = device->machine().driver_data<trackfld_state>();
 
 	if (state->m_yieartf_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( yieartf, trackfld_state )

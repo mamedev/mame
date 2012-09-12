@@ -754,7 +754,7 @@ static TIMER_CALLBACK( dsp_ended )
 	saturn_state *state = machine.driver_data<saturn_state>();
 
 	if(!(state->m_scu.ism & IRQ_DSP_END))
-		device_set_input_line_and_vector(state->m_maincpu, 0xa, HOLD_LINE, 0x45);
+		state->m_maincpu->set_input_line_and_vector(0xa, HOLD_LINE, 0x45);
 	else
 		state->m_scu.ist |= (IRQ_DSP_END);
 

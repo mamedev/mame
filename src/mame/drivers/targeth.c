@@ -37,15 +37,15 @@ static TIMER_DEVICE_CALLBACK(targeth_interrupt )
 	if(scanline == 240)
 	{
 		/* IRQ 2: drives the game */
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 	}
 
 	if(scanline == 0)
 	{
 		/* IRQ 4: Read 1P Gun */
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 		/* IRQ 6: Read 2P Gun */
-		device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+		state->m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 }
 

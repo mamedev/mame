@@ -24,7 +24,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_bankswitch_w)
 
 WRITE8_MEMBER(hcastle_state::hcastle_soundirq_w)
 {
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
@@ -184,7 +184,7 @@ static MACHINE_START( hcastle )
 
 	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007121_1 = machine.device("k007121_1");
 	state->m_k007121_2 = machine.device("k007121_2");
 

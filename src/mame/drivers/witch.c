@@ -396,7 +396,7 @@ WRITE8_MEMBER(witch_state::write_a00x)
 		break;
 
 		case 0x08: //A008
-			device_set_input_line(&space.device(),0,CLEAR_LINE);
+			space.device().execute().set_input_line(0,CLEAR_LINE);
 		break;
 	}
 }
@@ -781,12 +781,12 @@ static SCREEN_UPDATE_IND16(witch)
 
 static INTERRUPT_GEN( witch_main_interrupt )
 {
-	device_set_input_line(device,0,ASSERT_LINE);
+	device->execute().set_input_line(0,ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( witch_sub_interrupt )
 {
-	device_set_input_line(device,0,ASSERT_LINE);
+	device->execute().set_input_line(0,ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( witch, witch_state )

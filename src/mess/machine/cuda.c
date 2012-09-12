@@ -108,7 +108,7 @@ const rom_entry *cuda_device::device_rom_region() const
 
 void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 {
-//    printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->safe_pc());
+//    printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
 
 	switch (offset)
 	{
@@ -138,21 +138,21 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				if (treq != ((data>>1)&1))
 				{
 					#ifdef CUDA_SUPER_VERBOSE
-                    printf("CU-> TREQ: %d (PC=%x)\n", (data>>1)&1, m_maincpu->safe_pc());
+                    printf("CU-> TREQ: %d (PC=%x)\n", (data>>1)&1, m_maincpu->pc());
 					#endif
 					treq = (data>>1) & 1;
 				}
                 if (via_data != ((data>>5)&1))
                 {
 					#ifdef CUDA_SUPER_VERBOSE
-                    printf("CU-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->safe_pc());
+                    printf("CU-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->pc());
 					#endif
 					via_data = (data>>5) & 1;
                 }
                 if (via_clock != ((data>>4)&1))
                 {
 					#ifdef CUDA_SUPER_VERBOSE
-                    printf("CU-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->safe_pc());
+                    printf("CU-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
 					#endif
 					via_clock = (data>>4) & 1;
 					via6522_device *via1 = machine().device<via6522_device>("via6522_0");
@@ -165,7 +165,7 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			if ((data & 8) != reset_line)
 			{
 				#ifdef CUDA_SUPER_VERBOSE
-				printf("680x0 reset: %d -> %d (PC=%x)\n", (ports[2] & 8)>>3, (data & 8)>>3, m_maincpu->safe_pc());
+				printf("680x0 reset: %d -> %d (PC=%x)\n", (ports[2] & 8)>>3, (data & 8)>>3, m_maincpu->pc());
 				#endif
 				reset_line = (data & 8);
 				// falling edge, should reset the machine too
@@ -193,7 +193,7 @@ READ8_MEMBER( cuda_device::ddr_r )
 
 WRITE8_MEMBER( cuda_device::ddr_w )
 {
-//    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->safe_pc());
+//    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
 	send_port(space, offset, ports[offset] & data);
 
@@ -251,7 +251,7 @@ READ8_MEMBER( cuda_device::ports_r )
         incoming |= 0x01;
     }
 
-//    printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->safe_pc());
+//    printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->pc());
 
 	return incoming;
 }
@@ -279,7 +279,7 @@ WRITE8_MEMBER( cuda_device::pll_w )
 			(data & 0x40) ? 1 : 0,
 			(data & 0x20) ? 1 : 0,
 			(data & 0x10) ? 1 : 0,
-			(data & 0x08) ? 1 : 0, m_maincpu->safe_pc());
+			(data & 0x08) ? 1 : 0, m_maincpu->pc());
 	}
 	#endif
 	pll_ctrl = data;
@@ -300,7 +300,7 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
         { attotime::from_seconds(8), attotime::from_msec(250.0f), attotime::from_msec(125.1f), attotime::from_msec(62.5f), attotime::from_msec(31.3f) },
     };
 
-//    printf("%02x to timer control (PC=%x)\n", data, m_maincpu->safe_pc());
+//    printf("%02x to timer control (PC=%x)\n", data, m_maincpu->pc());
 
     if (data & 0x50)
     {
@@ -314,12 +314,12 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 
 	if ((timer_ctrl & 0x80) && !(data & 0x80))
     {
-        device_set_input_line(m_maincpu, M68HC05EG_INT_TIMER, CLEAR_LINE);
+        m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
         timer_ctrl &= ~0x80;
     }
 	else if ((timer_ctrl & 0x40) && !(data & 0x40))
     {
-        device_set_input_line(m_maincpu, M68HC05EG_INT_TIMER, CLEAR_LINE);
+        m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
         timer_ctrl &= ~0x40;
     }
 
@@ -334,7 +334,7 @@ READ8_MEMBER( cuda_device::timer_counter_r )
 
 WRITE8_MEMBER( cuda_device::timer_counter_w )
 {
-//    printf("%02x to timer counter (PC=%x)\n", data, m_maincpu->safe_pc());
+//    printf("%02x to timer counter (PC=%x)\n", data, m_maincpu->pc());
 	timer_counter = data;
     ripple_counter = timer_counter;
 }
@@ -350,7 +350,7 @@ WRITE8_MEMBER( cuda_device::onesec_w )
 
 	if ((onesec & 0x40) && !(data & 0x40))
 	{
-		device_set_input_line(m_maincpu, M68HC05EG_INT_CPI, CLEAR_LINE);
+		m_maincpu->set_input_line(M68HC05EG_INT_CPI, CLEAR_LINE);
 	}
 
 	onesec = data;
@@ -464,7 +464,7 @@ void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
         if (onesec & 0x10)
         {
-            device_set_input_line(m_maincpu, M68HC05EG_INT_CPI, ASSERT_LINE);
+            m_maincpu->set_input_line(M68HC05EG_INT_CPI, ASSERT_LINE);
         }
     }
     else
@@ -473,7 +473,7 @@ void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
         if (timer_ctrl & 0x20)
         {
-            device_set_input_line(m_maincpu, M68HC05EG_INT_TIMER, ASSERT_LINE);
+            m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
         }
 
         ripple_counter--;
@@ -485,7 +485,7 @@ void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
             if (timer_ctrl & 0x10)
             {
-                device_set_input_line(m_maincpu, M68HC05EG_INT_TIMER, ASSERT_LINE);
+                m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
             }
         }
     }

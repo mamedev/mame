@@ -119,7 +119,7 @@ static TIMER_CALLBACK( stfight_interrupt_1 )
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
-    device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);
+    device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);
     device->machine().scheduler().timer_set(attotime::from_hz(120), FUNC(stfight_interrupt_1));
 }
 

@@ -47,7 +47,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		state->soundlatch_byte_w(*space, 0, data & 0xff);
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		state->m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -69,7 +69,7 @@ static void m5205_int1( device_t *device )
 	state->m_sample_buffer1 >>= 4;
 	state->m_sample_select1 ^= 1;
 	if (state->m_sample_select1 == 0)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void m5205_int2( device_t *device )
@@ -697,8 +697,8 @@ static MACHINE_START( fcrash )
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
 	state->m_msm_1 = machine.device<msm5205_device>("msm1");
 	state->m_msm_2 = machine.device<msm5205_device>("msm2");
 
@@ -712,8 +712,8 @@ static MACHINE_START( kodb )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
 }
 
 static MACHINE_RESET( fcrash )

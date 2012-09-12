@@ -166,7 +166,7 @@ static MACHINE_START( mk1 )
 
 static void mk1_interrupt( device_t *device, UINT16 addr, int level )
 {
-	device_set_input_line_vector(device->machine().device("maincpu"), F8_INPUT_LINE_INT_REQ, addr );
+	device->machine().device("maincpu")->execute().set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr );
 
 	device->machine().device("maincpu")->execute().set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
 }

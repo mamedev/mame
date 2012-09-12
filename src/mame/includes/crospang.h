@@ -25,7 +25,7 @@ public:
 	int       m_bestri_tilebank;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(crospang_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(bestri_tilebank_w);
 	DECLARE_WRITE16_MEMBER(bestri_bg_scrolly_w);

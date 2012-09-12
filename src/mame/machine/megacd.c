@@ -2266,7 +2266,7 @@ void segacd_init_main_cpu( running_machine& machine )
 
 
 
-	device_set_irq_callback(machine.device("segacd_68k"), segacd_sub_int_callback);
+	machine.device("segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
 
 	space->install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
 
@@ -2331,8 +2331,8 @@ TIMER_DEVICE_CALLBACK( scd_dma_timer_callback )
 
 MACHINE_RESET( segacd )
 {
-	device_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
-	device_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	_segacd_68k_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	_segacd_68k_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	segacd_hint_register = 0xffff; // -1
 

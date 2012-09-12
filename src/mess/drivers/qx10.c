@@ -899,7 +899,7 @@ INPUT_PORTS_END
 
 void qx10_state::machine_start()
 {
-	device_set_irq_callback(machine().device("maincpu"), irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 void qx10_state::machine_reset()

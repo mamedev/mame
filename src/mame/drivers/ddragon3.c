@@ -174,25 +174,25 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 
 		case 1: /* soundlatch_byte_w */
 			soundlatch_byte_w(space, 1, m_io_reg[1] & 0xff);
-			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 			/*  this gets written to on startup and at the end of IRQ6
             **  possibly trigger IRQ on sound CPU
             */
-			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
+			m_maincpu->set_input_line(6, CLEAR_LINE);
 			break;
 
 		case 3:
 			/*  this gets written to on startup,
             **  and at the end of IRQ5 (input port read) */
-			device_set_input_line(m_maincpu, 5, CLEAR_LINE);
+			m_maincpu->set_input_line(5, CLEAR_LINE);
 			break;
 
 		case 4:
 			/* this gets written to at the end of IRQ6 only */
-			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
+			m_maincpu->set_input_line(6, CLEAR_LINE);
 			break;
 
 		default:
@@ -517,7 +517,7 @@ GFXDECODE_END
 static void dd3_ymirq_handler(device_t *device, int irq)
 {
 	ddragon3_state *state = device->machine().driver_data<ddragon3_state>();
-	device_set_input_line(state->m_audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	state->m_audiocpu->set_input_line(0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -541,14 +541,14 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 	{
 		if (scanline > 0)
 			timer.machine().primary_screen->update_partial(scanline - 1);
-		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
+		state->m_maincpu->set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		timer.machine().primary_screen->update_partial(scanline - 1);
-		device_set_input_line(state->m_maincpu, 6, ASSERT_LINE);
+		state->m_maincpu->set_input_line(6, ASSERT_LINE);
 	}
 }
 
@@ -562,8 +562,8 @@ static MACHINE_START( ddragon3 )
 {
 	ddragon3_state *state = machine.driver_data<ddragon3_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_vreg));
 	state->save_item(NAME(state->m_bg_scrollx));

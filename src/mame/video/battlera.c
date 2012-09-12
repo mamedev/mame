@@ -371,7 +371,7 @@ TIMER_DEVICE_CALLBACK( battlera_irq )
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (state->m_rcr_enable && (state->m_current_scanline+56)==state->m_HuC6270_registers[6]) {
 		timer.machine().primary_screen->update_partial(state->m_current_scanline);
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE); /* RCR interrupt */
+		state->m_maincpu->set_input_line(0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
@@ -379,7 +379,7 @@ TIMER_DEVICE_CALLBACK( battlera_irq )
 		state->m_bldwolf_vblank=1;
 		timer.machine().primary_screen->update_partial(240);
 		if (state->m_irq_enable)
-			device_set_input_line(state->m_maincpu, 0, HOLD_LINE); /* VBL */
+			state->m_maincpu->set_input_line(0, HOLD_LINE); /* VBL */
 	}
 
 	/* End of vblank */

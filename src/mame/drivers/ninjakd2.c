@@ -168,7 +168,7 @@ static void omegaf_io_protection_reset(running_machine &machine);
 
 static INTERRUPT_GEN( ninjakd2_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 

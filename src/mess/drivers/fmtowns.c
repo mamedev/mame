@@ -374,7 +374,7 @@ void towns_state::intervaltimer2_timeout()
 
 void towns_state::wait_end()
 {
-	device_set_input_line(m_maincpu,INPUT_LINE_HALT,CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT,CLEAR_LINE);
 }
 
 READ8_MEMBER(towns_state::towns_sys6c_r)
@@ -386,7 +386,7 @@ READ8_MEMBER(towns_state::towns_sys6c_r)
 WRITE8_MEMBER(towns_state::towns_sys6c_w)
 {
 	// halts the CPU for 1 microsecond
-	device_set_input_line(m_maincpu,INPUT_LINE_HALT,ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 	m_towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::never);
 }
 
@@ -2458,7 +2458,7 @@ void towns_state::driver_start()
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(FUNC(towns_cdrom_read_byte), (void*)machine().device("dma_1"));
 
-	device_set_irq_callback(machine().device("maincpu"), towns_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(towns_irq_callback);
 	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);
 
 }
@@ -2474,8 +2474,8 @@ void towns_state::machine_reset()
 {
 	address_space *program;
 
-	m_maincpu = machine().device("maincpu");
-	program = m_maincpu->memory().space(AS_PROGRAM);
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	program = m_maincpu->space(AS_PROGRAM);
 	m_dma_1 = machine().device("dma_1");
 	m_dma_2 = machine().device("dma_2");
 	m_fdc = machine().device("fdc");

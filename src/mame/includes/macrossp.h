@@ -49,8 +49,8 @@ public:
 	INT32			 m_old_fade;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE32_MEMBER(paletteram32_macrossp_w);
 	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
 	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);

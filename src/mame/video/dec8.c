@@ -166,9 +166,9 @@ WRITE8_MEMBER(dec8_state::lastmisn_control_w)
 	m_scroll2[2] = (data >> 6) & 1;
 
 	if (data & 0x80)
-		device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(dec8_state::shackled_control_w)

@@ -95,7 +95,7 @@ READ8_MEMBER(circusc_state::circusc_sh_timer_r)
 
 WRITE8_MEMBER(circusc_state::circusc_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(circusc_state::circusc_coin_counter_w)
@@ -352,7 +352,7 @@ static INTERRUPT_GEN( vblank_irq )
 	circusc_state *state = device->machine().driver_data<circusc_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( circusc, circusc_state )

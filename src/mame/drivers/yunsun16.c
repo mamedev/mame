@@ -148,7 +148,7 @@ number 0 on each voice. That sample is 00000-00000.
 		if ((data & 0xff) != 0x3a)
 		{
 			soundlatch_byte_w(space, 0, data & 0xff);
-			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -558,7 +558,7 @@ static MACHINE_START( yunsun16 )
 {
 	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_sprites_scrolldx));
 	state->save_item(NAME(state->m_sprites_scrolldy));
@@ -579,7 +579,7 @@ static MACHINE_RESET( yunsun16 )
 static void soundirq(device_t *device, int state)
 {
 	yunsun16_state *yunsun16 = device->machine().driver_data<yunsun16_state>();
-	device_set_input_line(yunsun16->m_audiocpu, 0, state);
+	yunsun16->m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface magicbub_ym3812_intf =

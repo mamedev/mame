@@ -109,8 +109,8 @@ public:
 	int        m_fixed_layer_bank_type;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_upd4990a;
 	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
 	DECLARE_WRITE16_MEMBER(io_control_w);

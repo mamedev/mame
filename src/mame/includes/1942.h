@@ -25,7 +25,7 @@ public:
 	UINT8 m_scroll[2];
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(c1942_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(c1942_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(c1942_bgvideoram_w);

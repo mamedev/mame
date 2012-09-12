@@ -52,9 +52,9 @@ public:
 	int      m_ic43_b;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_mcu;
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_slave;
 	DECLARE_WRITE8_MEMBER(bublbobl_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);

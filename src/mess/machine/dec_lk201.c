@@ -107,7 +107,7 @@ READ8_MEMBER( lk201_device::ddr_r )
 
 WRITE8_MEMBER( lk201_device::ddr_w )
 {
-//    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->safe_pc());
+//    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
 	send_port(space, offset, ports[offset] & data);
 
@@ -135,7 +135,7 @@ READ8_MEMBER( lk201_device::ports_r )
 	// add in ddr-masked version of port writes
 	incoming |= (ports[offset] & ddrs[offset]);
 
-//    printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->safe_pc());
+//    printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->pc());
 
 	return incoming;
 }
@@ -149,7 +149,7 @@ WRITE8_MEMBER( lk201_device::ports_w )
 
 void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 {
-//    printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->safe_pc());
+//    printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
 
 	switch (offset)
 	{
@@ -187,7 +187,7 @@ READ8_MEMBER( lk201_device::sci_r )
             break;
 	}
 
-//    printf("SCI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->safe_pc());
+//    printf("SCI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
 
 	return incoming;
 }
@@ -212,7 +212,7 @@ WRITE8_MEMBER( lk201_device::sci_w )
             break;
 	}
 
-//    printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->safe_pc());
+//    printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
 READ8_MEMBER( lk201_device::spi_r )
@@ -232,7 +232,7 @@ READ8_MEMBER( lk201_device::spi_r )
 			break;
 	}
 
-//    printf("SPI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->safe_pc());
+//    printf("SPI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
 
 	return incoming;
 }
@@ -251,7 +251,7 @@ WRITE8_MEMBER( lk201_device::spi_w )
 			break;
 	}
 
-//    printf("SPI %02x to %x (PC=%x)\n", data, offset, m_maincpu->safe_pc());
+//    printf("SPI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
 /*

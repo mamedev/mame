@@ -956,7 +956,7 @@ void trs80m16_state::machine_start()
 	trs80m2_state::machine_start();
 
 	// register CPU IRQ callback
-	device_set_irq_callback(m_maincpu, trs80m16_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(trs80m16_irq_callback);
 
 	// register for state saving
 	save_item(NAME(m_ual));

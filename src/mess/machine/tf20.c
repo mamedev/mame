@@ -330,7 +330,7 @@ static DEVICE_START( tf20 )
 	device_t *cpu = device->subdevice("tf20");
 	address_space *prg = cpu->memory().space(AS_PROGRAM);
 
-	device_set_irq_callback(cpu, tf20_irq_ack);
+	cpu->execute().set_irq_acknowledge_callback(tf20_irq_ack);
 
 	/* ram device */
 	tf20->ram = device->subdevice<ram_device>("ram");

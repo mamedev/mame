@@ -230,7 +230,7 @@ static MACHINE_START( ginganin )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_layers_ctrl));
 	state->save_item(NAME(state->m_flipscreen));

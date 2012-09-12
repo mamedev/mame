@@ -173,7 +173,7 @@ public:
 	struct { int r,g,b,offs,offs_internal; } m_pal;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_duart;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_WRITE16_MEMBER(wh2_w);
@@ -269,7 +269,7 @@ if (!screen.machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
 static void duart_irq_handler( device_t *device, int state, UINT8 vector )
 {
 	adp_state *adp = device->machine().driver_data<adp_state>();
-	device_set_input_line_and_vector(adp->m_maincpu, 4, state, vector);
+	adp->m_maincpu->set_input_line_and_vector(4, state, vector);
 }
 
 static void duart_tx( device_t *device, int channel, UINT8 data )
@@ -301,7 +301,7 @@ static MACHINE_START( skattv )
 {
 	adp_state *state = machine.driver_data<adp_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_duart = machine.device("duart68681");
 	//state->m_h63484 = machine.device("h63484");
 
@@ -623,7 +623,7 @@ INPUT_PORTS_END
 /*
 static INTERRUPT_GEN( adp_int )
 {
-    device_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    device->execute().set_input_line(1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 static const ay8910_interface ay8910_config =

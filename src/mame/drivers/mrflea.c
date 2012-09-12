@@ -85,7 +85,7 @@ WRITE8_MEMBER(mrflea_state::mrflea_io_w)
 {
 	m_status |= 0x08; // pending command to IO CPU
 	m_io = data;
-	device_set_input_line(m_subcpu, 0, HOLD_LINE );
+	m_subcpu->set_input_line(0, HOLD_LINE );
 }
 
 READ8_MEMBER(mrflea_state::mrflea_main_r)
@@ -122,7 +122,7 @@ static TIMER_DEVICE_CALLBACK( mrflea_slave_interrupt )
 	int scanline = param;
 
 	if ((scanline == 248) || (scanline == 248/2 && (state->m_status & 0x08)))
-		device_set_input_line(state->m_subcpu, 0, HOLD_LINE);
+		state->m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(mrflea_state::mrflea_interrupt_type_r)
@@ -332,8 +332,8 @@ static MACHINE_START( mrflea )
 {
 	mrflea_state *state = machine.driver_data<mrflea_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_gfx_bank));
 	state->save_item(NAME(state->m_io));

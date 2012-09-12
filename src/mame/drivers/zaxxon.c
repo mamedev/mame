@@ -302,7 +302,7 @@ static INTERRUPT_GEN( vblank_int )
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
 
 	if (state->m_int_enabled)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

@@ -76,7 +76,7 @@ struct sh8253_timer_channel
 typedef struct _exidy_sound_state exidy_sound_state;
 struct _exidy_sound_state
 {
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 
 	/* IRQ variable */
 	UINT8 m_riot_irq_state;
@@ -402,7 +402,7 @@ static DEVICE_START( common_sh_start )
 
 	/* allocate the stream */
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, exidy_stream_update);
-	state->m_maincpu = device->machine().device("maincpu");
+	state->m_maincpu = device->machine().device<cpu_device>("maincpu");
 
 	sh6840_register_state_globals(device);
 }
@@ -686,7 +686,7 @@ READ8_DEVICE_HANDLER( exidy_sh6840_r )
 		return 0;
 		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
 		case 1:
-		logerror("%04X:exidy_sh6840_r - unexpected read, status register is TODO!\n", state->m_maincpu->safe_pc());
+		logerror("%04X:exidy_sh6840_r - unexpected read, status register is TODO!\n", state->m_maincpu->pc());
 		return 0;
 		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
 		case 2: case 4: case 6:
@@ -1043,7 +1043,7 @@ READ8_DEVICE_HANDLER( victory_sound_response_r )
 	exidy_sound_state *state = get_safe_token(device);
 	UINT8 ret = state->m_pia1->b_output();
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", state->m_maincpu->safe_pcbase(), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", state->m_maincpu->pcbase(), ret);
 
 	state->m_pia1->cb1_w(0);
 
@@ -1056,7 +1056,7 @@ READ8_DEVICE_HANDLER( victory_sound_status_r )
 	exidy_sound_state *state = get_safe_token(device);
 	UINT8 ret = (state->m_pia1->ca1_r() << 7) | (state->m_pia1->cb1_r() << 6);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", state->m_maincpu->safe_pcbase(), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", state->m_maincpu->pcbase(), ret);
 
 	return ret;
 }
@@ -1073,7 +1073,7 @@ WRITE8_DEVICE_HANDLER( victory_sound_command_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", state->m_maincpu->safe_pcbase(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", state->m_maincpu->pcbase(), data);
 
 	device->machine().scheduler().synchronize(FUNC(delayed_command_w), data, state->m_pia1);
 }

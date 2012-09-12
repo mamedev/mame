@@ -25,7 +25,7 @@ static INTERRUPT_GEN( bottom9_interrupt )
 	bottom9_state *state = device->machine().driver_data<bottom9_state>();
 
 	if (k052109_is_irq_enabled(state->m_k052109))
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(bottom9_state::k052109_051960_r)
@@ -135,14 +135,14 @@ WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 
 WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static INTERRUPT_GEN( bottom9_sound_interrupt )
 {
 	bottom9_state *state = device->machine().driver_data<bottom9_state>();
 	if (state->m_nmienable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(bottom9_state::nmi_enable_w)
@@ -326,8 +326,8 @@ static MACHINE_START( bottom9 )
 
 	state->membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");
 	state->m_k051316 = machine.device("k051316");

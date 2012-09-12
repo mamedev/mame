@@ -1234,7 +1234,7 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// give sub cpu a bit more time to stabilize on the current fifo status
-			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(1));
+			machine().device("maincpu")->execute().spin_until_time(attotime::from_usec(1));
 
 			if (m_m2s_int_enable & 0x80)
 			{
@@ -1601,7 +1601,7 @@ static void main_cpu_dc_store(device_t *device, UINT32 address)
 	if ((address & 0xf0000000) == 0xc0000000)
 	{
 		// force sync when writing to GFX board main ram
-		device_spin_until_time(cobra->m_maincpu, attotime::from_usec(80));
+		cobra->m_maincpu->spin_until_time(attotime::from_usec(80));
 	}
 }
 

@@ -149,7 +149,7 @@ static void update_irq_state( running_machine &machine )
 				irq_level[state->m_irq_levels[i] & 7] = 1;
 
 		for (i = 0; i < 8; i++)
-			device_set_input_line(state->m_maincpu, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			state->m_maincpu->set_input_line(i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -157,7 +157,7 @@ static void update_irq_state( running_machine &machine )
             then reads the actual source by peeking a register (metro_irq_cause_r) */
 
 		int irq_state = (irq ? ASSERT_LINE : CLEAR_LINE);
-		device_set_input_line(state->m_maincpu, state->m_irq_line, irq_state);
+		state->m_maincpu->set_input_line(state->m_irq_line, irq_state);
 	}
 }
 
@@ -245,13 +245,13 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 	state->m_requested_int[state->m_vblank_bit] = 1;
 	update_irq_state(device->machine());
 
-	device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
+	state->m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static void ymf278b_interrupt( device_t *device, int active )
 {
 	metro_state *state = device->machine().driver_data<metro_state>();
-	device_set_input_line(state->m_maincpu, 2, active);
+	state->m_maincpu->set_input_line(2, active);
 }
 
 
@@ -288,8 +288,8 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		device_spin_until_interrupt(&space.device());
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		space.device().execute().spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
 }
@@ -445,7 +445,7 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 static void metro_sound_irq_handler( device_t *device, int state )
 {
 	metro_state *driver_state = device->machine().driver_data<metro_state>();
-	device_set_input_line(driver_state->m_audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	driver_state->m_audiocpu->set_input_line(UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -1610,7 +1610,7 @@ WRITE16_MEMBER(metro_state::blzntrnd_sound_w)
 {
 
 	soundlatch_byte_w(space, offset, data >> 8);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
@@ -1625,7 +1625,7 @@ WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 static void blzntrnd_irqhandler(device_t *device, int irq)
 {
 	metro_state *state = device->machine().driver_data<metro_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
@@ -3408,7 +3408,7 @@ static MACHINE_RESET( metro )
 	metro_state *state = machine.driver_data<metro_state>();
 
 	if (state->m_irq_line == -1)
-		device_set_irq_callback(machine.device("maincpu"), metro_irq_callback);
+		machine.device("maincpu")->execute().set_irq_acknowledge_callback(metro_irq_callback);
 }
 
 

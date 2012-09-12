@@ -151,14 +151,14 @@ static INTERRUPT_GEN(  rltennis_interrupt )
 {
 	rltennis_state *state = device->machine().driver_data<rltennis_state>();
 	++state->m_unk_counter; /* frame counter? verify */
-	device_set_input_line(device, 4, HOLD_LINE);
-	device_set_input_line(device, 1, HOLD_LINE); /* hack, to avoid dead loop */
+	device->execute().set_input_line(4, HOLD_LINE);
+	device->execute().set_input_line(1, HOLD_LINE); /* hack, to avoid dead loop */
 }
 
 static MACHINE_START( rltennis )
 {
 	rltennis_state *state = machine.driver_data<rltennis_state>();
-	state->m_maincpu = machine.device( "maincpu");
+	state->m_maincpu = machine.device<cpu_device>( "maincpu");
 	state->m_screen = machine.device(  "screen");
 	state->m_dac_1 = machine.device<dac_device>("dac1");
 	state->m_dac_2 = machine.device<dac_device>("dac2");

@@ -45,7 +45,7 @@ public:
 	UINT8          m_alphatable[256];
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 
 	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);

@@ -1711,7 +1711,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 	case 5:
 		if(m_ctl_vbl_active) {
 			m_ctl_vbl_active = false;
-			device_set_input_line(&space.device(), MIPS3_IRQ0, CLEAR_LINE);
+			space.device().execute().set_input_line(MIPS3_IRQ0, CLEAR_LINE);
 		}
 		break;
 
@@ -2437,7 +2437,7 @@ static INTERRUPT_GEN(s23_interrupt)
 
 	if(!state->m_ctl_vbl_active) {
 		state->m_ctl_vbl_active = true;
-		device_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
+		device->execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 	}
 
 	render.cur = !render.cur;

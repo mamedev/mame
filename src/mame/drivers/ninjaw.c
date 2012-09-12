@@ -331,7 +331,7 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	ninjaw_state *state = machine.driver_data<ninjaw_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -645,7 +645,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	ninjaw_state *state = device->machine().driver_data<ninjaw_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -806,9 +806,9 @@ static MACHINE_START( ninjaw )
 
 	state->membank("bank10")->configure_entries(0, 8, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_tc0140syt = machine.device("tc0140syt");
 	state->m_tc0100scn_1 = machine.device("tc0100scn_1");
 	state->m_tc0100scn_2 = machine.device("tc0100scn_2");

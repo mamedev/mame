@@ -1283,7 +1283,7 @@ void ppu2c0x_device::spriteram_dma( address_space *space, const UINT8 page )
 	}
 
 	// should last 513 CPU cycles.
-	device_adjust_icount(&space->device(), -513);
+	space->device().execute().adjust_icount(-513);
 }
 
 /*************************************

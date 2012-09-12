@@ -1203,7 +1203,7 @@ static const isa8bus_interface isabus_intf =
 void pc1512_state::machine_start()
 {
 	// register CPU IRQ callback
-	device_set_irq_callback(m_maincpu, pc1512_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(pc1512_irq_callback);
 
 	// set RAM size
 	size_t ram_size = m_ram->size();
@@ -1286,7 +1286,7 @@ void pc1512_state::machine_reset()
 void pc1640_state::machine_start()
 {
 	// register CPU IRQ callback
-	device_set_irq_callback(m_maincpu, pc1512_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(pc1512_irq_callback);
 
 	// state saving
 	save_item(NAME(m_pit1));

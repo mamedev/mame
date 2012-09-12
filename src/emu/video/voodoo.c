@@ -2159,7 +2159,7 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 	if (v->pci.stall_callback)
 		(*v->pci.stall_callback)(v->device, TRUE);
 	else
-		device_spin_until_trigger(v->cpu, v->trigger);
+		v->cpu->execute().spin_until_trigger(v->trigger);
 
 	/* set a timer to clear the stall */
 	v->pci.continue_timer->adjust(v->pci.op_end_time - current_time);
@@ -3800,7 +3800,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			device_eat_cycles(v->cpu, 1000);
+			v->cpu->execute().eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3813,7 +3813,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		case vRetrace:
 
 			/* eat some cycles since people like polling here */
-			device_eat_cycles(v->cpu, 10);
+			v->cpu->execute().eat_cycles(10);
 			result = v->screen->vpos();
 			break;
 
@@ -3828,7 +3828,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			result = v->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			device_eat_cycles(v->cpu, 1000);
+			v->cpu->execute().eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:

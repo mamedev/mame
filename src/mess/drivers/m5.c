@@ -521,8 +521,8 @@ WRITE8_MEMBER( m5_state::ppi_pb_w )
 
 	if (data == 0xf0)
 	{
-		device_set_input_line(m_fd5cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		device_set_input_line(m_fd5cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		m_fd5cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_fd5cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 

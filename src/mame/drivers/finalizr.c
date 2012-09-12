@@ -50,7 +50,7 @@ WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
 
 WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)
 {
-	device_set_input_line(m_audio_cpu, 0, ASSERT_LINE);
+	m_audio_cpu->execute().set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
@@ -62,7 +62,7 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
     */
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(m_audio_cpu, 0, CLEAR_LINE);
+		m_audio_cpu->execute().set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(finalizr_state::i8039_T1_r)

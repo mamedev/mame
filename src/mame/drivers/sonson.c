@@ -61,7 +61,7 @@ WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
 	if (m_last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line(m_audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
+		m_audiocpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
 	m_last_irq = data;
@@ -229,7 +229,7 @@ static MACHINE_START( sonson )
 {
 	sonson_state *state = machine.driver_data<sonson_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_last_irq));
 }

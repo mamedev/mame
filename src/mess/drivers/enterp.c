@@ -172,7 +172,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	device_set_input_line_vector(machine.device("maincpu"), 0, 0xff);
+	machine.device("maincpu")->execute().set_input_line_vector(0, 0xff);
 }
 
 

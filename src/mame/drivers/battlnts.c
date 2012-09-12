@@ -29,12 +29,12 @@ static INTERRUPT_GEN( battlnts_interrupt )
 {
 	battlnts_state *state = device->machine().driver_data<battlnts_state>();
 	if (k007342_is_int_enabled(state->m_k007342))
-		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
@@ -228,7 +228,7 @@ static MACHINE_START( battlnts )
 
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k007342 = machine.device("k007342");
 	state->m_k007420 = machine.device("k007420");
 

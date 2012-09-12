@@ -89,12 +89,12 @@ static SCREEN_UPDATE_IND16( destiny )
 
 WRITE8_MEMBER(destiny_state::firq_ack_w)
 {
-	device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(destiny_state::nmi_ack_w)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_MEMBER(destiny_state::printer_status_r)
@@ -147,7 +147,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 {
 	// NMI on Coin SW or Service SW
 	if (oldval)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// coincounter on coin insert
 	if (((int)(FPTR)param) == 0)

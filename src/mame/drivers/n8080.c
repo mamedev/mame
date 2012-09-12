@@ -434,7 +434,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 	int state = n8080->m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	device_set_input_line_and_vector(n8080->m_maincpu, INPUT_LINE_IRQ0, state, 0xcf);
+	n8080->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
@@ -443,7 +443,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	int state = n8080->m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	device_set_input_line_and_vector(n8080->m_maincpu, INPUT_LINE_IRQ0, state, 0xd7);
+	n8080->m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
@@ -457,7 +457,7 @@ WRITE8_MEMBER(n8080_state::n8080_status_callback)
 	if (data & I8085_STATUS_INTA)
 	{
 		/* interrupt acknowledge */
-		device_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
+		device->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -473,7 +473,7 @@ static MACHINE_START( n8080 )
 {
 	n8080_state *state = machine.driver_data<n8080_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_shift_data));
 	state->save_item(NAME(state->m_shift_bits));

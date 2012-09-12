@@ -1845,7 +1845,7 @@ static INTERRUPT_GEN( pc6001_interrupt )
 	state->m_cur_keycode = check_joy_press(device->machine());
 	if(IRQ_LOG) printf("Stick IRQ called 0x16\n");
 	state->m_irq_vector = 0x16;
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( pc6001sr_interrupt )
@@ -1856,13 +1856,13 @@ static INTERRUPT_GEN( pc6001sr_interrupt )
 	state->m_cur_keycode = check_joy_press(device->machine());
 	if(IRQ_LOG) printf("VRTC IRQ called 0x16\n");
 	state->m_irq_vector = (state->m_kludge) ? 0x22 : 0x16;
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK ( pc6001_irq_callback )
 {
 	pc6001_state *state = device->machine().driver_data<pc6001_state>();
-	device_set_input_line(device, 0, CLEAR_LINE);
+	device->execute().set_input_line(0, CLEAR_LINE);
 	return state->m_irq_vector;
 }
 
@@ -2114,7 +2114,7 @@ static MACHINE_RESET(pc6001)
 
 	state->m_port_c_8255=0;
 
-	device_set_irq_callback(machine.device("maincpu"),pc6001_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc6001_irq_callback);
 	state->m_cas_switch = 0;
 	state->m_cas_offset = 0;
 	state->m_timer_irq_mask = 1;
@@ -2132,7 +2132,7 @@ static MACHINE_RESET(pc6001m2)
 
 	state->m_port_c_8255=0;
 
-	device_set_irq_callback(machine.device("maincpu"),pc6001_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc6001_irq_callback);
 	state->m_cas_switch = 0;
 	state->m_cas_offset = 0;
 
@@ -2168,7 +2168,7 @@ static MACHINE_RESET(pc6001sr)
 
 	state->m_port_c_8255=0;
 
-	device_set_irq_callback(machine.device("maincpu"),pc6001_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc6001_irq_callback);
 	state->m_cas_switch = 0;
 	state->m_cas_offset = 0;
 

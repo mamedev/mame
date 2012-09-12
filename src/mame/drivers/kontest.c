@@ -154,7 +154,7 @@ WRITE8_MEMBER(kontest_state::control_w)
 	// other bits: ?
 	m_control = data;
 
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( kontest_map, AS_PROGRAM, 8, kontest_state )
@@ -243,7 +243,7 @@ static INTERRUPT_GEN( kontest_interrupt )
 {
 	kontest_state *state = device->machine().driver_data<kontest_state>();
 	if (state->m_control & 8)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 void kontest_state::machine_start()

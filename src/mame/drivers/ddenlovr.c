@@ -830,14 +830,14 @@ g_profiler.start(PROFILER_VIDEO);
 
 			if (irq_vector)
 				/* quizchq */
-				device_set_input_line_and_vector(&space->device(), 0, HOLD_LINE, irq_vector);
+				space->device().execute().set_input_line_and_vector(0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (state->m_ddenlovr_blitter_irq_enable)
 				{
 					state->m_ddenlovr_blitter_irq_flag = 1;
-					device_set_input_line(&space->device(), 1, HOLD_LINE);
+					space->device().execute().set_input_line(1, HOLD_LINE);
 				}
 			}
 			break;
@@ -996,7 +996,7 @@ g_profiler.start(PROFILER_VIDEO);
 				#endif
 			}
 
-			device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, irq_vector);
+			state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, irq_vector);
 			break;
 
 		default:
@@ -2077,7 +2077,7 @@ WRITE8_MEMBER(dynax_state::mmpanic_rombank_w)
 WRITE8_MEMBER(dynax_state::mmpanic_soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(dynax_state::mmpanic_blitter_w)
@@ -8360,8 +8360,8 @@ static MACHINE_START( ddenlovr )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 	state->m_oki = machine.device<okim6295_device>("oki");
 
 	state->save_item(NAME(state->m_input_sel));
@@ -8608,14 +8608,14 @@ static INTERRUPT_GEN( quizchq_irq )
 //  if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
 //      return;
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xee);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( quizchq_rtc_irq )
 {
 	dynax_state *drvstate = device->machine().driver_data<dynax_state>();
 
-	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0xfc);
+	drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 }
 
 static MSM6242_INTERFACE( quizchq_rtc_intf )
@@ -8692,7 +8692,7 @@ static INTERRUPT_GEN( mmpanic_irq )
 	//if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xcf); // RST 08, vblank
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // RST 08, vblank
 }
 
 
@@ -8700,7 +8700,7 @@ static WRITE_LINE_DEVICE_HANDLER( mmpanic_rtc_irq )
 {
 	dynax_state *drvstate = device->machine().driver_data<dynax_state>();
 
-	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0xdf); // RST 18, clock
+	drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
 }
 
 static MSM6242_INTERFACE( mmpanic_rtc_intf )
@@ -8777,7 +8777,7 @@ static INTERRUPT_GEN( hanakanz_irq )
 	//if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xe0);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(hanakanz_rtc_irq)
@@ -8790,7 +8790,7 @@ static WRITE_LINE_DEVICE_HANDLER(hanakanz_rtc_irq)
 	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0xe2);
+	drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
 }
 
 static MSM6242_INTERFACE( hanakanz_rtc_intf )
@@ -8869,7 +8869,7 @@ static INTERRUPT_GEN( mjchuuka_irq )
 	//if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xf8);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(mjchuuka_rtc_irq)
@@ -8882,7 +8882,7 @@ static WRITE_LINE_DEVICE_HANDLER(mjchuuka_rtc_irq)
 	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0xfa);
+	drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
 static MSM6242_INTERFACE( mjchuuka_rtc_intf )
@@ -8953,10 +8953,10 @@ static TIMER_DEVICE_CALLBACK( mjmyster_irq )
 		return;
 
 	if(scanline == 245)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xf8);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 
 	if(scanline == 0)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xfa);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
 static const ay8910_interface mjmyster_ay8910_interface =
@@ -8978,7 +8978,7 @@ static WRITE_LINE_DEVICE_HANDLER(mjmyster_rtc_irq)
 	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MSM6242_INTERFACE( mjmyster_rtc_intf )
@@ -9028,7 +9028,7 @@ static INTERRUPT_GEN( hginga_irq )
 //  if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
 //      return;
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xf8);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 
 static const ay8910_interface hginga_ay8910_interface =
@@ -9050,7 +9050,7 @@ static WRITE_LINE_DEVICE_HANDLER(hginga_rtc_irq)
 	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
 	//  return;
 
-	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0xee);
+	drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
 }
 
 static MSM6242_INTERFACE( hginga_rtc_intf )
@@ -9157,7 +9157,7 @@ static INTERRUPT_GEN( mjflove_irq )
 	dynax_state *state = device->machine().driver_data<dynax_state>();
 
 	state->m_mjflove_irq_cause = 1;
-	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+	state->m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(mjflove_rtc_irq)
@@ -9165,7 +9165,7 @@ static WRITE_LINE_DEVICE_HANDLER(mjflove_rtc_irq)
 	dynax_state *drvstate = device->machine().driver_data<dynax_state>();
 
 	drvstate->m_mjflove_irq_cause = 2;
-	device_set_input_line(drvstate->m_maincpu, 0, HOLD_LINE);
+	drvstate->m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 static MSM6242_INTERFACE( mjflove_rtc_intf )
@@ -9198,7 +9198,7 @@ MACHINE_CONFIG_END
     0xee is vblank  */
 static INTERRUPT_GEN( hparadis_irq )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xee);
 }
 
 static MACHINE_CONFIG_DERIVED( hparadis, quizchq )

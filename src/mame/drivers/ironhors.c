@@ -28,19 +28,19 @@ static TIMER_DEVICE_CALLBACK( ironhors_irq )
 	if (scanline == 240)
 	{
 		if (*state->m_interrupt_enable & 4)
-			device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+			state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (((scanline+16) % 64) == 0)
 	{
 		if (*state->m_interrupt_enable & 1)
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 WRITE8_MEMBER(ironhors_state::ironhors_sh_irqtrigger_w)
 {
 
-	device_set_input_line_and_vector(m_soundcpu, 0, HOLD_LINE, 0xff);
+	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(ironhors_state::ironhors_filter_w)
@@ -360,8 +360,8 @@ static MACHINE_START( ironhors )
 {
 	ironhors_state *state = machine.driver_data<ironhors_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 
 	state->save_item(NAME(state->m_palettebank));
 	state->save_item(NAME(state->m_charbank));
@@ -430,19 +430,19 @@ static TIMER_DEVICE_CALLBACK( farwest_irq )
 	if ((scanline % 2) == 1)
 	{
 		if (*state->m_interrupt_enable & 4)
-			device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+			state->m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if ((scanline % 2) == 0)
 	{
 		if (*state->m_interrupt_enable & 1)
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
 
-	return soundlatch_byte_r(*m_soundcpu->memory().space(AS_PROGRAM), 0);
+	return soundlatch_byte_r(*m_soundcpu->space(AS_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =

@@ -622,7 +622,7 @@ static MACHINE_RESET(gamecstl)
 {
 	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x30000);
 
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 

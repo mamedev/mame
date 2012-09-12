@@ -388,7 +388,7 @@ WRITE8_MEMBER( zx_state::zx81_io_w )
 		zx_ula_bkgnd(1);
 		if (m_ula_frame_vsync == 2)
 		{
-			device_spin_until_time(&mem->device(),machine().primary_screen->time_until_pos(height - 1, 0));
+			mem->device().execute().spin_until_time(machine().primary_screen->time_until_pos(height - 1, 0));
 			m_ula_scanline_count = height - 1;
 			logerror ("S: %d B: %d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 		}

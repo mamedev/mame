@@ -653,7 +653,7 @@ static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 static MACHINE_START(voyager)
 {
 	voyager_state *state = machine.driver_data<voyager_state>();
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	state->m_pit8254 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );

@@ -318,10 +318,10 @@ static TIMER_DEVICE_CALLBACK( meijinsn_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_config =

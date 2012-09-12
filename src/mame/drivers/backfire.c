@@ -42,7 +42,7 @@ public:
 	bitmap_ind16  *m_right;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 
@@ -433,7 +433,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -475,7 +475,7 @@ static MACHINE_START( backfire )
 {
 	backfire_state *state = machine.driver_data<backfire_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
 	state->m_deco_tilegen2 = machine.device("tilegen2");
 	state->m_lscreen = machine.device("lscreen");
@@ -701,8 +701,8 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 
 	//mame_printf_debug( "%08x\n",space.device().safe_pc());
 
-	if (space.device() .safe_pc()== 0xce44)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfire
-	if (space.device().safe_pc() == 0xcee4)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfirea
+	if (space.device() .safe_pc()== 0xce44)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfire
+	if (space.device().safe_pc() == 0xcee4)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfirea
 
 	return m_mainram[0x18/4];
 }

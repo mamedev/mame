@@ -333,7 +333,7 @@ static INTERRUPT_GEN( main_vblank_irq )
 	retofinv_state *state = device->machine().driver_data<retofinv_state>();
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( sub_vblank_irq )
@@ -341,7 +341,7 @@ static INTERRUPT_GEN( sub_vblank_irq )
 	retofinv_state *state = device->machine().driver_data<retofinv_state>();
 
 	if(state->m_sub_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

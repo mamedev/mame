@@ -530,7 +530,7 @@ void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void vidbrain_state::machine_start()
 {
 	// register IRQ callback
-	device_set_irq_callback(m_maincpu, vidbrain_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(vidbrain_int_ack);
 
 	// allocate timers
 	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);

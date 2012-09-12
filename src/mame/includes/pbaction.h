@@ -31,8 +31,8 @@ public:
 	int        m_scroll;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 
 	UINT8      m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(pbaction_sh_command_w);

@@ -248,7 +248,7 @@ static TIMER_DEVICE_CALLBACK( ikki_irq )
 
 	if(scanline == 240 || scanline == 120) // TODO: where non-timer IRQ happens?
 	{
-		device_set_input_line(state->m_maincpu,0,HOLD_LINE);
+		state->m_maincpu->set_input_line(0,HOLD_LINE);
 
 		state->m_irq_source = (scanline != 240);
 	}

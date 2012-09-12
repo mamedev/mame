@@ -545,7 +545,7 @@ static void tms7000_service_timer1( device_t *device )
         if( --cpustate->t1_decrementer < 0 ) /* Decrement timer1 register and check for underflow */
         {
             cpustate->t1_decrementer = cpustate->pf[2]; /* Reload decrementer (8 bit) */
-			device_set_input_line(device, TMS7000_IRQ2_LINE, HOLD_LINE);
+			device->execute().set_input_line(TMS7000_IRQ2_LINE, HOLD_LINE);
             //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpustate->device->total_cycles(), cpustate->device->total_cycles() - tick, cpustate->cycles_per_INT2-(cpustate->device->total_cycles() - tick) );
 			//tick = cpustate->device->total_cycles() );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */

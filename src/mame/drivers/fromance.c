@@ -158,7 +158,7 @@ static void fromance_adpcm_int( device_t *device )
 
 	/* generate an NMI if we're out of data */
 	if (!state->m_vclk_left)
-		device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -958,7 +958,7 @@ static MACHINE_START( fromance )
 
 	state->membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_directionflag));
 	state->save_item(NAME(state->m_commanddata));

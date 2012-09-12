@@ -20,8 +20,8 @@ public:
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(funkyjet);
 };

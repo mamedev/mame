@@ -74,7 +74,7 @@ INTERRUPT_GEN( exidy_vblank_interrupt )
 	state->m_int_condition &= ~0x80;
 
 	/* set the IRQ line */
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

@@ -354,7 +354,7 @@ static INTERRUPT_GEN( vblank_irq )
 	bombjack_state *state = device->machine().driver_data<bombjack_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( bombjack, bombjack_state )

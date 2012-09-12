@@ -426,9 +426,9 @@ static MACHINE_START( mexico86 )
 
 	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->m_port_a_in));

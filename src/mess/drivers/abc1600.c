@@ -1849,7 +1849,7 @@ static IRQ_CALLBACK( abc1600_int_ack )
 void abc1600_state::machine_start()
 {
 	// interrupt callback
-	device_set_irq_callback(m_maincpu, abc1600_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(abc1600_int_ack);
 
 	// HACK fill segment RAM with non-zero values or no boot
 	memset(m_segment_ram, 0xcd, 0x400);

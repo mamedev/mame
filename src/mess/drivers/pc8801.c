@@ -1887,7 +1887,7 @@ WRITE8_MEMBER(pc8801_state::upd765_mc_w)
 
 READ8_MEMBER(pc8801_state::upd765_tc_r)
 {
-	//printf("%04x 1\n",m_fdccpu->safe_pc());
+	//printf("%04x 1\n",m_fdccpu->pc());
 
 	upd765_tc_w(machine().device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
@@ -2411,7 +2411,7 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 	{
 		state->m_vrtc_irq_latch = 1;
 		//IRQ_LOG(("vrtc\n"));
-		device_set_input_line(device,0,HOLD_LINE);
+		device->execute().set_input_line(0,HOLD_LINE);
 	}
 }
 #endif
@@ -2420,7 +2420,7 @@ static MACHINE_START( pc8801 )
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 
-	device_set_irq_callback(machine.device("maincpu"), pc8801_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pc8801_irq_callback);
 
 	state->m_rtc->cs_w(1);
 	state->m_rtc->oe_w(1);
@@ -2447,7 +2447,7 @@ static MACHINE_RESET( pc8801 )
 	state->m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 	state->m_mouse.phase = 0;
 
-	device_set_input_line_vector(machine.device("fdccpu"), 0, 0);
+	machine.device("fdccpu")->execute().set_input_line_vector(0, 0);
 
 	{
 		state->m_txt_color = 2;

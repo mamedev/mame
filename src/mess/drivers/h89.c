@@ -101,7 +101,7 @@ static TIMER_DEVICE_CALLBACK( h89_irq_timer )
 	h89_state *state = timer.machine().driver_data<h89_state>();
 
 	if (state->m_port_f2 & 0x02)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xcf);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
 }
 
 WRITE8_MEMBER( h89_state::port_f2_w )

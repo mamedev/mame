@@ -19,8 +19,8 @@ public:
 	int             m_flipscreen;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(madmotor_sound_w);
 	DECLARE_DRIVER_INIT(madmotor);
 };

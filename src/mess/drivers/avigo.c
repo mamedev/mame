@@ -129,9 +129,9 @@ WRITE8_MEMBER(avigo_state::flash_0x8000_write_handler)
 void avigo_state::refresh_ints()
 {
 	if (m_irq!=0)
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	else
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 /* does not do anything yet */

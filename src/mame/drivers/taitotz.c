@@ -1845,14 +1845,14 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 			if (m_io_share_ram[0xfff] == 0x1010 || m_io_share_ram[0xfff] == 0x1020 ||
 				m_io_share_ram[0xfff] == 0x6000 || m_io_share_ram[0xfff] == 0x6010)
 			{
-				//device_spin_until_trigger(machine().device("maincpu"), PPC_TLCS_COMM_TRIGGER);
-				device_spin_until_interrupt(machine().device("maincpu"));
+				//machine().device("maincpu")->execute().spin_until_trigger(PPC_TLCS_COMM_TRIGGER);
+				machine().device("maincpu")->execute().spin_until_interrupt();
 			}
 
 			// pwrshovl sometimes writes commands during command handling... make sure that doesn't happen
 			if (m_io_share_ram[0xfff] == 0x0000)
 			{
-				device_spin_until_time(machine().device("maincpu"), attotime::from_usec(50));
+				machine().device("maincpu")->execute().spin_until_time(attotime::from_usec(50));
 			}
 
 			machine().scheduler().trigger(TLCS_PPC_COMM_TRIGGER);
@@ -1931,15 +1931,15 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 
 		// The PPC is now free to continue running
 		//machine().scheduler().trigger(PPC_TLCS_COMM_TRIGGER);
-		//device_yield(machine().device("iocpu"));
+		//machine().device("iocpu")->execute().yield();
 	}
 
 	if (offset == 0x1ffe)
 	{
 		if (m_io_share_ram[0xfff] == 0 && m_io_share_ram[0xffe] == 0x1012)
 		{
-			//device_spin_until_trigger(machine().device("iocpu"), TLCS_PPC_COMM_TRIGGER);
-			device_yield(machine().device("iocpu"));
+			//machine().device("iocpu")->execute().spin_until_trigger(TLCS_PPC_COMM_TRIGGER);
+			machine().device("iocpu")->execute().yield();
 			machine().scheduler().trigger(PPC_TLCS_COMM_TRIGGER);
 		}
 	}

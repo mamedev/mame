@@ -247,21 +247,21 @@ static TIMER_DEVICE_CALLBACK( jchan_vblank )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 11)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if (state->m_irq_sub_enable)
 	{
 		if(scanline == 240)
-			device_set_input_line(state->m_subcpu, 1, HOLD_LINE);
+			state->m_subcpu->set_input_line(1, HOLD_LINE);
 
 		if(scanline == 249)
-			device_set_input_line(state->m_subcpu, 2, HOLD_LINE);
+			state->m_subcpu->set_input_line(2, HOLD_LINE);
 
 		if(scanline == 11)
-			device_set_input_line(state->m_subcpu, 3, HOLD_LINE);
+			state->m_subcpu->set_input_line(3, HOLD_LINE);
 	}
 }
 

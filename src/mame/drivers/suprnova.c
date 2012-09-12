@@ -441,9 +441,9 @@ static TIMER_DEVICE_CALLBACK(skns_irq)
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu,5,HOLD_LINE); //vblank
+		state->m_maincpu->set_input_line(5,HOLD_LINE); //vblank
 	else if(scanline == 0)
-		device_set_input_line(state->m_maincpu,1,HOLD_LINE); // spc
+		state->m_maincpu->set_input_line(1,HOLD_LINE); // spc
 }
 
 /**********************************************************************************
@@ -646,7 +646,7 @@ WRITE32_MEMBER(skns_state::skns_io_w)
 			{
 				if (!strcmp(machine().system().name,"vblokbrk") ||
 					!strcmp(machine().system().name,"sarukani"))
-					device_spin_until_interrupt(&space.device());
+					space.device().execute().spin_until_interrupt();
 			}
 
 		}
@@ -870,32 +870,32 @@ READ32_MEMBER(skns_state::gutsn_speedup_r)
 	if (space.device().safe_pc()==0x402206e)
 	{
 		if(m_main_ram[0x00078/4] == m_main_ram[0x0c780/4])
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 	}
 	return m_main_ram[0x0c780/4];
 }
 
 READ32_MEMBER(skns_state::cyvern_speedup_r)
 {
-	if (space.device().safe_pc()==0x402ebd2) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x402ebd2) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x4d3c8/4];
 }
 
 READ32_MEMBER(skns_state::puzzloopj_speedup_r)
 {
-	if (space.device().safe_pc()==0x401dca0) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x401dca0) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x86714/4];
 }
 
 READ32_MEMBER(skns_state::puzzloopa_speedup_r)
 {
-	if (space.device().safe_pc()==0x401d9d4) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x401d9d4) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x85bcc/4];
 }
 
 READ32_MEMBER(skns_state::puzzloopu_speedup_r)
 {
-	if (space.device().safe_pc()==0x401dab0) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x401dab0) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x85cec/4];
 }
 
@@ -908,61 +908,61 @@ READ32_MEMBER(skns_state::puzzloope_speedup_r)
     0401DA18: BF      $0401DA26
     0401DA26: BRA     $0401DA12
 */
-	if (space.device().safe_pc()==0x401da14) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x401da14) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x81d38/4];
 }
 
 READ32_MEMBER(skns_state::senknow_speedup_r)
 {
-	if (space.device().safe_pc()==0x4017dce) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x4017dce) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x0000dc/4];
 }
 
 READ32_MEMBER(skns_state::teljan_speedup_r)
 {
-	if (space.device().safe_pc()==0x401ba32) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x401ba32) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x002fb4/4];
 }
 
 READ32_MEMBER(skns_state::jjparads_speedup_r)
 {
-	if (space.device().safe_pc()==0x4015e84) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x4015e84) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x000994/4];
 }
 
 READ32_MEMBER(skns_state::jjparad2_speedup_r)
 {
-	if (space.device().safe_pc()==0x401620a) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x401620a) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x000984/4];
 }
 
 READ32_MEMBER(skns_state::ryouran_speedup_r)
 {
-	if (space.device().safe_pc()==0x40182ce) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x40182ce) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x000a14/4];
 }
 
 READ32_MEMBER(skns_state::galpans2_speedup_r)
 {
-	if (space.device().safe_pc()==0x4049ae2) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x4049ae2) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x0fb6bc/4];
 }
 
 READ32_MEMBER(skns_state::panicstr_speedup_r)
 {
-	if (space.device().safe_pc()==0x404e68a) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x404e68a) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0x0f19e4/4];
 }
 
 READ32_MEMBER(skns_state::sengekis_speedup_r)// 60006ee  600308e
 {
-	if (space.device().safe_pc()==0x60006ec) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x60006ec) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0xb74bc/4];
 }
 
 READ32_MEMBER(skns_state::sengekij_speedup_r)// 60006ee  600308e
 {
-	if (space.device().safe_pc()==0x60006ec) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc()==0x60006ec) space.device().execute().spin_until_interrupt();
 	return m_main_ram[0xb7380/4];
 }
 

@@ -32,7 +32,7 @@ public:
 	int         m_sprites_scrolldy;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(yunsun16_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);
 	DECLARE_WRITE16_MEMBER(yunsun16_vram_0_w);

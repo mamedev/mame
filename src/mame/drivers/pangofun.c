@@ -187,7 +187,7 @@ static const struct kbdc8042_interface at8042 =
 
 static MACHINE_START( pangofun )
 {
-	device_set_irq_callback(machine.device("maincpu"), pcat_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, pangofun_set_keyb_int);
 	kbdc8042_init(machine, &at8042);
 }

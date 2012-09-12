@@ -58,18 +58,18 @@ READ8_MEMBER(rollerg_state::rollerg_sound_r)
 
 WRITE8_MEMBER(rollerg_state::soundirq_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
 	rollerg_state *state = machine.driver_data<rollerg_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -256,8 +256,8 @@ static MACHINE_START( rollerg )
 	state->membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
 	state->membank("bank1")->set_entry(0);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053244 = machine.device("k053244");
 	state->m_k051316 = machine.device("k051316");
 	state->m_k053260 = machine.device("k053260");

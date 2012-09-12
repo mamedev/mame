@@ -144,8 +144,8 @@ static MACHINE_START( taito_l )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_rambanks));
 	state->save_item(NAME(state->m_palette_ram));
@@ -312,10 +312,10 @@ static TIMER_DEVICE_CALLBACK( vbl_interrupt )
 {
 	taitol_state *state = timer.machine().driver_data<taitol_state>();
 	int scanline = param;
-	device_set_irq_callback(state->m_maincpu, irq_callback);
+	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
 
 	/* kludge to make plgirls boot */
-	if (state->m_maincpu->state().state_int(Z80_IM) != 2)
+	if (state->m_maincpu->state_int(Z80_IM) != 2)
 		return;
 
 	// What is really generating interrupts 0 and 1 is still to be found
@@ -323,17 +323,17 @@ static TIMER_DEVICE_CALLBACK( vbl_interrupt )
 	if (scanline == 120 && (state->m_irq_enable & 1))
 	{
 		state->m_last_irq_level = 0;
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if (scanline == 0 && (state->m_irq_enable & 2))
 	{
 		state->m_last_irq_level = 1;
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if (scanline == 240 && (state->m_irq_enable & 4))
 	{
 		state->m_last_irq_level = 2;
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -355,7 +355,7 @@ WRITE8_MEMBER(taitol_state::irq_enable_w)
 
 	// fix Plotting test mode
 	if ((m_irq_enable & (1 << m_last_irq_level)) == 0)
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(taitol_state::irq_enable_r)
@@ -1774,7 +1774,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(taitol_state::portA_w)

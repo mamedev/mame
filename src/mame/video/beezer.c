@@ -13,9 +13,9 @@ TIMER_DEVICE_CALLBACK( beezer_interrupt )
 	via_0->write_ca2((scanline & 0x20) ? 1 : 0);
 	#if 0
 	if (scanline == 240) // actually unused by the game! (points to a tight loop)
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		state->m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+		state->m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	#endif
 }
 

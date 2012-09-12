@@ -807,7 +807,7 @@ static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 static MACHINE_START(calchase)
 {
 	calchase_state *state = machine.driver_data<calchase_state>();
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	state->m_pit8254 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
@@ -962,7 +962,7 @@ READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
 
 	if(space.device().safe_pc()==0x1406f48)
-		device_spin_until_interrupt(m_maincpu);
+		m_maincpu->spin_until_interrupt();
 
 	return m_idle_skip_ram;
 }

@@ -564,7 +564,7 @@ void n64_periphs::sp_set_status(UINT32 status)
 	//printf("sp_set_status: %08x\n", status);
 	if (status & 0x1)
 	{
-		device_set_input_line(rspcpu, INPUT_LINE_HALT, ASSERT_LINE);
+		rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
         rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_HALT);
 	}
 
@@ -612,7 +612,7 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 
 		case 0x1c/4:		// SP_SEMAPHORE_REG
 			//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
-			device_yield(machine().device("maincpu"));
+			machine().device("maincpu")->execute().yield();
             if( sp_semaphore )
             {
                 ret = 1;
@@ -724,13 +724,13 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                 // printf( "RSP_STATUS_REG Write; %08x\n", data );
                 if (data & 0x00000001)      // clear halt
                 {
-					device_set_input_line(rspcpu, INPUT_LINE_HALT, CLEAR_LINE);
+					rspcpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
 					//printf("***SP HALT CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000002)      // set halt
                 {
-                    device_set_input_line(rspcpu, INPUT_LINE_HALT, ASSERT_LINE);
+                    rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
                     newstatus |= RSP_STATUS_HALT;
 					//printf("***SP HALT SET***\n"); fflush(stdout);
                 }
@@ -761,7 +761,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                     if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
                     {
                         rspcpu->state().set_state_int(RSP_STEPCNT, 1 );
-                        device_yield(machine().device("rsp"));
+                        machine().device("rsp")->execute().yield();
                     }
                 }
                 if (data & 0x00000080)
@@ -1407,7 +1407,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 static TIMER_CALLBACK(pi_dma_callback)
 {
 	machine.device<n64_periphs>("rcp")->pi_dma_tick();
-	device_yield(machine.device("rsp"));
+	machine.device("rsp")->execute().yield();
 }
 
 void n64_periphs::pi_dma_tick()

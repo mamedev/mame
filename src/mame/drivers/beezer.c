@@ -81,7 +81,7 @@ static MACHINE_START(beezer)
 {
 	beezer_state *state = machine.driver_data<beezer_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 }
 
 static MACHINE_CONFIG_START( beezer, beezer_state )

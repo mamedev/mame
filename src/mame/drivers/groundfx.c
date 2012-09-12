@@ -358,7 +358,7 @@ static INTERRUPT_GEN( groundfx_interrupt )
 {
 	groundfx_state *state = device->machine().driver_data<groundfx_state>();
 	state->m_frame_counter^=1;
-	device_set_input_line(device, 4, HOLD_LINE);
+	device->execute().set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( groundfx, groundfx_state )

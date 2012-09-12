@@ -34,8 +34,8 @@ public:
 	UINT16          m_io_reg[8];
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(ddragon3_io_w);
 	DECLARE_WRITE16_MEMBER(ddragon3_scroll_w);
 	DECLARE_READ16_MEMBER(ddragon3_scroll_r);

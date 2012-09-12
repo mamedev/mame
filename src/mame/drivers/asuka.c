@@ -233,13 +233,13 @@ DIP locations verified for:
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
 	asuka_state *state = machine.driver_data<asuka_state>();
-	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+	state->m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
-	device_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
+	device->execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
 
@@ -837,8 +837,8 @@ static MACHINE_START( asuka )
 {
 	asuka_state *state = machine.driver_data<asuka_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_pc090oj = machine.device("pc090oj");
 	state->m_tc0100scn = machine.device("tc0100scn");
 

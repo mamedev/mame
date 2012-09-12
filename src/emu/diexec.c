@@ -643,7 +643,7 @@ void device_execute_interface::interface_clock_changed()
 
 IRQ_CALLBACK( device_execute_interface::static_standard_irq_callback )
 {
-	return device_execute(device)->standard_irq_callback(irqline);
+	return device->execute().standard_irq_callback(irqline);
 }
 
 int device_execute_interface::standard_irq_callback(int irqline)

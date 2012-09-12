@@ -159,7 +159,7 @@ static TIMER_CALLBACK( clock_irq )
 	/* assert the IRQ if not already asserted */
 	if (!state->m_irq_state)
 	{
-		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		state->m_maincpu->set_input_line(0, ASSERT_LINE);
 		state->m_irq_state = 1;
 	}
 
@@ -245,7 +245,7 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 {
 	if (m_irq_state)
 	{
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 		m_irq_state = 0;
 	}
 }

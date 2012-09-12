@@ -523,7 +523,7 @@ static INTERRUPT_GEN( spoker_interrupt )
 {
 //  spoker_state *state = device->machine().driver_data<spoker_state>();
 
-	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( spoker, spoker_state )

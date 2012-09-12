@@ -778,7 +778,7 @@ static IRQ_CALLBACK( int_callback )
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine().time().as_double(), state->m_i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	device_set_input_line(state->m_i80186.cpu, 0, CLEAR_LINE);
+	state->m_i80186.cpu->execute().set_input_line(0, CLEAR_LINE);
 	state->m_i80186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
@@ -1603,7 +1603,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			/* we need to do this at a time when the 80186 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			device_set_irq_callback(state->m_i80186.cpu, int_callback);
+			state->m_i80186.cpu->execute().set_irq_acknowledge_callback(int_callback);
 			break;
 
 		case 0xc0/2:

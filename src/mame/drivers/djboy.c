@@ -153,7 +153,7 @@ WRITE8_MEMBER(djboy_state::beast_data_w)
 	m_data_to_beast = data;
 	m_z80_to_beast_full = 1;
 	m_beast_int0_l = 0;
-	device_set_input_line(m_beast, INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_beast->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 READ8_MEMBER(djboy_state::beast_data_r)
@@ -172,7 +172,7 @@ READ8_MEMBER(djboy_state::beast_status_r)
 
 WRITE8_MEMBER(djboy_state::trigger_nmi_on_cpu0)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(djboy_state::cpu0_bankswitch_w)
@@ -233,7 +233,7 @@ WRITE8_MEMBER(djboy_state::coin_count_w)
 WRITE8_MEMBER(djboy_state::trigger_nmi_on_sound_cpu2)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_cpu2, INPUT_LINE_NMI, PULSE_LINE);
+	m_cpu2->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 WRITE8_MEMBER(djboy_state::cpu2_bankswitch_w)
@@ -336,7 +336,7 @@ WRITE8_MEMBER(djboy_state::beast_p1_w)
 	if (data == 0xff)
 	{
 		m_beast_int0_l = 1;
-		device_set_input_line(m_beast, INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_beast->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
 	m_beast_p1 = data;
@@ -380,7 +380,7 @@ WRITE8_MEMBER(djboy_state::beast_p3_w)
 {
 
 	m_beast_p3 = data;
-	device_set_input_line(m_cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_cpu1->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 /* Program/data maps are defined in the 8051 core */
 
@@ -534,7 +534,7 @@ static MACHINE_START( djboy )
 	state->membank("bank3")->configure_entries(3, 5,  &CPU2[0x10000], 0x4000);
 	state->membank("bank4")->configure_entry(0, &MAIN[0x10000]); /* unsure if/how this area is banked */
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_cpu1 = machine.device("cpu1");
 	state->m_cpu2 = machine.device("cpu2");
 	state->m_beast = machine.device("beast");

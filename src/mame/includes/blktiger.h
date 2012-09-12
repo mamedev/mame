@@ -39,7 +39,7 @@ public:
 
 	/* devices */
 	device_t *m_mcu;
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);
 	DECLARE_READ8_MEMBER(blktiger_from_main_r);

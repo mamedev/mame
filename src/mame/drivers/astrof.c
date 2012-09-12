@@ -81,7 +81,7 @@
 
 READ8_MEMBER(astrof_state::irq_clear_r)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return 0;
 }
@@ -90,7 +90,7 @@ READ8_MEMBER(astrof_state::irq_clear_r)
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
 	astrof_state *state = timer.machine().driver_data<astrof_state>();
-	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+	state->m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -105,7 +105,7 @@ INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 {
 
 	/* coin insertion causes an NMI */
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 	coin_counter_w(machine(), 0, newval);
 }
 
@@ -114,7 +114,7 @@ INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
 {
 
 	/* service coin insertion causes an NMI */
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -490,7 +490,7 @@ static MACHINE_START( astrof )
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(machine, 0xff);
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_samples = machine.device<samples_device>("samples");
 
 	/* register for state saving */
@@ -524,7 +524,7 @@ static MACHINE_START( spfghmk2 )
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(machine, 0xff);
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	/* the red background circuit is disabled */
 	state->m_red_on = FALSE;
@@ -543,7 +543,7 @@ static MACHINE_START( tomahawk )
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(machine, 0xff);
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_sn = machine.device("snsnd");
 
 	/* register for state saving */

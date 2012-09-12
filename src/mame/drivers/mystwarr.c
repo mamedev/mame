@@ -112,13 +112,13 @@ static TIMER_DEVICE_CALLBACK(mystwarr_interrupt)
 	if (!(state->m_mw_irq_control & 0x01)) return;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, M68K_IRQ_2, HOLD_LINE);
+		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, M68K_IRQ_4, HOLD_LINE);
+		state->m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
 	/* writes to LSB of 0x410000 port and clears a work RAM flag, almost likely not really necessary. */
-//  device_set_input_line(state->m_maincpu, M68K_IRQ_6, HOLD_LINE);
+//  state->m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK(metamrph_interrupt)
@@ -127,13 +127,13 @@ static TIMER_DEVICE_CALLBACK(metamrph_interrupt)
 	int scanline = param;
 
 	/* irq 4 has an irq routine in metamrph, but it's not really called */
-//  device_set_input_line(state->m_maincpu, M68K_IRQ_4, HOLD_LINE);
+//  state->m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 
 	if(scanline == 24)
-		device_set_input_line(state->m_maincpu, M68K_IRQ_6, HOLD_LINE);
+		state->m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 	if(scanline == 248)
-		if (K053246_is_IRQ_enabled()) device_set_input_line(state->m_maincpu, M68K_IRQ_5, HOLD_LINE);
+		if (K053246_is_IRQ_enabled()) state->m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK(mchamp_interrupt)
@@ -145,16 +145,16 @@ static TIMER_DEVICE_CALLBACK(mchamp_interrupt)
 
 	if(scanline == 247)
 	{
-		if (K053246_is_IRQ_enabled()) device_set_input_line(state->m_maincpu, M68K_IRQ_6, HOLD_LINE);
+		if (K053246_is_IRQ_enabled()) state->m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 
 	if(scanline == 23)
-		device_set_input_line(state->m_maincpu, M68K_IRQ_2, HOLD_LINE);
+		state->m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(ddd_interrupt)
 {
-	device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+	device->execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 

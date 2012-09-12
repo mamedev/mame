@@ -302,7 +302,7 @@ ADDRESS_MAP_END
 
 static void silvmil_irqhandler( device_t *device, int irq )
 {
-	device_set_input_line(device->machine().device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

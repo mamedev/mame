@@ -141,7 +141,7 @@ UINT8 rex6000_state::identify_bank_type(UINT32 bank)
 	}
 	else
 	{
-		//logerror("%04x: unkonwn memory bank %x\n", m_maincpu->safe_pc(), bank);
+		//logerror("%04x: unkonwn memory bank %x\n", m_maincpu->pc(), bank);
 		return BANK_UNKNOWN;
 	}
 }
@@ -413,7 +413,7 @@ static INPUT_CHANGED( trigger_irq )
 	{
 		state->m_irq_flag |= IRQ_FLAG_KEYCHANGE;
 
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -519,7 +519,7 @@ static TIMER_DEVICE_CALLBACK( irq_timer1 )
 	{
 		state->m_irq_flag |= IRQ_FLAG_IRQ2;
 
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
 }
@@ -532,7 +532,7 @@ static TIMER_DEVICE_CALLBACK( irq_timer2 )
 	{
 		state->m_irq_flag |= IRQ_FLAG_IRQ1;
 
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -544,7 +544,7 @@ static TIMER_DEVICE_CALLBACK( sec_timer )
 	{
 		state->m_irq_flag |= IRQ_FLAG_1HZ;
 
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 	if (!(m_irq_mask & IRQ_FLAG_ALARM) && state)
 	{
 		m_irq_flag |= IRQ_FLAG_ALARM;
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 

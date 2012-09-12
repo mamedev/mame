@@ -270,7 +270,7 @@ static READ32_HANDLER( dmnfrnt_speedup_r )
 {
 	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	int pc = space->device().safe_pc();
-	if (pc == 0x8000fea) device_eat_cycles(&space->device(), 500);
+	if (pc == 0x8000fea) space->device().execute().eat_cycles(500);
 //  else printf("dmn_speedup_r %08x\n", pc);
 	return state->m_arm_ram[0x000444/4];
 }
@@ -279,8 +279,8 @@ static READ16_HANDLER( dmnfrnt_main_speedup_r )
 {
 	UINT16 data = pgm_mainram[0xa03c/2];
 	int pc = space->device().safe_pc();
-	if (pc == 0x10193a) device_spin_until_interrupt(&space->device());
-	else if (pc == 0x1019a4) device_spin_until_interrupt(&space->device());
+	if (pc == 0x10193a) space->device().execute().spin_until_interrupt();
+	else if (pc == 0x1019a4) space->device().execute().spin_until_interrupt();
 	return data;
 }
 

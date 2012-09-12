@@ -434,7 +434,7 @@ MACHINE_RESET_MEMBER( fk1_state )
 	membank("bank3")->set_base(ram + 0x8000);
 	membank("bank4")->set_base(ram + 0xc000);
 
-	device_set_irq_callback(machine().device("maincpu"), fk1_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(fk1_irq_callback);
 }
 
 SCREEN_UPDATE16_MEMBER( fk1_state )

@@ -44,7 +44,7 @@ WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 
 	soundlatch_byte_w(space, offset, code);
 	if (m_sound_nmi_enable)
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(bking_state::bking3_addr_l_w)
@@ -392,7 +392,7 @@ static MACHINE_START( bking )
 {
 	bking_state *state = machine.driver_data<bking_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	/* video */
 	state->save_item(NAME(state->m_pc3259_output));

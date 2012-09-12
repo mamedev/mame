@@ -123,7 +123,7 @@ protected:
 
 private:
 	// internal state
-	device_t   *m_maincpu;
+	cpu_device   *m_maincpu;
 
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_nmi_func;

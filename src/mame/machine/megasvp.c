@@ -333,7 +333,7 @@ static UINT8 megadrive_io_read_data_port_svp(running_machine &machine, int portn
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 device_spin_until_time(&space->device(), attotime::from_usec(100));
+	 space->device().execute().spin_until_time(attotime::from_usec(100));
 	return 0x0425;
 }
 

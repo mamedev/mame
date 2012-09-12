@@ -223,7 +223,7 @@ WRITE32_MEMBER(ms32_state::ms32_sound_w)
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	device_spin_until_time(&space.device(), attotime::from_usec(40));
+	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
 READ32_MEMBER(ms32_state::ms32_sound_r)
@@ -1284,7 +1284,7 @@ static IRQ_CALLBACK(irq_callback)
 	for(i=15; i>=0 && !(state->m_irqreq & (1<<i)); i--);
 	state->m_irqreq &= ~(1<<i);
 	if(!state->m_irqreq)
-		device_set_input_line(device, 0, CLEAR_LINE);
+		device->execute().set_input_line(0, CLEAR_LINE);
 	return i;
 }
 
@@ -1293,7 +1293,7 @@ static void irq_init(running_machine &machine)
 	ms32_state *state = machine.driver_data<ms32_state>();
 	state->m_irqreq = 0;
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 static void irq_raise(running_machine &machine, int level)

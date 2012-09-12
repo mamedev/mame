@@ -228,7 +228,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 
 static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 {
-	device_set_input_line_vector(device, 0, 0x03);
+	device->execute().set_input_line_vector(0, 0x03);
 	generic_pulse_irq_line(device, 0, 1);
 
 	cvs_scroll_stars(device->machine());
@@ -237,9 +237,9 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 
 static void cvs_slave_cpu_interrupt( device_t *cpu, int state )
 {
-	device_set_input_line_vector(cpu, 0, 0x03);
-	//device_set_input_line(cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(cpu, 0, state ? HOLD_LINE : CLEAR_LINE);
+	cpu->execute().set_input_line_vector(0, 0x03);
+	//cpu->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -999,8 +999,8 @@ MACHINE_START( cvs )
 	start_393hz_timer(machine);
 
 	/* set devices */
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_speech = machine.device("speech");
 	state->m_dac3 = machine.device<dac_device>("dac3");
 	state->m_tms = machine.device("tms");

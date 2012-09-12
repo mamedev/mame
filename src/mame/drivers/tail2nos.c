@@ -23,7 +23,7 @@ WRITE16_MEMBER(tail2nos_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -180,7 +180,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	tail2nos_state *state = device->machine().driver_data<tail2nos_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -213,8 +213,8 @@ static MACHINE_START( tail2nos )
 	state->membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 	state->membank("bank3")->set_entry(0);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k051316 = machine.device("k051316");
 
 	state->save_item(NAME(state->m_charbank));

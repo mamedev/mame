@@ -284,7 +284,7 @@ static PALETTE_INIT( tmspoker )
 
 static INTERRUPT_GEN( tmspoker_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 }
 
 

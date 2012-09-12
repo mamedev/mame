@@ -26,8 +26,8 @@ public:
 	UINT8    *m_spritebank;
 
 	/* devices */
-	device_t *m_mastercpu;
-	device_t *m_slavecpu;
+	cpu_device *m_mastercpu;
+	cpu_device *m_slavecpu;
 	DECLARE_READ8_MEMBER(topgunbl_rotary_r);
 	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
 	DECLARE_READ8_MEMBER(jackal_zram_r);

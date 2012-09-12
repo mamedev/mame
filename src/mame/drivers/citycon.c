@@ -21,7 +21,7 @@ READ8_MEMBER(citycon_state::citycon_in_r)
 
 READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return 0;
 }
@@ -190,7 +190,7 @@ static MACHINE_START( citycon )
 {
 	citycon_state *state = machine.driver_data<citycon_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_bg_image));
 }

@@ -62,11 +62,11 @@ static TIMER_DEVICE_CALLBACK( pingpong_interrupt )
 
 	if (scanline == 240)
 	{
-		if (state->m_intenable & 0x04) device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		if (state->m_intenable & 0x04) state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if ((scanline % 32) == 0)
 	{
-		if (state->m_intenable & 0x08) device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_intenable & 0x08) state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -77,11 +77,11 @@ static TIMER_DEVICE_CALLBACK( merlinmm_interrupt )
 
 	if (scanline == 240)
 	{
-		if (state->m_intenable & 0x04) device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		if (state->m_intenable & 0x04) state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if (scanline == 0)
 	{
-		if (state->m_intenable & 0x08) device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_intenable & 0x08) state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

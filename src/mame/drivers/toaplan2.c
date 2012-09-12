@@ -387,7 +387,7 @@ static void toaplan2_reset(device_t *device)
 	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
 
 	if (state->m_sub_cpu != NULL)
-		device_set_input_line(state->m_sub_cpu, INPUT_LINE_RESET, PULSE_LINE);
+		state->m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -491,7 +491,7 @@ static TIMER_CALLBACK( toaplan2_raise_irq )
 {
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	device_set_input_line(state->m_main_cpu, param, HOLD_LINE);
+	state->m_main_cpu->execute().set_input_line(param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(running_machine &machine, int irq_line)
@@ -588,7 +588,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
 
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
-		device_set_input_line(m_sub_cpu, INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+		m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -759,7 +759,7 @@ WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
 WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 {
 
-	device_set_input_line(m_sub_cpu, INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+	m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -869,7 +869,7 @@ WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 	{
 
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_sub_cpu, 0, HOLD_LINE);
+		m_sub_cpu->execute().set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -927,7 +927,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 	{
 
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+		m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -938,7 +938,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 	{
 
 		soundlatch2_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+		m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -955,7 +955,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	device_set_input_line(m_main_cpu, m_sndirq_line, CLEAR_LINE);
+	m_main_cpu->execute().set_input_line(m_sndirq_line, CLEAR_LINE);
 }
 
 
@@ -963,14 +963,14 @@ WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
 {
 
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	device_set_input_line(m_main_cpu, m_sndirq_line, HOLD_LINE);
+	m_main_cpu->execute().set_input_line(m_sndirq_line, HOLD_LINE);
 }
 
 
 WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
 {
 
-	device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1023,7 +1023,7 @@ WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 
 static INTERRUPT_GEN( bbakraid_snd_interrupt )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -3005,7 +3005,7 @@ static void irqhandler(device_t *device, int linestate)
 	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
 
 	if (state->m_sub_cpu != NULL)		// wouldn't tekipaki have problem without this? "mcu" is not generally added
-		device_set_input_line(state->m_sub_cpu, 0, linestate);
+		state->m_sub_cpu->execute().set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

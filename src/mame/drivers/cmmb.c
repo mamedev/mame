@@ -303,7 +303,7 @@ static INTERRUPT_GEN( cmmb_irq )
 {
 	//if(device->machine().input().code_pressed_once(KEYCODE_Z))
 	//if(device->machine().input().code_pressed(KEYCODE_Z))
-//      device_set_input_line(device, 0, HOLD_LINE);
+//      device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_RESET( cmmb )

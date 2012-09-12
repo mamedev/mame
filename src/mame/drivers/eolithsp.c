@@ -30,7 +30,7 @@ void eolith_speedup_read(address_space *space)
 
 		if ((pc==eolith_speedup_address) || (pc==eolith_speedup_address2))
 		{
-			device_spin_until_trigger(&space->device(), 1000);
+			space->device().execute().spin_until_trigger(1000);
 		}
 	}
 }
@@ -121,7 +121,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
 
 	if (pc==0x400081ec)
 		if(!eolith_vblank)
-			device_eat_cycles(m_maincpu, 500);
+			m_maincpu->eat_cycles(500);
 
 	return (machine().primary_screen->vpos() >= 240);
 }

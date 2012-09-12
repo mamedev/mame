@@ -349,7 +349,7 @@ static TIMER_CALLBACK( d65010_irq_on_cb )
 	int next_vpos = vpos + 12;
 
 	/* Set IRQ line and schedule release of IRQ line */
-	device_set_input_line( state->m_maincpu, 0, ASSERT_LINE );
+	state->m_maincpu->set_input_line(0, ASSERT_LINE );
 	state->m_irq_off_timer->adjust( state->m_screen->time_until_pos(vpos, 380/2 ) );
 
 	/* Schedule next IRQ trigger */
@@ -365,7 +365,7 @@ static TIMER_CALLBACK( d65010_irq_off_cb )
 {
 	pv1000_state *state = machine.driver_data<pv1000_state>();
 
-	device_set_input_line( state->m_maincpu, 0, CLEAR_LINE );
+	state->m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
 

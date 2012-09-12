@@ -24,7 +24,7 @@ public:
 	int        m_videobank;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_k052109;
 	device_t *m_k053244;
 	device_t *m_k053251;

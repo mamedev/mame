@@ -698,7 +698,7 @@ static const ay8910_interface ay8910_config =
 static INTERRUPT_GEN( skylncr_vblank_interrupt )
 {
 	skylncr_state *state = device->machine().driver_data<skylncr_state>();
-	if (state->m_nmi_enable) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_nmi_enable) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

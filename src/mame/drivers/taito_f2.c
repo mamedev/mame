@@ -575,13 +575,13 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+	state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
-	device_set_input_line(device, 5, HOLD_LINE);
+	device->execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -603,7 +603,7 @@ WRITE8_MEMBER(taitof2_state::sound_bankswitch_w)
 READ8_MEMBER(taitof2_state::driveout_sound_command_r)
 {
 
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n", m_driveout_sound_latch);
 	return m_driveout_sound_latch;
 }
@@ -644,7 +644,7 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 			else
 			{
 				m_driveout_sound_latch = ((data << 4) & 0xf0) | (m_driveout_sound_latch & 0x0f);
-				device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+				m_audiocpu->set_input_line(0, ASSERT_LINE);
 			}
 		}
 	}
@@ -2811,7 +2811,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	taitof2_state *state = device->machine().driver_data<taitof2_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3020,8 +3020,8 @@ static MACHINE_START( common )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");;
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");;
 	state->m_tc0100scn = machine.device("tc0100scn");;
 	state->m_tc0100scn_1 = machine.device("tc0100scn_1");;
 	state->m_tc0100scn_2 = machine.device("tc0100scn_2");;

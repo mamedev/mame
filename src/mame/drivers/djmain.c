@@ -408,7 +408,7 @@ static INTERRUPT_GEN( vb_interrupt )
 	}
 
 	//logerror("V-Blank interrupt\n");
-	device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+	device->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 }
 
 

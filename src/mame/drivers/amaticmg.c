@@ -908,7 +908,7 @@ static INTERRUPT_GEN( amaticmg2_irq )
 	amaticmg_state *state = device->machine().driver_data<amaticmg_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -579,7 +579,7 @@ void x07_state::t6834_r ()
 		m_regs_r[0]  = 0x40;
 		m_regs_r[1] = m_out.data[m_out.read];
 		m_regs_r[2] |= 0x01;
-		device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
+		m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
 		m_rsta_clear->adjust(attotime::from_msec(50));
 	}
 }
@@ -648,7 +648,7 @@ void x07_state::t6834_w ()
 				m_regs_r[0]  = 0x40;
 				m_regs_r[1] = m_out.data[m_out.read];
 				m_regs_r[2] |= 0x01;
-				device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
+				m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
 				m_rsta_clear->adjust(attotime::from_msec(50));
 			}
 		}
@@ -805,7 +805,7 @@ void x07_state::receive_bit(int bit)
 		m_cass_data = 0;
 		m_bit_count = 0;
 
-		device_set_input_line(m_maincpu, NSC800_RSTB, ASSERT_LINE);
+		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 		m_rstb_clear->adjust(attotime::from_usec(200));
 
 	}
@@ -982,7 +982,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_break )
 			m_regs_r[0] = 0x80;
 			m_regs_r[1] = 0x05;
 			m_regs_r[2] |= 0x01;
-			device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE );
+			m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE );
 			m_rsta_clear->adjust(attotime::from_msec(50));
 		}
 	}
@@ -998,7 +998,7 @@ void x07_state::kb_irq()
 		memcpy(m_t6834_ram + 0x400, m_t6834_ram + 0x401, 0xff);
 		m_kb_size--;
 		m_regs_r[2] |= 0x01;
-		device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE);
+		m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
 		m_rsta_clear->adjust(attotime::from_msec(50));
 	}
 }
@@ -1370,7 +1370,7 @@ static TIMER_DEVICE_CALLBACK( blink_timer )
 static TIMER_CALLBACK( rsta_clear )
 {
 	x07_state *state = machine.driver_data<x07_state>();
-	device_set_input_line(state->m_maincpu, NSC800_RSTA, CLEAR_LINE);
+	state->m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
 
 	if (state->m_kb_size)
 		state->kb_irq();
@@ -1379,7 +1379,7 @@ static TIMER_CALLBACK( rsta_clear )
 static TIMER_CALLBACK( rstb_clear )
 {
 	x07_state *state = machine.driver_data<x07_state>();
-	device_set_input_line(state->m_maincpu, NSC800_RSTB, CLEAR_LINE);
+	state->m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( beep_stop )

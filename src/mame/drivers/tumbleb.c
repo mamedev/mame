@@ -441,7 +441,7 @@ static void tumbleb2_playmusic( device_t *device )
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
 	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
-	device_set_input_line(device, 6, HOLD_LINE);
+	device->execute().set_input_line(6, HOLD_LINE);
 	tumbleb2_playmusic(state->m_oki);
 }
 
@@ -701,7 +701,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16, tumbleb_state )
@@ -740,7 +740,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-		// device_spin_until_time(&space.device(), attotime::from_usec(100));
+		// space.device().execute().spin_until_time(attotime::from_usec(100));
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 	}
@@ -1867,8 +1867,8 @@ static MACHINE_START( tumbleb )
 {
 	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_oki = machine.device("oki");
 
 	state->save_item(NAME(state->m_music_command));
@@ -2044,7 +2044,7 @@ MACHINE_CONFIG_END
 static void semicom_irqhandler( device_t *device, int irq )
 {
 	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

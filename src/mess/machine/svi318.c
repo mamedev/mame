@@ -540,7 +540,7 @@ DRIVER_INIT_MEMBER(svi318_state,svi318)
 		m_svi.svi318 = 1;
 	}
 
-	device_set_input_line_vector(machine().device("maincpu"), 0, 0xff);
+	machine().device("maincpu")->execute().set_input_line_vector(0, 0xff);
 
 	/* memory */
 	m_svi.empty_bank = auto_alloc_array(machine(), UINT8, 0x8000);

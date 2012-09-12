@@ -343,7 +343,7 @@ WRITE8_MEMBER( v1050_state::dint_w )
 
 WRITE8_MEMBER( v1050_state::dvint_clr_w )
 {
-	device_set_input_line(m_subcpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 READ8_MEMBER( v1050_state::sasi_status_r )
@@ -604,7 +604,7 @@ static WRITE_LINE_DEVICE_HANDLER( pic_int_w )
 {
 	if (state == ASSERT_LINE)
 	{
-		device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -756,7 +756,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 	if (!m_f_int_enb)
 	{
 		set_interrupt(INT_FLOPPY, 0);
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 	// baud select
@@ -948,11 +948,11 @@ WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
 {
 	if (m_f_int_enb)
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, state);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 	}
 	else
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -1013,7 +1013,7 @@ static IRQ_CALLBACK( v1050_int_ack )
 
 	//logerror("Interrupt Acknowledge Vector: %02x\n", vector);
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	return vector;
 }
@@ -1033,7 +1033,7 @@ void v1050_state::machine_start()
 	m_rtc->cs1_w(1);
 
 	// set CPU interrupt callback
-	device_set_irq_callback(m_maincpu, v1050_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(v1050_int_ack);
 
 	// setup memory banking
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();

@@ -121,7 +121,7 @@ static MACHINE_RESET( polyplay )
 
 static INTERRUPT_GEN( periodic_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x4e);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4e);
 }
 
 
@@ -134,7 +134,7 @@ static INTERRUPT_GEN( coin_interrupt )
 	else
 	{
 		if (state->m_last == 0)    /* coin inserted */
-			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50);
+			device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x50);
 
 		state->m_last = 1;
 	}

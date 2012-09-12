@@ -24,7 +24,7 @@ public:
 	int        m_prev_coin;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_mb14241;
 	DECLARE_READ8_MEMBER(fgoal_analog_r);
 	DECLARE_READ8_MEMBER(fgoal_nmi_reset_r);

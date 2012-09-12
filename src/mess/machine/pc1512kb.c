@@ -299,7 +299,7 @@ void pc1512_keyboard_device::device_start()
 
 void pc1512_keyboard_device::device_reset()
 {
-	device_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
 }
 
 
@@ -311,7 +311,7 @@ void pc1512_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, 
 {
 	if (!m_clock_in)
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -340,7 +340,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_device::clock_w )
 		}
 		else
 		{
-			device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}
 

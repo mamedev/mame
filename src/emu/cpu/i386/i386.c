@@ -646,7 +646,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 		if(trap_level >= 3)
 		{
 			logerror("IRQ: Triple fault. CPU reset.\n");
-			device_set_input_line(cpustate->device, INPUT_LINE_RESET, PULSE_LINE);
+			cpustate->device->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			return;
 		}
 

@@ -337,19 +337,19 @@ static void ps_intc_set_interrupt_line(running_machine &machine, UINT32 line, in
 	}
 	if(drvstate->m_intc_regs.hold & drvstate->m_intc_regs.enable & PS_INT_IRQ_MASK)
 	{
-		device_set_input_line(machine.device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line(machine.device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 	if(drvstate->m_intc_regs.hold & drvstate->m_intc_regs.enable & PS_INT_FIQ_MASK)
 	{
-		device_set_input_line(machine.device("maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
+		machine.device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line(machine.device("maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
+		machine.device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 

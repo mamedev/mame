@@ -391,7 +391,7 @@ static I8257_INTERFACE( hb_dma )
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-    device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+    device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -711,13 +711,13 @@ WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 
 	if (data & 1)
 	{
-		device_set_input_line(m_dev_n2a03a, INPUT_LINE_RESET, CLEAR_LINE);
-		device_set_input_line(m_dev_n2a03b, INPUT_LINE_RESET, CLEAR_LINE);
+		m_dev_n2a03a->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dev_n2a03b->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		device_set_input_line(m_dev_n2a03a, INPUT_LINE_RESET, ASSERT_LINE);
-		device_set_input_line(m_dev_n2a03b, INPUT_LINE_RESET, ASSERT_LINE);
+		m_dev_n2a03a->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_dev_n2a03b->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -1650,7 +1650,7 @@ static INTERRUPT_GEN( vblank_irq )
 	dkong_state *state = device->machine().driver_data<dkong_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( dkong_base, dkong_state )

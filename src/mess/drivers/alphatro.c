@@ -178,7 +178,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 
 INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )

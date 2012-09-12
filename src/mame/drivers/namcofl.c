@@ -261,7 +261,7 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		device_yield(&space.device());
+		space.device().execute().yield();
 	}
 }
 
@@ -548,21 +548,21 @@ static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
 {
 	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
 
-	device_set_input_line(state->m_mcu, M37710_LINE_IRQ0, HOLD_LINE);
+	state->m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
 {
 	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
 
-	device_set_input_line(state->m_mcu, M37710_LINE_IRQ2, HOLD_LINE);
+	state->m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
 {
 	namcofl_state *state = timer.machine().driver_data<namcofl_state>();
 
-	device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
+	state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 

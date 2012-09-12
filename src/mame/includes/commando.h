@@ -31,7 +31,7 @@ public:
 	UINT8 m_scroll_y[2];
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(commando_videoram_w);
 	DECLARE_WRITE8_MEMBER(commando_colorram_w);
 	DECLARE_WRITE8_MEMBER(commando_videoram2_w);

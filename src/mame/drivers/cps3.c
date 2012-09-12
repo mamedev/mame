@@ -2247,7 +2247,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN(cps3_vbl_interrupt)
 {
-	device_set_input_line(device,12, ASSERT_LINE);
+	device->execute().set_input_line(12, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(cps3_other_interrupt)
@@ -2255,7 +2255,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)
 	// what is the REAL source of IRQ10??
-	device_set_input_line(device,10, ASSERT_LINE);
+	device->execute().set_input_line(10, ASSERT_LINE);
 }
 
 

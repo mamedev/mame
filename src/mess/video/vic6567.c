@@ -377,7 +377,7 @@ INLINE void vic2_suspend_cpu( running_machine &machine, vic2_state *vic2 )
 		vic2->first_ba_cycle = vic2->cycles_counter;
 		if (vic2->in_rdy_workaround_func(0) != 7 )
 		{
-//          device_suspend(machine.firstcpu, SUSPEND_REASON_SPIN, 0);
+//          machine.firstcpu->suspend(SUSPEND_REASON_SPIN, 0);
 		}
 		vic2->device_suspended = 1;
 	}
@@ -388,7 +388,7 @@ INLINE void vic2_resume_cpu( running_machine &machine, vic2_state *vic2 )
 {
 	if (vic2->device_suspended == 1)
 	{
-	//  device_resume(machine.firstcpu, SUSPEND_REASON_SPIN);
+	//  machine.firstcpu->resume(SUSPEND_REASON_SPIN);
 		vic2->device_suspended = 0;
 	}
 }
@@ -1607,7 +1607,7 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 
 	if ((cpu_cycles == vic_cycles) && (vic2->rdy_cycles > 0))
 	{
-		device_spin_until_time (machine.firstcpu, vic2->cpu->cycles_to_attotime(vic2->rdy_cycles));
+		machine.firstcpu->spin_until_time(vic2->cpu->cycles_to_attotime(vic2->rdy_cycles));
 		vic2->rdy_cycles = 0;
 	}
 

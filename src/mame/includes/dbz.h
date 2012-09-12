@@ -28,8 +28,8 @@ public:
 	int           m_control;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k053246;
 	device_t *m_k053251;
 	device_t *m_k056832;

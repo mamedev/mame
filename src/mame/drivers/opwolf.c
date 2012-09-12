@@ -693,7 +693,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	opwolf_state *state = device->machine().driver_data<opwolf_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -37,7 +37,7 @@ static READ32_HANDLER( arm7_latch_arm_r )
 {
 	pgm_arm_type2_state *state = space->machine().driver_data<pgm_arm_type2_state>();
 
-	device_set_input_line(state->m_prot, ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
+	state->m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
 
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_kov2_latchdata_68k_w, mem_mask, space->device().safe_pc());
@@ -89,7 +89,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, space->device().safe_pc());
 	COMBINE_DATA(&state->m_kov2_latchdata_68k_w);
 
-	device_set_input_line(state->m_prot, ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
+	state->m_prot->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
 }
 
 static READ16_HANDLER( arm7_ram_r )
@@ -271,7 +271,7 @@ static READ32_HANDLER( ddp2_speedup_r )
 		if (r4==0x18002f9e)
 		{
 			UINT32 data2 =  state->m_arm_ram[0x2F9C/4]&0xffff0000;
-			if ((data==0x00000000) && (data2==0x00000000)) device_spin_until_interrupt(&space->device());
+			if ((data==0x00000000) && (data2==0x00000000)) space->device().execute().spin_until_interrupt();
 		}
 	}
 
@@ -284,8 +284,8 @@ static READ16_HANDLER( ddp2_main_speedup_r )
 	UINT16 data = pgm_mainram[0x0ee54/2];
 	int pc = space->device().safe_pc();
 
-	if (pc == 0x149dce) device_spin_until_interrupt(&space->device());
-	if (pc == 0x149cfe) device_spin_until_interrupt(&space->device());
+	if (pc == 0x149dce) space->device().execute().spin_until_interrupt();
+	if (pc == 0x149cfe) space->device().execute().spin_until_interrupt();
 
 	return data;
 

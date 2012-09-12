@@ -69,9 +69,9 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 	m_bank = data;
 
 	if (m_bank)
-		m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
 	else
-		m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x800f, "bank1");
+		m_maincpu->space(AS_PROGRAM)->install_read_bank(0x8000, 0x800f, "bank1");
 }
 
 READ8_MEMBER(liberate_state::prosoccr_bank_r)
@@ -174,9 +174,9 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 	m_bank = data & 1;
 
 	if (m_bank)
-		m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
 	else
-		m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
+		m_maincpu->space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
 
 }
 
@@ -766,7 +766,7 @@ static INTERRUPT_GEN( deco16_interrupt )
 	int p = ~state->ioport("IN3")->read();
 	if ((p & 0x43) && !state->m_latch)
 	{
-		device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
+		device->execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 		state->m_latch = 1;
 	}
 	else
@@ -780,7 +780,7 @@ static INTERRUPT_GEN( deco16_interrupt )
 static INTERRUPT_GEN( prosport_interrupt )
 {
 	/* ??? */
-	device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
+	device->execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -794,8 +794,8 @@ static MACHINE_START( liberate )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_background_disable));
 	state->save_item(NAME(state->m_background_color));

@@ -3249,7 +3249,7 @@ static INTERRUPT_GEN( suzume_irq )
 {
 	royalmah_state *state = device->machine().driver_data<royalmah_state>();
 	if ( state->m_suzume_bank & 0x40 )
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( suzume, dondenmj )
@@ -3295,15 +3295,15 @@ static TIMER_DEVICE_CALLBACK( janptr96_interrupt )
 	int scanline = param;
 
 	if(scanline == 248)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x80);	// vblank
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x80);	// vblank
 
 	if(scanline == 0)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x84);	// demo
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x84);	// demo
 }
 
 WRITE_LINE_MEMBER(royalmah_state::janptr96_rtc_irq)
 {
-	device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0x82);	// rtc
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x82);	// rtc
 }
 
 static MSM6242_INTERFACE( janptr96_rtc_intf )
@@ -3353,12 +3353,12 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 {
 	royalmah_state *state = device->machine().driver_data<royalmah_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);	// vblank
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);	// vblank
 }
 
 WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);	// rtc
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);	// rtc
 }
 
 

@@ -98,8 +98,8 @@ public:
 	UINT8 m_soundlatch;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 
 #if 0
 	int m_dbg_info;
@@ -763,7 +763,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_zpu_int_req_set_w)
 
 	m_zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	device_set_input_line(m_maincpu, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	m_maincpu->set_input_line(0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
@@ -773,7 +773,7 @@ READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
 
 	/* clear the INT line when there are no more interrupt requests */
 	if (m_zpu_int_vector == 0xff)
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return 0;
 }
@@ -958,7 +958,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	state->m_soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(mazerbla_state::main_sound_w)
@@ -968,12 +968,12 @@ WRITE8_MEMBER(mazerbla_state::main_sound_w)
 
 WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
 {
-	device_set_input_line(m_subcpu, 0, CLEAR_LINE);
+	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mazerbla_state::sound_nmi_clear_w)
 {
-	device_set_input_line(m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1421,7 +1421,7 @@ static IRQ_CALLBACK(irq_callback)
 /* frequency is 14.318 MHz/16/16/16/16 */
 static INTERRUPT_GEN( sound_interrupt )
 {
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -1435,8 +1435,8 @@ static MACHINE_START( mazerbla )
 {
 	mazerbla_state *state = machine.driver_data<mazerbla_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_vcu_video_reg));
 	state->save_item(NAME(state->m_vcu_gfx_addr));
@@ -1502,7 +1502,7 @@ static MACHINE_RESET( mazerbla )
 
 	memset(state->m_lookup_ram, 0, ARRAY_LENGTH(state->m_lookup_ram));
 
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 

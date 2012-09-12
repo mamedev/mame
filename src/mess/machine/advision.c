@@ -40,11 +40,11 @@ void advision_state::machine_start()
 void advision_state::machine_reset()
 {
 	/* enable internal ROM */
-	device_set_input_line(m_maincpu, MCS48_INPUT_EA, CLEAR_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_EA, CLEAR_LINE);
 	membank("bank1")->set_entry(0);
 
 	/* reset sound CPU */
-	device_set_input_line(m_soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_rambank = 0x300;
 	m_frame_start = 0;
@@ -58,7 +58,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 {
 	int ea = BIT(data, 2);
 
-	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_EA, ea ? ASSERT_LINE : CLEAR_LINE);
 
 	membank("bank1")->set_entry(ea);
 
@@ -79,7 +79,7 @@ READ8_MEMBER( advision_state::ext_ram_r )
 
 	if (m_video_bank == 0x06)
 	{
-		device_set_input_line(m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	return data;

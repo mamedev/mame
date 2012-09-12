@@ -261,7 +261,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 
 WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 {
-	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
@@ -308,7 +308,7 @@ WRITE8_MEMBER(airbustr_state::soundcommand_w)
 {
 	soundlatch_byte_w(space, 0, data);
 	m_soundlatch_status = 1;	// soundlatch has been written
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 WRITE8_MEMBER(airbustr_state::soundcommand2_w)
@@ -563,7 +563,7 @@ static TIMER_DEVICE_CALLBACK( airbustr_scanline )
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
 static INTERRUPT_GEN( slave_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfd);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }
 
 /* Machine Initialization */
@@ -584,7 +584,7 @@ static MACHINE_START( airbustr )
 
 	state->m_master = machine.device("master");
 	state->m_slave = machine.device("slave");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_pandora = machine.device("pandora");
 
 	state->save_item(NAME(state->m_soundlatch_status));

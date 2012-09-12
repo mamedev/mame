@@ -487,7 +487,7 @@ static const hc11_config hitpoker_config =
 
 static INTERRUPT_GEN( hitpoker_irq )
 {
-	device_set_input_line(device, MC68HC11_IRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( hitpoker, hitpoker_state )

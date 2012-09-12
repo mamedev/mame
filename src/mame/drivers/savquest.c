@@ -446,7 +446,7 @@ static const struct pit8253_config savquest_pit8254_config =
 
 WRITE_LINE_MEMBER(savquest_state::savquest_pic8259_1_set_int_line)
 {
-	device_set_input_line(m_maincpu, 0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( savquest_state::get_slave_ack )
@@ -476,7 +476,7 @@ static void set_gate_a20(running_machine &machine, int a20)
 {
 	savquest_state *state = machine.driver_data<savquest_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_A20, a20);
+	state->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine &machine, int state)
@@ -523,7 +523,7 @@ static MACHINE_START( savquest )
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, savquest_set_keyb_int);
 
-	device_set_irq_callback(state->m_maincpu, irq_callback);
+	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);

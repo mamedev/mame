@@ -39,7 +39,7 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 	if ((data & 0x80) == 0)
 		soundlatch_byte_w(space, 0, data & 0x7f);
 	else
-		device_set_input_line(m_soundcpu, 0, ASSERT_LINE);
+		m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -97,7 +97,7 @@ READ8_MEMBER(kncljoe_state::m6803_port2_r)
 
 WRITE8_MEMBER(kncljoe_state::sound_irq_ack_w)
 {
-	device_set_input_line(m_soundcpu, 0, CLEAR_LINE);
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(kncljoe_state::unused_w)
@@ -259,14 +259,14 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN (sound_nmi)
 {
-	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( kncljoe )
 {
 	kncljoe_state *state = machine.driver_data<kncljoe_state>();
 
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 
 	state->save_item(NAME(state->m_port1));
 	state->save_item(NAME(state->m_port2));

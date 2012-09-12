@@ -463,7 +463,7 @@ static INTERRUPT_GEN( pturn_sub_intgen )
 	pturn_state *state = device->machine().driver_data<pturn_state>();
 	if(state->m_nmi_sub)
 	{
-		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -472,7 +472,7 @@ static INTERRUPT_GEN( pturn_main_intgen )
 	pturn_state *state = device->machine().driver_data<pturn_state>();
 	if (state->m_nmi_main)
 	{
-		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 

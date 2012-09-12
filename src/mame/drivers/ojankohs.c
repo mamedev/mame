@@ -89,7 +89,7 @@ static void ojankohs_adpcm_int( device_t *device )
 
 	/* generate an NMI if we're out of data */
 	if (!state->m_vclk_left)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
@@ -793,7 +793,7 @@ static MACHINE_START( common )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_msm = machine.device("msm");
 
 	state->save_item(NAME(state->m_gfxreg));

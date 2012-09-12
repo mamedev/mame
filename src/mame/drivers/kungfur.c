@@ -88,7 +88,7 @@ static INTERRUPT_GEN( kungfur_irq )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	if (state->m_control & 0x10)
-		device_set_input_line(device, M6809_IRQ_LINE, ASSERT_LINE);
+		device->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 

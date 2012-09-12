@@ -68,7 +68,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
 WRITE8_MEMBER(funybubl_state::funybubl_soundcommand_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(funybubl_state::funybubl_oki_bank_sw)
@@ -205,7 +205,7 @@ static MACHINE_START( funybubl )
 	funybubl_state *state = machine.driver_data<funybubl_state>();
 	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_banked_vram));
 

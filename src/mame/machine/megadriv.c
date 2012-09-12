@@ -1019,12 +1019,12 @@ MACHINE_RESET( megadriv )
 	/* if any of these extra CPUs exist, pause them until we actually turn them on */
 	if (_32x_master_cpu != NULL)
 	{
-		device_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		_32x_master_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	if (_32x_slave_cpu != NULL)
 	{
-		device_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		_32x_slave_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	if (_segacd_68k_cpu != NULL )
@@ -1427,7 +1427,7 @@ static void megadriv_init_common(running_machine &machine)
 		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag() );
 	}
 
-	device_set_irq_callback(machine.device("maincpu"), genesis_int_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 

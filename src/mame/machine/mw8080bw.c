@@ -53,7 +53,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	int vpos = machine.primary_screen->vpos();
 	UINT8 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, vector);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == MW8080BW_INT_TRIGGER_COUNT_1)

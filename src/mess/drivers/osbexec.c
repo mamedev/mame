@@ -98,9 +98,9 @@ public:
 	void update_irq_state(running_machine &machine)
 	{
 		if ( m_pia0_irq_state || m_pia1_irq_state )
-			device_set_input_line( m_maincpu, 0, ASSERT_LINE );
+			m_maincpu->set_input_line(0, ASSERT_LINE );
 		else
-			device_set_input_line( m_maincpu, 0, CLEAR_LINE );
+			m_maincpu->set_input_line(0, CLEAR_LINE );
 	}
 	DECLARE_WRITE8_MEMBER(osbexec_0000_w);
 	DECLARE_READ8_MEMBER(osbexec_c000_r);

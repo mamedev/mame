@@ -709,9 +709,9 @@ static MACHINE_RESET( magicard )
 static INTERRUPT_GEN( magicard_irq )
 {
 	if(device->machine().input().code_pressed(KEYCODE_Z)) //vblank?
-		device_set_input_line_and_vector(device, 1, HOLD_LINE,0xe4/4);
+		device->execute().set_input_line_and_vector(1, HOLD_LINE,0xe4/4);
 	if(device->machine().input().code_pressed(KEYCODE_X)) //uart irq
-		device_set_input_line_and_vector(device, 1, HOLD_LINE,0xf0/4);
+		device->execute().set_input_line_and_vector(1, HOLD_LINE,0xf0/4);
 }
 
 static MACHINE_CONFIG_START( magicard, magicard_state )

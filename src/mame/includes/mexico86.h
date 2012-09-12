@@ -32,9 +32,9 @@ public:
 	int      m_coin_last;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_subcpu;
 	device_t *m_mcu;
 
 	/* queue */

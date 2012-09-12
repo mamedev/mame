@@ -49,5 +49,5 @@ INTERRUPT_GEN( aztarac_snd_timed_irq )
     state->m_sound_status ^= 0x10;
 
     if (state->m_sound_status & 0x10)
-        device_set_input_line(device,0,HOLD_LINE);
+        device->execute().set_input_line(0,HOLD_LINE);
 }

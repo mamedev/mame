@@ -2205,7 +2205,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	// set CPU interrupt callback
-	device_set_irq_callback(m_maincpu, atarist_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
 
 	// allocate timers
 	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(st_mouse_tick));
@@ -2262,7 +2262,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	/* set CPU interrupt callback */
-	device_set_irq_callback(m_maincpu, atarist_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
 
 	/* allocate timers */
 	m_dmasound_timer = machine().scheduler().timer_alloc(FUNC(atariste_dmasound_tick));
@@ -2302,7 +2302,7 @@ void stbook_state::machine_start()
 	}
 
 	/* set CPU interrupt callback */
-	device_set_irq_callback(m_maincpu, atarist_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
 
 	/* register for state saving */
 	ste_state::state_save();

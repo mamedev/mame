@@ -142,11 +142,11 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 				watchdog_reset_w(space, 0, data);
 			else{
 				if (m_firq_enable)	/* Cause interrupt on slave CPU */
-					device_set_input_line(m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+					m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
 			soundlatch_byte_w(space, offset, data);
@@ -206,9 +206,9 @@ MACHINE_START( ajax )
 	state->membank("bank1")->set_entry(0);
 	state->membank("bank2")->set_entry(0);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_k007232_1 = machine.device("k007232_1");
 	state->m_k007232_2 = machine.device("k007232_2");
 	state->m_k052109 = machine.device("k052109");
@@ -232,5 +232,5 @@ INTERRUPT_GEN( ajax_interrupt )
 	ajax_state *state = device->machine().driver_data<ajax_state>();
 
 	if (k051960_is_irq_enabled(state->m_k051960))
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }

@@ -1080,7 +1080,7 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 {
 //  MLOG1(("driver_init_dn3500"));
 
-	device_set_irq_callback(machine().device(MAINCPU), apollo_irq_acknowledge);
+	machine().device(MAINCPU)->execute().set_irq_acknowledge_callback(apollo_irq_acknowledge);
 
 	/* hook the RESET line, which resets a slew of other components */
 	m68k_set_reset_callback(machine().device(MAINCPU), apollo_reset_instr_callback);

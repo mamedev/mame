@@ -998,7 +998,7 @@ MACHINE_RESET( pk8020 )
 {
 	pk8020_state *state = machine.driver_data<pk8020_state>();
 	pk8020_set_bank(machine,0);
-	device_set_irq_callback(machine.device("maincpu"), pk8020_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pk8020_irq_callback);
 
 	state->m_sound_gate = 0;
 	state->m_sound_level = 0;

@@ -42,7 +42,7 @@ public:
 	INT32 m_last_steering_val;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_discrete;
 	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
 	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);

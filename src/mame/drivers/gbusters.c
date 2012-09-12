@@ -24,7 +24,7 @@ static INTERRUPT_GEN( gbusters_interrupt )
 	gbusters_state *state = device->machine().driver_data<gbusters_state>();
 
 	if (k052109_is_irq_enabled(state->m_k052109))
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(gbusters_state::bankedram_r)
@@ -101,7 +101,7 @@ char baf[40];
 
 WRITE8_MEMBER(gbusters_state::gbusters_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(gbusters_state::gbusters_snd_bankswitch_w)
@@ -276,8 +276,8 @@ static MACHINE_START( gbusters )
 
 	state->m_generic_paletteram_8.allocate(0x800);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");
 	state->m_k007232 = machine.device("k007232");

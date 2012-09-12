@@ -663,7 +663,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
 	/* assert the NMI and set a timer to clear it at the first visible line */
-	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(nmi_clear));
 
 	/* if we have a laserdisc, update it */

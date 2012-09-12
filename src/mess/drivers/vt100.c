@@ -356,7 +356,7 @@ static MACHINE_RESET(vt100)
 
 	state->m_key_scan = 0;
 
-	device_set_irq_callback(machine.device("maincpu"), vt100_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(vt100_irq_callback);
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
@@ -381,7 +381,7 @@ static INTERRUPT_GEN( vt100_vertical_interrupt )
 {
 	vt100_state *state = device->machine().driver_data<vt100_state>();
 	state->m_vertical_int = 1;
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 /* F4 Character Displayer */

@@ -63,9 +63,9 @@ public:
 	int      m_nmimask;	// zerotrgt only
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_subcpu;
 	DECLARE_WRITE8_MEMBER(zerotrgt_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
@@ -460,42 +460,42 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 
 WRITE8_MEMBER(cntsteer_state::gekitsui_sub_irq_ack)
 {
-	device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n", space.device().safe_pc(), offset, data);
-//  if (offset == 0) device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset == 0) m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset == 1) device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset == 2) device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset == 1) m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset == 2) m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
 {
-	device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
 {
 //  if (data)
-//  device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+//  m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 {
-	device_set_input_line(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
@@ -594,7 +594,7 @@ static INTERRUPT_GEN ( sound_interrupt )
 {
 	cntsteer_state *state = device->machine().driver_data<cntsteer_state>();
 	if (!state->m_nmimask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
@@ -681,7 +681,7 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(cntsteer_state::coin_inserted)
 {
-	device_set_input_line(m_subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( cntsteer )
@@ -815,9 +815,9 @@ static MACHINE_START( cntsteer )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("subcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("subcpu");
 
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_bg_bank));

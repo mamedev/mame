@@ -397,7 +397,7 @@ static TIMER_CALLBACK( f3_interrupt3 )
 
 static INTERRUPT_GEN( f3_interrupt2 )
 {
-	device_set_input_line(device, 2, HOLD_LINE);	// vblank
+	device->execute().set_input_line(2, HOLD_LINE);	// vblank
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(10000), FUNC(f3_interrupt3));
 }
 

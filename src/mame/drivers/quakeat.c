@@ -158,7 +158,7 @@ static IRQ_CALLBACK(irq_callback)
 static MACHINE_START(quakeat)
 {
 	quakeat_state *state = machine.driver_data<quakeat_state>();
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
 	state->m_pic8259_2 = machine.device( "pic8259_2" );

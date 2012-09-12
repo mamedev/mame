@@ -355,17 +355,17 @@ ssfindo_speedup_func ssfindo_speedup;
 static void ssfindo_speedups(address_space* space)
 {
 	if (space->device().safe_pc()==0x2d6c8) // ssfindo
-		device_spin_until_time(&space->device(), attotime::from_usec(20));
+		space->device().execute().spin_until_time(attotime::from_usec(20));
 	else if (space->device().safe_pc()==0x2d6bc) // ssfindo
-		device_spin_until_time(&space->device(), attotime::from_usec(20));
+		space->device().execute().spin_until_time(attotime::from_usec(20));
 }
 
 static void ppcar_speedups(address_space* space)
 {
 	if (space->device().safe_pc()==0x000bc8) // ppcar
-		device_spin_until_time(&space->device(), attotime::from_usec(20));
+		space->device().execute().spin_until_time(attotime::from_usec(20));
 	else if (space->device().safe_pc()==0x000bbc) // ppcar
-		device_spin_until_time(&space->device(), attotime::from_usec(20));
+		space->device().execute().spin_until_time(attotime::from_usec(20));
 }
 
 

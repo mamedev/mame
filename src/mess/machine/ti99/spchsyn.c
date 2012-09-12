@@ -108,7 +108,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 {
 	if ((offset & m_select_mask)==m_select_value)
 	{
-		device_adjust_icount(machine().device("maincpu"),-(18+3));		/* this is just a minimum, it can be more */
+		machine().device("maincpu")->execute().adjust_icount(-(18+3));		/* this is just a minimum, it can be more */
 		*value = m_vsp->read(space, offset, 0xff) & 0xff;
 		if (VERBOSE>4) LOG("spchsyn: read value = %02x\n", *value);
 	}
@@ -121,7 +121,7 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 {
 	if ((offset & m_select_mask)==(m_select_value | 0x0400))
 	{
-		device_adjust_icount(machine().device("maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
+		machine().device("maincpu")->execute().adjust_icount(-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 		/* RN: the stupid design of the tms5220 core means that ready is cleared */
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
@@ -133,7 +133,7 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 			int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 			if (VERBOSE>8) LOG("spchsyn: time to ready: %f -> %d\n", time_to_ready.as_double(), (int) cycles_to_ready);
 
-			device_adjust_icount(machine().device("maincpu"),-cycles_to_ready);
+			machine().device("maincpu")->execute().adjust_icount(-cycles_to_ready);
 			machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
 		}
 		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);

@@ -16,7 +16,7 @@ static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
 	state->m_int_vector = 0xe7;
-	device_set_input_line(machine.device("maincpu"), 0, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
@@ -210,7 +210,7 @@ DRIVER_INIT_MEMBER(poly88_state,poly88)
 MACHINE_RESET(poly88)
 {
 	poly88_state *state = machine.driver_data<poly88_state>();
-	device_set_irq_callback(machine.device("maincpu"), poly88_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(poly88_irq_callback);
 	state->m_intr = 0;
 	state->m_last_code = 0;
 
@@ -221,14 +221,14 @@ INTERRUPT_GEN( poly88_interrupt )
 {
 	poly88_state *state = device->machine().driver_data<poly88_state>();
 	state->m_int_vector = 0xf7;
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( poly88_usart_rxready )
 {
 	//poly88_state *drvstate = device->machine().driver_data<poly88_state>();
 	//drvstate->m_int_vector = 0xe7;
-	//device_set_input_line(device, 0, HOLD_LINE);
+	//device->execute().set_input_line(0, HOLD_LINE);
 }
 
 const i8251_interface poly88_usart_interface=

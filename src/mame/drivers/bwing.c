@@ -37,7 +37,7 @@ static INTERRUPT_GEN ( bwp3_interrupt )
 	bwing_state *state = device->machine().driver_data<bwing_state>();
 
 	if (!state->m_bwp3_nmimask)
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 //****************************************************************************
@@ -60,7 +60,7 @@ WRITE8_MEMBER(bwing_state::bwp3_nmimask_w)
 
 WRITE8_MEMBER(bwing_state::bwp3_nmiack_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -83,16 +83,16 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 	switch (offset)
 	{
 		// MSSTB
-		case 0: device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE); break;
+		case 0: m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); break;
 
 		// IRQACK
-		case 1: device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE); break;
+		case 1: m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); break;
 
 		// FIRQACK
-		case 2: device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE); break;
+		case 2: m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); break;
 
 		// NMIACK
-		case 3: device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE); break;
+		case 3: m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); break;
 
 		// SWAP(bank-swaps sprite RAM between 1800 & 1900; ignored bc. they're treated as a single chunk.)
 		case 4: break;
@@ -100,11 +100,11 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 		// SNDREQ
 		case 5:
 			if (data == 0x80) // protection trick to screw CPU1 & 3
-				device_set_input_line(m_subcpu, INPUT_LINE_NMI, ASSERT_LINE); // SNMI
+				m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			{
 				soundlatch_byte_w(space, 0, data);
-				device_set_input_line(m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
+				m_audiocpu->set_input_line(DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
 
@@ -125,13 +125,13 @@ WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 {
 	switch (offset)
 	{
-		case 0: device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
+		case 0: m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
 
-		case 1: device_set_input_line(m_subcpu, M6809_FIRQ_LINE, CLEAR_LINE); break;
+		case 1: m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); break;
 
-		case 2: device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE); break;
+		case 2: m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); break;
 
-		case 3: device_set_input_line(m_subcpu, INPUT_LINE_NMI, CLEAR_LINE); break;
+		case 3: m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); break;
 	}
 
 	#if BW_DEBUG
@@ -337,9 +337,9 @@ static MACHINE_START( bwing )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_palatch));
 	state->save_item(NAME(state->m_srbank));

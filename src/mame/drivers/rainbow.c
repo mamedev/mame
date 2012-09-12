@@ -335,7 +335,7 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -626,7 +626,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	rbisland_state *state = device->machine().driver_data<rbisland_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -666,8 +666,8 @@ static MACHINE_START( rbisland )
 {
 	rbisland_state *state = machine.driver_data<rbisland_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_pc080sn = machine.device("pc080sn");
 	state->m_pc090oj = machine.device("pc090oj");
 }

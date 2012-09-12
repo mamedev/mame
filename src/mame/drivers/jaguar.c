@@ -895,7 +895,7 @@ READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (m_main_speedup_hits++ > 5)
 		{
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 			m_main_speedup_hits = 0;
 		}
 	}
@@ -936,7 +936,7 @@ READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 READ32_MEMBER(jaguar_state::main_gpu_wait_r)
 {
 	if (m_gpu_command_pending)
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 	return *m_main_gpu_wait;
 }
 
@@ -972,7 +972,7 @@ WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (m_main_speedup_hits++ > 5)
 		{
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 			m_main_speedup_hits = 0;
 		}
 	}
@@ -1006,7 +1006,7 @@ WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (m_main_speedup_hits++ > 10)
 		{
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 			m_main_speedup_hits = 0;
 		}
 	}

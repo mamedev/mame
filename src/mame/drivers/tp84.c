@@ -284,7 +284,7 @@ static INTERRUPT_GEN( sub_vblank_irq )
 	tp84_state *state = device->machine().driver_data<tp84_state>();
 
 	if(state->m_sub_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 

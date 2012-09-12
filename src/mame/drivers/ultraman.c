@@ -27,7 +27,7 @@ WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
 {
 
 	if (ACCESSING_BITS_0_7)
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -194,8 +194,8 @@ static MACHINE_START( ultraman )
 {
 	ultraman_state *state = machine.driver_data<ultraman_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k051960 = machine.device("k051960");
 	state->m_k051316_1 = machine.device("k051316_1");
 	state->m_k051316_2 = machine.device("k051316_2");

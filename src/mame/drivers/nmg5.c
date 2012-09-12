@@ -256,8 +256,8 @@ public:
 	UINT8 m_gfx_bank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_soundcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_soundcpu;
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
@@ -294,7 +294,7 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -974,7 +974,7 @@ GFXDECODE_END
 static void soundirq( device_t *device, int state )
 {
 	nmg5_state *driver_state = device->machine().driver_data<nmg5_state>();
-	device_set_input_line(driver_state->m_soundcpu, 0, state);
+	driver_state->m_soundcpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_intf =
@@ -986,8 +986,8 @@ static MACHINE_START( nmg5 )
 {
 	nmg5_state *state = machine.driver_data<nmg5_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 
 	state->save_item(NAME(state->m_gfx_bank));
 	state->save_item(NAME(state->m_priority_reg));

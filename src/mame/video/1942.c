@@ -180,7 +180,7 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 
 	coin_counter_w(machine(), 0,data & 0x01);
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	flip_screen_set(data & 0x80);
 }

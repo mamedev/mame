@@ -73,7 +73,7 @@ Mighty Guy board layout:
 WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE );
+	m_audiocpu->set_input_line(0, ASSERT_LINE );
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_command_r)
@@ -104,13 +104,13 @@ CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)
 {
 
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE );
+	m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
 {
 
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE );
+	m_audiocpu->set_input_line(0, CLEAR_LINE );
 	return 0;
 }
 

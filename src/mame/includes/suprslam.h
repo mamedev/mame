@@ -35,7 +35,7 @@ public:
 	int         m_pending_command;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k053936;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ16_MEMBER(pending_command_r);

@@ -56,7 +56,7 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -279,7 +279,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int linestate)
 {
 	actfancr_state *state = device->machine().driver_data<actfancr_state>();
-	device_set_input_line(state->m_audiocpu, 0, linestate); /* IRQ */
+	state->m_audiocpu->set_input_line(0, linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -293,8 +293,8 @@ static MACHINE_START( actfancr )
 {
 	actfancr_state *state = machine.driver_data<actfancr_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 static MACHINE_START( triothep )

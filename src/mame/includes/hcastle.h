@@ -34,7 +34,7 @@ public:
 	int        m_gfx_bank;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
 

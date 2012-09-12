@@ -61,7 +61,7 @@ public:
 	UINT8     m_gfx_banking;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 	/* memory */
 	required_shared_ptr<UINT8> m_atram;
@@ -203,7 +203,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(egghunt_state::egghunt_okibanking_r)
@@ -391,7 +391,7 @@ static MACHINE_START( egghunt )
 {
 	egghunt_state *state = machine.driver_data<egghunt_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_gfx_banking));
 	state->save_item(NAME(state->m_okibanking));

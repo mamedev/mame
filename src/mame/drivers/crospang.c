@@ -318,7 +318,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	crospang_state *state = device->machine().driver_data<crospang_state>();
-	device_set_input_line(state->m_audiocpu, 0, linestate);
+	state->m_audiocpu->set_input_line(0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -331,7 +331,7 @@ static MACHINE_START( crospang )
 {
 	crospang_state *state = machine.driver_data<crospang_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_bestri_tilebank));
 

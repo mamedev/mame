@@ -23,7 +23,7 @@ public:
 	int        m_palette_selected;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_READ8_MEMBER(skyfox_vregs_r);
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);

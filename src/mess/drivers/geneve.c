@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( geneve::video_wait_states )
 WRITE8_MEMBER( geneve::tms9901_interrupt )
 {
 	/* INTREQ is connected to INT1. */
-	device_execute(m_cpu)->set_input_line(INPUT_LINE_99XX_INT1, data);
+	m_cpu->set_input_line(INPUT_LINE_99XX_INT1, data);
 }
 
 /* tms9901 setup */
@@ -585,7 +585,7 @@ WRITE_LINE_MEMBER( geneve::inta )
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(1, state);
-	device_execute(m_cpu)->set_input_line(INPUT_LINE_99XX_INT4, state);
+	m_cpu->set_input_line(INPUT_LINE_99XX_INT4, state);
 }
 
 /*

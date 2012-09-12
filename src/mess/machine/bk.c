@@ -74,14 +74,14 @@ MACHINE_START(bk0010)
 static IRQ_CALLBACK(bk0010_irq_callback)
 {
 	bk_state *state = device->machine().driver_data<bk_state>();
-	device_set_input_line(device, 0, CLEAR_LINE);
+	device->execute().set_input_line(0, CLEAR_LINE);
 	return state->m_key_irq_vector;
 }
 
 MACHINE_RESET( bk0010 )
 {
 	bk_state *state = machine.driver_data<bk_state>();
-	device_set_irq_callback(machine.device("maincpu"), bk0010_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(bk0010_irq_callback);
 
 	state->m_kbd_state = 0;
 	state->m_scrool = 01330;

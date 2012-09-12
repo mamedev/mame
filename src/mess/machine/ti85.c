@@ -22,7 +22,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 	{
 		if (state->m_ON_interrupt_mask && !state->m_ON_pressed)
 		{
-			device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+			state->m_maincpu->set_input_line(0, HOLD_LINE);
 			state->m_ON_interrupt_status = 1;
 			if (!state->m_timer_interrupt_mask) state->m_timer_interrupt_mask = 1;
 		}
@@ -33,7 +33,7 @@ static TIMER_CALLBACK(ti85_timer_callback)
 		state->m_ON_pressed = 0;
 	if (state->m_timer_interrupt_mask)
 	{
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 		state->m_timer_interrupt_status = 1;
 	}
 }
@@ -604,9 +604,9 @@ static void ti8x_snapshot_setup_registers (running_machine &machine, UINT8 * dat
 
 	state->m_maincpu->set_state_int(Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
 
-	device_set_input_line(state->m_maincpu, 0, 0);
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, 0);
-	device_set_input_line(state->m_maincpu, INPUT_LINE_HALT, 0);
+	state->m_maincpu->set_input_line(0, 0);
+	state->m_maincpu->set_input_line(INPUT_LINE_NMI, 0);
+	state->m_maincpu->set_input_line(INPUT_LINE_HALT, 0);
 }
 
 static void ti85_setup_snapshot (running_machine &machine, UINT8 * data)

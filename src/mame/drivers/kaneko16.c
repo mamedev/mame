@@ -1587,15 +1587,15 @@ static TIMER_DEVICE_CALLBACK( kaneko16_interrupt )
 
 	// main vblank interrupt
 	if(scanline == 224)
-		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+		state->m_maincpu->set_input_line(5, HOLD_LINE);
 
 	// each of these 2 int are responsible of translating a part of sprite buffer
 	// from work ram to sprite ram. How these are scheduled is unknown.
 	if(scanline == 64)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 144)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_intf_dsw =
@@ -2019,14 +2019,14 @@ static TIMER_DEVICE_CALLBACK( shogwarr_interrupt )
 	if(scanline == 224)
 	{
 		// the code for this interrupt is provided by the MCU..
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	if(scanline == 64)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 144)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 /*

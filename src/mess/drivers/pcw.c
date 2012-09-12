@@ -1087,7 +1087,7 @@ static MACHINE_RESET( pcw )
 
 DRIVER_INIT_MEMBER(pcw_state,pcw)
 {
-	device_set_input_line_vector(machine().device("maincpu"), 0, 0x0ff);
+	machine().device("maincpu")->execute().set_input_line_vector(0, 0x0ff);
 
 	/* lower 4 bits are interrupt counter */
 	m_system_status = 0x000;

@@ -193,7 +193,7 @@ WRITE8_MEMBER(tvc_state::tvc_flipflop_w)
 {
 	// every write here clears the vblank flipflop
 	m_int_flipflop = 1;
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(tvc_state::tvc_exp_id_r)
@@ -605,7 +605,7 @@ WRITE_LINE_MEMBER(tvc_state::tvc_int_ff_set)
 	if (state)
 	{
 		m_int_flipflop = 0;
-		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 

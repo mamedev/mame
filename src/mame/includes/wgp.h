@@ -40,9 +40,9 @@ public:
 	INT32       m_banknum;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_subcpu;
 	device_t *m_tc0100scn;
 	device_t *m_tc0140syt;
 	DECLARE_READ16_MEMBER(sharedram_r);

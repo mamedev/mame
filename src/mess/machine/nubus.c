@@ -116,7 +116,7 @@ nubus_device::nubus_device(const machine_config &mconfig, device_type type, cons
 
 void nubus_device::device_start()
 {
-	m_maincpu = machine().device(m_cputag);
+	m_maincpu = machine().device<cpu_device>(m_cputag);
 	// resolve callbacks
 	m_out_irq9_func.resolve(m_out_irq9_cb, *this);
 	m_out_irqa_func.resolve(m_out_irqa_cb, *this);
@@ -141,15 +141,15 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 
 void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask)
 {
-	m_maincpu = machine().device(m_cputag);
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	m_maincpu = machine().device<cpu_device>(m_cputag);
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -159,15 +159,15 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 
 void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, UINT32 mask)
 {
-	m_maincpu = machine().device(m_cputag);
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	m_maincpu = machine().device<cpu_device>(m_cputag);
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -177,15 +177,15 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 
 void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, UINT32 mask)
 {
-	m_maincpu = machine().device(m_cputag);
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	m_maincpu = machine().device<cpu_device>(m_cputag);
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
+			m_maincpu->space(AS_PROGRAM)->install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -195,15 +195,15 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 
 void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, UINT32 mask)
 {
-	m_maincpu = machine().device(m_cputag);
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	m_maincpu = machine().device<cpu_device>(m_cputag);
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(start, end, rhandler, mask);
+			m_maincpu->space(AS_PROGRAM)->install_read_handler(start, end, rhandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(start, end, rhandler, ((UINT64)mask<<32)|mask);
+			m_maincpu->space(AS_PROGRAM)->install_read_handler(start, end, rhandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -213,15 +213,15 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 
 void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, UINT32 mask)
 {
-	m_maincpu = machine().device(m_cputag);
-	int buswidth = m_maincpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	m_maincpu = machine().device<cpu_device>(m_cputag);
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(start, end, whandler, mask);
+			m_maincpu->space(AS_PROGRAM)->install_write_handler(start, end, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->memory().space(AS_PROGRAM)->install_write_handler(start, end, whandler, ((UINT64)mask<<32)|mask);
+			m_maincpu->space(AS_PROGRAM)->install_write_handler(start, end, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -232,8 +232,8 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 void nubus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
 //  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
-	m_maincpu = machine().device(m_cputag);
-	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	m_maincpu = machine().device<cpu_device>(m_cputag);
+	address_space *space = m_maincpu->space(AS_PROGRAM);
 	space->install_readwrite_bank(start, end, mask, mirror, tag );
 	machine().root_device().membank(tag)->set_base(data);
 }

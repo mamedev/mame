@@ -29,7 +29,7 @@ public:
 	UINT8      m_port2;
 
 	/* devices */
-	device_t *m_soundcpu;
+	cpu_device *m_soundcpu;
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(kncljoe_videoram_w);

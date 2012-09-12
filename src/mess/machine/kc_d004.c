@@ -245,7 +245,7 @@ void kc_d004_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch(id)
 	{
 		case TIMER_RESET:
-			device_set_input_line(m_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			break;
 		case TIMER_TC_CLEAR:
 			upd765_tc_w(m_fdc, 0x00);
@@ -331,21 +331,21 @@ void kc_d004_device::io_write(offs_t offset, UINT8 data)
 				break;
 			case 0xf4:
 				if (data & 0x01)
-					device_set_input_line(m_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+					m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 				if (data & 0x02)
 				{
 					for (int i=0; i<0xfc00; i++)
 						m_cpu->space(AS_PROGRAM)->write_byte(i, 0);
 
-					device_set_input_line(m_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+					m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				}
 
 				if (data & 0x04)
-					device_set_input_line(m_cpu, INPUT_LINE_RESET, HOLD_LINE);
+					m_cpu->set_input_line(INPUT_LINE_RESET, HOLD_LINE);
 
 				if (data & 0x08)
-					device_set_input_line(m_cpu, INPUT_LINE_NMI, HOLD_LINE);
+					m_cpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 
 				//printf("D004 CPU state: %x\n", data & 0x0f);
 				break;

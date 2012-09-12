@@ -1941,7 +1941,7 @@ static INTERRUPT_GEN(firebeat_interrupt)
 	// IRQ 2: Main board UART
 	// IRQ 4: ATAPI
 
-	device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_RESET( firebeat )

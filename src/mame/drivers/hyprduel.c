@@ -50,7 +50,7 @@ static void update_irq_state( running_machine &machine )
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	int irq = state->m_requested_int & ~*state->m_irq_enable;
 
-	device_set_input_line(state->m_maincpu, 3, (irq & state->m_int_num) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(3, (irq & state->m_int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( vblank_end_callback )
@@ -68,7 +68,7 @@ static TIMER_DEVICE_CALLBACK( hyprduel_interrupt )
 	{
 		state->m_requested_int |= 0x01;		/* vblank */
 		state->m_requested_int |= 0x20;
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 		/* the duration is a guess */
 		timer.machine().scheduler().timer_set(attotime::from_usec(2500), FUNC(vblank_end_callback), 0x20);
 	}
@@ -107,7 +107,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
 		case 0x01:
 			if (!m_subcpu_resetline)
 			{
-				device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+				m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				m_subcpu_resetline = 1;
 			}
 			break;
@@ -115,15 +115,15 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
 		case 0x00:
 			if (m_subcpu_resetline)
 			{
-				device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				m_subcpu_resetline = 0;
 			}
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 			break;
 
 		case 0x0c:
 		case 0x80:
-			device_set_input_line(m_subcpu, 2, HOLD_LINE);
+			m_subcpu->set_input_line(2, HOLD_LINE);
 			break;
 	}
 }
@@ -148,7 +148,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			device_spin_until_trigger(&space.device(), 1001);
+			space.device().execute().spin_until_trigger(1001);
 			m_cpu_trigger = 1001;
 		}
 	}
@@ -174,7 +174,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 	{
 		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			device_spin_until_trigger(&space.device(), 1002);
+			space.device().execute().spin_until_trigger(1002);
 			m_cpu_trigger = 1002;
 		}
 	}
@@ -184,7 +184,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 static TIMER_CALLBACK( magerror_irq_callback )
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	device_set_input_line(state->m_subcpu, 1, HOLD_LINE);
+	state->m_subcpu->set_input_line(1, HOLD_LINE);
 }
 
 /***************************************************************************
@@ -623,7 +623,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int state )
 {
 	hyprduel_state *hyprduel = device->machine().driver_data<hyprduel_state>();
-	device_set_input_line(hyprduel->m_subcpu, 1, HOLD_LINE);
+	hyprduel->m_subcpu->set_input_line(1, HOLD_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -653,8 +653,8 @@ static MACHINE_START( hyprduel )
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_blitter_bit));
 	state->save_item(NAME(state->m_requested_int));

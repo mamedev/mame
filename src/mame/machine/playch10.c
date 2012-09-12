@@ -843,7 +843,7 @@ static void gboard_scanline_cb( device_t *device, int scanline, int vblank, int 
 
 		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && priorCount) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			device_set_input_line(device->machine().device("cart"), 0, HOLD_LINE);
+			device->machine().device("cart")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 }

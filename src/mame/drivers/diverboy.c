@@ -65,7 +65,7 @@ public:
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(soundcmd_w);
 	DECLARE_WRITE8_MEMBER(okibank_w);
 };
@@ -125,7 +125,7 @@ WRITE16_MEMBER(diverboy_state::soundcmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -248,7 +248,7 @@ static MACHINE_START( diverboy )
 {
 	diverboy_state *state = machine.driver_data<diverboy_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( diverboy, diverboy_state )

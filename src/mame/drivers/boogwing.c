@@ -278,7 +278,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	boogwing_state *driver_state = device->machine().driver_data<boogwing_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
+	driver_state->m_audiocpu->set_input_line(1, state); /* IRQ 2 */
 }
 
 WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)

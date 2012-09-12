@@ -312,7 +312,7 @@ static MACHINE_START(cat)
 static MACHINE_RESET(cat)
 {
 	cat_state *state = machine.driver_data<cat_state>();
-	device_set_irq_callback(machine.device("maincpu"), cat_int_ack);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(cat_int_ack);
 	state->m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 }
 

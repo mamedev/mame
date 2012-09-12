@@ -235,13 +235,13 @@ void st_state::glue_tick()
 
 	if ((y == m_shifter_vblank_start) && (x == 0))
 	{
-		device_set_input_line(m_maincpu, M68K_IRQ_4, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 		m_shifter_ofs = m_shifter_base;
 	}
 
 	if (x == m_shifter_hblank_start)
 	{
-		device_set_input_line(m_maincpu, M68K_IRQ_2, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 //      m_shifter_ofs += (m_shifter_lineofs * 2); // STe
 	}
 

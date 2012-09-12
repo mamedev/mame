@@ -140,7 +140,7 @@ READ8_MEMBER(popper_state::popper_input_ports_r)
 
 READ8_MEMBER(popper_state::popper_soundcpu_nmi_r)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
@@ -314,7 +314,7 @@ static MACHINE_START( popper )
 {
 	popper_state *state = machine.driver_data<popper_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_e002));
@@ -335,7 +335,7 @@ static INTERRUPT_GEN( vblank_irq )
 	popper_state *state = device->machine().driver_data<popper_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

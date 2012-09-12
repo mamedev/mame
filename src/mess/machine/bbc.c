@@ -1425,7 +1425,7 @@ static void	bbc_i8271_interrupt(device_t *device, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
             it would clear - to be checked */
-			device_set_input_line(device->machine().device("maincpu"), INPUT_LINE_NMI,PULSE_LINE);
+			device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 

@@ -240,7 +240,7 @@ static MACHINE_START( 1942 )
 {
 	_1942_state *state = machine.driver_data<_1942_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_palette_bank));
 	state->save_item(NAME(state->m_scroll));

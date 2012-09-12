@@ -46,12 +46,12 @@ metlclsh:
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_cause_irq)
 {
-	device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
@@ -83,17 +83,17 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_cause_nmi2)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_ack_irq2)
 {
-	device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi2)
 {
-	device_set_input_line(m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
@@ -264,8 +264,8 @@ static MACHINE_START( metlclsh )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	state->save_item(NAME(state->m_write_mask));
 	state->save_item(NAME(state->m_gfxbank));

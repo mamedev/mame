@@ -153,7 +153,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 	coin_counter_w(machine(), 1,data & 2);
 
 	/* bit 5 resets the sound CPU */
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
 	flip_screen_set(data & 0x40);

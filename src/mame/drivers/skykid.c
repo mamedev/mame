@@ -428,7 +428,7 @@ static INTERRUPT_GEN( main_vblank_irq )
 	skykid_state *state = device->machine().driver_data<skykid_state>();
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -437,7 +437,7 @@ static INTERRUPT_GEN( mcu_vblank_irq )
 	skykid_state *state = device->machine().driver_data<skykid_state>();
 
 	if(state->m_mcu_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

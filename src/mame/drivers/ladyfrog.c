@@ -67,7 +67,7 @@ WRITE8_MEMBER(ladyfrog_state::to_main_w)
 
 WRITE8_MEMBER(ladyfrog_state::sound_cpu_reset_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -75,7 +75,7 @@ static TIMER_CALLBACK( nmi_callback )
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
 	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->m_pending_nmi = 1;
 }
@@ -97,7 +97,7 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		m_pending_nmi = 0;
 	}
 }
@@ -280,7 +280,7 @@ static MACHINE_START( ladyfrog )
 {
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_tilebank));
 	state->save_item(NAME(state->m_palette_bank));

@@ -1791,7 +1791,7 @@ static const eeprom_interface eeprom_intf =
 
 static INTERRUPT_GEN( spi_interrupt )
 {
-	device_set_input_line(device, 0, ASSERT_LINE );
+	device->execute().set_input_line(0, ASSERT_LINE );
 }
 
 static IRQ_CALLBACK(spi_irq_callback)
@@ -1817,7 +1817,7 @@ static MACHINE_RESET( spi )
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	machine.device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
-	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sound_fifo_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00000688, 0x0000068b, write32_delegate(FUNC(seibuspi_state::z80_prg_fifo_w),state));
@@ -1906,7 +1906,7 @@ static MACHINE_RESET( sxx2f )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::eeprom_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sb_coin_r),state));
 
-	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
 
 	state->m_sb_coin_latch = 0;
 }
@@ -1945,13 +1945,13 @@ MACHINE_CONFIG_END
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
 {
-	if (space.device().safe_pc()==0x00305bb2) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
 	return m_spimainram[(0x0018cb4-0x800)/4];
 }
 
 READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 {
-	if (space.device().safe_pc()== 0x30582e) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
 	return m_spimainram[(0x0018c9c-0x800)/4];
 }
 
@@ -1960,10 +1960,10 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 //  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
 
 	/* batlbalu */
-	if (space.device().safe_pc()==0x00305996) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x00305996) space.device().execute().spin_until_interrupt(); // idle
 
 	/* batlball */
-	if (space.device().safe_pc()==0x003058aa) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x003058aa) space.device().execute().spin_until_interrupt(); // idle
 
 	return m_spimainram[(0x0018db4-0x800)/4];
 }
@@ -1971,19 +1971,19 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
 	/* rdft */
-	if (space.device().safe_pc()==0x0203f0a) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdftau */
-	if (space.device().safe_pc()==0x0203f16) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdftj */
-	if (space.device().safe_pc()==0x0203f22) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdftdi */
-	if (space.device().safe_pc()==0x0203f46) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdftu */
-	if (space.device().safe_pc()==0x0203f3a) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
 
 //  mame_printf_debug("%08x\n",space.device().safe_pc());
 
@@ -1993,13 +1993,13 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 {
 	/* viprp1 */
-	if (space.device().safe_pc()==0x0202769) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
 
 	/* viprp1s */
-	if (space.device().safe_pc()==0x02027e9) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x02027e9) space.device().execute().spin_until_interrupt(); // idle
 
 	/* viprp1ot */
-	if (space.device().safe_pc()==0x02026bd) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
 
 //  mame_printf_debug("%08x\n",space.device().safe_pc());
 
@@ -2009,7 +2009,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
 	/* viperp1o */
-	if (space.device().safe_pc()==0x0201f99) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
 //  mame_printf_debug("%08x\n",space.device().safe_pc());
 	return m_spimainram[(0x001d49c-0x800)/4];
 }
@@ -2019,7 +2019,7 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
 // mame_printf_debug("%08x\n",space.device().safe_pc());
- if (space.device().safe_pc()==0x03032c7) device_spin_until_interrupt(&space.device()); // idle
+ if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
  return m_spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -2028,16 +2028,16 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
 
 	/* rdft22kc */
-	if (space.device().safe_pc()==0x0203926) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdft2, rdft2j */
-	if (space.device().safe_pc()==0x0204372) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0204372) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdft2us */
-	if (space.device().safe_pc()==0x020420e) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x020420e) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdft2a */
-	if (space.device().safe_pc()==0x0204366) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
 
 //  mame_printf_debug("%08x\n",space.device().safe_pc());
 
@@ -2047,20 +2047,20 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (space.device().safe_pc()==0x0206082) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rfjetus */
 	if (space.device().safe_pc()==0x0205b39)
 	{
 		UINT32 r;
-		device_spin_until_interrupt(&space.device()); // idle
+		space.device().execute().spin_until_interrupt(); // idle
 		// Hack to enter test mode
 		r = m_spimainram[(0x002894c-0x800)/4] & (~0x400);
 		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (space.device().safe_pc()==0x0205f2e) device_spin_until_interrupt(&space.device()); // idle
+	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
 
 //  mame_printf_debug("%08x\n",space.device().safe_pc());
 
@@ -2189,7 +2189,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet2k)
 
 static MACHINE_RESET( seibu386 )
 {
-	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
 }
 
 static MACHINE_CONFIG_START( seibu386, seibuspi_state )

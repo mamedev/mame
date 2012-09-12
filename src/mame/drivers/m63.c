@@ -155,7 +155,7 @@ public:
 	INT16    *m_samplebuf;
 
 	/* sound devices */
-	device_t *m_soundcpu;
+	cpu_device *m_soundcpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
 	samples_device *m_samples;
@@ -379,7 +379,7 @@ WRITE8_MEMBER(m63_state::coin_w)
 
 WRITE8_MEMBER(m63_state::snd_irq_w)
 {
-	device_set_input_line(m_soundcpu, 0, ASSERT_LINE);
+	m_soundcpu->set_input_line(0, ASSERT_LINE);
 	machine().scheduler().synchronize();
 }
 
@@ -409,7 +409,7 @@ WRITE8_MEMBER(m63_state::p2_w)
 	m_p2 = data;
 	if((m_p2 & 0xf0) == 0x50)
 	{
-		device_set_input_line(m_soundcpu, 0, CLEAR_LINE);
+		m_soundcpu->set_input_line(0, CLEAR_LINE);
 	}
 }
 
@@ -725,7 +725,7 @@ static MACHINE_START( m63 )
 {
 	m63_state *state = machine.driver_data<m63_state>();
 
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 	state->m_ay1 = machine.device("ay1");
 	state->m_ay2 = machine.device("ay2");
 	state->m_samples = machine.device<samples_device>("samples");
@@ -759,7 +759,7 @@ static INTERRUPT_GEN( vblank_irq )
 	m63_state *state = device->machine().driver_data<m63_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( m63, m63_state )

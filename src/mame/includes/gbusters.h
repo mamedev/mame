@@ -23,8 +23,8 @@ public:
 	int        m_priority;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k007232;
 	device_t *m_k052109;
 	device_t *m_k051960;

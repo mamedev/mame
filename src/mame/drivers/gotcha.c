@@ -241,7 +241,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	gotcha_state *state = device->machine().driver_data<gotcha_state>();
-	device_set_input_line(state->m_audiocpu, 0, linestate);
+	state->m_audiocpu->set_input_line(0, linestate);
 }
 
 static const ym2151_interface ym2151_config =
@@ -254,7 +254,7 @@ static MACHINE_START( gotcha )
 {
 	gotcha_state *state = machine.driver_data<gotcha_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_banksel));
 	state->save_item(NAME(state->m_gfxbank));

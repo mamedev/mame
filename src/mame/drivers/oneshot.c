@@ -332,7 +332,7 @@ GFXDECODE_END
 static void irq_handler(device_t *device, int irq)
 {
 	oneshot_state *state = device->machine().driver_data<oneshot_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -344,8 +344,8 @@ static MACHINE_START( oneshot )
 {
 	oneshot_state *state = machine.driver_data<oneshot_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_gun_x_p1));
 	state->save_item(NAME(state->m_gun_y_p1));

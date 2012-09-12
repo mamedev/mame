@@ -94,7 +94,7 @@ void dsbz80_device::device_reset()
 
 WRITE8_MEMBER(dsbz80_device::latch_w)
 {
-	device_set_input_line(m_ourcpu, INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_ourcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
     m_dsb_latch = data;
     status |= 2;
 //    printf("%02x to DSB latch\n", data);
@@ -102,7 +102,7 @@ WRITE8_MEMBER(dsbz80_device::latch_w)
 
 READ8_MEMBER(dsbz80_device::latch_r)
 {
-	device_set_input_line(m_ourcpu, INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_ourcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 //    printf("DSB Z80 read %02x\n", m_dsb_latch);
 	status &= ~2;
     return m_dsb_latch;

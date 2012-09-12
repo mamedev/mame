@@ -851,7 +851,7 @@ static const ym2151_interface ym2151_config =
 
 static INTERRUPT_GEN( roundup5_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static void apache3_68000_reset(device_t *device)

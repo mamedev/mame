@@ -419,7 +419,7 @@ static void parse_control(running_machine &machine)
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 1 is "vibration" acc. to test mode */
 }
@@ -447,14 +447,14 @@ WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
 static TIMER_CALLBACK( wgp_interrupt4 )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+	state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 #endif
 
 static TIMER_CALLBACK( wgp_interrupt6 )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+	state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -462,7 +462,7 @@ static TIMER_CALLBACK( wgp_interrupt6 )
 static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	state->m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -475,7 +475,7 @@ static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 static INTERRUPT_GEN( wgp_cpub_interrupt )
 {
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), FUNC(wgp_cpub_interrupt6));
-	device_set_input_line(device, 4, HOLD_LINE);
+	device->execute().set_input_line(4, HOLD_LINE);
 }
 
 
@@ -899,7 +899,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )	// assumes Z80 sandwiched between 68Ks
 {
 	wgp_state *state = device->machine().driver_data<wgp_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -948,9 +948,9 @@ static MACHINE_START( wgp )
 
 	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
-	state->m_subcpu = machine.device("sub");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 	state->m_tc0140syt = machine.device("tc0140syt");
 	state->m_tc0100scn = machine.device("tc0100scn");
 

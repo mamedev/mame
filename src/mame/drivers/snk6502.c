@@ -745,12 +745,12 @@ static INTERRUPT_GEN( satansat_interrupt )
 	snk6502_state *state = device->machine().driver_data<snk6502_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+		device->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 static INTERRUPT_GEN( snk6502_interrupt )
 {
-	device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+	device->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 

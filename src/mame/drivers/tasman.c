@@ -584,10 +584,10 @@ static TIMER_DEVICE_CALLBACK( kongambl_vblank )
 	int scanline = param;
 
 	if(scanline == 512)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE); // vblank?
+		state->m_maincpu->set_input_line(1, HOLD_LINE); // vblank?
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE); // sprite irq?
+		state->m_maincpu->set_input_line(3, HOLD_LINE); // sprite irq?
 }
 
 static MACHINE_CONFIG_START( kongambl, kongambl_state )

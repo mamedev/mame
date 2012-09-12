@@ -192,8 +192,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( horse_interrupt )
 {
-	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	device->execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
+	device->execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( horse, horse_state )

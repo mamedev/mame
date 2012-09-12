@@ -71,7 +71,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
@@ -242,7 +242,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	amspdwy_state *state = device->machine().driver_data<amspdwy_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface amspdwy_ym2151_interface =
@@ -254,7 +254,7 @@ static MACHINE_START( amspdwy )
 {
 	amspdwy_state *state = machine.driver_data<amspdwy_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_wheel_old));

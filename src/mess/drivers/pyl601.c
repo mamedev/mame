@@ -518,7 +518,7 @@ static INTERRUPT_GEN( pyl601_interrupt )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
 	state->m_tick50_mark = 0x80;
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static LEGACY_FLOPPY_OPTIONS_START(pyldin)

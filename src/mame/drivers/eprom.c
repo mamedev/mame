@@ -144,7 +144,7 @@ WRITE16_MEMBER(eprom_state::sync_w)
 
 	m_sync_data[offset] = newword;
 	if ((oldword & 0xff00) != (newword & 0xff00))
-		device_yield(&space.device());
+		space.device().execute().yield();
 }
 
 

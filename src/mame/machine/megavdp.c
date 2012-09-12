@@ -570,7 +570,7 @@ void sega_genesis_vdp_device::megadrive_do_insta_68k_to_vram_dma(running_machine
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	device_spin_until_time(m_cpu68k, attotime::from_nsec(length * 1000 / 3500));
+	m_cpu68k->spin_until_time(attotime::from_nsec(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{

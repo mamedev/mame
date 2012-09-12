@@ -620,7 +620,7 @@ static MACHINE_RESET (ddealer)
 
 static INTERRUPT_GEN( ddealer_interrupt )
 {
-	device_set_input_line(device, 4, HOLD_LINE);
+	device->execute().set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( ddealer, ddealer_state )

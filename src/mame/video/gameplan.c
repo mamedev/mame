@@ -214,7 +214,7 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 static TIMER_CALLBACK( via_irq_delayed )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
-	device_set_input_line(state->m_maincpu, 0, param);
+	state->m_maincpu->set_input_line(0, param);
 }
 
 

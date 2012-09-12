@@ -219,7 +219,7 @@ static TIMER_CALLBACK( delayed_command_w	)
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
 	state->m_pending_command = 0;
-	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	state->m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -560,7 +560,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	fromance_state *state = device->machine().driver_data<fromance_state>();
-	device_set_input_line(state->m_subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_subcpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -592,7 +592,7 @@ static MACHINE_START( pipedrm )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
 
-	state->m_subcpu = machine.device("sub");
+	state->m_subcpu = machine.device<cpu_device>("sub");
 
 	/* initialize main Z80 bank */
 	state->membank("bank1")->configure_entries(0, 8, state->memregion("maincpu")->base() + 0x10000, 0x2000);

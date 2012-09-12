@@ -333,8 +333,8 @@ WRITE32_MEMBER(metalmx_state::reset_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
-		device_set_input_line(m_dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-		device_set_input_line(m_dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		m_dsp32c_1->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		m_dsp32c_2->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -782,8 +782,8 @@ static MACHINE_RESET( metalmx )
 {
 	metalmx_state *state = machine.driver_data<metalmx_state>();
 
-	device_set_input_line(state->m_dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
-	device_set_input_line(state->m_dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_dsp32c_1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_dsp32c_2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

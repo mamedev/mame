@@ -857,7 +857,7 @@ READ16_MEMBER(namcos11_state::c76_speedup_r)
 
 	if ((space.device().safe_pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 	}
 
 	return m_su_83;
@@ -1004,21 +1004,21 @@ static TIMER_DEVICE_CALLBACK( mcu_irq0_cb )
 {
 	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
 
-	device_set_input_line(state->m_mcu, M37710_LINE_IRQ0, HOLD_LINE);
+	state->m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_irq2_cb )
 {
 	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
 
-	device_set_input_line(state->m_mcu, M37710_LINE_IRQ2, HOLD_LINE);
+	state->m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_adc_cb )
 {
 	namcos11_state *state = timer.machine().driver_data<namcos11_state>();
 
-	device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
+	state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( coh100, namcos11_state )

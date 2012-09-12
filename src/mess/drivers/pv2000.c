@@ -373,7 +373,7 @@ static MACHINE_RESET( pv2000 )
 	state->m_key_pressed = 0;
 	state->m_keyb_column = 0;
 
-	device_set_input_line_vector(machine.device("maincpu"), INPUT_LINE_IRQ0, 0xff);
+	machine.device("maincpu")->execute().set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 	memset(&state->memregion("maincpu")->base()[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 

@@ -166,7 +166,7 @@ static void amiga_ar1_init( running_machine &machine )
 	amigacrt.ar1_spurious = 0;
 
 	/* Install IRQ ACK callback */
-	device_set_irq_callback(machine.device("maincpu"), amiga_ar1_irqack);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(amiga_ar1_irqack);
 }
 
 /***************************************************************************

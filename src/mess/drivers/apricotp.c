@@ -557,7 +557,7 @@ static const sn76496_config psg_intf =
 void fp_state::machine_start()
 {
 	// register CPU IRQ callback
-	device_set_irq_callback(m_maincpu, fp_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(fp_irq_callback);
 
 	// allocate memory
 	m_work_ram = auto_alloc_array(machine(), UINT16, m_ram->size() / 2);

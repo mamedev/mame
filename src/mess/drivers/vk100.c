@@ -561,7 +561,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 {
 	UINT8 dipswitchLUT[8] = { 1,3,5,7,6,4,2,0 }; // the dipswitches map in a weird order to offsets
 #ifdef SYSTAT_A_VERBOSE
-	if (m_maincpu->safe_pc() != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", m_maincpu->safe_pc());
+	if (m_maincpu->pc() != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", m_maincpu->pc());
 #endif
 	return ((m_vgGO?0:1)<<7)|(vram_read(machine())<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|(m_vsync?0x2:0);
 }
@@ -585,7 +585,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 READ8_MEMBER(vk100_state::SYSTAT_B)
 {
 #ifdef SYSTAT_B_VERBOSE
-	logerror("0x%04X: SYSTAT_B Read!\n", m_maincpu->safe_pc());
+	logerror("0x%04X: SYSTAT_B Read!\n", m_maincpu->pc());
 #endif
 	return (m_ACTS<<7)|0x7F;
 }
@@ -875,20 +875,20 @@ static MACHINE_RESET( vk100 )
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 {
 	vk100_state *m_state = device->machine().driver_data<vk100_state>();
-	device_set_input_line(m_state->m_maincpu, I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
+	m_state->m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 	m_state->m_vsync = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER(i8251_rxrdy_int)
 {
 	vk100_state *m_state = device->machine().driver_data<vk100_state>();
-	device_set_input_line(m_state->m_maincpu, I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	m_state->m_maincpu->set_input_line(I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(i8251_txrdy_int)
 {
 	vk100_state *m_state = device->machine().driver_data<vk100_state>();
-	device_set_input_line(m_state->m_maincpu, I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	m_state->m_maincpu->set_input_line(I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(i8251_rts)

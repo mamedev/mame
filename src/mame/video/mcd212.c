@@ -623,7 +623,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = (state->m_scc68070_regs.lir >> 4) & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+                        machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
                         machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -633,7 +633,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = state->m_scc68070_regs.lir & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+                        machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
                         machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -714,7 +714,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = (state->m_scc68070_regs.lir >> 4) & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+                        machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
                         machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }
@@ -724,7 +724,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
                     UINT8 interrupt = state->m_scc68070_regs.lir & 7;
                     if(interrupt)
                     {
-                        device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+                        machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
                         machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
                     }
                 }

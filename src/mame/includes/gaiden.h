@@ -45,7 +45,7 @@ public:
 	const int   *m_raiga_jumppoints;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(gaiden_sound_command_w);
 	DECLARE_WRITE16_MEMBER(drgnbowl_sound_command_w);
 	DECLARE_WRITE16_MEMBER(wildfang_protection_w);

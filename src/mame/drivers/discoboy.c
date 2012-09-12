@@ -60,7 +60,7 @@ public:
 	UINT8    m_toggle;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 	/* memory */
 	UINT8    m_ram_1[0x800];
@@ -233,9 +233,9 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_01_w)
 WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
 {
 	//  printf("unk discoboy_port_03_w %02x\n", data);
-	//  device_set_input_line(m_audiocpu, INPUT_LINE_NMI, HOLD_LINE);
+	//  m_audiocpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 	soundlatch_byte_w(space, 0, data);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(discoboy_state::discoboy_port_06_w)
@@ -455,7 +455,7 @@ static MACHINE_START( discoboy )
 {
 	discoboy_state *state = machine.driver_data<discoboy_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_ram_bank));
 	state->save_item(NAME(state->m_port_00));

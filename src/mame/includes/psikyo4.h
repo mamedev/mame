@@ -34,7 +34,7 @@ public:
 	double         m_oldbrt2;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE32_MEMBER(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(ps4_bgpen_1_dword_w);
 	DECLARE_WRITE32_MEMBER(ps4_bgpen_2_dword_w);

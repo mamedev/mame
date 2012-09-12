@@ -76,7 +76,7 @@ public:
         m_dmac(*this, "mc68450")
     { }
 
-    required_device<device_t> m_maincpu;
+    required_device<m68000_device> m_maincpu;
     required_device<device_t> m_duart;
     optional_device<wd1772_t> m_fdc;
     optional_device<esq1x22_t> m_epsvfd;
@@ -270,12 +270,12 @@ static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
     if (state == ASSERT_LINE)
     {
-        device_set_input_line_vector(esq5505->m_maincpu, 1, vector);
-        device_set_input_line(esq5505->m_maincpu, 1, ASSERT_LINE);
+        esq5505->m_maincpu->set_input_line_vector(1, vector);
+        esq5505->m_maincpu->set_input_line(1, ASSERT_LINE);
     }
     else
     {
-        device_set_input_line(esq5505->m_maincpu, 1, CLEAR_LINE);
+        esq5505->m_maincpu->set_input_line(1, CLEAR_LINE);
     }
 };
 
@@ -299,7 +299,7 @@ static void duart_output(device_t *device, UINT8 data)
         floppy->ss_w((data & 2)>>1);
     }
 
-//    printf("DUART output: %02x (PC=%x)\n", data, state->m_maincpu->safe_pc());
+//    printf("DUART output: %02x (PC=%x)\n", data, state->m_maincpu->pc());
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
@@ -308,7 +308,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 
     if (channel == 1)
     {
-//        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->safe_pc());
+//        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->pc());
         switch (state->m_system_type)
         {
             case GENERIC:

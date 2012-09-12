@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(skyfox_state::coin_inserted)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( skyfox )
@@ -223,7 +223,7 @@ static MACHINE_START( skyfox )
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_bg_pos));
 	state->save_item(NAME(state->m_bg_ctrl));

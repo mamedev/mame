@@ -30,8 +30,8 @@ public:
 	int       m_pri;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);

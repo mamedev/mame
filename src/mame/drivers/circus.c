@@ -265,7 +265,7 @@ static MACHINE_START( circus )
 {
 	circus_state *state = machine.driver_data<circus_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_samples = machine.device<samples_device>("samples");
 	state->m_discrete = machine.device("discrete");
 

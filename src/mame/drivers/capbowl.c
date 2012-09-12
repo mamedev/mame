@@ -108,7 +108,7 @@
 static INTERRUPT_GEN( capbowl_interrupt )
 {
 	if (device->machine().root_device().ioport("SERVICE")->read() & 1)						/* get status of the F2 key */
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
 
 WRITE8_MEMBER(capbowl_state::capbowl_sndcmd_w)
 {
-	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_byte_w(space, offset, data);
 }
 
@@ -198,7 +198,7 @@ WRITE8_MEMBER(capbowl_state::capbowl_sndcmd_w)
 static void firqhandler( device_t *device, int irq )
 {
 	capbowl_state *state = device->machine().driver_data<capbowl_state>();
-	device_set_input_line(state->m_audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -338,8 +338,8 @@ static MACHINE_START( capbowl )
 {
 	capbowl_state *state = machine.driver_data<capbowl_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_blitter_addr));
 	state->save_item(NAME(state->m_last_trackball_val[0]));

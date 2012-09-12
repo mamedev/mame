@@ -41,7 +41,7 @@ public:
 	/* devices */
 	device_t *m_master;
 	device_t *m_slave;
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_pandora;
 	DECLARE_READ8_MEMBER(devram_r);
 	DECLARE_WRITE8_MEMBER(master_nmi_trigger_w);

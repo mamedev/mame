@@ -258,7 +258,7 @@ static INTERRUPT_GEN( vblank_irq )
 	spcforce_state *state = device->machine().driver_data<spcforce_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 3, HOLD_LINE);
+		device->execute().set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( spcforce, spcforce_state )

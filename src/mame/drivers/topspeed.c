@@ -300,7 +300,7 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
@@ -325,7 +325,7 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 static TIMER_CALLBACK( topspeed_interrupt6  )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+	state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -333,7 +333,7 @@ static TIMER_CALLBACK( topspeed_interrupt6  )
 static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	state->m_subcpu->set_input_line(6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -341,14 +341,14 @@ static INTERRUPT_GEN( topspeed_interrupt )
 {
 	/* Unsure how many int6's per frame */
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_interrupt6));
-	device_set_input_line(device, 5, HOLD_LINE);
+	device->execute().set_input_line(5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( topspeed_cpub_interrupt )
 {
 	/* Unsure how many int6's per frame */
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(topspeed_cpub_interrupt6));
-	device_set_input_line(device, 5, HOLD_LINE);
+	device->execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -661,7 +661,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -699,9 +699,9 @@ static MACHINE_START( topspeed )
 
 	state->membank("bank10")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("subcpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("subcpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_tc0220ioc = machine.device("tc0220ioc");
 	state->m_pc080sn_1 = machine.device("pc080sn_1");
 	state->m_pc080sn_2 = machine.device("pc080sn_2");

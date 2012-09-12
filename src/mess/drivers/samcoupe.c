@@ -342,7 +342,7 @@ void samcoupe_irq(device_t *device, UINT8 src)
 	samcoupe_state *state = device->machine().driver_data<samcoupe_state>();
 
 	/* assert irq and a timer to set it off again */
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 	device->machine().scheduler().timer_set(attotime::from_usec(20), FUNC(irq_off), src);
 
 	/* adjust STATUS register */

@@ -74,9 +74,9 @@ MACHINE_RESET( harddriv )
 	atarigen_interrupt_reset(state, hd68k_update_interrupts);
 
 	/* halt several of the DSPs to start */
-	if (state->m_adsp != NULL) device_set_input_line(state->m_adsp, INPUT_LINE_HALT, ASSERT_LINE);
-	if (state->m_dsp32 != NULL) device_set_input_line(state->m_dsp32, INPUT_LINE_HALT, ASSERT_LINE);
-	if (state->m_sounddsp != NULL) device_set_input_line(state->m_sounddsp, INPUT_LINE_HALT, ASSERT_LINE);
+	if (state->m_adsp != NULL) state->m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (state->m_dsp32 != NULL) state->m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (state->m_sounddsp != NULL) state->m_sounddsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* if we found a 6502, reset the JSA board */
 	if (state->m_jsacpu != NULL)
@@ -106,12 +106,12 @@ MACHINE_RESET( harddriv )
 static void hd68k_update_interrupts(running_machine &machine)
 {
 	harddriv_state *state = machine.driver_data<harddriv_state>();
-	device_set_input_line(state->m_maincpu, 1, state->m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->m_maincpu, 2, state->m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->m_maincpu, 3, state->m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->m_maincpu, 4, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
-	device_set_input_line(state->m_maincpu, 5, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->m_maincpu, 6, state->m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(1, state->m_msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(2, state->m_adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(3, state->m_gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(4, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
+	state->m_maincpu->set_input_line(5, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(6, state->m_duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -428,12 +428,12 @@ WRITE16_HANDLER( hd68k_nwr_w )
 		case 6:	/* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
 			if (state->m_gsp != NULL)
-				device_set_input_line(state->m_gsp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+				state->m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7:	/* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
 			if (state->m_msp != NULL)
-				device_set_input_line(state->m_msp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+				state->m_msp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -502,7 +502,7 @@ WRITE16_HANDLER( hdgsp_io_w )
 		{
 			state->m_last_gsp_shiftreg = new_shiftreg;
 			if (new_shiftreg)
-				device_yield(&space->device());
+				space->device().execute().yield();
 		}
 	}
 
@@ -599,7 +599,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", space->device().safe_pcbase(), data);
 		space->machine().scheduler().synchronize();
-		device_triggerint(state->m_adsp);
+		state->m_adsp->signal_interrupt_trigger();
 	}
 	else
 		logerror("%06X:ADSP W@%04X (%04X)\n", space->device().safe_pcbase(), offset, data);
@@ -714,14 +714,14 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 			state->m_adsp_br = !val;
 			logerror("ADSP /BR = %d\n", !state->m_adsp_br);
 			if (state->m_adsp_br || state->m_adsp_halt)
-				device_set_input_line(state->m_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				state->m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				device_set_input_line(state->m_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				state->m_adsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
-				device_spin(&space->device());
+				space->device().execute().spin();
 			}
 			break;
 
@@ -731,21 +731,21 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 			state->m_adsp_halt = !val;
 			logerror("ADSP /HALT = %d\n", !state->m_adsp_halt);
 			if (state->m_adsp_br || state->m_adsp_halt)
-				device_set_input_line(state->m_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				state->m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				device_set_input_line(state->m_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				state->m_adsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
-				device_spin(&space->device());
+				space->device().execute().spin();
 			}
 			break;
 
 		case 7:
 			logerror("ADSP reset = %d\n", val);
-			device_set_input_line(state->m_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
-			device_yield(&space->device());
+			state->m_adsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			space->device().execute().yield();
 			break;
 
 		default:
@@ -864,9 +864,9 @@ static void update_ds3_irq(harddriv_state *state)
 {
 	/* update the IRQ2 signal to the ADSP2101 */
 	if (!(!state->m_ds3_g68flag && state->m_ds3_g68irqs) && !(state->m_ds3_gflag && state->m_ds3_gfirqs))
-		device_set_input_line(state->m_adsp, ADSP2100_IRQ2, ASSERT_LINE);
+		state->m_adsp->set_input_line(ADSP2100_IRQ2, ASSERT_LINE);
 	else
-		device_set_input_line(state->m_adsp, ADSP2100_IRQ2, CLEAR_LINE);
+		state->m_adsp->set_input_line(ADSP2100_IRQ2, CLEAR_LINE);
 }
 
 
@@ -890,19 +890,19 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 			/* the ADSP at the next instruction boundary */
 			state->m_adsp_br = !val;
 			if (state->m_adsp_br)
-				device_set_input_line(state->m_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				state->m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				device_set_input_line(state->m_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				state->m_adsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
-				device_spin(&space->device());
+				space->device().execute().spin();
 			}
 			break;
 
 		case 3:
-			device_set_input_line(state->m_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			state->m_adsp->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			if (val && !state->m_ds3_reset)
 			{
 				state->m_ds3_gflag = 0;
@@ -913,7 +913,7 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 				update_ds3_irq(state);
 			}
 			state->m_ds3_reset = val;
-			device_yield(&space->device());
+			space->device().execute().yield();
 			logerror("DS III reset = %d\n", val);
 			break;
 
@@ -988,7 +988,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	/* if we just cleared the IRQ, we are going to do some VERY timing critical reads */
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
-	device_spin_until_trigger(&space->device(), DS3_TRIGGER);
+	space->device().execute().spin_until_trigger(DS3_TRIGGER);
 	space->machine().scheduler().trigger(DS3_TRIGGER, attotime::from_usec(5));
 
 	return state->m_ds3_gdata;
@@ -1004,7 +1004,7 @@ WRITE16_HANDLER( hd68k_ds3_gdata_w )
 	COMBINE_DATA(&state->m_ds3_g68data);
 	state->m_ds3_g68flag = 1;
 	state->m_ds3_gcmd = offset & 1;
-	device_triggerint(state->m_adsp);
+	state->m_adsp->signal_interrupt_trigger();
 	update_ds3_irq(state);
 }
 
@@ -1202,11 +1202,11 @@ WRITE16_HANDLER( hd68k_dsk_control_w )
 	switch (offset & 7)
 	{
 		case 0:	/* DSPRESTN */
-			device_set_input_line(state->m_dsp32, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			state->m_dsp32->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 1:	/* DSPZN */
-			device_set_input_line(state->m_dsp32, INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
+			state->m_dsp32->set_input_line(INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 2:	/* ZW1 */
@@ -1549,7 +1549,7 @@ READ16_HANDLER( hdgsp_speedup_r )
 		&space->device() == state->m_gsp && space->device().safe_pc() == state->m_gsp_speedup_pc)
 	{
 		state->m_gsp_speedup_count[0]++;
-		device_spin_until_interrupt(&space->device());
+		space->device().execute().spin_until_interrupt();
 	}
 
 	return result;
@@ -1564,7 +1564,7 @@ WRITE16_HANDLER( hdgsp_speedup1_w )
 
 	/* if $ffff is written, send an "interrupt" trigger to break us out of the spin loop */
 	if (state->m_gsp_speedup_addr[0][offset] == 0xffff)
-		device_triggerint(state->m_gsp);
+		state->m_gsp->signal_interrupt_trigger();
 }
 
 
@@ -1576,7 +1576,7 @@ WRITE16_HANDLER( hdgsp_speedup2_w )
 
 	/* if $ffff is written, send an "interrupt" trigger to break us out of the spin loop */
 	if (state->m_gsp_speedup_addr[1][offset] == 0xffff)
-		device_triggerint(state->m_gsp);
+		state->m_gsp->signal_interrupt_trigger();
 }
 
 
@@ -1599,7 +1599,7 @@ READ16_HANDLER( rdgsp_speedup1_r )
 		(result & 0xff) < space->device().state().state_int(TMS34010_A1))
 	{
 		state->m_gsp_speedup_count[0]++;
-		device_spin_until_interrupt(&space->device());
+		space->device().execute().spin_until_interrupt();
 	}
 
 	return result;
@@ -1611,7 +1611,7 @@ WRITE16_HANDLER( rdgsp_speedup1_w )
 	harddriv_state *state = space->machine().driver_data<harddriv_state>();
 	COMBINE_DATA(&state->m_gsp_speedup_addr[0][offset]);
 	if (&space->device() != state->m_gsp)
-		device_triggerint(state->m_gsp);
+		state->m_gsp->signal_interrupt_trigger();
 }
 
 
@@ -1635,7 +1635,7 @@ READ16_HANDLER( hdmsp_speedup_r )
 	if (data == 0 && &space->device() == state->m_msp && space->device().safe_pc() == state->m_msp_speedup_pc)
 	{
 		state->m_msp_speedup_count[0]++;
-		device_spin_until_interrupt(&space->device());
+		space->device().execute().spin_until_interrupt();
 	}
 
 	return data;
@@ -1647,7 +1647,7 @@ WRITE16_HANDLER( hdmsp_speedup_w )
 	harddriv_state *state = space->machine().driver_data<harddriv_state>();
 	COMBINE_DATA(&state->m_msp_speedup_addr[offset]);
 	if (offset == 0 && state->m_msp_speedup_addr[offset] != 0)
-		device_triggerint(state->m_msp);
+		state->m_msp->signal_interrupt_trigger();
 }
 
 
@@ -1670,7 +1670,7 @@ READ16_HANDLER( hdadsp_speedup_r )
 	if (data == 0xffff && &space->device() == state->m_adsp && space->device().safe_pc() <= 0x3b)
 	{
 		state->m_adsp_speedup_count[0]++;
-		device_spin_until_interrupt(&space->device());
+		space->device().execute().spin_until_interrupt();
 	}
 
 	return data;
@@ -1685,7 +1685,7 @@ READ16_HANDLER( hdds3_speedup_r )
 	if (data != 0 && &space->device() == state->m_adsp && space->device().safe_pc() == state->m_ds3_speedup_pc)
 	{
 		state->m_adsp_speedup_count[2]++;
-		device_spin_until_interrupt(&space->device());
+		space->device().execute().spin_until_interrupt();
 	}
 
 	return data;

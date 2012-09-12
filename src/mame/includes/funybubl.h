@@ -11,7 +11,7 @@ public:
 	required_shared_ptr<UINT8> m_paletteram;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 	/* memory */
 	UINT8      m_banked_vram[0x2000];

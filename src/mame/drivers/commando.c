@@ -218,7 +218,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( commando_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	// RST 10h - VBLANK
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);	// RST 10h - VBLANK
 }
 
 /* Machine Driver */
@@ -227,7 +227,7 @@ static MACHINE_START( commando )
 {
 	commando_state *state = machine.driver_data<commando_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_scroll_x));
 	state->save_item(NAME(state->m_scroll_y));

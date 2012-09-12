@@ -19,9 +19,9 @@ static TIMER_DEVICE_CALLBACK( shaolins_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		 device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		 state->m_maincpu->set_input_line(0, HOLD_LINE);
 	else if((scanline % 32) == 0)
-		if (state->m_nmi_enable & 0x02) device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_nmi_enable & 0x02) state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -267,12 +267,12 @@ static void taito_en_duart_irq_handler(device_t *device, int state, UINT8 vector
 {
 	if (state == ASSERT_LINE)
 	{
-		device_set_input_line_vector(device->machine().device("audiocpu"), M68K_IRQ_6, vector);
-		device_set_input_line(device->machine().device("audiocpu"), M68K_IRQ_6, ASSERT_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line_vector(M68K_IRQ_6, vector);
+		device->machine().device("audiocpu")->execute().set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	}
 	else
 	{
-		device_set_input_line(device->machine().device("audiocpu"), M68K_IRQ_6, CLEAR_LINE);
+		device->machine().device("audiocpu")->execute().set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	}
 }
 

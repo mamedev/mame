@@ -824,7 +824,7 @@ WRITE16_MEMBER(taitoz_state::contcirc_out_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = reset sub CPU */
-		device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bits 1-3 n.c. */
 

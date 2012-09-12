@@ -101,7 +101,7 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 		printf("mac_via_r: offset=0x%02x (PC=%x)\n", offset, m_maincpu->pc());
 	data = m_via1->read(space, offset);
 
-	device_adjust_icount(m_maincpu, m_via_cycles);
+	m_maincpu->adjust_icount(m_via_cycles);
 
     return data | (data<<8);
 }
@@ -119,7 +119,7 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 	if (ACCESSING_BITS_8_15)
 		m_via1->write(space, offset, (data >> 8) & 0xff);
 
-	device_adjust_icount(m_maincpu, m_via_cycles);
+	m_maincpu->adjust_icount(m_via_cycles);
 }
 
 static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)

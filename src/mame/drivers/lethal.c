@@ -208,7 +208,7 @@ static INTERRUPT_GEN(lethalen_interrupt)
 	lethal_state *state = device->machine().driver_data<lethal_state>();
 
 	if (k056832_is_irq_enabled(state->m_k056832, 0))
-		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device->execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(lethal_state::sound_cmd_w)
@@ -218,7 +218,7 @@ WRITE8_MEMBER(lethal_state::sound_cmd_w)
 
 WRITE8_MEMBER(lethal_state::sound_irq_w)
 {
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(lethal_state::sound_status_r)
@@ -229,7 +229,7 @@ READ8_MEMBER(lethal_state::sound_status_r)
 static void sound_nmi( device_t *device )
 {
 	lethal_state *state = device->machine().driver_data<lethal_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(lethal_state::le_bankswitch_w)
@@ -586,8 +586,8 @@ static MACHINE_START( lethalen )
 
 	state->m_generic_paletteram_8.allocate(0x3800 + 0x02);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
 	state->m_k054539 = machine.device("k054539");
 	state->m_k053244 = machine.device("k053244");
 	state->m_k056832 = machine.device("k056832");

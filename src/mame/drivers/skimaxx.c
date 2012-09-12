@@ -292,8 +292,8 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
 	{
 		device_t *subcpu = machine().device("subcpu");
 
-		device_set_input_line(subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-		device_set_input_line(subcpu, INPUT_LINE_HALT,  (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		subcpu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		subcpu->execute().set_input_line(INPUT_LINE_HALT,  (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

@@ -56,7 +56,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	{
 	case 1:
 		soundlatch_byte_w(space, 1, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -391,7 +391,7 @@ GFXDECODE_END
 static void irq_handler(device_t *device, int irq)
 {
 	mugsmash_state *state = device->machine().driver_data<mugsmash_state>();
-	device_set_input_line(state->m_audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	state->m_audiocpu->set_input_line(0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -403,8 +403,8 @@ static MACHINE_START( mugsmash )
 {
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( mugsmash, mugsmash_state )

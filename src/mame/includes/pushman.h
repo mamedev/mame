@@ -28,8 +28,8 @@ public:
 	UINT16     m_new_latch;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_mcu;
 	DECLARE_WRITE16_MEMBER(pushman_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(pushman_control_w);

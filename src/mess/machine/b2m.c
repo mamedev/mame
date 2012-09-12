@@ -372,6 +372,6 @@ MACHINE_RESET(b2m)
 	state->m_b2m_side = 0;
 	state->m_b2m_drive = 0;
 
-	device_set_irq_callback(machine.device("maincpu"), b2m_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(b2m_irq_callback);
 	b2m_set_bank(machine, 7);
 }

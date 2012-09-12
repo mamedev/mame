@@ -724,7 +724,7 @@ READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 	UINT32 a=m_mlc_ram[0x89a0/4];
 	UINT32 p=space.device().safe_pc();
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(&space.device());
+	if ((p==0x3234 || p==0x32dc) && (a&1)) space.device().execute().spin_until_interrupt();
 
 	return a;
 }

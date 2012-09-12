@@ -61,7 +61,7 @@ static INTERRUPT_GEN( asterix_interrupt )
 	if (!k056832_is_irq_enabled(state->m_k056832, 0))
 		return;
 
-	device_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
+	device->execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
 READ8_MEMBER(asterix_state::asterix_sound_r)
@@ -73,19 +73,19 @@ READ8_MEMBER(asterix_state::asterix_sound_r)
 static TIMER_CALLBACK( nmi_callback )
 {
 	asterix_state *state = machine.driver_data<asterix_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(asterix_state::sound_arm_nmi_w)
 {
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
 }
 
 WRITE16_MEMBER(asterix_state::sound_irq_w)
 {
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 // Check the routine at 7f30 in the ead version.
@@ -247,8 +247,8 @@ static MACHINE_START( asterix )
 {
 	asterix_state *state = machine.driver_data<asterix_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053260 = machine.device("k053260");
 	state->m_k056832 = machine.device("k056832");
 	state->m_k053244 = machine.device("k053244");

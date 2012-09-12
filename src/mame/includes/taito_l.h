@@ -52,8 +52,8 @@ public:
 	const char *m_portf1_tag;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 
 	/* memory buffers */
 	UINT8         m_rambanks[0x1000 * 12];

@@ -26,8 +26,8 @@ public:
 	UINT16      m_fgscroll;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_READ16_MEMBER(dummy_r);
 	DECLARE_WRITE16_MEMBER(sf_coin_w);
 	DECLARE_WRITE16_MEMBER(soundcmd_w);

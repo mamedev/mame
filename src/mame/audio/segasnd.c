@@ -447,7 +447,7 @@ static DEVICE_RESET( usb_sound )
 	usb_state *usb = get_safe_token(device);
 
 	/* halt the USB CPU at reset time */
-	device_set_input_line(usb->cpu, INPUT_LINE_RESET, ASSERT_LINE);
+	usb->cpu->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
 	usb->t1_clock_mask = 0x10;
@@ -467,7 +467,7 @@ READ8_DEVICE_HANDLER( sega_usb_status_r )
 
 	LOG(("%04X:usb_data_r = %02X\n", usb->maincpu->safe_pc(), (usb->out_latch & 0x81) | (usb->in_latch & 0x7e)));
 
-	device_adjust_icount(usb->maincpu, -200);
+	usb->maincpu->execute().adjust_icount(-200);
 
 	/* only bits 0 and 7 are controlled by the I8035; the remaining */
 	/* bits 1-6 reflect the current input latch values */
@@ -481,7 +481,7 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 	int data = param;
 
 	/* look for rising/falling edges of bit 7 to control the RESET line */
-	device_set_input_line(usb->cpu, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	usb->cpu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* if the CLEAR line is set, the low 7 bits of the input are ignored */
 	if ((usb->last_p2_value & 0x40) == 0)

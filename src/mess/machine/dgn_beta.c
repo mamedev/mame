@@ -702,7 +702,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			device_yield(device->machine().device(MAINCPU_TAG));
+			device->machine().device(MAINCPU_TAG)->execute().yield();
 
 		state->m_d_pia1_pa_last = data & 0x80;
 	}
@@ -741,7 +741,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			device_yield(device->machine().device(DMACPU_TAG));
+			device->machine().device(DMACPU_TAG)->execute().yield();
 	}
 }
 
@@ -789,7 +789,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		{
 			device->machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("device_yield()\n");
-			device_yield(device->machine().device(DMACPU_TAG));	/* Let DMA CPU run */
+			device->machine().device(DMACPU_TAG)->execute().yield();	/* Let DMA CPU run */
 		}
 		else
 		{

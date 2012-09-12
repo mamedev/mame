@@ -1838,8 +1838,8 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 	m_subtimer = machine().scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
 	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
 	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(FUNC(fm77av_vsync));
-	device_set_irq_callback(machine().device("maincpu"),fm7_irq_ack);
-	device_set_irq_callback(machine().device("sub"),fm7_sub_irq_ack);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(fm7_irq_ack);
+	machine().device("sub")->execute().set_irq_acknowledge_callback(fm7_sub_irq_ack);
 }
 
 static MACHINE_START(fm7)

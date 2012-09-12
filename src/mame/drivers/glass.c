@@ -24,7 +24,7 @@ static INTERRUPT_GEN( glass_interrupt )
 
 	if (state->m_cause_interrupt)
 	{
-		device_set_input_line(device, 6, HOLD_LINE);
+		device->execute().set_input_line(6, HOLD_LINE);
 		state->m_cause_interrupt = 0;
 	}
 }

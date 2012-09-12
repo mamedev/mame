@@ -11,7 +11,7 @@ public:
 	int m_pbus;
 	int m_banklatch;
 
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(beezer_map_w);
 	DECLARE_READ8_MEMBER(beezer_line_r);

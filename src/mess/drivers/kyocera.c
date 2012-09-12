@@ -1291,7 +1291,7 @@ static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
 	tandy200_state *state = timer.machine().driver_data<tandy200_state>();
 
-	device_set_input_line(state->m_maincpu, I8085_RST75_LINE, state->m_tp);
+	state->m_maincpu->set_input_line(I8085_RST75_LINE, state->m_tp);
 
 	state->m_tp = !state->m_tp;
 }

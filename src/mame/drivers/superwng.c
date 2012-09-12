@@ -212,25 +212,25 @@ static INTERRUPT_GEN( superwng_nmi_interrupt )
 WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
 {
 	m_sound_byte = data;
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(superwng_state::superwng_sound_byte_r)
 {
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;
 }
 
 WRITE8_MEMBER(superwng_state::superwng_sound_nmi_clear_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( superwng_sound_nmi_assert )
 {
 	superwng_state *state = device->machine().driver_data<superwng_state>();
 	if (BIT(state->m_nmi_enable, 0))
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)

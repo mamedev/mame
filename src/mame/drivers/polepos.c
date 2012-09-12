@@ -336,7 +336,7 @@ WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 
 	m_sub_irq_mask = data;
 	if (!data)
-		device_set_input_line(&space.device(), 0, CLEAR_LINE);
+		space.device().execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -472,8 +472,8 @@ static MACHINE_RESET( polepos )
 		state->polepos_latch_w(*space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	device_set_input_line_vector(machine.device("sub"), 0, Z8000_NVI);
-	device_set_input_line_vector(machine.device("sub2"), 0, Z8000_NVI);
+	machine.device("sub")->execute().set_input_line_vector(0, Z8000_NVI);
+	machine.device("sub2")->execute().set_input_line_vector(0, Z8000_NVI);
 }
 
 

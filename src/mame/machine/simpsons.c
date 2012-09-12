@@ -47,7 +47,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 
 READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff );
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
@@ -83,8 +83,8 @@ MACHINE_START( simpsons )
 	state->m_xtraram = auto_alloc_array_clear(machine, UINT8, 0x1000);
 	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053260 = machine.device("k053260");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k053246 = machine.device("k053246");

@@ -315,7 +315,7 @@ WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data);
-		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -324,7 +324,7 @@ WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -1851,7 +1851,7 @@ static const ym2203_interface ym2203_config =
 static void YM3812_irq( device_t *device, int param )
 {
 	alpha68k_state *state = device->machine().driver_data<alpha68k_state>();
-	device_set_input_line(state->m_audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -1867,7 +1867,7 @@ static MACHINE_START( common )
 {
 	alpha68k_state *state = machine.driver_data<alpha68k_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_trigstate));
 	state->save_item(NAME(state->m_deposits1));
@@ -2128,7 +2128,7 @@ static INTERRUPT_GEN( alpha68k_sound_nmi )
 	alpha68k_state *state = device->machine().driver_data<alpha68k_state>();
 
 	if(state->m_sound_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )

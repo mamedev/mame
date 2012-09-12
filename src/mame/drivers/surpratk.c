@@ -22,7 +22,7 @@ static INTERRUPT_GEN( surpratk_interrupt )
 {
 	surpratk_state *state = device->machine().driver_data<surpratk_state>();
 	if (k052109_is_irq_enabled(state->m_k052109))
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(surpratk_state::bankedram_r)
@@ -161,7 +161,7 @@ INPUT_PORTS_END
 static void irqhandler( device_t *device, int linestate )
 {
 	surpratk_state *state = device->machine().driver_data<surpratk_state>();
-	device_set_input_line(state->m_maincpu, KONAMI_FIRQ_LINE, linestate);
+	state->m_maincpu->set_input_line(KONAMI_FIRQ_LINE, linestate);
 }
 
 static const ym2151_interface ym2151_config =
@@ -199,7 +199,7 @@ static MACHINE_START( surpratk )
 
 	state->m_generic_paletteram_8.allocate(0x1000);
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_k053244 = machine.device("k053244");
 	state->m_k053251 = machine.device("k053251");
 	state->m_k052109 = machine.device("k052109");

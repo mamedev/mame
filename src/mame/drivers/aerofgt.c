@@ -72,7 +72,7 @@ WRITE16_MEMBER(aerofgt_state::sound_command_w)
 	{
 		m_pending_command = 1;
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -82,7 +82,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_sound_command_w)
 	{
 		m_pending_command = 1;
 		soundlatch_byte_w(space, offset, (data >> 8) & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -91,7 +91,7 @@ WRITE16_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 	if(ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1280,7 +1280,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	aerofgt_state *state = device->machine().driver_data<aerofgt_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -1298,7 +1298,7 @@ static MACHINE_START( common )
 {
 	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->save_item(NAME(state->m_pending_command));
 }
 

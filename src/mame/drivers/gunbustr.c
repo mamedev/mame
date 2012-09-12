@@ -60,7 +60,7 @@ static TIMER_CALLBACK( gunbustr_interrupt5 )
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), FUNC(gunbustr_interrupt5));
-	device_set_input_line(device, 4, HOLD_LINE);
+	device->execute().set_input_line(4, HOLD_LINE);
 }
 
 WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
@@ -435,7 +435,7 @@ ROM_END
 READ32_MEMBER(gunbustr_state::main_cycle_r)
 {
 	if (space.device().safe_pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
-		device_spin_until_interrupt(&space.device());
+		space.device().execute().spin_until_interrupt();
 
 	return m_ram[0x3acc/4];
 }

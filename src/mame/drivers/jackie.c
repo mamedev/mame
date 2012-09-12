@@ -566,9 +566,9 @@ static TIMER_DEVICE_CALLBACK( jackie_irq )
 		return;
 
 	if((scanline % 64) == 32 && state->m_irq_enable)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	else if	((scanline % 64) == 0 && state->m_nmi_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( jackie, jackie_state )

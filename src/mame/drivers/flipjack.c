@@ -261,19 +261,19 @@ WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
 
 READ8_MEMBER(flipjack_state::flipjack_soundlatch_r)
 {
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch;
 }
 
 WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
 {
 	m_soundlatch = data;
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(flipjack_state::flipjack_sound_nmi_ack_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
@@ -284,7 +284,7 @@ WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
 INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 {
 	if (newval)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

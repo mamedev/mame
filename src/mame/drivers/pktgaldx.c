@@ -318,7 +318,7 @@ static MACHINE_START( pktgaldx )
 {
 	pktgaldx_state *state = machine.driver_data<pktgaldx_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 

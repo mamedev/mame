@@ -277,7 +277,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( homez80_interrupt )
 {
 	homez80_state *state = device->machine().driver_data<homez80_state>();
-	device_set_input_line(device, 0, (state->m_irq) ? HOLD_LINE : CLEAR_LINE);
+	device->execute().set_input_line(0, (state->m_irq) ? HOLD_LINE : CLEAR_LINE);
 	state->m_irq ^= 1;
 }
 

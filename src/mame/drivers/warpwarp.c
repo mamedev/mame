@@ -144,7 +144,7 @@ static INTERRUPT_GEN( vblank_irq )
 	warpwarp_state *state = device->machine().driver_data<warpwarp_state>();
 
 	if(state->m_ball_on)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

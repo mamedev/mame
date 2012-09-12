@@ -975,7 +975,7 @@ static SCREEN_UPDATE_IND16( raiden2 )
 
 static INTERRUPT_GEN( raiden2_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);	/* VBL */
 }
 
 

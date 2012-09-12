@@ -48,7 +48,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( sc5_fake_timer_int )
 {
 	// this should be coming from the Timer / SIM modules of the Coldfire
-	device_set_input_line_and_vector((legacy_cpu_device*)device->machine().device("maincpu"), 5, HOLD_LINE, 0x8c);
+	device->machine().device("maincpu")->execute().set_input_line_and_vector(5, HOLD_LINE, 0x8c);
 }
 
 static MACHINE_CONFIG_START( sc5, sc5_state )

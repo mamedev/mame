@@ -33,8 +33,8 @@ public:
 	UINT8      m_pan[DARIUS_PAN_MAX];
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_cpub;
 	device_t *m_adpcm;
 	device_t *m_tc0140syt;

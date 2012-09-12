@@ -548,7 +548,7 @@ READ32_MEMBER(konamigx_state::waitskip_r)
 
 	if (space.device().safe_pc() == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{
-		device_spin_until_trigger(&space.device(), resume_trigger);
+		space.device().execute().spin_until_trigger(resume_trigger);
 		suspension_active = 1;
 	}
 
@@ -650,7 +650,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			device_set_input_line(device, 1, HOLD_LINE);
+			device->execute().set_input_line(1, HOLD_LINE);
 		}
 	}
 
@@ -681,7 +681,7 @@ static TIMER_DEVICE_CALLBACK(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 			{
 				gx_syncen &= ~1;
-				device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+				state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 			}
 		}
@@ -698,7 +698,7 @@ static TIMER_DEVICE_CALLBACK(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x82) == 0x82 || (gx_syncen & 2))
 			{
 				gx_syncen &= ~2;
-				device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+				state->m_maincpu->set_input_line(2, HOLD_LINE);
 			}
 		}
 	}

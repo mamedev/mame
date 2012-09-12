@@ -268,7 +268,7 @@ READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mes
 
 WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
 {
-	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->safe_pc(), data); //if (m_maincpu->safe_pc() != 0x31D)
+	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->pc(), data); //if (m_maincpu->pc() != 0x31D)
 	// if two writes happen within one frame, reset the keyboard latches
 	m_kbmcu_rscount++;
 	if (m_kbmcu_rscount > 1)
@@ -912,7 +912,7 @@ static TIMER_CALLBACK( clear_irq_cb )
 static INTERRUPT_GEN( assert_irq )
 {
 	socrates_state *state = device->machine().driver_data<socrates_state>();
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(44), FUNC(clear_irq_cb));
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	state->m_vblankstate = 1;

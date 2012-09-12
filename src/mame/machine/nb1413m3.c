@@ -192,7 +192,7 @@ INTERRUPT_GEN( nb1413m3_interrupt )
 {
 //  nb1413m3_busyflag = 1;
 //  nb1413m3_busyctr = 0;
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 
 #if NB1413M3_DEBUG
 	popmessage("NMI SW:%01X CLOCK:%02X COUNT:%02X", nb1413m3_nmi_enable, nb1413m3_nmi_clock, nb1413m3_nmi_count);

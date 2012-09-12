@@ -102,7 +102,7 @@
 
 static INTERRUPT_GEN( sys16_interrupt )
 {
-	device_set_input_line(device, 4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
+	device->execute().set_input_line(4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
 }
 
 
@@ -114,7 +114,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -152,7 +152,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_soundcpu, 0, HOLD_LINE);
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -369,7 +369,7 @@ static void tturfbl_msm5205_callback( device_t *device )
 	state->m_sample_buffer <<=  4;
 	state->m_sample_select ^=  1;
 	if(state->m_sample_select == 0)
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface tturfbl_msm5205_interface  =
@@ -1109,7 +1109,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_soundcpu, 0, HOLD_LINE);
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -1185,7 +1185,7 @@ static void shdancbl_msm5205_callback(device_t *device)
 	state->m_sample_buffer >>=  4;
 	state->m_sample_select ^=  1;
 	if (state->m_sample_select == 0)
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface  =
@@ -2048,7 +2048,7 @@ static void sound_cause_nmi( device_t *device, int chip )
 	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 
 	/* upd7759 callback */
-	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -3255,8 +3255,8 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 
 	m_beautyb_unkx = 0;
 
-	m_maincpu = machine().device("maincpu");
-	m_soundcpu = machine().device("soundcpu");
+	m_maincpu = machine().device<cpu_device>("maincpu");
+	m_soundcpu = machine().device<cpu_device>("soundcpu");
 }
 
 /* Sys16A */

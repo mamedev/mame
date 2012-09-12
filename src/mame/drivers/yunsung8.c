@@ -454,7 +454,7 @@ static void yunsung8_adpcm_int( device_t *device )
 
 	state->m_toggle ^= 1;
 	if (state->m_toggle)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =
@@ -478,7 +478,7 @@ static MACHINE_START( yunsung8 )
 	state->membank("bank2")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
 	state->membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_videoram));
 	state->save_item(NAME(state->m_layers_ctrl));

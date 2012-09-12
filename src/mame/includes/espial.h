@@ -35,8 +35,8 @@ public:
 	UINT8     m_sound_nmi_enabled;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);

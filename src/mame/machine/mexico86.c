@@ -15,12 +15,12 @@ bit 0 = ? (unused?)
 WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 {
 
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (m_mcu != NULL)
 	{
 		// mexico 86, knight boy
-		device_set_input_line(m_mcu, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -157,8 +157,8 @@ INTERRUPT_GEN( kikikai_interrupt )
 	if (state->m_mcu_running)
 		mcu_simulate(device->machine());
 
-	device_set_input_line_vector(device, 0, state->m_protection_ram[0]);
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line_vector(0, state->m_protection_ram[0]);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 
@@ -220,7 +220,7 @@ static void kiki_clogic(running_machine &machine, int address, int latch)
 
 INTERRUPT_GEN( mexico86_m68705_interrupt )
 {
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -305,9 +305,9 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 
 	if (BIT(m_ddr_b, 5) && BIT(data, 5) && BIT(~m_port_b_out, 5))
 	{
-		device_set_input_line_vector(m_maincpu, 0, m_protection_ram[0]);
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);        // HOLD_LINE works better in Z80 interrupt mode 1.
-		device_set_input_line(m_mcu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line_vector(0, m_protection_ram[0]);
+		m_maincpu->set_input_line(0, HOLD_LINE);        // HOLD_LINE works better in Z80 interrupt mode 1.
+		m_mcu->execute().set_input_line(0, CLEAR_LINE);
 	}
 
 	if (BIT(m_ddr_b, 6) && BIT(~data, 6) && BIT(m_port_b_out, 6))

@@ -20,7 +20,7 @@ static IRQ_CALLBACK( mc8020_irq_callback )
 
 MACHINE_RESET( mc8020 )
 {
-	device_set_irq_callback(machine.device("maincpu"), mc8020_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(mc8020_irq_callback);
 }
 
 WRITE_LINE_MEMBER( mc80_state::ctc_z0_w )
@@ -114,7 +114,7 @@ static IRQ_CALLBACK( mc8030_irq_callback )
 
 MACHINE_RESET( mc8030 )
 {
-	device_set_irq_callback(machine.device("maincpu"), mc8030_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(mc8030_irq_callback);
 }
 
 READ8_MEMBER( mc80_state::zve_port_a_r )

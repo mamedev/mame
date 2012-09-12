@@ -39,8 +39,8 @@ public:
 	int         m_latch;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(karnov_control_w);
 	DECLARE_READ16_MEMBER(karnov_control_r);
 	DECLARE_WRITE16_MEMBER(karnov_videoram_w);

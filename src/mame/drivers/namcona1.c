@@ -968,7 +968,7 @@ static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
 	{
 		simulate_mcu( timer.machine() );
 		if (enabled & 8)
-			device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+			state->m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	// posirq, used with dolphin in Emeraldia's "how to play" attract mode
@@ -978,7 +978,7 @@ static TIMER_DEVICE_CALLBACK( namcona1_interrupt )
 		if (posirq_scanline)
 			timer.machine().primary_screen->update_partial(posirq_scanline);
 
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
 	}
 }
 
@@ -993,11 +993,11 @@ static TIMER_DEVICE_CALLBACK( mcu_interrupt )
 
 	// vblank
 	if (scanline == 224)
-		device_set_input_line(state->m_mcu, M37710_LINE_IRQ1, HOLD_LINE);
+		state->m_mcu->set_input_line(M37710_LINE_IRQ1, HOLD_LINE);
 
 	// adc (timing guessed, when does this trigger?)
 	if (scanline == 0)
-		device_set_input_line(state->m_mcu, M37710_LINE_ADC, HOLD_LINE);
+		state->m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 static const c140_interface C140_interface_typeA =

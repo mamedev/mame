@@ -207,8 +207,8 @@ TODO:
 WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
 {
 
-	device_set_input_line_vector(m_maincpu, 0, data);
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line_vector(0, data);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 		case 0x01:	/* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */
@@ -895,7 +895,7 @@ static INTERRUPT_GEN( rallyx_vblank_irq )
 	rallyx_state *state = device->machine().driver_data<rallyx_state>();
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( jungler_vblank_irq )
@@ -903,7 +903,7 @@ static INTERRUPT_GEN( jungler_vblank_irq )
 	rallyx_state *state = device->machine().driver_data<rallyx_state>();
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( rallyx, rallyx_state )

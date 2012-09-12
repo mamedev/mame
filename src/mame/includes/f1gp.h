@@ -45,7 +45,7 @@ public:
 	int       m_pending_command;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k053936;
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);

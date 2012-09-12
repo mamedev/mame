@@ -67,7 +67,7 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 	}
 
 	// give the z80 time to see it
-	device_spin_until_time(&space.device(), attotime::from_usec(40));
+	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
 WRITE16_MEMBER(splash_state::splash_coin_w)
@@ -148,7 +148,7 @@ static void roldfrog_update_irq( running_machine &machine )
 {
 	splash_state * state = machine.driver_data<splash_state>();
 	int irq = (state->m_sound_irq ? 0x08 : 0) | ((state->m_vblank_irq) ? 0x18 : 0);
-	device_set_input_line_and_vector(machine.device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
+	machine.device("audiocpu")->execute().set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
 }
 
 WRITE8_MEMBER(splash_state::roldfrog_vblank_ack_w)
@@ -600,7 +600,7 @@ static void adpcm_int1( device_t *device )
 		if (state->m_msm_toggle1 == 0)
 		{
 			state->m_msm_source|=1;
-			device_set_input_line_and_vector(device->machine().device("audiocpu"), 0, HOLD_LINE, 0x38);
+			device->machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x38);
 		}
 	}
 }
@@ -616,7 +616,7 @@ static void adpcm_int2( device_t *device )
 		if (state->m_msm_toggle2 == 0)
 		{
 			state->m_msm_source|=2;
-			device_set_input_line_and_vector(device->machine().device("audiocpu"), 0, HOLD_LINE, 0x38);
+			device->machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x38);
 		}
 	}
 }

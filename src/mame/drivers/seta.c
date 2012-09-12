@@ -1709,7 +1709,7 @@ WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 	{
 		soundlatch_word_w(space, 0, data, mem_mask);
 		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
+		space.device().execute().spin_until_time(attotime::from_usec(50));	// Allow the other cpu to reply
 	}
 }
 
@@ -3186,7 +3186,7 @@ static MACHINE_RESET(calibr50)
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 {
 	soundlatch2_byte_w(space,0,data);
-	device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
+	space.device().execute().spin_until_time(attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )
@@ -7420,10 +7420,10 @@ static TIMER_DEVICE_CALLBACK( seta_interrupt_1_and_2 )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 112)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( seta_interrupt_2_and_4 )
@@ -7432,10 +7432,10 @@ static TIMER_DEVICE_CALLBACK( seta_interrupt_2_and_4 )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 112)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 
@@ -7445,10 +7445,10 @@ static TIMER_DEVICE_CALLBACK( seta_sub_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	if(scanline == 112)
-		device_set_input_line(state->m_subcpu, 0, HOLD_LINE);
+		state->m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -7476,10 +7476,10 @@ static TIMER_DEVICE_CALLBACK( tndrcade_sub_interrupt )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	if((scanline % 16) == 0)
-		device_set_input_line(state->m_subcpu, 0, HOLD_LINE);
+		state->m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( tndrcade, seta_state )
@@ -7624,10 +7624,10 @@ static TIMER_DEVICE_CALLBACK( calibr50_interrupt )
 	int scanline = param;
 
 	if((scanline % 64) == 0)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 248)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 
@@ -8029,10 +8029,10 @@ static TIMER_DEVICE_CALLBACK( setaroul_interrupt )
 	int scanline = param;
 
 	if(scanline == 248)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 112)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 
@@ -8156,7 +8156,7 @@ MACHINE_CONFIG_END
 #if __uPD71054_TIMER
 static INTERRUPT_GEN( wrofaero_interrupt )
 {
-	device_set_input_line(device, 2, HOLD_LINE );
+	device->execute().set_input_line(2, HOLD_LINE );
 }
 
 static MACHINE_START( wrofaero ) { uPD71054_timer_init(machine); }
@@ -9088,10 +9088,10 @@ static TIMER_DEVICE_CALLBACK( crazyfgt_interrupt )
 	int scanline = param;
 
 	if((scanline % 48) == 0)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE); // should this be triggered by the 3812?
+		state->m_maincpu->set_input_line(2, HOLD_LINE); // should this be triggered by the 3812?
 
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( crazyfgt, seta_state )
@@ -9139,16 +9139,16 @@ static TIMER_DEVICE_CALLBACK( inttoote_interrupt )
 
 	/* ACIA irq */
 	if(scanline == 15)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 38)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 61)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline >= 85 && (scanline % 23) == 0)
-		device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+		state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 static const pia6821_interface inttoote_pia0_intf =

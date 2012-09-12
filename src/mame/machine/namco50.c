@@ -205,14 +205,14 @@ static WRITE8_HANDLER( namco_50xx_O_w )
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
 	namco_50xx_state *state = get_safe_token((device_t *)ptr);
-	device_set_input_line(state->m_cpu, 0, CLEAR_LINE);
+	state->m_cpu->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static void namco_50xx_irq_set(device_t *device)
 {
 	namco_50xx_state *state = get_safe_token(device);
 
-	device_set_input_line(state->m_cpu, 0, ASSERT_LINE);
+	state->m_cpu->execute().set_input_line(0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.

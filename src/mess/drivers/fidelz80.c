@@ -1087,15 +1087,15 @@ static INPUT_CHANGED( fidelz80_trigger_reset )
 {
 	fidelz80_state *state = field.machine().driver_data<fidelz80_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( abc_trigger_reset )
 {
 	fidelz80_state *state = field.machine().driver_data<fidelz80_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(state->m_i8041, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	state->m_i8041->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( fidelz80 )

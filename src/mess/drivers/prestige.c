@@ -396,7 +396,7 @@ static IRQ_CALLBACK( prestige_int_ack )
 	UINT32 vector;
 	prestige_state *state = device->machine().driver_data<prestige_state>();
 
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	state->m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	if (state->m_irq_counter == 0x02)
 	{
@@ -417,7 +417,7 @@ void prestige_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
-	device_set_irq_callback(m_maincpu, prestige_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(prestige_int_ack);
 
 	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);
 	membank("bank2")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);

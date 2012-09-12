@@ -220,7 +220,7 @@ static INTERRUPT_GEN( timelimt_irq )
 {
 	timelimt_state *state = device->machine().driver_data<timelimt_state>();
 	if ( state->m_nmi_enabled )
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/

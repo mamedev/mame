@@ -19,8 +19,8 @@ public:
 	int        m_pandata[4];
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_tc0140syt;
 	device_t *m_tc0100scn_1;
 	device_t *m_tc0100scn_2;

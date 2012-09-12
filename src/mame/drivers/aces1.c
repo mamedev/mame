@@ -154,7 +154,7 @@ static TIMER_CALLBACK( m_aces1_irq_timer_callback )
 {
 	aces1_state *state = machine.driver_data<aces1_state>();
 //  printf("irq\n");
-	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	state->aces1_reset_irq_timer();
 }
 
@@ -162,7 +162,7 @@ static TIMER_CALLBACK( m_aces1_nmi_timer_callback )
 {
 	aces1_state *state = machine.driver_data<aces1_state>();
 //  printf("nmi\n");
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	state->aces1_reset_nmi_timer();
 }
 

@@ -578,7 +578,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 					offset == 0x103 &&
 					&space.device() == machine().device("maincpu"))
 		{ /* hack; synchronization for solvalou */
-			device_yield(&space.device());
+			space.device().execute().yield();
 		}
 	}
 } /* dspram16_w */

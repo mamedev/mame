@@ -39,7 +39,7 @@ public:
 	int m_inte;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(n8080_shift_bits_w);
 	DECLARE_WRITE8_MEMBER(n8080_shift_data_w);
 	DECLARE_READ8_MEMBER(n8080_shift_r);

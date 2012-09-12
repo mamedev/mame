@@ -287,7 +287,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sengokmj_interrupt )
 {
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0xc8/4);
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
 }
 
 static MACHINE_CONFIG_START( sengokmj, sengokmj_state )

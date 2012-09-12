@@ -95,7 +95,7 @@ static INTERRUPT_GEN( grchamp_cpu0_interrupt )
 	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
 	if (state->m_cpu0_out[0] & 0x01)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -104,7 +104,7 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
 	if (state->m_cpu1_out[4] & 0x01)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

@@ -33,7 +33,7 @@ public:
 #endif
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(ginganin_fgram16_w);
 	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
 	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);

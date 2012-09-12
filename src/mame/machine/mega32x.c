@@ -666,8 +666,8 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 
 		if (data & 0x02)
 		{
-			device_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, CLEAR_LINE);
-			device_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+			_32x_master_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			_32x_slave_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 
 		if (data & 0x01)
@@ -727,13 +727,13 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15102_w )
 
 		if (data&0x1)
 		{
-			if (m_sh2_master_cmdint_enable) device_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (m_sh2_master_cmdint_enable) _32x_master_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 			else printf("master cmdint when masked!\n");
 		}
 
 		if (data&0x2)
 		{
-			if (m_sh2_slave_cmdint_enable) device_set_input_line(_32x_slave_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (m_sh2_slave_cmdint_enable) _32x_slave_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 			else printf("slave cmdint when masked!\n");
 		}
 	}
@@ -859,8 +859,8 @@ void sega_32x_device::handle_pwm_callback(void)
 	if(m_pwm_timer_tick == m_pwm_tm_reg)
 	{
 		m_pwm_timer_tick = 0;
-		if(sh2_master_pwmint_enable) { device_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
-		if(sh2_slave_pwmint_enable) { device_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(sh2_master_pwmint_enable) { _32x_master_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(sh2_slave_pwmint_enable) { _32x_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
 	m_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (m_pwm_cycle - 1)));
@@ -1322,8 +1322,8 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4006_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4014_w ){ device_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4014_w ) { device_set_input_line(_32x_slave_cpu, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4014_w ){ _32x_master_cpu->set_input_line(SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4014_w ) { _32x_slave_cpu->set_input_line(SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4016
@@ -1338,8 +1338,8 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4016_w ) { m_sh2_slave_vint_pend
 // HINT (horizontal interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4018_w ){ device_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4018_w ) { device_set_input_line(_32x_slave_cpu, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4018_w ){ _32x_master_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4018_w ) { _32x_slave_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401A
@@ -1347,16 +1347,16 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4018_w ) { device_set_input_line
 // Note: flag cleared here is a guess, according to After Burner behaviour
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401a_w ){ m_32x_68k_a15102_reg &= ~1; device_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401a_w ) { m_32x_68k_a15102_reg &= ~2; device_set_input_line(_32x_slave_cpu, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401a_w ){ m_32x_68k_a15102_reg &= ~1; _32x_master_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401a_w ) { m_32x_68k_a15102_reg &= ~2; _32x_slave_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401C
 // PINT (PWM timer interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401c_w ){ device_set_input_line(_32x_master_cpu,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401c_w ) { device_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401c_w ){ _32x_master_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401c_w ) { _32x_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401E
@@ -1569,11 +1569,11 @@ ADDRESS_MAP_END
 void sega_32x_device::_32x_check_irqs(running_machine& machine)
 {
 
-	if (m_sh2_master_vint_enable && m_sh2_master_vint_pending) device_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-	else device_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
+	if (m_sh2_master_vint_enable && m_sh2_master_vint_pending) _32x_master_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+	else _32x_master_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 
-	if (m_sh2_slave_vint_enable && m_sh2_slave_vint_pending) device_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-	else device_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
+	if (m_sh2_slave_vint_enable && m_sh2_slave_vint_pending) _32x_slave_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+	else _32x_slave_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 }
 
 void sega_32x_device::_32x_scanline_cb0(running_machine& machine)
@@ -1594,8 +1594,8 @@ void sega_32x_device::_32x_scanline_cb1()
 
 		if(genesis_scanline_counter < 224 || m_sh2_hint_in_vbl)
 		{
-			if(m_sh2_master_hint_enable) { device_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
-			if(m_sh2_slave_hint_enable) { device_set_input_line(_32x_slave_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
+			if(m_sh2_master_hint_enable) { _32x_master_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
+			if(m_sh2_slave_hint_enable) { _32x_slave_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
 		}
 	}
 }

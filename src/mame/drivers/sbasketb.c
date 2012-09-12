@@ -52,7 +52,7 @@ CPU/Video Board Parts:
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(machine().device<cpu_device>("audiocpu"), 0, HOLD_LINE, 0xff);
+	machine().device<cpu_device>("audiocpu")->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_coin_counter_w)
@@ -181,7 +181,7 @@ static INTERRUPT_GEN( vblank_irq )
 	sbasketb_state *state = device->machine().driver_data<sbasketb_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 //-------------------------------------------------

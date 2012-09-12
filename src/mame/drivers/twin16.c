@@ -688,13 +688,13 @@ static const k007232_interface k007232_config =
 static INTERRUPT_GEN( CPUA_interrupt )
 {
 	twin16_state *state = device->machine().driver_data<twin16_state>();
-	if (CPUA_IRQ_ENABLE) device_set_input_line(device, 5, HOLD_LINE);
+	if (CPUA_IRQ_ENABLE) device->execute().set_input_line(5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( CPUB_interrupt )
 {
 	twin16_state *state = device->machine().driver_data<twin16_state>();
-	if (CPUB_IRQ_ENABLE) device_set_input_line(device, 5, HOLD_LINE);
+	if (CPUB_IRQ_ENABLE) device->execute().set_input_line(5, HOLD_LINE);
 }
 
 /* Machine Drivers */

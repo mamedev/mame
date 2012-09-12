@@ -884,7 +884,7 @@ static INTERRUPT_GEN( avt_vblank_irq )
 {
 	avt_state *state = device->machine().driver_data<avt_state>();
 
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x06);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x06);
 }
 
 static MACHINE_CONFIG_START( avt, avt_state )

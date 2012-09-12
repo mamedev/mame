@@ -405,7 +405,7 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			device_spin_until_interrupt(&space.device());
+			space.device().execute().spin_until_interrupt();
 #endif
 			break;
 	}
@@ -1069,7 +1069,7 @@ static MACHINE_RESET(mediagx)
 	mediagx_state *state = machine.driver_data<mediagx_state>();
 	UINT8 *rom = state->memregion("bios")->base();
 
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	memcpy(state->m_bios_ram, rom, 0x40000);
 	machine.device("maincpu")->reset();
@@ -1269,7 +1269,7 @@ INLINE UINT32 generic_speedup(address_space *space, int idx)
 	if (space->device().safe_pc() == state->m_speedup_table[idx].pc)
 	{
 		state->m_speedup_hits[idx]++;
-		device_spin_until_interrupt(&space->device());
+		space->device().execute().spin_until_interrupt();
 	}
 	return state->m_main_ram[state->m_speedup_table[idx].offset/4];
 }

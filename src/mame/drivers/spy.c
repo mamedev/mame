@@ -31,7 +31,7 @@ static INTERRUPT_GEN( spy_interrupt )
 	spy_state *state = device->machine().driver_data<spy_state>();
 
 	if (k052109_is_irq_enabled(state->m_k052109))
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(spy_state::spy_bankedram1_r)
@@ -324,7 +324,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 		}
 		spy_collision(machine());
 //ZT
-		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
 	m_old_3f90 = data;
@@ -333,7 +333,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 
 WRITE8_MEMBER(spy_state::spy_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(spy_state::sound_bank_w)
@@ -470,7 +470,7 @@ static const k007232_interface spy_k007232_interface =
 static void irqhandler( device_t *device, int linestate )
 {
 	spy_state *state = device->machine().driver_data<spy_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, linestate);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -505,8 +505,8 @@ static MACHINE_START( spy )
 	state->m_generic_paletteram_8.allocate(0x800);
 	memset(state->m_pmcram, 0, sizeof(state->m_pmcram));
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k052109 = machine.device("k052109");
 	state->m_k051960 = machine.device("k051960");
 	state->m_k007232_1 = machine.device("k007232_1");

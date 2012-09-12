@@ -27,7 +27,7 @@ public:
 	UINT16      m_scroll[4];
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
 	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);

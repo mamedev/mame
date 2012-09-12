@@ -154,7 +154,7 @@ void i82371sb_device::device_start()
 	/* setup save states */
 	save_item(NAME(m_regs));
 
-	device_set_irq_callback(machine().device(":maincpu"), at_irq_callback);
+	machine().device(":maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
 }
 
 //-------------------------------------------------

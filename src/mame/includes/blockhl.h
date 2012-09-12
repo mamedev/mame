@@ -24,8 +24,8 @@ public:
 	int        m_rombank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k052109;
 	device_t *m_k051960;
 	DECLARE_READ8_MEMBER(bankedram_r);

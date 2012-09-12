@@ -53,7 +53,7 @@ READ16_MEMBER(supbtime_state::supbtime_controls_r)
 WRITE16_MEMBER(supbtime_state::sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -311,7 +311,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	supbtime_state *driver_state = device->machine().driver_data<supbtime_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
+	driver_state->m_audiocpu->set_input_line(1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -334,8 +334,8 @@ static MACHINE_START( supbtime )
 {
 	supbtime_state *state = machine.driver_data<supbtime_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 

@@ -27,7 +27,7 @@ public:
 	attotime m_time_released;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(mgolf_vram_w);
 	DECLARE_READ8_MEMBER(mgolf_wram_r);
 	DECLARE_READ8_MEMBER(mgolf_dial_r);
@@ -100,7 +100,7 @@ static void update_plunger( running_machine &machine )
 			state->m_time_released = machine.time();
 
 			if (!state->m_mask)
-				device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+				state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 			state->m_time_pushed = machine.time();
@@ -306,7 +306,7 @@ static MACHINE_START( mgolf )
 {
 	mgolf_state *state = machine.driver_data<mgolf_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_prev));
 	state->save_item(NAME(state->m_mask));

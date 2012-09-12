@@ -30,7 +30,7 @@ WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -222,7 +222,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	madmotor_state *driver_state = device->machine().driver_data<madmotor_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
+	driver_state->m_audiocpu->set_input_line(1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -234,8 +234,8 @@ static MACHINE_START( madmotor )
 {
 	madmotor_state *state = machine.driver_data<madmotor_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_flipscreen));
 }

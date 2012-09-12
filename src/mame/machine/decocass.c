@@ -65,7 +65,7 @@ WRITE8_HANDLER( decocass_sound_command_w )
 	state->m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	state->m_sound_ack &= ~0x40;
-	device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 READ8_HANDLER( decocass_sound_data_r )
@@ -97,7 +97,7 @@ READ8_HANDLER( decocass_sound_command_r )
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	UINT8 data = state->soundlatch_byte_r(*space, 0);
 	LOG(4,("CPU %s sound command <- $%02x\n", space->device().tag(), data));
-	device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, CLEAR_LINE);
+	state->m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	state->m_sound_ack &= ~0x80;
 	return data;
 }
@@ -107,21 +107,21 @@ TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
 	decocass_state *state = timer.machine().driver_data<decocass_state>();
 	int scanline = param;
 	state->m_audio_nmi_state = scanline & 8;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->m_audio_nmi_enabled = 1;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->m_audio_nmi_enabled = 1;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	return 0xff;
 }
 
@@ -144,7 +144,7 @@ WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 WRITE8_HANDLER( decocass_nmi_reset_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE );
+	state->m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
@@ -214,17 +214,17 @@ WRITE8_HANDLER( decocass_reset_w )
 	state->m_decocass_reset = data;
 
 	/* CPU #1 active high reset */
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, data & 0x01);
+	state->m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x01);
 
 	/* on reset also disable audio NMI */
 	if (data & 1)
 	{
 		state->m_audio_nmi_enabled = 0;
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* 8041 active low reset */
-	device_set_input_line(state->m_mcu, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1352,8 +1352,8 @@ MACHINE_START( decocass )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 	state->m_cassette = machine.device("cassette");
 }

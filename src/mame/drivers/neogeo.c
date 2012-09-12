@@ -351,20 +351,20 @@ static void start_interrupt_timers( running_machine &machine )
 static void audio_cpu_irq(device_t *device, int assert)
 {
 	neogeo_state *state = device->machine().driver_data<neogeo_state>();
-	device_set_input_line(state->m_audiocpu, 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void audio_cpu_assert_nmi(running_machine &machine)
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(neogeo_state::audio_cpu_clear_nmi_w)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1012,8 +1012,8 @@ static MACHINE_START( neogeo )
 	state->m_irq3_pending = 1;
 
 	/* get devices */
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_upd4990a = machine.device("upd4990a");
 
 	/* register state save */

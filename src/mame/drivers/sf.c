@@ -45,7 +45,7 @@ WRITE16_MEMBER(sf_state::soundcmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -799,7 +799,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	sf_state *state = device->machine().driver_data<sf_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -818,8 +818,8 @@ static MACHINE_START( sf )
 	sf_state *state = machine.driver_data<sf_state>();
 
 	/* devices */
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_sf_active));
 	state->save_item(NAME(state->m_bgscroll));

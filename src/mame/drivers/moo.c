@@ -122,7 +122,7 @@ static TIMER_CALLBACK( dmaend_callback )
 {
 	moo_state *state = machine.driver_data<moo_state>();
 	if (state->m_cur_control2 & 0x800)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( moo_interrupt )
@@ -138,7 +138,7 @@ static INTERRUPT_GEN( moo_interrupt )
 
 	// trigger V-blank interrupt
 	if (state->m_cur_control2 & 0x20)
-		device_set_input_line(device, 5, HOLD_LINE);
+		device->execute().set_input_line(5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( moobl_interrupt )
@@ -150,7 +150,7 @@ static INTERRUPT_GEN( moobl_interrupt )
     state->m_dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 
 	// trigger V-blank interrupt
-	device_set_input_line(device, 5, HOLD_LINE);
+	device->execute().set_input_line(5, HOLD_LINE);
 }
 
 WRITE16_MEMBER(moo_state::sound_cmd1_w)
@@ -170,7 +170,7 @@ WRITE16_MEMBER(moo_state::sound_cmd2_w)
 
 WRITE16_MEMBER(moo_state::sound_irq_w)
 {
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(moo_state::sound_status_r)
@@ -427,8 +427,8 @@ static MACHINE_START( moo )
 {
 	moo_state *state = machine.driver_data<moo_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("soundcpu");
 	state->m_k054539 = machine.device("k054539");
 	state->m_k053246 = machine.device("k053246");
 	state->m_k053251 = machine.device("k053251");

@@ -1994,7 +1994,7 @@ CPU_GET_INFO( m68301 )
 
 void m68307_set_interrupt(device_t *device, int level, int vector)
 {
-	device_set_input_line_and_vector(device, level, HOLD_LINE, vector);
+	device->execute().set_input_line_and_vector(level, HOLD_LINE, vector);
 }
 
 void m68307_timer0_interrupt(legacy_cpu_device *cpudev)

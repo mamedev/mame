@@ -428,7 +428,7 @@ static const ym3526_interface ym3526_config =
 
 static INTERRUPT_GEN( missb2_interrupt )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 /* Machine Driver */
@@ -437,8 +437,8 @@ static MACHINE_START( missb2 )
 {
 	missb2_state *state = machine.driver_data<missb2_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_slave = machine.device("slave");
 	state->m_mcu = NULL;
 

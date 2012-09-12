@@ -197,7 +197,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( hotblocks_irq ) /* right? */
 {
-	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const ay8910_interface ay8910_config =

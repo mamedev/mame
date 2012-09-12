@@ -29,7 +29,7 @@ public:
 	UINT8 m_game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_eeprom;
 
 	/* memory */

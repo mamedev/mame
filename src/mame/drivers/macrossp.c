@@ -338,9 +338,9 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
 		soundlatch_word_w(space, 0, data >> 16, 0xffff);
 		m_sndpending = 1;
-		device_set_input_line(m_audiocpu, 2, HOLD_LINE);
+		m_audiocpu->set_input_line(2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		device_spin_until_time(&space.device(), attotime::from_usec(50));
+		space.device().execute().spin_until_time(attotime::from_usec(50));
 	}
 }
 
@@ -584,7 +584,7 @@ static void irqhandler(device_t *device, int irq)
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-	//  device_set_input_line(state->m_audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	//  state->m_audiocpu->set_input_line(1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -601,8 +601,8 @@ static MACHINE_START( macrossp )
 {
 	macrossp_state *state = machine.driver_data<macrossp_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_sndpending));
 	state->save_item(NAME(state->m_snd_toggle));
@@ -770,7 +770,7 @@ PC :00018110 018110: beq     18104
 */
 
 	COMBINE_DATA(&m_mainram[0x10158 / 4]);
-	if (space.device().safe_pc() == 0x001810A) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc() == 0x001810A) space.device().execute().spin_until_interrupt();
 }
 
 #ifdef UNUSED_FUNCTION
@@ -778,7 +778,7 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 {
 
 	COMBINE_DATA(&m_mainram[0x00020 / 4]);
-	if (space.device().safe_pc() == 0x1cc) device_spin_until_interrupt(&space.device());
+	if (space.device().safe_pc() == 0x1cc) space.device().execute().spin_until_interrupt();
 }
 #endif
 

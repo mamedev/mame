@@ -169,7 +169,7 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_DIRECT)
 	{
 		m_audio_nmi_enabled = data & 1;
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
 	{
 		m_audio_nmi_enabled = ~data & 1;
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -188,7 +188,7 @@ static TIMER_DEVICE_CALLBACK( audio_nmi_gen )
 	btime_state *state = timer.machine().driver_data<btime_state>();
 	int scanline = param;
 	state->m_audio_nmi_state = scanline & 8;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_audio_nmi_enabled && state->m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -506,30 +506,30 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_hi)
 {
 	if (newval)
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_lo)
 {
 	if (!newval)
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(btime_state::audio_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(btime_state::audio_command_r)
 {
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, offset);
 }
 
@@ -1400,8 +1400,8 @@ static MACHINE_START( btime )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_btime_palette));
 	state->save_item(NAME(state->m_bnj_scroll1));

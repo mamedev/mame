@@ -366,7 +366,7 @@ static MACHINE_START( mermaid )
 {
 	mermaid_state *state = machine.driver_data<mermaid_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_ay1 = machine.device("ay1");
 	state->m_ay2 = machine.device("ay2");
 
@@ -446,7 +446,7 @@ static INTERRUPT_GEN( vblank_irq )
 	mermaid_state *state = device->machine().driver_data<mermaid_state>();
 
 	if(state->m_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( mermaid, mermaid_state )

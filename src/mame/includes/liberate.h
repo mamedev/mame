@@ -29,8 +29,8 @@ public:
 	tilemap_t *m_back_tilemap;
 	tilemap_t *m_fix_tilemap;
 
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_READ8_MEMBER(deco16_bank_r);
 	DECLARE_READ8_MEMBER(deco16_io_r);
 	DECLARE_WRITE8_MEMBER(deco16_bank_w);

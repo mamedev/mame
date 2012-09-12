@@ -929,7 +929,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( niyanpai_interrupt )
 {
-	device_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
+	device->execute().set_input_line_and_vector(1, HOLD_LINE,0x100/4);
 }
 
 static const z80_daisy_config daisy_chain_sound[] =

@@ -1720,7 +1720,7 @@ ROM_END
 
 READ32_MEMBER(midvunit_state::generic_speedup_r)
 {
-	device_eat_cycles(&space.device(), 100);
+	space.device().execute().eat_cycles(100);
 	return m_generic_speedup[offset];
 }
 

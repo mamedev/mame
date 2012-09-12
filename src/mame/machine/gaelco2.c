@@ -192,12 +192,12 @@ TIMER_DEVICE_CALLBACK( bang_irq )
 	int scanline = param;
 
 	if (scanline == 256){
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 		state->m_clr_gun_int = 0;
 	}
 
 	if ((scanline % 64) == 0 && state->m_clr_gun_int)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 /***************************************************************************

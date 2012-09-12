@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( tankbatt_interrupt )
 {
 	tankbatt_state *state = device->machine().driver_data<tankbatt_state>();
-	if (state->m_nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+	if (state->m_nmi_enable) device->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)

@@ -444,7 +444,7 @@ static INTERRUPT_GEN( interrupt_gen )
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
 	if (state->m_irq_enabled)
-		device_set_input_line(device, state->m_irq_line, ASSERT_LINE);
+		device->execute().set_input_line(state->m_irq_line, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( fakechange_interrupt_gen )
@@ -468,7 +468,7 @@ WRITE8_MEMBER(galaxian_state::irq_enable_w)
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!m_irq_enabled)
-		device_set_input_line(&space.device(), m_irq_line, CLEAR_LINE);
+		space.device().execute().set_input_line(m_irq_line, CLEAR_LINE);
 }
 
 /*************************************

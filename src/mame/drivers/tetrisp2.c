@@ -566,7 +566,7 @@ WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 
 	state->soundlatch_word_w(space, offset, data, mem_mask);
 
-	device_set_input_line(machine().device("sub"), M68K_IRQ_6, HOLD_LINE);
+	machine().device("sub")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }

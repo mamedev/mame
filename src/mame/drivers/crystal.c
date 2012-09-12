@@ -160,7 +160,7 @@ public:
 	UINT32    m_DMActrl[2];
 	UINT8     m_OldPort4;
 
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	ds1302_device *m_ds1302;
 	device_t *m_vr0video;
 	DECLARE_READ32_MEMBER(FlipCount_r);
@@ -193,18 +193,18 @@ public:
 static void IntReq( running_machine &machine, int num )
 {
 	crystal_state *state = machine.driver_data<crystal_state>();
-	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->space(AS_PROGRAM);
 	UINT32 IntEn = space->read_dword(0x01800c08);
 	UINT32 IntPend = space->read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
 	{
 		IntPend |= (1 << num);
 		space->write_dword(0x01800c0c, IntPend);
-		device_set_input_line(state->m_maincpu, SE3208_INT, ASSERT_LINE);
+		state->m_maincpu->set_input_line(SE3208_INT, ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
 	state->m_FlipCntRead = 0;
-	device_resume(state->m_maincpu, SUSPEND_REASON_SPIN);
+	state->m_maincpu->resume(SUSPEND_REASON_SPIN);
 #endif
 }
 
@@ -215,7 +215,7 @@ READ32_MEMBER(crystal_state::FlipCount_r)
 	UINT32 IntPend = space.read_dword(0x01800c0c);
 	m_FlipCntRead++;
 	if (m_FlipCntRead >= 16 && !IntPend && m_FlipCount != 0)
-		device_suspend(m_maincpu, SUSPEND_REASON_SPIN, 1);
+		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 #endif
 	return ((UINT32) m_FlipCount) << 16;
 }
@@ -262,7 +262,7 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 		IntPend &= ~(1 << (data & 0x1f));
 		space.write_dword(0x01800c0c, IntPend);
 		if (!IntPend)
-			device_set_input_line(m_maincpu, SE3208_INT, CLEAR_LINE);
+			m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
 	}
 	if (mem_mask & 0xff00)
 		m_IntHigh = (data >> 8) & 7;
@@ -579,11 +579,11 @@ static MACHINE_START( crystal )
 	crystal_state *state = machine.driver_data<crystal_state>();
 	int i;
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_ds1302 = machine.device<ds1302_device>("rtc");
 	state->m_vr0video = machine.device("vr0");
 
-	device_set_irq_callback(machine.device("maincpu"), icallback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
 	for (i = 0; i < 4; i++)
 		state->m_Timer[i] = machine.scheduler().timer_alloc(FUNC(Timercb), (void*)(FPTR)i);
 
@@ -613,7 +613,7 @@ static MACHINE_RESET( crystal )
 	memset(state->m_vidregs, 0, 0x10000);
 	state->m_FlipCount = 0;
 	state->m_IntHigh = 0;
-	device_set_irq_callback(machine.device("maincpu"), icallback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
 	state->m_Bank = 0;
 	state->membank("bank1")->set_base(state->memregion("user1")->base() + 0);
 	state->m_FlashCmd = 0xff;

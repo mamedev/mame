@@ -118,7 +118,7 @@ WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 
 WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
 {
-	device_set_input_line(m_audiocpu_2, 0, CLEAR_LINE);
+	m_audiocpu_2->set_input_line(0, CLEAR_LINE);
 }
 
 static void filter_w( device_t *device, int chip, int data )
@@ -149,12 +149,12 @@ WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
 WRITE8_MEMBER(gyruss_state::gyruss_sh_irqtrigger_w)
 {
 	/* writing to this register triggers IRQ on the sound CPU */
-	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
 {
-	device_set_input_line(m_audiocpu_2, 0, ASSERT_LINE);
+	m_audiocpu_2->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(gyruss_state::master_nmi_mask_w)
@@ -501,7 +501,7 @@ static INTERRUPT_GEN( master_vblank_irq )
 	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
 	if (state->m_master_nmi_mask)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( slave_vblank_irq )
@@ -509,7 +509,7 @@ static INTERRUPT_GEN( slave_vblank_irq )
 	gyruss_state *state = device->machine().driver_data<gyruss_state>();
 
 	if (state->m_slave_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( gyruss, gyruss_state )

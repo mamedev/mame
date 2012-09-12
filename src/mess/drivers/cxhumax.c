@@ -101,7 +101,7 @@ WRITE32_MEMBER( cxhumax_state::cx_gxa_w )
 
 			if((m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)])
 				|| (m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]))
-					device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 
 			break;
 		default:
@@ -322,7 +322,7 @@ static TIMER_CALLBACK( timer_tick )
 
 			/* Interrupt if Timer interrupt is not masked in ITC_INTENABLE_REG */
 			if (state->m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)] & INT_TIMER_BIT)
-				device_set_input_line(machine.device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+				machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	attotime period = attotime::from_hz(XTAL_54MHz)*state->m_timer_regs.timer[param].timebase;
@@ -418,7 +418,7 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 
 					/* If INT is enabled at INT Ctrl raise it */
 					if(m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]&INT_UART2_BIT) {
-						device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+						machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 					}
 				}
 			}
@@ -548,9 +548,9 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 	/* check if */
 	if((m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)])
 		|| (m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]))
-		device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	else
-		device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 
 }
 
@@ -734,7 +734,7 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c1_w )
 			m_intctrl_regs[INTREG(INTGROUP1, INTSTATSET)] |= 1<<7;
 			if (m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)] & (1<<7)) {
 					verboselog( machine(), 9, "(I2C1) Int\n" );
-					device_set_input_line(machine().device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+					machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 			}
 			break;
 		case I2C_STAT_REG:

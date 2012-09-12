@@ -835,7 +835,7 @@ static void execute_blit(address_space *space)
 	} while (state->m_pattern_height-- != 0);
 
 	/* count cycles we ran the bus */
-	device_adjust_icount(&space->device(), -cycles);
+	space->device().execute().adjust_icount(-cycles);
 }
 
 

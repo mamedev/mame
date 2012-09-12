@@ -151,7 +151,7 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 	if (state->m_last_irq_state == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line_and_vector(state->m_soundcpu, 0, HOLD_LINE, 0xff);
+		state->m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
 	state->m_last_irq_state = data;

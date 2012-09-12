@@ -55,8 +55,8 @@ public:
 	UINT16     m_speech_rom_bit_address;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_speech;
 	dac_device *m_dac3;
 	device_t *m_tms;

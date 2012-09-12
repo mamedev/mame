@@ -146,7 +146,7 @@ static PALETTE_INIT( nsmpoker )
 
 static INTERRUPT_GEN( nsmpoker_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
+	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 }
 
 //WRITE8_MEMBER(nsmpoker_state::debug_w)

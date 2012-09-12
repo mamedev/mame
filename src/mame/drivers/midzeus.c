@@ -117,7 +117,7 @@ static TIMER_CALLBACK( display_irq_off )
 
 static INTERRUPT_GEN( display_irq )
 {
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
 	device->machine().scheduler().timer_set(attotime::from_hz(30000000), FUNC(display_irq_off));
 }
 

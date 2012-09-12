@@ -1162,7 +1162,7 @@ static INTERRUPT_GEN(m2)
         state->m_irq_active |= 0x8;
     }*/
 
-	device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( m2, konamim2_state )

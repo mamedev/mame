@@ -107,7 +107,7 @@ static INTERRUPT_GEN( toypop_main_vblank_irq )
 	device_t *namcoio_2 = device->machine().device("56xx_2");
 
 	if(state->m_main_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
 		device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
@@ -125,7 +125,7 @@ static INTERRUPT_GEN( toypop_sound_timer_irq )
 	toypop_state *state = device->machine().driver_data<toypop_state>();
 
 	if(state->m_sound_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_sound_clear_w)
@@ -165,7 +165,7 @@ static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
 	toypop_state *state = device->machine().driver_data<toypop_state>();
 	if (state->m_interrupt_enable_68k)
-		device_set_input_line(device, 6, HOLD_LINE);
+		device->execute().set_input_line(6, HOLD_LINE);
 }
 
 WRITE16_MEMBER(toypop_state::toypop_m68000_interrupt_enable_w)

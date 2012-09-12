@@ -133,7 +133,7 @@ WRITE16_MEMBER(rltennis_state::rlt_blitter_w)
 
 	if(offset == BLT_START && (((new_data ^ old_data ) & new_data) & BLTSTRT_TRIGGER))  /* blit strobe 0->1 */
 	{
-		device_set_input_line(m_maincpu, 1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 		int src_x0=(m_blitter[BLT_X_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
 		int src_y0=(m_blitter[BLT_Y_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);

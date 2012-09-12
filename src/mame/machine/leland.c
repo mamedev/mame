@@ -453,7 +453,7 @@ INTERRUPT_GEN( leland_master_interrupt )
 {
 	/* check for coins here */
 	if ((device->machine().root_device().ioport("IN1")->read() & 0x0e) != 0x0e)
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 

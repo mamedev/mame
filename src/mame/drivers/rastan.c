@@ -342,7 +342,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	rastan_state *state = device->machine().driver_data<rastan_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -365,8 +365,8 @@ static MACHINE_START( rastan )
 	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
 	state->membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_pc080sn = machine.device("pc080sn");
 	state->m_pc090oj = machine.device("pc090oj");
 

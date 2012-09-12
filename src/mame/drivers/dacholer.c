@@ -205,12 +205,12 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 WRITE8_MEMBER(dacholer_state::snd_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -551,7 +551,7 @@ static INTERRUPT_GEN( sound_irq )
 	dacholer_state *state = device->machine().driver_data<dacholer_state>();
 	if (state->m_music_interrupt_enable == 1)
 	{
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
+		device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x30);
 	}
 }
 
@@ -565,7 +565,7 @@ static void adpcm_int( device_t *device )
 		state->m_msm_toggle ^= 1;
 		if (state->m_msm_toggle == 0)
 		{
-			device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0x38);
+			state->m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
 		}
 	}
 }

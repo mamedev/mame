@@ -165,7 +165,7 @@ static TIMER_CALLBACK( clear_irq_cb )
 static INTERRUPT_GEN( assert_irq )
 {
 	mustache_state *state = device->machine().driver_data<mustache_state>();
-	device_set_input_line(device, 0, ASSERT_LINE);
+	device->execute().set_input_line(0, ASSERT_LINE);
     state->m_clear_irq_timer->adjust(downcast<cpu_device *>(device)->cycles_to_attotime(14288));
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
           fires no less than TWICE per frame, else game doesn't work right.

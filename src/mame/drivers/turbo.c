@@ -393,7 +393,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi0c_w)
 	/* bit   6 = /IOREQ on the 2nd CPU */
 	/* bit   7 = /INT on the 2nd CPU */
 	m_buckrog_fchg = data & 0x07;
-	device_set_input_line(m_subcpu, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

@@ -112,7 +112,7 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type 
 
 void a2eauxslot_device::device_start()
 {
-	m_maincpu = machine().device(m_cputag);
+	m_maincpu = machine().device<cpu_device>(m_cputag);
 
     // resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);

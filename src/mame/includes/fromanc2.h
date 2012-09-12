@@ -25,8 +25,8 @@ public:
 	UINT8    m_datalatch_2l;
 
 	/* devices */
-	device_t *m_audiocpu;
-	device_t *m_subcpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_subcpu;
 	device_t *m_eeprom;
 	device_t *m_left_screen;
 	device_t *m_right_screen;

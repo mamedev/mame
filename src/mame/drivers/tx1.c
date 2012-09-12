@@ -83,7 +83,7 @@ WRITE8_MEMBER(tx1_state::z80_intreq_w)
 /* Periodic Z80 interrupt */
 static INTERRUPT_GEN( z80_irq )
 {
-	device_set_input_line(device, 0, HOLD_LINE);
+	device->execute().set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(tx1_state::z80_shared_r)

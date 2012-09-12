@@ -60,7 +60,7 @@ WRITE8_MEMBER(commando_state::commando_c804_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 
 	// bit 4 resets the sound CPU
-	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);

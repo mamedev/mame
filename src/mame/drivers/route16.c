@@ -107,7 +107,7 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		device_yield(&space.device());
+		space.device().execute().yield();
 	}
 }
 

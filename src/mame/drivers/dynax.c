@@ -102,7 +102,7 @@ void sprtmtch_update_irq( running_machine &machine )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int irq = (state->m_sound_irq ? 0x08 : 0) | ((state->m_vblank_irq) ? 0x10 : 0) | ((state->m_blitter_irq) ? 0x20 : 0) ;
-	device_set_input_line_and_vector(state->m_maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	state->m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 WRITE8_MEMBER(dynax_state::dynax_vblank_ack_w)
@@ -141,7 +141,7 @@ void jantouki_update_irq(running_machine &machine)
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int irq = ((state->m_blitter_irq) ? 0x08 : 0) | ((state->m_blitter2_irq) ? 0x10 : 0) | ((state->m_vblank_irq) ? 0x20 : 0) ;
-	device_set_input_line_and_vector(state->m_maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	state->m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_vblank_ack_w)
@@ -178,7 +178,7 @@ static void jantouki_sound_update_irq(running_machine &machine)
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	int irq = ((state->m_sound_irq) ? 0x08 : 0) | ((state->m_soundlatch_irq) ? 0x10 : 0) | ((state->m_sound_vblank_irq) ? 0x20 : 0) ;
-	device_set_input_line_and_vector(state->m_soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	state->m_soundcpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
@@ -407,7 +407,7 @@ static void adpcm_int( device_t *device )
 	if (state->m_toggle)
 	{
 		if (state->m_resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -421,7 +421,7 @@ static void adpcm_int_cpu1( device_t *device )
 	if (state->m_toggle_cpu1)
 	{
 		if (state->m_resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);	// cpu1
+		state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);	// cpu1
 	}
 }
 
@@ -4157,8 +4157,8 @@ static MACHINE_START( dynax )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 	state->m_rtc = machine.device("rtc");
 	state->m_ymsnd = machine.device("ymsnd");
 
@@ -4716,7 +4716,7 @@ void mjelctrn_update_irq( running_machine &machine )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	state->m_blitter_irq = 1;
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xfa);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
 static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
@@ -4726,7 +4726,7 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (!state->m_blitter_irq)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
+		device->execute().set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 
 static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
@@ -4751,7 +4751,7 @@ void neruton_update_irq( running_machine &machine )
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 	state->m_blitter_irq = 1;
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x42);
+	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x42);
 }
 
 static TIMER_DEVICE_CALLBACK( neruton_irq_scanline )
@@ -4764,9 +4764,9 @@ static TIMER_DEVICE_CALLBACK( neruton_irq_scanline )
 	if (state->m_blitter_irq)	return;
 
 	if(scanline == 256)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x40);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
 	else if((scanline % 32) == 0)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x46);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x46);
 }
 
 static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
@@ -4794,9 +4794,9 @@ static TIMER_DEVICE_CALLBACK( majxtal7_vblank_interrupt )
 	if (state->m_blitter_irq)	return;
 
 	if(scanline == 256)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x40);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x40);
 	else if((scanline % 32) == 0)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x44); // temp kludge
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x44); // temp kludge
 }
 
 static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
@@ -4876,10 +4876,10 @@ static TIMER_DEVICE_CALLBACK( tenkai_interrupt )
 	int scanline = param;
 
 	if(scanline == 256)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);
 }
 
 static const ay8910_interface tenkai_ay8910_interface =
@@ -4900,7 +4900,7 @@ static MACHINE_START( tenkai )
 
 WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
 {
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ2, HOLD_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 }
 
 static MSM6242_INTERFACE( tenkai_rtc_intf )

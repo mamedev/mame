@@ -321,7 +321,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 	tms5220_wsq_w(m_tms5220c, (data & 0x01) ? 1 : 0);
 	tms5220_rsq_w(m_tms5220c, (data & 0x02) ? 1 : 0);
 
-	device_set_input_line(m_maincpu, TMS7000_IRQ1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(TMS7000_IRQ1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Check for low->high transition on B6 */
 	if (!(m_tms7041_portb & 0x40) && (data & 0x40))

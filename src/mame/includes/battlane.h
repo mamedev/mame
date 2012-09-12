@@ -23,8 +23,8 @@ public:
 	int         m_cpu_control;	/* CPU interrupt control register */
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 	DECLARE_WRITE8_MEMBER(battlane_cpu_command_w);
 	DECLARE_WRITE8_MEMBER(battlane_palette_w);
 	DECLARE_WRITE8_MEMBER(battlane_scrollx_w);

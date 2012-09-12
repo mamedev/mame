@@ -57,14 +57,14 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 
 WRITE8_MEMBER(megazone_state::megazone_i8039_irq_w)
 {
-	device_set_input_line(m_daccpu, 0, ASSERT_LINE);
+	m_daccpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
 {
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(m_daccpu, 0, CLEAR_LINE);
+		m_daccpu->set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
@@ -251,7 +251,7 @@ static INTERRUPT_GEN( vblank_irq )
 	megazone_state *state = device->machine().driver_data<megazone_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE);
+		device->execute().set_input_line(0, HOLD_LINE);
 }
 
 

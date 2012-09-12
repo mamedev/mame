@@ -3224,10 +3224,10 @@ static TIMER_DEVICE_CALLBACK( irqblocka_interrupt )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_irq_enable)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 
 	if(scanline == 0 && state->m_nmi_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -3294,10 +3294,10 @@ static TIMER_DEVICE_CALLBACK( mgcs_interrupt )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_irq1_enable)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0 && state->m_irq2_enable)
-		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static MACHINE_RESET( mgcs )
@@ -3515,10 +3515,10 @@ static TIMER_DEVICE_CALLBACK( mgdh_interrupt )
 	int scanline = param;
 
 	if(scanline == 240 && state->m_irq1_enable)
-		device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 0 && state->m_irq2_enable)
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE); // lev 3 instead of 2
+		state->m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
 static I8255A_INTERFACE( mgdh_ppi8255_intf )

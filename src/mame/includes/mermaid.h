@@ -49,7 +49,7 @@ public:
 	UINT8    m_adpcm_play_reg;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
 

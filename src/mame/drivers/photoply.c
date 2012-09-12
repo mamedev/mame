@@ -309,7 +309,7 @@ static void photoply_set_keyb_int(running_machine &machine, int state)
 static MACHINE_START( photoply )
 {
 	photoply_state *state = machine.driver_data<photoply_state>();
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 	state->m_pit8253 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
 	state->m_pic8259_2 = machine.device( "pic8259_2" );

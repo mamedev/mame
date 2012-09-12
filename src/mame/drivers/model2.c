@@ -187,7 +187,7 @@ static UINT32 copro_fifoout_pop(address_space *space)
 		i960_stall(&space->device());
 
 		/* spin the main cpu and let the TGP catch up */
-		device_spin_until_time(&space->device(), attotime::from_usec(100));
+		space->device().execute().spin_until_time(attotime::from_usec(100));
 
 		return 0;
 	}
@@ -246,13 +246,13 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 		{
 			sharc_set_flag_input(device, 1, ASSERT_LINE);
 
-			//device_set_input_line(device, SHARC_INPUT_FLAG1, ASSERT_LINE);
+			//device->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
 			sharc_set_flag_input(device, 1, CLEAR_LINE);
 
-			//device_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//device->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
 }
@@ -747,7 +747,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
         {
             logerror("Boot geo, %d dwords\n", m_geocnt);
             machine().device("dsp2")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-            //device_spin_until_time(&space.device(), attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
+            //space.device().execute().spin_until_time(attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -976,7 +976,7 @@ static int snd_68k_ready_r(address_space *space)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		device_spin_until_time(&space->device(), attotime::from_usec(40));
+		space->device().execute().spin_until_time(attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -988,7 +988,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	model2_state *state = space->machine().driver_data<model2_state>();
 	if (!snd_68k_ready_r(space))
 	{
-		device_spin_until_time(&space->device(), attotime::from_usec(40));
+		space->device().execute().spin_until_time(attotime::from_usec(40));
 	}
 
 	state->m_to_68k = data;
@@ -996,7 +996,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	space->machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 
 	// give the 68k time to notice
-	device_spin_until_time(&space->device(), attotime::from_usec(40));
+	space->device().execute().spin_until_time(attotime::from_usec(40));
 }
 
 READ32_MEMBER(model2_state::model2_serial_r)
@@ -1024,7 +1024,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 		scsp_midi_in(machine().device("scsp"), 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		device_spin_until_time(&space.device(), attotime::from_usec(40));
+		space.device().execute().spin_until_time(attotime::from_usec(40));
 	}
 }
 
@@ -1762,14 +1762,14 @@ static TIMER_DEVICE_CALLBACK(model2_interrupt)
 	{
 		state->m_intreq |= (1<<10);
 		if (state->m_intena & (1<<10))
-			device_set_input_line(state->m_maincpu, I960_IRQ3, ASSERT_LINE);
+			state->m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 	}
 
 	if(scanline == 384/2)
 	{
 		state->m_intreq |= (1<<0);
 		if (state->m_intena & (1<<0))
-			device_set_input_line(state->m_maincpu, I960_IRQ0, ASSERT_LINE);
+			state->m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -1782,21 +1782,21 @@ static TIMER_DEVICE_CALLBACK(model2c_interrupt)
 	{
 		state->m_intreq |= (1<<10);
 		if (state->m_intena & (1<<10))
-			device_set_input_line(state->m_maincpu, I960_IRQ3, ASSERT_LINE);
+			state->m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 	}
 
 	if(scanline == 256)
 	{
 		state->m_intreq |= (1<<2);
 		if (state->m_intena & (1<<2))
-			device_set_input_line(state->m_maincpu, I960_IRQ2, ASSERT_LINE);
+			state->m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 	}
 
 	if(scanline == 128)
 	{
 		state->m_intreq |= (1<<0);
 		if (state->m_intena & (1<<0))
-			device_set_input_line(state->m_maincpu, I960_IRQ0, ASSERT_LINE);
+			state->m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	}
 }
 

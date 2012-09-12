@@ -137,16 +137,16 @@ static TIMER_DEVICE_CALLBACK( igs_interrupt )
 		return;
 
 	if((scanline % 64) == 32)
-		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		state->m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if((scanline % 64) == 0 && state->m_nmi_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 READ8_MEMBER(igspoker_state::igs_irqack_r)
 {
-	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 

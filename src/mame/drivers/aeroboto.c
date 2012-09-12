@@ -44,7 +44,7 @@ static INTERRUPT_GEN( aeroboto_interrupt )
 	aeroboto_state *state = device->machine().driver_data<aeroboto_state>();
 
 	if (!state->m_disable_irq)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 	else
 		state->m_disable_irq--;
 }

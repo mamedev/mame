@@ -21,8 +21,8 @@ public:
 	int        m_readzoomroms;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k053260;
 	device_t *m_k053244;
 	device_t *m_k051316;

@@ -1002,7 +1002,7 @@ WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking)
 	(&space.device() == machine().device("maincpu")) ? membank("bank2")->set_entry(BIT(data, 2)) : membank("bank3")->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
-	device_set_input_line(other_cpu, 0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	other_cpu->execute().set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* move along */
 	if (&space.device() == machine().device("maincpu"))

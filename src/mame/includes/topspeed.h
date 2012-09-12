@@ -35,9 +35,9 @@ public:
 	INT32      m_banknum;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_subcpu;
 	device_t *m_pc080sn_1;
 	device_t *m_pc080sn_2;
 	device_t *m_tc0220ioc;

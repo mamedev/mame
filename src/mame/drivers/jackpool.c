@@ -249,7 +249,7 @@ GFXDECODE_END
 /*irq 2 used for communication stuff.3 is just a rte*/
 static INTERRUPT_GEN( jackpool_interrupt )
 {
-	device_set_input_line(device, 1, HOLD_LINE);
+	device->execute().set_input_line(1, HOLD_LINE);
 }
 
 

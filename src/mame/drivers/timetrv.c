@@ -135,12 +135,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0x20/4); //vblank bit flag clear
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4); //vblank bit flag clear
 }
 
 static INTERRUPT_GEN( ld_irq )
 {
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0x48/4); //ld irq
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }
 
 static MACHINE_CONFIG_START( timetrv, timetrv_state )

@@ -318,7 +318,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( iq151_state::pic_set_int_line )
 {
-	device_set_input_line(m_maincpu, 0, state ?  HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( iq151_vblank_interrupt )
@@ -352,7 +352,7 @@ DRIVER_INIT_MEMBER(iq151_state,iq151)
 	membank("boot")->configure_entry(0, RAM + 0xf800);
 	membank("boot")->configure_entry(1, RAM + 0x0000);
 
-	device_set_irq_callback(m_maincpu, iq151_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(iq151_irq_callback);
 
 	// keep machine pointers to slots
 	m_carts[0] = machine().device<iq151cart_slot_device>("slot1");

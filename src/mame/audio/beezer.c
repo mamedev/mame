@@ -95,7 +95,7 @@ struct sh6840_timer_channel
 typedef struct _beezer_sound_state beezer_sound_state;
 struct _beezer_sound_state
 {
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 
 	/* IRQ variable */
 	UINT8 m_ptm_irq_state;
@@ -384,7 +384,7 @@ static DEVICE_START( common_sh_start )
 
 	/* allocate the stream */
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, beezer_stream_update);
-	state->m_maincpu = device->machine().device("maincpu");
+	state->m_maincpu = device->machine().device<cpu_device>("maincpu");
 
 	sh6840_register_state_globals(device);
 }
@@ -499,7 +499,7 @@ READ8_DEVICE_HANDLER( beezer_sh6840_r )
 		return 0;
 		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
 		case 1:
-		logerror("%04X:beezer_sh6840_r - unexpected read, status register is TODO!\n", state->m_maincpu->safe_pc());
+		logerror("%04X:beezer_sh6840_r - unexpected read, status register is TODO!\n", state->m_maincpu->pc());
 		return 0;
 		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
 		case 2: case 4: case 6:

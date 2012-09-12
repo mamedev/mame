@@ -2104,7 +2104,7 @@ WRITE8_MEMBER(sms_state::sms_store_control_w)
 WRITE_LINE_DEVICE_HANDLER( sms_store_int_callback )
 {
 	sms_state *driver_state = device->machine().driver_data<sms_state>();
-	device_set_input_line(driver_state->m_store_control & 0x01 ? driver_state->m_control_cpu : driver_state->m_main_cpu, 0, state);
+	(driver_state->m_store_control & 0x01 ? driver_state->m_control_cpu : driver_state->m_main_cpu)->execute().set_input_line(0, state);
 }
 
 

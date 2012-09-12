@@ -71,8 +71,8 @@ public:
 	INT32           m_oki_bank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	device_t *m_tc0100scn;
 	device_t *m_tc0100scn_1;

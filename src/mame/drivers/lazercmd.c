@@ -248,7 +248,7 @@ static TIMER_DEVICE_CALLBACK( lazercmd_timer )
 	{
 		state->m_timer_count = 0;
 		state->m_sense_state ^= 1;
-		device_set_input_line(state->m_maincpu, 1, (state->m_sense_state) ? ASSERT_LINE : CLEAR_LINE);
+		state->m_maincpu->set_input_line(1, (state->m_sense_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

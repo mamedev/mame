@@ -278,7 +278,7 @@ MACHINE_START( nitedrvr )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_discrete = machine.device("discrete");
 
 	state->save_item(NAME(state->m_gear));

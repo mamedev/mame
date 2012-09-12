@@ -44,7 +44,7 @@ public:
 	int            m_mcu_status;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 	/* game-specific */
 	// 1945 MCU

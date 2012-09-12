@@ -158,7 +158,7 @@ static INTERRUPT_GEN( skyarmy_nmi_source )
 {
 	skyarmy_state *state = device->machine().driver_data<skyarmy_state>();
 
-	if(state->m_nmi) device_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
+	if(state->m_nmi) device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

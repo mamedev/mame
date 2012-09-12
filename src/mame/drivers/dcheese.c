@@ -53,7 +53,7 @@ static void update_irq_state( device_t *cpu )
 
 	int i;
 	for (i = 1; i < 5; i++)
-		device_set_input_line(cpu, i, state->m_irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		cpu->execute().set_input_line(i, state->m_irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -97,11 +97,11 @@ static MACHINE_START( dcheese )
 {
 	dcheese_state *state = machine.driver_data<dcheese_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_bsmt = machine.device("bsmt");
 
-	device_set_irq_callback(state->m_maincpu, irq_callback);
+	state->m_maincpu->set_irq_acknowledge_callback(irq_callback);
 
 	state->save_item(NAME(state->m_irq_state));
 	state->save_item(NAME(state->m_soundlatch_full));
@@ -142,7 +142,7 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
 	{
 		/* write the latch and set the IRQ */
 		m_soundlatch_full = 1;
-		device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
 		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
@@ -160,7 +160,7 @@ READ8_MEMBER(dcheese_state::sound_command_r)
 
 	/* read the latch and clear the IRQ */
 	m_soundlatch_full = 0;
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
 }
 

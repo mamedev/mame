@@ -983,7 +983,7 @@ static void parse_cpu_control( running_machine &machine )
 {
 	/* bit 0 enables cpu B */
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
@@ -1022,7 +1022,7 @@ WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
+	state->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -1030,7 +1030,7 @@ static TIMER_CALLBACK( taitoz_interrupt6 )
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
+	state->m_subcpu->set_input_line(5, HOLD_LINE);
 }
 
 
@@ -1048,7 +1048,7 @@ static INTERRUPT_GEN( sci_interrupt )
 	if (state->m_sci_int6)
 		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
-	device_set_input_line(device, 4, HOLD_LINE);
+	device->execute().set_input_line(4, HOLD_LINE);
 }
 
 
@@ -2900,7 +2900,7 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 static void irqhandler(device_t *device, int irq)
 {
 	taitoz_state *state = device->machine().driver_data<taitoz_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
@@ -2908,7 +2908,7 @@ static void irqhandlerb(device_t *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
 //  taitoz_state *state = device->machine().driver_data<taitoz_state>();
-//  device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3031,9 +3031,9 @@ static MACHINE_START( bshark )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_subcpu = machine.device("sub");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_eeprom = machine.device<eeprom_device>("eeprom");
 	state->m_tc0100scn = machine.device("tc0100scn");
 	state->m_tc0150rod = machine.device("tc0150rod");

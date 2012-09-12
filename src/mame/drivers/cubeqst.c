@@ -195,7 +195,7 @@ static INTERRUPT_GEN( vblank )
 	cubeqst_state *state = device->machine().driver_data<cubeqst_state>();
 	int int_level = state->m_video_field == 0 ? 5 : 6;
 
-	device_set_input_line(device, int_level, HOLD_LINE);
+	device->execute().set_input_line(int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
 	state->m_video_field ^= 1;

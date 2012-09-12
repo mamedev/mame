@@ -734,7 +734,7 @@ READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_state *state = space->machine().driver_data<atarigen_state>();
 	state->m_cpu_to_sound_ready = 0;
-	device_set_input_line(state->m_sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+	state->m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return state->m_cpu_to_sound;
 }
 
@@ -750,9 +750,9 @@ static void update_6502_irq(running_machine &machine)
 {
 	atarigen_state *state = machine.driver_data<atarigen_state>();
 	if (state->m_timed_int || state->m_ym2151_int)
-		device_set_input_line(state->m_sound_cpu, M6502_IRQ_LINE, ASSERT_LINE);
+		state->m_sound_cpu->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		device_set_input_line(state->m_sound_cpu, M6502_IRQ_LINE, CLEAR_LINE);
+		state->m_sound_cpu->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -769,8 +769,8 @@ static TIMER_CALLBACK( delayed_sound_reset )
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
-		device_set_input_line(state->m_sound_cpu, INPUT_LINE_HALT, CLEAR_LINE);
-		device_set_input_line(state->m_sound_cpu, INPUT_LINE_RESET, PULSE_LINE);
+		state->m_sound_cpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		state->m_sound_cpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* reset the sound write state */
@@ -799,7 +799,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	/* set up the states and signal an NMI to the sound CPU */
 	state->m_cpu_to_sound = param;
 	state->m_cpu_to_sound_ready = 1;
-	device_set_input_line(state->m_sound_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -1385,7 +1385,7 @@ void atarigen_halt_until_hblank_0(screen_device &screen)
 
 	/* halt and set a timer to wake up */
 	screen.machine().scheduler().timer_set(screen.scan_period() * (hblank - hpos) / width, FUNC(unhalt_cpu), 0, (void *)cpu);
-	device_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -1477,7 +1477,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 static TIMER_CALLBACK( unhalt_cpu )
 {
 	device_t *cpu = (device_t *)ptr;
-	device_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
+	cpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

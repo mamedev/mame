@@ -672,9 +672,9 @@ static TIMER_DEVICE_CALLBACK( renegade_interrupt )
 	int scanline = param;
 
 	if (scanline == 112) // ???
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(renegade_state::renegade_coin_counter_w)

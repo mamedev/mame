@@ -706,7 +706,7 @@ static INTERRUPT_GEN( wiz_vblank_interrupt )
 	wiz_state *state = device->machine().driver_data<wiz_state>();
 
 	if(state->m_main_nmi_mask & 1)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( wiz_sound_interrupt )
@@ -714,7 +714,7 @@ static INTERRUPT_GEN( wiz_sound_interrupt )
 	wiz_state *state = device->machine().driver_data<wiz_state>();
 
 	if(state->m_sound_nmi_mask & 1)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

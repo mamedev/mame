@@ -296,7 +296,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( megasys1D_irq )
 {
-	device_set_input_line(device, 2, HOLD_LINE);
+	device->execute().set_input_line(2, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )

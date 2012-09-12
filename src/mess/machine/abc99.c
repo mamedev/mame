@@ -239,7 +239,7 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
 {
-	device_set_input_line(m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_mousecpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -459,8 +459,8 @@ ioport_constructor abc99_device::device_input_ports() const
 
 inline void abc99_device::serial_input()
 {
-	device_set_input_line(m_maincpu, MCS48_INPUT_IRQ, (m_si | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(m_mousecpu, MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, (m_si | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+	m_mousecpu->set_input_line(MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -578,8 +578,8 @@ void abc99_device::device_start()
 void abc99_device::device_reset()
 {
 	// set EA lines
-	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ASSERT_LINE);
-	device_set_input_line(m_mousecpu, MCS48_INPUT_EA, ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
+	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 }
 
 
@@ -786,7 +786,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 	if (m_reset != reset)
 	{
 		m_reset = reset;
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// serial output
@@ -854,5 +854,5 @@ READ_LINE_MEMBER( abc99_device::txd_r )
 
 WRITE_LINE_MEMBER( abc99_device::reset_w )
 {
-	device_set_input_line(m_mousecpu, INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_mousecpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }

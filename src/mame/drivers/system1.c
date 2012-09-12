@@ -417,7 +417,7 @@ WRITE8_MEMBER(system1_state::videomode_w)
 
 	/* bit 6 is connected to the 8751 IRQ */
 	if (i8751 != NULL)
-		device_set_input_line(i8751, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		i8751->execute().set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* handle any custom banking or other stuff */
 	if (m_videomode_custom != NULL)
@@ -597,8 +597,8 @@ READ8_MEMBER(system1_state::mcu_io_r)
 static INTERRUPT_GEN( mcu_irq_assert )
 {
 	/* toggle the INT0 line on the MCU */
-	device_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
-	device_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
+	device->execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+	device->execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
 	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -614,8 +614,8 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
     */
 
 	device_t *mcu = timer.machine().device("mcu");
-	device_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
-	device_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
+	mcu->execute().set_input_line(MCS51_T0_LINE, ASSERT_LINE);
+	mcu->execute().set_input_line(MCS51_T0_LINE, CLEAR_LINE);
 }
 
 
@@ -638,7 +638,7 @@ WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((m_mcu_control ^ data) & 0x04) && !(data & 0x04))
-		device_set_input_line(&space.device(), MCS51_INT0_LINE, CLEAR_LINE);
+		space.device().execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((m_mcu_control ^ data) & 0x08) && !(data & 0x08))

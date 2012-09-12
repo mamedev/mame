@@ -22,9 +22,9 @@ public:
 	UINT16     m_cpuB_ctrl;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k053260_1;
 	device_t *m_k053260_2;
 	device_t *m_k051316_1;

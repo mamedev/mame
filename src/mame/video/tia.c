@@ -798,7 +798,7 @@ WRITE8_MEMBER( tia_video_device::WSYNC_w )
 
 	if (cycles % 76)
 	{
-		device_adjust_icount(&space.device(), cycles % 76 - 76);
+		space.device().execute().adjust_icount(cycles % 76 - 76);
 	}
 }
 

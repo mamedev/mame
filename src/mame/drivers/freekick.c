@@ -80,7 +80,7 @@ static INTERRUPT_GEN( freekick_irqgen )
 {
 	freekick_state *state = device->machine().driver_data<freekick_state>();
 	if (state->m_nmi_en)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(freekick_state::oigas_5_w)

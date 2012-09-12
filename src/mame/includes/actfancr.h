@@ -22,8 +22,8 @@ public:
 	int            m_trio_control_select;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_audiocpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(triothep_control_select_w);
 	DECLARE_READ8_MEMBER(triothep_control_r);
 	DECLARE_WRITE8_MEMBER(actfancr_sound_w);

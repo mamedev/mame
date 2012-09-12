@@ -354,17 +354,17 @@ static TIMER_DEVICE_CALLBACK( dfruit_irq_scanline )
 
 	if (scanline == 240 && (state->m_irq_enable & 4))
 	{
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, state->m_irq_vector[2]);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[2]);
 	}
 
 	if (scanline == 0 && (state->m_irq_enable & 2))
 	{
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, state->m_irq_vector[1]);
+		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[1]);
 	}
 
 	if (scanline == 196 && (state->m_irq_enable & 1))
 	{
-		//device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, state->m_irq_vector[0]);
+		//state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, state->m_irq_vector[0]);
 	}
 }
 

@@ -357,12 +357,12 @@ WRITE8_MEMBER(namcos1_state::namcos1_sub_firq_w)
 
 WRITE8_MEMBER(namcos1_state::irq_ack_w)
 {
-	device_set_input_line(&space.device(), 0, CLEAR_LINE);
+	space.device().execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(namcos1_state::firq_ack_w)
 {
-	device_set_input_line(&space.device(), M6809_FIRQ_LINE, CLEAR_LINE);
+	space.device().execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

@@ -163,7 +163,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	dietgo_state *driver_state = device->machine().driver_data<dietgo_state>();
-	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
+	driver_state->m_audiocpu->set_input_line(1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -199,8 +199,8 @@ static MACHINE_START( dietgo )
 {
 	dietgo_state *state = machine.driver_data<dietgo_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 

@@ -183,7 +183,7 @@ static TIMER_DEVICE_CALLBACK( d6800_p )
 {
 	d6800_state *state = timer.machine().driver_data<d6800_state>();
 	state->m_rtc++;
-	device_set_input_line(state->m_maincpu, M6800_IRQ_LINE, (state->m_rtc > 0xf8) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_maincpu->set_input_line(M6800_IRQ_LINE, (state->m_rtc > 0xf8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -108,8 +108,8 @@ public:
 	UINT8 *m_decrypted_region;	// goldnaxeb1 & bayrouteb1
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_soundcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_soundcpu;
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);

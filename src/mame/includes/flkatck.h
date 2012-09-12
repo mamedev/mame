@@ -24,7 +24,7 @@ public:
 	int        m_multiply_reg[2];
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 	device_t *m_k007121;
 	DECLARE_WRITE8_MEMBER(flkatck_bankswitch_w);
 	DECLARE_READ8_MEMBER(flkatck_ls138_r);

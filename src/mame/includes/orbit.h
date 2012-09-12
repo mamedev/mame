@@ -35,7 +35,7 @@ public:
 	UINT8      m_misc_flags;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	device_t *m_discrete;
 	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);

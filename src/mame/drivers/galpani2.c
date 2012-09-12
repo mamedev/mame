@@ -548,17 +548,17 @@ static TIMER_DEVICE_CALLBACK( galpani2_interrupt1 )
 	int scanline = param;
 
 	if(scanline == 240)
-		 device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+		 state->m_maincpu->set_input_line(5, HOLD_LINE);
 
 	/* MCU related? */
 	if(scanline == 128)
 	{
-		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(3, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 
 	if(scanline == 0)
-		 device_set_input_line(state->m_maincpu, 6, HOLD_LINE); // hblank?
+		 state->m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
 }
 
 /* CPU#2 interrupts, lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
@@ -568,13 +568,13 @@ static TIMER_DEVICE_CALLBACK( galpani2_interrupt2 )
 	int scanline = param;
 
 	if(scanline == 240)
-		device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
+		state->m_subcpu->set_input_line(5, HOLD_LINE);
 
 	if(scanline == 128)
-		device_set_input_line(state->m_subcpu, 4, HOLD_LINE);
+		state->m_subcpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_subcpu, 3, HOLD_LINE);
+		state->m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( galpani2, galpani2_state )

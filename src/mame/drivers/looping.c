@@ -334,7 +334,7 @@ static MACHINE_START( looping )
 
 static INTERRUPT_GEN( looping_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 4);
+	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
 }
 
 

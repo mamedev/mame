@@ -285,7 +285,7 @@ WRITE8_MEMBER(popobear_state::popobear_irq_ack_w)
 	for(i=0;i<8;i++)
 	{
 		if(data & 1 << i)
-			device_set_input_line(m_maincpu, i, CLEAR_LINE);
+			m_maincpu->set_input_line(i, CLEAR_LINE);
 	}
 }
 
@@ -443,14 +443,14 @@ static TIMER_DEVICE_CALLBACK( popobear_irq )
 
 	/* Order is trusted (5 as vblank-out makes the title screen logo spinning to behave wrongly) */
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 3, ASSERT_LINE);
+		state->m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
+		state->m_maincpu->set_input_line(5, ASSERT_LINE);
 
 	/* TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo) */
 	if(scanline == 64 || scanline == 192)
-		device_set_input_line(state->m_maincpu, 2, ASSERT_LINE);
+		state->m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( popobear, popobear_state )

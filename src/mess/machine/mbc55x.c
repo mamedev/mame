@@ -388,7 +388,7 @@ MACHINE_RESET( mbc55x )
 {
 	set_ram_size(machine);
 	keyboard_reset(machine);
-	device_set_irq_callback(machine.device(MAINCPU_TAG), mbc55x_irq_callback);
+	machine.device(MAINCPU_TAG)->execute().set_irq_acknowledge_callback(mbc55x_irq_callback);
 }
 
 MACHINE_START( mbc55x )

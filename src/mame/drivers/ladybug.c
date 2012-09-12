@@ -186,7 +186,7 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
 {
 
 	/* left coin insertion causes an NMI */
-	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
@@ -194,7 +194,7 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		device_set_input_line(m_maincpu, 0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -729,14 +729,14 @@ static const sn76496_config psg_intf =
 static MACHINE_START( ladybug )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 }
 
 static MACHINE_START( sraider )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 
 	state->save_item(NAME(state->m_grid_color));
 	state->save_item(NAME(state->m_sound_low));

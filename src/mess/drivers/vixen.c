@@ -79,7 +79,7 @@ void vixen_state::update_interrupt()
 {
 	int state = (m_cmd_d1 && m_fdint) || m_vsync || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
 
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -778,7 +778,7 @@ static IRQ_CALLBACK( vixen_int_ack )
 void vixen_state::machine_start()
 {
 	// interrupt callback
-	device_set_irq_callback(m_maincpu, vixen_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(vixen_int_ack);
 
 	// configure memory banking
 	UINT8 *ram = m_ram->pointer();

@@ -538,7 +538,7 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 #endif
 
 	if (offset == 0x1ff8/4)
-		device_set_input_line(m_maincpu, 6, CLEAR_LINE);
+		m_maincpu->set_input_line(6, CLEAR_LINE);
 
 	if (offset == 0x1ffc/4)
 	{
@@ -556,13 +556,13 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
             */
 			if (!m_first_dsp_reset || !m_has_dsp_hack)
 			{
-				device_set_input_line(m_dsp, INPUT_LINE_RESET, CLEAR_LINE);
+				m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			m_first_dsp_reset = 0;
 		}
 		else
 		{
-			device_set_input_line(m_dsp, INPUT_LINE_RESET, ASSERT_LINE);
+			m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }
@@ -1010,7 +1010,7 @@ READ16_MEMBER(taitojc_state::dsp_to_main_r)
 
 WRITE16_MEMBER(taitojc_state::dsp_to_main_w)
 {
-	device_set_input_line(m_maincpu, 6, ASSERT_LINE);
+	m_maincpu->set_input_line(6, ASSERT_LINE);
 
 	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
 }
@@ -1215,12 +1215,12 @@ static MACHINE_RESET( taitojc )
 	memset(state->m_intersection_data, 0, sizeof(state->m_intersection_data));
 
 	// hold the TMS in reset until we have code
-	device_set_input_line(state->m_dsp, INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( taitojc_vblank )
 {
-	device_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
+	device->execute().set_input_line_and_vector(2, HOLD_LINE, 130);
 }
 
 static const tc0640fio_interface taitojc_io_intf =
@@ -1302,7 +1302,7 @@ MACHINE_CONFIG_END
 READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 {
 	if(space.device().safe_pc()==0x404c)
-		device_spin_until_time(&space.device(), attotime::from_usec(500));
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
 	return m_dsp_shared_ram[0x7f0];
 }
@@ -1310,7 +1310,7 @@ READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 {
 	if(space.device().safe_pc()==0x402e)
-		device_spin_until_time(&space.device(), attotime::from_usec(500));
+		space.device().execute().spin_until_time(attotime::from_usec(500));
 
 	return m_dsp_shared_ram[0x7f0];
 }

@@ -156,7 +156,7 @@ READ32_MEMBER(polygonet_state::psac_rom_r)
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
 static INTERRUPT_GEN(polygonet_interrupt)
 {
-	device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+	device->execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
@@ -557,7 +557,7 @@ WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )

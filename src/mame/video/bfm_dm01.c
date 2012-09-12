@@ -238,7 +238,7 @@ void BFM_dm01_writedata(running_machine &machine, UINT8 data)
 
 INTERRUPT_GEN( bfm_dm01_vbl )
 {
-	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE );
+	device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////

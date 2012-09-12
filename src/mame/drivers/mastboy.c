@@ -697,7 +697,7 @@ static INTERRUPT_GEN( mastboy_interrupt )
 	mastboy_state *state = device->machine().driver_data<mastboy_state>();
 	if ((state->m_irq0_ack & 1) == 1)
 	{
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
 

@@ -722,7 +722,7 @@ static IRQ_CALLBACK(irq_callback)
 static void irq_init(running_machine &machine)
 {
 	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	device_set_irq_callback(machine.device("maincpu"), irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 }
 
 static TIMER_DEVICE_CALLBACK( model1_interrupt )
@@ -854,7 +854,7 @@ READ16_MEMBER(model1_state::snd_68k_ready_r)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		device_spin_until_time(&space.device(), attotime::from_usec(40));
+		space.device().execute().spin_until_time(attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -875,7 +875,7 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 	// signal the 68000 that there's data waiting
 	machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
 	// give the 68k time to reply
-	device_spin_until_time(&space.device(), attotime::from_usec(40));
+	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )

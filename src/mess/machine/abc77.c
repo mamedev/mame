@@ -498,10 +498,10 @@ void abc77_device::device_reset()
 	int ea = BIT(ioport("DSW")->read(), 7);
 
 	// trigger reset
-	device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_reset_timer->adjust(attotime::from_msec(t));
 
-	device_set_input_line(m_maincpu, MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_EA, ea ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -518,7 +518,7 @@ void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		break;
 
 	case TIMER_RESET:
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		break;
 	}
 }
@@ -638,7 +638,7 @@ WRITE8_MEMBER( abc77_device::j3_w )
 
 WRITE_LINE_MEMBER( abc77_device::rxd_w )
 {
-	device_set_input_line(m_maincpu, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

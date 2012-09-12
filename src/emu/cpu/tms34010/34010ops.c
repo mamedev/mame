@@ -96,7 +96,7 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 	/* extra check to prevent bad things */
 	if (tms->pc == 0 || opcode_table[tms->direct->read_decrypted_word(TOBYTE(tms->pc)) >> 4] == unimpl)
 	{
-		device_set_input_line(tms->device, INPUT_LINE_HALT, ASSERT_LINE);
+		tms->device->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		debugger_break(tms->device->machine());
 	}
 }

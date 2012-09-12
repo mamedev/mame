@@ -541,7 +541,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	lsasquad_state *state = device->machine().driver_data<lsasquad_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(lsasquad_state::unk)
@@ -571,8 +571,8 @@ static MACHINE_START( lsasquad )
 
 	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_mcu = machine.device("mcu");
 
 	state->save_item(NAME(state->m_port_a_in));

@@ -81,7 +81,7 @@ WRITE16_MEMBER(xmen_state::sound_cmd_w)
 
 WRITE16_MEMBER(xmen_state::sound_irq_w)
 {
-	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
@@ -300,8 +300,8 @@ static MACHINE_START( xmen )
 	state->membank("bank4")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	state->membank("bank4")->set_entry(0);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053246 = machine.device("k053246");
 	state->m_k053251 = machine.device("k053251");
 	state->m_k052109 = machine.device("k052109");

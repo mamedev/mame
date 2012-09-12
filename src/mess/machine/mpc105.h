@@ -47,7 +47,7 @@ private:
 	UINT8 m_bank_enable;
 	UINT32 m_bank_registers[8];
 
-	device_t*   m_maincpu;
+	cpu_device*   m_maincpu;
 };
 
 

@@ -102,14 +102,14 @@ WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 {
-	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq( device_t *device, int irq )
 {
 	dbz_state *state = device->machine().driver_data<dbz_state>();
 
-	device_set_input_line(state->m_audiocpu, 0, (irq) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, (irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
@@ -351,8 +351,8 @@ static MACHINE_START( dbz )
 {
 	dbz_state *state = machine.driver_data<dbz_state>();
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_k053936_1 = machine.device("k053936_1");
 	state->m_k053936_2 = machine.device("k053936_2");
 	state->m_k056832 = machine.device("k056832");

@@ -167,7 +167,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
 static INTERRUPT_GEN( supertnk_interrupt )
 {
 	/* On a TMS9980, a 6 on the interrupt bus means a level 4 interrupt */
-	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
+	device->execute().set_input_line_and_vector(0, ASSERT_LINE, 6);
 }
 
 

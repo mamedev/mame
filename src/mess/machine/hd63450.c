@@ -258,7 +258,7 @@ static void dma_transfer_start(device_t* device, int channel, int dir)
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
 		device_t *cpu = device->machine().device(dmac->intf->cpu_tag);
-		device_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		dmac->timer[channel]->adjust(attotime::zero, channel, dmac->burst_clock[channel]);
 	}
 	else
@@ -440,7 +440,7 @@ void hd63450_single_transfer(device_t* device, int x)
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)
 				{
 					device_t *cpu = device->machine().device(dmac->intf->cpu_tag);
-					device_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
+					cpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				}
 
 				if(dmac->intf->dma_end)

@@ -122,11 +122,11 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		state->m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= screen_height)
@@ -141,23 +141,23 @@ static WRITE8_HANDLER( chinagat_interrupt_w )
 	{
 		case 0: /* 3e00 - SND irq */
 			state->soundlatch_byte_w(*space, 0, data);
-			device_set_input_line(state->m_snd_cpu, state->m_sound_irq, (state->m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			state->m_snd_cpu->execute().set_input_line(state->m_sound_irq, (state->m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
 		case 1: /* 3e01 - NMI ack */
-			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 2: /* 3e02 - FIRQ ack */
-			device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+			state->m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 3e03 - IRQ ack */
-			device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+			state->m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 4: /* 3e04 - sub CPU IRQ ack */
-			device_set_input_line(state->m_sub_cpu, state->m_sprite_irq, (state->m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			state->m_sub_cpu->execute().set_input_line(state->m_sprite_irq, (state->m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 	}
 }
@@ -495,7 +495,7 @@ GFXDECODE_END
 static void chinagat_irq_handler( device_t *device, int irq )
 {
 	ddragon_state *state = device->machine().driver_data<ddragon_state>();
-	device_set_input_line(state->m_snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	state->m_snd_cpu->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -526,7 +526,7 @@ static MACHINE_START( chinagat )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_sub_cpu = machine.device("sub");
 	state->m_snd_cpu = machine.device("audiocpu");
 

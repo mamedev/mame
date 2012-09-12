@@ -42,7 +42,7 @@ static INTERRUPT_GEN( dribling_irq_gen )
 {
 	dribling_state *state = device->machine().driver_data<dribling_state>();
 	if (state->m_di)
-		device_set_input_line(device, 0, ASSERT_LINE);
+		device->execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -88,7 +88,7 @@ WRITE8_MEMBER(dribling_state::misc_w)
 	/* bit 7 = di */
 	m_di = (data >> 7) & 1;
 	if (!m_di)
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 

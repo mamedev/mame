@@ -199,7 +199,7 @@ static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
 static MACHINE_START( magtouch )
 {
-	device_set_irq_callback(machine.device("maincpu"), pcat_irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
 

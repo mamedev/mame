@@ -79,8 +79,8 @@ WRITE16_MEMBER(fuuki16_state::fuuki16_sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space,0,data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-//      device_spin_until_time(&space.device(), attotime::from_usec(50));   // Allow the other CPU to reply
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+//      space.device().execute().spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 	}
 }
@@ -394,7 +394,7 @@ GFXDECODE_END
 static void soundirq( device_t *device, int state )
 {
 	fuuki16_state *fuuki16 = device->machine().driver_data<fuuki16_state>();
-	device_set_input_line(fuuki16->m_audiocpu, 0, state);
+	fuuki16->m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface fuuki16_ym3812_intf =
@@ -417,7 +417,7 @@ static const ym3812_interface fuuki16_ym3812_intf =
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
+	state->m_maincpu->set_input_line(1, HOLD_LINE);
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 }
 
@@ -425,7 +425,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);	// VBlank IRQ
+	state->m_maincpu->set_input_line(3, HOLD_LINE);	// VBlank IRQ
 	machine.scheduler().timer_set(machine.primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 }
 
@@ -433,7 +433,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);	// Raster Line IRQ
+	state->m_maincpu->set_input_line(5, HOLD_LINE);	// Raster Line IRQ
 	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 	state->m_raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
 }
@@ -446,8 +446,8 @@ static MACHINE_START( fuuki16 )
 
 	state->membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
 
-	state->m_maincpu = machine.device("maincpu");
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->m_raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }

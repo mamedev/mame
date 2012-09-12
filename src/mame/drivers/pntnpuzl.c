@@ -274,19 +274,19 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_28001a_r)
 
 READ16_MEMBER(pntnpuzl_state::irq1_ack_r)
 {
-//  device_set_input_line(m_maincpu, 1, CLEAR_LINE);
+//  m_maincpu->set_input_line(1, CLEAR_LINE);
 	return 0;
 }
 
 READ16_MEMBER(pntnpuzl_state::irq2_ack_r)
 {
-//  device_set_input_line(m_maincpu, 2, CLEAR_LINE);
+//  m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
 READ16_MEMBER(pntnpuzl_state::irq4_ack_r)
 {
-//  device_set_input_line(m_maincpu, 4, CLEAR_LINE);
+//  m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0;
 }
 

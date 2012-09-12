@@ -24,7 +24,7 @@ public:
 	bitmap_ind16       *m_bitmap_buffer;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	dac_device *m_dac;
 
 	UINT8          m_irq_mask;

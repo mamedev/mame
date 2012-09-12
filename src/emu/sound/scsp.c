@@ -1241,7 +1241,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 	if(scsp->udata.data[0x1e/2] & 0x10)
 	{
 		popmessage("SCSP DMA IRQ triggered, contact MAMEdev");
-		device_set_input_line(space->machine().device("audiocpu"),DecodeSCI(scsp,SCIDMA),HOLD_LINE);
+		space->machine().device("audiocpu")->execute().set_input_line(DecodeSCI(scsp,SCIDMA),HOLD_LINE);
 	}
 }
 

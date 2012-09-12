@@ -36,7 +36,7 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_68705_port_b_w)
 
 	if ((m_ddr_b & 0x02) && (~m_port_b_out & 0x02) && (data & 0x02)) /* positive going transition of the clock */
 	{
-		device_set_input_line(m_mcu, 0, CLEAR_LINE);
+		m_mcu->execute().set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 
 	}
@@ -81,7 +81,7 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_mcu_w)
 
 	m_port_a_in = data;
 	m_main_sent = 1;
-	device_set_input_line(m_mcu, 0, ASSERT_LINE);
+	m_mcu->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

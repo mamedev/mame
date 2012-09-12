@@ -588,13 +588,13 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-//  device_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0x4c/4); // ?
+//  device->execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x4c/4); // ?
 }
 
 static INTERRUPT_GEN( unk_irq )
 {
-	device_set_input_line_and_vector(device,0,HOLD_LINE,0x48/4); // ?
+	device->execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); // ?
 }
 
 

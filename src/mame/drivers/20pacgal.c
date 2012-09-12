@@ -113,7 +113,7 @@ WRITE8_MEMBER(_20pacgal_state::irqack_w)
 	m_irq_mask = data & 1;
 
 	if (!m_irq_mask)
-		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
@@ -345,7 +345,7 @@ static MACHINE_START( 20pacgal )
 {
 	_20pacgal_state *state = machine.driver_data<_20pacgal_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_eeprom = machine.device("eeprom");
 
 	state->save_item(NAME(state->m_game_selected));
@@ -367,7 +367,7 @@ static INTERRUPT_GEN( vblank_irq )
 	_20pacgal_state *state = device->machine().driver_data<_20pacgal_state>();
 
 	if(state->m_irq_mask)
-		device_set_input_line(device, 0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
+		device->execute().set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
 static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )

@@ -218,10 +218,10 @@ static TIMER_DEVICE_CALLBACK( parentj_interrupt )
 	int scanline = param;
 
 	if(scanline == 448)
-		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+		state->m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
-		device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
+		state->m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -246,7 +246,7 @@ static MACHINE_START( taitoo )
 {
 	taitoo_state *state = machine.driver_data<taitoo_state>();
 
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_tc0080vco = machine.device("tc0080vco");
 }
 

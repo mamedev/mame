@@ -701,12 +701,12 @@ static INTERRUPT_GEN( m90_interrupt )
 
 static INTERRUPT_GEN( dynablsb_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x60/4);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
 }
 
 static INTERRUPT_GEN( bomblord_interrupt )
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50/4);
+	device->execute().set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
 }
 
 

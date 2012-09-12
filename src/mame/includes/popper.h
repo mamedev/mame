@@ -33,7 +33,7 @@ public:
 	rectangle m_tilemap_clip;
 
 	/* devices */
-	device_t *m_audiocpu;
+	cpu_device *m_audiocpu;
 
 	UINT8 m_nmi_mask;
 	DECLARE_READ8_MEMBER(popper_input_ports_r);

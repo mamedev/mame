@@ -163,7 +163,7 @@ WRITE8_MEMBER(scramble_state::frogger_filter_w)
 
 void scramble_sh_init(running_machine &machine)
 {
-	device_set_irq_callback(machine.device("audiocpu"), scramble_sh_irq_callback);
+	machine.device("audiocpu")->execute().set_irq_acknowledge_callback(scramble_sh_irq_callback);
 
 	/* PR is always 0, D is always 1 */
 	machine.device<ttl7474_device>("konami_7474")->d_w(1);

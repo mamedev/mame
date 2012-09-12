@@ -30,8 +30,8 @@ public:
 	UINT8          m_gfxbank;
 
 	/* devices */
-	device_t *m_maincpu;
-	device_t *m_subcpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
 	DECLARE_WRITE8_MEMBER(metlclsh_cause_irq);
 	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi);
 	DECLARE_WRITE8_MEMBER(metlclsh_cause_nmi2);

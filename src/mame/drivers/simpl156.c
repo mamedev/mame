@@ -385,7 +385,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( simpl156_vbl_interrupt )
 {
-	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -1055,7 +1055,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 {
 	if (space.device().safe_pc() == 0x284)
-		device_spin_until_time(&space.device(), attotime::from_usec(400));
+		space.device().execute().spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x18/4];
 }
 
@@ -1069,7 +1069,7 @@ DRIVER_INIT_MEMBER(simpl156_state,joemacr)
 READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 {
 	if (space.device().safe_pc() == 0x2d4)
-		device_spin_until_time(&space.device(), attotime::from_usec(400));
+		space.device().execute().spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x18/4];
 }
 
@@ -1082,7 +1082,7 @@ DRIVER_INIT_MEMBER(simpl156_state,chainrec)
 READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 {
 	if (space.device().safe_pc() == 0x4f0)
-		device_spin_until_time(&space.device(), attotime::from_usec(400));
+		space.device().execute().spin_until_time(attotime::from_usec(400));
 	return m_systemram[0xae0/4];
 }
 
@@ -1096,7 +1096,7 @@ DRIVER_INIT_MEMBER(simpl156_state,prtytime)
 READ32_MEMBER(simpl156_state::charlien_speedup_r)
 {
 	if (space.device().safe_pc() == 0xc8c8)
-		device_spin_until_time(&space.device(), attotime::from_usec(400));
+		space.device().execute().spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x10/4];
 }
 
@@ -1109,7 +1109,7 @@ DRIVER_INIT_MEMBER(simpl156_state,charlien)
 READ32_MEMBER(simpl156_state::osman_speedup_r)
 {
 	if (space.device().safe_pc() == 0x5974)
-		device_spin_until_time(&space.device(), attotime::from_usec(400));
+		space.device().execute().spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x10/4];
 }
 

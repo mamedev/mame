@@ -23,7 +23,7 @@ public:
 	tilemap_t* m_bg_tilemap;
 
 	/* devices */
-	device_t *m_maincpu;
+	cpu_device *m_maincpu;
 	DECLARE_WRITE8_MEMBER(cball_vram_w);
 	DECLARE_READ8_MEMBER(cball_wram_r);
 	DECLARE_WRITE8_MEMBER(cball_wram_w);
@@ -90,7 +90,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static MACHINE_START( cball )
 {
 	cball_state *state = machine.driver_data<cball_state>();
-	state->m_maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
 }
 
 static MACHINE_RESET( cball )

@@ -23,7 +23,7 @@ public:
 	int        m_flipscreen;
 
 	/* devices */
-	device_t *m_subcpu;
+	cpu_device *m_subcpu;
 	DECLARE_WRITE8_MEMBER(himesiki_rombank_w);
 	DECLARE_WRITE8_MEMBER(himesiki_sound_w);
 	DECLARE_WRITE8_MEMBER(himesiki_bg_ram_w);

@@ -804,7 +804,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 				m_adsp_regs.bdma_control |= ((src_addr >> 14) & 0xff) << 8;
 
 				if (m_adsp_regs.bdma_control & 8)
-					device_set_input_line(m_adsp, INPUT_LINE_RESET, PULSE_LINE);
+					m_adsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			}
 			break;
 		}

@@ -121,10 +121,10 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	upd765_reset_w(m_fdc, BIT(data, 5));
 
 	// timer 0 enable
-	device_set_input_line(m_maincpu, INPUT_LINE_TMRIN0, BIT(data, 6));
+	m_maincpu->set_input_line(INPUT_LINE_TMRIN0, BIT(data, 6));
 
 	// timer 1 enable
-	device_set_input_line(m_maincpu, INPUT_LINE_TMRIN1, BIT(data, 7));
+	m_maincpu->set_input_line(INPUT_LINE_TMRIN1, BIT(data, 7));
 }
 
 WRITE8_MEMBER( tandy2k_state::dma_mux_w )

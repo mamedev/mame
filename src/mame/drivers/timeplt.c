@@ -64,7 +64,7 @@ static INTERRUPT_GEN( timeplt_interrupt )
 	timeplt_state *state = device->machine().driver_data<timeplt_state>();
 
 	if (state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -72,7 +72,7 @@ WRITE8_MEMBER(timeplt_state::timeplt_nmi_enable_w)
 {
 	m_nmi_enable = data & 1;
 	if (!m_nmi_enable)
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

@@ -225,14 +225,14 @@ static WRITE8_DEVICE_HANDLER(a2bus_irq_w)
 {
     apple2_state *a2 = device->machine().driver_data<apple2_state>();
 
-    device_set_input_line(a2->m_maincpu, M6502_IRQ_LINE, data);
+    a2->m_maincpu->set_input_line(M6502_IRQ_LINE, data);
 }
 
 static WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
 {
     apple2_state *a2 = device->machine().driver_data<apple2_state>();
 
-    device_set_input_line(a2->m_maincpu, INPUT_LINE_NMI, data);
+    a2->m_maincpu->set_input_line(INPUT_LINE_NMI, data);
 }
 
 static WRITE8_DEVICE_HANDLER(a2bus_inh_w)

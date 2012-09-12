@@ -91,7 +91,7 @@ WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
 
 		m_pending_command = 1;
 		soundlatch_byte_w(space, 0, data & 0xff);
-		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -296,7 +296,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	inufuku_state *state = device->machine().driver_data<inufuku_state>();
-	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -319,7 +319,7 @@ static MACHINE_START( inufuku )
 	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 	state->membank("bank1")->set_entry(0);
 
-	state->m_audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
 	state->save_item(NAME(state->m_pending_command));
 	state->save_item(NAME(state->m_bg_scrollx));

@@ -418,7 +418,7 @@ static INTERRUPT_GEN( svision_frame_int )
 {
 	svision_state *state = device->machine().driver_data<svision_state>();
 	if (state->BANK&1)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	svision_sound_decrement(state->m_sound);
 }

@@ -90,12 +90,12 @@ UINT32 cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 WRITE16_MEMBER( cesclassic_state::irq2_ack_w )
 {
-	device_set_input_line(m_maincpu, 2, CLEAR_LINE);
+	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
 WRITE16_MEMBER( cesclassic_state::irq3_ack_w )
 {
-	device_set_input_line(m_maincpu, 3, CLEAR_LINE);
+	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
 WRITE16_MEMBER( cesclassic_state::lamps_w )
