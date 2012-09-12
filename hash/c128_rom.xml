@@ -46,7 +46,7 @@
 		</part>
 	</software>
 
-	<software name="superchpb">
+	<software name="superchpb" cloneof="superchp">
 		<description>Super Chip B</description>
 		<year>1988</year>
 		<publisher>Utilities Unlimited</publisher>

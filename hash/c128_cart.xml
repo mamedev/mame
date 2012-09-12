@@ -18,7 +18,7 @@
 		</part>
 	</software>
 
-	<software name="c128diaga" supported="no">
+	<software name="c128diaga" cloneof="c128diag" supported="no">
 		<description>C128 Diagnostic</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
