@@ -496,6 +496,38 @@ ROM_START( gngbl )
 	ROM_LOAD( "14.84490.1l",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) /* sprites 2 Plane 3-4 */
 ROM_END
 
+ROM_START( gngprot )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "gg10n.bin",      0x04000, 0x4000, CRC(5d2a2c90) SHA1(39db20ebf95deb61d887bd88e3cb66c7bbd11f15) )
+	ROM_LOAD( "gg9n.bin",       0x08000, 0x4000, CRC(30eb183d) SHA1(8df3d73c9d190edfa0b435cdf994b9f30def2ce0) )
+	ROM_LOAD( "gg8n.bin",       0x0c000, 0x4000, CRC(4b5e2145) SHA1(99f269d52ab817fee456b157ce7931859711102a) )
+	ROM_LOAD( "gg13n.bin",      0x10000, 0x4000, CRC(2664aae6) SHA1(d2dd3951d115da8a28096d4bad709b1d6f80fc50) )
+	ROM_LOAD( "gg12n.bin",      0x14000, 0x4000, CRC(c7ef4ae8) SHA1(ffa34bad487b3a5b249bc8d1bbe614e34d1dc2c6) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gg14h.bin",      0x0000, 0x8000, CRC(55cfb196) SHA1(df9cdbb24c26bca226d7274225725d62ea854c7a) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "1.84490.11e",      0x00000, 0x4000, BAD_DUMP CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) ) /* characters */ // MISSING FROM THIS SET! (was on PCB, why wasn't it dumped?)
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "gg3e.bin",      0x00000, 0x4000, CRC(68db22c8) SHA1(ada859bfa60d9563a8a86b1b6526f626b932981c) ) /* tiles 0-1 Plane 1*/
+	ROM_LOAD( "gg1e.bin",      0x04000, 0x4000, CRC(dad8dd2f) SHA1(30a6dd2f6b26acaab0a003f5099a2fcb46644d45) ) /* tiles 2-3 Plane 1*/
+	ROM_LOAD( "gg3c.bin",      0x08000, 0x4000, CRC(7a158323) SHA1(183f33f214b4c04e9130cbe2c24e08b5303bb2de) ) /* tiles 0-1 Plane 2*/
+	ROM_LOAD( "gg1c.bin",      0x0c000, 0x4000, CRC(7314d095) SHA1(1288eaf0d82ac65a1bb94e68114b4b2f84910901) ) /* tiles 2-3 Plane 2*/
+	ROM_LOAD( "gg3b.bin",      0x10000, 0x4000, CRC(03a96d9b) SHA1(5d74e156b0cd1b54d7bd61e1664834f768d5b9f8) ) /* tiles 0-1 Plane 3*/
+	ROM_LOAD( "gg1b.bin",      0x14000, 0x4000, CRC(7b9899bc) SHA1(be9b7b18542f38c8fb8b075760995acecace79ad) ) /* tiles 2-3 Plane 3*/
+
+	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASEFF )
+	ROM_LOAD( "gg4l.bin",     0x00000, 0x4000, CRC(49cf81b4) SHA1(b87aba71446884f9926ced28716876ad701b183f) ) /* sprites 0 Plane 1-2 */
+	ROM_LOAD( "gg3l.bin",     0x04000, 0x4000, CRC(e61437b1) SHA1(7043ac80ee40057839bf7ee7af62961d9ff3d50b) ) /* sprites 1 Plane 1-2 */
+	ROM_LOAD( "gg1l.bin",     0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) /* sprites 2 Plane 1-2 */
+	ROM_LOAD( "gg4n.bin",     0x10000, 0x4000, CRC(d5aff5a7) SHA1(b75b271c7d38ed9689bff7a3bc9a67a0aae9ed8b) ) /* sprites 0 Plane 3-4 */
+	ROM_LOAD( "gg3n.bin",     0x14000, 0x4000, CRC(d589caeb) SHA1(f787557dc083f765aec3d64896ef6cdf5e8d54cc) ) /* sprites 1 Plane 3-4 */
+	ROM_LOAD( "gg1n.bin",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) /* sprites 2 Plane 3-4 */
+ROM_END
+
+
 ROM_START( gngblita )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "3",      0x04000, 0x4000, CRC(4859d068) SHA1(8b22772ea383ecaee01da696c0c7b568ab1e4615) )
@@ -745,6 +777,7 @@ DRIVER_INIT_MEMBER(gng_state,diamond)
 GAME( 1985, gng,       0,   gng, gng, driver_device,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gnga,      gng, gng, gng, driver_device,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngbl,     gng, gng, gng, driver_device,      0,       ROT0, "bootleg", "Ghosts'n Goblins (bootleg with Cross)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngprot,   gng, gng, gng, driver_device,      0,       ROT0, "Capcom", "Ghosts'n Goblins (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngblita,  gng, gng, gng, driver_device,      0,       ROT0, "bootleg", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngc,      gng, gng, gng, driver_device,      0,       ROT0, "Capcom", "Ghosts'n Goblins (World? set 3)", GAME_SUPPORTS_SAVE ) // rev c?
 GAME( 1985, gngt,      gng, gng, gng, driver_device,      0,       ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", GAME_SUPPORTS_SAVE )
