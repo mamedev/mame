@@ -390,7 +390,7 @@ TIMER_DEVICE_CALLBACK( dpoker_hopper_callback )
 		dpoker_coin_status &= ~8;
 	}
 	
-	coin_counter_w(timer.machine(), 3, dpoker_output_34 & 8);
+	coin_counter_w(timer.machine(), 3, dpoker_coin_status & 8);
 }
 
 TIMER_DEVICE_CALLBACK( dpoker_coin_in_callback )
