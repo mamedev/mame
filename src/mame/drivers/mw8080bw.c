@@ -44,8 +44,9 @@
           cabinet side art all call it just "Amazing Maze"
         * Desert Gun was originally named Road Runner. The name was changed
           when Midway merged with Bally who had a game by the same title
-        * Guided Missile: Original manufacturer is Taito and title is "Missile X".
-          Midway licensed the game from Taito
+        * Guided Missile: It is a misconception that that this is the same
+          game as Taito's "Missile X". The latter does not run on a CPU,
+          akin to Midway's Gun Fight vs Taito's Western Gun.
         * Space Invaders: Taito imported this licensed version because of
           short supply in Japan. The game is called "Space Invaders M"
           The M stands for Midway.
@@ -3196,7 +3197,7 @@ ROM_END
 /* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, driver_device, 0, ROT0,   "Midway", "Road Runner (Midway)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 619 */ GAME( 1977, dplay,    0,        dplay,    dplay, driver_device,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
 /* 622 */ GAMEL(1977, lagunar,  0,        zzzap,    lagunar, driver_device,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_lagunar )
-/* 623 */ GAME( 1977, gmissile, 0,        gmissile, gmissile, driver_device, 0, ROT0,   "Taito / Midway", "Missile X / Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+/* 623 */ GAME( 1977, gmissile, 0,        gmissile, gmissile, driver_device, 0, ROT0,   "Midway", "Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 626 */ GAME( 1977, m4,       0,        m4,       m4, driver_device,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns, driver_device,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
 /* 630 */ GAMEL(1978, clowns1,  clowns,   clowns,   clowns1, driver_device,  0, ROT0,   "Midway", "Clowns (rev. 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
