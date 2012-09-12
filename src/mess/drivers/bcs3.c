@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class bcs3_state : public driver_device
 {
@@ -209,11 +207,11 @@ static INPUT_PORTS_START( bcs3 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(bcs3_state)
+void bcs3_state::machine_reset()
 {
 }
 
-VIDEO_START_MEMBER( bcs3_state )
+void bcs3_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }

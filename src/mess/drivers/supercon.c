@@ -22,7 +22,6 @@
 #include "sound/beep.h"
 #include "supercon.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class supercon_state : public driver_device
 {
@@ -553,7 +552,7 @@ static MACHINE_START( supercon )
 	machine.save().register_presave(save_prepost_delegate(FUNC(board_presave),state));
 }
 
-MACHINE_RESET_MEMBER( supercon_state )
+void supercon_state::machine_reset()
 {
 	set_board();
 	set_pieces();

@@ -35,7 +35,6 @@ Z    Zleep (lock terminal). Press control+G twice to unlock.
 #include "machine/ins8250.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class ccs2810_state : public driver_device
 {
@@ -110,7 +109,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(ccs2810_state, kbd_put)
 };
 
-MACHINE_RESET_MEMBER(ccs2810_state)
+void ccs2810_state::machine_reset()
 {
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 	m_26_count = 0x41;

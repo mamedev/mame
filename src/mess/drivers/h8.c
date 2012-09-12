@@ -20,7 +20,6 @@
 #include "sound/beep.h"
 #include "h8.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class h8_state : public driver_device
 {
@@ -166,7 +165,7 @@ static INPUT_PORTS_START( h8 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("@ REG") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(h8_state)
+void h8_state::machine_reset()
 {
 	beep_set_frequency(m_beep, H8_BEEP_FRQ);
 	output_set_value("pwr_led", 0);

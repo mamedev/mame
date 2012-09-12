@@ -21,9 +21,6 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class beehive_state : public driver_device
 {
@@ -226,18 +223,18 @@ static INPUT_PORTS_START( beehive )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(beehive_state)
+void beehive_state::machine_reset()
 {
 }
 
-VIDEO_START_MEMBER( beehive_state )
+void beehive_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
-SCREEN_UPDATE16_MEMBER( beehive_state )
+UINT32 beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 cursor_pos = (m_p_videoram[0xcaf] | (m_p_videoram[0xcb0] << 8)) & 0xfff;
 	UINT16 p_linelist;

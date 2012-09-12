@@ -17,7 +17,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class czk80_state : public driver_device
 {
@@ -74,7 +73,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( czk80 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(czk80_state)
+void czk80_state::machine_reset()
 {
 	UINT8* bios = memregion("maincpu")->base() + 0xe000;
 	memcpy(m_p_ram, bios, 0x2000);

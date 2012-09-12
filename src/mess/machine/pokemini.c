@@ -1556,7 +1556,7 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 }
 
 
-MACHINE_START_MEMBER( pokemini_state )
+void pokemini_state::machine_start()
 {
 	/* Clear internal structures */
 	memset( &m_prc, 0, sizeof(m_prc) );

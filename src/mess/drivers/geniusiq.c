@@ -91,7 +91,6 @@ PCB - German Version:
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 #define KEYBOARD_QUEUE_SIZE 	0x80
 
@@ -559,7 +558,7 @@ static INPUT_PORTS_START( geniusiq_de )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( geniusiq_state )
+void geniusiq_state::machine_reset()
 {
 	m_keyboard.head = m_keyboard.tail = 0;
 

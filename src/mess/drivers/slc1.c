@@ -51,8 +51,6 @@ Pasting doesn't work, but if it did...
 #include "sound/speaker.h"
 #include "slc1.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
 
 class slc1_state : public driver_device
 {
@@ -162,11 +160,11 @@ READ8_MEMBER( slc1_state::io_r )
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER( slc1_state )
+void slc1_state::machine_start()
 {
 }
 
-MACHINE_RESET_MEMBER( slc1_state )
+void slc1_state::machine_reset()
 {
 }
 

@@ -19,7 +19,6 @@
 #include "machine/i8251.h"
 #include "video/i8275.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class sm1800_state : public driver_device
 {
@@ -72,7 +71,7 @@ static IRQ_CALLBACK(sm1800_irq_callback)
 	return 0xff;
 }
 
-MACHINE_RESET_MEMBER(sm1800_state)
+void sm1800_state::machine_reset()
 {
 	m_maincpu->set_irq_acknowledge_callback(sm1800_irq_callback);
 }

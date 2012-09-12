@@ -24,7 +24,6 @@ V Virtual Memory
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class pimps_state : public driver_device
 {
@@ -75,7 +74,7 @@ static INPUT_PORTS_START( pimps )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( pimps_state )
+void pimps_state::machine_reset()
 {
 	m_term_data = 0;
 }

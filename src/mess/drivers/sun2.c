@@ -72,7 +72,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class sun2_state : public driver_device
 {
@@ -100,7 +99,7 @@ static INPUT_PORTS_START( sun2 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(sun2_state)
+void sun2_state::machine_reset()
 {
 	UINT8* user1 = memregion("user1")->base();
 

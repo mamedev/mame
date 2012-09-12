@@ -21,8 +21,6 @@
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class zrt80_state : public driver_device
 {
@@ -181,13 +179,13 @@ static INPUT_PORTS_START( zrt80 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( zrt80_state )
+void zrt80_state::machine_reset()
 {
 	beep_set_frequency(m_beep, 800);
 	m_term_data = 0;
 }
 
-VIDEO_START_MEMBER( zrt80_state )
+void zrt80_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }

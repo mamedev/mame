@@ -52,7 +52,6 @@
 #include "machine/upd7201.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class sun1_state : public driver_device
 {
@@ -110,7 +109,7 @@ static INPUT_PORTS_START( sun1 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(sun1_state)
+void sun1_state::machine_reset()
 {
 	UINT8* user1 = memregion("user1")->base();
 

@@ -55,7 +55,6 @@ PIO A-Data 0F4h, A-Command 0F5h, B-Data 0F6h, B-Command 0F7h
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class mccpm_state : public driver_device
 {
@@ -110,7 +109,7 @@ static INPUT_PORTS_START( mccpm )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( mccpm_state )
+void mccpm_state::machine_reset()
 {
 	UINT8* bios = memregion("maincpu")->base();
 	memcpy(m_p_ram, bios, 0x1000);

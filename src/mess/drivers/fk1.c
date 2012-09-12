@@ -13,8 +13,6 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class fk1_state : public driver_device
 {
@@ -423,7 +421,7 @@ static TIMER_DEVICE_CALLBACK( vsync_callback )
 }
 
 
-MACHINE_RESET_MEMBER( fk1_state )
+void fk1_state::machine_reset()
 {
 	address_space *space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
@@ -437,7 +435,7 @@ MACHINE_RESET_MEMBER( fk1_state )
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(fk1_irq_callback);
 }
 
-SCREEN_UPDATE16_MEMBER( fk1_state )
+UINT32 fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 code;
 	int y, x, b;

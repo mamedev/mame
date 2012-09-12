@@ -16,9 +16,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class univac_state : public driver_device
 {
@@ -79,17 +76,17 @@ static INPUT_PORTS_START( uts20 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(univac_state)
+void univac_state::machine_reset()
 {
 	m_screen_num = 0;
 }
 
-VIDEO_START_MEMBER(univac_state)
+void univac_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER(univac_state)
+UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;

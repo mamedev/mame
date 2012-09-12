@@ -16,8 +16,6 @@
 #include "video/mc6845.h"
 #include "machine/8237dma.h"
 
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 
 class b16_state : public driver_device
@@ -63,14 +61,14 @@ public:
 #define mc6845_update_addr  	(((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-VIDEO_START_MEMBER( b16_state )
+void b16_state::video_start()
 {
 	// find memory regions
 	m_char_rom = memregion("pcg")->base();
 }
 
 
-SCREEN_UPDATE16_MEMBER( b16_state )
+UINT32 b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	b16_state *state = machine().driver_data<b16_state>();
 	int x,y;

@@ -34,7 +34,6 @@ Z nothing
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class hpz80unk_state : public driver_device
 {
@@ -102,7 +101,7 @@ static INPUT_PORTS_START( hpz80unk )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( hpz80unk_state )
+void hpz80unk_state::machine_reset()
 {
 	UINT8* user1 = memregion("user1")->base();
 	memcpy((UINT8*)m_p_rom, user1, 0x4000);

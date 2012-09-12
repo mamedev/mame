@@ -30,9 +30,6 @@
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class cd2650_state : public driver_device
 {
@@ -96,17 +93,17 @@ static INPUT_PORTS_START( cd2650 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(cd2650_state)
+void cd2650_state::machine_reset()
 {
 	m_term_data = 0x80;
 }
 
-VIDEO_START_MEMBER(cd2650_state)
+void cd2650_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER(cd2650_state)
+UINT32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.

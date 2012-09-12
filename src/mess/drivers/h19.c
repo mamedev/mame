@@ -36,8 +36,6 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 #define H19_BEEP_FRQ (H19_CLOCK / 1024)
@@ -290,12 +288,12 @@ static INPUT_PORTS_START( h19 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(h19_state)
+void h19_state::machine_reset()
 {
 	beep_set_frequency(m_beep, H19_BEEP_FRQ);
 }
 
-VIDEO_START_MEMBER( h19_state )
+void h19_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }

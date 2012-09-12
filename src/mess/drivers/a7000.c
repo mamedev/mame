@@ -15,8 +15,6 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
 
 class a7000_state : public driver_device
 {
@@ -766,7 +764,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( a7000 )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER( a7000_state )
+void a7000_state::machine_start()
 {
 	m_IOMD_timer[0] = machine().scheduler().timer_alloc(FUNC(IOMD_timer0_callback));
 	m_IOMD_timer[1] = machine().scheduler().timer_alloc(FUNC(IOMD_timer1_callback));
@@ -775,7 +773,7 @@ MACHINE_START_MEMBER( a7000_state )
 	m_io_id = 0xd4e7;
 }
 
-MACHINE_RESET_MEMBER( a7000_state )
+void a7000_state::machine_reset()
 {
 	m_IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
 //  m_IRQ_status_A = 0x10; // set POR bit ON

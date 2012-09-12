@@ -41,7 +41,6 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 
 class ipc_state : public driver_device
@@ -95,7 +94,7 @@ static INPUT_PORTS_START( ipc )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(ipc_state)
+void ipc_state::machine_reset()
 {
 	machine().device("maincpu")->state().set_state_int(I8085_PC, 0xE800);
 }

@@ -12,7 +12,6 @@ It requires a floppy disk to boot from.
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class ccs2422_state : public driver_device
 {
@@ -70,7 +69,7 @@ static INPUT_PORTS_START( ccs2422 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(ccs2422_state)
+void ccs2422_state::machine_reset()
 {
 	UINT8* user1 = memregion("user1")->base();
 	memcpy((UINT8*)m_ccs_ram, user1, 0x0800);

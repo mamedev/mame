@@ -27,8 +27,6 @@
 #include "cpu/z80/z80daisy.h"
 #include "babbage.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
 #define MAIN_CLOCK 25e5
 
 class babbage_state : public driver_device
@@ -68,11 +66,11 @@ public:
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER( babbage_state )
+void babbage_state::machine_start()
 {
 }
 
-MACHINE_RESET_MEMBER( babbage_state )
+void babbage_state::machine_reset()
 {
 }
 

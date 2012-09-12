@@ -33,7 +33,6 @@
 #include "video/dl1416.h"
 #include "sitcom.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 
 class sitcom_state : public driver_device
@@ -72,7 +71,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sitcom )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( sitcom_state )
+void sitcom_state::machine_reset()
 {
 	dl1416_ce_w(m_ds0, 0); // enable
 	dl1416_wr_w(m_ds0, 0);

@@ -22,8 +22,6 @@
 #include "machine/micropolis.h"
 
 #define SORCERER_USING_RS232 0
-#define SCREEN_UPDATE_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 typedef struct {
 	struct {

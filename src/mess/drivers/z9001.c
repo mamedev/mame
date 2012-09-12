@@ -37,10 +37,7 @@ ToDo:
 // temporary
 #include "machine/keyboard.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-//#define MACHINE_START_MEMBER(name) void name::machine_start()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-
+//
 class z9001_state : public driver_device
 {
 public:
@@ -150,13 +147,13 @@ static TIMER_DEVICE_CALLBACK( timer_callback )
 	state->m_maincpu->space(AS_PROGRAM)->write_byte(0x006a, 0);
 }
 
-MACHINE_RESET_MEMBER( z9001_state )
+void z9001_state::machine_reset()
 {
 	beep_set_frequency(m_beeper, 800);
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
-VIDEO_START_MEMBER( z9001_state )
+void z9001_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }

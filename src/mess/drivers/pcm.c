@@ -61,9 +61,6 @@
 #include "sound/wave.h"
 #include "machine/k7659kb.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class pcm_state : public driver_device
 {
@@ -180,16 +177,16 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pcm )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(pcm_state)
+void pcm_state::machine_reset()
 {
 }
 
-VIDEO_START_MEMBER( pcm_state )
+void pcm_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER( pcm_state )
+UINT32 pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0x400,x;

@@ -13,9 +13,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class c10_state : public driver_device
 {
@@ -60,20 +57,20 @@ static TIMER_CALLBACK( c10_reset )
 	state->membank("boot")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(c10_state)
+void c10_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(4), FUNC(c10_reset));
 }
 
-VIDEO_START_MEMBER( c10_state )
+void c10_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. The word at FAB5 looks like it might be cursor location. */
-SCREEN_UPDATE16_MEMBER( c10_state )
+UINT32 c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;

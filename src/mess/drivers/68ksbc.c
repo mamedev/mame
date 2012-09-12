@@ -29,7 +29,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class c68ksbc_state : public driver_device
 {
@@ -77,7 +76,7 @@ static INPUT_PORTS_START( c68ksbc )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( c68ksbc_state )
+void c68ksbc_state::machine_reset()
 {
 	m_term_data = 0;
 }

@@ -23,9 +23,6 @@
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 #define LOG	1
 
@@ -198,7 +195,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 };
 
 
-MACHINE_RESET_MEMBER(phunsy_state)
+void phunsy_state::machine_reset()
 {
 	membank( "bank1" )->set_base( m_ram_1800 );
 	membank( "bank2" )->set_base( memregion("ram_4000")->base() );
@@ -220,13 +217,13 @@ static PALETTE_INIT( phunsy )
 }
 
 
-VIDEO_START_MEMBER( phunsy_state )
+void phunsy_state::video_start()
 {
 	m_p_chargen = memregion( "chargen" )->base();
 }
 
 
-SCREEN_UPDATE16_MEMBER( phunsy_state )
+UINT32 phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx,col;
 	UINT16 sy=0,ma=0,x;

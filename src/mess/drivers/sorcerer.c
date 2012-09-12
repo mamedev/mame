@@ -342,12 +342,12 @@ static GFXDECODE_START( sorcerer )
 	GFXDECODE_ENTRY( "maincpu", 0xf800, sorcerer_charlayout, 0, 1 )
 GFXDECODE_END
 
-VIDEO_START_MEMBER( sorcerer_state )
+void sorcerer_state::video_start()
 {
 	m_p_videoram = memregion("maincpu")->base()+0xf000;
 }
 
-SCREEN_UPDATE_MEMBER( sorcerer_state )
+UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0x80,x;

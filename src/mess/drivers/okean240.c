@@ -52,8 +52,6 @@ Usage of terminal:
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class okean240_state : public driver_device
 {
@@ -363,7 +361,7 @@ static TIMER_CALLBACK( okean240_boot )
 	state->membank("boot")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER( okean240_state )
+void okean240_state::machine_reset()
 {
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(okean240_boot));
 	membank("boot")->set_entry(1);
@@ -388,7 +386,7 @@ DRIVER_INIT_MEMBER(okean240_state,okean240)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
-VIDEO_START_MEMBER( okean240_state )
+void okean240_state::video_start()
 {
 }
 

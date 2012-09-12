@@ -51,7 +51,6 @@
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class eacc_state : public driver_device
 {
@@ -128,7 +127,7 @@ static INPUT_PORTS_START(eacc)
 	PORT_BIT( 0xf8, 0, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(eacc_state)
+void eacc_state::machine_reset()
 {
 	m_cb2 = 0;
 }

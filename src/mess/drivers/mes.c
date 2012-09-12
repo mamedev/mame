@@ -9,9 +9,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class mes_state : public driver_device
 {
@@ -46,18 +43,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mes )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(mes_state)
+void mes_state::machine_reset()
 {
 }
 
-VIDEO_START_MEMBER( mes_state )
+void mes_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
-SCREEN_UPDATE16_MEMBER( mes_state )
+UINT32 mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;

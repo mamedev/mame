@@ -12,9 +12,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class k8915_state : public driver_device
 {
@@ -81,7 +78,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( k8915 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(k8915_state)
+void k8915_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
 }
@@ -92,12 +89,12 @@ DRIVER_INIT_MEMBER(k8915_state,k8915)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-VIDEO_START_MEMBER( k8915_state )
+void k8915_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER( k8915_state )
+UINT32 k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;

@@ -23,7 +23,6 @@
 #include "machine/ram.h"
 #include "video/upd7220.h"
 
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class vt240_state : public driver_device
 {

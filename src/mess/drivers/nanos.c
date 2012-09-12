@@ -17,10 +17,6 @@
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class nanos_state : public driver_device
 {
@@ -263,12 +259,12 @@ static INPUT_PORTS_START( nanos )
 INPUT_PORTS_END
 
 
-VIDEO_START_MEMBER( nanos_state )
+void nanos_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER( nanos_state )
+UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  static UINT8 framecnt=0;
 	UINT8 y,ra,chr,gfx;
@@ -436,12 +432,12 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	}
 }
 
-MACHINE_START_MEMBER(nanos_state)
+void nanos_state::machine_start()
 {
 	m_key_pressed = 0xff;
 }
 
-MACHINE_RESET_MEMBER(nanos_state)
+void nanos_state::machine_reset()
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 

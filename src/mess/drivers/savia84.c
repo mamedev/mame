@@ -31,7 +31,6 @@
 #include "machine/i8255.h"
 #include "savia84.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class savia84_state : public driver_device
 {
@@ -122,7 +121,7 @@ static INPUT_PORTS_START( savia84 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( savia84_state )
+void savia84_state::machine_reset()
 {
 	m_digit_last = 0;
 }

@@ -20,7 +20,6 @@ real hardware.
 //#include "machine/ins8250.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class imds_state : public driver_device
 {
@@ -77,7 +76,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(imds_state, kbd_put)
 };
 
-MACHINE_RESET_MEMBER( imds_state )
+void imds_state::machine_reset()
 {
 	m_term_data = 0;
 }

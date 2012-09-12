@@ -107,10 +107,6 @@
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 typedef struct {
 	struct {
@@ -548,12 +544,12 @@ static TIMER_CALLBACK( sol20_boot )
 	state->membank("boot")->set_entry(0);
 }
 
-MACHINE_START_MEMBER( sol20_state )
+void sol20_state::machine_start()
 {
 	m_cassette_timer = machine().scheduler().timer_alloc(FUNC(sol20_cassette_tc));
 }
 
-MACHINE_RESET_MEMBER( sol20_state )
+void sol20_state::machine_reset()
 {
 	UINT8 data = 0, s_count = 0;
 	int s_clock;
@@ -611,12 +607,12 @@ DRIVER_INIT_MEMBER(sol20_state,sol20)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
-VIDEO_START_MEMBER( sol20_state )
+void sol20_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER( sol20_state )
+UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.

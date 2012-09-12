@@ -12,7 +12,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class qtsbc_state : public driver_device
 {
@@ -64,7 +63,7 @@ static INPUT_PORTS_START( qtsbc )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(qtsbc_state)
+void qtsbc_state::machine_reset()
 {
 	UINT8* bios = memregion("maincpu")->base()+0x10000;
 	memcpy(m_p_ram, bios, 0x800);

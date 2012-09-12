@@ -11,7 +11,6 @@
 #include "video/i8275.h"
 #include "machine/keyboard.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class ipds_state : public driver_device
 {
@@ -74,7 +73,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ipds )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(ipds_state)
+void ipds_state::machine_reset()
 {
 }
 

@@ -57,9 +57,6 @@
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 #define MSM5832RS_TAG "rtc"
 
 class mycom_state : public driver_device
@@ -117,7 +114,7 @@ public:
 
 
 
-VIDEO_START_MEMBER( mycom_state )
+void mycom_state::video_start()
 {
 	m_p_videoram = memregion("vram")->base();
 	m_p_chargen = memregion("chargen")->base();
@@ -566,12 +563,12 @@ static const sn76496_config psg_intf =
 };
 
 
-MACHINE_START_MEMBER(mycom_state)
+void mycom_state::machine_start()
 {
 	m_p_ram = memregion("maincpu")->base();
 }
 
-MACHINE_RESET_MEMBER(mycom_state)
+void mycom_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
 	m_upper_sw = 0x10000;

@@ -30,8 +30,6 @@
 
 #define MAIN_CLOCK XTAL_4MHz
 
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class alphatro_state : public driver_device
 {
@@ -133,7 +131,7 @@ WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 	m_cass->output( (state) ? 0.8 : -0.8);
 }
 
-VIDEO_START_MEMBER( alphatro_state )
+void alphatro_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }

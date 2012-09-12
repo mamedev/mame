@@ -50,9 +50,6 @@
 #include "sound/wave.h"
 #include "machine/ram.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class rx78_state : public driver_device
 {
@@ -109,11 +106,11 @@ READ8_MEMBER( rx78_state::rx78_f0_r )
 }
 
 
-VIDEO_START_MEMBER( rx78_state )
+void rx78_state::video_start()
 {
 }
 
-SCREEN_UPDATE16_MEMBER( rx78_state )
+UINT32 rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *vram = memregion("vram")->base();
 	int x,y,count;
@@ -411,7 +408,7 @@ static INPUT_PORTS_START( rx78 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(rx78_state)
+void rx78_state::machine_reset()
 {
 }
 

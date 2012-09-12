@@ -36,8 +36,6 @@
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class dim68k_state : public driver_device
 {
@@ -200,7 +198,7 @@ static INPUT_PORTS_START( dim68k )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(dim68k_state)
+void dim68k_state::machine_reset()
 {
 	UINT8* ROM = memregion("bootrom")->base();
 
@@ -209,7 +207,7 @@ MACHINE_RESET_MEMBER(dim68k_state)
 	machine().device("maincpu")->reset();
 }
 
-VIDEO_START_MEMBER( dim68k_state )
+void dim68k_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }

@@ -13,7 +13,6 @@
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
 
-#define MACHINE_START_MEMBER(name) void name::machine_start()
 
 typedef struct
 {

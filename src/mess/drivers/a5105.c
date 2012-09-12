@@ -30,8 +30,6 @@ ToDo:
 #include "formats/basicdsk.h"
 
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
 
 class a5105_state : public driver_device
 {
@@ -453,7 +451,7 @@ static INPUT_PORTS_START( a5105 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(a5105_state)
+void a5105_state::machine_reset()
 {
 	address_space *space = m_maincpu->space(AS_PROGRAM);
 	a5105_ab_w(*space, 0, 9); // turn motor off
@@ -500,7 +498,7 @@ static PALETTE_INIT( gdc )
 	}
 }
 
-VIDEO_START_MEMBER( a5105_state )
+void a5105_state::video_start()
 {
 	// find memory regions
 	m_char_rom = memregion("pcg")->base();

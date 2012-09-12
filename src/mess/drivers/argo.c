@@ -24,9 +24,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class argo_state : public driver_device
 {
@@ -258,7 +255,7 @@ static TIMER_CALLBACK( argo_boot )
 	state->membank("boot")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(argo_state)
+void argo_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
@@ -270,12 +267,12 @@ DRIVER_INIT_MEMBER(argo_state,argo)
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-VIDEO_START_MEMBER( argo_state )
+void argo_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
 
-SCREEN_UPDATE16_MEMBER( argo_state )
+UINT32 argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;

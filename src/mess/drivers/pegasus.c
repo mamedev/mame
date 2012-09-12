@@ -44,10 +44,6 @@
 #include "sound/wave.h"
 
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define MACHINE_START_MEMBER(name) void name::machine_start()
-#define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class pegasus_state : public driver_device
 {
@@ -318,7 +314,7 @@ static const cassette_interface pegasus_cassette_interface =
 };
 
 
-VIDEO_START_MEMBER( pegasus_state )
+void pegasus_state::video_start()
 {
 	m_p_chargen = memregion("chargen")->base();
 }
@@ -336,7 +332,7 @@ static const UINT8 mcm6571a_shift[] =
 };
 
 
-SCREEN_UPDATE16_MEMBER( pegasus_state )
+UINT32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx,inv;
 	UINT16 sy=0,ma=0,x;
@@ -476,12 +472,12 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_START_MEMBER( pegasus_state )
+void pegasus_state::machine_start()
 {
 	m_p_pcgram = memregion("pcg")->base();
 }
 
-MACHINE_RESET_MEMBER( pegasus_state )
+void pegasus_state::machine_reset()
 {
 	m_kbd_row = 0;
 	m_kbd_irq = 1;
