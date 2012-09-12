@@ -786,7 +786,7 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 		/* changed uart from off to on */
 		if ((data & (1<<3))==0)
 		{
-			devtag_reset(machine(), "uart");
+			machine().device("uart")->reset();
 		}
 	}
 

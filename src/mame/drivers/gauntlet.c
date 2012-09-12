@@ -214,8 +214,8 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 			atarigen_sound_reset(machine());
 			if (m_sound_reset_val & 1)
 			{
-				devtag_reset(machine(), "ymsnd");
-				devtag_reset(machine(), "tms");
+				machine().device("ymsnd")->reset();
+				machine().device("tms")->reset();
 				tms5220_set_frequency(machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
 				atarigen_set_ym2151_vol(machine(), 0);
 				atarigen_set_pokey_vol(machine(), 0);
@@ -258,7 +258,7 @@ WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) devtag_reset(machine(), "ymsnd");
+			if (((data>>7)&1) == 0) machine().device("ymsnd")->reset();
 			break;
 
 		case 1:	/* speech write, bit D7, active low */

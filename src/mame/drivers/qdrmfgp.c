@@ -658,7 +658,7 @@ static MACHINE_RESET( qdrmfgp )
 
 	/* reset the IDE controller */
 	state->m_gp2_irq_control = 0;
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 }
 
 

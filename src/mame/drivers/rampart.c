@@ -117,10 +117,10 @@ WRITE16_MEMBER(rampart_state::latch_w)
 	{
 		atarigen_set_oki6295_vol(machine(), (data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
-			devtag_reset(machine(), "oki");
+			machine().device("oki")->reset();
 		atarigen_set_ym2413_vol(machine(), ((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
-			devtag_reset(machine(), "ymsnd");
+			machine().device("ymsnd")->reset();
 	}
 }
 

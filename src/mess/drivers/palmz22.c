@@ -249,7 +249,7 @@ static MACHINE_START( palmz22 )
 static MACHINE_RESET( palmz22 )
 {
 	palmz22_state *state = machine.driver_data<palmz22_state>();
-	devtag_reset( machine, "maincpu");
+	machine.device("maincpu")->reset();
 	memset( state->m_port, 0, sizeof( state->m_port));
 }
 

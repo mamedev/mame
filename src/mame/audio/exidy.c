@@ -874,8 +874,8 @@ static DEVICE_RESET( venture_sound )
 	DEVICE_RESET_CALL(common_sh_reset);
 
 	/* PIA */
-	devtag_reset(device->machine(), "pia0");
-	devtag_reset(device->machine(), "pia1");
+	device->machine().device("pia0")->reset();
+	device->machine().device("pia1")->reset();
 
 	/* 6532 */
 	state->m_riot->reset();

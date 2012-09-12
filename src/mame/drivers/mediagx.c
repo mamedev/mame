@@ -1080,7 +1080,7 @@ static MACHINE_RESET(mediagx)
 	state->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
 	state->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
 	dmadac_enable(&state->m_dmadac[0], 2, 1);
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 }
 
 /*************************************************************

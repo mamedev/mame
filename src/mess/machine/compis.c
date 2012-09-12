@@ -82,8 +82,7 @@ enum COMPIS_INTERRUPT_REQUESTS
 #ifdef UNUSED_FUNCTION
 void compis_irq_set(UINT8 irq)
 {
-	cputag_set_input_line_vector(machine, "maincpu", 0, irq);
-	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, irq);
 }
 #endif
 

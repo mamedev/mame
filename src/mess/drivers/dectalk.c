@@ -331,7 +331,7 @@ static void dectalk_reset(device_t *device)
 	dectalk_x2212_recall(device->machine()); // nvram recall
 	state->m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	state->m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
-	devtag_reset(device->machine(), "duart68681"); // reset the DUART
+	device->machine().device("duart68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(device->machine()); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	dectalk_semaphore_w(device->machine(), 0); // on the original state->m_dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.

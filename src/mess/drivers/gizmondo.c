@@ -145,7 +145,7 @@ static MACHINE_START( gizmondo )
 
 static MACHINE_RESET( gizmondo )
 {
-	devtag_reset( machine, "maincpu");
+	machine.device("maincpu")->reset();
 }
 
 /*******************************************************************************

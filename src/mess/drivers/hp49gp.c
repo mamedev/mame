@@ -246,7 +246,7 @@ static MACHINE_START( hp49gp )
 static MACHINE_RESET( hp49gp )
 {
 //  hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	devtag_reset( machine, "maincpu");
+	machine.device("maincpu")->reset();
 }
 
 /***************************************************************************

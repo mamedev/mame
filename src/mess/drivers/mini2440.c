@@ -177,7 +177,7 @@ static MACHINE_START( mini2440 )
 static MACHINE_RESET( mini2440 )
 {
 	mini2440_state *state = machine.driver_data<mini2440_state>();
-	devtag_reset( machine, "maincpu");
+	machine.device("maincpu")->reset();
 	memset( state->m_port, 0, sizeof( state->m_port));
 }
 

@@ -254,10 +254,10 @@ static TIMER_CALLBACK( ipu_watchdog_reset )
 {
 	logerror("ipu_watchdog_reset\n");
 	machine.device("ipu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-	devtag_reset(machine, "ipu_ctc");
-	devtag_reset(machine, "ipu_pio0");
-	devtag_reset(machine, "ipu_pio1");
-	devtag_reset(machine, "ipu_sio");
+	machine.device("ipu_ctc")->reset();
+	machine.device("ipu_pio0")->reset();
+	machine.device("ipu_pio1")->reset();
+	machine.device("ipu_sio")->reset();
 }
 
 

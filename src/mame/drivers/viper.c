@@ -1954,7 +1954,7 @@ static MACHINE_START(viper)
 
 static MACHINE_RESET(viper)
 {
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 	mpc8240_epic_reset();
 
 	UINT8 *ide_features = ide_get_features(machine.device("ide"), 0);

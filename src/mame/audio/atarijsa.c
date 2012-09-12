@@ -298,7 +298,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			}
 
 			/* reset the YM2151 if needed */
-			if ((data&1) == 0) devtag_reset(space->machine(), "ymsnd");
+			if ((data&1) == 0) space->machine().device("ymsnd")->reset();
 
 			/* coin counters */
 			coin_counter_w(space->machine(), 1, (data >> 5) & 1);
@@ -419,7 +419,7 @@ static WRITE8_HANDLER( jsa2_io_w )
             */
 
 			/* reset the YM2151 if needed */
-			if ((data&1) == 0) devtag_reset(space->machine(), "ymsnd");
+			if ((data&1) == 0) space->machine().device("ymsnd")->reset();
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -544,7 +544,7 @@ static WRITE8_HANDLER( jsa3_io_w )
             */
 
 			/* reset the YM2151 if needed */
-			if ((data&1) == 0) devtag_reset(space->machine(), "ymsnd");
+			if ((data&1) == 0) space->machine().device("ymsnd")->reset();
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
@@ -678,7 +678,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* reset the YM2151 if needed */
-			if ((data&1) == 0) devtag_reset(space->machine(), "ymsnd");
+			if ((data&1) == 0) space->machine().device("ymsnd")->reset();
 
 			/* update the OKI bank */
 			space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 2) | ((data >> 1) & 1));

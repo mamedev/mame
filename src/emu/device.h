@@ -55,9 +55,6 @@
 // macro for specifying a clock derived from an owning device
 #define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
 
-// shorthand for accessing devices by machine/type/tag
-#define devtag_reset(mach,tag)								(mach).device(tag)->reset()
-
 
 
 //**************************************************************************

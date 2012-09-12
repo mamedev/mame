@@ -255,7 +255,7 @@ static MACHINE_START( juicebox )
 
 static MACHINE_RESET( juicebox )
 {
-	devtag_reset( machine, "maincpu");
+	machine.device("maincpu")->reset();
 	smc_reset( machine);
 }
 

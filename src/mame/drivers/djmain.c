@@ -1423,7 +1423,7 @@ static MACHINE_RESET( djmain )
 	sndram_set_bank(machine);
 
 	/* reset the IDE controller */
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 
 	/* reset LEDs */
 	set_led_status(machine, 0, 1);

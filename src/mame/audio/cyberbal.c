@@ -60,7 +60,7 @@ WRITE8_MEMBER(cyberbal_state::cyberbal_sound_bank_select_w)
 	coin_counter_w(machine(), 1, (data >> 5) & 1);
 	coin_counter_w(machine(), 0, (data >> 4) & 1);
 	machine().device("dac")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	if (!(data & 0x01)) devtag_reset(machine(), "ymsnd");
+	if (!(data & 0x01)) machine().device("ymsnd")->reset();
 }
 
 

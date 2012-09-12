@@ -403,7 +403,7 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine &machine, UINT8 reg, UINT8
 			// Check for card reset
 			if (!(data & 0x40))
 			{
-				devtag_reset(machine, ":card");
+				machine.device(":card")->reset();
 				state->m_locked = 0x1ff;
 				ide_set_gnet_readlock (machine.device(":card"), 1);
 			}
@@ -889,7 +889,7 @@ static MACHINE_RESET( coh3002t )
 	state->m_locked = 0x1ff;
 	install_handlers(machine, 0);
 	state->m_control = 0;
-	devtag_reset(machine, ":card");
+	machine.device(":card")->reset();
 	ide_set_gnet_readlock(machine.device(":card"), 1);
 
 	// halt sound CPU since it has no valid program at start

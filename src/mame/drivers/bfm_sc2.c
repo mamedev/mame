@@ -372,7 +372,7 @@ static void on_scorpion2_reset(running_machine &machine)
 
 	e2ram_reset(machine);
 
-	devtag_reset(machine, "ymsnd");
+	machine.device("ymsnd")->reset();
 
   // reset stepper motors /////////////////////////////////////////////////
 	{

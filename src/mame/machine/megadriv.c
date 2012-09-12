@@ -684,9 +684,9 @@ static TIMER_CALLBACK( megadriv_z80_run_state )
 	/* Is the z80 RESET line pulled? */
 	if ( genz80.z80_is_reset )
 	{
-		devtag_reset( machine, "genesis_snd_z80" );
+		machine.device("genesis_snd_z80" )->reset();
 		machine.device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
-		devtag_reset( machine, "ymsnd" );
+		machine.device("ymsnd" )->reset();
 	}
 	else
 	{

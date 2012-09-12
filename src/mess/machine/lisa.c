@@ -1087,7 +1087,7 @@ MACHINE_RESET( lisa )
 	}
 
 	/* reset 68k to pick up proper vectors from MMU */
-	devtag_reset(machine, "maincpu");
+	machine.device("maincpu")->reset();
 }
 
 INTERRUPT_GEN( lisa_interrupt )

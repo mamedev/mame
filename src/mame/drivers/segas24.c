@@ -696,7 +696,7 @@ void segas24_state::reset_reset()
 			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
-		devtag_reset(machine(), "ymsnd");
+		machine().device("ymsnd")->reset();
 	prev_resetcontrol = resetcontrol;
 }
 

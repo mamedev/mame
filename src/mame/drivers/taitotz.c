@@ -2425,7 +2425,7 @@ static void set_ide_drive_serial_number(device_t *device, int drive, const char 
 static MACHINE_RESET( taitotz )
 {
 	taitotz_state *state = machine.driver_data<taitotz_state>();
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 
 	if (state->m_hdd_serial_number != NULL)
 	{

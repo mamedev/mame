@@ -83,7 +83,7 @@ static MACHINE_RESET( midvplus )
 	state->m_timer[0] = machine.device<timer_device>("timer0");
 	state->m_timer[1] = machine.device<timer_device>("timer1");
 
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 }
 
 

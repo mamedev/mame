@@ -314,7 +314,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound)
 	if (ACCESSING_BITS_0_7 && (data == 0))
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n", space.device().safe_pcbase(), data);
-		devtag_reset(machine(), "ymsnd");
+		machine().device("ymsnd")->reset();
 		device_t *audiocpu = machine().device("audiocpu");
 		if (audiocpu != NULL && audiocpu->type() == Z80)
 			audiocpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);

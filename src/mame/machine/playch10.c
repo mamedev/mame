@@ -140,7 +140,7 @@ WRITE8_MEMBER(playch10_state::pc10_GAMESTOP_w)
 WRITE8_MEMBER(playch10_state::pc10_PPURES_w)
 {
 	if (data & 1)
-		devtag_reset(machine(), "ppu");
+		machine().device("ppu")->reset();
 }
 
 READ8_MEMBER(playch10_state::pc10_detectclr_r)

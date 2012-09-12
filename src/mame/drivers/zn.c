@@ -1520,7 +1520,7 @@ static MACHINE_RESET( coh1000w )
 	machine.root_device().membank( "bank1" )->set_base( machine.root_device().memregion( "user2" )->base() ); /* fixed game rom */
 	zn_machine_init(machine);
 
-	devtag_reset(machine, "ide");
+	machine.device("ide")->reset();
 }
 
 static const ide_config ide_intf = 
@@ -2195,7 +2195,7 @@ static MACHINE_RESET( coh1000a )
 	if( ( !strcmp( machine.system().name, "jdredd" ) ) ||
 		( !strcmp( machine.system().name, "jdreddb" ) ) )
 	{
-		devtag_reset(machine, "ide");
+		machine.device("ide")->reset();
 	}
 }
 
