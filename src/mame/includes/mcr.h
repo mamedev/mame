@@ -64,7 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dpoker_output_w);
 	DECLARE_WRITE8_MEMBER(dpoker_meters_w);
 	DECLARE_READ8_MEMBER(kick_ip1_r);
-
 	DECLARE_WRITE8_MEMBER(wacko_op4_w);
 	DECLARE_READ8_MEMBER(wacko_ip1_r);
 	DECLARE_READ8_MEMBER(wacko_ip2_r);
