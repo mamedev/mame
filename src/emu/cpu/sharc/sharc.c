@@ -73,6 +73,21 @@ typedef struct
 	UINT32 loop_type;
 } LADDR;
 
+typedef struct
+{
+	UINT32 src;
+	UINT32 dst;
+	UINT32 chain_ptr;
+	INT32 src_modifier;
+	INT32 dst_modifier;
+	INT32 src_count;
+	INT32 dst_count;
+	INT32 pmode;
+	INT32 chained_direction;
+	emu_timer *timer;
+	bool active;
+} DMA_OP;
+
 typedef struct _SHARC_REGS SHARC_REGS;
 struct _SHARC_REGS
 {
@@ -147,17 +162,8 @@ struct _SHARC_REGS
 
 	SHARC_BOOT_MODE boot_mode;
 
-	UINT32 dmaop_src;
-	UINT32 dmaop_dst;
-	UINT32 dmaop_chain_ptr;
-	INT32 dmaop_src_modifier;
-	INT32 dmaop_dst_modifier;
-	INT32 dmaop_src_count;
-	INT32 dmaop_dst_count;
-	INT32 dmaop_pmode;
-	INT32 dmaop_cycles;
-	INT32 dmaop_channel;
-	INT32 dmaop_chained_direction;
+	DMA_OP dma_op[12];
+	UINT32 dma_status;
 
 	INT32 interrupt_active;
 
@@ -260,12 +266,7 @@ static UINT32 sharc_iop_r(SHARC_REGS *cpustate, UINT32 address)
 
 		case 0x37:		// DMA status
 		{
-			UINT32 r = 0;
-			if (cpustate->dmaop_cycles > 0)
-			{
-				r |= 1 << cpustate->dmaop_channel;
-			}
-			return r;
+			return cpustate->dma_status;
 		}
 		default:		fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", address, cpustate->pc);
 	}
@@ -292,7 +293,6 @@ static void sharc_iop_w(SHARC_REGS *cpustate, UINT32 address, UINT32 data)
 		case 0x1c:
 		{
 			cpustate->dma[6].control = data;
-			//add_iop_write_latency_effect(cpustate, 0x1c, data, 1);
 			sharc_iop_delayed_w(cpustate, 0x1c, data, 1);
 			break;
 		}
@@ -312,7 +312,6 @@ static void sharc_iop_w(SHARC_REGS *cpustate, UINT32 address, UINT32 data)
 		case 0x1d:
 		{
 			cpustate->dma[7].control = data;
-			//add_iop_write_latency_effect(cpustate, 0x1d, data, 30);
 			sharc_iop_delayed_w(cpustate, 0x1d, data, 30);
 			break;
 		}
@@ -438,6 +437,12 @@ static CPU_INIT( sharc )
 
 	cpustate->delayed_iop_timer = device->machine().scheduler().timer_alloc(FUNC(sharc_iop_delayed_write_callback), cpustate);
 
+	for (int i=0; i < 12; i++)
+	{
+		cpustate->dma_op[i].active = false;
+		cpustate->dma_op[i].timer = device->machine().scheduler().timer_alloc(FUNC(sharc_dma_callback), cpustate);
+	}
+
 	device->save_item(NAME(cpustate->pc));
 	device->save_pointer(NAME(&cpustate->r[0].r), ARRAY_LENGTH(cpustate->r));
 	device->save_pointer(NAME(&cpustate->reg_alt[0].r), ARRAY_LENGTH(cpustate->reg_alt));
@@ -523,17 +528,21 @@ static CPU_INIT( sharc )
 	device->save_item(NAME(cpustate->irq_active));
 	device->save_item(NAME(cpustate->active_irq_num));
 
-	device->save_item(NAME(cpustate->dmaop_src));
-	device->save_item(NAME(cpustate->dmaop_dst));
-	device->save_item(NAME(cpustate->dmaop_chain_ptr));
-	device->save_item(NAME(cpustate->dmaop_src_modifier));
-	device->save_item(NAME(cpustate->dmaop_dst_modifier));
-	device->save_item(NAME(cpustate->dmaop_src_count));
-	device->save_item(NAME(cpustate->dmaop_dst_count));
-	device->save_item(NAME(cpustate->dmaop_pmode));
-	device->save_item(NAME(cpustate->dmaop_cycles));
-	device->save_item(NAME(cpustate->dmaop_channel));
-	device->save_item(NAME(cpustate->dmaop_chained_direction));
+	for (saveindex = 0; saveindex < ARRAY_LENGTH(cpustate->dma_op); saveindex++)
+	{
+		device->save_item(NAME(cpustate->dma_op[saveindex].src), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].dst), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].chain_ptr), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].src_modifier), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].dst_modifier), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].src_count), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].dst_count), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].pmode), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].chained_direction), saveindex);
+		device->save_item(NAME(cpustate->dma_op[saveindex].active), saveindex);
+	}
+
+	device->save_item(NAME(cpustate->dma_status));
 
 	device->save_item(NAME(cpustate->interrupt_active));
 
@@ -571,10 +580,9 @@ static CPU_RESET( sharc )
 			cpustate->dma[6].control		= 0x2a1;
 
 			sharc_dma_exec(cpustate, 6);
-			dma_op(cpustate, cpustate->dmaop_src, cpustate->dmaop_dst, cpustate->dmaop_src_modifier, cpustate->dmaop_dst_modifier,
-				   cpustate->dmaop_src_count, cpustate->dmaop_dst_count, cpustate->dmaop_pmode);
-			cpustate->dmaop_cycles = 0;
-
+			dma_op(cpustate, 6);
+			
+			cpustate->dma_op[6].timer->adjust(attotime::never, 0);
 			break;
 		}
 
@@ -679,21 +687,6 @@ static CPU_EXECUTE( sharc )
 
 	if (cpustate->idle && cpustate->irq_active == 0)
 	{
-		// handle pending DMA transfers
-		if (cpustate->dmaop_cycles > 0)
-		{
-			cpustate->dmaop_cycles -= cpustate->icount;
-			if (cpustate->dmaop_cycles <= 0)
-			{
-				cpustate->dmaop_cycles = 0;
-				dma_op(cpustate, cpustate->dmaop_src, cpustate->dmaop_dst, cpustate->dmaop_src_modifier, cpustate->dmaop_dst_modifier, cpustate->dmaop_src_count, cpustate->dmaop_dst_count, cpustate->dmaop_pmode);
-				if (cpustate->dmaop_chain_ptr != 0)
-				{
-					schedule_chained_dma_op(cpustate, cpustate->dmaop_channel, cpustate->dmaop_chain_ptr, cpustate->dmaop_chained_direction);
-				}
-			}
-		}
-
 		cpustate->icount = 0;
 		debugger_instruction_hook(device, cpustate->daddr);
 	}
@@ -787,28 +780,6 @@ static CPU_EXECUTE( sharc )
 			if (cpustate->systemreg_latency_cycles <= 0)
 			{
 				systemreg_write_latency_effect(cpustate);
-			}
-		}
-
-		// DMA transfer
-		if (cpustate->dmaop_cycles > 0)
-		{
-			--cpustate->dmaop_cycles;
-			if (cpustate->dmaop_cycles <= 0)
-			{
-				cpustate->irptl |= (1 << (cpustate->dmaop_channel+10));
-
-				/* DMA interrupt */
-				if (cpustate->imask & (1 << (cpustate->dmaop_channel+10)))
-				{
-					cpustate->irq_active |= 1 << (cpustate->dmaop_channel+10);
-				}
-
-				dma_op(cpustate, cpustate->dmaop_src, cpustate->dmaop_dst, cpustate->dmaop_src_modifier, cpustate->dmaop_dst_modifier, cpustate->dmaop_src_count, cpustate->dmaop_dst_count, cpustate->dmaop_pmode);
-				if (cpustate->dmaop_chain_ptr != 0)
-				{
-					schedule_chained_dma_op(cpustate, cpustate->dmaop_channel, cpustate->dmaop_chain_ptr, cpustate->dmaop_chained_direction);
-				}
 			}
 		}
 

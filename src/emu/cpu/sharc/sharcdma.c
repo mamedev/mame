@@ -19,59 +19,79 @@ static void schedule_chained_dma_op(SHARC_REGS *cpustate, int channel, UINT32 dm
 	UINT32 ext_modifier 	= dm_read32(cpustate, op_ptr - 6);
 	UINT32 ext_count		= dm_read32(cpustate, op_ptr - 7);
 
-	if (cpustate->dmaop_cycles > 0)
+	if (cpustate->dma_op[channel].active)
 	{
 		fatalerror("schedule_chained_dma_op: DMA operation already scheduled at %08X!\n", cpustate->pc);
 	}
 
 	if (chained_direction)		// Transmit to external
 	{
-		cpustate->dmaop_dst 			= ext_index;
-		cpustate->dmaop_dst_modifier	= ext_modifier;
-		cpustate->dmaop_dst_count		= ext_count;
-		cpustate->dmaop_src				= int_index;
-		cpustate->dmaop_src_modifier	= int_modifier;
-		cpustate->dmaop_src_count		= int_count;
+		cpustate->dma_op[channel].dst			= ext_index;
+		cpustate->dma_op[channel].dst_modifier	= ext_modifier;
+		cpustate->dma_op[channel].dst_count		= ext_count;
+		cpustate->dma_op[channel].src			= int_index;
+		cpustate->dma_op[channel].src_modifier	= int_modifier;
+		cpustate->dma_op[channel].src_count		= int_count;
 	}
-	else			// Receive from external
+	else						// Receive from external
 	{
-		cpustate->dmaop_src 			= ext_index;
-		cpustate->dmaop_src_modifier	= ext_modifier;
-		cpustate->dmaop_src_count		= ext_count;
-		cpustate->dmaop_dst				= int_index;
-		cpustate->dmaop_dst_modifier	= int_modifier;
-		cpustate->dmaop_dst_count		= int_count;
+		cpustate->dma_op[channel].src 			= ext_index;
+		cpustate->dma_op[channel].src_modifier	= ext_modifier;
+		cpustate->dma_op[channel].src_count		= ext_count;
+		cpustate->dma_op[channel].dst			= int_index;
+		cpustate->dma_op[channel].dst_modifier	= int_modifier;
+		cpustate->dma_op[channel].dst_count		= int_count;
 	}
 
-	cpustate->dmaop_pmode = 0;
-	cpustate->dmaop_channel = channel;
-	cpustate->dmaop_cycles = cpustate->dmaop_src_count / 4;
-	cpustate->dmaop_chain_ptr = chain_ptr;
-	cpustate->dmaop_chained_direction = chained_direction;
+	cpustate->dma_op[channel].pmode = 0;
+	cpustate->dma_op[channel].chain_ptr = chain_ptr;
+	cpustate->dma_op[channel].chained_direction = chained_direction;
+
+	cpustate->dma_op[channel].active = true;
+
+	int cycles = cpustate->dma_op[channel].src_count / 4;
+	cpustate->dma_op[channel].timer->adjust(cpustate->device->cycles_to_attotime(cycles), channel);
+
+	// enable busy flag
+	cpustate->dma_status |= (1 << channel);
 }
 
 static void schedule_dma_op(SHARC_REGS *cpustate, int channel, UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode)
 {
-	if (cpustate->dmaop_cycles > 0)
+	if (cpustate->dma_op[channel].active)
 	{
 		fatalerror("schedule_dma_op: DMA operation already scheduled at %08X!\n", cpustate->pc);
 	}
 
-	cpustate->dmaop_channel = channel;
-	cpustate->dmaop_src = src;
-	cpustate->dmaop_dst = dst;
-	cpustate->dmaop_src_modifier = src_modifier;
-	cpustate->dmaop_dst_modifier = dst_modifier;
-	cpustate->dmaop_src_count = src_count;
-	cpustate->dmaop_dst_count = dst_count;
-	cpustate->dmaop_pmode = pmode;
-	cpustate->dmaop_chain_ptr = 0;
-	cpustate->dmaop_cycles = src_count / 4;
+	cpustate->dma_op[channel].src = src;
+	cpustate->dma_op[channel].dst = dst;
+	cpustate->dma_op[channel].src_modifier = src_modifier;
+	cpustate->dma_op[channel].dst_modifier = dst_modifier;
+	cpustate->dma_op[channel].src_count = src_count;
+	cpustate->dma_op[channel].dst_count = dst_count;
+	cpustate->dma_op[channel].pmode = pmode;
+	cpustate->dma_op[channel].chain_ptr = 0;
+
+	cpustate->dma_op[channel].active = true;
+
+	int cycles = src_count / 4;
+	cpustate->dma_op[channel].timer->adjust(cpustate->device->cycles_to_attotime(cycles), channel);
+
+	// enable busy flag
+	cpustate->dma_status |= (1 << channel);
 }
 
-static void dma_op(SHARC_REGS *cpustate, UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode)
+static void dma_op(SHARC_REGS *cpustate, int channel)
 {
 	int i;
+	UINT32 src			= cpustate->dma_op[channel].src;
+	UINT32 dst			= cpustate->dma_op[channel].dst;
+	int src_modifier	= cpustate->dma_op[channel].src_modifier;
+	int dst_modifier	= cpustate->dma_op[channel].dst_modifier;
+	int src_count		= cpustate->dma_op[channel].src_count;
+	//int dst_count		= cpustate->dma_op[channel].dst_count;
+	int pmode			= cpustate->dma_op[channel].pmode;
+
 	//printf("dma_op: %08X, %08X, %08X, %08X, %08X, %08X, %d\n", src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);
 
 	switch (pmode)
@@ -124,16 +144,21 @@ static void dma_op(SHARC_REGS *cpustate, UINT32 src, UINT32 dst, int src_modifie
 		}
 	}
 
-	if (cpustate->dmaop_channel == 6)
+	if (channel == 6)
 	{
-		cpustate->irptl |= (1 << (cpustate->dmaop_channel+10));
+		cpustate->irptl |= (1 << (channel+10));
 
 		/* DMA interrupt */
-		if (cpustate->imask & (1 << (cpustate->dmaop_channel+10)))
+		if (cpustate->imask & (1 << (channel+10)))
 		{
-			cpustate->irq_active |= 1 << (cpustate->dmaop_channel+10);
+			cpustate->irq_active |= 1 << (channel+10);
 		}
 	}
+
+	// clear busy flag
+	cpustate->dma_status &= ~(1 << channel);
+
+	cpustate->dma_op[channel].active = false;
 }
 
 static void sharc_dma_exec(SHARC_REGS *cpustate, int channel)
@@ -200,5 +225,27 @@ static void sharc_dma_exec(SHARC_REGS *cpustate, int channel)
 		}
 
 		schedule_dma_op(cpustate, channel, src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);
+	}
+}
+
+static TIMER_CALLBACK(sharc_dma_callback)
+{
+	SHARC_REGS *cpustate = (SHARC_REGS *)ptr;
+	int channel = param;
+
+	cpustate->dma_op[channel].timer->adjust(attotime::never, 0);
+
+	cpustate->irptl |= (1 << (channel+10));
+
+	// DMA interrupt
+	if (cpustate->imask & (1 << (channel+10)))
+	{
+		cpustate->irq_active |= 1 << (channel+10);
+	}
+
+	dma_op(cpustate, channel);
+	if (cpustate->dma_op[channel].chain_ptr != 0)
+	{
+		schedule_chained_dma_op(cpustate, channel, cpustate->dma_op[channel].chain_ptr, cpustate->dma_op[channel].chained_direction);
 	}
 }
