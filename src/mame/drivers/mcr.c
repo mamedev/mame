@@ -390,7 +390,7 @@ TIMER_DEVICE_CALLBACK( dpoker_hopper_callback )
 		dpoker_coin_status &= ~8;
 	}
 	
-	coin_counter_w(timer.machine(), 0, dpoker_output_34 & 8);
+	coin_counter_w(timer.machine(), 3, dpoker_output_34 & 8);
 }
 
 TIMER_DEVICE_CALLBACK( dpoker_coin_in_callback )
@@ -461,6 +461,8 @@ WRITE8_MEMBER(mcr_state::dpoker_p34_w)
 		m_dpoker_hopper_timer->adjust(attotime::from_msec(500));
 	
 	// other bits: unused?
+
+	dpoker_output_34 = data;
 }
 
 
