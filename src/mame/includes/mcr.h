@@ -20,14 +20,15 @@ class mcr_state : public driver_device
 public:
 	mcr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu"),
+		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_ssio(*this, "ssio"),
 		m_chip_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
 		m_turbo_chip_squeak(*this, "tcs"),
-		m_squawk_n_talk(*this, "snt") { }
+		m_squawk_n_talk(*this, "snt")
+	{ }
 
 	// these should be required but can't because mcr68 shares with us
 	// once the sound boards are properly device-ified, fix this
@@ -67,6 +68,7 @@ public:
 	DECLARE_READ8_MEMBER(demoderb_ip1_r);
 	DECLARE_READ8_MEMBER(demoderb_ip2_r);
 	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
+
 	DECLARE_DRIVER_INIT(mcr_91490);
 	DECLARE_DRIVER_INIT(kroozr);
 	DECLARE_DRIVER_INIT(kick);
@@ -78,6 +80,8 @@ public:
 	DECLARE_DRIVER_INIT(nflfoot);
 	DECLARE_DRIVER_INIT(journey);
 	DECLARE_DRIVER_INIT(solarfox);
+	DECLARE_DRIVER_INIT(dpoker);
+
 	TILE_GET_INFO_MEMBER(mcr_90009_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_90010_get_tile_info);
 	TILE_GET_INFO_MEMBER(mcr_91490_get_tile_info);

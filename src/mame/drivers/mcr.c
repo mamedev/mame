@@ -19,9 +19,10 @@
         * Discs of Tron (Squawk n' Talk)
         * NFL Football (Squawk n' Talk + laserdisk)
         * Demolition Derby (Turbo Chip Squeak)
+        * Draw Poker
 
     Known bugs:
-        * none at this time
+        * dpoker needs coincounters and hopper
 
 ****************************************************************************
 
@@ -59,6 +60,7 @@
                          -----  -----  -----  ------------
         Kick             90009  91399  90908
         Solar Fox        90009  91399  90908
+        Draw Poker       90009  91399  90908  ?
 
         Satan's Hollow   90010  91399  90913
         Tron             90010  91399  90913  91418
@@ -81,7 +83,7 @@
 ****************************************************************************
 
     Detailed CPU board descriptions:
-        90009 (Kick, Solar Fox)
+        90009 (Kick, Solar Fox, Draw Poker)
             * 2.5MHz Z80
             * up to 7x2k program EPROMs
             * 2x4k background EPROMs
@@ -130,7 +132,7 @@
 ****************************************************************************
 
     Detailed Video board descriptions:
-        91399 (Kick, Solar Fox, Satan's Hollow, Tron, Kozmik Krooz'r, Domino Man, Wacko)
+        91399 (Kick, Solar Fox, Draw Poker, Satan's Hollow, Tron, Kozmik Krooz'r, Domino Man, Wacko)
             * 4x8k sprite EPROMs
             * data is ORed into linebuffers
             * support for hflip, vflip (code bits 6,7)
@@ -152,7 +154,7 @@
 ****************************************************************************
 
     Detailed Sound Board descriptions:
-        90908 (Kick, Solar Fox)
+        90908 (Kick, Solar Fox, Draw Poker)
             * 2MHz Z80
             * 2x2MHz AY8910
             * each AY8910 channel has a duty cycle controlled @ 50kHz by a down counter
@@ -187,11 +189,11 @@
 
 ****************************************************************************
 
-    90009 = CPU Board (Kick, SolarFox)
+    90009 = CPU Board (Kick, SolarFox, DPoker)
     90010 = Super CPU (Kroozr, Tron, SHollow)
-    90908 = Sound I/O (Kick, SolarFox)
+    90908 = Sound I/O (Kick, SolarFox, DPoker)
     90913 = Super Sound I/O (SHollow, Tron)
-    91399 = Video Gen (Kick, SolarFox, SHollow, Tron, Kroozr)
+    91399 = Video Gen (Kick, SolarFox, DPoker, SHollow, Tron, Kroozr)
     91418 = Optical Encoder (Tron)
     91433 = Video Gen III (SpyHunt)
     91434 = Optical Sensor PC (Kroozr)
@@ -890,6 +892,95 @@ static INPUT_PORTS_START( kickc )
 
 	PORT_START("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(3) PORT_KEYDELTA(50) PORT_REVERSE PORT_COCKTAIL
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dpoker )
+	PORT_START("ssio:IP0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin-in Hit - cursor down in testmode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin-in Release (to register a coin for now, press 5 and 6 is succession)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin-out Up
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin-out Down
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Coin-drop Hit - select item in testmode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin-drop Release
+
+	PORT_START("ssio:IP1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+
+	PORT_START("ssio:IP2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// 10-position DIP switch on the sound pcb
+	// settings and defaults are from a sticker inside the cabinet, I don't know where 9 or 10 are connected
+	PORT_START("ssio:IP3")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper" )			PORT_DIPLOCATION("B3:1")
+	PORT_DIPSETTING(    0x01, "Relay Pulse" )
+	PORT_DIPSETTING(    0x00, "Miser On" )
+	PORT_DIPNAME( 0x02, 0x02, "Music" )				PORT_DIPLOCATION("B3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x04, "Novelty" )			PORT_DIPLOCATION("B3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )	PORT_DIPLOCATION("B3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )	PORT_DIPLOCATION("B3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "After 5th Coin" )	PORT_DIPLOCATION("B3:6")
+	PORT_DIPSETTING(    0x20, "Face Up" )
+	PORT_DIPSETTING(    0x00, "Logo Up" )
+	PORT_DIPNAME( 0x40, 0x40, "Currency" )			PORT_DIPLOCATION("B3:7")
+	PORT_DIPSETTING(    0x40, "Ike Dollars" )
+	PORT_DIPSETTING(    0x00, "Other Coins" )
+	PORT_DIPNAME( 0x80, 0x00, "Background Color" )	PORT_DIPLOCATION("B3:8")
+	PORT_DIPSETTING(    0x80, "Green" )
+	PORT_DIPSETTING(    0x00, "Blue" )
+//	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )	PORT_DIPLOCATION("B3:9")
+//	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+//	PORT_DIPNAME( 0x01, 0x00, "Freeze" )			PORT_DIPLOCATION("B3:10")
+//	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+
+	PORT_START("ssio:IP4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("ssio:DIP")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P24")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // Hopper Full
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // Coin Return
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 1 Open") PORT_CODE(KEYCODE_A) // CAM OPEN
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 1 Lock") PORT_CODE(KEYCODE_S) // CAM LOCK
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2 Open") PORT_CODE(KEYCODE_D) // HNG OPEN
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door 2 Lock") PORT_CODE(KEYCODE_F) // HNG LOCK
+
+	PORT_START("P28")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? ARM HIT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) // will only work after opening a door
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? XTMSG (ON/OFF)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? EXTLKT (ON/OFF)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1866,6 +1957,36 @@ ROM_START( kickc )
 ROM_END
 
 
+ROM_START( dpoker )
+    ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD( "vppp.b3",      0x0000, 0x1000, CRC(2a76ded2) SHA1(3bb5467f0cbca07e72f6d61deb2687b7c1c839c8) )
+    ROM_LOAD( "vppp.b4",      0x1000, 0x1000, CRC(d6948faa) SHA1(4b9c3df45b1333c4e5595b790b439c104ab89eda) )
+    ROM_LOAD( "vppp.b5",      0x2000, 0x1000, CRC(a49916e5) SHA1(b21268c87bc5c3ea6e072846c5b97a7ae1e3995e) )
+    ROM_LOAD( "vppp.d4",      0x3000, 0x1000, CRC(c496934f) SHA1(cf27b6fb764fbf7ed4c5e1030c43498f0ac60c1c) )
+    ROM_LOAD( "vppp.d5",      0x4000, 0x1000, CRC(84f4bd38) SHA1(d1c53d8c6ba10d3bc343fe120eecbca70d48b759) )
+    ROM_LOAD( "vppp.d6",      0x5000, 0x1000, CRC(b0023bf1) SHA1(77a57a42dd403ef56f334ca295b5b43e94b99598) )
+    ROM_LOAD( "vppp.d7",      0x6000, 0x1000, CRC(a4012f5a) SHA1(011e77a6634fbb02a6ae99fe6685c92f2fad3fee) )
+
+	// The sound board was missing in this pcb set, we'll use the roms from Kick as placeholder.
+	// Funnily enough, according to a cabinet recording, the sound is actually very similar to Kickman.
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "4200-a.a7",    0x0000, 0x1000, BAD_DUMP CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
+	ROM_LOAD( "4300-b.a8",    0x1000, 0x1000, BAD_DUMP CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
+	ROM_LOAD( "4400-c.a9",    0x2000, 0x1000, BAD_DUMP CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
+	ROM_LOAD( "4500-d.a10",   0x3000, 0x1000, BAD_DUMP CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
+
+    ROM_REGION( 0x02000, "gfx1", 0 )
+    ROM_LOAD( "vpbg.g4",      0x0000, 0x1000, CRC(9fe9aad8) SHA1(f9174bcce3886548b8c18c5a06995d5c69ce5486) )
+    ROM_LOAD( "vpbg.g5",      0x1000, 0x1000, CRC(d43aeaae) SHA1(7bbabf9641c73154a769aa9bfc56ab0bc050e964) )
+
+    ROM_REGION( 0x08000, "gfx2", 0 )
+    ROM_LOAD( "vpfg.a1",      0x6000, 0x2000, CRC(d76ec7dd) SHA1(a7be6f05a988c59c7f83c640dd0ef824ea4ce839) )
+    ROM_LOAD( "vpfg.b1",      0x4000, 0x2000, CRC(cdba9a7d) SHA1(9076b52363cd84ae6e01ac46b369d7719536fac0) )
+    ROM_LOAD( "vpfg.d1",      0x2000, 0x2000, CRC(c661cace) SHA1(d5755f0c32a7d9ba283822daaf37ccbd2f6667de) )
+    ROM_LOAD( "vpfg.e1",      0x0000, 0x2000, CRC(acb3b469) SHA1(9769d6cfd49cba48264034fb5aed1d1b84ebba4c) )
+ROM_END
+
+
 ROM_START( shollow )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sh-pro.00",    0x0000, 0x2000, CRC(95e2b800) SHA1(8781295e21e5202288293fb9eb558cb1835b11ea) )
@@ -2559,6 +2680,18 @@ DRIVER_INIT_MEMBER(mcr_state,kick)
 }
 
 
+DRIVER_INIT_MEMBER(mcr_state,dpoker)
+{
+	mcr_init(machine(), 90009, 91399, 90908);
+
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, "P24");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, "P28");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, "P2C");
+
+	mcr12_sprite_xoffs_flip = 16;
+}
+
+
 DRIVER_INIT_MEMBER(mcr_state,mcr_90010)
 {
 	mcr_init(machine(), 90010, 91399, 90913);
@@ -2659,6 +2792,7 @@ GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state, solarfox,  R
 GAME( 1981, kick,     0,        mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickman,  kick,     mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickc,    kick,     mcr_90009,     kickc, mcr_state,    kick,      ROT90,                      "Midway", "Kick (cocktail)", GAME_SUPPORTS_SAVE )
+GAME( 1985, dpoker,   0,        mcr_90009,     dpoker, mcr_state,   dpoker,    0,                          "Bally",  "Draw Poker (Bally, 03-20)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", GAME_SUPPORTS_SAVE )
