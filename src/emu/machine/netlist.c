@@ -765,6 +765,7 @@ net_output_t::net_output_t(int atype)
 	m_new_Q = m_Q;
 	m_active = 0;
 	m_in_queue = 2;
+	m_num_cons = 0;
 }
 
 ATTR_COLD void net_output_t::set_netdev(const net_core_device_t *dev)
