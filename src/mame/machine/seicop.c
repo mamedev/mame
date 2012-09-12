@@ -1542,7 +1542,7 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 		case (0x026/2): { state->m_scrollram16[3] = seibu_vregs[offset]; break; }
 		case (0x028/2): { state->m_scrollram16[4] = seibu_vregs[offset]; break; }
 		case (0x02a/2): { state->m_scrollram16[5] = seibu_vregs[offset]; break; }
-//		case (0x03a/2): Godzilla sets this up to be 0x1ef / 0x1eb, presumably bit 2 is vertical wrap-around on/off?
+
 		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset*2,data); break; }
 	}
 }
@@ -2630,11 +2630,11 @@ static WRITE16_HANDLER( generic_cop_w )
 				//  return;
 
 				address = (cop_dma_src[cop_dma_trigger] << 6);
-				length = ((cop_dma_size[cop_dma_trigger]+1) << 4);
+				length = ((cop_dma_size[cop_dma_trigger]+1) << 5);
 
-				for (i=address;i<address+length;i+=4)
+				for (i=address;i<address+length;i+=2)
 				{
-					space->write_dword(i, fill_val);
+					space->write_word(i, fill_val);
 				}
 
 				return;
