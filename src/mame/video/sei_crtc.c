@@ -60,8 +60,8 @@ List of default vregs (title screen):
 #include "includes/sei_crtc.h"
 
 static tilemap_t *sc0_tilemap,*sc2_tilemap,*sc1_tilemap,*sc3_tilemap_0,*sc3_tilemap_1;
-UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
-UINT16 *seibucrtc_vregs;
+static UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
+static UINT16 *seibucrtc_vregs;
 UINT16 seibucrtc_sc0bank;
 
 /*******************************
@@ -255,6 +255,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 VIDEO_START( seibu_crtc )
 {
+	seibucrtc_sc0vram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("crtc_sc0vram")->ptr());
+	seibucrtc_sc1vram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("crtc_sc1vram")->ptr());
+	seibucrtc_sc2vram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("crtc_sc2vram")->ptr());
+	seibucrtc_sc3vram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("crtc_sc3vram")->ptr());
+	seibucrtc_vregs = reinterpret_cast<UINT16 *>(machine.root_device().memshare("crtc_vregs")->ptr());
+
 	sc0_tilemap = tilemap_create(machine, seibucrtc_sc0_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
 	sc2_tilemap = tilemap_create(machine, seibucrtc_sc2_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);
 	sc1_tilemap = tilemap_create(machine, seibucrtc_sc1_tile_info,TILEMAP_SCAN_ROWS,16,16,32,32);

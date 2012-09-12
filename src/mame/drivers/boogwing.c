@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
 	AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE_LEGACY(deco16_104_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)
+	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE_LEGACY(deco16_104_prot_w) AM_SHARE("prot16ram")
 
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -581,6 +581,8 @@ DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 	deco56_remap_gfx(machine(), "gfx6");
 	deco102_decrypt_cpu(machine(), "maincpu", 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
+	
+	decoprot_reset(machine());
 }
 
 GAME( 1992, boogwing, 0,        boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Euro v1.5, 92.12.07)", GAME_SUPPORTS_SAVE )

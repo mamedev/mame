@@ -11,7 +11,6 @@
 
 #define	PCE_MAIN_CLOCK		21477270
 
-extern unsigned char *pce_user_ram; /* scratch RAM at F8 */
 WRITE8_HANDLER ( pce_joystick_w );
  READ8_HANDLER ( pce_joystick_r );
 

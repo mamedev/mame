@@ -38,7 +38,7 @@ static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
 #define IOC_LOG 0
 
-UINT32 *archimedes_memc_physmem;
+static UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
 static int memc_latchrom;
 static UINT32 ioc_timercnt[4], ioc_timerout[4];
@@ -422,6 +422,7 @@ DIRECT_UPDATE_HANDLER( a310_setopbase )
 
 void archimedes_driver_init(running_machine &machine)
 {
+	archimedes_memc_physmem = reinterpret_cast<UINT32 *>(machine.root_device().memshare("physicalram")->ptr());
 //  address_space *space = machine.device<arm_device>("maincpu")->space(AS_PROGRAM);
 //  space->set_direct_update_handler(direct_update_delegate(FUNC(a310_setopbase), &machine));
 }

@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16, funkyjet_state )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE_LEGACY(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)
+	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE_LEGACY(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_SHARE("prot16ram")
 	AM_RANGE(0x184000, 0x184001) AM_WRITENOP
 	AM_RANGE(0x188000, 0x188001) AM_WRITENOP
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
@@ -304,6 +304,8 @@ static MACHINE_START( funkyjet )
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
+
+	decoprot_reset(machine);
 }
 
 static MACHINE_CONFIG_START( funkyjet, funkyjet_state )

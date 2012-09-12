@@ -117,10 +117,10 @@ READ16_MEMBER(sengokmj_state::sengokmj_system_r)
 static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc0vram_w) AM_BASE_LEGACY(&seibucrtc_sc0vram)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE_LEGACY(seibucrtc_sc1vram_w) AM_BASE_LEGACY(&seibucrtc_sc1vram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc2vram_w) AM_BASE_LEGACY(&seibucrtc_sc2vram)
-	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc3vram_w) AM_BASE_LEGACY(&seibucrtc_sc3vram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc0vram_w) AM_SHARE("crtc_sc0vram")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE_LEGACY(seibucrtc_sc1vram_w) AM_SHARE("crtc_sc1vram")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc2vram_w) AM_SHARE("crtc_sc2vram")
+	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc3vram_w) AM_SHARE("crtc_sc3vram")
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
@@ -129,7 +129,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
-	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE_LEGACY(seibucrtc_vregs_w) AM_BASE_LEGACY(&seibucrtc_vregs)
+	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE_LEGACY(seibucrtc_vregs_w) AM_SHARE("crtc_vregs")
 
 //  AM_RANGE(0x8080, 0x8081) CRTC extra register?
 //  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?

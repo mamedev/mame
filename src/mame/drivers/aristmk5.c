@@ -297,7 +297,7 @@ WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 /* U.S games have no dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(archimedes_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE_LEGACY(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 /* with dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE_LEGACY(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write

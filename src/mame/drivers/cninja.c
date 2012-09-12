@@ -181,8 +181,8 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_SHARE("spriteram")			/* Sprites */
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE_LEGACY(deco16_104_cninja_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)		/* Protection writes */
-	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ_LEGACY(deco16_104_cninja_prot_r) AM_BASE_LEGACY(&deco16_prot_ram)		/* Protection device */
+	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE_LEGACY(deco16_104_cninja_prot_w) AM_SHARE("prot16ram")		/* Protection writes */
+	AM_RANGE(0x1bc000, 0x1bcfff) AM_READ_LEGACY(deco16_104_cninja_prot_r) AM_SHARE("prot16ram")		/* Protection device */
 
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
 
 	AM_RANGE(0x188000, 0x189fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x194000, 0x197fff) AM_RAM AM_SHARE("ram") /* Main ram */
-	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE_LEGACY(deco16_60_prot_r, deco16_60_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0x198000, 0x1987ff) AM_READWRITE_LEGACY(deco16_60_prot_r, deco16_60_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
 	AM_RANGE(0x199750, 0x199751) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
 
@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x160000, 0x161fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP /* VBL irq ack */
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE_LEGACY(deco16_66_prot_r, deco16_66_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE_LEGACY(deco16_66_prot_r, deco16_66_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) AM_DEVREAD_LEGACY("deco_common", decocomn_71_r)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
 
@@ -875,6 +875,8 @@ static MACHINE_START( cninja )
 
 	state->save_item(NAME(state->m_scanline));
 	state->save_item(NAME(state->m_irq_mask));
+
+	decoprot_reset(machine);
 }
 
 static MACHINE_RESET( cninja )

@@ -296,8 +296,8 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_SHARE("mainram")// main ram
 
-//  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE_LEGACY(&backfire_180010) // always 180010 ?
-//  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE_LEGACY(&backfire_188010) // always 188010 ?
+//  AM_RANGE(0x180010, 0x180013) AM_RAM AM_SHARE("backfire_180010") // always 180010 ?
+//  AM_RANGE(0x188010, 0x188013) AM_RAM AM_SHARE("backfire_188010") // always 188010 ?
 
 	AM_RANGE(0x184000, 0x185fff) AM_READWRITE(backfire_spriteram1_r, backfire_spriteram1_w)
 	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE(backfire_spriteram2_r, backfire_spriteram2_w)

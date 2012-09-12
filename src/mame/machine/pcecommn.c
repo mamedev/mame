@@ -5,8 +5,6 @@
 #include "cpu/h6280/h6280.h"
 
 /* system RAM */
-unsigned char *pce_user_ram;    /* scratch RAM at F8 */
-
 struct pce_struct pce;
 
 /* joystick related data*/

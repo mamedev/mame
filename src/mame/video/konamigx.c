@@ -1817,18 +1817,18 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 	int tileno, colour, col, flip = 0;
 	if (tile_index&1)
 	{
-		tileno = gx_psacram[tile_index/2] & 0x00001fff;
-		col    =(gx_psacram[tile_index/2] & 0x00002000)>>13;
-		if      (gx_psacram[tile_index/2] & 0x00004000) flip |= TILE_FLIPX;
-		if      (gx_psacram[tile_index/2] & 0x00008000) flip |= TILE_FLIPY;
+		tileno = m_psacram[tile_index/2] & 0x00001fff;
+		col    =(m_psacram[tile_index/2] & 0x00002000)>>13;
+		if      (m_psacram[tile_index/2] & 0x00004000) flip |= TILE_FLIPX;
+		if      (m_psacram[tile_index/2] & 0x00008000) flip |= TILE_FLIPY;
 
 	}
 	else
 	{
-		tileno = (gx_psacram[tile_index/2] & 0x1fff0000)>>16;
-		col    = (gx_psacram[tile_index/2] & 0x20000000)>>29;
-		if       (gx_psacram[tile_index/2] & 0x40000000) flip |= TILE_FLIPX;
-		if       (gx_psacram[tile_index/2] & 0x80000000) flip |= TILE_FLIPY;
+		tileno = (m_psacram[tile_index/2] & 0x1fff0000)>>16;
+		col    = (m_psacram[tile_index/2] & 0x20000000)>>29;
+		if       (m_psacram[tile_index/2] & 0x40000000) flip |= TILE_FLIPX;
+		if       (m_psacram[tile_index/2] & 0x80000000) flip |= TILE_FLIPY;
 
 	}
 
@@ -1913,14 +1913,14 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 	flip=0;
 	colour = 0;
 
-	tileno = (gx_psacram[tile_index*2] & 0x00003fff)>>0;
+	tileno = (m_psacram[tile_index*2] & 0x00003fff)>>0;
 
 	// scanrows
-	//flipx  = (gx_psacram[tile_index*2+1] & 0x00800000)>>23;
-	//flipy  = (gx_psacram[tile_index*2+1] & 0x00400000)>>22;
+	//flipx  = (m_psacram[tile_index*2+1] & 0x00800000)>>23;
+	//flipy  = (m_psacram[tile_index*2+1] & 0x00400000)>>22;
 	// scancols
-	flipy  = (gx_psacram[tile_index*2+1] & 0x00800000)>>23;
-	flipx  = (gx_psacram[tile_index*2+1] & 0x00400000)>>22;
+	flipy  = (m_psacram[tile_index*2+1] & 0x00800000)>>23;
+	flipx  = (m_psacram[tile_index*2+1] & 0x00400000)>>22;
 
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
@@ -1935,14 +1935,14 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
 	flip=0;
 
 	colour = 0;
-	tileno = (gx_psacram[tile_index*2+1] & 0x00003fff)>>0;
+	tileno = (m_psacram[tile_index*2+1] & 0x00003fff)>>0;
 
 	// scanrows
-	//flipx  = (gx_psacram[tile_index*2+1] & 0x00800000)>>23;
-	//flipy  = (gx_psacram[tile_index*2+1] & 0x00400000)>>22;
+	//flipx  = (m_psacram[tile_index*2+1] & 0x00800000)>>23;
+	//flipy  = (m_psacram[tile_index*2+1] & 0x00400000)>>22;
 	// scancols
-	flipy  = (gx_psacram[tile_index*2+1] & 0x00200000)>>21;
-	flipx  = (gx_psacram[tile_index*2+1] & 0x00100000)>>20;
+	flipy  = (m_psacram[tile_index*2+1] & 0x00200000)>>21;
+	flipx  = (m_psacram[tile_index*2+1] & 0x00100000)>>20;
 
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
@@ -2547,6 +2547,8 @@ SCREEN_UPDATE_RGB32(konamigx_left)
 
 SCREEN_UPDATE_RGB32(konamigx_right)
 {
+	konamigx_state *state = screen.machine().driver_data<konamigx_state>();
+
 	if (konamigx_current_frame==1)
 	{
 		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
@@ -2560,7 +2562,7 @@ SCREEN_UPDATE_RGB32(konamigx_right)
 		{
 			for (offset=0;offset<0x4000/4;offset++)
 			{
-				UINT32 coldat = gx_subpaletteram32[offset];
+				UINT32 coldat = state->m_subpaletteram32[offset];
 
 				set_color_555(screen.machine(), offset*2, 0, 5, 10,coldat >> 16);
 				set_color_555(screen.machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
@@ -2572,9 +2574,9 @@ SCREEN_UPDATE_RGB32(konamigx_right)
 			{
 				int r,g,b;
 
-				r = (gx_subpaletteram32[offset] >>16) & 0xff;
-				g = (gx_subpaletteram32[offset] >> 8) & 0xff;
-				b = (gx_subpaletteram32[offset] >> 0) & 0xff;
+				r = (state->m_subpaletteram32[offset] >>16) & 0xff;
+				g = (state->m_subpaletteram32[offset] >> 8) & 0xff;
+				b = (state->m_subpaletteram32[offset] >> 0) & 0xff;
 
 				palette_set_color(screen.machine(),offset,MAKE_RGB(r,g,b));
 			}
@@ -2606,11 +2608,11 @@ WRITE32_MEMBER(konamigx_state::konamigx_palette2_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&gx_subpaletteram32[offset]);
+	COMBINE_DATA(&state->m_subpaletteram32[offset]);
 
-	r = (gx_subpaletteram32[offset] >>16) & 0xff;
-	g = (gx_subpaletteram32[offset] >> 8) & 0xff;
-	b = (gx_subpaletteram32[offset] >> 0) & 0xff;
+	r = (state->m_subpaletteram32[offset] >>16) & 0xff;
+	g = (state->m_subpaletteram32[offset] >> 8) & 0xff;
+	b = (state->m_subpaletteram32[offset] >> 0) & 0xff;
 
 	offset += (0x8000/4);
 
@@ -2640,8 +2642,8 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 {
 	UINT32 coldat;
-	COMBINE_DATA(&gx_subpaletteram32[offset]);
-	coldat = gx_subpaletteram32[offset];
+	COMBINE_DATA(&state->m_subpaletteram32[offset]);
+	coldat = state->m_subpaletteram32[offset];
 
 	offset += (0x4000/4);
 
@@ -2666,7 +2668,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
 // type 1 RAM-based PSAC tilemap
 WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
 {
-	COMBINE_DATA(&gx_psacram[offset]);
+	COMBINE_DATA(&m_psacram[offset]);
 	gx_psac_tilemap->mark_tile_dirty(offset/2);
 	gx_psac_tilemap2->mark_tile_dirty(offset/2);
 }
@@ -2674,7 +2676,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
 // type 4 RAM-based PSAC tilemap
 WRITE32_MEMBER(konamigx_state::konamigx_t4_psacmap_w)
 {
-	COMBINE_DATA(&gx_psacram[offset]);
+	COMBINE_DATA(&m_psacram[offset]);
 
 	gx_psac_tilemap->mark_tile_dirty(offset*2);
 	gx_psac_tilemap->mark_tile_dirty((offset*2)+1);

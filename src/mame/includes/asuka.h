@@ -8,7 +8,8 @@ class asuka_state : public driver_device
 {
 public:
 	asuka_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_cadash_shared_ram(*this, "sharedram") { }
 
 	/* memory pointers */
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
@@ -28,6 +29,8 @@ public:
 	/* misc */
 	int         m_adpcm_pos;
 	int         m_adpcm_data;
+	
+	optional_shared_ptr<UINT8> m_cadash_shared_ram;
 
 	/* devices */
 	cpu_device *m_maincpu;

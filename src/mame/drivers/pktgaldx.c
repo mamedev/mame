@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
-	AM_RANGE(0x167800, 0x167fff) AM_READWRITE_LEGACY(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)
+	AM_RANGE(0x167800, 0x167fff) AM_READWRITE_LEGACY(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_SHARE("prot16ram")
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -320,6 +320,8 @@ static MACHINE_START( pktgaldx )
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_deco_tilegen1 = machine.device("tilegen1");
+
+	decoprot_reset(machine);
 }
 
 static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )

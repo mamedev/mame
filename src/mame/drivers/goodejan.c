@@ -105,12 +105,12 @@ WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
 
 static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
 	AM_RANGE(0x00000, 0x0afff) AM_RAM
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc0vram_w) AM_BASE_LEGACY(&seibucrtc_sc0vram)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE_LEGACY(seibucrtc_sc3vram_w) AM_BASE_LEGACY(&seibucrtc_sc3vram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc0vram_w) AM_SHARE("crtc_sc0vram")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE_LEGACY(seibucrtc_sc3vram_w) AM_SHARE("crtc_sc3vram")
 	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	/*Guess: these two aren't used/initialized at all.*/
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc1vram_w) AM_BASE_LEGACY(&seibucrtc_sc1vram)
-	AM_RANGE(0x0e800, 0x0efff) AM_RAM_WRITE_LEGACY(seibucrtc_sc2vram_w) AM_BASE_LEGACY(&seibucrtc_sc2vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE_LEGACY(seibucrtc_sc1vram_w) AM_SHARE("crtc_sc1vram")
+	AM_RANGE(0x0e800, 0x0efff) AM_RAM_WRITE_LEGACY(seibucrtc_sc2vram_w) AM_SHARE("crtc_sc2vram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -128,12 +128,12 @@ static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE_LEGACY(seibucrtc_vregs_w) AM_BASE_LEGACY(&seibucrtc_vregs)
+	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE_LEGACY(seibucrtc_vregs_w) AM_SHARE("crtc_vregs")
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8040, 0x807f) AM_RAM_WRITE_LEGACY(seibucrtc_vregs_w) AM_BASE_LEGACY(&seibucrtc_vregs)
+	AM_RANGE(0x8040, 0x807f) AM_RAM_WRITE_LEGACY(seibucrtc_vregs_w) AM_SHARE("crtc_vregs")
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 

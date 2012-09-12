@@ -1,7 +1,5 @@
 /*----------- defined in video/sei_crtc.c -----------*/
 
-extern UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
-extern UINT16 *seibucrtc_vregs;
 extern UINT16 seibucrtc_sc0bank;
 
 WRITE16_HANDLER( seibucrtc_sc0vram_w );

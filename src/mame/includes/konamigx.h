@@ -3,10 +3,16 @@ class konamigx_state : public driver_device
 public:
 	konamigx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_workram(*this,"workram"),
+		m_psacram(*this,"psacram"),
+		m_subpaletteram32(*this,"subpaletteram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT32> m_workram;
+	optional_shared_ptr<UINT32> m_psacram;
+	optional_shared_ptr<UINT32> m_subpaletteram32;
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
@@ -50,11 +56,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_gx_psac1a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac1b_tile_info);
 };
-
-
-/*----------- defined in drivers/konamigx.c -----------*/
-
-extern UINT32 *gx_psacram, *gx_subpaletteram32;
 
 
 /*----------- defined in video/konamigx.c -----------*/

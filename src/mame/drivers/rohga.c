@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w)  AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w)  AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w)
 
-	AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE_LEGACY(deco16_104_prot_r,deco16_104_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE_LEGACY(deco16_104_prot_r,deco16_104_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
-	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
+	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE_LEGACY(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w) AM_SHARE("prot16ram") /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW3")  AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
@@ -1544,6 +1544,8 @@ DRIVER_INIT_MEMBER(rohga_state,wizdfire)
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
+
+	decoprot_reset(machine());
 }
 
 DRIVER_INIT_MEMBER(rohga_state,nitrobal)

@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
 	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
-//  AM_RANGE(0x070f000, 0x070ffff) AM_READ_LEGACY(stadhr96_prot_146_w) AM_BASE_LEGACY(&deco32_prot_ram)
+//  AM_RANGE(0x070f000, 0x070ffff) AM_READ_LEGACY(stadhr96_prot_146_w) AM_SHARE("prot32ram")
 ADDRESS_MAP_END
 
 /******************************************************************************/

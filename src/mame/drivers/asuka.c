@@ -294,16 +294,14 @@ WRITE8_MEMBER(asuka_state::asuka_msm5205_stop_w)
 	m_adpcm_pos &= 0xff00;
 }
 
-static UINT8 *cadash_shared_ram;
-
 READ16_MEMBER(asuka_state::cadash_share_r)
 {
-	return cadash_shared_ram[offset];
+	return m_cadash_shared_ram[offset];
 }
 
 WRITE16_MEMBER(asuka_state::cadash_share_w)
 {
-	cadash_shared_ram[offset] = data & 0xff;
+	m_cadash_shared_ram[offset] = data & 0xff;
 }
 
 
@@ -433,7 +431,7 @@ m68k M -> z180 M <-> z180 S <- m68k S
 
 static ADDRESS_MAP_START( cadash_sub_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_LEGACY(&cadash_shared_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cadash_sub_io, AS_IO, 8, asuka_state )

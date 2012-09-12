@@ -110,12 +110,8 @@
 static MACHINE_START(konamigx);
 static MACHINE_RESET(konamigx);
 
-UINT32 *gx_psacram, *gx_subpaletteram32;
-
 static int konamigx_cfgport;
 
-static UINT32 *gx_workram; /* workram pointer for ESC protection fun */
-static UINT16 *gx_sndram;
 static int gx_rdport1_3, gx_syncen;
 
 static emu_timer *dmadelay_timer;
@@ -323,17 +319,17 @@ static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int c
 
 static void tkmmpzdm_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(gx_workram, 0x0142, 0x100, 0);
+	konamigx_esc_alert(space->machine().driver_data<konamigx_state>()->m_workram, 0x0142, 0x100, 0);
 }
 
 static void dragoonj_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(gx_workram, 0x5c00, 0x100, 0);
+	konamigx_esc_alert(space->machine().driver_data<konamigx_state>()->m_workram, 0x5c00, 0x100, 0);
 }
 
 static void sal2_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(gx_workram, 0x1c8c, 0x172, 1);
+	konamigx_esc_alert(space->machine().driver_data<konamigx_state>()->m_workram, 0x1c8c, 0x172, 1);
 }
 
 static void sexyparo_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
@@ -544,7 +540,7 @@ static struct { UINT32 offs, pc, mask, data; } waitskip;
 
 READ32_MEMBER(konamigx_state::waitskip_r)
 {
-	UINT32 data = gx_workram[waitskip.offs+offset];
+	UINT32 data = m_workram[waitskip.offs+offset];
 
 	if (space.device().safe_pc() == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{
@@ -1158,7 +1154,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// BIOS ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM	// main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM	// data ROM
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_BASE_LEGACY(&gx_workram)	// work RAM
+	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram")	// work RAM
 	AM_RANGE(0xd00000, 0xd01fff) AM_READ_LEGACY(K056832_5bpp_rom_long_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(K053247_long_r, K053247_long_w)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
@@ -1198,7 +1194,7 @@ static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe20000, 0xe2000f) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
 	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)	// chips 21L+19L / S
-	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE(konamigx_t1_psacmap_w) AM_BASE_LEGACY(&gx_psacram)  // chips 20J+23J+18J / S
+	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE(konamigx_t1_psacmap_w) AM_SHARE("psacram")  // chips 20J+23J+18J / S
 	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)	// ROM readback
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)	// ROM readback
 	AM_RANGE(0xf80000, 0xf80fff) AM_RAM	// chip 21Q / S
@@ -1220,7 +1216,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)
 	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram")	// main monitor palette
-	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32)
+	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_SHARE("subpaletteram")
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
@@ -1234,9 +1230,9 @@ static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)  // 29C & 29G (PSAC2 line control)
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_SHARE("paletteram") // 11G/13G/15G (main screen palette RAM)
-	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
+	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_SHARE("subpaletteram") // 5G/7G/9G (sub screen palette RAM)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_BASE_LEGACY(&gx_psacram)	// PSAC2 tilemap
+	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_SHARE("psacram")	// PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
@@ -1290,7 +1286,7 @@ WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 /* 68000 memory handling */
 static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_LEGACY(&gx_sndram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00)
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r, tms57002_data_word_w)

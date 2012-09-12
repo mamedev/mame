@@ -786,7 +786,7 @@ static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x16c000, 0x16c01f) AM_READNOP
 	AM_RANGE(0x17c000, 0x17c03f) AM_READNOP
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_BASE_LEGACY(&deco32_prot_ram)
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
 	AM_RANGE(0x208800, 0x208803) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
@@ -816,7 +816,7 @@ static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff)  AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_BASE_LEGACY(&deco32_prot_ram)
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_SHARE("prot32ram")
 ADDRESS_MAP_END
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
@@ -956,7 +956,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_BASE_LEGACY(&deco32_prot_ram)
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_SHARE("prot32ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
@@ -997,7 +997,7 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32")
 	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_BASE_LEGACY(&deco32_prot_ram)
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_SHARE("prot32ram")
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1669,6 +1669,7 @@ static MACHINE_RESET( deco32 )
 {
 	deco32_state *state = machine.driver_data<deco32_state>();
 	state->m_raster_irq_timer = machine.device<timer_device>("int_timer");
+	decoprot_reset(machine);
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
