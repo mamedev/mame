@@ -127,7 +127,7 @@ Medium size chip with heat sink on it
 class magictg_state : public driver_device
 {
 public:
-	magictg_state(const machine_config &mconfig, device_type type, const char* tag)
+	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mips(*this, "mips"),
 		m_adsp(*this, "adsp"),
