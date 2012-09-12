@@ -555,7 +555,7 @@ static CDP1861_INTERFACE( vdc_intf )
 	DEVCB_DRIVER_LINE_MEMBER(vip_state, vdc_ef1_w)
 };
 
-UINT32 vip_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdc->screen_update(screen, bitmap, cliprect);
 
@@ -773,9 +773,6 @@ static MACHINE_CONFIG_START( vip, vip_state )
     // video hardware
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
-
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz/2, vdc_intf)
 

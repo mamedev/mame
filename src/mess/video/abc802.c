@@ -61,7 +61,6 @@ static MC6845_UPDATE_ROW( abc802_update_row )
     */
 
 	abc802_state *state =  device->machine().driver_data<abc802_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int rf = 0, rc = 0, rg = 0;
 
@@ -134,7 +133,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = BIT(data, 7) ^ ri;
 
-					bitmap.pix32(y, x) = palette[color];
+					bitmap.pix32(y, x) = RGB_MONOCHROME_AMBER[color];
 
 					data <<= 1;
 				}
@@ -146,8 +145,8 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = BIT(data, 7) ^ ri;
 
-					bitmap.pix32(y, x) = palette[color];
-					bitmap.pix32(y, x + 1) = palette[color];
+					bitmap.pix32(y, x) = RGB_MONOCHROME_AMBER[color];
+					bitmap.pix32(y, x + 1) = RGB_MONOCHROME_AMBER[color];
 
 					data <<= 1;
 				}
@@ -249,7 +248,4 @@ MACHINE_CONFIG_FRAGMENT( abc802_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0,768-1, 0, 312-1)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_amber)
 MACHINE_CONFIG_END

@@ -575,8 +575,6 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(8+8)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -72,7 +72,7 @@ protected:
 	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data);
 	virtual UINT8 vip_dma_r(address_space &space, offs_t offset);
 	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual int vip_ef1_r();
 	virtual int vip_ef3_r();
 	virtual int vip_ef4_r();

@@ -49,7 +49,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( keyboard_r );
 	DECLARE_WRITE16_MEMBER( keyboard_w );
@@ -64,13 +64,14 @@ public:
 	DECLARE_READ16_MEMBER( sync_r );
 
 	void update_clut();
-	void draw_bitmap(screen_device *screen, bitmap_ind16 &bitmap);
-	void draw_overlay(screen_device *screen, bitmap_ind16 &bitmap);
+	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);
+	void draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap);
 
 	/* interrupt state */
 	UINT16 m_int_mask;
 
 	/* video state */
+	rgb_t m_clut[256];
 	required_shared_ptr<UINT16> m_chrom_ram;
 	required_shared_ptr<UINT16> m_plane_ram;
 	required_shared_ptr<UINT16> m_clut_ram;

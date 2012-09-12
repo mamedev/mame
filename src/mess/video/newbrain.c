@@ -13,7 +13,7 @@ void newbrain_state::video_start()
 	save_item(NAME(m_segment_data));
 }
 
-void newbrain_state::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space *program = m_maincpu->space(AS_PROGRAM);
 
@@ -67,11 +67,11 @@ void newbrain_state::screen_update(bitmap_ind16 &bitmap, const rectangle &clipre
 			{
 				int color = BIT(charrom_data, 7) ^ rv;
 
-				bitmap.pix16(y, x++) = color;
+				bitmap.pix32(y, x++) = RGB_MONOCHROME_WHITE[color];
 
 				if (columns == 40)
 				{
-					bitmap.pix16(y, x++) = color;
+					bitmap.pix32(y, x++) = RGB_MONOCHROME_WHITE[color];
 				}
 
 				charrom_data <<= 1;
@@ -101,7 +101,7 @@ void newbrain_state::screen_update(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 newbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 newbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_enrg1 & NEWBRAIN_ENRG1_TVP)
 	{
@@ -109,7 +109,7 @@ UINT32 newbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(RGB_BLACK, cliprect);
 	}
 
 	return 0;
@@ -126,7 +126,4 @@ MACHINE_CONFIG_FRAGMENT( newbrain_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END

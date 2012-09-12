@@ -145,14 +145,12 @@
 #define MCFG_CDP1869_SCREEN_PAL_ADD(_cdptag, _tag, _clock) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL) \
-	MCFG_PALETTE_LENGTH(8+64)
+	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_PAL, CDP1869_SCANLINE_VBLANK_END_PAL, CDP1869_SCANLINE_VBLANK_START_PAL)
 
 #define MCFG_CDP1869_SCREEN_NTSC_ADD(_cdptag, _tag, _clock) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_NTSC, CDP1869_SCANLINE_VBLANK_END_NTSC, CDP1869_SCANLINE_VBLANK_START_NTSC) \
-	MCFG_PALETTE_LENGTH(8+64)
+	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_NTSC, CDP1869_SCANLINE_VBLANK_END_NTSC, CDP1869_SCANLINE_VBLANK_START_NTSC)
 
 #define CDP1869_INTERFACE(_name) \
 	const cdp1869_interface (_name) =
@@ -231,7 +229,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( predisplay_r );
 	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -260,8 +258,8 @@ protected:
 	inline int get_pen(int ccb0, int ccb1, int pcb);
 
 	void initialize_palette();
-	void draw_line(bitmap_ind16 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
-	void draw_char(bitmap_ind16 &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
+	void draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
+	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
 
 private:
 	devcb_resolved_read_line		m_in_pal_ntsc_func;
@@ -276,6 +274,7 @@ private:
 	sound_stream *m_stream;
 
 	// video state
+	rgb_t m_palette[8+64];
 	int m_prd;						// predisplay
 	int m_dispoff;					// display off
 	int m_fresvert;					// full resolution vertical

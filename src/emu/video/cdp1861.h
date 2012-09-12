@@ -113,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_off_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -132,7 +132,7 @@ private:
 	devcb_resolved_write_line	m_out_efx_func;
 
 	screen_device *m_screen;		// screen
-	bitmap_ind16 m_bitmap;				// bitmap
+	bitmap_rgb32 m_bitmap;			// bitmap
 
 	int m_disp;						// display enabled
 	int m_dispon;					// display on latch

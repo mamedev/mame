@@ -57,6 +57,7 @@ private:
 	// internal state
 	required_device<mc6845_device> m_crtc;
 
+	rgb_t m_palette[16];
 	UINT16 *m_video_ram;
 	UINT8 m_option;
 	UINT16 m_scroll;

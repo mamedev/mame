@@ -305,13 +305,13 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
-static PALETTE_INIT( visicom )
+static const rgb_t VISICOM_PALETTE[] =
 {
-    palette_set_color_rgb(machine, 0, 0x00, 0x80, 0x00);
-    palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff);
-    palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00);
-    palette_set_color_rgb(machine, 3, 0xff, 0x00, 0x00);
-}
+    MAKE_RGB(0x00, 0x80, 0x00),
+    MAKE_RGB(0x00, 0x00, 0xff),
+    MAKE_RGB(0x00, 0xff, 0x00),
+    MAKE_RGB(0xff, 0x00, 0x00)
+};
 
 READ_LINE_MEMBER( mpt02_state::rdata_r )
 {
@@ -465,10 +465,6 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 
     /* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-
 	MCFG_CDP1861_ADD(CDP1861_TAG, 1760000, studio2_cdp1861_intf)
 
 	/* sound hardware */
@@ -488,10 +484,6 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 
     /* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
-
-	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT(visicom)
-
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2/8, studio2_cdp1861_intf)
 
 	/* sound hardware */
@@ -512,8 +504,6 @@ static MACHINE_CONFIG_START( mpt02, mpt02_state )
     /* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
-
-	MCFG_PALETTE_LENGTH(8+8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

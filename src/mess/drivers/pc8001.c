@@ -340,10 +340,6 @@ INPUT_PORTS_END
 
 /* Video */
 
-static PALETTE_INIT( pc8001 )
-{
-}
-
 void pc8001_state::video_start()
 {
 	// find memory regions
@@ -351,6 +347,18 @@ void pc8001_state::video_start()
 }
 
 /* uPD3301 Interface */
+
+static const rgb_t PALETTE[] =
+{
+	RGB_BLACK,
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0x00),
+	MAKE_RGB(0x00, 0x00, 0x00),
+	RGB_WHITE
+};
 
 static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 {
@@ -368,7 +376,7 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap.pix16(y, (sx * 8) + i) = color ? 7 : 0;
+			bitmap.pix32(y, (sx * 8) + i) = PALETTE[color ? 7 : 0];
 
 			data <<= 1;
 		}
@@ -381,8 +389,8 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap.pix16(y, (sx/2 * 16) + (i * 2)) = color ? 7 : 0;
-			bitmap.pix16(y, (sx/2 * 16) + (i * 2) + 1) = color ? 7 : 0;
+			bitmap.pix32(y, (sx/2 * 16) + (i * 2)) = PALETTE[color ? 7 : 0];
+			bitmap.pix32(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE[color ? 7 : 0];
 
 			data <<= 1;
 		}
@@ -560,9 +568,6 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_SCREEN_SIZE(640, 220)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(pc8001)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -596,9 +601,6 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 220)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(pc8001)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

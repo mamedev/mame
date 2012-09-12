@@ -461,7 +461,7 @@ void cdp1869_device::initialize_palette()
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), i, get_rgb(i, i, 15));
+		m_palette[i] = get_rgb(i, i, 15);
 	}
 
 	// tone-on-tone display (CFC=1)
@@ -469,7 +469,7 @@ void cdp1869_device::initialize_palette()
 	{
 		for (int l = 0; l < 8; l++)
 		{
-			palette_set_color(machine(), i, get_rgb(i, c, l));
+			m_palette[i] = get_rgb(i, c, l);
 			i++;
 		}
 	}
@@ -544,7 +544,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  draw_line - draw character line
 //-------------------------------------------------
 
-void cdp1869_device::draw_line(bitmap_ind16 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
+void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
 {
 	int i;
 
@@ -554,20 +554,20 @@ void cdp1869_device::draw_line(bitmap_ind16 &bitmap, const rectangle &rect, int 
 	{
 		if (data & 0x80)
 		{
-			bitmap.pix16(y, x) = color;
+			bitmap.pix32(y, x) = m_palette[color];
 
 			if (!m_fresvert)
 			{
-				bitmap.pix16(y + 1, x) = color;
+				bitmap.pix32(y + 1, x) = m_palette[color];
 			}
 
 			if (!m_freshorz)
 			{
-				bitmap.pix16(y, x + 1) = color;
+				bitmap.pix32(y, x + 1) = m_palette[color];
 
 				if (!m_fresvert)
 				{
-					bitmap.pix16(y + 1, x + 1) = color;
+					bitmap.pix32(y + 1, x + 1) = m_palette[color];
 				}
 			}
 		}
@@ -588,7 +588,7 @@ void cdp1869_device::draw_line(bitmap_ind16 &bitmap, const rectangle &rect, int 
 //  draw_char - draw character
 //-------------------------------------------------
 
-void cdp1869_device::draw_char(bitmap_ind16 &bitmap, const rectangle &rect, int x, int y, UINT16 pma)
+void cdp1869_device::draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma)
 {
 	UINT8 pmd = read_page_ram_byte(pma);
 
@@ -912,7 +912,7 @@ READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle screen_rect, outer;
 

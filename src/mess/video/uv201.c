@@ -81,7 +81,7 @@
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
 
 #define DRAW_PIXEL(_scanline, _dot) \
-	if (IS_VISIBLE(_scanline)) bitmap.pix16((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = pixel;
+	if (IS_VISIBLE(_scanline)) bitmap.pix32((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = m_palette[pixel];
 
 
 
@@ -239,14 +239,14 @@ void uv201_device::initialize_palette()
 			onvalue = onhiintensity;
 		}
 
-		palette_set_color_rgb(machine(), offset + 0, offvalue, offvalue, offvalue); // black
-		palette_set_color_rgb(machine(), offset + 1, onvalue, offvalue, offvalue); // red
-		palette_set_color_rgb(machine(), offset + 2, offvalue, onvalue, offvalue); // green
-		palette_set_color_rgb(machine(), offset + 3, onvalue, onvalue, offvalue); // red-green
-		palette_set_color_rgb(machine(), offset + 4, offvalue, offvalue, onvalue); // blue
-		palette_set_color_rgb(machine(), offset + 5, onvalue, offvalue, onvalue); // red-blue
-		palette_set_color_rgb(machine(), offset + 6, offvalue, onvalue, onvalue); // green-blue
-		palette_set_color_rgb(machine(), offset + 7, onvalue, onvalue, onvalue); // white
+		m_palette[offset + 0] = MAKE_RGB(offvalue, offvalue, offvalue); // black
+		m_palette[offset + 1] = MAKE_RGB(onvalue, offvalue, offvalue); // red
+		m_palette[offset + 2] = MAKE_RGB(offvalue, onvalue, offvalue); // green
+		m_palette[offset + 3] = MAKE_RGB(onvalue, onvalue, offvalue); // red-green
+		m_palette[offset + 4] = MAKE_RGB(offvalue, offvalue, onvalue); // blue
+		m_palette[offset + 5] = MAKE_RGB(onvalue, offvalue, onvalue); // red-blue
+		m_palette[offset + 6] = MAKE_RGB(offvalue, onvalue, onvalue); // green-blue
+		m_palette[offset + 7] = MAKE_RGB(onvalue, onvalue, onvalue); // white
 	}
 }
 
@@ -496,7 +496,7 @@ READ_LINE_MEMBER( uv201_device::kbd_r )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 uv201_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 

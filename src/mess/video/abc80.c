@@ -39,7 +39,7 @@ GFXDECODE_END
 //  update_screen -
 //-------------------------------------------------
 
-void abc80_state::update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int c = 0;
 	int r = 0;
@@ -135,7 +135,7 @@ void abc80_state::update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				color ^= (cursor & m_blink);
 				color &= blank;
 
-				bitmap.pix16(y, x) = color;
+				bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
 
 				data <<= 1;
 			}
@@ -199,7 +199,7 @@ void abc80_state::video_start()
 //  SCREEN_UPDATE_IND16( abc80 )
 //-------------------------------------------------
 
-UINT32 abc80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_screen(bitmap, cliprect);
 
@@ -216,9 +216,6 @@ MACHINE_CONFIG_FRAGMENT( abc80_video )
 	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
 
 	MCFG_GFXDECODE(abc80)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_SCREEN_RAW_PARAMS(XTAL_11_9808MHz/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 MACHINE_CONFIG_END

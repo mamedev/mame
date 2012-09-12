@@ -991,7 +991,6 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, cons
 {
 	if (y > 0x3ff) return;
 
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int x = HFP;
 
 	for (int column = 0; column < x_count; column += 2)
@@ -1007,7 +1006,7 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, cons
 			{
 				int color = (BIT(data, 15) ^ PIX_POL) & !BLANK;
 
-				bitmap.pix32(y + VFP, x++) = palette[color];
+				bitmap.pix32(y + VFP, x++) = RGB_MONOCHROME_GREEN[color];
 
 				data <<= 1;
 			}
@@ -1124,7 +1123,6 @@ MACHINE_CONFIG_FRAGMENT( abc1600_video )
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_state, screen_update)
     MCFG_SCREEN_SIZE(958, 1067)
     MCFG_SCREEN_VISIBLE_AREA(0, 958-1, 0, 1067-1)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(monochrome_green)
+
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, XTAL_64MHz/32, crtc_intf)
 MACHINE_CONFIG_END

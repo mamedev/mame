@@ -98,7 +98,7 @@ public:
 	void io_w(address_space &space, offs_t offset, UINT8 data);
 	UINT8 dma_r(address_space &space, offs_t offset);
 	void dma_w(address_space &space, offs_t offset, UINT8 data);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
@@ -146,7 +146,7 @@ protected:
 	virtual UINT8 vip_dma_r(address_space &space, offs_t offset) { return 0xff; };
 	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data) { };
 
-	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
+	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 
 	virtual int vip_ef1_r() { return CLEAR_LINE; }
 	virtual int vip_ef3_r() { return CLEAR_LINE; }

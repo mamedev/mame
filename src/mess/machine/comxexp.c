@@ -205,23 +205,6 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
 }
 
 
-//-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
-
-UINT32 comx_expansion_slot_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bool value = false;
-
-	if (m_card != NULL)
-	{
-		value = m_card->comx_screen_update(screen, bitmap, cliprect);
-	}
-
-	return value;
-}
-
-
 WRITE_LINE_MEMBER( comx_expansion_slot_device::int_w ) { m_out_int_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_slot_device::ef4_w ) { m_out_ef4_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_slot_device::wait_w ) { m_out_wait_func(state); }

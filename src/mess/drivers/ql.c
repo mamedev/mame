@@ -702,40 +702,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  VIDEO
-//**************************************************************************
-
-//-------------------------------------------------
-//  PALETTE_INIT( ql )
-//-------------------------------------------------
-
-static PALETTE_INIT( ql )
-{
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 ); // black
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff ); // blue
-	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00 ); // red
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff ); // magenta
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00 ); // green
-	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff ); // cyan
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 ); // yellow
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff ); // white
-}
-
-
-//-------------------------------------------------
-//  SCREEN_UPDATE_IND16( ql )
-//-------------------------------------------------
-
-UINT32 ql_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_zx8301->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -1014,12 +980,9 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50.08)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_UPDATE_DRIVER(ql_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE(ZX8301_TAG, zx8301_device, screen_update)
 	MCFG_SCREEN_SIZE(960, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT(ql)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

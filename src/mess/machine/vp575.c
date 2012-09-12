@@ -249,7 +249,7 @@ void vp575_device::vip_dma_w(address_space &space, offs_t offset, UINT8 data)
 //  vip_screen_update - screen update
 //-------------------------------------------------
 
-UINT32 vp575_device::vip_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vp575_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 data = 0;
 

@@ -24,22 +24,17 @@
 #define VERTICAL_PORCH_HACK		27
 
 
-
-//-------------------------------------------------
-//  PALETTE_INIT( abc806 )
-//-------------------------------------------------
-
-static PALETTE_INIT( abc806 )
+static const rgb_t PALETTE[] =
 {
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine, 3, 0xff, 0xff, 0x00); // yellow
-	palette_set_color_rgb(machine, 4, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff); // magenta
-	palette_set_color_rgb(machine, 6, 0x00, 0xff, 0xff); // cyan
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
-}
+	RGB_BLACK, // black
+	MAKE_RGB(0xff, 0x00, 0x00), // red
+	MAKE_RGB(0x00, 0xff, 0x00), // green
+	MAKE_RGB(0xff, 0xff, 0x00), // yellow
+	MAKE_RGB(0x00, 0x00, 0xff), // blue
+	MAKE_RGB(0xff, 0x00, 0xff), // magenta
+	MAKE_RGB(0x00, 0xff, 0xff), // cyan
+	RGB_WHITE // white
+};
 
 
 //-------------------------------------------------
@@ -242,7 +237,6 @@ WRITE8_MEMBER( abc806_state::sso_w )
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	abc806_state *state = device->machine().driver_data<abc806_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 //  UINT8 old_data = 0xff;
 	int fg_color = 7;
@@ -333,11 +327,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 
-			bitmap.pix32(y, x++) = palette[color];
+			bitmap.pix32(y, x++) = PALETTE[color];
 
 			if (e5 || e6)
 			{
-				bitmap.pix32(y, x++) = palette[color];
+				bitmap.pix32(y, x++) = PALETTE[color];
 			}
 
 			chargen_data <<= 1;
@@ -436,7 +430,6 @@ static const mc6845_interface crtc_intf =
 
 void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32 addr = (m_hrs & 0x0f) << 15;
 
 	for (int y = m_sync + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
@@ -450,9 +443,9 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || bitmap.pix32(y, x) == palette[0])
+				if (BIT(dot, 15) || (bitmap.pix32(y, x) == RGB_BLACK))
 				{
-					bitmap.pix32(y, x) = palette[(dot >> 12) & 0x07];
+					bitmap.pix32(y, x) = PALETTE[(dot >> 12) & 0x07];
 				}
 
 				dot <<= 4;
@@ -547,8 +540,4 @@ MACHINE_CONFIG_FRAGMENT( abc806_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
-
-	MCFG_PALETTE_LENGTH(8)
-
-	MCFG_PALETTE_INIT(abc806)
 MACHINE_CONFIG_END

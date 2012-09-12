@@ -73,7 +73,7 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 
 /* OSM-200 */
 
-UINT32 osc1000b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -82,10 +82,6 @@ UINT32 osc1000b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 MACHINE_CONFIG_FRAGMENT( tmc1800_video )
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_1_75MHz)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_1_75MHz, tmc1800_cdp1861_intf)
 MACHINE_CONFIG_END
 
@@ -95,16 +91,11 @@ MACHINE_CONFIG_FRAGMENT( osc1000b_video )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( tmc2000_video )
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
-
-	MCFG_PALETTE_LENGTH(8+8)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, tmc2000_cdp1864_intf)
@@ -114,8 +105,6 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( nano_video )
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
-
-	MCFG_PALETTE_LENGTH(8+8)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, nano_cdp1864_intf)

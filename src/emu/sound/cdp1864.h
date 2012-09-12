@@ -155,7 +155,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( aoe_w );
 	DECLARE_WRITE_LINE_MEMBER( evs_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -186,10 +186,11 @@ private:
 
 	cpu_device *m_cpu;
 	screen_device *m_screen;		// screen
-	bitmap_ind16 m_bitmap;				// bitmap
+	bitmap_rgb32 m_bitmap;			// bitmap
 	sound_stream *m_stream;			// sound output
 
 	// video state
+	rgb_t m_palette[16];
 	int m_disp;						// display on
 	int m_dmaout;					// DMA request active
 	int m_bgcolor;					// background color

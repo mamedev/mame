@@ -210,7 +210,7 @@ void vip_expansion_slot_device::dma_w(address_space &space, offs_t offset, UINT8
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
 

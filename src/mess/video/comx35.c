@@ -109,20 +109,6 @@ void comx35_state::video_start()
 	save_pointer(NAME(m_charram), COMX35_CHARRAM_SIZE);
 }
 
-UINT32 comx35_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if (screen.width() == CDP1869_SCREEN_WIDTH)
-	{
-		m_vis->screen_update(screen, bitmap, cliprect);
-	}
-	else
-	{
-		m_expansion->screen_update(screen, bitmap, cliprect);
-	}
-
-	return 0;
-}
-
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( comx35_pal_video )

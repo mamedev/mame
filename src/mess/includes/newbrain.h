@@ -75,7 +75,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	enum
 	{
@@ -113,7 +113,7 @@ public:
 	void tvram_w(UINT8 data, int a6);
 	inline int get_reset_t();
 	inline int get_pwrup_t();
-	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// processor state
 	int m_pwrup;			// power up

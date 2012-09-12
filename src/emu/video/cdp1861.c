@@ -214,7 +214,7 @@ WRITE8_MEMBER( cdp1861_device::dma_w )
 	for (x = 0; x < 8; x++)
 	{
 		int color = BIT(data, 7);
-		m_bitmap.pix16(y, sx + x) = color;
+		m_bitmap.pix32(y, sx + x) = RGB_MONOCHROME_WHITE[color];
 		data <<= 1;
 	}
 }
@@ -251,7 +251,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 cdp1861_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 cdp1861_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
@@ -259,7 +259,7 @@ UINT32 cdp1861_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(RGB_BLACK, cliprect);
 	}
 	return 0;
 }

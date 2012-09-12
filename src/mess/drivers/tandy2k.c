@@ -306,7 +306,7 @@ INPUT_PORTS_END
 
 // Video
 
-UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_vidouts)
 	{
@@ -712,9 +712,6 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-
-	MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, vpac_intf, vpac_mem)
 	MCFG_CRT9212_ADD(CRT9212_0_TAG, drb0_intf)

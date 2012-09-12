@@ -70,8 +70,7 @@
 	MCFG_DEVICE_CONFIG(_config) \
     MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, uv201_device, screen_update) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, 232, 18, 232, 262, 21, 262) \
-    MCFG_PALETTE_LENGTH(32)
+	MCFG_SCREEN_RAW_PARAMS(_clock, 232, 18, 232, 262, 21, 262)
 
 
 #define UV201_INTERFACE(name) \
@@ -110,7 +109,7 @@ public:
     DECLARE_WRITE_LINE_MEMBER( ext_int_w );
     DECLARE_READ_LINE_MEMBER( kbd_r );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -140,6 +139,7 @@ private:
 
 	screen_device *m_screen;
 
+	rgb_t m_palette[32];
 	UINT8 m_ram[0x90];
 	UINT8 m_y_int;
 	UINT8 m_fmod;

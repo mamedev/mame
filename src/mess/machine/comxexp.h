@@ -148,9 +148,6 @@ protected:
 	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
 	virtual void comx_io_w(offs_t offset, UINT8 data) { };
 
-	// video
-	virtual UINT32 comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
-
 	comx_expansion_slot_device *m_slot;
 };
 

@@ -47,6 +47,13 @@
 #define ATTR_SUBSCRIPT		BIT(attr, 6)
 #define ATTR_SUPERSCRIPT	BIT(attr, 7)
 
+static const rgb_t PALETTE[] = 
+{
+	RGB_BLACK,
+	MAKE_RGB(0x00, 0x80, 0x00),
+	MAKE_RGB(0x00, 0xff, 0x00)
+};
+
 
 
 //**************************************************************************
@@ -62,8 +69,6 @@ const device_type WANGPC_MVC = &device_creator<wangpc_mvc_device>;
 
 void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-
 	for (int sx = 0; sx < 50; sx++)
 	{
 		offs_t addr = (y * 50) + sx;
@@ -74,7 +79,7 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 			int x = (sx * 16) + bit;
 			int color = BIT(data, 15);
 
-			bitmap.pix32(y, x) = palette[color];
+			bitmap.pix32(y, x) = PALETTE[color];
 
 			data <<= 1;
 		}
@@ -110,7 +115,7 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 			int color = ((BIT(data, 9) & !ATTR_BLANK) ^ ATTR_REVERSE);
 
 			if ((color | bitmap.pix32(y, x)) & ATTR_BOLD) color = 2;
-			if (color) bitmap.pix32(y, x) = palette[color];
+			if (color) bitmap.pix32(y, x) = PALETTE[color];
 
 			data <<= 1;
 		}
@@ -158,8 +163,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_mvc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*12-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
-
-	MCFG_PALETTE_LENGTH(3)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, XTAL_14_31818MHz/16, crtc_intf)
 MACHINE_CONFIG_END
@@ -222,11 +225,6 @@ void wangpc_mvc_device::device_start()
 	m_video_ram = auto_alloc_array(machine(), UINT16, VIDEO_RAM_SIZE);
 	m_char_ram = auto_alloc_array(machine(), UINT16, CHAR_RAM_SIZE);
 	m_bitmap_ram = auto_alloc_array(machine(), UINT16, BITMAP_RAM_SIZE);
-
-	// initialize palette
-	palette_set_color_rgb(machine(), 0, 0, 0, 0);
-	palette_set_color_rgb(machine(), 1, 0, 0x80, 0);
-	palette_set_color_rgb(machine(), 2, 0, 0xff, 0);
 
 	// state saving
 	save_pointer(NAME(m_video_ram), VIDEO_RAM_SIZE);

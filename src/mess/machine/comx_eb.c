@@ -383,23 +383,3 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 		}
 	}
 }
-
-
-//-------------------------------------------------
-//  comx_screen_update - screen update
-//-------------------------------------------------
-
-UINT32 comx_eb_device::comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bool value = false;
-
-	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
-	{
-		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
-		{
-			m_expansion_slot[slot]->screen_update(screen, bitmap, cliprect);
-		}
-	}
-
-	return value;
-}

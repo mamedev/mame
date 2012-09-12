@@ -187,7 +187,7 @@ public:
 		  m_trom(*this, SAA5052_TAG)
 	{ }
 
-	required_device<device_t> m_trom;
+	required_device<saa5050_device> m_trom;
 
 	DECLARE_DRIVER_INIT(driver_init);
 

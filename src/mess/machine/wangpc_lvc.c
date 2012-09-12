@@ -54,8 +54,6 @@ const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
 
 void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-
 	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x80;
 
 	if (OPTION_80_COL)
@@ -72,7 +70,7 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 
 	            if (column == cursor_x) color = 0x03;
 
-	            bitmap.pix32(y, x) = palette[color];
+	            bitmap.pix32(y, x) = m_palette[color];
 
 	            data <<= 1;
 	        }
@@ -94,7 +92,7 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 
 	            if (column == cursor_x) color = 0x03;
 
-	            bitmap.pix32(y, x) = palette[color];
+	            bitmap.pix32(y, x) = m_palette[color];
 
 	            data <<= 1;
 	        }
@@ -145,8 +143,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_lvc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*9-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
-
-	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, XTAL_14_31818MHz/16, crtc_intf)
 MACHINE_CONFIG_END
@@ -351,7 +347,7 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 				int g = BIT(data, 7) ? (i ? 0xff : 0x80) : 0;
 				int b = BIT(data, 3) ? (i ? 0xff : 0x80) : 0;
 
-				palette_set_color_rgb(machine(), index, r, g, b);
+				m_palette[index] = MAKE_RGB(r, g, b);
 			}
 			break;
 

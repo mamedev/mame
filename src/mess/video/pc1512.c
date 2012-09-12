@@ -9,6 +9,26 @@
 #define LOG 0
 
 
+static const rgb_t PALETTE[] =
+{
+	RGB_BLACK,
+	MAKE_RGB(0x00, 0x00, 0xaa),
+	MAKE_RGB(0x00, 0xaa, 0x00),
+	MAKE_RGB(0x00, 0xaa, 0xaa),
+	MAKE_RGB(0xaa, 0x00, 0x00),
+	MAKE_RGB(0xaa, 0x00, 0xaa),
+	MAKE_RGB(0xaa, 0x55, 0x00),
+	MAKE_RGB(0xaa, 0xaa, 0xaa),
+	MAKE_RGB(0x55, 0x55, 0x55),
+	MAKE_RGB(0x55, 0x55, 0xff),
+	MAKE_RGB(0x55, 0xff, 0x55),
+	MAKE_RGB(0x55, 0xff, 0xff),
+	MAKE_RGB(0xff, 0x55, 0x55),
+	MAKE_RGB(0xff, 0x55, 0xff),
+	MAKE_RGB(0xff, 0xff, 0x55),
+	RGB_WHITE
+};
+
 static const int PALETTE_0[] = { 0, 3, 5, 7 };
 static const int PALETTE_1[] = { 0, 2, 4, 6 };
 static const int PALETTE_2[] = { 0, 3, 4, 7 };
@@ -39,36 +59,6 @@ enum
 #define HFP_HIRES			112
 #define VFP_LORES			22
 #define HFP_LORES			16
-
-
-
-//**************************************************************************
-//  PALETTE
-//**************************************************************************
-
-//-------------------------------------------------
-//  PALETTE_INIT( pc1512 )
-//-------------------------------------------------
-
-static PALETTE_INIT( pc1512 )
-{
-	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine,  1, 0x00, 0x00, 0xaa);
-	palette_set_color_rgb(machine,  2, 0x00, 0xaa, 0x00);
-	palette_set_color_rgb(machine,  3, 0x00, 0xaa, 0xaa);
-	palette_set_color_rgb(machine,  4, 0xaa, 0x00, 0x00);
-	palette_set_color_rgb(machine,  5, 0xaa, 0x00, 0xaa);
-	palette_set_color_rgb(machine,  6, 0xaa, 0x55, 0x00);
-	palette_set_color_rgb(machine,  7, 0xaa, 0xaa, 0xaa);
-	palette_set_color_rgb(machine,  8, 0x55, 0x55, 0x55);
-	palette_set_color_rgb(machine,  9, 0x55, 0x55, 0xff);
-	palette_set_color_rgb(machine, 10, 0x55, 0xff, 0x55);
-	palette_set_color_rgb(machine, 11, 0x55, 0xff, 0xff);
-	palette_set_color_rgb(machine, 12, 0xff, 0x55, 0x55);
-	palette_set_color_rgb(machine, 13, 0xff, 0x55, 0xff);
-	palette_set_color_rgb(machine, 14, 0xff, 0xff, 0x55);
-	palette_set_color_rgb(machine, 15, 0xff, 0xff, 0xff);
-}
 
 
 
@@ -403,10 +393,9 @@ offs_t pc1512_state::get_char_rom_offset()
 	return ((ioport("LK")->read() >> 5) & 0x03) << 11;
 }
 
-void pc1512_state::draw_alpha(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32 *p = &bitmap.pix32(y + VFP_HIRES, HFP_HIRES);
 
 	if (get_display_mode(m_vdu_mode) == ALPHA_40)
@@ -443,7 +432,7 @@ void pc1512_state::draw_alpha(mc6845_device *device, bitmap_rgb32 &bitmap, const
 		{
 			int color = BIT(data, 7) ? fg : bg;
 
-			*p = palette[color]; p++;
+			*p = PALETTE[color]; p++;
 
 			data <<= 1;
 		}
@@ -473,12 +462,11 @@ int pc1512_state::get_color(UINT8 data)
 	return color;
 };
 
-void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 199) return;
 
 	UINT32 *p = &bitmap.pix32(y + VFP_LORES, HFP_LORES);
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -488,18 +476,17 @@ void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_rgb32 &bitmap, 
 
 		for (int x = 0; x < 8; x++)
 		{
-			*p = palette[get_color((BIT(b, 15) << 1) | BIT(b, 14))]; p++;
+			*p = PALETTE[get_color((BIT(b, 15) << 1) | BIT(b, 14))]; p++;
 			b <<= 2;
 		}
 	}
 }
 
-void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 199) return;
 
 	UINT32 *p = &bitmap.pix32(y + VFP_HIRES, HFP_HIRES);
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -512,7 +499,7 @@ void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_rgb32 &bitmap, 
 
 		for (int x = 0; x < 16; x++)
 		{
-			*p = palette[(BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15)]; p++;
+			*p = PALETTE[(BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15)]; p++;
 			i <<= 1; r <<= 1; g <<= 1; b <<= 1;
 		}
 	}
@@ -526,15 +513,15 @@ static MC6845_UPDATE_ROW( pc1512_update_row )
 	{
 	case ALPHA_40:
 	case ALPHA_80:
-		state->draw_alpha(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+		state->draw_alpha(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 		break;
 
 	case GRAPHICS_1:
-		state->draw_graphics_1(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+		state->draw_graphics_1(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 		break;
 
 	case GRAPHICS_2:
-		state->draw_graphics_2(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+		state->draw_graphics_2(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
 		break;
 	}
 }
@@ -574,7 +561,6 @@ void pc1512_state::video_start()
 
 UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	if (m_vdu_mode & MODE_ENABLE_VIDEO)
 	{
 		m_blink_ctr++;
@@ -608,11 +594,11 @@ UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		case ALPHA_40:
 		case ALPHA_80:
 		case GRAPHICS_1:
-			bitmap.fill(palette[m_vdu_color & 0x0f], cliprect);
+			bitmap.fill(PALETTE[m_vdu_color & 0x0f], cliprect);
 			break;
 
 		case GRAPHICS_2:
-			bitmap.fill(palette[m_vdu_border & 0x0f], cliprect);
+			bitmap.fill(PALETTE[m_vdu_border & 0x0f], cliprect);
 			break;
 		}
 
@@ -620,7 +606,7 @@ UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 	else
 	{
-		bitmap.fill(palette[0], cliprect);
+		bitmap.fill(RGB_BLACK, cliprect);
 	}
 
 	return 0;
@@ -638,9 +624,6 @@ MACHINE_CONFIG_FRAGMENT( pc1512_video )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
-
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(pc1512)
 
 	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, XTAL_28_63636MHz/32, crtc_intf)
 MACHINE_CONFIG_END

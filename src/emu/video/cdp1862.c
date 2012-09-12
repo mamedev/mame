@@ -66,7 +66,7 @@ inline void cdp1862_device::initialize_palette()
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		palette_set_color_rgb(machine(), i, r, g, b);
+		m_palette[i] = MAKE_RGB(r, g, b);
 	}
 }
 
@@ -171,7 +171,7 @@ WRITE8_MEMBER( cdp1862_device::dma_w )
 			color = (gd << 2) | (bd << 1) | rd;
 		}
 
-		m_bitmap.pix16(y, sx + x) = color;
+		m_bitmap.pix32(y, sx + x) = m_palette[color];
 
 		data <<= 1;
 	}
@@ -213,9 +213,11 @@ WRITE_LINE_MEMBER( cdp1862_device::con_w )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 cdp1862_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 cdp1862_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	m_bitmap.fill(CDP1862_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8, cliprect);
+
+	m_bitmap.fill(m_palette[CDP1862_BACKGROUND_COLOR_SEQUENCE[m_bgcolor] + 8], cliprect);
+	
 	return 0;
 }

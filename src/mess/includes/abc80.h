@@ -100,9 +100,9 @@ public:
 	virtual void machine_start();
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void scan_keyboard();
 
