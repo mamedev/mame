@@ -32,6 +32,7 @@
 #define M6526_TAG		"u20"
 #define WD1770_TAG		"u11"
 #define C64H156_TAG		"u6"
+#define C64H157_TAG		"u5"
 
 
 enum

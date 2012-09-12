@@ -148,7 +148,8 @@
 #define M6502_TAG		"ucd5"
 #define M6522_0_TAG		"uab1"
 #define M6522_1_TAG		"ucd4"
-#define C64H156_TAG		"64h156"
+#define C64H156_TAG		"uc4"
+#define C64H157_TAG     "uc5"
 
 #define MC6821_TAG      "pia"
 #define CENTRONICS_TAG  "centronics"
