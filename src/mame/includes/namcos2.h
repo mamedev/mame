@@ -188,6 +188,7 @@ public:
 		  m_dpram(*this, "dpram"),
 		  m_paletteram(*this, "paletteram"),
 		  m_spriteram(*this, "spriteram"),
+		  m_serial_comms_ram(*this, "serialram"),
 		  m_rozram(*this, "rozram"),
 		  m_roz_ctrl(*this, "rozctrl"),
 		  m_c45_road(*this, "c45_road")
@@ -250,6 +251,10 @@ public:
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
+	DECLARE_READ16_MEMBER( serial_comms_ram_r );
+	DECLARE_WRITE16_MEMBER( serial_comms_ram_w );
+	DECLARE_READ16_MEMBER( serial_comms_ctrl_r );
+	DECLARE_WRITE16_MEMBER( serial_comms_ctrl_w );
 
 	void draw_sprite_init();
 	void update_palette();
@@ -264,10 +269,12 @@ public:
 	required_shared_ptr<UINT8> m_dpram;	/* 2Kx8 */
 	required_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_serial_comms_ram;
 	optional_shared_ptr<UINT16> m_rozram;
 	optional_shared_ptr<UINT16> m_roz_ctrl;
 	tilemap_t *m_tilemap_roz;
 	UINT16 m_gfx_ctrl;
+	UINT16 m_serial_comms_ctrl[0x8];
 
 	optional_device<namco_c45_road_device> m_c45_road;
 };
@@ -307,16 +314,6 @@ READ16_HANDLER( namcos2_68k_eeprom_r );
 /*  Shared data ROM memory handlerhandlers                    */
 /**************************************************************/
 READ16_HANDLER( namcos2_68k_data_rom_r );
-
-/**************************************************************/
-/* Shared serial communications processory (CPU5 ????)        */
-/**************************************************************/
-READ16_HANDLER( namcos2_68k_serial_comms_ram_r );
-WRITE16_HANDLER( namcos2_68k_serial_comms_ram_w );
-READ16_HANDLER( namcos2_68k_serial_comms_ctrl_r );
-WRITE16_HANDLER( namcos2_68k_serial_comms_ctrl_w );
-
-extern UINT16 *namcos2_68k_serial_comms_ram;
 
 /**************************************************************/
 /* Shared protection/random number generator                  */

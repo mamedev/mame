@@ -40,15 +40,13 @@ extern WRITE64_HANDLER( dc_mess_gdrom_w );
 extern READ64_HANDLER( dc_mess_g1_ctrl_r );
 extern WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
-static UINT64 *dc_ram;
-
 static READ64_HANDLER( dcus_idle_skip_r )
 {
 	if (space->device().safe_pc()==0xc0ba52a)
 		space->device().execute().spin_until_time(attotime::from_usec(2500));
 	//  device_spinuntil_int(&space->device());
 
-	return dc_ram[0x2303b0/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x2303b0/8];
 }
 
 static READ64_HANDLER( dcjp_idle_skip_r )
@@ -57,7 +55,7 @@ static READ64_HANDLER( dcjp_idle_skip_r )
 		space->device().execute().spin_until_time(attotime::from_usec(2500));
 	//  device_spinuntil_int(&space->device());
 
-	return dc_ram[0x2302f8/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x2302f8/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,dc)
@@ -179,10 +177,10 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("share4") AM_BASE_LEGACY(&dc_ram)
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("share4")// extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("share4")// mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("dc_ram")
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("dc_ram")// extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("dc_ram")// mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram")// mirror
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
@@ -193,7 +191,7 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
 	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
-	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("share4")	// another RAM mirror
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram")	// another RAM mirror
 
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END

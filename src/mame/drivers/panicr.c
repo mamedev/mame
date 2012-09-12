@@ -619,6 +619,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	int size;
 	int i,j;
 
+	t5182_init(machine());
+
 	rom = machine().root_device().memregion("gfx1")->base();
 	size = machine().root_device().memregion("gfx1")->bytes();
 

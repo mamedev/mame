@@ -676,6 +676,6 @@ SCREEN_VBLANK( pgm )
 		pgm_state *state = screen.machine().driver_data<pgm_state>();
 
 		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
-		memcpy(state->m_spritebufferram, pgm_mainram, 0xa00);
+		memcpy(state->m_spritebufferram, state->m_mainram, 0xa00);
 	}
 }

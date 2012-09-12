@@ -110,7 +110,7 @@ public:
 
 //static UINT16 *save_ram;
 
-UINT16* neocd_work_ram;
+//UINT16* neocd_work_ram;
 
 /*************************************
  *
@@ -1310,7 +1310,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x000000, 0x00007f) AM_RAMBANK(NEOGEO_BANK_VECTORS)
 	AM_RANGE(0x000080, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM AM_BASE_LEGACY(&neocd_work_ram)
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM AM_SHARE("neocd_work_ram")
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(NEOGEO_BANK_CARTRIDGE)
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)

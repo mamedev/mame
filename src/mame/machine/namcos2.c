@@ -164,20 +164,17 @@ READ16_HANDLER( namcos2_68k_data_rom_r ){
 /* 68000 Shared serial communications processor (CPU5?)       */
 /**************************************************************/
 
-static UINT16  namcos2_68k_serial_comms_ctrl[0x8];
-UINT16 *namcos2_68k_serial_comms_ram;
-
-READ16_HANDLER( namcos2_68k_serial_comms_ram_r ){
-	return namcos2_68k_serial_comms_ram[offset];
+READ16_MEMBER( namcos2_state::serial_comms_ram_r ){
+	return m_serial_comms_ram[offset];
 }
 
-WRITE16_HANDLER( namcos2_68k_serial_comms_ram_w ){
-	COMBINE_DATA( &namcos2_68k_serial_comms_ram[offset] );
+WRITE16_MEMBER( namcos2_state::serial_comms_ram_w ){
+	COMBINE_DATA( &m_serial_comms_ram[offset] );
 }
 
-READ16_HANDLER( namcos2_68k_serial_comms_ctrl_r )
+READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
 {
-	UINT16 retval = namcos2_68k_serial_comms_ctrl[offset];
+	UINT16 retval = m_serial_comms_ctrl[offset];
 
 	switch(offset){
 	case 0x00:
@@ -190,9 +187,9 @@ READ16_HANDLER( namcos2_68k_serial_comms_ctrl_r )
 	return retval;
 }
 
-WRITE16_HANDLER( namcos2_68k_serial_comms_ctrl_w )
+WRITE16_MEMBER( namcos2_state::serial_comms_ctrl_w )
 {
-	COMBINE_DATA( &namcos2_68k_serial_comms_ctrl[offset] );
+	COMBINE_DATA( &m_serial_comms_ctrl[offset] );
 }
 
 /*************************************************************/

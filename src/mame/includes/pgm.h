@@ -16,7 +16,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_videoregs(*this, "videoregs"),
 		  m_videoram(*this, "videoram"),
-		  m_z80_mainram(*this, "z80_mainram")
+		  m_z80_mainram(*this, "z80_mainram"),
+		  m_mainram(*this, "sram")
 		{
 			m_irq4_disabled = 0;
 		}
@@ -25,7 +26,7 @@ public:
 	required_shared_ptr<UINT16> m_videoregs;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT8> m_z80_mainram;
-//  UINT16 *      m_mainram;  // currently this is also used by nvram handler
+	required_shared_ptr<UINT16> m_mainram;
 	UINT16 *      m_bg_videoram;
 	UINT16 *      m_tx_videoram;
 	UINT16 *      m_rowscrollram;
@@ -298,8 +299,6 @@ public:
 
 
 
-
-extern UINT16 *pgm_mainram;	// used by nvram handler, we cannot move it to driver data struct
 
 /*----------- defined in drivers/pgm.c -----------*/
 

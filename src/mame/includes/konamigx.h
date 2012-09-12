@@ -8,7 +8,8 @@ public:
 		m_psacram(*this,"psacram"),
 		m_subpaletteram32(*this,"subpaletteram"),
 		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
-		m_k053936_0_linectrl(*this,"k053936_0_line",32)
+		m_k053936_0_linectrl(*this,"k053936_0_line",32),
+		m_konamigx_type3_psac2_bank(*this,"psac2_bank")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -17,6 +18,7 @@ public:
 	optional_shared_ptr<UINT32> m_subpaletteram32;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
 	optional_shared_ptr<UINT16> m_k053936_0_linectrl;
+	optional_shared_ptr<UINT32> m_konamigx_type3_psac2_bank;
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
@@ -148,11 +150,7 @@ SCREEN_UPDATE_RGB32(konamigx);
 SCREEN_UPDATE_RGB32(konamigx_left);
 SCREEN_UPDATE_RGB32(konamigx_right);
 
-#ifdef UNUSED_FUNCTION
-#endif
-
 extern int konamigx_current_frame;
-extern UINT32* konamigx_type3_psac2_bank;
 
 
 /*----------- defined in machine/konamigx.c -----------*/

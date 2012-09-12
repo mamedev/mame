@@ -15,6 +15,7 @@ class dc_state : public driver_device
 		dc_framebuffer_ram(*this, "frameram"),
 		dc_texture_ram(*this, "dc_texture_ram"),
 		dc_sound_ram(*this, "dc_sound_ram"),
+		dc_ram(*this, "dc_ram"),
 		pvr2_texture_ram(*this, "textureram2"),
 		pvr2_framebuffer_ram(*this, "frameram2"),
 		elan_ram(*this, "elan_ram") { }
@@ -23,6 +24,7 @@ class dc_state : public driver_device
 	required_shared_ptr<UINT64> dc_texture_ram; // '64-bit access area'
 
 	required_shared_ptr<UINT32> dc_sound_ram;
+	required_shared_ptr<UINT64> dc_ram;
 
 	/* machine related */
 	UINT32 dc_rtcregister[4];

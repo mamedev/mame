@@ -32,7 +32,8 @@ READ16_HANDLER( dw2_d80000_r )
 // if(dw2reg<0x20) //NOT SURE!!
 	{
 		//The value at 0x80EECE is computed in the routine at 0x107c18
-		UINT16 d = pgm_mainram[0xEECE/2];
+		pgm_state *state = space->machine().driver_data<pgm_state>();
+		UINT16 d = state->m_mainram[0xEECE/2];
 		UINT16 d2 = 0;
 		d = (d >> 8) | (d << 8);
 		DW2BITSWAP(d, d2, 7,  0);

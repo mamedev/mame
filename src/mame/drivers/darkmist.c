@@ -408,6 +408,8 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
+	t5182_init(machine());
+
 	decrypt_gfx(machine());
 
 	decrypt_snd(machine());

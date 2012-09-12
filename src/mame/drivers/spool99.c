@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
-//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE_LEGACY(&vcarn_io)
+//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END

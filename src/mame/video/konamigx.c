@@ -1839,7 +1839,6 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flip));
 }
 
-UINT32* konamigx_type3_psac2_bank;
 static int konamigx_type3_psac2_actual_bank;
 //int konamigx_type3_psac2_actual_last_bank = 0;
 
@@ -1847,8 +1846,8 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 {
 	// other bits are used for something...
 
-	COMBINE_DATA(&konamigx_type3_psac2_bank[offset]);
-	konamigx_type3_psac2_actual_bank = (konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
+	COMBINE_DATA(&m_konamigx_type3_psac2_bank[offset]);
+	konamigx_type3_psac2_actual_bank = (m_konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
 
 	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
     if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)

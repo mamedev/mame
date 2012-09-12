@@ -736,9 +736,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_SHARE(_tag) \
 	curentry->set_share(_tag); \
 
-#define AM_BASE_LEGACY(_base) \
-	curentry->set_baseptr(_base); \
-
 
 // common shortcuts
 #define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)

@@ -882,8 +882,8 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
 //  AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM    /* Work RAM */
 //  AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
-//  AM_RANGE(0x0b9000, 0x0bdfff) AM_RAM AM_BASE_LEGACY(&nmk16_mcu_work_ram)   /* Work RAM */
-//  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE_LEGACY(&nmk16_mcu_shared_ram)  /* Work RAM */
+//  AM_RANGE(0x0b9000, 0x0bdfff) AM_RAM AM_SHARE("mcu_work_ram")   /* Work RAM */
+//  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_SHARE("mcu_shared_ram")  /* Work RAM */
 //  AM_RANGE(0x0bf000, 0x0bffff) AM_RAM    /* Work RAM */
 	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM_WRITE(tdragon_mainram_w ) AM_SHARE("mainram")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")

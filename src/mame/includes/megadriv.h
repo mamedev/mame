@@ -105,9 +105,11 @@ class md_base_state : public driver_device
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-		m_vdp(*this,"gen_vdp")
+		m_vdp(*this,"gen_vdp"),
+		m_megadrive_ram(*this,"megadrive_ram")
 	{ }
 	required_device<sega_genesis_vdp_device> m_vdp;
+	optional_shared_ptr<UINT16> m_megadrive_ram;
 
 	DECLARE_DRIVER_INIT(megadriv_c2);
 	DECLARE_DRIVER_INIT(megadrie);
@@ -445,7 +447,10 @@ class segacd_state : public _32x_state	// use _32x_state as base to make easier 
 {
 public:
 	segacd_state(const machine_config &mconfig, device_type type, const char *tag)
-	: _32x_state(mconfig, type, tag) { }
+	: _32x_state(mconfig, type, tag),
+	  m_font_bits(*this,"segacd_font") { }
+	
+	required_shared_ptr<UINT16> m_font_bits;
 };
 
 extern int sega_cd_connected;

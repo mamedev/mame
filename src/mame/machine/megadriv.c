@@ -56,7 +56,6 @@ static cpu_device *_genesis_snd_z80_cpu;
 int genesis_other_hacks = 0; // misc hacks
 
 timer_device* megadriv_scanline_timer;
-UINT16* megadrive_ram = NULL;
 
 struct genesis_z80_vars
 {
@@ -577,14 +576,14 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
 
 	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_cram)
+//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("megadrive_vdp_vram")
+//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
+//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
 
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 ADDRESS_MAP_END
@@ -883,7 +882,7 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
@@ -1008,8 +1007,8 @@ MACHINE_RESET( megadriv )
 	{
 	//  set_refresh_rate(megadriv_framerate);
 	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
-		if (megadrive_ram)
-			memset(megadrive_ram,0x00,0x10000);
+		if (state->m_megadrive_ram)
+			memset(state->m_megadrive_ram,0x00,0x10000);
 	}
 
 	megadriv_reset_vdp(machine);

@@ -167,7 +167,6 @@
  *************************************/
 
 static UINT8 *memcard_data;
-static UINT16 *save_ram;
 
 static const char *audio_banks[4] =
 {
@@ -499,7 +498,7 @@ WRITE16_MEMBER(neogeo_state::save_ram_w)
 {
 
 	if (m_save_ram_unlocked)
-		COMBINE_DATA(&save_ram[offset]);
+		COMBINE_DATA(&m_save_ram[offset]);
 }
 
 
@@ -992,7 +991,7 @@ static MACHINE_START( neogeo )
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
 	/* configure NVRAM */
-	machine.device<nvram_device>("saveram")->set_base(save_ram, 0x10000);
+	machine.device<nvram_device>("saveram")->set_base(state->m_save_ram, 0x10000);
 
 	/* set the BIOS bank */
 	state->membank(NEOGEO_BANK_BIOS)->set_base(state->memregion("mainbios")->base());
@@ -1105,7 +1104,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram_r, neogeo_paletteram_w)
 	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROMBANK(NEOGEO_BANK_BIOS)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_RAM_WRITE(save_ram_w) AM_BASE_LEGACY(&save_ram)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_RAM_WRITE(save_ram_w) AM_SHARE("save_ram")
 	AM_RANGE(0xe00000, 0xffffff) AM_READ(neogeo_unmapped_r)
 ADDRESS_MAP_END
 

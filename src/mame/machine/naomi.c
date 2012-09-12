@@ -22,7 +22,6 @@ hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
 #include "includes/naomi.h"
 #include "includes/dc.h"
 
-UINT64 *naomi_ram64;
 int jvsboard_type;
 UINT16 actel_id;
 
@@ -34,7 +33,7 @@ static READ64_HANDLER( naomi_biose_idle_skip_r )
 //  else
 //      printf("%08x\n", space->device().safe_pc());
 
-	return naomi_ram64[0x2ad238/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x2ad238/8];
 }
 
 static READ64_HANDLER( naomi_biosh_idle_skip_r )
@@ -44,7 +43,7 @@ static READ64_HANDLER( naomi_biosh_idle_skip_r )
 
 //   printf("%08x\n", space->device().safe_pc());
 
-	return naomi_ram64[0x2b0600/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x2b0600/8];
 }
 
 static READ64_HANDLER( naomi2_biose_idle_skip_r )
@@ -55,7 +54,7 @@ static READ64_HANDLER( naomi2_biose_idle_skip_r )
 //  else
 //      printf("%08x\n", space->device().safe_pc());
 
-	return naomi_ram64[0x2b0600/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x2b0600/8];
 }
 
 static UINT8 asciihex_to_dec(UINT8 in)
@@ -246,7 +245,7 @@ static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 	if (space->device().safe_pc()==0x0c0c9adc)
 		space->device().execute().spin_until_time(attotime::from_usec(500));
 
-	return naomi_ram64[0x1aae18/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x1aae18/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,ggxxsla)
@@ -260,7 +259,7 @@ static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 	if (space->device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
 		space->device().execute().spin_until_time(attotime::from_usec(500));
 
-	return naomi_ram64[0x1837b8/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x1837b8/8];
 }
 
 
@@ -277,7 +276,7 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 
 	//printf("%08x\n", space->device().safe_pc());
 
-	return naomi_ram64[0x18d6c8/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x18d6c8/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,ggxxrl)
@@ -292,7 +291,7 @@ static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 	if (space->device().safe_pc()==0xc36a2dc)
 		space->device().execute().spin_until_time(attotime::from_usec(500));
 
-	return naomi_ram64[0x5dc900/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0x5dc900/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,sfz3ugd)
@@ -340,7 +339,7 @@ static READ64_HANDLER( hotd2_idle_skip_r )
 //  else
 //  printf("%08x\n", space->device().safe_pc());
 
-	return naomi_ram64[0xa25fb8/8];
+	return space->machine().driver_data<dc_state>()->dc_ram[0xa25fb8/8];
 }
 
 DRIVER_INIT_MEMBER(dc_state,hotd2)

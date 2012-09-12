@@ -2235,7 +2235,13 @@ READ16_HANDLER( segacd_stopwatch_timer_r )
 void segacd_init_main_cpu( running_machine& machine )
 {
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
+	
+	segacd_font_bits = reinterpret_cast<UINT16 *>(machine.root_device().memshare("segacd_font")->ptr());
+	segacd_backupram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("backupram")->ptr());
+	segacd_dataram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("dataram")->ptr());
+	segacd_dataram2 = reinterpret_cast<UINT16 *>(machine.root_device().memshare("dataram2")->ptr());
+	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("segacd_program")->ptr());
+	
 	segacd_4meg_prgbank = 0;
 
 
@@ -3008,12 +3014,12 @@ READ16_HANDLER( segacd_font_converted_r )
 }
 
 ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, driver_device )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_LEGACY(&segacd_4meg_prgram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("segacd_program")
 
-	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE_LEGACY(&segacd_dataram)
-	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE_LEGACY(&segacd_dataram2)
+	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_SHARE("dataram")
+	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_SHARE("dataram2")
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE_LEGACY(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE_LEGACY(&segacd_backupram)// backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE_LEGACY(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") // backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8_LEGACY("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
 	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8_LEGACY("rfsnd", rf5c68_r, 0x00ff)
@@ -3038,7 +3044,7 @@ ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8_LEGACY(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8_LEGACY(segacd_cdd_tx_w,0xffff)
 	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE_LEGACY(segacd_font_color_r, segacd_font_color_w)
-	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_BASE_LEGACY(&segacd_font_bits)
+	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_SHARE("segacd_font")
 	AM_RANGE(0xff8050, 0xff8057) AM_READ_LEGACY(segacd_font_converted_r)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE_LEGACY(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE_LEGACY(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address

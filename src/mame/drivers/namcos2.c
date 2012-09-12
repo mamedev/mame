@@ -594,8 +594,8 @@ static ADDRESS_MAP_START( namcos2_68k_default_cpu_board_am, AS_PROGRAM, 16, namc
 	AM_RANGE(0x440000, 0x44ffff) AM_READWRITE(paletteram_word_r,paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x460000, 0x460fff) AM_READWRITE(dpram_word_r,dpram_word_w)
 	AM_RANGE(0x468000, 0x468fff) AM_READWRITE(dpram_word_r,dpram_word_w) /* mirror */
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(namcos2_68k_serial_comms_ram_r,namcos2_68k_serial_comms_ram_w) AM_BASE_LEGACY(&namcos2_68k_serial_comms_ram)
-	AM_RANGE(0x4a0000, 0x4a000f) AM_READWRITE_LEGACY(namcos2_68k_serial_comms_ctrl_r,namcos2_68k_serial_comms_ctrl_w)
+	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(serial_comms_ram_r,serial_comms_ram_w) AM_SHARE("serialram")
+	AM_RANGE(0x4a0000, 0x4a000f) AM_READWRITE(serial_comms_ctrl_r,serial_comms_ctrl_w)
 ADDRESS_MAP_END
 
 /*************************************************************/

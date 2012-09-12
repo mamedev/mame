@@ -162,6 +162,11 @@ enum
 static UINT8 *t5182_sharedram;
 static int irqstate;
 
+void t5182_init(running_machine &machine)
+{
+	t5182_sharedram = reinterpret_cast<UINT8 *>(machine.root_device().memshare("t5182_sharedram")->ptr());
+}
+
 READ8_HANDLER(t5182_sharedram_r)
 {
 	return t5182_sharedram[offset];
@@ -298,7 +303,7 @@ const ym2151_interface t5182_ym2151_interface =
 ADDRESS_MAP_START( t5182_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM	// internal ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM	AM_MIRROR(0x1800) // internal RAM
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_BASE_LEGACY(&t5182_sharedram) // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
+	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_MIRROR(0x3F00) AM_SHARE("t5182_sharedram") // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
 	AM_RANGE(0x8000, 0xffff) AM_ROM	// external ROM
 ADDRESS_MAP_END
 

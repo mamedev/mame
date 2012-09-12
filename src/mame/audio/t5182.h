@@ -5,6 +5,8 @@
 #define CPUTAG_T5182 "t5182"
 #define T5182COINPORT "T5182_COIN"
 
+void t5182_init(running_machine &machine);
+
 ADDRESS_MAP_EXTERN( t5182_map, 8 );
 ADDRESS_MAP_EXTERN( t5182_io, 8 );
 

@@ -672,7 +672,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200010, 0x200013) AM_READ(randomtmmjprds) // gfx chip status?
 	/* check these are used .. */
-//  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs0 )
+//  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs0")
 	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
 	AM_RANGE(0x200120, 0x200137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
 	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
@@ -681,12 +681,12 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE_LEGACY(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
 	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
     AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
-//  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs7 )
-//  AM_RANGE(0x200700, 0x20070f) AM_WRITE(tmmjprd_blitter_w) AM_BASE_LEGACY(&tmmjprd_blitterregs )
-//  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs9 ) // never changes?
+//  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs7")
+//  AM_RANGE(0x200700, 0x20070f) AM_WRITE(tmmjprd_blitter_w) AM_SHARE("tmmjprd_blitterregs")
+//  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs9") // never changes?
 	AM_RANGE(0x200900, 0x2009ff) AM_DEVREADWRITE16("i5000snd", i5000snd_device, read, write, 0xffffffff)
 	/* hmm */
-//  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs10 )
+//  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs10")
 	/* tilemaps */
 	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(tmmjprd_tilemap0_r,tmmjprd_tilemap0_w)
 	AM_RANGE(0x284000, 0x287fff) AM_READWRITE(tmmjprd_tilemap1_r,tmmjprd_tilemap1_w)

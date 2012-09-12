@@ -250,6 +250,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(mustache_state,mustache)
 {
+	t5182_init(machine());
+
 	int i;
 
 	int G1 = machine().root_device().memregion("gfx1")->bytes()/3;

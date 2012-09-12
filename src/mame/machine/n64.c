@@ -2404,6 +2404,12 @@ static void n64_machine_stop(running_machine &machine)
 
 MACHINE_START( n64 )
 {
+	n64_state *state = machine.driver_data<n64_state>();
+	rdram = reinterpret_cast<UINT32 *>(state->memshare("rdram")->ptr());
+	n64_sram = reinterpret_cast<UINT32 *>(state->memshare("sram")->ptr());
+	rsp_imem = reinterpret_cast<UINT32 *>(state->memshare("rsp_imem")->ptr());
+	rsp_dmem = reinterpret_cast<UINT32 *>(state->memshare("rsp_dmem")->ptr());
+
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */

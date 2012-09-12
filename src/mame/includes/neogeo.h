@@ -36,11 +36,12 @@ class neogeo_state : public driver_device
 {
 public:
 	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_save_ram(*this, "save_ram") { }
 
 	/* memory pointers */
 //  UINT8      *memcard_data;   // this currently uses generic handlers
-//  UINT16     *save_ram;       // this currently uses generic handlers
+	required_shared_ptr<UINT16> m_save_ram;       // this currently uses generic handlers
 
 	/* video-related */
 	UINT8      *m_sprite_gfx;

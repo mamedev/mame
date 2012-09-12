@@ -280,8 +280,8 @@ static READ32_HANDLER( ddp2_speedup_r )
 
 static READ16_HANDLER( ddp2_main_speedup_r )
 {
-
-	UINT16 data = pgm_mainram[0x0ee54/2];
+	pgm_state *state = space->machine().driver_data<pgm_state>();
+	UINT16 data = state->m_mainram[0x0ee54/2];
 	int pc = space->device().safe_pc();
 
 	if (pc == 0x149dce) space->device().execute().spin_until_interrupt();

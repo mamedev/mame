@@ -185,10 +185,11 @@ static WRITE16_HANDLER( olds_w )
 
 static READ16_HANDLER( olds_prot_swap_r )
 {
+	pgm_state *state = space->machine().driver_data<pgm_state>();
 	if (space->device().safe_pc() < 0x100000)		//bios
-		return pgm_mainram[0x178f4 / 2];
+		return state->m_mainram[0x178f4 / 2];
 	else						//game
-		return pgm_mainram[0x178d8 / 2];
+		return state->m_mainram[0x178d8 / 2];
 
 }
 

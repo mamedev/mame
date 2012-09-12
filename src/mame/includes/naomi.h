@@ -25,8 +25,6 @@ extern void naomi_game_decrypt(running_machine& machine, UINT64 key, UINT8* regi
 
 
 
-extern UINT64 *naomi_ram64;
-
 extern int jvsboard_type;
 extern UINT16 actel_id;
 

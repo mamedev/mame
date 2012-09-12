@@ -191,9 +191,6 @@ Notes:
 #include "includes/pgm.h"
 
 
-UINT16 *pgm_mainram;
-
-
 READ16_MEMBER(pgm_state::pgm_videoram_r)
 {
 
@@ -320,7 +317,7 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE_LEGACY(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_SHARE("sram") /* Main Ram */
 
 	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE(pgm_videoram_r, pgm_videoram_w) AM_SHARE("videoram") /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")

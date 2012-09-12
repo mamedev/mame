@@ -1213,7 +1213,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_SHARE("k053936_0_ctrl")
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
-	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
+	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_SHARE("psac2_bank")
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_SHARE("k053936_0_line")
 	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram")	// main monitor palette
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_SHARE("subpaletteram")
