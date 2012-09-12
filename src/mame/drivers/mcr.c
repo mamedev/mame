@@ -465,6 +465,11 @@ WRITE8_MEMBER(mcr_state::dpoker_p34_w)
 	dpoker_output_34 = data;
 }
 
+WRITE8_MEMBER(mcr_state::dpoker_p3c_w)
+{
+	// meters?
+}
+
 
 
 /*************************************
@@ -2792,13 +2797,18 @@ DRIVER_INIT_MEMBER(mcr_state,dpoker)
 
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_state::dpoker_ip0_r),this));
 
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, "P24");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, "P28");
-	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, "P2C");
+	// meter ram, is it battery backed?
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x8000, 0x81ff, 0, 0x0200);
 
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_state::dpoker_p2c_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_p30_w),this));
-	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_p34_w),this));
+	// extra I/O
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x24, 0x24, 0, 0x03, "P24");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x28, 0x28, 0, 0x03, "P28");
+	machine().device("maincpu")->memory().space(AS_IO)->install_read_port(0x2c, 0x2c, 0, 0x03, "P2C");
+
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2c, 0x2c, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p2c_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x30, 0x30, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p30_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x34, 0x34, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p34_w),this));
+	machine().device("maincpu")->memory().space(AS_IO)->install_write_handler(0x3c, 0x3c, 0, 0x03, write8_delegate(FUNC(mcr_state::dpoker_p3c_w),this));
 	
 	dpoker_coin_status = 0;
 	dpoker_output_34 = 0;
