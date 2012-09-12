@@ -7,6 +7,7 @@
     Games supported:
         * Solar Fox
         * Kick
+        * Draw Poker
         * Satan's Hollow
         * Tron
         * Kozmik Krooz'r
@@ -19,7 +20,6 @@
         * Discs of Tron (Squawk n' Talk)
         * NFL Football (Squawk n' Talk + laserdisk)
         * Demolition Derby (Turbo Chip Squeak)
-        * Draw Poker
 
 ****************************************************************************
 
@@ -287,6 +287,8 @@
 #include "machine/nvram.h"
 #include "includes/mcr.h"
 
+#include "dpoker.lh"
+
 
 static UINT8 input_mux;
 static UINT8 last_op4;
@@ -426,12 +428,12 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 
 WRITE8_MEMBER(mcr_state::dpoker_lamps1_w)
 {
-	// cpanel button lamps
-	output_set_lamp_value(0, data >> 0 & 1); // hold 0
-	output_set_lamp_value(1, data >> 4 & 1); // hold 1
-	output_set_lamp_value(2, data >> 5 & 1); // hold 2
-	output_set_lamp_value(3, data >> 6 & 1); // hold 3
-	output_set_lamp_value(4, data >> 7 & 1); // hold 4
+	// cpanel button lamps (white)
+	output_set_lamp_value(0, data >> 0 & 1); // hold 1
+	output_set_lamp_value(1, data >> 4 & 1); // hold 2
+	output_set_lamp_value(2, data >> 5 & 1); // hold 3
+	output_set_lamp_value(3, data >> 6 & 1); // hold 4
+	output_set_lamp_value(4, data >> 7 & 1); // hold 5
 	output_set_lamp_value(5, data >> 1 & 1); // deal
 	output_set_lamp_value(6, data >> 2 & 1); // cancel
 	output_set_lamp_value(7, data >> 3 & 1); // stand
@@ -440,7 +442,7 @@ WRITE8_MEMBER(mcr_state::dpoker_lamps1_w)
 WRITE8_MEMBER(mcr_state::dpoker_lamps2_w)
 {
 	// d5: button lamp: service or change
-	output_set_lamp_value(8, data >> 1 & 1);
+	output_set_lamp_value(8, data >> 5 & 1);
 	
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
@@ -2082,10 +2084,10 @@ ROM_START( dpoker )
 	// The sound board was missing in this pcb set, we'll use the roms from Kick as placeholder.
 	// Funnily enough, according to a cabinet recording, the sound is actually very similar to Kickman.
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "4200-a.a7",    0x0000, 0x1000, BAD_DUMP CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
-	ROM_LOAD( "4300-b.a8",    0x1000, 0x1000, BAD_DUMP CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
-	ROM_LOAD( "4400-c.a9",    0x2000, 0x1000, BAD_DUMP CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
-	ROM_LOAD( "4500-d.a10",   0x3000, 0x1000, BAD_DUMP CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
+	ROM_LOAD( "vssp.a7",      0x0000, 0x1000, BAD_DUMP CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
+	ROM_LOAD( "vssp.a8",      0x1000, 0x1000, BAD_DUMP CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
+	ROM_LOAD( "vssp.a9",      0x2000, 0x1000, BAD_DUMP CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
+	ROM_LOAD( "vssp.a10",     0x3000, 0x1000, BAD_DUMP CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
 
     ROM_REGION( 0x02000, "gfx1", 0 )
     ROM_LOAD( "vpbg.g4",      0x0000, 0x1000, CRC(9fe9aad8) SHA1(f9174bcce3886548b8c18c5a06995d5c69ce5486) )
@@ -2918,7 +2920,7 @@ GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state, solarfox,  R
 GAME( 1981, kick,     0,        mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickman,  kick,     mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickc,    kick,     mcr_90009,     kickc, mcr_state,    kick,      ROT90,                      "Midway", "Kick (cocktail)", GAME_SUPPORTS_SAVE )
-GAME( 1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dpoker )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", GAME_SUPPORTS_SAVE )

@@ -2079,7 +2079,7 @@ $(DRIVERS)/jpmimpct.o:	$(LAYOUT)/awpvid16.lh
 
 $(DRIVERS)/jpmsys5.o:	$(LAYOUT)/awpvid16.lh
 
-$(DRIVERS)/kas89.o:	$(LAYOUT)/kas89.lh
+$(DRIVERS)/kas89.o:		$(LAYOUT)/kas89.lh
 
 $(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
 
@@ -2098,7 +2098,9 @@ $(DRIVERS)/majorpkr.o:	$(LAYOUT)/majorpkr.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
-$(DRIVERS)/mcr3.o:	$(LAYOUT)/turbotag.lh
+$(DRIVERS)/mcr.o:		$(LAYOUT)/dpoker.lh
+
+$(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
 
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 
@@ -2112,10 +2114,10 @@ $(DRIVERS)/mpu4hw.o:	$(LAYOUT)/mpu4.lh \
 $(DRIVERS)/mpu4vid.o:	$(LAYOUT)/crmaze2p.lh \
 			$(LAYOUT)/crmaze4p.lh
 
-$(DRIVERS)/mpu4plasma.o: $(LAYOUT)/mpu4plasma.lh \
+$(DRIVERS)/mpu4plasma.o:	$(LAYOUT)/mpu4plasma.lh \
 
 
-$(DRIVERS)/mw18w.o:	$(LAYOUT)/18w.lh
+$(DRIVERS)/mw18w.o:		$(LAYOUT)/18w.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/clowns.lh \
