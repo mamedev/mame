@@ -43,7 +43,6 @@
 
 #include "emu.h"
 #include "pc_vga.h"
-#include "video/isa_vga_ati.h"
 #include "machine/eeprom.h"
 #include "debugger.h"
 
