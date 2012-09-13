@@ -2630,11 +2630,11 @@ static WRITE16_HANDLER( generic_cop_w )
 				//  return;
 
 				address = (cop_dma_src[cop_dma_trigger] << 6);
-				length = ((cop_dma_size[cop_dma_trigger]+1) << 5);
+				length = ((cop_dma_size[cop_dma_trigger]+1) << 4);
 
-				for (i=address;i<address+length;i+=2)
+				for (i=address;i<address+length;i+=4)
 				{
-					space->write_word(i, fill_val);
+					space->write_dword(i, fill_val);
 				}
 
 				return;
