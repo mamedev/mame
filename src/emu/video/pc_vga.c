@@ -94,7 +94,7 @@ static struct
 /**/	UINT8 vert_retrace_end;
 /**/	UINT16 vert_blank_start;
 		UINT16 line_compare;
-/**/	UINT16 cursor_addr;
+/**/	UINT32 cursor_addr;
 /**/	UINT8 byte_panning;
 /**/	UINT8 preset_row_scan;
 		UINT8 scan_doubling;
@@ -4993,6 +4993,10 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 		ati.ext_reg[ati.ext_reg_select] = data;
 		switch(ati.ext_reg_select)
 		{
+		case 0x23:
+			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffdffff) | ((data & 0x10) << 13);
+			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffdffff) | ((data & 0x08) << 14);
+			break;
 		case 0x2d:
 			if(data & 0x08)
 			{
@@ -5001,6 +5005,10 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 				// bit 2 = bit 8 of horizontal retrace start
 				logerror("ATI: ATI2D (extensions) write %02x\n",data);
 			}
+			break;
+		case 0x30:
+			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x40) << 10);
+			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
 			break;
 		case 0x32:  // memory page select
 			svga.bank_r = ((data & 0x01) << 3) | ((data & 0xe0) >> 5);
