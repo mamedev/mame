@@ -20,6 +20,7 @@ The name "Seibu CRTC" is actually an agglomerate of all the Seibu Customs that a
 single boards, most if not all of them are shared video chips in the aforementioned games.
 
 TODO:
+- Needs a full device rewrite
 - Dynamic Resolution Change (xx10 register?)
 - Dynamic Paging register probably incorrect,needs further investigation;
 - Merge the aforementioned games and clean-up the code in these drivers;
@@ -99,22 +100,22 @@ UINT16 seibucrtc_sc0bank;
 /************************************
 * 0x24 - Screen 1 (FG) scroll x
 ************************************/
-#define SEIBU_CRTC_SC1_SX	(seibucrtc_vregs[0x0024/2])
+#define SEIBU_CRTC_SC1_SX	(seibucrtc_vregs[0x0028/2])
 
 /************************************
 * 0x26 - Screen 1 (FG) scroll y
 ************************************/
-#define SEIBU_CRTC_SC1_SY	(seibucrtc_vregs[0x0026/2])
+#define SEIBU_CRTC_SC1_SY	(seibucrtc_vregs[0x002a/2])
 
 /************************************
 * 0x28 - Screen 2 (MD) scroll x
 ************************************/
-#define SEIBU_CRTC_SC2_SX	(seibucrtc_vregs[0x0028/2])
+#define SEIBU_CRTC_SC2_SX	(seibucrtc_vregs[0x0024/2])
 
 /************************************
 * 0x2a - Screen 2 (MD) scroll y
 ************************************/
-#define SEIBU_CRTC_SC2_SY	(seibucrtc_vregs[0x002a/2])
+#define SEIBU_CRTC_SC2_SY	(seibucrtc_vregs[0x0026/2])
 
 /************************************
 * 0x2c - Fix screen scroll x (global)

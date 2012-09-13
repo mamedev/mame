@@ -28,11 +28,11 @@ Sound:  Z80-A
         M6295
 OSC:    14.31818MHz
         16.000MHz
-Chips:  SEI0100
+Chips:  SEI0100 (YM3931, main/sub cpu interface)
         SEI0160
-        SEI0200
+        SEI0200 (tilemap chip)
         SEI0210
-        SEI0220
+        SEI0220 (sprite chip)
 
 
 MAH1-1-1.915  samples
@@ -78,28 +78,31 @@ public:
 /* Multiplexer device for the mahjong panel */
 READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 {
-	switch(m_sengokumj_mux_data)
+	const char *const mpnames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "UNUSED" };
+	int i;
+	UINT16 res = 0xffff;
+
+	for(i=0;i<5;i++)
 	{
-		case 0x0100: return ioport("KEY0")->read();
-		case 0x0200: return ioport("KEY1")->read();
-		case 0x0400: return ioport("KEY2")->read();
-		case 0x0800: return ioport("KEY3")->read();
-		case 0x1000: return ioport("KEY4")->read();
-		case 0x2000: return ioport("UNUSED")->read();
+		if(m_sengokumj_mux_data & 1 << i)
+			res = ioport(mpnames[i])->read();
 	}
 
-	return 0xffff;
+	return res;
 }
 
 WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
 {
-	m_sengokumj_mux_data = data;
+	m_sengokumj_mux_data = (data & 0x3f00) >> 8;
+
+	if(data & 0xc0ff)
+		logerror("Write to mux %04x\n",data);
 }
 
 WRITE16_MEMBER(sengokmj_state::sengokmj_out_w)
 {
 	/* ---- ---- ---x ---- J.P. Signal (?)*/
-	/* ---- ---- ---- -x-- Coin counter (done AFTER that you press start)*/
+	/* ---- ---- ---- -x-- Coin counter (done AFTER you press start)*/
 	/* ---- ---- ---- --x- Cash enable (lockout)*/
 	/* ---- ---- ---- ---x Hopper 10 */
 	coin_lockout_w(machine(), 0,~data & 2);
