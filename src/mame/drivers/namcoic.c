@@ -888,7 +888,7 @@ void namcos2_shared_state::c355_obj_init(int gfxbank, int pal_xor, c355_obj_code
 	else
 		m_c355_obj_code2tile = c355_obj_code2tile_delegate(FUNC(namcos2_shared_state::c355_obj_default_code2tile), this);
 
-	memset(&m_c355_obj_ram[0], 0, memshare("objram")->bytes()); // needed for Nebulas Ray
+	memset(m_c355_obj_ram, 0, sizeof(m_c355_obj_ram)); // needed for Nebulas Ray
 	memset(m_c355_obj_position, 0, sizeof(m_c355_obj_position));
 }
 

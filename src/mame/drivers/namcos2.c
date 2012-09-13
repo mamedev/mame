@@ -654,7 +654,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_sgunner_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) AM_SHARE("objram")
+	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
 	AM_RANGE(0x818000, 0x818001) AM_WRITENOP
 	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE_LEGACY(namcos2_68k_key_r,namcos2_68k_key_w)
 	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
@@ -703,7 +703,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( common_luckywld_am, AS_PROGRAM, 16, namcos2_state )
-	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) AM_SHARE("objram")
+	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
 	AM_RANGE(0x818000, 0x818001) AM_NOP /* enable? */
 	AM_RANGE(0x81a000, 0x81a001) AM_WRITENOP /* enable? */
 	AM_RANGE(0x840000, 0x840001) AM_READNOP

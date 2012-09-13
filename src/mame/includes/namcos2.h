@@ -98,7 +98,6 @@ public:
 		  m_c169_roz_videoram(*this, "rozvideoram", 0),
 		  m_c169_roz_gfxbank(0),
 		  m_c169_roz_mask(NULL),
-		  m_c355_obj_ram(*this, "objram", 0),
 		  m_c355_obj_gfxbank(0),
 		  m_c355_obj_palxor(0)
 	{ }
@@ -168,11 +167,11 @@ protected:
 	template<class _BitmapClass>
 	void c355_obj_draw_list(_BitmapClass &bitmap, const rectangle &cliprect, int pri, const UINT16 *pSpriteList16, const UINT16 *pSpriteTable);
 
-	optional_shared_ptr<UINT16> m_c355_obj_ram;
 	c355_obj_code2tile_delegate m_c355_obj_code2tile;
 	int m_c355_obj_gfxbank;
 	int m_c355_obj_palxor;
 	UINT16 m_c355_obj_position[4];
+	UINT16 m_c355_obj_ram[0x20000/2];
 
 public:
 	// general
