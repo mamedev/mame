@@ -22,8 +22,8 @@ static READ32_HANDLER( dd_null_r )
 static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("rdram")					// RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("imem")					// RSP IMEM
+	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")					// RSP DMEM
+	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")					// RSP IMEM
 	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
 	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
 	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
@@ -42,8 +42,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("rdram")				// RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("imem")					// RSP IMEM
+	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")					// RSP DMEM
+	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")					// RSP IMEM
 	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
 	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
 	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
@@ -61,10 +61,10 @@ static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_state )
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("dmem")
-	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("imem")
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem") AM_SHARE("dmem")
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem") AM_SHARE("imem")
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("rsp_dmem")
+	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("rsp_imem")
+	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")
+	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( n64 )
@@ -215,7 +215,8 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 		//printf("Loading\n");
 		UINT8 data[0x30800];
 		battery_image->battery_load(data, 0x30800, 0x00);
-		memcpy(n64_sram, data, 0x20000);
+		//memcpy(n64_sram, data, 0x20000);
+		memcpy(image.device().machine().root_device().memshare("sram")->ptr(), data, 0x20000);
 		memcpy(periphs->m_save_data.eeprom, data + 0x20000, 0x800);
 		memcpy(periphs->m_save_data.mempak[0], data + 0x20800, 0x8000);
 		memcpy(periphs->m_save_data.mempak[1], data + 0x28800, 0x8000);
