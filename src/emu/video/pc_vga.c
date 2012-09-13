@@ -5011,9 +5011,17 @@ WRITE8_DEVICE_HANDLER(ati_port_ext_w)
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
 			break;
 		case 0x32:  // memory page select
-			svga.bank_r = ((data & 0x01) << 3) | ((data & 0xe0) >> 5);
-			svga.bank_w = ((data & 0x1e) >> 1);
-			//logerror("ATI: Memory Page Select write %02x\n",data);
+			if(ati.ext_reg[0x3e] & 0x08)
+			{
+				svga.bank_r = ((data & 0x01) << 3) | ((data & 0xe0) >> 5);
+				svga.bank_w = ((data & 0x1e) >> 1);
+			}
+			else
+			{
+				svga.bank_r = ((data & 0x1e) >> 1);
+				svga.bank_w = ((data & 0x1e) >> 1);
+			}
+			logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
 			if(data & 0x04)
