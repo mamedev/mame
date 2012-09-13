@@ -381,6 +381,7 @@ void cdp1869_device::device_start()
 
 	// initialize palette
 	initialize_palette();
+	m_bkg = 0;
 
 	// create sound stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
@@ -940,7 +941,7 @@ UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 
 	outer &= cliprect;
-	bitmap.fill(m_bkg, outer);
+	bitmap.fill(m_palette[m_bkg], outer);
 
 	if (!m_dispoff)
 	{
